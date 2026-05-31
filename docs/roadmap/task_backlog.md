@@ -8,7 +8,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- | --- |
 | App-0 | Repo baseline/source-of-truth sync | Master plan and roadmap files | DONE locally: Git initialized/repaired on `main`, safe metadata exists, local baseline commit `25ef64d` exists; TODO: push safe baseline to GitHub |
 | App-1 | Architecture audit | `docs/roadmap/app_mvp_architecture_audit.md` | DONE; routes, storage, model path, UI gaps, tests, Story Check, NCP, and OMI readiness captured |
-| App-2 | Project file model | Local project schema | Project identity, bible, storyform, scenes, and owner memory separated |
+| App-2 | Project file model | `docs/roadmap/project_file_model.md` | DONE; project identity, bible, storyform, scenes, analysis artifacts, OMI candidates, provenance, and owner-approved truth boundaries separated |
 | App-3 | NCP compatibility subset | MVP NCP subset | OS/MC/IC/RS fields validated without overclaiming |
 | App-3a | OMI MVP design schema | Schema/lifecycle spec | OMI is bounded to analysis-only candidate planning with owner decision, destination, provenance, and status |
 | App-4 | Scene editor hardening | Reliable save/load UX | No scene data loss in normal local workflow |
@@ -34,7 +34,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase | Scope | Status |
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
-| Phase 1 | App architecture audit and project model decisions | TODO |
+| Phase 1 | App architecture audit and project model decisions | IN PROGRESS; App-1 architecture audit and App-2 project file model done; App-3/App-3a/sample alignment remain TODO |
 | Phase 2 | Backend safety and schema foundation | TODO |
 | Phase 3 | Mock and baseline Story Check | TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |

@@ -14,6 +14,7 @@
 - Inputs: current FastAPI/React/Ollama app, NCP schema, sample project, OMI product boundary.
 - Outputs: architecture audit report, source-of-truth cleanup, NCP/storyform MVP subset, project storage model, OMI MVP design schema, sample project alignment decision.
 - Status note: App-1 architecture audit completed in `docs/roadmap/app_mvp_architecture_audit.md`.
+- Status note: App-2 project file model completed in `docs/roadmap/project_file_model.md`.
 - Exit: core app gaps and project truth/candidate storage boundaries are documented.
 
 ### Phase 2: Backend Safety and Schema Foundation

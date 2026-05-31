@@ -35,3 +35,11 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 8. Revise or create a RunPod cloud smoke config before smoke training.
 9. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
 10. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
+
+## Project Model Owner Questions
+
+1. Should `project_id` remain filesystem-oriented, with display title fully separate from `project_id`?
+2. Should `owner_memory.json` be included in MVP, or deferred until after Story Check and OMI basics?
+3. Should analysis artifacts be saved automatically after every Story Check, or only when the owner chooses to save them?
+4. Should OMI candidates live inside each project, or can there be a global idea inbox later?
+5. For the aligned sample project, should we use owner-created material or public-domain material?

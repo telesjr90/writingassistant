@@ -169,6 +169,8 @@ tests/
 
 Local project storage should preserve source text, owner-approved story truth, candidate model observations, and promotion state separately. A candidate analysis may be saved for review, but it must not overwrite owner-approved truth without explicit owner action.
 
+App-2 project file model status: `docs/roadmap/project_file_model.md` defines the target MVP project structure and separates owner-approved truth, Story Check analysis artifacts, OMI candidates, NotebookLM candidates, and retrieved reference definitions. It is a design spec only; no runtime migration or project file changes have been performed.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -234,7 +236,7 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | App-0 plan/source-of-truth | Establish this plan as the execution source. | `docs/plan.md`, current repo state. | `docs/master_plan.md`, roadmap docs. | Plan files exist and reflect verified state. | Markdown review, pytest. | None. | docs |
 | App-1 architecture audit | Confirm runtime paths and gaps. | Backend/frontend/tests. | Audit notes or issues. | Routes, storage, model path, and UI surfaces documented. | `python -m pytest tests -q`. | None. | app, docs |
-| App-2 project file model | Define durable local project schema. | Current `projects/example`, NCP schema. | `project.json`, storage spec, migration plan. | Elena/Ember mismatch resolved or isolated. | Project manager tests. | Product naming/sample decision. | storage |
+| App-2 project file model | Define durable local project schema. | Current `projects/example`, NCP schema. | `project.json`, storage spec, migration plan. | Elena/Ember mismatch documented and isolated for separate sample-alignment work. | Project manager tests. | Product naming/sample decision. | storage |
 | App-3 NCP compatibility subset | Decide supported NCP fields for MVP. | `docs/repo_knowledge.md`, `storyform.py`. | MVP storyform subset spec. | Required OS/MC/IC/RS fields validated. | Storyform fixture tests. | NCP subset decision. | ncp |
 | App-4 scene editor hardening | Make editor reliable for repeated local use. | React editor state. | Save/load UX, dirty state, errors. | No data loss on save/load. | Frontend manual smoke. | Project model. | frontend |
 | App-5 bible/storyform read/write layer | Add editable context storage safely. | Backend project manager, frontend context. | APIs and UI for context read/write. | Owner-approved truth stays distinct from candidates. | Backend tests. | Project model. | backend, storage |
