@@ -175,6 +175,8 @@ Local project storage should preserve source text, owner-approved story truth, c
 
 App-2 project file model status: `docs/roadmap/project_file_model.md` defines the target MVP project structure and separates owner-approved truth, Story Check analysis artifacts, OMI candidates, NotebookLM candidates, and retrieved reference definitions. It is a design spec only; no runtime migration or project file changes have been performed.
 
+App-3 NCP compatibility subset status: `docs/roadmap/ncp_compatibility_subset.md` defines the App MVP storyform/NCP subset for Story Check and future OMI use. It is a design spec only; no runtime storyform parser, API, frontend, or project-file migration changes have been performed.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -267,7 +269,7 @@ MVP completion requires:
 
 ### Phase 1 - App architecture audit and project model decisions
 
-- Status: App-1 architecture audit and App-2 project file model are complete. App-3 NCP compatibility subset is next, followed by OMI-001 schema/lifecycle and sample project alignment work.
+- Status: App-1 architecture audit, App-2 project file model, and App-3 NCP compatibility subset are complete as documentation/specification artifacts. App-3a / OMI-001 schema/lifecycle is next, followed by sample project alignment work.
 - Architecture audit report.
 - Source-of-truth cleanup.
 - NCP/storyform MVP subset.

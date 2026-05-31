@@ -43,3 +43,9 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 3. Should analysis artifacts be saved automatically after every Story Check, or only when the owner chooses to save them?
 4. Should OMI candidates live inside each project, or can there be a global idea inbox later?
 5. For the aligned sample project, should we use owner-created material or public-domain material?
+
+## NCP/Storyform Owner Questions
+
+1. Which canonical throughline labels should the UI show: Overall Story or Objective Story?
+2. Should unknown NCP fields be hidden from the MVP UI or shown as advanced raw context?
+3. Should OMI propose candidate storyform slots, or only ask diagnostic questions until the owner fills them?

@@ -19,3 +19,5 @@
 | R15 | OMI accidentally becomes prose generation | High | Medium | Apply no-prose guard; OMI must not write, rewrite, continue, imitate, polish, or improve story prose | Active |
 | R16 | OMI promotion mutates bible/storyform without owner approval | High | Medium | Require explicit owner decision, destination, provenance, status, and final promotion action | Active |
 | R17 | OMI scope creep delays core Story Check MVP | Medium | Medium | Phase OMI implementation after backend guardrails/schema foundation and keep design-first slice bounded | Active |
+| R18 | Schema-valid NCP data mistaken for verified story truth | High | Medium | Separate JSON Schema validation from semantic certainty; require owner-approved context and insufficient-evidence reporting | Active |
+| R19 | Generic relationship or theme language becomes false RS/Issue proof | High | Medium | Keep RS/Issue/CIPS/dynamics claims owner-gated and evidence-grounded; preserve unresolved fields rather than guessing | Active |
