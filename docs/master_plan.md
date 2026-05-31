@@ -8,7 +8,7 @@ The product is analysis-only. It must never write, rewrite, continue, imitate, o
 
 Current app architecture is FastAPI plus React with local Ollama inference. The current baseline model is `qwen3:8b` through `backend/analysis_engine.py -> Ollama -> qwen3:8b`. The future model target is `dramatica-analyst:8b` through the same app path after a non-smoke fine-tune passes evaluation.
 
-The MVP goal is a usable local app that can create/load a project, edit and save scenes, store bible/storyform context, run Story Check, and show normalized analysis results. Fine-tuning is a separate track. The MVP does not require a fine-tuned model.
+The MVP goal is a usable local app that can create/load a project, edit and save scenes, store bible/storyform context, run Story Check, show normalized analysis results, and support a bounded Organize My Idea (OMI) planning workflow. Fine-tuning is a separate track. The MVP does not require a fine-tuned model.
 
 ## 2. Product Boundaries
 
@@ -47,8 +47,12 @@ Inspected workspace: `/home/tjrpirateking/projects/WritingAssistantApplication`.
 
 Repo/Git:
 
-- `git status --short --branch` fails with `fatal: not a git repository`.
-- The workspace should be treated as not initialized as a valid Git repository.
+- Git has been initialized/repaired in this workspace.
+- Current branch: `main`.
+- Remote: `origin https://github.com/telesjr90/writingassistant`.
+- First safe local baseline commit exists: `25ef64d chore: initialize safe project baseline`.
+- No push has been performed yet. The next repository step is to push the safe baseline to GitHub.
+- Safe repository metadata now exists: `.gitignore`, `README.md`, `LICENSE`, `.env.example`, `backend/requirements.txt`, `training/reports/git_setup_report.md`, and `training/reports/pre_commit_safety_audit_report.md`.
 
 Backend:
 
@@ -88,7 +92,7 @@ Setup/config status:
 - Cloud/local profiles also exist: `cloud_qwen25_7b_2048_main.yaml`, `cloud_qwen25_7b_4096_storycheck.yaml`, and `runpod_a6000_cloud.yaml`.
 - `training/reports/plan_md_update_report.md` is not present in this workspace despite prior task context.
 - `training/reports/phase_2_3_integration_status.md` is not present.
-- A root Python dependency file such as `requirements.txt` or `pyproject.toml` was not found in the inspected file list.
+- `backend/requirements.txt` exists as the simple backend dependency manifest. It is intentionally separate from `training/requirements-unsloth.txt` and may still need future validation as implementation evolves.
 
 Dataset/training:
 
@@ -111,11 +115,11 @@ Accepted constraints:
 - Canonical repository name: `telesjr90/writingassistant`.
 - Product working name: Dramatica-Informed Writing Assistant.
 - License boundary: MIT for app source code only. Training data, book sources, packet evidence, model artifacts, and datasets are excluded pending separate provenance/license review.
-- Git timing: initialize or repair local Git later as the next setup task. Do not treat this documentation update as Git initialization.
-- Python dependency strategy: use simple requirements files now, with backend requirements separate from `training/requirements-unsloth.txt`. Revisit `pyproject.toml`/`uv` later.
+- Git setup: local Git is initialized/repaired on `main`, `origin` points to `https://github.com/telesjr90/writingassistant`, and the first safe local baseline commit is `25ef64d chore: initialize safe project baseline`. Pushing that baseline to GitHub remains TODO.
+- Python dependency strategy: use simple requirements files now. `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`; revisit `pyproject.toml`/`uv` later if the implementation needs it.
 - Node target: `>=22.12.0 <23`. Package metadata changes are deferred.
 - Example fixture: replace the Elena/Ember Crown mismatch later with one clean aligned fixture, preferably public-domain or owner-created.
-- OMI is design-only. Minimum schema fields are raw idea, candidates, owner decision, destination, provenance, and status.
+- OMI is part of the App MVP, but bounded to analysis/planning only. It must not generate story prose, continue a story, rewrite text, or silently promote ideas/model output/NotebookLM output into durable project truth. Minimum design fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`.
 - Durable memory promotion requires explicit owner approval, destination choice, attached evidence/provenance, and final confirmation.
 - No-prose enforcement must run before model call and after model output.
 - Mock mode should return deterministic fixture JSON for `story_check`, `throughline_classification`, `writer_questions`, and `out_of_scope_refusal`.
@@ -128,11 +132,11 @@ Accepted constraints:
 
 Remaining setup/verification tasks:
 
-- Initialize or repair Git and add safe repo metadata files.
-- Add backend requirements without changing `training/requirements-unsloth.txt`.
+- Push the safe local baseline commit to GitHub.
+- Keep backend requirements validated as runtime dependencies evolve, without merging them into `training/requirements-unsloth.txt`.
 - Declare the Node target in package metadata.
 - Replace the sample fixture.
-- Draft OMI schema documentation without implementing OMI endpoints.
+- Define the OMI MVP schema and lifecycle before runtime implementation. Do not assume OMI endpoints currently exist.
 - Run Book 1-3 cross-book coverage review before deciding whether Books 4-5 are needed.
 
 ## 5. Architecture Target
@@ -225,8 +229,93 @@ The MVP includes:
 - Mock mode.
 - qwen3/Ollama baseline mode.
 - Evaluation fixtures.
+- Organize My Idea (OMI) as an owner-controlled planning feature.
+
+OMI MVP boundary:
+
+- OMI is analysis/planning only.
+- OMI must not generate story prose.
+- OMI must not continue, rewrite, imitate, polish, or improve story text.
+- OMI must not silently promote raw ideas, candidates, model output, or NotebookLM output into durable project truth.
+- OMI outputs remain candidate planning material until the owner explicitly approves destination and promotion.
+- OMI must track `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`.
+- Suggested statuses are `draft`, `candidate`, `owner_review`, `approved`, `rejected`, `promoted`, and `archived`.
+- Suggested destinations are `planning_notes`, `project_bible_candidate`, `storyform_context_candidate`, `scene_prompt_context_candidate`, `template_starter_candidate`, and `discard`.
+- These fields, statuses, and destinations are design targets until implementation tasks create storage, API, and UI surfaces.
 
 The MVP does not require a fine-tuned model.
+
+MVP completion requires:
+
+- Story Check works in deterministic mock mode.
+- Story Check works in qwen3/Ollama baseline mode.
+- Runtime no-prose guardrails protect Story Check and OMI-relevant request paths.
+- OMI can capture a raw idea.
+- OMI can create or display structured candidate planning material without generating story prose.
+- OMI can track owner decision, destination, provenance, and status.
+- OMI cannot promote output into bible, storyform, planning notes, or other durable project truth without explicit owner approval.
+
+## 6.1 App MVP Phases
+
+### Phase 0 - Repo baseline and source-of-truth sync
+
+- DONE: Git initialized/repaired.
+- DONE: safe metadata created.
+- DONE: first safe local baseline commit created: `25ef64d chore: initialize safe project baseline`.
+- TODO: push safe baseline to GitHub.
+- TODO: keep master plan and roadmap synced after status changes.
+
+### Phase 1 - App architecture audit and project model decisions
+
+- Status: App-1 architecture audit and App-2 project file model are complete. App-3 NCP compatibility subset is next, followed by OMI-001 schema/lifecycle and sample project alignment work.
+- Architecture audit report.
+- Source-of-truth cleanup.
+- NCP/storyform MVP subset.
+- Project storage model.
+- OMI MVP design schema.
+- Sample project alignment decision.
+
+### Phase 2 - Backend safety and schema foundation
+
+- Runtime no-prose guardrails.
+- Refusal response schema.
+- Story Check normalizer.
+- Minimal-to-rich compatibility.
+- Insufficient-evidence handling.
+- Analysis mode config.
+
+### Phase 3 - Mock and baseline Story Check
+
+- Mock analysis mode.
+- Story Check route tests.
+- Ollama baseline mode.
+- qwen3 baseline verification.
+- Evaluation fixtures.
+
+### Phase 4 - Frontend MVP diagnostics
+
+- Rich diagnostics sidebar.
+- Mock/baseline mode visibility.
+- Error and malformed-output display.
+- Scene editor dirty-state handling.
+- Empty scene behavior.
+
+### Phase 5 - OMI MVP implementation
+
+- OMI storage design.
+- OMI candidate lifecycle.
+- OMI owner decision flow.
+- OMI destination handling.
+- OMI provenance/status display.
+- OMI must not write story prose or mutate owner-approved truth automatically.
+
+### Phase 6 - MVP hardening
+
+- Project navigation reliability.
+- Save/reload testing.
+- App smoke tests.
+- Documentation cleanup.
+- Manual local run checklist.
 
 ## 7. Training-Independent App Roadmap
 
@@ -248,6 +337,13 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | App-11 Story Check sidebar UI | Render rich diagnostics. | `AnalysisSidebar.jsx`, schema. | Throughline, drift, consistency, warnings, questions. | All schema fields visible without prose drafting. | Browser smoke/manual. | App-6. | frontend |
 | App-12 evaluation fixtures | Add app-level fixtures. | Existing tests, eval schemas. | Fixture JSON and expected normalized output. | Covers valid, malformed, refusal, insufficient evidence. | Pytest. | App-6. | evaluation |
 | App-13 baseline evaluation harness | Track qwen3 baseline quality. | Ollama, eval fixtures. | Script/report for baseline runs. | Counts JSON validity, schema compliance, refusal violations. | Eval script run. | App-8, App-12. | evaluation |
+| OMI-001 define OMI MVP schema and lifecycle | Bound OMI as owner-controlled planning. | Product boundary, project storage model. | Schema/lifecycle spec for raw idea, candidates, owner decision, destination, provenance, status. | No prose, no silent promotion, candidate-first behavior is explicit. | Markdown review. | Phase 1. | app, docs, omi |
+| OMI-002 design OMI storage model | Keep candidates separate from approved truth. | Project storage model. | Storage design for OMI items and promotion records. | Candidate material cannot overwrite bible/storyform/project truth by default. | Design review. | OMI-001. | storage, omi |
+| OMI-003 implement OMI candidate creation flow | Capture raw idea and structured candidates. | OMI schema/storage design. | Backend/UI flow, when implemented. | Outputs are structured planning candidates only, not story prose. | Unit/UI tests. | Phase 2, OMI-002. | backend, frontend, omi |
+| OMI-004 implement owner decision and destination selection | Require owner action before promotion. | OMI lifecycle. | Owner decision and destination controls. | Destination is explicit before promotion. | Tests/manual smoke. | OMI-003. | frontend, storage, omi |
+| OMI-005 prevent promotion without explicit owner approval | Enforce durable truth boundary. | Guardrails, storage model. | Approval gate. | Promotion fails unless owner approval, destination, provenance, and status are present. | Guardrail/storage tests. | OMI-004. | guardrails, omi |
+| OMI-006 OMI UI for raw idea, candidates, status, provenance, destination | Make lifecycle visible. | OMI flow. | OMI panel/view, when implemented. | Candidate vs approved/promoted state is visible. | Browser smoke. | OMI-003, OMI-004. | frontend, omi |
+| OMI-007 OMI tests for no-prose and no-silent-promotion behavior | Verify OMI boundaries. | OMI implementation. | Test coverage. | No prose generation path and no silent promotion path pass. | Pytest/UI tests. | OMI-003 to OMI-005. | tests, guardrails, omi |
 
 ## 8. Packet/Dataset Roadmap
 
@@ -448,7 +544,7 @@ The backend default should not change from `qwen3:8b` until `dramatica-analyst:8
 
 ## 15. Blocked/Future Tasks
 
-- OMI implementation is design-only for now, with minimum schema fields of raw idea, candidates, owner decision, destination, provenance, and status.
+- OMI is included in the App MVP as a bounded, analysis-only, owner-controlled planning workflow. Implementation remains TODO and must follow the schema/lifecycle design before any API/UI work.
 - Full storyform questionnaire later.
 - Full NCP authoring UI later.
 - Advanced Dramatica verifier claims blocked.
@@ -462,7 +558,7 @@ The backend default should not change from `qwen3:8b` until `dramatica-analyst:8
 
 ## 16. Risk Register Summary
 
-Top risks are overclaiming Dramatica truth, prose-generation leakage, weak IC/RS/CIPS training, dataset gate failure, local VRAM limits, sample data mismatch, missing Git initialization, and treating NotebookLM candidates as truth. See `docs/roadmap/risk_register.md`.
+Top risks are overclaiming Dramatica truth, prose-generation leakage, weak IC/RS/CIPS training, dataset gate failure, local VRAM limits, sample data mismatch, OMI candidate output being mistaken for truth, and treating NotebookLM candidates as truth. See `docs/roadmap/risk_register.md`.
 
 ## 17. Decision Log Summary
 
@@ -479,8 +575,14 @@ gantt
     title Relative Execution Roadmap
     dateFormat  X
     axisFormat  Phase %s
-    section App
-    App MVP Foundation              :app, 0, 4
+    section App MVP
+    Phase 0 repo baseline/source sync :done, p0, 0, 1
+    Phase 1 architecture/model decisions :p1, after p0, 1
+    Phase 2 backend guardrails/schema :p2, after p1, 1
+    Phase 3 mock/baseline Story Check :p3, after p2, 1
+    Phase 4 frontend diagnostics     :p4, after p3, 1
+    Phase 5 bounded OMI MVP          :p5, after p4, 1
+    Phase 6 MVP hardening            :p6, after p5, 1
     section Dataset
     Short-story packet completion    :packets, 1, 5
     Book-backed cross-book review    :books, 2, 3

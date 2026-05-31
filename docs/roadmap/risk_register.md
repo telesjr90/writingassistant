@@ -13,6 +13,9 @@
 | R9 | Local GPU cannot train primary model | High | Confirmed | Use RunPod/larger GPU; smoke only locally if explicitly allowed | Active |
 | R10 | Smoke model accidentally deployed | High | Medium | Label artifacts and block production export/deploy | Active |
 | R11 | Sample project mismatch hides app bugs | Medium | Confirmed | Align Elena vs Ember Crown before MVP evaluation | Active |
-| R12 | Invalid Git repository prevents issue/project workflow | Medium | Confirmed | Initialize or repair Git after owner decision | Active |
-| R13 | Missing dependency strategy blocks reproducibility | Medium | Medium | Add Python dependency plan after decision | Active |
-| R14 | OMI assumptions leak into implementation | Medium | Medium | Keep OMI design-only until schema/storage approved | Active |
+| R12 | Safe baseline has not been pushed to GitHub | Medium | Medium | Push local commit `25ef64d` after owner approval; do not claim remote publication until complete | Active |
+| R13 | Backend dependency manifest drifts from implementation | Medium | Medium | Keep `backend/requirements.txt` separate from training requirements and validate as runtime dependencies evolve | Active |
+| R14 | OMI candidate output mistaken for story truth | High | Medium | Use candidate-only status, provenance/status labels, destination selection, and owner approval gate | Active |
+| R15 | OMI accidentally becomes prose generation | High | Medium | Apply no-prose guard; OMI must not write, rewrite, continue, imitate, polish, or improve story prose | Active |
+| R16 | OMI promotion mutates bible/storyform without owner approval | High | Medium | Require explicit owner decision, destination, provenance, status, and final promotion action | Active |
+| R17 | OMI scope creep delays core Story Check MVP | Medium | Medium | Phase OMI implementation after backend guardrails/schema foundation and keep design-first slice bounded | Active |

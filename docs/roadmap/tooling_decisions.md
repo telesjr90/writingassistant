@@ -6,7 +6,7 @@
 - Supporting Markdown roadmap files.
 - Mermaid Gantt inside Markdown.
 - Issue-driven task decomposition as a method.
-- GitHub Issues/GitHub Projects later, after plan structure exists.
+- GitHub Issues/GitHub Projects later, after the safe local baseline is pushed.
 - `ai-llm-project-file-structure-template` only as a checklist.
 - `llm_finetuning` only as evaluation/training lifecycle inspiration.
 - NotebookLM only as candidate packet/evidence aggregation workflow.
@@ -45,4 +45,8 @@
 - Frontend: React/Vite.
 - Local inference: Ollama.
 - Training: Unsloth QLoRA scripts/configs exist.
-- GitHub Issues/Projects: deferred until plan approval and valid Git repository decision.
+- Git: initialized/repaired on `main` with `origin https://github.com/telesjr90/writingassistant`; local baseline commit `25ef64d chore: initialize safe project baseline` exists.
+- GitHub push: still TODO; do not claim the safe baseline has been pushed.
+- Backend dependency manifest: `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`.
+- OMI: App MVP feature, but bounded to analysis-only candidate planning. No prose generation, no story continuation, no rewriting, and no silent promotion into durable truth.
+- GitHub Issues/Projects: deferred until after safe baseline push and owner approval.

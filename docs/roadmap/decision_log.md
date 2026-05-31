@@ -17,11 +17,12 @@
 | Canonical repository name | Accepted | Use `telesjr90/writingassistant` |
 | Product working name | Accepted | Use Dramatica-Informed Writing Assistant |
 | License boundary | Accepted | MIT applies to app source code only; training data, book sources, packet evidence, model artifacts, and datasets are excluded pending separate provenance/license review |
-| Git timing | Accepted | Initialize or repair Git later as the next setup task; no Git initialization in the decision update task |
-| Python dependency strategy | Accepted | Use simple requirements files now, with backend requirements separate from `training/requirements-unsloth.txt`; revisit `pyproject.toml`/`uv` later |
+| Git initialization | Accepted | Local Git is initialized/repaired on `main`; `origin` is `https://github.com/telesjr90/writingassistant`; first safe local baseline commit is `25ef64d chore: initialize safe project baseline`; push remains TODO |
+| Python dependency strategy | Accepted | Use simple requirements files now; `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`; revisit `pyproject.toml`/`uv` later |
 | Node target | Accepted | Target Node `>=22.12.0 <23`; package metadata update is deferred |
 | Example fixture direction | Accepted | Replace Elena/Ember Crown mismatch later with one clean aligned fixture, preferably public-domain or owner-created |
-| OMI minimum schema | Accepted | Design-only fields: raw idea, candidates, owner decision, destination, provenance, and status |
+| OMI MVP inclusion | Accepted | OMI is in the App MVP, bounded to analysis-only, no-prose, no story continuation, no rewriting, owner-controlled, candidate-first planning |
+| OMI minimum schema | Accepted | Design target fields: `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; do not assume endpoints/storage/UI exist yet |
 | Durable memory promotion rule | Accepted | Owner must explicitly approve, choose destination, attach evidence/provenance, and confirm promotion |
 | No-prose enforcement policy | Accepted | Enforce before model call and after model output |
 | Mock mode output | Accepted | Use deterministic fixture JSON for `story_check`, `throughline_classification`, `writer_questions`, and `out_of_scope_refusal` |
@@ -36,12 +37,11 @@
 
 | Task | Needed for | Current note |
 | --- | --- | --- |
-| Initialize/repair valid Git repository | Change tracking and future GitHub Issues/Projects | Owner approved doing this later as the next setup task |
-| Add safe repo metadata files | Publication hygiene | Must respect MIT app-source-only license boundary |
-| Add backend requirements file | Reproducible backend setup | Do not merge with `training/requirements-unsloth.txt` |
+| Push safe baseline to GitHub | Remote publication | Local baseline exists; no push has been performed yet |
+| Validate backend requirements over time | Reproducible backend setup | `backend/requirements.txt` exists; keep separate from `training/requirements-unsloth.txt` |
 | Declare Node engine | Frontend setup | Target is `>=22.12.0 <23`; `package.json` not edited in this task |
 | Replace sample fixture | MVP fixtures and docs | Use one aligned public-domain or owner-created fixture |
-| Draft OMI schema | Future project memory | Design-only; no OMI endpoints assumed |
+| Define OMI API/storage implementation | MVP OMI runtime work | Implementation-level follow-up; OMI remains candidate-first and no-prose |
 | Build no-prose guard | Runtime safety | Must check before model call and after output |
 | Build mock fixtures | App/test foundation | Four supported task JSON fixtures required |
 | Revise cloud smoke config | RunPod readiness | Required before RunPod smoke |

@@ -6,9 +6,12 @@ We are building a single‑UI writing tool inspired by Subtxt. The MVP will:
 - Use the **Narrative Context Protocol (NCP)** as the structural backbone.
 - Allow writing & editing scenes in a local project.
 - Perform a **Story Check** analysis that flags narrative drift, inconsistency, and missing beats.
+- Include bounded **Organize My Idea (OMI)** planning that captures raw ideas and structured candidates without generating story prose.
 - Display the results in a sidebar alongside the editor.
 
-All project files live in the `storymind/` directory. The UI is a React app served by a FastAPI backend.
+OMI is part of the App MVP, but it is analysis/planning only. It must not write, rewrite, continue, imitate, polish, or improve story prose, and it must not silently promote ideas, candidates, model output, or NotebookLM output into durable project truth. OMI MVP design fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; runtime endpoints/storage/UI are not assumed until implementation tasks create them.
+
+The current workspace is `/home/tjrpirateking/projects/WritingAssistantApplication`. The UI is a React app served by a FastAPI backend.
 
 ---
 
@@ -16,7 +19,7 @@ All project files live in the `storymind/` directory. The UI is a React app serv
 - **OpenAI Codex CLI** installed and authenticated.
 - Node.js & Python 3.10+ installed.
 - An OpenAI API key exported as `OPENAI_API_KEY`.
-- Working directory: `storymind/`.
+- Working directory: `/home/tjrpirateking/projects/WritingAssistantApplication`.
 
 ---
 
@@ -90,6 +93,36 @@ Goal: Build a multi‑task dataset that teaches a model to diagnose narrative co
 
 ---
 
+## 0.1 Master Plan Status Sync
+
+- Local Git has been initialized/repaired on `main`.
+- `origin` is `https://github.com/telesjr90/writingassistant`.
+- First safe local baseline commit exists: `25ef64d chore: initialize safe project baseline`.
+- Safe repository metadata exists, including `.gitignore`, `README.md`, `LICENSE`, `.env.example`, and `backend/requirements.txt`.
+- Push to GitHub remains TODO.
+- OMI is included in the App MVP only as bounded analysis/planning: no prose generation, no story continuation, no rewriting, no silent promotion, owner-controlled, and candidate-first.
+- OMI design fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`.
+
+---
+
+## 0.2 MVP Phase Order
+
+Current status: App-1 architecture audit and App-2 project file model are complete. The next App MVP task is App-3 NCP compatibility subset, followed by OMI-001 schema/lifecycle and sample project alignment work before Phase 2 implementation.
+
+Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates.
+
+| Phase | Scope | Completion Definition |
+| --- | --- | --- |
+| 0 | Repo baseline and source-of-truth sync | Git repaired on `main`, safe metadata exists, local baseline commit `25ef64d` exists, push remains TODO, and docs reflect current state. |
+| 1 | App architecture audit and project model decisions | Project storage, NCP subset, sample fixture direction, and OMI schema/lifecycle are specified without overclaiming current runtime support. |
+| 2 | Backend safety and schema foundation | Story Check schema/normalizer, candidate-vs-owner truth boundary, insufficient-evidence handling, and pre/post no-prose guardrails are defined or implemented. |
+| 3 | Mock and baseline Story Check | Deterministic mock fixtures and qwen3/Ollama baseline mode support Story Check, refusal, malformed-output, and insufficient-evidence validation. |
+| 4 | Frontend MVP diagnostics | Sidebar/editor surfaces render structured diagnostics and safe error states without prose drafting. |
+| 5 | Bounded OMI MVP implementation | OMI captures raw ideas and structured candidates with owner decision, destination, provenance, and status; it cannot write prose or silently promote durable truth. |
+| 6 | MVP hardening | Story Check mock/qwen3, no-prose guardrails, bounded OMI, save/load, docs, and local smoke checks are verified before release readiness. |
+
+---
+
 ## Book-Backed Phase Status (updated)
 
 The book-backed phase is active as a candidate evidence workflow for improving Dramatica-informed analysis coverage. It does not bypass the dataset gates above.
@@ -130,16 +163,16 @@ Goal: Train Qwen2.5-7B-Instruct as a bounded structural analyst that returns JSO
    - Change vs. Steadfast contrast accuracy (separate test set)
    - “Insufficient evidence” calibration (must not overclaim)
    - Compatibility with current app: parse through FastAPI/Ollama path
-5. After training, export GGUF, load into Ollama as `dramatica-analyst:8b`, and swap the backend model default only after a non-smoke model passes evaluation. OMI is planned but not implemented; do not assume OMI endpoints exist.
+5. After training, export GGUF, load into Ollama as `dramatica-analyst:8b`, and swap the backend model default only after a non-smoke model passes evaluation. OMI is in the App MVP as bounded planning, but is not implemented yet; do not assume OMI endpoints exist.
 
 ---
 ## 4. Verification
 After all tasks, your directory should contain a functional local application. To verify:
 ```bash
-cd storymind/backend
+cd /home/tjrpirateking/projects/WritingAssistantApplication/backend
 ./run.sh
 # In another terminal
-cd storymind/frontend
+cd /home/tjrpirateking/projects/WritingAssistantApplication/frontend
 npm run dev
 # Open http://localhost:5173
 ```
@@ -158,7 +191,7 @@ You should see the project navigation, the editor, and the analysis sidebar with
 
 **How to use this plan:**
 1. Create the `codex.yml` file in your project root.
-2. Place this entire plan as `plan.md` inside `storymind/`.
+2. Place this entire plan as `docs/plan.md` in the repository.
 3. Run Codex:
    ```bash
    codex init
