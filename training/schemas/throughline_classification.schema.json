@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "throughline_classification.schema.json",
+  "title": "Throughline Classification Output",
+  "description": "Classifies the dominant Dramatica throughline for a scene and records evidence for the decision.",
+  "type": "object",
+  "required": [
+    "task",
+    "primary_throughline",
+    "secondary_throughlines",
+    "confidence",
+    "evidence_spans",
+    "why_not"
+  ],
+  "properties": {
+    "task": {
+      "const": "throughline_classification"
+    },
+    "primary_throughline": {
+      "type": "string",
+      "enum": [
+        "overall_story",
+        "main_character",
+        "influence_character",
+        "relationship_story",
+        "mixed",
+        "insufficient_evidence"
+      ]
+    },
+    "secondary_throughlines": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/throughline"
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "evidence_spans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "text",
+          "supports",
+          "reason"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "supports": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "why_not": {
+      "type": "object",
+      "required": [
+        "overall_story",
+        "main_character",
+        "influence_character",
+        "relationship_story"
+      ],
+      "properties": {
+        "overall_story": {
+          "type": "string",
+          "minLength": 1
+        },
+        "main_character": {
+          "type": "string",
+          "minLength": 1
+        },
+        "influence_character": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationship_story": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "throughline": {
+      "type": "string",
+      "enum": [
+        "overall_story",
+        "main_character",
+        "influence_character",
+        "relationship_story"
+      ]
+    }
+  }
+}

@@ -1,0 +1,168 @@
+```markdown
+# Dramatica-Informed Writing Assistant – Minimal Viable Core Plan
+
+## 0. Project Overview
+We are building a single‑UI writing tool inspired by Subtxt. The MVP will:
+- Use the **Narrative Context Protocol (NCP)** as the structural backbone.
+- Allow writing & editing scenes in a local project.
+- Perform a **Story Check** analysis that flags narrative drift, inconsistency, and missing beats.
+- Display the results in a sidebar alongside the editor.
+
+All project files live in the `storymind/` directory. The UI is a React app served by a FastAPI backend.
+
+---
+
+## 1. Prerequisites
+- **OpenAI Codex CLI** installed and authenticated.
+- Node.js & Python 3.10+ installed.
+- An OpenAI API key exported as `OPENAI_API_KEY`.
+- Working directory: `storymind/`.
+
+---
+
+## Phase 2 – Data Preparation (updated)
+
+Goal: Build a multi‑task dataset that teaches a model to diagnose narrative coherence against a Dramatica storyform and to ask writer‑focused questions, **never to generate prose**.
+
+1. Base model: **Qwen/Qwen2.5-7B-Instruct** (primary). Fallback: Qwen3-4B-Instruct-2507 if GPU is constrained.
+2. Dataset structure: multi‑task SFT records. Each example includes:
+   - task: "story_check" | "throughline_classification" | "writer_questions" | "out_of_scope_refusal"
+   - storyform_context (all four throughlines, dynamics, concerns, issues, problem/solution)
+   - bible_summary
+   - scene_text
+   - user_request
+   - gold_output (strict JSON matching the task schema)
+3. Output schemas (included in the plan as reference):
+
+   **Story Check:**
+   {
+     "task": "story_check",
+     "coherence_score": 7,
+     "throughline_alignment": {
+       "overall_story": {"present": true, "evidence": ["..."], "concerns": []},
+       "main_character": {"present": true, "evidence": ["..."], "concerns": ["..."]},
+       "influence_character": {"present": false, "evidence": [], "concerns": ["..."]},
+       "relationship_story": {"present": false, "evidence": [], "concerns": []}
+     },
+     "theme_drift": {"status": "none|mild|serious|insufficient_evidence", "reason": "..."},
+     "character_consistency": {"status": "consistent|inconsistent|insufficient_evidence", "reason": "..."},
+     "warnings": ["max 5"],
+     "suggestions": ["max 5"],
+     "insufficient_evidence": ["missing info"]
+   }
+
+   **Throughline classification:**
+   {
+     "task": "throughline_classification",
+     "primary_throughline": "overall_story|main_character|influence_character|relationship_story|mixed|insufficient_evidence",
+     "secondary_throughlines": [],
+     "confidence": 0.78,
+     "evidence_spans": [{"text": "...", "supports": "...", "reason": "..."}],
+     "why_not": {"overall_story": "...", "main_character": "...", "influence_character": "...", "relationship_story": "..."}
+   }
+
+   **Writer questions:**
+   {
+     "task": "writer_questions",
+     "questions": [{"throughline": "...", "story_point": "...", "diagnostic_purpose": "...", "question": "..."}],
+     "no_prose_generated": true
+   }
+
+   **Out-of-scope refusal:**
+   {
+     "task": "out_of_scope_refusal",
+     "request_type": "prose_generation",
+     "allowed_help": ["analysis", "diagnostic questions", "structural classification"],
+     "message": "I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose."
+   }
+
+4. Dataset mix:
+   - Story Check diagnostics: 40‑45%
+   - Throughline classification: 25‑30%
+   - Writer diagnostic questions: 20‑25%
+   - Out‑of‑scope refusals: 5‑10%
+5. Prioritise contrast pairs: same scene interpreted as OS vs. MC, Change vs. Steadfast, IC pressure vs. Relationship Story conflict, missing evidence vs. confident classification.
+6. Prompt template for training:
+   System: "You are a Dramatica-informed narrative analysis assistant. You do not write, rewrite, continue, imitate, or improve prose. You only perform structural analysis, throughline classification, and writer-focused diagnostic questioning. Return only valid JSON matching the requested schema. If evidence is insufficient, say what is missing instead of guessing."
+   User: "TASK: {task}\nALLOWED OUTPUT SCHEMA:\n{json_schema}\nSTORYFORM CONTEXT:\n{storyform_context}\nSTORY BIBLE:\n{bible_summary}\nSCENE TEXT:\n{scene_text}\nUSER REQUEST:\n{user_request}"
+   Assistant: {gold_output}
+7. Target: 500‑1000 examples. Generate semi‑synthetic with human correction.
+
+---
+
+## Book-Backed Phase Status (updated)
+
+The book-backed phase is active as a candidate evidence workflow for improving Dramatica-informed analysis coverage. It does not bypass the dataset gates above.
+
+- Book 1 is completed through the book-backed packet workflow, verified from the WSL-mounted folder `/mnt/e/WritingAssistantApplication/docs/books/dcc`. The repo-local folder `docs/books/dcc` is not present in this workspace.
+- Book 2 is completed through the book-backed packet workflow, verified from the WSL-mounted folder `/mnt/e/WritingAssistantApplication/docs/books/projecthm`. The repo-local folder `docs/books/projecthm` is not present in this workspace.
+- Book 3 is completed through the book-backed packet workflow, verified from the WSL-mounted folder `/mnt/e/WritingAssistantApplication/docs/books/thggalaxy`. The repo-local folder `docs/books/thggalaxy` is not present in this workspace.
+- After Book 3, the next step is cross-book review and deciding whether Books 4-5 are needed.
+- Books 6+ remain blocked for this phase.
+- NotebookLM output remains candidate-only, not training truth.
+- Book-level master packets remain context, not direct SFT truth.
+- Excerpt-backed, owner-approved evidence remains preferred for SFT review candidates.
+
+---
+
+## Phase 3 – Fine‑Tuning (updated)
+
+Goal: Train Qwen2.5-7B-Instruct as a bounded structural analyst that returns JSON and refuses prose generation.
+
+1. Framework: Unsloth (QLoRA) on a single ≤16GB GPU.
+2. QLoRA settings:
+   - Quantization: 4‑bit NF4
+   - Sequence length: 2048 for classification/questions; 4096 for Story Check
+   - LoRA rank r=16, alpha=32, dropout 0.05
+   - Target modules: q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj
+   - Learning rate: 1e-4 to 2e-4
+   - Epochs: 2‑3 with early stopping
+   - Batch size: small per‑device, gradient accumulation to effective batch 32‑64
+   - Eval every 100‑250 steps
+3. Export: GGUF q4_k_m for Ollama; q8_0 for quality testing.
+4. Evaluation checklist (do not rely on “sounds smart”):
+   - JSON validity ≥99%
+   - Schema compliance ≥98%
+   - Throughline macro‑F1 ≥85% (initial milestone)
+   - OS/MC/IC/RS confusion rate tracked per label
+   - No‑prose violation rate 0% on refusal set
+   - Evidence span relevance (human reviewed)
+   - Change vs. Steadfast contrast accuracy (separate test set)
+   - “Insufficient evidence” calibration (must not overclaim)
+   - Compatibility with current app: parse through FastAPI/Ollama path
+5. After training, export GGUF, load into Ollama as `dramatica-analyst:8b`, and swap the backend model default only after a non-smoke model passes evaluation. OMI is planned but not implemented; do not assume OMI endpoints exist.
+
+---
+## 4. Verification
+After all tasks, your directory should contain a functional local application. To verify:
+```bash
+cd storymind/backend
+./run.sh
+# In another terminal
+cd storymind/frontend
+npm run dev
+# Open http://localhost:5173
+```
+You should see the project navigation, the editor, and the analysis sidebar with a working Story Check button.
+
+---
+
+## 5. Next Steps (Beyond MVP)
+- Dynamic storyform questionnaire.
+- NovelClaw‑style memory banks.
+- Dramatron-style scene generation remains blocked/non-goal.
+- World‑building interface (Notebook‑inspired).
+- Support for local LLMs (Ollama).
+
+---
+
+**How to use this plan:**
+1. Create the `codex.yml` file in your project root.
+2. Place this entire plan as `plan.md` inside `storymind/`.
+3. Run Codex:
+   ```bash
+   codex init
+   codex run "Follow the plan in plan.md step by step. Confirm with me before writing files."
+   ```
+```
+

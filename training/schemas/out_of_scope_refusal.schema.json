@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "out_of_scope_refusal.schema.json",
+  "title": "Out-of-Scope Refusal Output",
+  "description": "Refusal for prose generation, rewriting, continuation, imitation, or prose improvement requests.",
+  "type": "object",
+  "required": [
+    "task",
+    "request_type",
+    "allowed_help",
+    "message"
+  ],
+  "properties": {
+    "task": {
+      "const": "out_of_scope_refusal"
+    },
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "prose_generation",
+        "prose_rewrite",
+        "prose_continuation",
+        "prose_imitation",
+        "prose_improvement",
+        "other_out_of_scope"
+      ]
+    },
+    "allowed_help": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "analysis",
+          "diagnostic questions",
+          "structural classification",
+          "storyform clarification",
+          "evidence gaps"
+        ]
+      }
+    },
+    "message": {
+      "description": "Brief refusal that redirects to permitted structural analysis help.",
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

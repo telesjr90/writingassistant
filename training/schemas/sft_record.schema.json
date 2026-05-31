@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sft_record.schema.json",
+  "title": "Phase 2 SFT Record",
+  "description": "Common multi-task supervised fine-tuning record for the Dramatica-informed analysis assistant.",
+  "type": "object",
+  "required": [
+    "task",
+    "storyform_context",
+    "bible_summary",
+    "scene_text",
+    "user_request",
+    "gold_output"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task": {
+      "$ref": "#/$defs/task"
+    },
+    "storyform_context": {
+      "$ref": "#/$defs/storyformContext"
+    },
+    "bible_summary": {
+      "description": "Concise story bible context needed to audit consistency. Prefer a structured object when source data is available.",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": true
+        }
+      ]
+    },
+    "scene_text": {
+      "description": "Scene excerpt to analyze. This is source material only; target outputs must not continue or rewrite it.",
+      "type": "string",
+      "minLength": 1
+    },
+    "user_request": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gold_output": {
+      "oneOf": [
+        {
+          "$ref": "story_check.schema.json"
+        },
+        {
+          "$ref": "throughline_classification.schema.json"
+        },
+        {
+          "$ref": "writer_questions.schema.json"
+        },
+        {
+          "$ref": "out_of_scope_refusal.schema.json"
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "const": "story_check"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gold_output": {
+            "$ref": "story_check.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "const": "throughline_classification"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gold_output": {
+            "$ref": "throughline_classification.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "const": "writer_questions"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gold_output": {
+            "$ref": "writer_questions.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "const": "out_of_scope_refusal"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gold_output": {
+            "$ref": "out_of_scope_refusal.schema.json"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "task": {
+      "type": "string",
+      "enum": [
+        "story_check",
+        "throughline_classification",
+        "writer_questions",
+        "out_of_scope_refusal"
+      ]
+    },
+    "storyformContext": {
+      "type": "object",
+      "required": [
+        "throughlines",
+        "dynamics"
+      ],
+      "properties": {
+        "throughlines": {
+          "type": "object",
+          "required": [
+            "overall_story",
+            "main_character",
+            "influence_character",
+            "relationship_story"
+          ],
+          "properties": {
+            "overall_story": {
+              "$ref": "#/$defs/throughlineContext"
+            },
+            "main_character": {
+              "$ref": "#/$defs/throughlineContext"
+            },
+            "influence_character": {
+              "$ref": "#/$defs/throughlineContext"
+            },
+            "relationship_story": {
+              "$ref": "#/$defs/throughlineContext"
+            }
+          },
+          "additionalProperties": false
+        },
+        "dynamics": {
+          "description": "Story dynamics such as Main Character Resolve, Story Outcome, Story Judgment, Driver, and Limit.",
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": true
+        },
+        "central_inequity": {
+          "type": "object",
+          "properties": {
+            "problem": {
+              "type": "string",
+              "minLength": 1
+            },
+            "solution": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "throughlineContext": {
+      "type": "object",
+      "required": [
+        "domain",
+        "concern",
+        "issue",
+        "problem",
+        "solution"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "concern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issue": {
+          "type": "string",
+          "minLength": 1
+        },
+        "problem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "solution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "story_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,85 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv*/
+venv/
+ENV/
+
+# Node and frontend build output
+node_modules/
+dist/
+build/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Local editor, OS, and tool state
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+.vscode/
+.idea/
+.agents/
+.codex/
+.playwright-mcp/
+
+# Local project/user writing content pending explicit review
+projects/
+
+# Reference repositories are documentation-only, not app source
+open_source_repos/
+
+# Training data, runs, checkpoints, caches, and outputs
+training/data/
+training/configs/
+training/bundles/
+training/knowledge/
+training/runs/
+training/checkpoints/
+training/outputs/
+unsloth_compiled_cache/
+
+# Training reports are excluded by default because many contain packet evidence.
+training/reports/*
+!training/reports/git_setup_report.md
+!training/reports/master_plan_creation_report.md
+!training/reports/pre_commit_safety_audit_report.md
+
+# Raw book/source text and packet evidence pending provenance review
+docs/books/
+books/
+book_sources/
+raw_books/
+source_text/
+source-text/
+**/book_sources/
+**/raw_books/
+**/source_text/
+**/source-text/
+**/*full_text*
+**/*raw_text*
+
+# Model artifacts and large generated binaries
+models/
+artifacts/
+*.db
+*.sqlite
+*.jsonl
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.tflite

@@ -1,0 +1,24 @@
+agents:
+  repo_retriever:
+    description: "Clones open-source repos and extracts key files/schemas/prompts."
+    tools: ["shell", "read_file", "write_file"]
+
+  storyform_agent:
+    description: "Implements the NCP schema and storyform handler."
+    tools: ["shell", "python_repl", "read_file", "write_file", "openai_api"]
+
+  project_agent:
+    description: "Manages local project folders and files."
+    tools: ["shell", "read_file", "write_file"]
+
+  editor_ui_agent:
+    description: "Creates the React frontend with editor and analysis sidebar."
+    tools: ["shell", "write_file", "read_file", "nodejs"]
+
+  analysis_agent:
+    description: "Builds the analysis engine and prompts."
+    tools: ["shell", "python_repl", "read_file", "write_file", "openai_api"]
+
+  orchestrator:
+    description: "Coordinates tasks, sets up FastAPI, wires frontend/backend, creates sample project."
+    tools: ["shell", "read_file", "write_file", "python_repl", "nodejs"]

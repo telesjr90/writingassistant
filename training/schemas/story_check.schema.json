@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "story_check.schema.json",
+  "title": "Story Check Output",
+  "description": "Richer Phase 2 Story Check diagnostic output. Suggestions must be writer-focused diagnostic questions, not prose generation.",
+  "type": "object",
+  "required": [
+    "task",
+    "coherence_score",
+    "throughline_alignment",
+    "theme_drift",
+    "character_consistency",
+    "warnings",
+    "suggestions",
+    "insufficient_evidence"
+  ],
+  "properties": {
+    "task": {
+      "const": "story_check"
+    },
+    "coherence_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "throughline_alignment": {
+      "type": "object",
+      "required": [
+        "overall_story",
+        "main_character",
+        "influence_character",
+        "relationship_story"
+      ],
+      "properties": {
+        "overall_story": {
+          "$ref": "#/$defs/throughlineAlignment"
+        },
+        "main_character": {
+          "$ref": "#/$defs/throughlineAlignment"
+        },
+        "influence_character": {
+          "$ref": "#/$defs/throughlineAlignment"
+        },
+        "relationship_story": {
+          "$ref": "#/$defs/throughlineAlignment"
+        }
+      },
+      "additionalProperties": false
+    },
+    "theme_drift": {
+      "type": "object",
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "none",
+            "mild",
+            "serious",
+            "insufficient_evidence"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "character_consistency": {
+      "type": "object",
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "consistent",
+            "inconsistent",
+            "insufficient_evidence"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "suggestions": {
+      "description": "Writer-focused diagnostic questions or structural next checks. Do not include replacement prose, dialogue, continuation, imitation, or line edits.",
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "insufficient_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "throughlineAlignment": {
+      "type": "object",
+      "required": [
+        "present",
+        "evidence",
+        "concerns"
+      ],
+      "properties": {
+        "present": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "concerns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

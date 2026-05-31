@@ -1,0 +1,12 @@
+# Install only inside the isolated Phase 3 training environment.
+# Do not add these packages to backend or frontend runtime dependencies.
+unsloth
+transformers
+datasets
+trl
+accelerate
+peft
+bitsandbytes
+sentencepiece
+protobuf
+huggingface_hub[cli]
