@@ -1,16 +1,56 @@
 # Phase Map
 
-## Phase A: Source of Truth
+## App MVP Track
 
-- Inputs: `docs/plan.md`, repo inspection, book workflow verification.
-- Outputs: `docs/master_plan.md`, roadmap docs, creation report.
-- Exit: owner accepts plan structure.
+### Phase 0: Repo Baseline and Source-of-Truth Sync
 
-## Phase B: App MVP Foundation
+- Inputs: Git setup reports, safe baseline commit, current roadmap docs.
+- Outputs: synced master plan/roadmap docs.
+- Status: Git initialized/repaired on `main`; `origin` is `https://github.com/telesjr90/writingassistant`; safe metadata exists; first safe local baseline commit is `25ef64d chore: initialize safe project baseline`.
+- Remaining exit: push safe baseline to GitHub and keep planning docs current.
 
-- Inputs: current FastAPI/React/Ollama app, NCP schema, sample project.
-- Outputs: stable project file model, mock mode, baseline Ollama mode, Story Check parser, no-prose guard.
-- Exit: MVP works without fine-tuned model and passes app/eval fixtures.
+### Phase 1: App Architecture Audit and Project Model Decisions
+
+- Inputs: current FastAPI/React/Ollama app, NCP schema, sample project, OMI product boundary.
+- Outputs: architecture audit report, source-of-truth cleanup, NCP/storyform MVP subset, project storage model, OMI MVP design schema, sample project alignment decision.
+- Status note: App-1 architecture audit completed in `docs/roadmap/app_mvp_architecture_audit.md`.
+- Exit: core app gaps and project truth/candidate storage boundaries are documented.
+
+### Phase 2: Backend Safety and Schema Foundation
+
+- Inputs: Story Check schema, refusal schema, no-prose policy, analysis mode decision.
+- Outputs: runtime no-prose guardrails, refusal response schema, Story Check normalizer, minimal-to-rich compatibility, insufficient-evidence handling, analysis mode config.
+- Exit: Story Check and OMI-relevant paths have clear no-prose and structured-output foundations before feature implementation expands.
+
+### Phase 3: Mock and Baseline Story Check
+
+- Inputs: schema foundation, mock fixture requirements, Ollama baseline config.
+- Outputs: mock analysis mode, Story Check route tests, Ollama baseline mode, qwen3 baseline verification, evaluation fixtures.
+- Exit: Story Check works without fine-tuning in mock and qwen3 baseline modes.
+
+### Phase 4: Frontend MVP Diagnostics
+
+- Inputs: normalized Story Check response, mode metadata, editor state.
+- Outputs: rich diagnostics sidebar, mock/baseline visibility, error and malformed-output display, scene editor dirty-state handling, empty scene behavior.
+- Exit: UI displays bounded analysis clearly and does not expose prose-generation paths.
+
+### Phase 5: OMI MVP Implementation
+
+- Inputs: OMI schema/lifecycle design, project storage model, no-prose guardrails, schema foundation.
+- Outputs: OMI storage design, candidate lifecycle, owner decision flow, destination handling, provenance/status display.
+- Exit: OMI captures raw ideas and structured candidate planning material without writing story prose or mutating owner-approved truth automatically.
+
+OMI must remain analysis-only, candidate-output-first, and owner-controlled. Promotion requires explicit owner approval, destination, provenance, and status. Suggested design statuses are `draft`, `candidate`, `owner_review`, `approved`, `rejected`, `promoted`, and `archived`. Suggested destinations are `planning_notes`, `project_bible_candidate`, `storyform_context_candidate`, `scene_prompt_context_candidate`, `template_starter_candidate`, and `discard`.
+
+### Phase 6: MVP Hardening
+
+- Inputs: working Story Check and bounded OMI MVP paths.
+- Outputs: project navigation reliability, save/reload testing, app smoke tests, documentation cleanup, manual local run checklist.
+- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, or fine-tuning.
+
+## Dataset and Training Tracks
+
+These tracks are outside the App MVP critical path.
 
 ## Phase C: Short-Story Packet Completion
 
@@ -53,3 +93,29 @@
 - Inputs: trained adapter, eval harness.
 - Outputs: GGUF q4_k_m/q8_0, Ollama import, eval report, rollback plan.
 - Exit: `dramatica-analyst:8b` becomes app default only after gates pass.
+
+## Mermaid Gantt
+
+```mermaid
+gantt
+    title App MVP and Later Tracks
+    dateFormat  X
+    axisFormat  Phase %s
+    section App MVP
+    Phase 0 repo baseline/source sync :done, p0, 0, 1
+    Phase 1 architecture/model decisions :p1, after p0, 1
+    Phase 2 backend guardrails/schema :p2, after p1, 1
+    Phase 3 mock/baseline Story Check :p3, after p2, 1
+    Phase 4 frontend diagnostics :p4, after p3, 1
+    Phase 5 bounded OMI MVP :p5, after p4, 1
+    Phase 6 MVP hardening :p6, after p5, 1
+    section Dataset
+    Short-story packet completion :packets, 1, 5
+    Book-backed cross-book review :books, 2, 3
+    External dataset research :external, 2, 3
+    Dataset conversion/promotion :promotion, 4, 4
+    section Training
+    RunPod smoke :smoke, 7, 1
+    Full fine-tune :train, 8, 2
+    Export/eval/model swap :deploy, 10, 2
+```
