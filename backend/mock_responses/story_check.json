@@ -1,0 +1,65 @@
+{
+  "task": "story_check",
+  "coherence_score": 7,
+  "throughline_alignment": {
+    "overall_story": {
+      "present": true,
+      "evidence": [
+        "wanted to marry a princess",
+        "whether they were real ones",
+        "we'll soon find that out"
+      ],
+      "concerns": []
+    },
+    "main_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "No owner-approved Main Character throughline is assigned in the fixture."
+      ]
+    },
+    "influence_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "No owner-approved Influence Character pressure is assigned in the fixture."
+      ]
+    },
+    "relationship_story": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "The marriage outcome is not treated as Relationship Story proof."
+      ]
+    }
+  },
+  "theme_drift": {
+    "status": "insufficient_evidence",
+    "reason": "The fixture has Objective Story context, but no owner-approved Issue or Variation evidence."
+  },
+  "character_consistency": {
+    "status": "consistent",
+    "reason": "The scene does not contradict the source-derived bible facts for the prince, princess, old queen, or old king."
+  },
+  "warnings": [
+    "[Factual] Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved for this fixture.",
+    "[Factual] Treat this Story Check as candidate diagnostics, not project truth."
+  ],
+  "suggestions": [
+    "What owner-approved evidence would identify a Main Character throughline for this scene?",
+    "What exact evidence would distinguish Influence Character pressure from ordinary plot function?",
+    "What evidence would prove a Relationship Story conflict rather than a relationship outcome?"
+  ],
+  "insufficient_evidence": [
+    "Main Character evidence is not owner-approved for this fixture.",
+    "Influence Character evidence is not owner-approved for this fixture.",
+    "Relationship Story evidence is not owner-approved for this fixture.",
+    "CIPS and dynamics are unresolved for this fixture."
+  ],
+  "diagnostics": {
+    "analysis_mode": "mock",
+    "fixture": "backend/mock_responses/story_check.json",
+    "candidate_only": true,
+    "mutates_project_truth": false
+  }
+}

@@ -18,8 +18,9 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | BE-002 | Story Check normalizer | `backend/analysis_normalizer.py`, `tests/test_analysis_normalizer.py` | DONE; malformed model output becomes safe fallback, minimal UI fields remain stable, rich fields are preserved, and schema errors are diagnostic only |
 | SC-001 | Story Check rich prompt alignment | `backend/prompts/story_check.txt`, `tests/test_story_check_prompt.py` | DONE; prompt requests the rich schema, JSON-only output, no-prose boundaries, and insufficient-evidence handling without changing runtime routes |
 | SC-002 | Minimal-to-rich Story Check compatibility | `tests/test_story_check_route.py`, sidebar inspection | DONE; minimal, rich, fallback, diagnostic, missing-rich-field, unknown-field, and error-shaped reports remain route-safe and current sidebar-compatible through minimal fields/raw JSON |
-| App-7 | Mock analysis mode | `ANALYSIS_MODE=mock` | Deterministic fixtures drive UI/tests |
-| App-8 | Ollama baseline mode | `ANALYSIS_MODE=ollama_baseline` | Uses `qwen3:8b` via config |
+| BE-001 | Analysis mode config | `backend/analysis_modes.py`, `.env.example` | DONE; missing/empty `ANALYSIS_MODE` defaults to `ollama_baseline`, `mock` is explicit, and invalid modes return a stable error path |
+| App-7 | Mock analysis mode | `ANALYSIS_MODE=mock`, `backend/mock_responses/story_check.json` | DONE; deterministic rich Story Check fixture drives UI/tests without Ollama and remains candidate-only |
+| App-8 | Ollama baseline mode | `ANALYSIS_MODE=ollama_baseline` | PARTIAL; explicit mode config and mocked route/engine tests preserve `qwen3:8b` baseline behavior, but live Ollama verification remains TODO |
 | App-9 | Analysis parser/normalizer | Normalized response object | UI receives bounded structured data |
 | GUARD-001 | Shared no-prose guard module | `backend/guardrails.py`, `tests/test_guardrails.py` | DONE; prose-generation request classifier, standard refusal response, allowed-help list, and Story Check suggestion filtering integration |
 | GUARD-002 | Request-path no-prose guard integration | Route/service guard use | TODO; apply guard to future freeform request fields without treating scene text as request intent |
@@ -41,8 +42,8 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
-| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, BE-002, SC-001, and SC-002 done; route/output guard integration, mock mode, and richer UI remain TODO |
-| Phase 3 | Mock and baseline Story Check | TODO |
+| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, BE-001, BE-002, SC-001, and SC-002 done; route/output guard integration and richer UI remain TODO |
+| Phase 3 | Mock and baseline Story Check | IN PROGRESS; App-7 mock Story Check mode done and App-8 explicit baseline config tested with mocked Ollama, live qwen3 verification remains TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |
 | Phase 6 | MVP hardening | TODO |

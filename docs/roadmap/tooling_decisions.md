@@ -44,6 +44,7 @@
 - Backend: Python FastAPI.
 - Frontend: React/Vite.
 - Local inference: Ollama.
+- Analysis mode switch: `ANALYSIS_MODE=ollama_baseline` uses local Ollama and defaults `OLLAMA_MODEL` to `qwen3:8b`; `ANALYSIS_MODE=mock` returns deterministic normalized Story Check diagnostics without Ollama.
 - Training: Unsloth QLoRA scripts/configs exist.
 - Git: initialized/repaired on `main` with `origin https://github.com/telesjr90/writingassistant`; local baseline commit `25ef64d chore: initialize safe project baseline` exists.
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.

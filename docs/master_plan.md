@@ -186,15 +186,17 @@ GUARD-001 status: `backend/guardrails.py` provides the shared runtime no-prose g
 
 BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Check normalizer, safe JSON-object extraction, `jsonschema` validation when available, minimal UI compatibility fields, rich Story Check field preservation, and deterministic malformed-output fallback. It is integrated through `backend/analysis_engine.py`; SC-001 prompt updates and GUARD-003 output blocking remain future tasks.
 
+BE-001 / App-7 status: `backend/analysis_modes.py` defines explicit `ANALYSIS_MODE` selection. Missing or empty mode preserves the current `ollama_baseline` behavior, `ANALYSIS_MODE=mock` returns deterministic Story Check diagnostics from `backend/mock_responses/story_check.json`, and invalid modes return a stable error-shaped response through `run_story_check`. Mock Story Check output is normalized through the same compatibility path and remains candidate-only.
+
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
 SC-002 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. Current `AnalysisSidebar.jsx` remains minimal-field compatible and exposes rich/fallback details through raw JSON; full rich section rendering remains future FE work.
 
 Analysis modes:
 
-- `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
-- `ANALYSIS_MODE=ollama_baseline`: local Ollama using `qwen3:8b`.
-- `ANALYSIS_MODE=dramatica_analyst_future`: local Ollama using `dramatica-analyst:8b` after model-swap gates pass.
+- `ANALYSIS_MODE=mock`: deterministic Story Check fixture for UI and test development without Ollama.
+- `ANALYSIS_MODE=ollama_baseline`: local Ollama using `qwen3:8b`; this remains the default when `ANALYSIS_MODE` is missing or empty.
+- Future mode target, not currently accepted by runtime config: local Ollama using `dramatica-analyst:8b` after model-swap gates pass.
 
 Backend responsibilities:
 

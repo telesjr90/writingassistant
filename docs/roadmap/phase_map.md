@@ -27,6 +27,7 @@
 - Outputs: runtime no-prose guardrails, refusal response schema, Story Check normalizer, minimal-to-rich compatibility, insufficient-evidence handling, analysis mode config.
 - Status note: GUARD-001 shared runtime no-prose guard completed in `backend/guardrails.py` with tests in `tests/test_guardrails.py`; integrated only into Story Check suggestion filtering where safe.
 - Status note: BE-002 Story Check normalizer completed in `backend/analysis_normalizer.py` with tests in `tests/test_analysis_normalizer.py`; `analysis_engine.py` now delegates model-output parsing and fallback behavior to the reusable normalizer.
+- Status note: BE-001 analysis mode config completed in `backend/analysis_modes.py` and `.env.example`; missing/empty `ANALYSIS_MODE` defaults to `ollama_baseline`, `ANALYSIS_MODE=mock` selects deterministic fixtures, and invalid modes follow a stable error path.
 - Status note: SC-001 rich Story Check prompt alignment completed in `backend/prompts/story_check.txt` with prompt checks in `tests/test_story_check_prompt.py`; route/UI compatibility remains future work.
 - Status note: SC-002 minimal-to-rich compatibility checks completed with Story Check route tests in `tests/test_story_check_route.py`; current sidebar compatibility was inspected and remains intentionally minimal until FE-001.
 - Exit: Story Check and OMI-relevant paths have clear no-prose and structured-output foundations before feature implementation expands.
@@ -35,6 +36,8 @@
 
 - Inputs: schema foundation, mock fixture requirements, Ollama baseline config.
 - Outputs: mock analysis mode, Story Check route tests, Ollama baseline mode, qwen3 baseline verification, evaluation fixtures.
+- Status note: App-7 mock Story Check mode completed with `backend/mock_responses/story_check.json` and tests covering schema compatibility, no Ollama calls, unresolved MC/IC/RS/CIPS/dynamics, route behavior, and no project-file mutation.
+- Status note: App-8 is partial only: `ANALYSIS_MODE=ollama_baseline` and `OLLAMA_MODEL=qwen3:8b` defaults are configured and tested with mocked Ollama output; manual live qwen3 verification remains TODO.
 - Exit: Story Check works without fine-tuning in mock and qwen3 baseline modes.
 
 ### Phase 4: Frontend MVP Diagnostics

@@ -2,9 +2,9 @@ import json
 import sys
 from pathlib import Path
 
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from backend import analysis_engine, guardrails
 from backend.analysis_engine import _parse_story_check_response
 
 
@@ -117,3 +117,133 @@ def test_suggestions_remain_questions_and_prose_requests_are_dropped():
     report = _parse_story_check_response(json.dumps(payload))
 
     assert report["suggestions"] == ["What approved storyform evidence is missing?"]
+
+
+def test_run_story_check_mock_mode_returns_rich_schema_compatible_report(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "mock")
+
+    def fail_post(*args, **kwargs):
+        raise AssertionError("mock mode must not call Ollama")
+
+    monkeypatch.setattr(analysis_engine.requests, "post", fail_post)
+
+    report = analysis_engine.run_story_check("example", "scene_001")
+
+    assert report["task"] == "story_check"
+    assert report["coherence_score"] == 7
+    assert {"overall_story", "main_character", "influence_character", "relationship_story"} == set(
+        report["throughline_alignment"]
+    )
+    assert report["theme_drift"]["status"] == "insufficient_evidence"
+    assert report["character_consistency"]["status"] == "consistent"
+    assert report["diagnostics"]["schema_valid"] is True
+    assert report["diagnostics"]["analysis_mode"] == "mock"
+    assert report["diagnostics"]["candidate_only"] is True
+    assert report["diagnostics"]["mutates_project_truth"] is False
+
+
+def test_mock_story_check_output_keeps_unsupported_throughlines_unproven(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "mock")
+
+    report = analysis_engine.run_story_check("example", "scene_001")
+    alignment = report["throughline_alignment"]
+
+    assert alignment["main_character"]["present"] is False
+    assert alignment["main_character"]["evidence"] == []
+    assert alignment["influence_character"]["present"] is False
+    assert alignment["influence_character"]["evidence"] == []
+    assert alignment["relationship_story"]["present"] is False
+    assert alignment["relationship_story"]["evidence"] == []
+    assert any("CIPS and dynamics are unresolved" in item for item in report["insufficient_evidence"])
+    assert guardrails.output_appears_to_contain_prose_generation(report) is False
+
+
+def test_mock_story_check_output_does_not_mutate_project_files(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "mock")
+    project_files = [
+        Path("projects/example/bible.json"),
+        Path("projects/example/storyform.json"),
+        Path("projects/example/project.json"),
+        Path("projects/example/scenes/scene_001.md"),
+    ]
+    before = {path: path.read_text(encoding="utf-8") for path in project_files}
+
+    analysis_engine.run_story_check("example", "scene_001")
+
+    after = {path: path.read_text(encoding="utf-8") for path in project_files}
+    assert after == before
+
+
+def test_run_story_check_ollama_baseline_uses_mocked_post_and_normalizer(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "ollama_baseline")
+    monkeypatch.setenv("OLLAMA_MODEL", "test-model")
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "message": {
+                    "content": json.dumps(
+                        {
+                            "coherence_score": 6,
+                            "warnings": ["Missing approved context."],
+                            "suggestions": ["What evidence is missing?"],
+                        }
+                    )
+                }
+            }
+
+    captured = {}
+
+    def fake_post(url, *, json, timeout):
+        captured["url"] = url
+        captured["json"] = json
+        captured["timeout"] = timeout
+        return FakeResponse()
+
+    monkeypatch.setattr(analysis_engine.requests, "post", fake_post)
+
+    report = analysis_engine.run_story_check("example", "scene_001")
+
+    assert captured["json"]["model"] == "test-model"
+    assert captured["json"]["format"] == "json"
+    assert captured["json"]["think"] is False
+    assert captured["json"]["stream"] is False
+    assert report["coherence_score"] == 6
+    assert report["warnings"] == ["[Factual] Missing approved context."]
+    assert report["diagnostics"]["legacy_small_schema"] is True
+
+
+def test_run_story_check_missing_analysis_mode_uses_ollama_baseline(monkeypatch):
+    monkeypatch.delenv("ANALYSIS_MODE", raising=False)
+    monkeypatch.delenv("OLLAMA_MODEL", raising=False)
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"message": {"content": json.dumps(rich_story_check_payload())}}
+
+    captured = {}
+
+    def fake_post(url, *, json, timeout):
+        captured["model"] = json["model"]
+        return FakeResponse()
+
+    monkeypatch.setattr(analysis_engine.requests, "post", fake_post)
+
+    report = analysis_engine.run_story_check("example", "scene_001")
+
+    assert captured["model"] == "qwen3:8b"
+    assert report["diagnostics"]["schema_valid"] is True
+
+
+def test_run_story_check_invalid_analysis_mode_returns_stable_error(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "invalid")
+
+    report = analysis_engine.run_story_check("example", "scene_001")
+
+    assert report == {"error": "Invalid ANALYSIS_MODE 'invalid'. Expected one of: mock, ollama_baseline."}

@@ -151,3 +151,20 @@ def test_story_check_route_returns_error_shaped_report(monkeypatch):
     body = main.story_check("example", "scene_001")
 
     assert body == payload
+
+
+def test_story_check_route_returns_mock_mode_output_without_ollama(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "mock")
+
+    def fail_post(*args, **kwargs):
+        raise AssertionError("mock route must not call Ollama")
+
+    monkeypatch.setattr(main.analysis_engine.requests, "post", fail_post)
+
+    body = main.story_check("example", "scene_001")
+
+    assert body["task"] == "story_check"
+    assert body["diagnostics"]["analysis_mode"] == "mock"
+    assert body["diagnostics"]["schema_valid"] is True
+    assert body["throughline_alignment"]["influence_character"]["present"] is False
+    assert body["throughline_alignment"]["relationship_story"]["present"] is False

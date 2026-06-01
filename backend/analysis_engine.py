@@ -8,25 +8,36 @@ from typing import Any
 import requests
 
 try:
-    from . import analysis_normalizer, project_manager
+    from . import analysis_modes, analysis_normalizer, project_manager
     from .storyform import Storyform
 except ImportError:  # pragma: no cover - supports direct execution from backend/
+    import analysis_modes
     import analysis_normalizer
     import project_manager
     from storyform import Storyform
 
 
 PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "story_check.txt"
+MOCK_STORY_CHECK_PATH = Path(__file__).resolve().parent / "mock_responses" / "story_check.json"
 OLLAMA_CHAT_URL = os.getenv("OLLAMA_CHAT_URL", "http://localhost:11434/api/chat")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:8b")
+DEFAULT_OLLAMA_MODEL = "qwen3:8b"
 
 
 def _parse_story_check_response(content: str) -> dict[str, Any]:
     return analysis_normalizer.normalize_story_check_output(content)
 
 
+def _load_mock_story_check_response() -> dict[str, Any]:
+    payload = json.loads(MOCK_STORY_CHECK_PATH.read_text(encoding="utf-8"))
+    return analysis_normalizer.normalize_story_check_output(payload)
+
+
 def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
     try:
+        mode = analysis_modes.get_analysis_mode()
+        if mode == analysis_modes.MOCK:
+            return _load_mock_story_check_response()
+
         timeout_seconds = float(os.getenv("OLLAMA_TIMEOUT_SECONDS", "300"))
         storyform_context = Storyform.from_file(project_name).to_prompt_context()
         scene_text = project_manager.load_scene(project_name, scene_id)
@@ -45,7 +56,7 @@ def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
         response = requests.post(
             OLLAMA_CHAT_URL,
             json={
-                "model": OLLAMA_MODEL,
+                "model": os.getenv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL),
                 "messages": [{"role": "user", "content": prompt}],
                 "format": "json",
                 "think": False,
