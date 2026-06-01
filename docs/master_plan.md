@@ -182,6 +182,8 @@ App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifec
 
 Sample project alignment status: `docs/roadmap/sample_project_alignment_spec.md` defines the aligned sample requirements, replacement strategy, provenance checks, Story Check fixture implications, OMI fixture implications, and no-prose boundaries. The local ignored `projects/example` fixture now uses public-domain scene source text; `owner_sample_input.md` is OMI-only future input. No runtime files, frontend files, tests, generated prose, public-domain prose rewrites, or owner idea promotion were introduced.
 
+GUARD-001 status: `backend/guardrails.py` provides the shared runtime no-prose guard API, standard refusal response, allowed-help list, and conservative output helper. It is integrated into Story Check suggestion filtering only; request-level route guards remain future work for OMI and other freeform request paths.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -284,7 +286,7 @@ MVP completion requires:
 
 ### Phase 2 - Backend safety and schema foundation
 
-- Runtime no-prose guardrails.
+- DONE: GUARD-001 shared runtime no-prose guard module and tests.
 - Refusal response schema.
 - Story Check normalizer.
 - Minimal-to-rich compatibility.

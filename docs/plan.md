@@ -107,7 +107,7 @@ Goal: Build a multi‑task dataset that teaches a model to diagnose narrative co
 
 ## 0.2 MVP Phase Order
 
-Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, sample project alignment spec, and local public-domain `projects/example` fixture alignment are complete. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. The next App MVP task is Phase 2 backend safety and schema foundation.
+Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, sample project alignment spec, local public-domain `projects/example` fixture alignment, and GUARD-001 shared runtime no-prose guard are complete. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. The next App MVP task is BE-002 Story Check normalizer or GUARD-002/GUARD-003 route/output guard integration.
 
 Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates.
 

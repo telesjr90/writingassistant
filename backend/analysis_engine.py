@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from pathlib import Path
 from typing import Any
 
@@ -14,9 +13,10 @@ except ImportError:  # pragma: no cover - runtime can still normalize without sc
     JsonSchemaValidator = None  # type: ignore[assignment]
 
 try:
-    from . import project_manager
+    from . import guardrails, project_manager
     from .storyform import Storyform
 except ImportError:  # pragma: no cover - supports direct execution from backend/
+    import guardrails
     import project_manager
     from storyform import Storyform
 
@@ -32,12 +32,6 @@ ALLOWED_WARNING_PREFIXES = (
     "[Factual]",
     "[Stylistic]",
 )
-PROSE_GENERATION_RE = re.compile(
-    r"\b(?:write|draft|compose|generate|rewrite|revise|polish|improve|continue|finish|extend)\b"
-    r".{0,80}\b(?:scene|chapter|paragraph|prose|dialogue|monologue|passage|text|story)\b",
-    re.IGNORECASE,
-)
-
 
 def _fallback_response(message: str, *, raw_content: str | None = None) -> dict[str, Any]:
     response: dict[str, Any] = {
@@ -85,7 +79,7 @@ def _normalize_warnings(value: Any) -> list[str]:
 
 def _is_safe_question(value: str) -> bool:
     text = value.strip()
-    return text.endswith("?") and PROSE_GENERATION_RE.search(text) is None
+    return text.endswith("?") and not guardrails.is_prose_generation_request(text)
 
 
 def _normalize_suggestions(value: Any) -> list[str]:

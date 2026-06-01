@@ -19,7 +19,9 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-7 | Mock analysis mode | `ANALYSIS_MODE=mock` | Deterministic fixtures drive UI/tests |
 | App-8 | Ollama baseline mode | `ANALYSIS_MODE=ollama_baseline` | Uses `qwen3:8b` via config |
 | App-9 | Analysis parser/normalizer | Normalized response object | UI receives bounded structured data |
-| App-10 | No-prose runtime guard | Input/output guardrails | Prose requests refuse with standard message |
+| GUARD-001 | Shared no-prose guard module | `backend/guardrails.py`, `tests/test_guardrails.py` | DONE; prose-generation request classifier, standard refusal response, allowed-help list, and Story Check suggestion filtering integration |
+| GUARD-002 | Request-path no-prose guard integration | Route/service guard use | TODO; apply guard to future freeform request fields without treating scene text as request intent |
+| GUARD-003 | Output no-prose guard integration | Model-output guard use | TODO; integrate conservative output guard after normalizers exist |
 | App-11 | Story Check sidebar UI | Rich diagnostic sidebar | Four throughlines, drift, consistency, warnings, and questions render clearly |
 | App-12 | Evaluation fixtures | Fixture set | Valid, invalid, refusal, and insufficient-evidence cases covered |
 | App-13 | Baseline evaluation harness | Baseline report | JSON validity, schema compliance, refusal violations counted |
@@ -37,7 +39,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
-| Phase 2 | Backend safety and schema foundation | TODO |
+| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001 shared runtime no-prose guard done; Story Check normalizer and route/output guard integration remain TODO |
 | Phase 3 | Mock and baseline Story Check | TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |
