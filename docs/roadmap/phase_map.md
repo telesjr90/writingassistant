@@ -17,6 +17,7 @@
 - Status note: App-2 project file model completed in `docs/roadmap/project_file_model.md`.
 - Status note: App-3 NCP compatibility subset completed in `docs/roadmap/ncp_compatibility_subset.md`.
 - Status note: App-3a / OMI-001 schema and lifecycle completed in `docs/roadmap/omi_mvp_schema_lifecycle.md`.
+- Status note: Owner-created sample project alignment spec completed in `docs/roadmap/sample_project_alignment_spec.md`.
 - Exit: core app gaps and project truth/candidate storage boundaries are documented.
 
 ### Phase 2: Backend Safety and Schema Foundation

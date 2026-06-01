@@ -46,4 +46,12 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 ## Owner Questions
 
-No additional owner decisions are required before reviewing and committing App-3a / OMI-001. Remaining items are implementation or verification follow-ups.
+Sample implementation requires owner-provided content and approval:
+
+1. What should the owner-created sample `project_id` be?
+2. What should the display title be?
+3. Will the owner provide the first scene text?
+4. Should the first aligned sample include IC and RS evidence, or intentionally leave one or both absent for insufficient-evidence testing?
+5. Is it approved to commit the owner-created sample files once provided?
+
+Until those inputs are available, the app can proceed to Phase 2 backend safety and schema foundation.

@@ -12,7 +12,7 @@
 | R8 | NotebookLM output treated as truth | High | Medium | Mark candidate-only in all plans and reports | Active |
 | R9 | Local GPU cannot train primary model | High | Confirmed | Use RunPod/larger GPU; smoke only locally if explicitly allowed | Active |
 | R10 | Smoke model accidentally deployed | High | Medium | Label artifacts and block production export/deploy | Active |
-| R11 | Sample project mismatch hides app bugs | Medium | Confirmed | Align Elena vs Ember Crown before MVP evaluation | Active |
+| R11 | Sample project mismatch hides app bugs | Medium | Confirmed | Replace or align the current sample with owner-created rights-safe content before MVP evaluation; do not use mismatched sample for quality claims | Active |
 | R12 | Safe baseline has not been pushed to GitHub | Medium | Medium | Push local commit `25ef64d` after owner approval; do not claim remote publication until complete | Active |
 | R13 | Backend dependency manifest drifts from implementation | Medium | Medium | Keep `backend/requirements.txt` separate from training requirements and validate as runtime dependencies evolve | Active |
 | R14 | OMI candidate output mistaken for story truth | High | Medium | Use candidate-only status, provenance/status labels, destination selection, and owner approval gate | Active |
@@ -23,3 +23,4 @@
 | R19 | Generic relationship or theme language becomes false RS/Issue proof | High | Medium | Keep RS/Issue/CIPS/dynamics claims owner-gated and evidence-grounded; preserve unresolved fields rather than guessing | Active |
 | R20 | OMI template starters drift into prose generation | High | Medium | Define template starters as structural scaffolding only; block scene, dialogue, paragraph, chapter, and ending text | Active |
 | R21 | OMI promotion proceeds with incomplete metadata | High | Medium | Require owner decision, destination, provenance, status, source candidate ID, timestamp, and final confirmation before promotion | Active |
+| R22 | Sample fixture introduces provenance or copyright ambiguity | High | Medium | Use owner-created content only for MVP sample; include provenance note and owner approval before committing sample files | Active |

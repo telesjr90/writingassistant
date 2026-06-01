@@ -179,6 +179,8 @@ App-3 NCP compatibility subset status: `docs/roadmap/ncp_compatibility_subset.md
 
 App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifecycle.md` defines OMI idea/candidate fields, lifecycle statuses, destinations, owner decisions, provenance, no-prose boundaries, and no-silent-promotion rules. It is a design spec only; no OMI endpoints, storage files, frontend components, or project-file migrations have been implemented.
 
+Sample project alignment spec status: `docs/roadmap/sample_project_alignment_spec.md` defines the owner-created aligned sample requirements, replacement strategy, provenance checks, Story Check fixture implications, OMI fixture implications, and no-prose boundaries. It is a design spec only; no project files, runtime files, frontend files, or tests have been changed.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -271,7 +273,7 @@ MVP completion requires:
 
 ### Phase 1 - App architecture audit and project model decisions
 
-- Status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, and App-3a / OMI-001 schema/lifecycle are complete as documentation/specification artifacts. Sample project alignment work is next.
+- Status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, and the owner-created sample project alignment spec are complete as documentation/specification artifacts. Owner sample inputs or Phase 2 backend foundation are next.
 - Architecture audit report.
 - Source-of-truth cleanup.
 - NCP/storyform MVP subset.
