@@ -384,11 +384,11 @@ Future tests should prove:
 
 Recommended answer:
 
-- Use a small owner-created aligned sample project for MVP fixtures.
-- Public-domain material can be used later for broader evaluation.
+- Use the public-domain `public_domain_scene_002.txt` source for the main `projects/example` MVP Story Check fixture.
+- Reserve `owner_sample_input.md` for future OMI raw idea and candidate-planning tests.
 - Do not modify `projects/example` in this task.
 
-The current Elena/Ember Crown mismatch remains a separate sample alignment task.
+The owner idea input is not accepted story truth, not Story Check scene prose, and not a source for `bible.json` or `storyform.json` unless a future owner-controlled OMI promotion explicitly approves a candidate destination.
 
 ## 19. App-3a / OMI-001 Acceptance Checklist
 
@@ -409,7 +409,7 @@ The current Elena/Ember Crown mismatch remains a separate sample alignment task.
 ## 20. Recommended Next Tasks
 
 1. Review and commit App-3a / OMI-001 outputs.
-2. Sample project alignment decision/spec using a small owner-created aligned sample.
+2. Sample project alignment decision/spec using the public-domain main fixture and OMI-only owner idea input split.
 3. Phase 2 backend safety and schema foundation.
 4. GUARD-001 runtime no-prose guard in shared `backend/guardrails.py`.
 5. BE-002 Story Check normalizer using `jsonschema` plus custom normalizer.

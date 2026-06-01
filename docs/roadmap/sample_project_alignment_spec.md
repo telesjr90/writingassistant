@@ -1,10 +1,14 @@
 # Owner-Created Sample Project Alignment Spec
 
+## Source Role Correction
+
+Correction applied after implementation planning: the main MVP `projects/example` Story Check fixture should use `/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt` as its scene source. `/mnt/e/WritingAssistantApplication/docs/owner_sample_input.md` is future OMI raw idea / candidate-planning input only. It must not be used as `scene_001.md`, accepted project truth, bible truth, or storyform truth.
+
 ## 1. Executive Summary
 
 The current sample project must be replaced or aligned because its durable project context is internally inconsistent: the storyform, bible, and scene files describe different stories. That prevents the App MVP from using the sample as a reliable Story Check demo, mock fixture source, or evaluation baseline.
 
-The owner-created MVP sample is for app validation, not for publication or literary evaluation. It should be small, rights-safe, structurally clear, and designed to exercise Story Check, NCP/storyform context, OMI candidate lifecycle examples, mock mode, and future guardrail tests.
+The corrected MVP sample is for app validation, not for publication or literary evaluation. It should be small, rights-safe, structurally clear, and designed to exercise Story Check, NCP/storyform context, mock mode, and future guardrail tests. The app-wide sample may use public-domain source text; owner idea material is reserved for OMI candidate lifecycle examples.
 
 This spec defines the required sample contents, file model, provenance policy, validation plan, fixture implications, replacement strategy, and owner inputs needed before implementation.
 
@@ -53,13 +57,19 @@ The actual story content must come from the owner.
 
 Codex may create file structure specs, field templates, validation rules, placeholder labels, and implementation plans. Codex must not write story prose, generate a scene, draft dialogue, create paragraphs, write an opening, write an ending, or improve existing prose for the sample.
 
-Owner-created content should be:
+Owner-created or public-domain fixture content should be:
 
 - Small enough for fast local tests.
 - Rights-safe.
 - Explicitly approved for repository use.
 - Designed to make structural evidence easy to inspect.
 - Clear about which fields are intentionally present and which are intentionally absent.
+
+Corrected source-role policy:
+
+- `public_domain_scene_002.txt` is the main MVP sample scene source for `projects/example`.
+- `owner_sample_input.md` is OMI raw idea / candidate-planning input only.
+- OMI input must remain candidate-only and must not be silently promoted into `bible.json`, `storyform.json`, scene files, or durable project truth.
 
 ## 5. Recommended Sample Identity Model
 
@@ -231,7 +241,7 @@ Future implementation options:
 - Option B: create `projects/mvp_owner_sample` and later update frontend project selection.
 - Option C: keep `projects/example` as legacy and add a new aligned sample.
 
-Recommendation for MVP: Option A. The current frontend hard-codes `PROJECT_ID = 'example'`, so replacing `projects/example` with an owner-created aligned sample is the smallest implementation path and avoids adding project selection before the app needs it.
+Recommendation for MVP: Option A. The current frontend hard-codes `PROJECT_ID = 'example'`, so replacing `projects/example` with the aligned public-domain sample is the smallest implementation path and avoids adding project selection before the app needs it.
 
 Do not perform replacement in this task.
 

@@ -12,6 +12,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-3 | NCP compatibility subset | `docs/roadmap/ncp_compatibility_subset.md` | DONE; supported NCP/storyform fields, OS/MC/IC/RS separation, owner-gated claims, and insufficient-evidence boundaries documented |
 | App-3a | OMI MVP design schema | `docs/roadmap/omi_mvp_schema_lifecycle.md` | DONE; OMI idea/candidate schema, lifecycle, destinations, owner decisions, provenance, no-prose, and no-silent-promotion boundaries documented |
 | App-3b | Owner-created sample project alignment spec | `docs/roadmap/sample_project_alignment_spec.md` | DONE; owner-created sample requirements, mismatch replacement strategy, Story Check/OMI fixture implications, provenance, and no-prose boundaries documented |
+| App-3c | Sample fixture source correction and alignment | `projects/example/` local ignored fixture | DONE locally; public-domain scene source replaced the mismatched sample and prior owner-idea mix-up; `owner_sample_input.md` reserved for future OMI tests; MC/IC/RS/CIPS/dynamics remain unresolved |
 | App-4 | Scene editor hardening | Reliable save/load UX | No scene data loss in normal local workflow |
 | App-5 | Bible/storyform read/write layer | Backend APIs and UI | Candidate output cannot overwrite owner-approved truth |
 | App-6 | Story Check rich schema parser | Parser/normalizer | Malformed model output becomes safe fallback |
@@ -35,7 +36,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase | Scope | Status |
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
-| Phase 1 | App architecture audit and project model decisions | IN PROGRESS; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, and sample alignment spec done; owner sample inputs or Phase 2 start remain TODO |
+| Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
 | Phase 2 | Backend safety and schema foundation | TODO |
 | Phase 3 | Mock and baseline Story Check | TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |

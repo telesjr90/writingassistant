@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1.0",
+  "project_id": "example",
+  "title": "The Princess and the Pea",
+  "description": "Public-domain MVP fixture aligned across project metadata, bible, storyform, and scene text.",
+  "status": "sample_fixture",
+  "created_at": "2026-05-31T00:00:00Z",
+  "updated_at": "2026-05-31T00:00:00Z",
+  "default_scene_id": "scene_001",
+  "analysis_mode_default": "mock",
+  "provenance": {
+    "source": "public_domain_scene_002",
+    "source_path": "/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt",
+    "content_status": "public_domain",
+    "scene_text_copied_verbatim": true
+  },
+  "fixture_purpose": [
+    "Story Check context alignment",
+    "NCP/storyform context loading",
+    "future mock fixtures",
+    "future no-prose guardrail testing",
+    "public-domain app-wide MVP testing"
+  ],
+  "owner_approved_truth_policy": {
+    "durable_truth_requires_owner_approval": true,
+    "candidate_outputs_do_not_promote_automatically": true,
+    "standard_refusal_message": "I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose."
+  }
+}

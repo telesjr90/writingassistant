@@ -46,12 +46,13 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 ## Owner Questions
 
-Sample implementation requires owner-provided content and approval:
+No additional owner decisions are required before Phase 2 backend safety and schema foundation.
 
-1. What should the owner-created sample `project_id` be?
-2. What should the display title be?
-3. Will the owner provide the first scene text?
-4. Should the first aligned sample include IC and RS evidence, or intentionally leave one or both absent for insufficient-evidence testing?
-5. Is it approved to commit the owner-created sample files once provided?
+Resolved sample/source roles:
 
-Until those inputs are available, the app can proceed to Phase 2 backend safety and schema foundation.
+1. `project_id`: `example`, kept for MVP compatibility with the current hard-coded frontend project ID.
+2. Display title: `The Princess and the Pea`, from `/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt`.
+3. First scene text: copied verbatim from `/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt` into the local ignored fixture.
+4. `/mnt/e/WritingAssistantApplication/docs/owner_sample_input.md`: reserved for future OMI raw idea/candidate-planning tests only, not Story Check fixture prose or project truth.
+5. MC, IC, RS, CIPS, and dynamics evidence: not asserted for the public-domain fixture, so these remain unresolved for insufficient-evidence behavior.
+6. Commit status: project fixture changes remain unstaged/uncommitted until explicitly requested.

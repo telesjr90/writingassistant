@@ -1,0 +1,111 @@
+{
+  "schema_version": "0.1.0",
+  "project_id": "example",
+  "title": "The Princess and the Pea",
+  "status": "sample_fixture",
+  "provenance": {
+    "source": "public_domain_scene_002",
+    "source_path": "/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt",
+    "content_status": "public_domain",
+    "notes": [
+      "Facts are source-derived from the public-domain scene file only.",
+      "No model output, NotebookLM output, retrieved reference, or generated story prose is included."
+    ]
+  },
+  "premise": {
+    "logline": "A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.",
+    "genre_notes": [
+      "Fairy tale",
+      "Public-domain sample fixture"
+    ]
+  },
+  "characters": [
+    {
+      "id": "character_prince",
+      "name": "prince",
+      "role": "source character",
+      "facts": [
+        "He wants to marry a real princess.",
+        "He travels all over the world to find one.",
+        "He comes home sad after failing to find what he wants.",
+        "He takes the princess for his wife after the test."
+      ]
+    },
+    {
+      "id": "character_princess",
+      "name": "princess",
+      "role": "source character",
+      "facts": [
+        "She arrives at the city gate during a terrible storm.",
+        "She says that she is a real princess.",
+        "She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.",
+        "She reports sleeping badly and being black and blue from something hard in the bed."
+      ]
+    },
+    {
+      "id": "character_old_queen",
+      "name": "old queen",
+      "role": "source character",
+      "facts": [
+        "She decides to find out whether the visitor is a real princess.",
+        "She places a pea on the bottom of the bedstead and piles bedding over it."
+      ]
+    },
+    {
+      "id": "character_old_king",
+      "name": "old king",
+      "role": "source character",
+      "facts": [
+        "He opens the city gate when knocking is heard during the storm."
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "id": "setting_prince_home",
+      "name": "prince's home",
+      "facts": [
+        "The prince returns there after travelling all over the world."
+      ]
+    },
+    {
+      "id": "setting_city_gate",
+      "name": "city gate",
+      "facts": [
+        "The princess appears there during thunder, lightning, and heavy rain."
+      ]
+    },
+    {
+      "id": "setting_bedroom",
+      "name": "bedroom",
+      "facts": [
+        "The old queen prepares the bedstead, pea, mattresses, and eider-down beds there."
+      ]
+    },
+    {
+      "id": "setting_museum",
+      "name": "museum",
+      "facts": [
+        "The pea is put there after the prince marries the princess."
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "id": "object_pea",
+      "name": "pea",
+      "facts": [
+        "The old queen places it under twenty mattresses and twenty eider-down beds.",
+        "It becomes evidence used to identify the visitor as a real princess.",
+        "It is put in the museum."
+      ]
+    }
+  ],
+  "unresolved": {
+    "main_character": "No Dramatica Main Character assignment is asserted for this fixture.",
+    "influence_character": "No Influence Character assignment is asserted for this fixture.",
+    "relationship_story": "The marriage outcome is not treated as Relationship Story proof.",
+    "cips": "Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.",
+    "dynamics": "Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved."
+  }
+}
