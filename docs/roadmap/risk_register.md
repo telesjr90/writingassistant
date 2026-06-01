@@ -21,3 +21,5 @@
 | R17 | OMI scope creep delays core Story Check MVP | Medium | Medium | Phase OMI implementation after backend guardrails/schema foundation and keep design-first slice bounded | Active |
 | R18 | Schema-valid NCP data mistaken for verified story truth | High | Medium | Separate JSON Schema validation from semantic certainty; require owner-approved context and insufficient-evidence reporting | Active |
 | R19 | Generic relationship or theme language becomes false RS/Issue proof | High | Medium | Keep RS/Issue/CIPS/dynamics claims owner-gated and evidence-grounded; preserve unresolved fields rather than guessing | Active |
+| R20 | OMI template starters drift into prose generation | High | Medium | Define template starters as structural scaffolding only; block scene, dialogue, paragraph, chapter, and ending text | Active |
+| R21 | OMI promotion proceeds with incomplete metadata | High | Medium | Require owner decision, destination, provenance, status, source candidate ID, timestamp, and final confirmation before promotion | Active |

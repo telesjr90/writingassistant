@@ -10,7 +10,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-1 | Architecture audit | `docs/roadmap/app_mvp_architecture_audit.md` | DONE; routes, storage, model path, UI gaps, tests, Story Check, NCP, and OMI readiness captured |
 | App-2 | Project file model | `docs/roadmap/project_file_model.md` | DONE; project identity, bible, storyform, scenes, analysis artifacts, OMI candidates, provenance, and owner-approved truth boundaries separated |
 | App-3 | NCP compatibility subset | `docs/roadmap/ncp_compatibility_subset.md` | DONE; supported NCP/storyform fields, OS/MC/IC/RS separation, owner-gated claims, and insufficient-evidence boundaries documented |
-| App-3a | OMI MVP design schema | Schema/lifecycle spec | OMI is bounded to analysis-only candidate planning with owner decision, destination, provenance, and status |
+| App-3a | OMI MVP design schema | `docs/roadmap/omi_mvp_schema_lifecycle.md` | DONE; OMI idea/candidate schema, lifecycle, destinations, owner decisions, provenance, no-prose, and no-silent-promotion boundaries documented |
 | App-4 | Scene editor hardening | Reliable save/load UX | No scene data loss in normal local workflow |
 | App-5 | Bible/storyform read/write layer | Backend APIs and UI | Candidate output cannot overwrite owner-approved truth |
 | App-6 | Story Check rich schema parser | Parser/normalizer | Malformed model output becomes safe fallback |
@@ -21,7 +21,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-11 | Story Check sidebar UI | Rich diagnostic sidebar | Four throughlines, drift, consistency, warnings, and questions render clearly |
 | App-12 | Evaluation fixtures | Fixture set | Valid, invalid, refusal, and insufficient-evidence cases covered |
 | App-13 | Baseline evaluation harness | Baseline report | JSON validity, schema compliance, refusal violations counted |
-| OMI-001 | Define OMI MVP schema and lifecycle | OMI schema/lifecycle design | TODO; fields include `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status` |
+| OMI-001 | Define OMI MVP schema and lifecycle | `docs/roadmap/omi_mvp_schema_lifecycle.md` | DONE; fields include `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status` |
 | OMI-002 | Design OMI storage model | Storage design | TODO; candidates remain separate from owner-approved bible/storyform/project truth |
 | OMI-003 | Implement OMI candidate creation flow | Candidate creation path | TODO; raw ideas can produce/display structured candidate planning material only, with no story prose |
 | OMI-004 | Implement owner decision and destination selection | Decision/destination flow | TODO; owner explicitly chooses approval/rejection and destination |
@@ -34,7 +34,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase | Scope | Status |
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
-| Phase 1 | App architecture audit and project model decisions | IN PROGRESS; App-1 architecture audit, App-2 project file model, and App-3 NCP subset done; App-3a/sample alignment remain TODO |
+| Phase 1 | App architecture audit and project model decisions | IN PROGRESS; App-1 architecture audit, App-2 project file model, App-3 NCP subset, and App-3a/OMI-001 done; sample alignment remains TODO |
 | Phase 2 | Backend safety and schema foundation | TODO |
 | Phase 3 | Mock and baseline Story Check | TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |

@@ -48,5 +48,5 @@
 - Git: initialized/repaired on `main` with `origin https://github.com/telesjr90/writingassistant`; local baseline commit `25ef64d chore: initialize safe project baseline` exists.
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.
 - Backend dependency manifest: `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`.
-- OMI: App MVP feature, but bounded to analysis-only candidate planning. No prose generation, no story continuation, no rewriting, and no silent promotion into durable truth.
+- OMI: App MVP feature, but bounded to analysis-only candidate planning. No prose generation, no story continuation, no rewriting, and no silent promotion into durable truth. Future runtime implementation should use shared `backend/guardrails.py` before model calls; this is a design target only until implemented.
 - GitHub Issues/Projects: deferred until after safe baseline push and owner approval.
