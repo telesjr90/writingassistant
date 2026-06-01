@@ -188,6 +188,8 @@ BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Chec
 
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
+SC-002 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. Current `AnalysisSidebar.jsx` remains minimal-field compatible and exposes rich/fallback details through raw JSON; full rich section rendering remains future FE work.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -294,7 +296,7 @@ MVP completion requires:
 - Refusal response schema.
 - DONE: BE-002 Story Check normalizer.
 - DONE: SC-001 rich Story Check prompt alignment.
-- Minimal-to-rich compatibility.
+- DONE: SC-002 minimal-to-rich route/UI compatibility checks.
 - Insufficient-evidence handling.
 - Analysis mode config.
 

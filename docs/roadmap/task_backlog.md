@@ -17,7 +17,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-5 | Bible/storyform read/write layer | Backend APIs and UI | Candidate output cannot overwrite owner-approved truth |
 | BE-002 | Story Check normalizer | `backend/analysis_normalizer.py`, `tests/test_analysis_normalizer.py` | DONE; malformed model output becomes safe fallback, minimal UI fields remain stable, rich fields are preserved, and schema errors are diagnostic only |
 | SC-001 | Story Check rich prompt alignment | `backend/prompts/story_check.txt`, `tests/test_story_check_prompt.py` | DONE; prompt requests the rich schema, JSON-only output, no-prose boundaries, and insufficient-evidence handling without changing runtime routes |
-| SC-002 | Minimal-to-rich Story Check compatibility | Route/UI compatibility checks | TODO; verify frontend and future mock fixtures consume normalized minimal and rich responses |
+| SC-002 | Minimal-to-rich Story Check compatibility | `tests/test_story_check_route.py`, sidebar inspection | DONE; minimal, rich, fallback, diagnostic, missing-rich-field, unknown-field, and error-shaped reports remain route-safe and current sidebar-compatible through minimal fields/raw JSON |
 | App-7 | Mock analysis mode | `ANALYSIS_MODE=mock` | Deterministic fixtures drive UI/tests |
 | App-8 | Ollama baseline mode | `ANALYSIS_MODE=ollama_baseline` | Uses `qwen3:8b` via config |
 | App-9 | Analysis parser/normalizer | Normalized response object | UI receives bounded structured data |
@@ -41,7 +41,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
-| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, BE-002, and SC-001 done; minimal-to-rich compatibility checks and route/output guard integration remain TODO |
+| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, BE-002, SC-001, and SC-002 done; route/output guard integration, mock mode, and richer UI remain TODO |
 | Phase 3 | Mock and baseline Story Check | TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |
