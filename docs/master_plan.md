@@ -186,6 +186,8 @@ GUARD-001 status: `backend/guardrails.py` provides the shared runtime no-prose g
 
 BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Check normalizer, safe JSON-object extraction, `jsonschema` validation when available, minimal UI compatibility fields, rich Story Check field preservation, and deterministic malformed-output fallback. It is integrated through `backend/analysis_engine.py`; SC-001 prompt updates and GUARD-003 output blocking remain future tasks.
 
+SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -291,6 +293,7 @@ MVP completion requires:
 - DONE: GUARD-001 shared runtime no-prose guard module and tests.
 - Refusal response schema.
 - DONE: BE-002 Story Check normalizer.
+- DONE: SC-001 rich Story Check prompt alignment.
 - Minimal-to-rich compatibility.
 - Insufficient-evidence handling.
 - Analysis mode config.

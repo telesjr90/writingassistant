@@ -23,6 +23,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 | Story Check artifact saving | Manual owner save only for MVP. |
 | OMI location | Project-local for MVP; global idea inbox later. |
 | Schema validation | Use `jsonschema` plus custom normalizer; schema validity is not story truth. BE-002 implements the reusable Story Check normalizer with schema diagnostics and safe fallback behavior. |
+| Story Check prompt schema | SC-001 aligns `backend/prompts/story_check.txt` to the rich Story Check schema, JSON-only output, no-prose boundaries, and insufficient-evidence reporting. |
 | GitHub Issues/Projects | Not yet; wait until Phase 1 and early Phase 2 task structure are approved. |
 | Reference repo role | Prose-generation and autonomous-agent repos remain documentation-only. NCP may inform structure. |
 | qwen25 cloud config | Revise/create cloud smoke config before RunPod smoke. |
@@ -39,10 +40,11 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 4. Define exact OMI API/storage implementation without assuming current endpoints exist.
 5. Integrate shared `backend/guardrails.py` into future freeform request routes and post-model output paths without treating scene text as user request intent.
 6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
-7. Create deterministic mock-mode fixtures for all four supported analysis tasks.
-8. Revise or create a RunPod cloud smoke config before smoke training.
-9. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
-10. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
+7. Verify minimal-to-rich Story Check route/UI compatibility and deterministic mock fixtures.
+8. Create deterministic mock-mode fixtures for all four supported analysis tasks.
+9. Revise or create a RunPod cloud smoke config before smoke training.
+10. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
+11. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
 
 ## Owner Questions
 
