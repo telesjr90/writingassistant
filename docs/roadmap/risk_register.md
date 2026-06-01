@@ -24,3 +24,4 @@
 | R20 | OMI template starters drift into prose generation | High | Medium | Define template starters as structural scaffolding only; block scene, dialogue, paragraph, chapter, and ending text | Active |
 | R21 | OMI promotion proceeds with incomplete metadata | High | Medium | Require owner decision, destination, provenance, status, source candidate ID, timestamp, and final confirmation before promotion | Active |
 | R22 | Sample fixture introduces provenance or copyright ambiguity | High | Low | Local fixture metadata records public-domain source provenance; owner idea input is excluded from project truth and reserved for OMI tests | Mitigated locally |
+| R23 | Malformed or noncompliant model JSON breaks Story Check UX | High | Medium | BE-002 reusable Story Check normalizer validates with `jsonschema` where available, coerces minimal UI fields, preserves rich diagnostics, and returns deterministic fallback for malformed output | Mitigated locally |

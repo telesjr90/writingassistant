@@ -26,6 +26,7 @@
 - Inputs: Story Check schema, refusal schema, no-prose policy, analysis mode decision.
 - Outputs: runtime no-prose guardrails, refusal response schema, Story Check normalizer, minimal-to-rich compatibility, insufficient-evidence handling, analysis mode config.
 - Status note: GUARD-001 shared runtime no-prose guard completed in `backend/guardrails.py` with tests in `tests/test_guardrails.py`; integrated only into Story Check suggestion filtering where safe.
+- Status note: BE-002 Story Check normalizer completed in `backend/analysis_normalizer.py` with tests in `tests/test_analysis_normalizer.py`; `analysis_engine.py` now delegates model-output parsing and fallback behavior to the reusable normalizer.
 - Exit: Story Check and OMI-relevant paths have clear no-prose and structured-output foundations before feature implementation expands.
 
 ### Phase 3: Mock and Baseline Story Check

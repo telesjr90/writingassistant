@@ -15,7 +15,9 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-3c | Sample fixture source correction and alignment | `projects/example/` local ignored fixture | DONE locally; public-domain scene source replaced the mismatched sample and prior owner-idea mix-up; `owner_sample_input.md` reserved for future OMI tests; MC/IC/RS/CIPS/dynamics remain unresolved |
 | App-4 | Scene editor hardening | Reliable save/load UX | No scene data loss in normal local workflow |
 | App-5 | Bible/storyform read/write layer | Backend APIs and UI | Candidate output cannot overwrite owner-approved truth |
-| App-6 | Story Check rich schema parser | Parser/normalizer | Malformed model output becomes safe fallback |
+| BE-002 | Story Check normalizer | `backend/analysis_normalizer.py`, `tests/test_analysis_normalizer.py` | DONE; malformed model output becomes safe fallback, minimal UI fields remain stable, rich fields are preserved, and schema errors are diagnostic only |
+| SC-001 | Story Check rich prompt alignment | `backend/prompts/story_check.txt` review/update | TODO; align prompt with normalized rich schema behavior without prose generation |
+| SC-002 | Minimal-to-rich Story Check compatibility | Route/UI compatibility checks | TODO; verify frontend and future mock fixtures consume normalized minimal and rich responses |
 | App-7 | Mock analysis mode | `ANALYSIS_MODE=mock` | Deterministic fixtures drive UI/tests |
 | App-8 | Ollama baseline mode | `ANALYSIS_MODE=ollama_baseline` | Uses `qwen3:8b` via config |
 | App-9 | Analysis parser/normalizer | Normalized response object | UI receives bounded structured data |
@@ -39,7 +41,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
-| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001 shared runtime no-prose guard done; Story Check normalizer and route/output guard integration remain TODO |
+| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001 shared runtime no-prose guard and BE-002 Story Check normalizer done; prompt alignment and route/output guard integration remain TODO |
 | Phase 3 | Mock and baseline Story Check | TODO |
 | Phase 4 | Frontend MVP diagnostics | TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |

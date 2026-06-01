@@ -22,7 +22,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 | Owner memory | Include `owner_memory.json` as a design target; defer full runtime behavior until core Story Check and OMI basics. |
 | Story Check artifact saving | Manual owner save only for MVP. |
 | OMI location | Project-local for MVP; global idea inbox later. |
-| Schema validation | Use `jsonschema` plus custom normalizer; schema validity is not story truth. |
+| Schema validation | Use `jsonschema` plus custom normalizer; schema validity is not story truth. BE-002 implements the reusable Story Check normalizer with schema diagnostics and safe fallback behavior. |
 | GitHub Issues/Projects | Not yet; wait until Phase 1 and early Phase 2 task structure are approved. |
 | Reference repo role | Prose-generation and autonomous-agent repos remain documentation-only. NCP may inform structure. |
 | qwen25 cloud config | Revise/create cloud smoke config before RunPod smoke. |
@@ -38,7 +38,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 3. Replace the sample fixture with one aligned owner-created project for MVP.
 4. Define exact OMI API/storage implementation without assuming current endpoints exist.
 5. Integrate shared `backend/guardrails.py` into future freeform request routes and post-model output paths without treating scene text as user request intent.
-6. Implement runtime schema validation with `jsonschema` plus custom normalizers later.
+6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
 7. Create deterministic mock-mode fixtures for all four supported analysis tasks.
 8. Revise or create a RunPod cloud smoke config before smoke training.
 9. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.

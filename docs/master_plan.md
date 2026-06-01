@@ -184,6 +184,8 @@ Sample project alignment status: `docs/roadmap/sample_project_alignment_spec.md`
 
 GUARD-001 status: `backend/guardrails.py` provides the shared runtime no-prose guard API, standard refusal response, allowed-help list, and conservative output helper. It is integrated into Story Check suggestion filtering only; request-level route guards remain future work for OMI and other freeform request paths.
 
+BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Check normalizer, safe JSON-object extraction, `jsonschema` validation when available, minimal UI compatibility fields, rich Story Check field preservation, and deterministic malformed-output fallback. It is integrated through `backend/analysis_engine.py`; SC-001 prompt updates and GUARD-003 output blocking remain future tasks.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic fixtures for UI and test development.
@@ -288,7 +290,7 @@ MVP completion requires:
 
 - DONE: GUARD-001 shared runtime no-prose guard module and tests.
 - Refusal response schema.
-- Story Check normalizer.
+- DONE: BE-002 Story Check normalizer.
 - Minimal-to-rich compatibility.
 - Insufficient-evidence handling.
 - Analysis mode config.
