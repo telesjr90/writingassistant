@@ -13,7 +13,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-3a | OMI MVP design schema | `docs/roadmap/omi_mvp_schema_lifecycle.md` | DONE; OMI idea/candidate schema, lifecycle, destinations, owner decisions, provenance, no-prose, and no-silent-promotion boundaries documented |
 | App-3b | Owner-created sample project alignment spec | `docs/roadmap/sample_project_alignment_spec.md` | DONE; owner-created sample requirements, mismatch replacement strategy, Story Check/OMI fixture implications, provenance, and no-prose boundaries documented |
 | App-3c | Sample fixture source correction and alignment | `projects/example/` local ignored fixture | DONE locally; public-domain scene source replaced the mismatched sample and prior owner-idea mix-up; `owner_sample_input.md` reserved for future OMI tests; MC/IC/RS/CIPS/dynamics remain unresolved |
-| App-4 | Scene editor hardening | Reliable save/load UX | No scene data loss in normal local workflow |
+| App-4 | Scene editor hardening | Reliable save/load UX | DONE; dirty state, save/load status, scene-switch confirmation, empty scene support, and route/storage tests are in place |
 | App-5 | Bible/storyform read/write layer | Backend APIs and UI | Candidate output cannot overwrite owner-approved truth |
 | BE-002 | Story Check normalizer | `backend/analysis_normalizer.py`, `tests/test_analysis_normalizer.py` | DONE; malformed model output becomes safe fallback, minimal UI fields remain stable, rich fields are preserved, and schema errors are diagnostic only |
 | SC-001 | Story Check rich prompt alignment | `backend/prompts/story_check.txt`, `tests/test_story_check_prompt.py` | DONE; prompt requests the rich schema, JSON-only output, no-prose boundaries, and insufficient-evidence handling without changing runtime routes |
@@ -44,7 +44,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
 | Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, BE-001, BE-002, SC-001, and SC-002 done; route/output guard integration and richer UI remain TODO |
 | Phase 3 | Mock and baseline Story Check | IN PROGRESS; App-7 mock Story Check mode and App-8 live qwen3 baseline verification done; evaluation fixtures/harness and remaining mock fixtures remain TODO |
-| Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar done, while scene editor hardening and other frontend hardening remain TODO |
+| Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar and App-4 scene editor hardening done; remaining frontend hardening and context editing remain TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |
 | Phase 6 | MVP hardening | TODO |
 

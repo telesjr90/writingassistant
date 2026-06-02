@@ -45,6 +45,16 @@ def test_save_and_load_scene_round_trips_markdown(tmp_path, monkeypatch):
     assert project_manager.load_scene("ember", "scene_001") == content
 
 
+def test_save_and_load_empty_scene_round_trips(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    project_manager.save_scene("ember", "empty_scene", "")
+
+    scene_path = tmp_path / "ember" / "scenes" / "empty_scene.md"
+    assert scene_path.read_text(encoding="utf-8") == ""
+    assert project_manager.load_scene("ember", "empty_scene") == ""
+
+
 def test_list_scenes_returns_sorted_markdown_scene_ids(tmp_path, monkeypatch):
     monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
     scenes_dir = tmp_path / "ember" / "scenes"

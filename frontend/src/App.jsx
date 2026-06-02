@@ -10,10 +10,13 @@ import {
   saveScene,
 } from './api.js';
 
+const UNSAVED_CHANGES_MESSAGE = 'Discard unsaved changes and load another scene?';
+
 export default function App() {
   const [scenes, setScenes] = useState([]);
   const [selectedSceneId, setSelectedSceneId] = useState('');
   const [sceneContent, setSceneContent] = useState('');
+  const [lastSavedContent, setLastSavedContent] = useState('');
   const [storyformContext, setStoryformContext] = useState('');
   const [analysisReport, setAnalysisReport] = useState(null);
   const [sceneError, setSceneError] = useState('');
@@ -22,6 +25,7 @@ export default function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
 
   useEffect(() => {
     let isMounted = true;
@@ -61,8 +65,17 @@ export default function App() {
   }, []);
 
   const handleSelectScene = useCallback(async (sceneId) => {
+    if (sceneId === selectedSceneId) {
+      return;
+    }
+
+    if (isDirty && !window.confirm(UNSAVED_CHANGES_MESSAGE)) {
+      return;
+    }
+
     setSelectedSceneId(sceneId);
     setSceneContent('');
+    setLastSavedContent('');
     setAnalysisReport(null);
     setSaveStatus('');
     setSceneError('');
@@ -70,13 +83,43 @@ export default function App() {
 
     try {
       const data = await fetchScene(sceneId);
-      setSceneContent(data.content ?? '');
+      const loadedContent = data.content ?? '';
+      setSceneContent(loadedContent);
+      setLastSavedContent(loadedContent);
+      setSaveStatus('Saved');
     } catch (error) {
       setSceneError(error instanceof Error ? error.message : 'Failed to load scene.');
+      setSelectedSceneId('');
+      setSceneContent('');
+      setLastSavedContent('');
     } finally {
       setIsLoadingScene(false);
     }
+  }, [isDirty, selectedSceneId]);
+
+  const handleSceneContentChange = useCallback((nextContent) => {
+    setSceneContent(nextContent);
+    setSaveStatus((currentStatus) => (
+      currentStatus.startsWith('Save failed') ? 'Unsaved changes' : currentStatus
+    ));
   }, []);
+
+  useEffect(() => {
+    function handleBeforeUnload(event) {
+      if (!isDirty) {
+        return;
+      }
+
+      event.preventDefault();
+      event.returnValue = '';
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isDirty]);
 
   const handleSave = useCallback(async () => {
     if (!selectedSceneId || isSaving) {
@@ -88,10 +131,11 @@ export default function App() {
 
     try {
       await saveScene(selectedSceneId, sceneContent);
-      setSaveStatus('Saved!');
-      window.setTimeout(() => setSaveStatus(''), 1800);
+      setLastSavedContent(sceneContent);
+      setSaveStatus('Saved');
     } catch (error) {
-      setSaveStatus(error instanceof Error ? error.message : 'Save failed.');
+      const message = error instanceof Error ? error.message : 'Save failed.';
+      setSaveStatus(`Save failed: ${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -150,11 +194,14 @@ export default function App() {
         <Editor
           content={sceneContent}
           disabled={!selectedSceneId || isLoadingScene}
+          hasUnsavedChanges={isDirty}
           isLoading={isLoadingScene}
-          onChange={setSceneContent}
+          isSaving={isSaving}
+          onChange={handleSceneContentChange}
           onSave={handleSave}
           saveDisabled={!selectedSceneId || isLoadingScene || isSaving}
           saveStatus={saveStatus}
+          sceneError={sceneError}
           selectedSceneId={selectedSceneId}
         />
       </main>

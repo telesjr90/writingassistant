@@ -39,9 +39,6 @@ def get_scene(project_name: str, scene_id: str) -> dict[str, str]:
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Scene not found") from exc
 
-    if not content:
-        raise HTTPException(status_code=404, detail="Scene not found")
-
     return {"content": content}
 
 

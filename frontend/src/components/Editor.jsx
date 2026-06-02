@@ -25,11 +25,14 @@ function textToHtml(content) {
 export default function Editor({
   content,
   disabled,
+  hasUnsavedChanges,
   isLoading,
+  isSaving,
   onChange,
   onSave,
   saveDisabled,
   saveStatus,
+  sceneError,
   selectedSceneId,
 }) {
   const editor = useEditor({
@@ -64,6 +67,32 @@ export default function Editor({
   }, [disabled, editor]);
 
   const title = selectedSceneId ? selectedSceneId.replace(/[-_]+/g, ' ') : 'No scene selected';
+  const displayedSaveStatus = (() => {
+    if (isLoading) {
+      return 'Loading...';
+    }
+
+    if (isSaving) {
+      return 'Saving...';
+    }
+
+    if (saveStatus.startsWith('Save failed')) {
+      return saveStatus;
+    }
+
+    if (hasUnsavedChanges) {
+      return 'Unsaved changes';
+    }
+
+    if (saveStatus) {
+      return saveStatus;
+    }
+
+    return selectedSceneId ? 'Saved' : '';
+  })();
+  const saveStatusClass = displayedSaveStatus.startsWith('Save failed')
+    ? 'save-status is-error'
+    : `save-status${hasUnsavedChanges ? ' is-unsaved' : ''}`;
 
   return (
     <section className="editor-panel">
@@ -80,13 +109,17 @@ export default function Editor({
             Italic
           </button>
           <button type="button" disabled={saveDisabled} onClick={onSave}>
-            {isLoading ? 'Loading...' : 'Save'}
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
-          {saveStatus && <span className="save-status">{saveStatus}</span>}
+          {displayedSaveStatus && <span className={saveStatusClass}>{displayedSaveStatus}</span>}
         </div>
       </header>
 
       {!selectedSceneId && <p className="editor-empty">Select a scene to begin editing.</p>}
+      {selectedSceneId && sceneError && <p className="error-copy">{sceneError}</p>}
+      {selectedSceneId && !isLoading && content.length === 0 && (
+        <p className="muted-copy">This scene is empty. Saving an empty scene is allowed.</p>
+      )}
       <EditorContent editor={editor} />
     </section>
   );

@@ -72,6 +72,7 @@ Frontend:
 
 - `frontend/package.json` uses React 19, Vite 8, Axios, and TipTap dependencies.
 - `frontend/src/App.jsx` composes `ProjectNav`, `Editor`, and `AnalysisSidebar`.
+- `frontend/src/App.jsx` tracks scene dirty state against the last saved content and confirms before discarding unsaved edits on scene switch or unload.
 - `frontend/src/components/AnalysisSidebar.jsx` renders normalized rich Story Check diagnostics as candidate analysis sections, with raw JSON preserved in a collapsed advanced view.
 - `frontend/src/api.js` hard-codes `PROJECT_ID = 'example'`.
 - Components found: `ProjectNav.jsx`, `Editor.jsx`, `AnalysisSidebar.jsx`.
@@ -194,6 +195,8 @@ App-8 status: `ANALYSIS_MODE=ollama_baseline`, `OLLAMA_BASE_URL`, and `OLLAMA_MO
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
 SC-002 / FE-001 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. `AnalysisSidebar.jsx` remains minimal/fallback/error compatible and now renders rich Story Check sections for coherence score, warnings, diagnostic suggestions, throughline alignment, theme drift, character consistency, insufficient evidence, compact diagnostics, and advanced raw JSON. Frontend build validation passes after adding the Vite build script and repairing npm optional dependencies.
+
+App-4 status: Scene editor hardening is complete locally. The editor shows saved, unsaved, saving, and error states; preserves user text on save failure; confirms before discarding unsaved edits during scene switching or page unload; and supports intentional empty scene save/load through the backend route.
 
 Analysis modes:
 
@@ -318,8 +321,8 @@ MVP completion requires:
 - DONE: FE-001 rich Story Check diagnostics sidebar.
 - DONE: mock/baseline mode visibility when diagnostics include mode metadata.
 - DONE: error and malformed-output display through safe fallback sections and advanced raw JSON.
-- Scene editor dirty-state handling.
-- Empty scene behavior.
+- DONE: App-4 scene editor dirty-state handling.
+- DONE: empty scene behavior.
 
 ### Phase 5 - OMI MVP implementation
 
@@ -348,7 +351,7 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | App-1 architecture audit | Confirm runtime paths and gaps. | Backend/frontend/tests. | Audit notes or issues. | Routes, storage, model path, and UI surfaces documented. | `python -m pytest tests -q`. | None. | app, docs |
 | App-2 project file model | Define durable local project schema. | Current `projects/example`, NCP schema. | `project.json`, storage spec, migration plan. | Elena/Ember mismatch documented and isolated for separate sample-alignment work. | Project manager tests. | Product naming/sample decision. | storage |
 | App-3 NCP compatibility subset | Decide supported NCP fields for MVP. | `docs/repo_knowledge.md`, `storyform.py`. | MVP storyform subset spec. | Required OS/MC/IC/RS fields validated. | Storyform fixture tests. | NCP subset decision. | ncp |
-| App-4 scene editor hardening | Make editor reliable for repeated local use. | React editor state. | Save/load UX, dirty state, errors. | No data loss on save/load. | Frontend manual smoke. | Project model. | frontend |
+| App-4 scene editor hardening | Make editor reliable for repeated local use. | React editor state. | DONE; save/load UX, dirty state, scene-switch protection, errors, and empty scenes are handled. | No data loss on save/load. | Vite build and pytest route/storage tests pass. | Project model. | frontend |
 | App-5 bible/storyform read/write layer | Add editable context storage safely. | Backend project manager, frontend context. | APIs and UI for context read/write. | Owner-approved truth stays distinct from candidates. | Backend tests. | Project model. | backend, storage |
 | App-6 Story Check rich schema parser | Normalize rich model output. | `story_check.schema.json`, parser. | Parser supports full schema. | Invalid output becomes safe fallback. | Analysis engine tests. | None. | story-check |
 | App-7 mock analysis mode | Enable deterministic UI/eval development. | Schema fixtures. | `ANALYSIS_MODE=mock`. | Same request returns stable mock JSON. | Unit tests. | Mode decision. | backend |
