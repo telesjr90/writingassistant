@@ -19,8 +19,9 @@ except ImportError:  # pragma: no cover - supports direct execution from backend
 
 PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "story_check.txt"
 MOCK_STORY_CHECK_PATH = Path(__file__).resolve().parent / "mock_responses" / "story_check.json"
-OLLAMA_CHAT_URL = os.getenv("OLLAMA_CHAT_URL", "http://localhost:11434/api/chat")
+DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434"
 DEFAULT_OLLAMA_MODEL = "qwen3:8b"
+OLLAMA_STORY_CHECK_NUM_PREDICT = 2048
 
 
 def _parse_story_check_response(content: str) -> dict[str, Any]:
@@ -30,6 +31,11 @@ def _parse_story_check_response(content: str) -> dict[str, Any]:
 def _load_mock_story_check_response() -> dict[str, Any]:
     payload = json.loads(MOCK_STORY_CHECK_PATH.read_text(encoding="utf-8"))
     return analysis_normalizer.normalize_story_check_output(payload)
+
+
+def _ollama_chat_url() -> str:
+    base_url = os.getenv("OLLAMA_BASE_URL", DEFAULT_OLLAMA_BASE_URL).rstrip("/")
+    return f"{base_url}/api/chat"
 
 
 def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
@@ -54,7 +60,7 @@ def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
         )
 
         response = requests.post(
-            OLLAMA_CHAT_URL,
+            _ollama_chat_url(),
             json={
                 "model": os.getenv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL),
                 "messages": [{"role": "user", "content": prompt}],
@@ -62,7 +68,7 @@ def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
                 "think": False,
                 "options": {
                     "temperature": 0,
-                    "num_predict": 512,
+                    "num_predict": OLLAMA_STORY_CHECK_NUM_PREDICT,
                 },
                 "stream": False,
             },

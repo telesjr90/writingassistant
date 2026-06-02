@@ -63,7 +63,7 @@ Backend:
   - `GET /api/projects/{project_name}/bible`
   - `POST /api/projects/{project_name}/story-check/{scene_id}`
   - `GET /api/projects/{project_name}/storyform-context`
-- `backend/analysis_engine.py` calls Ollama chat at `OLLAMA_CHAT_URL`, defaults `OLLAMA_MODEL` to `qwen3:8b`, requests JSON, and normalizes Story Check output.
+- `backend/analysis_engine.py` calls Ollama chat at `{OLLAMA_BASE_URL}/api/chat`, defaults `OLLAMA_BASE_URL` to `http://localhost:11434`, defaults `OLLAMA_MODEL` to `qwen3:8b`, requests JSON, and normalizes Story Check output.
 - `backend/prompts/story_check.txt` contains rich Story Check JSON instructions and explicit no-prose rules.
 - `backend/project_manager.py` stores projects under `projects/{project_name}` with `bible.json`, `storyform.json`, and `scenes/{scene_id}.md`.
 - `backend/storyform.py` validates NCP-style storyforms against the schema embedded in `docs/repo_knowledge.md`.
@@ -188,6 +188,8 @@ BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Chec
 
 BE-001 / App-7 status: `backend/analysis_modes.py` defines explicit `ANALYSIS_MODE` selection. Missing or empty mode preserves the current `ollama_baseline` behavior, `ANALYSIS_MODE=mock` returns deterministic Story Check diagnostics from `backend/mock_responses/story_check.json`, and invalid modes return a stable error-shaped response through `run_story_check`. Mock Story Check output is normalized through the same compatibility path and remains candidate-only.
 
+App-8 status: `ANALYSIS_MODE=ollama_baseline`, `OLLAMA_BASE_URL`, and `OLLAMA_MODEL=qwen3:8b` are configured and covered by mocked tests. Live baseline verification completed locally on 2026-06-01 against Windows Ollama from WSL using `OLLAMA_BASE_URL=http://172.25.144.1:11434`; the qwen3 Story Check smoke returned normalized, schema-valid rich Story Check JSON. No model was pulled or installed during verification.
+
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
 SC-002 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. Current `AnalysisSidebar.jsx` remains minimal-field compatible and exposes rich/fallback details through raw JSON; full rich section rendering remains future FE work.
@@ -195,7 +197,7 @@ SC-002 status: Story Check route compatibility checks cover minimal, rich, fallb
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic Story Check fixture for UI and test development without Ollama.
-- `ANALYSIS_MODE=ollama_baseline`: local Ollama using `qwen3:8b`; this remains the default when `ANALYSIS_MODE` is missing or empty.
+- `ANALYSIS_MODE=ollama_baseline`: local Ollama using `qwen3:8b`; this remains the default when `ANALYSIS_MODE` is missing or empty. Use `OLLAMA_BASE_URL` to point at non-localhost Ollama hosts such as Windows Ollama from WSL.
 - Future mode target, not currently accepted by runtime config: local Ollama using `dramatica-analyst:8b` after model-swap gates pass.
 
 Backend responsibilities:

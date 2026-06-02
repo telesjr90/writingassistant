@@ -37,7 +37,7 @@
 - Inputs: schema foundation, mock fixture requirements, Ollama baseline config.
 - Outputs: mock analysis mode, Story Check route tests, Ollama baseline mode, qwen3 baseline verification, evaluation fixtures.
 - Status note: App-7 mock Story Check mode completed with `backend/mock_responses/story_check.json` and tests covering schema compatibility, no Ollama calls, unresolved MC/IC/RS/CIPS/dynamics, route behavior, and no project-file mutation.
-- Status note: App-8 is partial only: `ANALYSIS_MODE=ollama_baseline` and `OLLAMA_MODEL=qwen3:8b` defaults are configured and tested with mocked Ollama output; manual live qwen3 verification remains TODO.
+- Status note: App-8 verified locally as of 2026-06-01: `OLLAMA_BASE_URL` lets WSL reach Windows Ollama and `qwen3:8b`; the live Story Check smoke returned normalized, schema-valid rich Story Check JSON through the baseline path.
 - Exit: Story Check works without fine-tuning in mock and qwen3 baseline modes.
 
 ### Phase 4: Frontend MVP Diagnostics

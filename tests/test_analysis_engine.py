@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend import analysis_engine, guardrails
-from backend.analysis_engine import _parse_story_check_response
+from backend.analysis_engine import _ollama_chat_url, _parse_story_check_response
 
 
 def rich_story_check_payload():
@@ -119,6 +119,24 @@ def test_suggestions_remain_questions_and_prose_requests_are_dropped():
     assert report["suggestions"] == ["What approved storyform evidence is missing?"]
 
 
+def test_default_ollama_base_url_builds_chat_endpoint(monkeypatch):
+    monkeypatch.delenv("OLLAMA_BASE_URL", raising=False)
+
+    assert _ollama_chat_url() == "http://localhost:11434/api/chat"
+
+
+def test_custom_ollama_base_url_builds_chat_endpoint(monkeypatch):
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://172.25.144.1:11434")
+
+    assert _ollama_chat_url() == "http://172.25.144.1:11434/api/chat"
+
+
+def test_custom_ollama_base_url_strips_trailing_slash(monkeypatch):
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://172.25.144.1:11434/")
+
+    assert _ollama_chat_url() == "http://172.25.144.1:11434/api/chat"
+
+
 def test_run_story_check_mock_mode_returns_rich_schema_compatible_report(monkeypatch):
     monkeypatch.setenv("ANALYSIS_MODE", "mock")
 
@@ -176,6 +194,7 @@ def test_mock_story_check_output_does_not_mutate_project_files(monkeypatch):
 
 def test_run_story_check_ollama_baseline_uses_mocked_post_and_normalizer(monkeypatch):
     monkeypatch.setenv("ANALYSIS_MODE", "ollama_baseline")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://example.test:11434/")
     monkeypatch.setenv("OLLAMA_MODEL", "test-model")
 
     class FakeResponse:
@@ -207,9 +226,12 @@ def test_run_story_check_ollama_baseline_uses_mocked_post_and_normalizer(monkeyp
 
     report = analysis_engine.run_story_check("example", "scene_001")
 
+    assert captured["url"] == "http://example.test:11434/api/chat"
     assert captured["json"]["model"] == "test-model"
     assert captured["json"]["format"] == "json"
     assert captured["json"]["think"] is False
+    assert captured["json"]["options"]["temperature"] == 0
+    assert captured["json"]["options"]["num_predict"] == 2048
     assert captured["json"]["stream"] is False
     assert report["coherence_score"] == 6
     assert report["warnings"] == ["[Factual] Missing approved context."]
@@ -218,6 +240,7 @@ def test_run_story_check_ollama_baseline_uses_mocked_post_and_normalizer(monkeyp
 
 def test_run_story_check_missing_analysis_mode_uses_ollama_baseline(monkeypatch):
     monkeypatch.delenv("ANALYSIS_MODE", raising=False)
+    monkeypatch.delenv("OLLAMA_BASE_URL", raising=False)
     monkeypatch.delenv("OLLAMA_MODEL", raising=False)
 
     class FakeResponse:
@@ -230,6 +253,7 @@ def test_run_story_check_missing_analysis_mode_uses_ollama_baseline(monkeypatch)
     captured = {}
 
     def fake_post(url, *, json, timeout):
+        captured["url"] = url
         captured["model"] = json["model"]
         return FakeResponse()
 
@@ -237,6 +261,7 @@ def test_run_story_check_missing_analysis_mode_uses_ollama_baseline(monkeypatch)
 
     report = analysis_engine.run_story_check("example", "scene_001")
 
+    assert captured["url"] == "http://localhost:11434/api/chat"
     assert captured["model"] == "qwen3:8b"
     assert report["diagnostics"]["schema_valid"] is True
 
