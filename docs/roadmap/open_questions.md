@@ -43,7 +43,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
 7. Add broader route tests where useful without live Ollama.
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
-9. Implement first-class rich Story Check UI sections later in FE-001.
+9. Continue frontend hardening after FE-001; rich Story Check UI sections are implemented and build-validated, while scene editor dirty-state handling and broader UX hardening remain future work.
 10. Revise or create a RunPod cloud smoke config before smoke training.
 11. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
 12. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.

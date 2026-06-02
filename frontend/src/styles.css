@@ -282,12 +282,101 @@ h2 {
   font-size: 14px;
 }
 
+.analysis-note {
+  margin: 0;
+  padding: 10px 12px;
+  color: #46546c;
+  font-size: 13px;
+  line-height: 1.45;
+  background: #f7f9fc;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
 .analysis-section ul {
   margin: 0;
   padding-left: 20px;
   color: #2c374c;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.analysis-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.analysis-metadata div {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.45fr) 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.analysis-metadata dt {
+  color: #637089;
+  font-size: 12px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.analysis-metadata dd {
+  margin: 0;
+  color: #2c374c;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.throughline-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.throughline-diagnostic {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #fbfcff;
+  border: 1px solid #e7ecf4;
+  border-radius: 8px;
+}
+
+.throughline-diagnostic h4,
+.mini-heading {
+  margin: 0;
+}
+
+.throughline-diagnostic h4 {
+  color: #172033;
+  font-size: 13px;
+}
+
+.mini-heading {
+  color: #637089;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.throughline-diagnostic ul {
+  margin-top: 4px;
+}
+
+.insufficient-evidence {
+  padding: 10px 0;
+  border-top: 1px solid #e7ecf4;
+  border-bottom: 1px solid #e7ecf4;
+}
+
+.raw-details summary {
+  color: #46546c;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .primary-action {

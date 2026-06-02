@@ -72,6 +72,7 @@ Frontend:
 
 - `frontend/package.json` uses React 19, Vite 8, Axios, and TipTap dependencies.
 - `frontend/src/App.jsx` composes `ProjectNav`, `Editor`, and `AnalysisSidebar`.
+- `frontend/src/components/AnalysisSidebar.jsx` renders normalized rich Story Check diagnostics as candidate analysis sections, with raw JSON preserved in a collapsed advanced view.
 - `frontend/src/api.js` hard-codes `PROJECT_ID = 'example'`.
 - Components found: `ProjectNav.jsx`, `Editor.jsx`, `AnalysisSidebar.jsx`.
 
@@ -192,7 +193,7 @@ App-8 status: `ANALYSIS_MODE=ollama_baseline`, `OLLAMA_BASE_URL`, and `OLLAMA_MO
 
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
-SC-002 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. Current `AnalysisSidebar.jsx` remains minimal-field compatible and exposes rich/fallback details through raw JSON; full rich section rendering remains future FE work.
+SC-002 / FE-001 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. `AnalysisSidebar.jsx` remains minimal/fallback/error compatible and now renders rich Story Check sections for coherence score, warnings, diagnostic suggestions, throughline alignment, theme drift, character consistency, insufficient evidence, compact diagnostics, and advanced raw JSON. Frontend build validation passes after adding the Vite build script and repairing npm optional dependencies.
 
 Analysis modes:
 
@@ -314,9 +315,9 @@ MVP completion requires:
 
 ### Phase 4 - Frontend MVP diagnostics
 
-- Rich diagnostics sidebar.
-- Mock/baseline mode visibility.
-- Error and malformed-output display.
+- DONE: FE-001 rich Story Check diagnostics sidebar.
+- DONE: mock/baseline mode visibility when diagnostics include mode metadata.
+- DONE: error and malformed-output display through safe fallback sections and advanced raw JSON.
 - Scene editor dirty-state handling.
 - Empty scene behavior.
 
@@ -354,7 +355,7 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | App-8 Ollama baseline mode | Formalize qwen3 baseline path. | Current Ollama integration. | `ANALYSIS_MODE=ollama_baseline`, config docs. | Uses `qwen3:8b` without code edits. | Local smoke if Ollama available. | Config decision. | backend |
 | App-9 analysis parser/normalizer | Protect UI from malformed output. | Parser, schemas. | Normalized analysis object. | UI never receives unbounded prose as suggestions. | Parser tests. | App-6. | guardrails |
 | App-10 no-prose runtime guard | Enforce analysis-only boundary. | Refusal message, prompt, parser. | Input/output guard. | Prose requests refuse with standard message. | Guardrail tests. | Enforcement policy. | guardrails |
-| App-11 Story Check sidebar UI | Render rich diagnostics. | `AnalysisSidebar.jsx`, schema. | Throughline, drift, consistency, warnings, questions. | All schema fields visible without prose drafting. | Browser smoke/manual. | App-6. | frontend |
+| App-11 / FE-001 Story Check sidebar UI | Render rich diagnostics. | `AnalysisSidebar.jsx`, schema. | DONE; throughline, drift, consistency, warnings, diagnostic suggestions, insufficient evidence, diagnostics, and raw JSON debug view render without prose drafting. | All schema fields visible without prose drafting. | Vite build and backend pytest pass. | App-6. | frontend |
 | App-12 evaluation fixtures | Add app-level fixtures. | Existing tests, eval schemas. | Fixture JSON and expected normalized output. | Covers valid, malformed, refusal, insufficient evidence. | Pytest. | App-6. | evaluation |
 | App-13 baseline evaluation harness | Track qwen3 baseline quality. | Ollama, eval fixtures. | Script/report for baseline runs. | Counts JSON validity, schema compliance, refusal violations. | Eval script run. | App-8, App-12. | evaluation |
 | OMI-001 define OMI MVP schema and lifecycle | Bound OMI as owner-controlled planning. | Product boundary, project storage model. | Schema/lifecycle spec for raw idea, candidates, owner decision, destination, provenance, status. | No prose, no silent promotion, candidate-first behavior is explicit. | Markdown review. | Phase 1. | app, docs, omi |
