@@ -2,15 +2,41 @@ import { useCallback, useEffect, useState } from 'react';
 import ProjectNav from './components/ProjectNav.jsx';
 import Editor from './components/Editor.jsx';
 import AnalysisSidebar from './components/AnalysisSidebar.jsx';
+import ProjectContext from './components/ProjectContext.jsx';
 import {
+  fetchBible,
   fetchScene,
   fetchScenes,
+  fetchStoryform,
   fetchStoryformContext,
   runStoryCheck,
+  saveBible,
   saveScene,
+  saveStoryform,
 } from './api.js';
 
 const UNSAVED_CHANGES_MESSAGE = 'Discard unsaved changes and load another scene?';
+
+function formatJson(value) {
+  return JSON.stringify(value ?? {}, null, 2);
+}
+
+function parseJsonObject(text, label) {
+  let parsed;
+
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Invalid JSON.';
+    throw new Error(`Invalid ${label} JSON: ${message}`);
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error(`${label} JSON must be an object.`);
+  }
+
+  return parsed;
+}
 
 export default function App() {
   const [scenes, setScenes] = useState([]);
@@ -18,12 +44,20 @@ export default function App() {
   const [sceneContent, setSceneContent] = useState('');
   const [lastSavedContent, setLastSavedContent] = useState('');
   const [storyformContext, setStoryformContext] = useState('');
+  const [bibleText, setBibleText] = useState('{}');
+  const [lastSavedBibleText, setLastSavedBibleText] = useState('{}');
+  const [storyformText, setStoryformText] = useState('{}');
+  const [lastSavedStoryformText, setLastSavedStoryformText] = useState('{}');
   const [analysisReport, setAnalysisReport] = useState(null);
   const [sceneError, setSceneError] = useState('');
   const [isLoadingScenes, setIsLoadingScenes] = useState(true);
   const [isLoadingScene, setIsLoadingScene] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingBible, setIsSavingBible] = useState(false);
+  const [isSavingStoryform, setIsSavingStoryform] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
+  const [bibleStatus, setBibleStatus] = useState('');
+  const [storyformStatus, setStoryformStatus] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
 
@@ -35,8 +69,10 @@ export default function App() {
       setSceneError('');
 
       try {
-        const [scenePayload, contextPayload] = await Promise.all([
+        const [scenePayload, biblePayload, storyformPayload, contextPayload] = await Promise.all([
           fetchScenes(),
+          fetchBible(),
+          fetchStoryform(),
           fetchStoryformContext(),
         ]);
 
@@ -45,6 +81,14 @@ export default function App() {
         }
 
         setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? []);
+        const formattedBible = formatJson(biblePayload);
+        const formattedStoryform = formatJson(storyformPayload);
+        setBibleText(formattedBible);
+        setLastSavedBibleText(formattedBible);
+        setBibleStatus('Saved');
+        setStoryformText(formattedStoryform);
+        setLastSavedStoryformText(formattedStoryform);
+        setStoryformStatus('Saved');
         setStoryformContext(contextPayload.context ?? '');
       } catch (error) {
         if (isMounted) {
@@ -104,6 +148,16 @@ export default function App() {
     ));
   }, []);
 
+  const handleBibleTextChange = useCallback((nextText) => {
+    setBibleText(nextText);
+    setBibleStatus(nextText === lastSavedBibleText ? 'Saved' : 'Unsaved changes');
+  }, [lastSavedBibleText]);
+
+  const handleStoryformTextChange = useCallback((nextText) => {
+    setStoryformText(nextText);
+    setStoryformStatus(nextText === lastSavedStoryformText ? 'Saved' : 'Unsaved changes');
+  }, [lastSavedStoryformText]);
+
   useEffect(() => {
     function handleBeforeUnload(event) {
       if (!isDirty) {
@@ -140,6 +194,58 @@ export default function App() {
       setIsSaving(false);
     }
   }, [isSaving, sceneContent, selectedSceneId]);
+
+  const handleSaveBible = useCallback(async () => {
+    if (isSavingBible) {
+      return;
+    }
+
+    setIsSavingBible(true);
+
+    try {
+      const parsed = parseJsonObject(bibleText, 'Bible');
+      await saveBible(parsed);
+      const formatted = formatJson(parsed);
+      setBibleText(formatted);
+      setLastSavedBibleText(formatted);
+      setBibleStatus('Saved');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Save failed.';
+      setBibleStatus(`Save failed: ${message}`);
+    } finally {
+      setIsSavingBible(false);
+    }
+  }, [bibleText, isSavingBible]);
+
+  const handleSaveStoryform = useCallback(async () => {
+    if (isSavingStoryform) {
+      return;
+    }
+
+    setIsSavingStoryform(true);
+
+    try {
+      const parsed = parseJsonObject(storyformText, 'Storyform');
+      await saveStoryform(parsed);
+      const formatted = formatJson(parsed);
+      setStoryformText(formatted);
+      setLastSavedStoryformText(formatted);
+      setStoryformStatus('Saved');
+
+      try {
+        const contextPayload = await fetchStoryformContext();
+        setStoryformContext(contextPayload.context ?? '');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Context refresh failed.';
+        setStoryformStatus(`Saved; prompt context refresh failed: ${message}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Save failed.';
+      setStoryformStatus(`Save failed: ${message}`);
+    } finally {
+      setIsSavingStoryform(false);
+    }
+  }, [isSavingStoryform, storyformText]);
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -186,10 +292,19 @@ export default function App() {
         onSelectScene={handleSelectScene}
       />
       <main className="editor-column" aria-label="Scene editor">
-        <details className="storyform-context" open>
-          <summary>Storyform Context</summary>
-          <pre>{storyformContext || 'No storyform context available.'}</pre>
-        </details>
+        <ProjectContext
+          bibleText={bibleText}
+          bibleStatus={bibleStatus}
+          isSavingBible={isSavingBible}
+          onBibleChange={handleBibleTextChange}
+          onSaveBible={handleSaveBible}
+          storyformText={storyformText}
+          storyformStatus={storyformStatus}
+          isSavingStoryform={isSavingStoryform}
+          onStoryformChange={handleStoryformTextChange}
+          onSaveStoryform={handleSaveStoryform}
+          storyformContext={storyformContext}
+        />
 
         <Editor
           content={sceneContent}

@@ -57,6 +57,7 @@ button {
 }
 
 .panel-header,
+.context-header,
 .editor-header {
   display: flex;
   flex-direction: column;
@@ -142,6 +143,108 @@ h2 {
   border: 1px solid #dfe5ef;
   border-radius: 8px;
   box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+}
+
+.project-context {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.context-header {
+  gap: 10px;
+}
+
+.context-note {
+  margin: 0;
+  color: #46546c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.context-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.context-editor {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.context-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.context-editor-header h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.context-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.context-actions button {
+  min-height: 32px;
+  padding: 0 12px;
+  color: #ffffff;
+  background: #234a84;
+  border: 1px solid #234a84;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.context-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.context-status {
+  color: #3b6948;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.context-status.is-unsaved {
+  color: #9a6500;
+}
+
+.context-status.is-error {
+  color: #a93636;
+}
+
+.context-textarea {
+  min-height: 220px;
+  width: 100%;
+  resize: vertical;
+  padding: 12px;
+  color: #172033;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.context-textarea:focus {
+  border-color: #7aa2e8;
+  box-shadow: 0 0 0 3px rgba(122, 162, 232, 0.2);
+  outline: none;
 }
 
 .editor-actions {
@@ -406,5 +509,9 @@ h2 {
 
   .editor-column {
     padding: 20px;
+  }
+
+  .context-grid {
+    grid-template-columns: 1fr;
   }
 }

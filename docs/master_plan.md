@@ -61,6 +61,9 @@ Backend:
   - `GET /api/projects/{project_name}/scenes/{scene_id}`
   - `PUT /api/projects/{project_name}/scenes/{scene_id}`
   - `GET /api/projects/{project_name}/bible`
+  - `PUT /api/projects/{project_name}/bible`
+  - `GET /api/projects/{project_name}/storyform`
+  - `PUT /api/projects/{project_name}/storyform`
   - `POST /api/projects/{project_name}/story-check/{scene_id}`
   - `GET /api/projects/{project_name}/storyform-context`
 - `backend/analysis_engine.py` calls Ollama chat at `{OLLAMA_BASE_URL}/api/chat`, defaults `OLLAMA_BASE_URL` to `http://localhost:11434`, defaults `OLLAMA_MODEL` to `qwen3:8b`, requests JSON, and normalizes Story Check output.
@@ -73,6 +76,7 @@ Frontend:
 - `frontend/package.json` uses React 19, Vite 8, Axios, and TipTap dependencies.
 - `frontend/src/App.jsx` composes `ProjectNav`, `Editor`, and `AnalysisSidebar`.
 - `frontend/src/App.jsx` tracks scene dirty state against the last saved content and confirms before discarding unsaved edits on scene switch or unload.
+- `frontend/src/components/ProjectContext.jsx` provides owner-editable bible/storyform JSON panels with explicit save actions and validation/error states.
 - `frontend/src/components/AnalysisSidebar.jsx` renders normalized rich Story Check diagnostics as candidate analysis sections, with raw JSON preserved in a collapsed advanced view.
 - `frontend/src/api.js` hard-codes `PROJECT_ID = 'example'`.
 - Components found: `ProjectNav.jsx`, `Editor.jsx`, `AnalysisSidebar.jsx`.
@@ -198,6 +202,8 @@ SC-002 / FE-001 status: Story Check route compatibility checks cover minimal, ri
 
 App-4 status: Scene editor hardening is complete locally. The editor shows saved, unsaved, saving, and error states; preserves user text on save failure; confirms before discarding unsaved edits during scene switching or page unload; and supports intentional empty scene save/load through the backend route.
 
+App-5 status: Bible/storyform read/write layer is complete locally. The backend exposes raw JSON GET/PUT routes for bible and storyform, validates storyform JSON before write, preserves files on invalid saves, and keeps storyform prompt context read-only. The frontend Project Context panel lets the owner view/edit/save bible and storyform JSON with parse/save status while reminding that analysis output does not overwrite owner-approved context.
+
 Analysis modes:
 
 - `ANALYSIS_MODE=mock`: deterministic Story Check fixture for UI and test development without Ollama.
@@ -216,7 +222,7 @@ Frontend responsibilities:
 
 - Local project navigation.
 - Scene editor and save state.
-- Storyform/bible context views.
+- Storyform/bible context views and explicit owner save controls.
 - Analysis sidebar with rich Story Check rendering.
 - Clear display of insufficient evidence and refusal outcomes.
 
@@ -323,6 +329,7 @@ MVP completion requires:
 - DONE: error and malformed-output display through safe fallback sections and advanced raw JSON.
 - DONE: App-4 scene editor dirty-state handling.
 - DONE: empty scene behavior.
+- DONE: App-5 bible/storyform read/write layer with owner-controlled JSON save paths.
 
 ### Phase 5 - OMI MVP implementation
 
@@ -352,7 +359,7 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | App-2 project file model | Define durable local project schema. | Current `projects/example`, NCP schema. | `project.json`, storage spec, migration plan. | Elena/Ember mismatch documented and isolated for separate sample-alignment work. | Project manager tests. | Product naming/sample decision. | storage |
 | App-3 NCP compatibility subset | Decide supported NCP fields for MVP. | `docs/repo_knowledge.md`, `storyform.py`. | MVP storyform subset spec. | Required OS/MC/IC/RS fields validated. | Storyform fixture tests. | NCP subset decision. | ncp |
 | App-4 scene editor hardening | Make editor reliable for repeated local use. | React editor state. | DONE; save/load UX, dirty state, scene-switch protection, errors, and empty scenes are handled. | No data loss on save/load. | Vite build and pytest route/storage tests pass. | Project model. | frontend |
-| App-5 bible/storyform read/write layer | Add editable context storage safely. | Backend project manager, frontend context. | APIs and UI for context read/write. | Owner-approved truth stays distinct from candidates. | Backend tests. | Project model. | backend, storage |
+| App-5 bible/storyform read/write layer | Add editable context storage safely. | Backend project manager, frontend context. | DONE; raw bible/storyform JSON routes and Project Context UI support explicit owner saves with validation/error states. | Owner-approved truth stays distinct from candidates. | Vite build and pytest route/storage tests pass. | Project model. | backend, storage |
 | App-6 Story Check rich schema parser | Normalize rich model output. | `story_check.schema.json`, parser. | Parser supports full schema. | Invalid output becomes safe fallback. | Analysis engine tests. | None. | story-check |
 | App-7 mock analysis mode | Enable deterministic UI/eval development. | Schema fixtures. | `ANALYSIS_MODE=mock`. | Same request returns stable mock JSON. | Unit tests. | Mode decision. | backend |
 | App-8 Ollama baseline mode | Formalize qwen3 baseline path. | Current Ollama integration. | `ANALYSIS_MODE=ollama_baseline`, config docs. | Uses `qwen3:8b` without code edits. | Local smoke if Ollama available. | Config decision. | backend |

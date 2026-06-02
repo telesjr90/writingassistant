@@ -3,10 +3,12 @@ import sys
 from pathlib import Path
 
 import pytest
+from jsonschema.exceptions import ValidationError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend import project_manager
+from backend.storyform import Storyform
 
 
 def test_save_and_load_bible_round_trips_json(tmp_path, monkeypatch):
@@ -32,6 +34,39 @@ def test_load_bible_rejects_non_object_json(tmp_path, monkeypatch):
 
     with pytest.raises(ValueError, match="JSON object"):
         project_manager.load_bible("ember")
+
+
+def test_save_bible_rejects_non_object_data(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    with pytest.raises(ValueError, match="JSON object"):
+        project_manager.save_bible("ember", [])
+
+
+def test_save_and_load_storyform_json_round_trips_valid_data(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    storyform = Storyform.from_questionnaire({}).to_dict()
+
+    project_manager.save_storyform_json("ember", storyform)
+
+    storyform_path = tmp_path / "ember" / "storyform.json"
+    assert json.loads(storyform_path.read_text(encoding="utf-8")) == storyform
+    assert project_manager.load_storyform_json("ember") == storyform
+
+
+def test_save_storyform_json_rejects_invalid_data_without_overwriting(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    valid_storyform = Storyform.from_questionnaire({}).to_dict()
+    project_manager.save_storyform_json("ember", valid_storyform)
+    storyform_path = tmp_path / "ember" / "storyform.json"
+    original_text = storyform_path.read_text(encoding="utf-8")
+
+    with pytest.raises(ValidationError):
+        project_manager.save_storyform_json("ember", {"story": {"title": "Invalid"}})
+
+    assert storyform_path.read_text(encoding="utf-8") == original_text
 
 
 def test_save_and_load_scene_round_trips_markdown(tmp_path, monkeypatch):

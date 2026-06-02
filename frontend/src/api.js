@@ -42,6 +42,22 @@ export async function saveScene(sceneId, content) {
   return requestData(() => client.put(`/projects/${PROJECT_ID}/scenes/${sceneId}`, { content }));
 }
 
+export async function fetchBible() {
+  return requestData(() => client.get(`/projects/${PROJECT_ID}/bible`));
+}
+
+export async function saveBible(data) {
+  return requestData(() => client.put(`/projects/${PROJECT_ID}/bible`, data));
+}
+
+export async function fetchStoryform() {
+  return requestData(() => client.get(`/projects/${PROJECT_ID}/storyform`));
+}
+
+export async function saveStoryform(data) {
+  return requestData(() => client.put(`/projects/${PROJECT_ID}/storyform`, data));
+}
+
 export async function runStoryCheck(sceneId) {
   return requestData(() => client.post(`/projects/${PROJECT_ID}/story-check/${sceneId}`));
 }

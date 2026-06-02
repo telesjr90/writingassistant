@@ -30,24 +30,56 @@ def _scene_path(project_name: str, scene_id: str) -> Path:
     return _project_dir(project_name) / "scenes" / f"{safe_scene_id}.md"
 
 
-def load_bible(project_name: str) -> dict[str, Any]:
-    path = _project_dir(project_name) / "bible.json"
+def _json_path(project_name: str, filename: str) -> Path:
+    return _project_dir(project_name) / filename
+
+
+def _load_json_object(project_name: str, filename: str, label: str) -> dict[str, Any]:
+    path = _json_path(project_name, filename)
     with path.open(encoding="utf-8") as handle:
         data = json.load(handle)
 
     if not isinstance(data, dict):
-        raise ValueError(f"Bible file must contain a JSON object: {path}")
+        raise ValueError(f"{label} file must contain a JSON object: {path}")
 
     return data
 
 
-def save_bible(project_name: str, data: dict[str, Any]) -> None:
-    path = _project_dir(project_name) / "bible.json"
+def _save_json_object(project_name: str, filename: str, data: dict[str, Any], label: str) -> None:
+    if not isinstance(data, dict):
+        raise ValueError(f"{label} data must be a JSON object")
+
+    path = _json_path(project_name, filename)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(data, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+
+
+def load_bible(project_name: str) -> dict[str, Any]:
+    return _load_json_object(project_name, "bible.json", "Bible")
+
+
+def save_bible(project_name: str, data: dict[str, Any]) -> None:
+    _save_json_object(project_name, "bible.json", data, "Bible")
+
+
+def load_storyform_json(project_name: str) -> dict[str, Any]:
+    return _load_json_object(project_name, "storyform.json", "Storyform")
+
+
+def save_storyform_json(project_name: str, data: dict[str, Any]) -> None:
+    if not isinstance(data, dict):
+        raise ValueError("Storyform data must be a JSON object")
+
+    try:
+        from .storyform import Storyform
+    except ImportError:  # pragma: no cover - supports direct module execution
+        from storyform import Storyform
+
+    Storyform.validate_data(data)
+    _save_json_object(project_name, "storyform.json", data, "Storyform")
 
 
 def load_scene(project_name: str, scene_id: str) -> str:

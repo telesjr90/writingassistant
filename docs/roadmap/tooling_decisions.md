@@ -49,6 +49,7 @@
 - App-8 live baseline verification: local smoke passed on 2026-06-01 with `OLLAMA_BASE_URL=http://172.25.144.1:11434`, `ANALYSIS_MODE=ollama_baseline`, and `OLLAMA_MODEL=qwen3:8b`; do not pull/install models without owner approval.
 - FE-001 rich diagnostics sidebar: `AnalysisSidebar.jsx` renders normalized Story Check sections first and keeps raw JSON in a collapsed advanced view; `frontend/package.json` now defines `npm run build`, and `npm install --include=optional` restored the Vite/Rolldown optional native binding needed for build validation. No frontend test framework is configured beyond the placeholder `npm test` script.
 - App-4 scene editor hardening: frontend validation remains `npm run build`; backend route/storage behavior is covered by pytest with temporary project directories so `projects/example` fixture content is not modified.
+- App-5 bible/storyform read/write: context editing uses plain JSON textareas in `ProjectContext.jsx`; backend PUT routes require explicit owner-submitted JSON objects, storyform saves validate with the existing schema before writing, and tests use temporary project directories.
 - Training: Unsloth QLoRA scripts/configs exist.
 - Git: initialized/repaired on `main` with `origin https://github.com/telesjr90/writingassistant`; local baseline commit `25ef64d chore: initialize safe project baseline` exists.
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.
