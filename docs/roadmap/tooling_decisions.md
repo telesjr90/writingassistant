@@ -50,6 +50,7 @@
 - FE-001 rich diagnostics sidebar: `AnalysisSidebar.jsx` renders normalized Story Check sections first and keeps raw JSON in a collapsed advanced view; `frontend/package.json` now defines `npm run build`, and `npm install --include=optional` restored the Vite/Rolldown optional native binding needed for build validation. No frontend test framework is configured beyond the placeholder `npm test` script.
 - App-4 scene editor hardening: frontend validation remains `npm run build`; backend route/storage behavior is covered by pytest with temporary project directories so `projects/example` fixture content is not modified.
 - App-5 bible/storyform read/write: context editing uses plain JSON textareas in `ProjectContext.jsx`; backend PUT routes require explicit owner-submitted JSON objects, storyform saves validate with the existing schema before writing, and tests use temporary project directories.
+- GUARD-002 request-path policy: use `guard_freeform_request` for future freeform assistant/model request fields before model calls. Do not run the request guard on owner-authored content fields such as scene content, bible JSON, storyform JSON, raw ideas, or planning notes.
 - Training: Unsloth QLoRA scripts/configs exist.
 - Git: initialized/repaired on `main` with `origin https://github.com/telesjr90/writingassistant`; local baseline commit `25ef64d chore: initialize safe project baseline` exists.
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.

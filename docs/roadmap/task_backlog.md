@@ -23,7 +23,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-8 | Ollama baseline mode | `ANALYSIS_MODE=ollama_baseline`, `OLLAMA_BASE_URL` | VERIFIED locally; Windows Ollama/qwen3 reached from WSL and 2026-06-01 live smoke returned normalized schema-valid rich Story Check JSON |
 | App-9 | Analysis parser/normalizer | Normalized response object | UI receives bounded structured data |
 | GUARD-001 | Shared no-prose guard module | `backend/guardrails.py`, `tests/test_guardrails.py` | DONE; prose-generation request classifier, standard refusal response, allowed-help list, and Story Check suggestion filtering integration |
-| GUARD-002 | Request-path no-prose guard integration | Route/service guard use | TODO; apply guard to future freeform request fields without treating scene text as request intent |
+| GUARD-002 | Request-path no-prose guard integration | Route/service guard use | DONE; freeform request helper and field policy exist, current routes are audited, and tests verify owner-authored scene/bible/storyform content is not overblocked |
 | GUARD-003 | Output no-prose guard integration | Model-output guard use | TODO; integrate conservative output guard after normalizers exist |
 | App-11 / FE-001 | Story Check sidebar UI | Rich diagnostic sidebar | DONE; normalized rich Story Check fields render as first-class candidate diagnostics with raw JSON kept in an advanced details view and frontend build validation passes |
 | App-12 | Evaluation fixtures | Fixture set | Valid, invalid, refusal, and insufficient-evidence cases covered |
@@ -42,7 +42,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- |
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
-| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, BE-001, BE-002, SC-001, and SC-002 done; route/output guard integration and richer UI remain TODO |
+| Phase 2 | Backend safety and schema foundation | IN PROGRESS; GUARD-001, GUARD-002, BE-001, BE-002, SC-001, and SC-002 done; output guard integration remains TODO |
 | Phase 3 | Mock and baseline Story Check | IN PROGRESS; App-7 mock Story Check mode and App-8 live qwen3 baseline verification done; evaluation fixtures/harness and remaining mock fixtures remain TODO |
 | Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform context editing done; remaining App MVP hardening and guard/evaluation work remain TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |

@@ -3,7 +3,7 @@
 | ID | Risk | Impact | Likelihood | Mitigation | Status |
 | --- | --- | --- | --- | --- | --- |
 | R1 | Model or docs overclaim Dramatica truth | High | High | Preserve owner-approved vs candidate vs insufficient-evidence boundaries | Active |
-| R2 | Prose-generation leakage | High | Medium | Shared `backend/guardrails.py` input classifier and refusal response implemented; route/output integration and refusal eval remain TODO | Active |
+| R2 | Prose-generation leakage | High | Medium | Shared `backend/guardrails.py` input classifier, refusal response, and request-field policy helpers implemented; current owner-authored save routes are regression-tested against overblocking; output integration and refusal eval remain TODO | Active |
 | R3 | Weak IC/RS labels become positive training truth | High | High | Owner approval plus excerpt-backed evidence required | Active |
 | R4 | CIPS/dynamics trained from insufficient evidence | High | High | Keep positive CIPS/dynamics owner-gated | Active |
 | R5 | Dataset gate remains blocked | High | High | Prioritize packets and book-backed evidence triage | Active |

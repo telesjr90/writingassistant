@@ -188,7 +188,7 @@ App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifec
 
 Sample project alignment status: `docs/roadmap/sample_project_alignment_spec.md` defines the aligned sample requirements, replacement strategy, provenance checks, Story Check fixture implications, OMI fixture implications, and no-prose boundaries. The local ignored `projects/example` fixture now uses public-domain scene source text; `owner_sample_input.md` is OMI-only future input. No runtime files, frontend files, tests, generated prose, public-domain prose rewrites, or owner idea promotion were introduced.
 
-GUARD-001 status: `backend/guardrails.py` provides the shared runtime no-prose guard API, standard refusal response, allowed-help list, and conservative output helper. It is integrated into Story Check suggestion filtering only; request-level route guards remain future work for OMI and other freeform request paths.
+GUARD-001 / GUARD-002 status: `backend/guardrails.py` provides the shared runtime no-prose guard API, standard refusal response, allowed-help list, conservative output helper, and request-field policy helpers. Current routes are audited: scene, bible, and storyform saves are owner-authored content and are not scanned as assistant requests; Story Check has no freeform request field and does not guard scene text as request intent. Future OMI/freeform request routes must call `guard_freeform_request` before model calls. GUARD-003 output blocking remains future work.
 
 BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Check normalizer, safe JSON-object extraction, `jsonschema` validation when available, minimal UI compatibility fields, rich Story Check field preservation, and deterministic malformed-output fallback. It is integrated through `backend/analysis_engine.py`; SC-001 prompt updates and GUARD-003 output blocking remain future tasks.
 
@@ -307,6 +307,7 @@ MVP completion requires:
 ### Phase 2 - Backend safety and schema foundation
 
 - DONE: GUARD-001 shared runtime no-prose guard module and tests.
+- DONE: GUARD-002 request-path no-prose guard policy and tests.
 - Refusal response schema.
 - DONE: BE-002 Story Check normalizer.
 - DONE: SC-001 rich Story Check prompt alignment.

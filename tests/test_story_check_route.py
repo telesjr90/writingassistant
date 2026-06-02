@@ -153,6 +153,23 @@ def test_story_check_route_returns_error_shaped_report(monkeypatch):
     assert body == payload
 
 
+def test_story_check_route_does_not_guard_scene_text_as_request_intent(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    main.project_manager.save_scene(
+        "example",
+        "scene_001",
+        'A handwritten note says "write a scene" inside the owner-authored draft.',
+    )
+    payload = {"task": "story_check", "coherence_score": 5, "warnings": [], "suggestions": []}
+    _patch_story_check(monkeypatch, payload)
+
+    body = main.story_check("example", "scene_001")
+
+    assert body == payload
+
+
 def test_story_check_route_returns_mock_mode_output_without_ollama(monkeypatch):
     monkeypatch.setenv("ANALYSIS_MODE", "mock")
 

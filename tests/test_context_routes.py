@@ -82,6 +82,18 @@ def test_bible_route_rejects_non_object_without_overwriting(tmp_path, monkeypatc
     assert main.project_manager.load_bible("example") == original
 
 
+def test_bible_route_does_not_guard_owner_authored_context_terms(tmp_path, monkeypatch):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    bible = {
+        "notes": [
+            "A chapter note mentions dialogue, style, and rewrite as owner context."
+        ]
+    }
+
+    assert main.update_bible("example", bible) == {"status": "saved"}
+    assert main.project_manager.load_bible("example") == bible
+
+
 def test_storyform_routes_load_save_and_refresh_context(tmp_path, monkeypatch):
     monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
     storyform = Storyform.from_questionnaire({}).to_dict()
@@ -93,6 +105,20 @@ def test_storyform_routes_load_save_and_refresh_context(tmp_path, monkeypatch):
     context = main.get_storyform_context("example")
     assert "Story: Quest for the Ember Crown" in context["context"]
     assert "Throughlines:" in context["context"]
+
+
+def test_storyform_route_does_not_guard_owner_authored_context_terms(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    storyform = Storyform.from_questionnaire({}).to_dict()
+    storyform["story"]["narratives"][0]["storytelling"]["overviews"][0]["summary"] = (
+        "Owner context can mention dialogue, chapter, style, and rewrite without "
+        "becoming a request to the assistant."
+    )
+
+    assert main.update_storyform("example", storyform) == {"status": "saved"}
+    assert main.project_manager.load_storyform_json("example") == storyform
 
 
 def test_storyform_route_rejects_invalid_json_without_overwriting(

@@ -67,6 +67,18 @@ def test_scene_route_saves_empty_scene(tmp_path, monkeypatch):
     assert main.project_manager.load_scene("example", "empty_scene") == ""
 
 
+def test_scene_route_does_not_guard_owner_authored_scene_text(tmp_path, monkeypatch):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    content = (
+        'The note on the desk said "continue this chapter," but nobody treated it '
+        "as an instruction to the assistant."
+    )
+    update = types.SimpleNamespace(content=content)
+
+    assert main.update_scene("example", "scene_001", update) == {"status": "saved"}
+    assert main.project_manager.load_scene("example", "scene_001") == content
+
+
 def test_scene_route_returns_safe_missing_scene_error(tmp_path, monkeypatch):
     monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
 

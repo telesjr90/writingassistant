@@ -14,7 +14,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 | Example fixture identity | Replace the Elena/Ember Crown mismatch later with a small owner-created aligned sample for MVP. Public-domain material can be used later for broader evaluation. |
 | Minimum OMI schema | OMI is in the App MVP as bounded analysis-only candidate planning. Design target fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`. OMI may propose candidate storyform slots plus diagnostic questions, but candidate-only until owner approval. |
 | Promotion action | Owner must explicitly approve, choose destination, attach evidence/provenance, and confirm promotion. |
-| No-prose enforcement point | Enforce both before model call and after model output. Shared guard location is `backend/guardrails.py`; GUARD-001 has implemented the reusable module, while freeform route and model-output integration remain follow-up tasks. |
+| No-prose enforcement point | Enforce both before model call and after model output. Shared guard location is `backend/guardrails.py`; GUARD-001 has implemented the reusable module, and GUARD-002 has implemented request-field policy for future freeform routes. Model-output integration remains a follow-up task. |
 | Mock mode behavior | Story Check deterministic fixture JSON is implemented for `ANALYSIS_MODE=mock`; `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion fixtures remain future work. |
 | UI throughline label | Use Overall Story in UI; accept Objective Story as an alias. |
 | Unknown NCP fields | Hide unknown NCP fields in normal MVP UI; preserve them for advanced/raw context later. |
@@ -39,7 +39,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 2. Declare Node `>=22.12.0 <23` in package metadata in a later implementation task.
 3. Replace the sample fixture with one aligned owner-created project for MVP.
 4. Define exact OMI API/storage implementation without assuming current endpoints exist.
-5. Integrate shared `backend/guardrails.py` into future freeform request routes and post-model output paths without treating scene text as user request intent.
+5. Integrate shared `backend/guardrails.py` into future freeform request routes when those routes are implemented, and complete post-model output guard integration without treating scene text as user request intent.
 6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
 7. Add broader route tests where useful without live Ollama.
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.

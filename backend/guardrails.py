@@ -14,6 +14,36 @@ ALLOWED_HELP = [
     "structural classification",
 ]
 
+OWNER_AUTHORED_CONTENT_FIELDS = {
+    "bible",
+    "bible_json",
+    "content",
+    "context",
+    "note",
+    "notes",
+    "owner_memory",
+    "planning_note",
+    "planning_notes",
+    "raw_idea",
+    "scene",
+    "scene_text",
+    "storyform",
+    "storyform_json",
+}
+
+FREEFORM_REQUEST_FIELDS = {
+    "analysis_request",
+    "assistant_request",
+    "freeform_request",
+    "instruction",
+    "model_request",
+    "prompt",
+    "request",
+    "raw_instruction",
+    "user_request",
+    "writer_request",
+}
+
 
 _REQUEST_PREFIX = (
     r"(?:^\s*(?:please\s+)?|"
@@ -80,6 +110,33 @@ def classify_request(text: str) -> str | None:
 
 def is_prose_generation_request(text: str) -> bool:
     return classify_request(text) is not None
+
+
+def is_owner_authored_content_field(field_name: str) -> bool:
+    if not isinstance(field_name, str):
+        return False
+
+    normalized = field_name.strip().lower()
+    return normalized in OWNER_AUTHORED_CONTENT_FIELDS
+
+
+def should_guard_request_field(field_name: str) -> bool:
+    if not isinstance(field_name, str):
+        return False
+
+    normalized = field_name.strip().lower()
+    if is_owner_authored_content_field(normalized):
+        return False
+
+    return normalized in FREEFORM_REQUEST_FIELDS or normalized.endswith("_request")
+
+
+def guard_freeform_request(text: str) -> dict[str, Any] | None:
+    request_type = classify_request(text)
+    if request_type is None:
+        return None
+
+    return refusal_response(request_type=request_type)
 
 
 def refusal_response(request_type: str = "prose_generation") -> dict[str, Any]:
