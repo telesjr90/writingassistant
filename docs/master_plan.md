@@ -198,6 +198,8 @@ App-8 status: `ANALYSIS_MODE=ollama_baseline`, `OLLAMA_BASE_URL`, and `OLLAMA_MO
 
 App-12 status: App-level Story Check evaluation fixtures now live under `tests/fixtures/story_check/` with pytest coverage in `tests/test_evaluation_fixtures.py`. They cover valid rich output, minimal output, malformed fallback, refusal response shape, insufficient evidence, and output-guard sanitization. These fixtures are not training data and are not part of `training/data` or `dataset_manifest.json`.
 
+App-13 status: `training/scripts/run_story_check_baseline_eval.py` provides an offline-first Story Check baseline evaluation harness over the App-12 fixtures. The harness reports JSON validity, schema compliance, fallback/parser warnings, exact refusal matching, insufficient-evidence preservation, output-guard behavior, no-prose violations, evidence preservation, and per-fixture results. Live Ollama evaluation is opt-in with `--live-ollama` and is not used by pytest.
+
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
 SC-002 / FE-001 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. `AnalysisSidebar.jsx` remains minimal/fallback/error compatible and now renders rich Story Check sections for coherence score, warnings, diagnostic suggestions, throughline alignment, theme drift, character consistency, insufficient evidence, compact diagnostics, and advanced raw JSON. Frontend build validation passes after adding the Vite build script and repairing npm optional dependencies.
@@ -325,6 +327,7 @@ MVP completion requires:
 - Ollama baseline mode.
 - qwen3 baseline verification.
 - DONE: App-12 app-level evaluation fixtures for Story Check normalizer, guardrails, refusal, malformed output, and insufficient evidence.
+- DONE: App-13 offline baseline evaluation harness for App-12 Story Check fixtures.
 
 ### Phase 4 - Frontend MVP diagnostics
 
