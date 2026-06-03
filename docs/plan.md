@@ -9,7 +9,7 @@ We are building a single‑UI writing tool inspired by Subtxt. The MVP will:
 - Include bounded **Organize My Idea (OMI)** planning that captures raw ideas and structured candidates without generating story prose.
 - Display the results in a sidebar alongside the editor.
 
-OMI is part of the App MVP, but it is analysis/planning only. It must not write, rewrite, continue, imitate, polish, or improve story prose, and it must not silently promote ideas, candidates, model output, or NotebookLM output into durable project truth. OMI MVP design fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; runtime endpoints/storage/UI are not assumed until implementation tasks create them.
+OMI is part of the App MVP, but it is analysis/planning only. It must not write, rewrite, continue, imitate, polish, or improve story prose, and it must not silently promote ideas, candidates, model output, or NotebookLM output into durable project truth. OMI MVP fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; the first runtime slice now captures owner-authored raw ideas and structured candidate planning records without promotion.
 
 The current workspace is `/home/tjrpirateking/projects/WritingAssistantApplication`. The UI is a React app served by a FastAPI backend.
 
@@ -107,7 +107,7 @@ Goal: Build a multi‑task dataset that teaches a model to diagnose narrative co
 
 ## 0.2 MVP Phase Order
 
-Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. The next App MVP task is OMI-003 candidate creation flow.
+Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. The next App MVP task is OMI-004 owner decision and destination selection.
 
 Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates.
 
@@ -118,7 +118,7 @@ Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP c
 | 2 | Backend safety and schema foundation | Story Check schema/normalizer, candidate-vs-owner truth boundary, insufficient-evidence handling, and pre/post no-prose guardrails are defined or implemented. |
 | 3 | Mock and baseline Story Check | Story Check mock mode is complete; qwen3/Ollama baseline config is explicit and covered with mocked tests; live baseline reaches Windows Ollama through `OLLAMA_BASE_URL` and returns normalized schema-valid rich Story Check JSON; app-level evaluation fixtures and an offline baseline evaluation harness exist for future regression work. |
 | 4 | Frontend MVP diagnostics | FE-001 rich Story Check sidebar, App-4 scene editor hardening, App-5 bible/storyform read/write, GUARD-002 request-path policy, and GUARD-003 Story Check output guard are complete; remaining work includes evaluation fixtures, OMI, and broader MVP hardening. |
-| 5 | Bounded OMI MVP implementation | OMI captures raw ideas and structured candidates with owner decision, destination, provenance, and status; it cannot write prose or silently promote durable truth. |
+| 5 | Bounded OMI MVP implementation | OMI captures raw ideas and structured candidates with owner decision, destination, provenance, and status; it cannot write prose or silently promote durable truth. OMI-003 implements raw idea and candidate record creation only; owner approval and promotion remain deferred. |
 | 6 | MVP hardening | Story Check mock/qwen3, no-prose guardrails, bounded OMI, save/load, docs, and local smoke checks are verified before release readiness. |
 
 ---

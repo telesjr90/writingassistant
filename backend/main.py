@@ -17,6 +17,20 @@ class SceneUpdate(BaseModel):
     content: str
 
 
+class OMIIdeaCreate(BaseModel):
+    raw_idea: str
+    provenance: dict | None = None
+
+
+class OMICandidateCreate(BaseModel):
+    idea_id: str
+    candidate_type: str
+    candidate_content: dict
+    destination: str
+    provenance: dict | None = None
+    evidence: list | None = None
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -116,3 +130,61 @@ def get_storyform_context(project_name: str) -> dict[str, str]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return {"context": loaded_storyform.to_prompt_context()}
+
+
+@app.get("/api/projects/{project_name}/omi")
+def get_omi(project_name: str) -> dict:
+    try:
+        return project_manager.get_omi_summary(project_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/projects/{project_name}/omi/ideas")
+def create_omi_idea(project_name: str, payload: OMIIdeaCreate) -> dict:
+    try:
+        return project_manager.create_omi_idea(
+            project_name,
+            payload.raw_idea,
+            provenance=payload.provenance,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/projects/{project_name}/omi/ideas/{idea_id}")
+def get_omi_idea(project_name: str, idea_id: str) -> dict:
+    try:
+        return project_manager.load_omi_idea(project_name, idea_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI idea not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/projects/{project_name}/omi/candidates")
+def create_omi_candidate(project_name: str, payload: OMICandidateCreate) -> dict:
+    try:
+        return project_manager.create_omi_candidate(
+            project_name,
+            payload.idea_id,
+            payload.candidate_type,
+            payload.candidate_content,
+            payload.destination,
+            provenance=payload.provenance,
+            evidence=payload.evidence,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI idea not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/projects/{project_name}/omi/candidates/{candidate_id}")
+def get_omi_candidate(project_name: str, candidate_id: str) -> dict:
+    try:
+        return project_manager.load_omi_candidate(project_name, candidate_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI candidate not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

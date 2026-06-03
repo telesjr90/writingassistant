@@ -4,7 +4,7 @@ const client = axios.create({
   baseURL: '/api',
 });
 
-const PROJECT_ID = 'example';
+export const PROJECT_ID = 'example';
 
 function getErrorMessage(error) {
   if (axios.isAxiosError(error)) {
@@ -64,4 +64,24 @@ export async function runStoryCheck(sceneId) {
 
 export async function fetchStoryformContext() {
   return requestData(() => client.get(`/projects/${PROJECT_ID}/storyform-context`));
+}
+
+export async function getOMI(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/omi`));
+}
+
+export async function createOMIIdea(projectId = PROJECT_ID, payload) {
+  return requestData(() => client.post(`/projects/${projectId}/omi/ideas`, payload));
+}
+
+export async function getOMIIdea(projectId = PROJECT_ID, ideaId) {
+  return requestData(() => client.get(`/projects/${projectId}/omi/ideas/${ideaId}`));
+}
+
+export async function createOMICandidate(projectId = PROJECT_ID, payload) {
+  return requestData(() => client.post(`/projects/${projectId}/omi/candidates`, payload));
+}
+
+export async function getOMICandidate(projectId = PROJECT_ID, candidateId) {
+  return requestData(() => client.get(`/projects/${projectId}/omi/candidates/${candidateId}`));
 }

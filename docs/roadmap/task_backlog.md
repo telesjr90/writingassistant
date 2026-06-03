@@ -30,10 +30,10 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | App-13 | Baseline evaluation harness | Baseline report | DONE; offline fixture harness reports JSON validity, schema compliance, fallback/parser warnings, refusal exactness, insufficient evidence, output guard behavior, no-prose violations, and evidence preservation |
 | OMI-001 | Define OMI MVP schema and lifecycle | `docs/roadmap/omi_mvp_schema_lifecycle.md` | DONE; fields include `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status` |
 | OMI-002 | Design OMI storage model | `docs/roadmap/omi_storage_model.md` | DONE; OMI ideas, candidates, promotions, index, statuses, destinations, provenance, and promotion gates are specified without runtime files |
-| OMI-003 | Implement OMI candidate creation flow | Candidate creation path | TODO; raw ideas can produce/display structured candidate planning material only, with no story prose |
+| OMI-003 | Implement OMI candidate creation flow | Candidate creation path | DONE; owner-authored raw ideas and structured candidate planning records can be created/listed/loaded under project-local `omi/` storage with no story prose, no model generation, and no promotion path |
 | OMI-004 | Implement owner decision and destination selection | Decision/destination flow | TODO; owner explicitly chooses approval/rejection and destination |
 | OMI-005 | Prevent OMI candidate promotion without explicit owner approval | Promotion guard | TODO; no OMI output mutates durable truth without approval, destination, provenance, and status |
-| OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | TODO; candidate status and provenance labels are visible |
+| OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | TODO; OMI-003 includes a minimal create/list panel, but full owner decision/status/provenance workflow remains future work |
 | OMI-007 | OMI tests for no-prose and no-silent-promotion behavior | Test coverage | TODO; verifies OMI cannot generate story prose or silently promote candidates |
 
 ## App MVP Phase Order
@@ -45,7 +45,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 2 | Backend safety and schema foundation | COMPLETE locally for Story Check MVP; GUARD-001, GUARD-002, GUARD-003, BE-001, BE-002, SC-001, and SC-002 done |
 | Phase 3 | Mock and baseline Story Check | COMPLETE locally for Story Check MVP; App-7 mock mode, App-8 live qwen3 baseline verification, App-12 evaluation fixtures, and App-13 offline baseline harness done; remaining mock fixtures beyond Story Check are future work |
 | Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, App-5 bible/storyform context editing, and Story Check guard integration done; remaining App MVP OMI hardening remains TODO |
-| Phase 5 | OMI MVP implementation | IN PROGRESS; OMI-001 schema/lifecycle and OMI-002 storage model are complete, while runtime candidate creation, owner decision UI, promotion guard, OMI UI, and tests remain TODO |
+| Phase 5 | OMI MVP implementation | IN PROGRESS; OMI-001 schema/lifecycle, OMI-002 storage model, and OMI-003 raw idea/candidate creation are complete, while owner decision UI, promotion guard, full OMI UI, and broader OMI tests remain TODO |
 | Phase 6 | MVP hardening | TODO |
 
 ## Packet/Dataset

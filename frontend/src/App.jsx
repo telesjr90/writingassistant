@@ -3,12 +3,17 @@ import ProjectNav from './components/ProjectNav.jsx';
 import Editor from './components/Editor.jsx';
 import AnalysisSidebar from './components/AnalysisSidebar.jsx';
 import ProjectContext from './components/ProjectContext.jsx';
+import OMIPanel from './components/OMIPanel.jsx';
 import {
+  PROJECT_ID,
+  createOMICandidate,
+  createOMIIdea,
   fetchBible,
   fetchScene,
   fetchScenes,
   fetchStoryform,
   fetchStoryformContext,
+  getOMI,
   runStoryCheck,
   saveBible,
   saveScene,
@@ -48,16 +53,22 @@ export default function App() {
   const [lastSavedBibleText, setLastSavedBibleText] = useState('{}');
   const [storyformText, setStoryformText] = useState('{}');
   const [lastSavedStoryformText, setLastSavedStoryformText] = useState('{}');
+  const [omiData, setOmiData] = useState({ index: null, ideas: [], candidates: [] });
   const [analysisReport, setAnalysisReport] = useState(null);
   const [sceneError, setSceneError] = useState('');
   const [isLoadingScenes, setIsLoadingScenes] = useState(true);
   const [isLoadingScene, setIsLoadingScene] = useState(false);
+  const [isLoadingOMI, setIsLoadingOMI] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingBible, setIsSavingBible] = useState(false);
   const [isSavingStoryform, setIsSavingStoryform] = useState(false);
+  const [isCreatingOMIIdea, setIsCreatingOMIIdea] = useState(false);
+  const [isCreatingOMICandidate, setIsCreatingOMICandidate] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [bibleStatus, setBibleStatus] = useState('');
   const [storyformStatus, setStoryformStatus] = useState('');
+  const [omiStatus, setOmiStatus] = useState('');
+  const [omiError, setOmiError] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
 
@@ -69,11 +80,12 @@ export default function App() {
       setSceneError('');
 
       try {
-        const [scenePayload, biblePayload, storyformPayload, contextPayload] = await Promise.all([
+        const [scenePayload, biblePayload, storyformPayload, contextPayload, omiPayload] = await Promise.all([
           fetchScenes(),
           fetchBible(),
           fetchStoryform(),
           fetchStoryformContext(),
+          getOMI(PROJECT_ID),
         ]);
 
         if (!isMounted) {
@@ -90,6 +102,8 @@ export default function App() {
         setLastSavedStoryformText(formattedStoryform);
         setStoryformStatus('Saved');
         setStoryformContext(contextPayload.context ?? '');
+        setOmiData(omiPayload);
+        setOmiStatus('Ready');
       } catch (error) {
         if (isMounted) {
           setSceneError(error instanceof Error ? error.message : 'Failed to load project data.');
@@ -106,6 +120,25 @@ export default function App() {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  const refreshOMI = useCallback(async () => {
+    setIsLoadingOMI(true);
+    setOmiError('');
+
+    try {
+      const payload = await getOMI(PROJECT_ID);
+      setOmiData(payload);
+      setOmiStatus('Ready');
+      return payload;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to load OMI data.';
+      setOmiError(message);
+      setOmiStatus('Load failed');
+      throw error;
+    } finally {
+      setIsLoadingOMI(false);
+    }
   }, []);
 
   const handleSelectScene = useCallback(async (sceneId) => {
@@ -247,6 +280,54 @@ export default function App() {
     }
   }, [isSavingStoryform, storyformText]);
 
+  const handleCreateOMIIdea = useCallback(async (rawIdea) => {
+    if (isCreatingOMIIdea) {
+      return null;
+    }
+
+    setIsCreatingOMIIdea(true);
+    setOmiError('');
+    setOmiStatus('Creating idea...');
+
+    try {
+      const idea = await createOMIIdea(PROJECT_ID, { raw_idea: rawIdea });
+      await refreshOMI();
+      setOmiStatus('Idea created');
+      return idea;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Create idea failed.';
+      setOmiError(message);
+      setOmiStatus('Error');
+      throw error;
+    } finally {
+      setIsCreatingOMIIdea(false);
+    }
+  }, [isCreatingOMIIdea, refreshOMI]);
+
+  const handleCreateOMICandidate = useCallback(async (payload) => {
+    if (isCreatingOMICandidate) {
+      return null;
+    }
+
+    setIsCreatingOMICandidate(true);
+    setOmiError('');
+    setOmiStatus('Creating candidate...');
+
+    try {
+      const candidate = await createOMICandidate(PROJECT_ID, payload);
+      await refreshOMI();
+      setOmiStatus('Candidate created');
+      return candidate;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Create candidate failed.';
+      setOmiError(message);
+      setOmiStatus('Error');
+      throw error;
+    } finally {
+      setIsCreatingOMICandidate(false);
+    }
+  }, [isCreatingOMICandidate, refreshOMI]);
+
   useEffect(() => {
     function handleKeyDown(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
@@ -304,6 +385,17 @@ export default function App() {
           onStoryformChange={handleStoryformTextChange}
           onSaveStoryform={handleSaveStoryform}
           storyformContext={storyformContext}
+        />
+
+        <OMIPanel
+          omiData={omiData}
+          isLoading={isLoadingOMI}
+          status={omiStatus}
+          error={omiError}
+          isCreatingIdea={isCreatingOMIIdea}
+          isCreatingCandidate={isCreatingOMICandidate}
+          onCreateIdea={handleCreateOMIIdea}
+          onCreateCandidate={handleCreateOMICandidate}
         />
 
         <Editor

@@ -66,6 +66,11 @@ Backend:
   - `PUT /api/projects/{project_name}/storyform`
   - `POST /api/projects/{project_name}/story-check/{scene_id}`
   - `GET /api/projects/{project_name}/storyform-context`
+  - `GET /api/projects/{project_name}/omi`
+  - `POST /api/projects/{project_name}/omi/ideas`
+  - `GET /api/projects/{project_name}/omi/ideas/{idea_id}`
+  - `POST /api/projects/{project_name}/omi/candidates`
+  - `GET /api/projects/{project_name}/omi/candidates/{candidate_id}`
 - `backend/analysis_engine.py` calls Ollama chat at `{OLLAMA_BASE_URL}/api/chat`, defaults `OLLAMA_BASE_URL` to `http://localhost:11434`, defaults `OLLAMA_MODEL` to `qwen3:8b`, requests JSON, and normalizes Story Check output.
 - `backend/prompts/story_check.txt` contains rich Story Check JSON instructions and explicit no-prose rules.
 - `backend/project_manager.py` stores projects under `projects/{project_name}` with `bible.json`, `storyform.json`, and `scenes/{scene_id}.md`.
@@ -78,6 +83,7 @@ Frontend:
 - `frontend/src/App.jsx` tracks scene dirty state against the last saved content and confirms before discarding unsaved edits on scene switch or unload.
 - `frontend/src/components/ProjectContext.jsx` provides owner-editable bible/storyform JSON panels with explicit save actions and validation/error states.
 - `frontend/src/components/AnalysisSidebar.jsx` renders normalized rich Story Check diagnostics as candidate analysis sections, with raw JSON preserved in a collapsed advanced view.
+- `frontend/src/components/OMIPanel.jsx` captures owner-authored raw ideas and structured candidate planning records without any prose-generation controls or promotion path.
 - `frontend/src/api.js` hard-codes `PROJECT_ID = 'example'`.
 - Components found: `ProjectNav.jsx`, `Editor.jsx`, `AnalysisSidebar.jsx`.
 
@@ -184,7 +190,9 @@ App-2 project file model status: `docs/roadmap/project_file_model.md` defines th
 
 App-3 NCP compatibility subset status: `docs/roadmap/ncp_compatibility_subset.md` defines the App MVP storyform/NCP subset for Story Check and future OMI use. It is a design spec only; no runtime storyform parser, API, frontend, or project-file migration changes have been performed.
 
-App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifecycle.md` defines OMI idea/candidate fields, lifecycle statuses, destinations, owner decisions, provenance, no-prose boundaries, and no-silent-promotion rules. It is a design spec only; no OMI endpoints, storage files, frontend components, or project-file migrations have been implemented.
+App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifecycle.md` defines OMI idea/candidate fields, lifecycle statuses, destinations, owner decisions, provenance, no-prose boundaries, and no-silent-promotion rules.
+
+OMI-003 status: the first runtime OMI slice is implemented. Backend storage helpers write project-local `omi/ideas`, `omi/candidates`, and `omi/index.json` records only on explicit owner create actions. The API can create/list/load raw ideas and structured candidates, and the frontend OMI panel exposes raw idea and candidate JSON creation. No promotion route, bible/storyform/scene mutation, model-generated candidate creation, owner decision approval flow, or full OMI UI has been implemented.
 
 Sample project alignment status: `docs/roadmap/sample_project_alignment_spec.md` defines the aligned sample requirements, replacement strategy, provenance checks, Story Check fixture implications, OMI fixture implications, and no-prose boundaries. The local ignored `projects/example` fixture now uses public-domain scene source text; `owner_sample_input.md` is OMI-only future input. No runtime files, frontend files, tests, generated prose, public-domain prose rewrites, or owner idea promotion were introduced.
 
@@ -341,7 +349,7 @@ MVP completion requires:
 ### Phase 5 - OMI MVP implementation
 
 - DONE: OMI storage design in `docs/roadmap/omi_storage_model.md`.
-- OMI candidate lifecycle.
+- DONE: OMI-003 raw idea and structured candidate creation flow.
 - OMI owner decision flow.
 - OMI destination handling.
 - OMI provenance/status display.

@@ -38,13 +38,13 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 1. Push the safe local `main` branch to GitHub in a separate task.
 2. Declare Node `>=22.12.0 <23` in package metadata in a later implementation task.
 3. Replace the sample fixture with one aligned owner-created project for MVP.
-4. Implement OMI runtime storage/API from the OMI-002 storage model without assuming current endpoints exist.
+4. Extend OMI runtime beyond the OMI-003 raw idea/candidate creation slice with owner decision, approval, and promotion-gate behavior.
 5. Reuse shared `backend/guardrails.py` request and output guard helpers when future freeform/model routes are implemented without treating scene text as user request intent.
 6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
 7. Add broader route tests where useful without live Ollama.
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
 9. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
-10. Begin OMI-003 candidate creation flow from the OMI-002 storage model while preserving owner approval and no-prose boundaries.
+10. Continue with OMI-004 owner decision and destination selection while preserving owner approval and no-prose boundaries.
 11. Revise or create a RunPod cloud smoke config before smoke training.
 12. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
