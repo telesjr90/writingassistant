@@ -107,7 +107,7 @@ Goal: Build a multi‑task dataset that teaches a model to diagnose narrative co
 
 ## 0.2 MVP Phase Order
 
-Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. The next App MVP task is OMI-004 owner decision and destination selection.
+Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, OMI-004 owner decision and destination selection, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. The next App MVP task is OMI-005 promotion gate enforcement.
 
 Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates.
 
@@ -118,7 +118,7 @@ Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP c
 | 2 | Backend safety and schema foundation | Story Check schema/normalizer, candidate-vs-owner truth boundary, insufficient-evidence handling, and pre/post no-prose guardrails are defined or implemented. |
 | 3 | Mock and baseline Story Check | Story Check mock mode is complete; qwen3/Ollama baseline config is explicit and covered with mocked tests; live baseline reaches Windows Ollama through `OLLAMA_BASE_URL` and returns normalized schema-valid rich Story Check JSON; app-level evaluation fixtures and an offline baseline evaluation harness exist for future regression work. |
 | 4 | Frontend MVP diagnostics | FE-001 rich Story Check sidebar, App-4 scene editor hardening, App-5 bible/storyform read/write, GUARD-002 request-path policy, and GUARD-003 Story Check output guard are complete; remaining work includes evaluation fixtures, OMI, and broader MVP hardening. |
-| 5 | Bounded OMI MVP implementation | OMI captures raw ideas and structured candidates with owner decision, destination, provenance, and status; it cannot write prose or silently promote durable truth. OMI-003 implements raw idea and candidate record creation only; owner approval and promotion remain deferred. |
+| 5 | Bounded OMI MVP implementation | OMI captures raw ideas and structured candidates with owner decision, destination, provenance, and status; it cannot write prose or silently promote durable truth. OMI-003 implements raw idea and candidate creation, and OMI-004 implements owner decision/status/destination updates without promotion. |
 | 6 | MVP hardening | Story Check mock/qwen3, no-prose guardrails, bounded OMI, save/load, docs, and local smoke checks are verified before release readiness. |
 
 ---
@@ -163,7 +163,7 @@ Goal: Train Qwen2.5-7B-Instruct as a bounded structural analyst that returns JSO
    - Change vs. Steadfast contrast accuracy (separate test set)
    - “Insufficient evidence” calibration (must not overclaim)
    - Compatibility with current app: parse through FastAPI/Ollama path
-5. After training, export GGUF, load into Ollama as `dramatica-analyst:8b`, and swap the backend model default only after a non-smoke model passes evaluation. OMI is in the App MVP as bounded planning, but is not implemented yet; do not assume OMI endpoints exist.
+5. After training, export GGUF, load into Ollama as `dramatica-analyst:8b`, and swap the backend model default only after a non-smoke model passes evaluation. OMI is in the App MVP as bounded planning; raw idea/candidate creation and owner decision/destination updates exist locally, but promotion remains unimplemented.
 
 ---
 ## 4. Verification

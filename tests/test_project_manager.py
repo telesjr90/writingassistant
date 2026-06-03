@@ -322,3 +322,258 @@ def test_omi_raw_idea_allows_owner_authored_context_words(tmp_path, monkeypatch)
     )
 
     assert "dialogue" in idea["raw_idea"]
+
+
+def test_update_omi_idea_decision_to_owner_review(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Review this planning note.")
+
+    updated = project_manager.update_omi_idea_decision(
+        "ember",
+        idea["idea_id"],
+        {"decision": "pending", "notes": "Owner review requested."},
+        status="owner_review",
+    )
+
+    assert updated["status"] == "owner_review"
+    assert updated["owner_decision"]["decision"] == "pending"
+    assert updated["owner_decision"]["notes"] == "Owner review requested."
+    assert updated["owner_decision"]["approved"] is False
+    assert updated["updated_at"] != idea["updated_at"]
+
+
+def test_approve_omi_idea_requires_confirmation(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Approval candidate.")
+    reviewed = project_manager.update_omi_idea_decision(
+        "ember",
+        idea["idea_id"],
+        {"decision": "pending"},
+        status="owner_review",
+    )
+    before = project_manager.load_omi_idea("ember", idea["idea_id"])
+
+    with pytest.raises(ValueError, match="approval_confirmed"):
+        project_manager.update_omi_idea_decision(
+            "ember",
+            reviewed["idea_id"],
+            {"decision": "approve", "approval_confirmed": False},
+            status="approved",
+        )
+
+    assert project_manager.load_omi_idea("ember", idea["idea_id"]) == before
+
+    approved = project_manager.update_omi_idea_decision(
+        "ember",
+        reviewed["idea_id"],
+        {"decision": "approve", "approval_confirmed": True, "notes": "Approved."},
+        status="approved",
+    )
+
+    assert approved["status"] == "approved"
+    assert approved["owner_decision"]["approved"] is True
+    assert approved["owner_decision"]["approval_confirmed"] is True
+    assert approved["owner_decision"]["decided_by"] == "owner"
+    assert approved["owner_decision"]["decided_at"]
+
+
+def test_reject_omi_idea_and_invalid_updates_preserve_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Rejectable note.")
+    reviewed = project_manager.update_omi_idea_decision(
+        "ember",
+        idea["idea_id"],
+        {"decision": "pending"},
+        status="owner_review",
+    )
+
+    rejected = project_manager.update_omi_idea_decision(
+        "ember",
+        reviewed["idea_id"],
+        {"decision": "reject", "notes": "Not relevant."},
+        status="rejected",
+    )
+
+    assert rejected["status"] == "rejected"
+    assert rejected["owner_decision"]["decision"] == "reject"
+
+    before = project_manager.load_omi_idea("ember", idea["idea_id"])
+
+    with pytest.raises(ValueError, match="owner_decision"):
+        project_manager.update_omi_idea_decision(
+            "ember",
+            idea["idea_id"],
+            {"decision": "promote"},
+            status="approved",
+        )
+
+    with pytest.raises(ValueError, match="Invalid OMI status transition"):
+        project_manager.update_omi_idea_decision(
+            "ember",
+            idea["idea_id"],
+            {"decision": "pending"},
+            status="approved",
+        )
+
+    assert project_manager.load_omi_idea("ember", idea["idea_id"]) == before
+
+
+def test_update_omi_candidate_destination_and_decision(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Candidate destination.")
+    candidate = project_manager.create_omi_candidate(
+        "ember",
+        idea["idea_id"],
+        "planning_note",
+        {"summary": "Candidate-only context"},
+        "planning_notes",
+    )
+
+    updated = project_manager.update_omi_candidate_decision(
+        "ember",
+        candidate["candidate_id"],
+        {"decision": "pending", "notes": "Move to owner review."},
+        status="owner_review",
+        destination="project_bible_candidate",
+    )
+
+    assert updated["status"] == "owner_review"
+    assert updated["destination"] == "project_bible_candidate"
+    assert updated["promotion_status"]["eligible"] is False
+    assert updated["updated_at"] != candidate["updated_at"]
+
+
+def test_approve_omi_candidate_requires_confirmation(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Candidate approval.")
+    candidate = project_manager.create_omi_candidate(
+        "ember",
+        idea["idea_id"],
+        "planning_note",
+        {"summary": "Candidate-only context"},
+        "planning_notes",
+    )
+    reviewed = project_manager.update_omi_candidate_decision(
+        "ember",
+        candidate["candidate_id"],
+        {"decision": "pending"},
+        status="owner_review",
+    )
+    before = project_manager.load_omi_candidate("ember", candidate["candidate_id"])
+
+    with pytest.raises(ValueError, match="approval_confirmed"):
+        project_manager.update_omi_candidate_decision(
+            "ember",
+            reviewed["candidate_id"],
+            {"decision": "approve", "approval_confirmed": False},
+            status="approved",
+        )
+
+    assert project_manager.load_omi_candidate("ember", candidate["candidate_id"]) == before
+
+    approved = project_manager.update_omi_candidate_decision(
+        "ember",
+        reviewed["candidate_id"],
+        {"decision": "approve", "approval_confirmed": True},
+        status="approved",
+    )
+
+    assert approved["status"] == "approved"
+    assert approved["owner_decision"]["approved"] is True
+    assert approved["promotion_status"]["eligible"] is False
+    assert "final confirmation required" in approved["promotion_status"]["blocked_reasons"]
+
+
+def test_reject_omi_candidate_and_invalid_destination_or_status(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Candidate rejection.")
+    candidate = project_manager.create_omi_candidate(
+        "ember",
+        idea["idea_id"],
+        "planning_note",
+        {"summary": "Candidate-only context"},
+        "planning_notes",
+    )
+    reviewed = project_manager.update_omi_candidate_decision(
+        "ember",
+        candidate["candidate_id"],
+        {"decision": "pending"},
+        status="owner_review",
+    )
+
+    rejected = project_manager.update_omi_candidate_decision(
+        "ember",
+        reviewed["candidate_id"],
+        {"decision": "reject", "notes": "Not useful."},
+        status="rejected",
+    )
+
+    assert rejected["status"] == "rejected"
+    assert rejected["owner_decision"]["decision"] == "reject"
+
+    before = project_manager.load_omi_candidate("ember", candidate["candidate_id"])
+
+    with pytest.raises(ValueError, match="destination"):
+        project_manager.update_omi_candidate_decision(
+            "ember",
+            candidate["candidate_id"],
+            {"decision": "pending"},
+            destination="scene_prose",
+        )
+
+    with pytest.raises(ValueError, match="promoted status"):
+        project_manager.update_omi_candidate_decision(
+            "ember",
+            candidate["candidate_id"],
+            {"decision": "pending"},
+            status="promoted",
+        )
+
+    with pytest.raises(FileNotFoundError):
+        project_manager.update_omi_candidate_decision(
+            "ember",
+            "candidate_missing",
+            {"decision": "pending"},
+        )
+
+    assert project_manager.load_omi_candidate("ember", candidate["candidate_id"]) == before
+
+
+def test_omi_decision_update_does_not_modify_project_truth_files(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_dir = tmp_path / "ember"
+    scenes_dir = project_dir / "scenes"
+    scenes_dir.mkdir(parents=True)
+    files = {
+        project_dir / "project.json": '{"title": "Fixture"}\n',
+        project_dir / "bible.json": '{"characters": []}\n',
+        project_dir / "storyform.json": '{"schema_version": "ncp-0.1"}\n',
+        scenes_dir / "scene_001.md": "Owner-authored scene text.",
+    }
+    for path, content in files.items():
+        path.write_text(content, encoding="utf-8")
+
+    idea = project_manager.create_omi_idea("ember", "Owner-authored planning input.")
+    candidate = project_manager.create_omi_candidate(
+        "ember",
+        idea["idea_id"],
+        "project_bible_candidate",
+        {"summary": "Candidate-only context"},
+        "project_bible_candidate",
+    )
+    project_manager.update_omi_idea_decision(
+        "ember",
+        idea["idea_id"],
+        {"decision": "pending", "notes": "write dialogue chapter context only"},
+        status="owner_review",
+    )
+    project_manager.update_omi_candidate_decision(
+        "ember",
+        candidate["candidate_id"],
+        {"decision": "pending", "notes": "write dialogue chapter context only"},
+        status="owner_review",
+        destination="storyform_context_candidate",
+    )
+
+    for path, content in files.items():
+        assert path.read_text(encoding="utf-8") == content

@@ -367,6 +367,43 @@ h2 {
   font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+.omi-decision-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e7ecf4;
+}
+
+.omi-decision-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.omi-decision-grid .field-label,
+.omi-decision-form .field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.omi-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #46546c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.omi-note-textarea {
+  min-height: 72px;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
 .editor-actions {
   display: flex;
   flex-wrap: wrap;
@@ -634,6 +671,7 @@ h2 {
   .context-grid,
   .omi-grid,
   .omi-record-grid,
+  .omi-decision-grid,
   .omi-metadata {
     grid-template-columns: 1fr;
   }

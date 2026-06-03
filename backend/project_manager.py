@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -36,6 +36,19 @@ OMI_BLOCKED_DESTINATIONS = {
     "final_story_text",
 }
 
+OMI_OWNER_DECISIONS = {"pending", "approve", "reject", "needs_revision"}
+
+OMI_STATUSES = {"draft", "candidate", "owner_review", "approved", "rejected", "archived"}
+
+OMI_STATUS_TRANSITIONS = {
+    "draft": {"owner_review", "archived"},
+    "candidate": {"owner_review", "archived"},
+    "owner_review": {"approved", "rejected", "candidate"},
+    "approved": {"owner_review", "archived"},
+    "rejected": {"owner_review", "archived"},
+    "archived": set(),
+}
+
 
 def _safe_path_component(value: str, label: str) -> str:
     if not value:
@@ -64,6 +77,25 @@ def _json_path(project_name: str, filename: str) -> Path:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _utc_after(previous_timestamp: str | None) -> str:
+    current_timestamp = _utc_now()
+    if not previous_timestamp or current_timestamp > previous_timestamp:
+        return current_timestamp
+
+    try:
+        previous = datetime.fromisoformat(previous_timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        return current_timestamp
+
+    return (
+        (previous + timedelta(seconds=1))
+        .astimezone(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _new_record_id(prefix: str) -> str:
@@ -202,6 +234,7 @@ def _default_owner_decision() -> dict[str, Any]:
     return {
         "decision": "pending",
         "approved": False,
+        "approval_confirmed": False,
         "decided_by": None,
         "decided_at": None,
         "notes": "",
@@ -218,6 +251,97 @@ def _validate_omi_candidate_type(candidate_type: str) -> str:
     if candidate_type not in OMI_CANDIDATE_TYPES:
         raise ValueError(f"Unsupported OMI candidate_type: {candidate_type}")
     return candidate_type
+
+
+def validate_omi_owner_decision(value: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError("OMI owner_decision must be a JSON object")
+
+    decision = value.get("decision", "pending")
+    if decision not in OMI_OWNER_DECISIONS:
+        raise ValueError(f"Unsupported OMI owner_decision: {decision}")
+
+    approval_confirmed = bool(value.get("approval_confirmed", value.get("approved", False)))
+    if decision == "approve" and not approval_confirmed:
+        raise ValueError("OMI approve decision requires approval_confirmed true")
+
+    notes = value.get("notes", "")
+    if not isinstance(notes, str):
+        raise ValueError("OMI owner_decision notes must be a string")
+
+    decided_by = value.get("decided_by")
+    if decided_by is not None and not isinstance(decided_by, str):
+        raise ValueError("OMI owner_decision decided_by must be a string")
+
+    decided_at = value.get("decided_at")
+    if decided_at is not None and not isinstance(decided_at, str):
+        raise ValueError("OMI owner_decision decided_at must be a string or null")
+
+    return {
+        "decision": decision,
+        "approved": decision == "approve" and approval_confirmed,
+        "approval_confirmed": approval_confirmed,
+        "decided_by": decided_by,
+        "decided_at": decided_at,
+        "notes": notes,
+    }
+
+
+def _status_from_decision(
+    current_status: str,
+    owner_decision: dict[str, Any],
+    requested_status: str | None,
+) -> str:
+    decision = owner_decision["decision"]
+    default_status = {
+        "approve": "approved",
+        "reject": "rejected",
+        "needs_revision": "candidate",
+    }.get(decision, current_status)
+    next_status = requested_status or default_status
+
+    expected_status = {
+        "approve": "approved",
+        "reject": "rejected",
+        "needs_revision": "candidate",
+    }.get(decision)
+    if expected_status is not None and next_status != expected_status:
+        raise ValueError(
+            f"OMI {decision} decision requires status {expected_status}"
+        )
+
+    return next_status
+
+
+def validate_omi_status_transition(current_status: str, next_status: str) -> str:
+    if next_status == "promoted":
+        raise ValueError("OMI promoted status is reserved for the future promotion gate")
+    if current_status not in OMI_STATUSES:
+        raise ValueError(f"Unsupported current OMI status: {current_status}")
+    if next_status not in OMI_STATUSES:
+        raise ValueError(f"Unsupported OMI status: {next_status}")
+    if next_status == current_status:
+        return next_status
+    if next_status not in OMI_STATUS_TRANSITIONS[current_status]:
+        raise ValueError(f"Invalid OMI status transition: {current_status} -> {next_status}")
+    return next_status
+
+
+def validate_omi_destination(destination: str) -> str:
+    return _validate_omi_destination(destination)
+
+
+def _finalize_owner_decision(owner_decision: dict[str, Any], timestamp: str) -> dict[str, Any]:
+    finalized = dict(owner_decision)
+    if finalized["decision"] == "pending":
+        finalized["approved"] = False
+        finalized["approval_confirmed"] = False
+        finalized["decided_by"] = finalized.get("decided_by")
+        finalized["decided_at"] = None
+    else:
+        finalized["decided_by"] = "owner"
+        finalized["decided_at"] = timestamp
+    return finalized
 
 
 def load_bible(project_name: str) -> dict[str, Any]:
@@ -451,6 +575,79 @@ def load_omi_candidate(project_name: str, candidate_id: str) -> dict[str, Any]:
         _omi_record_path(project_name, "candidates", candidate_id, "candidate_id"),
         "OMI candidate",
     )
+
+
+def update_omi_idea_decision(
+    project_name: str,
+    idea_id: str,
+    owner_decision: dict[str, Any],
+    status: str | None = None,
+) -> dict[str, Any]:
+    idea = load_omi_idea(project_name, idea_id)
+    normalized_decision = validate_omi_owner_decision(owner_decision)
+    next_status = _status_from_decision(
+        idea.get("status", "draft"),
+        normalized_decision,
+        status,
+    )
+    validate_omi_status_transition(idea.get("status", "draft"), next_status)
+
+    timestamp = _utc_after(idea.get("updated_at"))
+    idea["owner_decision"] = _finalize_owner_decision(normalized_decision, timestamp)
+    idea["status"] = next_status
+    idea["updated_at"] = timestamp
+
+    _write_json_object(
+        _omi_record_path(project_name, "ideas", idea_id, "idea_id"),
+        idea,
+        "OMI idea",
+        overwrite=True,
+    )
+    return idea
+
+
+def update_omi_candidate_decision(
+    project_name: str,
+    candidate_id: str,
+    owner_decision: dict[str, Any],
+    status: str | None = None,
+    destination: str | None = None,
+) -> dict[str, Any]:
+    candidate = load_omi_candidate(project_name, candidate_id)
+    normalized_decision = validate_omi_owner_decision(owner_decision)
+    next_status = _status_from_decision(
+        candidate.get("status", "candidate"),
+        normalized_decision,
+        status,
+    )
+    validate_omi_status_transition(candidate.get("status", "candidate"), next_status)
+    next_destination = (
+        _validate_omi_destination(destination)
+        if destination is not None
+        else candidate.get("destination")
+    )
+
+    timestamp = _utc_after(candidate.get("updated_at"))
+    candidate["owner_decision"] = _finalize_owner_decision(normalized_decision, timestamp)
+    candidate["status"] = next_status
+    candidate["destination"] = next_destination
+    candidate["updated_at"] = timestamp
+    candidate["promotion_status"] = {
+        "eligible": False,
+        "promotion_id": None,
+        "blocked_reasons": [
+            "promotion gate enforcement pending",
+            "final confirmation required",
+        ],
+    }
+
+    _write_json_object(
+        _omi_record_path(project_name, "candidates", candidate_id, "candidate_id"),
+        candidate,
+        "OMI candidate",
+        overwrite=True,
+    )
+    return candidate
 
 
 def get_omi_summary(project_name: str) -> dict[str, Any]:

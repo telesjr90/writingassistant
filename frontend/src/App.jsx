@@ -18,6 +18,8 @@ import {
   saveBible,
   saveScene,
   saveStoryform,
+  updateOMICandidateDecision,
+  updateOMIIdeaDecision,
 } from './api.js';
 
 const UNSAVED_CHANGES_MESSAGE = 'Discard unsaved changes and load another scene?';
@@ -64,6 +66,7 @@ export default function App() {
   const [isSavingStoryform, setIsSavingStoryform] = useState(false);
   const [isCreatingOMIIdea, setIsCreatingOMIIdea] = useState(false);
   const [isCreatingOMICandidate, setIsCreatingOMICandidate] = useState(false);
+  const [isUpdatingOMI, setIsUpdatingOMI] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [bibleStatus, setBibleStatus] = useState('');
   const [storyformStatus, setStoryformStatus] = useState('');
@@ -328,6 +331,54 @@ export default function App() {
     }
   }, [isCreatingOMICandidate, refreshOMI]);
 
+  const handleUpdateOMIIdeaDecision = useCallback(async (ideaId, payload) => {
+    if (isUpdatingOMI) {
+      return null;
+    }
+
+    setIsUpdatingOMI(true);
+    setOmiError('');
+    setOmiStatus('Updating idea...');
+
+    try {
+      const idea = await updateOMIIdeaDecision(PROJECT_ID, ideaId, payload);
+      await refreshOMI();
+      setOmiStatus('Idea updated');
+      return idea;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Idea update failed.';
+      setOmiError(message);
+      setOmiStatus('Error');
+      throw error;
+    } finally {
+      setIsUpdatingOMI(false);
+    }
+  }, [isUpdatingOMI, refreshOMI]);
+
+  const handleUpdateOMICandidateDecision = useCallback(async (candidateId, payload) => {
+    if (isUpdatingOMI) {
+      return null;
+    }
+
+    setIsUpdatingOMI(true);
+    setOmiError('');
+    setOmiStatus('Updating candidate...');
+
+    try {
+      const candidate = await updateOMICandidateDecision(PROJECT_ID, candidateId, payload);
+      await refreshOMI();
+      setOmiStatus('Candidate updated');
+      return candidate;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Candidate update failed.';
+      setOmiError(message);
+      setOmiStatus('Error');
+      throw error;
+    } finally {
+      setIsUpdatingOMI(false);
+    }
+  }, [isUpdatingOMI, refreshOMI]);
+
   useEffect(() => {
     function handleKeyDown(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
@@ -394,8 +445,11 @@ export default function App() {
           error={omiError}
           isCreatingIdea={isCreatingOMIIdea}
           isCreatingCandidate={isCreatingOMICandidate}
+          isUpdating={isUpdatingOMI}
           onCreateIdea={handleCreateOMIIdea}
           onCreateCandidate={handleCreateOMICandidate}
+          onUpdateIdeaDecision={handleUpdateOMIIdeaDecision}
+          onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
         />
 
         <Editor

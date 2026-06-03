@@ -31,6 +31,17 @@ class OMICandidateCreate(BaseModel):
     evidence: list | None = None
 
 
+class OMIIdeaDecisionUpdate(BaseModel):
+    owner_decision: dict
+    status: str | None = None
+
+
+class OMICandidateDecisionUpdate(BaseModel):
+    owner_decision: dict
+    status: str | None = None
+    destination: str | None = None
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -40,6 +51,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _patch_route(path: str):
+    return getattr(app, "patch", app.post)(path)
 
 
 @app.get("/api/projects/{project_name}/scenes")
@@ -184,6 +199,45 @@ def create_omi_candidate(project_name: str, payload: OMICandidateCreate) -> dict
 def get_omi_candidate(project_name: str, candidate_id: str) -> dict:
     try:
         return project_manager.load_omi_candidate(project_name, candidate_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI candidate not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@_patch_route("/api/projects/{project_name}/omi/ideas/{idea_id}/decision")
+def update_omi_idea_decision(
+    project_name: str,
+    idea_id: str,
+    payload: OMIIdeaDecisionUpdate,
+) -> dict:
+    try:
+        return project_manager.update_omi_idea_decision(
+            project_name,
+            idea_id,
+            payload.owner_decision,
+            status=payload.status,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI idea not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@_patch_route("/api/projects/{project_name}/omi/candidates/{candidate_id}/decision")
+def update_omi_candidate_decision(
+    project_name: str,
+    candidate_id: str,
+    payload: OMICandidateDecisionUpdate,
+) -> dict:
+    try:
+        return project_manager.update_omi_candidate_decision(
+            project_name,
+            candidate_id,
+            payload.owner_decision,
+            status=payload.status,
+            destination=payload.destination,
+        )
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="OMI candidate not found") from exc
     except ValueError as exc:

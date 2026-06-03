@@ -85,3 +85,13 @@ export async function createOMICandidate(projectId = PROJECT_ID, payload) {
 export async function getOMICandidate(projectId = PROJECT_ID, candidateId) {
   return requestData(() => client.get(`/projects/${projectId}/omi/candidates/${candidateId}`));
 }
+
+export async function updateOMIIdeaDecision(projectId = PROJECT_ID, ideaId, payload) {
+  return requestData(() => client.patch(`/projects/${projectId}/omi/ideas/${ideaId}/decision`, payload));
+}
+
+export async function updateOMICandidateDecision(projectId = PROJECT_ID, candidateId, payload) {
+  return requestData(() => (
+    client.patch(`/projects/${projectId}/omi/candidates/${candidateId}/decision`, payload)
+  ));
+}
