@@ -340,7 +340,7 @@ MVP completion requires:
 
 ### Phase 5 - OMI MVP implementation
 
-- OMI storage design.
+- DONE: OMI storage design in `docs/roadmap/omi_storage_model.md`.
 - OMI candidate lifecycle.
 - OMI owner decision flow.
 - OMI destination handling.
@@ -376,7 +376,7 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | App-12 evaluation fixtures | Add app-level fixtures. | Existing tests, eval schemas. | Fixture JSON and expected normalized output. | Covers valid, malformed, refusal, insufficient evidence. | Pytest. | App-6. | evaluation |
 | App-13 baseline evaluation harness | Track qwen3 baseline quality. | Ollama, eval fixtures. | Script/report for baseline runs. | Counts JSON validity, schema compliance, refusal violations. | Eval script run. | App-8, App-12. | evaluation |
 | OMI-001 define OMI MVP schema and lifecycle | Bound OMI as owner-controlled planning. | Product boundary, project storage model. | Schema/lifecycle spec for raw idea, candidates, owner decision, destination, provenance, status. | No prose, no silent promotion, candidate-first behavior is explicit. | Markdown review. | Phase 1. | app, docs, omi |
-| OMI-002 design OMI storage model | Keep candidates separate from approved truth. | Project storage model. | Storage design for OMI items and promotion records. | Candidate material cannot overwrite bible/storyform/project truth by default. | Design review. | OMI-001. | storage, omi |
+| OMI-002 design OMI storage model | Keep candidates separate from approved truth. | Project storage model. | DONE; `docs/roadmap/omi_storage_model.md` defines OMI idea, candidate, promotion, and index storage records. | Candidate material cannot overwrite bible/storyform/project truth by default. | Design review and pytest. | OMI-001. | storage, omi |
 | OMI-003 implement OMI candidate creation flow | Capture raw idea and structured candidates. | OMI schema/storage design. | Backend/UI flow, when implemented. | Outputs are structured planning candidates only, not story prose. | Unit/UI tests. | Phase 2, OMI-002. | backend, frontend, omi |
 | OMI-004 implement owner decision and destination selection | Require owner action before promotion. | OMI lifecycle. | Owner decision and destination controls. | Destination is explicit before promotion. | Tests/manual smoke. | OMI-003. | frontend, storage, omi |
 | OMI-005 prevent promotion without explicit owner approval | Enforce durable truth boundary. | Guardrails, storage model. | Approval gate. | Promotion fails unless owner approval, destination, provenance, and status are present. | Guardrail/storage tests. | OMI-004. | guardrails, omi |
