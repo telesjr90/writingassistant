@@ -188,9 +188,9 @@ App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifec
 
 Sample project alignment status: `docs/roadmap/sample_project_alignment_spec.md` defines the aligned sample requirements, replacement strategy, provenance checks, Story Check fixture implications, OMI fixture implications, and no-prose boundaries. The local ignored `projects/example` fixture now uses public-domain scene source text; `owner_sample_input.md` is OMI-only future input. No runtime files, frontend files, tests, generated prose, public-domain prose rewrites, or owner idea promotion were introduced.
 
-GUARD-001 / GUARD-002 status: `backend/guardrails.py` provides the shared runtime no-prose guard API, standard refusal response, allowed-help list, conservative output helper, and request-field policy helpers. Current routes are audited: scene, bible, and storyform saves are owner-authored content and are not scanned as assistant requests; Story Check has no freeform request field and does not guard scene text as request intent. Future OMI/freeform request routes must call `guard_freeform_request` before model calls. GUARD-003 output blocking remains future work.
+GUARD-001 / GUARD-002 / GUARD-003 status: `backend/guardrails.py` provides the shared runtime no-prose guard API, standard refusal response, allowed-help list, request-field policy helpers, and conservative Story Check output sanitizer. Current routes are audited: scene, bible, and storyform saves are owner-authored content and are not scanned as assistant requests; Story Check has no freeform request field and does not guard scene text as request intent. Future OMI/freeform request routes must call `guard_freeform_request` before model calls. Story Check output now passes through `sanitize_story_check_output` after normalization so model-authored unsafe warnings, suggestions, reasons, concerns, and raw diagnostics are removed or blocked while evidence arrays are preserved.
 
-BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Check normalizer, safe JSON-object extraction, `jsonschema` validation when available, minimal UI compatibility fields, rich Story Check field preservation, and deterministic malformed-output fallback. It is integrated through `backend/analysis_engine.py`; SC-001 prompt updates and GUARD-003 output blocking remain future tasks.
+BE-002 status: `backend/analysis_normalizer.py` provides the reusable Story Check normalizer, safe JSON-object extraction, `jsonschema` validation when available, minimal UI compatibility fields, rich Story Check field preservation, and deterministic malformed-output fallback. It is integrated through `backend/analysis_engine.py`; normalized Story Check output is then passed through the GUARD-003 output sanitizer.
 
 BE-001 / App-7 status: `backend/analysis_modes.py` defines explicit `ANALYSIS_MODE` selection. Missing or empty mode preserves the current `ollama_baseline` behavior, `ANALYSIS_MODE=mock` returns deterministic Story Check diagnostics from `backend/mock_responses/story_check.json`, and invalid modes return a stable error-shaped response through `run_story_check`. Mock Story Check output is normalized through the same compatibility path and remains candidate-only.
 
@@ -308,6 +308,7 @@ MVP completion requires:
 
 - DONE: GUARD-001 shared runtime no-prose guard module and tests.
 - DONE: GUARD-002 request-path no-prose guard policy and tests.
+- DONE: GUARD-003 post-model Story Check output guard integration and tests.
 - Refusal response schema.
 - DONE: BE-002 Story Check normalizer.
 - DONE: SC-001 rich Story Check prompt alignment.

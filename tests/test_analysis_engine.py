@@ -236,6 +236,29 @@ def test_run_story_check_ollama_baseline_uses_mocked_post_and_normalizer(monkeyp
     assert report["coherence_score"] == 6
     assert report["warnings"] == ["[Factual] Missing approved context."]
     assert report["diagnostics"]["legacy_small_schema"] is True
+    assert report["diagnostics"]["output_guard_triggered"] is False
+
+
+def test_run_story_check_ollama_baseline_applies_output_guard(monkeypatch):
+    monkeypatch.setenv("ANALYSIS_MODE", "ollama_baseline")
+
+    payload = rich_story_check_payload()
+    payload["theme_drift"]["reason"] = "Here is a polished paragraph: [blocked]."
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"message": {"content": json.dumps(payload)}}
+
+    monkeypatch.setattr(analysis_engine.requests, "post", lambda *args, **kwargs: FakeResponse())
+
+    report = analysis_engine.run_story_check("example", "scene_001")
+
+    assert report["theme_drift"]["reason"] == guardrails.OUTPUT_GUARD_NOTE
+    assert report["diagnostics"]["output_guard_triggered"] is True
+    assert "polished paragraph" not in json.dumps(report)
 
 
 def test_run_story_check_missing_analysis_mode_uses_ollama_baseline(monkeypatch):

@@ -51,6 +51,7 @@
 - App-4 scene editor hardening: frontend validation remains `npm run build`; backend route/storage behavior is covered by pytest with temporary project directories so `projects/example` fixture content is not modified.
 - App-5 bible/storyform read/write: context editing uses plain JSON textareas in `ProjectContext.jsx`; backend PUT routes require explicit owner-submitted JSON objects, storyform saves validate with the existing schema before writing, and tests use temporary project directories.
 - GUARD-002 request-path policy: use `guard_freeform_request` for future freeform assistant/model request fields before model calls. Do not run the request guard on owner-authored content fields such as scene content, bible JSON, storyform JSON, raw ideas, or planning notes.
+- GUARD-003 output policy: Story Check output is normalized first, then passed through `sanitize_story_check_output` before route/UI exposure. The sanitizer scans model-authored warnings, suggestions, reasons, concerns, and raw diagnostics, but skips evidence arrays so exact scene evidence spans are not blocked as generated prose.
 - Training: Unsloth QLoRA scripts/configs exist.
 - Git: initialized/repaired on `main` with `origin https://github.com/telesjr90/writingassistant`; local baseline commit `25ef64d chore: initialize safe project baseline` exists.
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.

@@ -8,11 +8,12 @@ from typing import Any
 import requests
 
 try:
-    from . import analysis_modes, analysis_normalizer, project_manager
+    from . import analysis_modes, analysis_normalizer, guardrails, project_manager
     from .storyform import Storyform
 except ImportError:  # pragma: no cover - supports direct execution from backend/
     import analysis_modes
     import analysis_normalizer
+    import guardrails
     import project_manager
     from storyform import Storyform
 
@@ -25,12 +26,16 @@ OLLAMA_STORY_CHECK_NUM_PREDICT = 2048
 
 
 def _parse_story_check_response(content: str) -> dict[str, Any]:
-    return analysis_normalizer.normalize_story_check_output(content)
+    return guardrails.sanitize_story_check_output(
+        analysis_normalizer.normalize_story_check_output(content)
+    )
 
 
 def _load_mock_story_check_response() -> dict[str, Any]:
     payload = json.loads(MOCK_STORY_CHECK_PATH.read_text(encoding="utf-8"))
-    return analysis_normalizer.normalize_story_check_output(payload)
+    return guardrails.sanitize_story_check_output(
+        analysis_normalizer.normalize_story_check_output(payload)
+    )
 
 
 def _ollama_chat_url() -> str:
