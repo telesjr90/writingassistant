@@ -1,0 +1,62 @@
+{
+  "task": "story_check",
+  "coherence_score": 3,
+  "throughline_alignment": {
+    "overall_story": {
+      "present": true,
+      "evidence": [
+        "shared problem"
+      ],
+      "concerns": [
+        "Overall Story context is tentative without owner confirmation."
+      ]
+    },
+    "main_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "No owner-approved personal throughline evidence is supplied."
+      ]
+    },
+    "influence_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "No owner-approved counter-pressure evidence is supplied."
+      ]
+    },
+    "relationship_story": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "No owner-approved relationship-conflict evidence is supplied."
+      ]
+    }
+  },
+  "theme_drift": {
+    "status": "insufficient_evidence",
+    "reason": "Generic theme language is not Issue or Variation proof."
+  },
+  "character_consistency": {
+    "status": "insufficient_evidence",
+    "reason": "Approved bible context is incomplete."
+  },
+  "warnings": [
+    "[Factual] Missing IC, RS, CIPS, and dynamics evidence must remain unresolved."
+  ],
+  "suggestions": [
+    "Which owner-approved evidence would distinguish IC pressure from plot function?"
+  ],
+  "insufficient_evidence": [
+    "Main Character throughline is unresolved.",
+    "Influence Character throughline is unresolved.",
+    "Relationship Story throughline is unresolved.",
+    "CIPS is unresolved.",
+    "Dynamics are unresolved."
+  ],
+  "diagnostics": {
+    "fixture": "insufficient_evidence_story_check",
+    "candidate_only": true,
+    "mutates_project_truth": false
+  }
+}

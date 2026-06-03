@@ -1,0 +1,54 @@
+{
+  "task": "story_check",
+  "coherence_score": 6,
+  "throughline_alignment": {
+    "overall_story": {
+      "present": true,
+      "evidence": [
+        "continue this chapter"
+      ],
+      "concerns": [
+        "Overall Story pressure is visible."
+      ]
+    },
+    "main_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "No owner-approved Main Character evidence is supplied."
+      ]
+    },
+    "influence_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": []
+    },
+    "relationship_story": {
+      "present": false,
+      "evidence": [],
+      "concerns": []
+    }
+  },
+  "theme_drift": {
+    "status": "insufficient_evidence",
+    "reason": "Here is a polished paragraph: [blocked]."
+  },
+  "character_consistency": {
+    "status": "insufficient_evidence",
+    "reason": "Approved character context is incomplete."
+  },
+  "warnings": [
+    "[Factual] Approved context is incomplete."
+  ],
+  "suggestions": [
+    "Rewrite the scene with sharper dialogue.",
+    "What owner-approved evidence is missing?"
+  ],
+  "insufficient_evidence": [
+    "Influence Character evidence is unresolved."
+  ],
+  "diagnostics": {
+    "fixture": "unsafe_output_story_check",
+    "candidate_only": true
+  }
+}

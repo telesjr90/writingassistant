@@ -26,7 +26,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | GUARD-002 | Request-path no-prose guard integration | Route/service guard use | DONE; freeform request helper and field policy exist, current routes are audited, and tests verify owner-authored scene/bible/storyform content is not overblocked |
 | GUARD-003 | Output no-prose guard integration | Model-output guard use | DONE; normalized Story Check output is sanitized after parsing to remove unsafe model-authored prose-generation content while preserving evidence spans |
 | App-11 / FE-001 | Story Check sidebar UI | Rich diagnostic sidebar | DONE; normalized rich Story Check fields render as first-class candidate diagnostics with raw JSON kept in an advanced details view and frontend build validation passes |
-| App-12 | Evaluation fixtures | Fixture set | Valid, invalid, refusal, and insufficient-evidence cases covered |
+| App-12 | Evaluation fixtures | Fixture set | DONE; app-level Story Check fixtures cover valid rich, minimal, malformed, refusal, insufficient-evidence, and unsafe-output guard cases without creating training data |
 | App-13 | Baseline evaluation harness | Baseline report | JSON validity, schema compliance, refusal violations counted |
 | OMI-001 | Define OMI MVP schema and lifecycle | `docs/roadmap/omi_mvp_schema_lifecycle.md` | DONE; fields include `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status` |
 | OMI-002 | Design OMI storage model | Storage design | TODO; candidates remain separate from owner-approved bible/storyform/project truth |
@@ -43,7 +43,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 0 | Repo baseline and source-of-truth sync | Git repair, safe metadata, and local baseline commit done; push and ongoing doc sync TODO |
 | Phase 1 | App architecture audit and project model decisions | COMPLETE locally; App-1 architecture audit, App-2 project file model, App-3 NCP subset, App-3a/OMI-001, sample alignment spec, and public-domain sample fixture alignment done |
 | Phase 2 | Backend safety and schema foundation | COMPLETE locally for Story Check MVP; GUARD-001, GUARD-002, GUARD-003, BE-001, BE-002, SC-001, and SC-002 done |
-| Phase 3 | Mock and baseline Story Check | IN PROGRESS; App-7 mock Story Check mode and App-8 live qwen3 baseline verification done; evaluation fixtures/harness and remaining mock fixtures remain TODO |
+| Phase 3 | Mock and baseline Story Check | IN PROGRESS; App-7 mock Story Check mode, App-8 live qwen3 baseline verification, and App-12 evaluation fixtures done; App-13 harness and remaining mock fixtures remain TODO |
 | Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, App-5 bible/storyform context editing, and Story Check guard integration done; remaining App MVP evaluation/OMI hardening remains TODO |
 | Phase 5 | OMI MVP implementation | TODO, after guardrails/schema foundation; bounded to analysis-only, owner-controlled candidate planning |
 | Phase 6 | MVP hardening | TODO |

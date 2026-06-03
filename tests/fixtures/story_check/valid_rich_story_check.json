@@ -1,0 +1,58 @@
+{
+  "task": "story_check",
+  "coherence_score": 7,
+  "throughline_alignment": {
+    "overall_story": {
+      "present": true,
+      "evidence": [
+        "public deadline"
+      ],
+      "concerns": []
+    },
+    "main_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "Main Character evidence is not owner-approved in this fixture."
+      ]
+    },
+    "influence_character": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "Influence Character pressure is not established by approved evidence."
+      ]
+    },
+    "relationship_story": {
+      "present": false,
+      "evidence": [],
+      "concerns": [
+        "Generic relationship context is not Relationship Story proof."
+      ]
+    }
+  },
+  "theme_drift": {
+    "status": "insufficient_evidence",
+    "reason": "No owner-approved Issue or Variation evidence is supplied."
+  },
+  "character_consistency": {
+    "status": "insufficient_evidence",
+    "reason": "Approved character context is incomplete."
+  },
+  "warnings": [
+    "[Factual] Treat this Story Check as candidate diagnostics only."
+  ],
+  "suggestions": [
+    "What owner-approved evidence would support a Main Character claim?"
+  ],
+  "insufficient_evidence": [
+    "Influence Character evidence is unresolved.",
+    "Relationship Story evidence is unresolved.",
+    "CIPS and dynamics are unresolved."
+  ],
+  "diagnostics": {
+    "fixture": "valid_rich_story_check",
+    "candidate_only": true,
+    "mutates_project_truth": false
+  }
+}

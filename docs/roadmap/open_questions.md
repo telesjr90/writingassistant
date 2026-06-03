@@ -40,13 +40,14 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 3. Replace the sample fixture with one aligned owner-created project for MVP.
 4. Define exact OMI API/storage implementation without assuming current endpoints exist.
 5. Reuse shared `backend/guardrails.py` request and output guard helpers when future freeform/model routes are implemented without treating scene text as user request intent.
-6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
-7. Add broader route tests where useful without live Ollama.
-8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
-9. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
-10. Revise or create a RunPod cloud smoke config before smoke training.
-11. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
-12. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
+6. Implement App-13 baseline evaluation harness on top of the App-12 fixtures without calling live Ollama from pytest.
+7. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
+8. Add broader route tests where useful without live Ollama.
+9. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
+10. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
+11. Revise or create a RunPod cloud smoke config before smoke training.
+12. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
+13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
 
 ## Owner Questions
 

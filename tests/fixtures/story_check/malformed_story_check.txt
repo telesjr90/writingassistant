@@ -1,0 +1,1 @@
+{ "task": "story_check", "coherence_score": 4, "warnings": [

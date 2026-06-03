@@ -1,0 +1,10 @@
+{
+  "task": "out_of_scope_refusal",
+  "request_type": "prose_generation",
+  "allowed_help": [
+    "analysis",
+    "diagnostic questions",
+    "structural classification"
+  ],
+  "message": "I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose."
+}

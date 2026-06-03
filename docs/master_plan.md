@@ -196,6 +196,8 @@ BE-001 / App-7 status: `backend/analysis_modes.py` defines explicit `ANALYSIS_MO
 
 App-8 status: `ANALYSIS_MODE=ollama_baseline`, `OLLAMA_BASE_URL`, and `OLLAMA_MODEL=qwen3:8b` are configured and covered by mocked tests. Live baseline verification completed locally on 2026-06-01 against Windows Ollama from WSL using `OLLAMA_BASE_URL=http://172.25.144.1:11434`; the qwen3 Story Check smoke returned normalized, schema-valid rich Story Check JSON. No model was pulled or installed during verification.
 
+App-12 status: App-level Story Check evaluation fixtures now live under `tests/fixtures/story_check/` with pytest coverage in `tests/test_evaluation_fixtures.py`. They cover valid rich output, minimal output, malformed fallback, refusal response shape, insufficient evidence, and output-guard sanitization. These fixtures are not training data and are not part of `training/data` or `dataset_manifest.json`.
+
 SC-001 status: `backend/prompts/story_check.txt` now explicitly requests the rich Story Check schema supported by BE-002, requires JSON-only output, preserves the analysis-only/no-prose boundary, and instructs insufficient-evidence reporting instead of unsupported Dramatica/NCP guesses.
 
 SC-002 / FE-001 status: Story Check route compatibility checks cover minimal, rich, fallback, missing-rich-field, unknown-field, and error-shaped reports without live Ollama. `AnalysisSidebar.jsx` remains minimal/fallback/error compatible and now renders rich Story Check sections for coherence score, warnings, diagnostic suggestions, throughline alignment, theme drift, character consistency, insufficient evidence, compact diagnostics, and advanced raw JSON. Frontend build validation passes after adding the Vite build script and repairing npm optional dependencies.
@@ -322,7 +324,7 @@ MVP completion requires:
 - Story Check route tests.
 - Ollama baseline mode.
 - qwen3 baseline verification.
-- Evaluation fixtures.
+- DONE: App-12 app-level evaluation fixtures for Story Check normalizer, guardrails, refusal, malformed output, and insufficient evidence.
 
 ### Phase 4 - Frontend MVP diagnostics
 
