@@ -44,7 +44,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 7. Add broader route tests where useful without live Ollama.
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
 9. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
-10. Continue with OMI-007 no-prose/no-silent-promotion tests while preserving owner approval, final confirmation, no-prose boundaries, and record-only promotion behavior.
+10. Execute the MVP exit matrix preflight now that OMI-007 no-prose/no-silent-promotion tests are in place.
 11. Revise or create a RunPod cloud smoke config before smoke training.
 12. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.

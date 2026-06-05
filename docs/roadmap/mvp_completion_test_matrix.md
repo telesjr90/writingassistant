@@ -31,7 +31,7 @@ Pass/fail recording should use the format in the final section of this document.
 | No-prose request guard tests | Verify prohibited request classes refuse safely | Guardrail and request-path pytest groups | Standard refusal message appears where expected; owner-authored saves are not overblocked |
 | Output guard tests | Verify model-authored unsafe text is sanitized | Output guard pytest groups | Unsafe warnings/suggestions/diagnostics are removed or replaced; evidence spans preserved |
 | Bible/storyform context tests | Verify owner-controlled read/write behavior | Context route and project manager tests | Valid saves work; invalid storyform saves preserve files; candidate analysis does not overwrite truth |
-| OMI MVP tests | Verify raw idea, candidate, decision, destination, and promotion-record behavior | Project manager and OMI route tests | OMI records stay under `omi/`; no promotion application; no durable truth mutation |
+| OMI MVP tests | Verify raw idea, candidate, decision, destination, promotion-record, and boundary behavior | Project manager, OMI route, and OMI boundary tests | OMI records stay under `omi/`; no promotion application; no durable truth mutation; no prose-generation destination/type path |
 | Evaluation harness tests | Verify App-12/App-13 fixtures and offline harness | Evaluation fixture and baseline harness pytest groups; optional offline sample report | Fixtures load; fallback/refusal/guard behavior tracked; no training data or manifest writes |
 | Full end-to-end MVP manual acceptance test | Exercise the app as a local writer | Manual checklist below | Owner can load project, edit/save scene, edit/save context, run Story Check, view diagnostics, create/review OMI candidates, create promotion records only, and confirm no prose generation path exists |
 
@@ -49,6 +49,7 @@ Minimum backend suite for MVP exit:
 - Context route tests.
 - Project manager tests.
 - OMI route tests.
+- OMI boundary tests.
 - Evaluation fixture tests.
 - Baseline harness tests.
 
@@ -149,6 +150,9 @@ OMI MVP validation must cover:
 - Promotion record status remains record-only, not `promoted`.
 - No apply-promotion route exists.
 - No writes to `bible.json`, `storyform.json`, `scenes/`, `project.json`, `owner_memory.json`, planning notes, `training/data`, or `dataset_manifest.json`.
+- No prose-generation candidate type or destination is accepted.
+- Owner-authored raw ideas, candidate content, decision notes, and promotion metadata are not treated as assistant request intent when saved.
+- UI boundary copy remains present and no generation/rewrite/continue/polish/improve controls appear.
 
 ## Evaluation Harness Tests
 
