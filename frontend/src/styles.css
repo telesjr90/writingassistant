@@ -220,18 +220,30 @@ h2 {
 }
 
 .context-actions button,
-.primary-button {
+.primary-button,
+.secondary-button {
   min-height: 32px;
   padding: 0 12px;
-  color: #ffffff;
-  background: #234a84;
-  border: 1px solid #234a84;
   border-radius: 6px;
   cursor: pointer;
 }
 
+.context-actions button,
+.primary-button {
+  color: #ffffff;
+  background: #234a84;
+  border: 1px solid #234a84;
+}
+
+.secondary-button {
+  color: #234a84;
+  background: #ffffff;
+  border: 1px solid #aab8ce;
+}
+
 .context-actions button:disabled,
-.primary-button:disabled {
+.primary-button:disabled,
+.secondary-button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
@@ -304,6 +316,54 @@ h2 {
   border-radius: 8px;
 }
 
+.omi-detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.omi-detail-header h3,
+.omi-detail-card h4 {
+  margin: 0;
+  color: #101828;
+}
+
+.omi-detail-header h3 {
+  font-size: 16px;
+}
+
+.omi-detail-card h4 {
+  font-size: 14px;
+}
+
+.omi-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 12px;
+}
+
+.omi-detail-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e7ecf4;
+  border-radius: 8px;
+}
+
 .omi-record p {
   margin: 0;
   color: #2c374c;
@@ -349,6 +409,30 @@ h2 {
 
 .omi-metadata dd {
   margin: 2px 0 0;
+  color: #2c374c;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.omi-provenance-grid {
+  display: grid;
+  grid-template-columns: minmax(94px, 0.42fr) minmax(0, 1fr);
+  gap: 8px 10px;
+  margin: 0;
+}
+
+.omi-provenance-grid div {
+  display: contents;
+}
+
+.omi-provenance-grid dt {
+  color: #637089;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-provenance-grid dd {
+  margin: 0;
   color: #2c374c;
   font-size: 12px;
   overflow-wrap: anywhere;
@@ -428,6 +512,45 @@ h2 {
 .omi-readiness ul {
   margin: 0;
   padding-left: 18px;
+}
+
+.omi-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omi-checklist li {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.45fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  background: #fbfcff;
+  border: 1px solid #e7ecf4;
+  border-left-width: 4px;
+  border-radius: 8px;
+}
+
+.omi-checklist li.is-met {
+  border-left-color: #3b6948;
+}
+
+.omi-checklist li.is-blocked {
+  border-left-color: #a93636;
+}
+
+.omi-checklist strong {
+  color: #172033;
+  font-size: 12px;
+}
+
+.omi-checklist span {
+  color: #46546c;
+  font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 .omi-promotion-form {
@@ -710,9 +833,15 @@ h2 {
   .context-grid,
   .omi-grid,
   .omi-record-grid,
+  .omi-detail-grid,
   .omi-decision-grid,
   .omi-promotion-form,
-  .omi-metadata {
+  .omi-metadata,
+  .omi-checklist li {
     grid-template-columns: 1fr;
+  }
+
+  .omi-detail-header {
+    flex-direction: column;
   }
 }

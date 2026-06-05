@@ -33,7 +33,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | OMI-003 | Implement OMI candidate creation flow | Candidate creation path | DONE; owner-authored raw ideas and structured candidate planning records can be created/listed/loaded under project-local `omi/` storage with no story prose, no model generation, and no promotion path |
 | OMI-004 | Implement owner decision and destination selection | Decision/destination flow | DONE; owner can update idea/candidate decisions, status, approval confirmation, notes, and candidate destinations without promotion |
 | OMI-005 | Prevent OMI candidate promotion without explicit owner approval | Promotion guard | DONE; approved candidates can create promotion audit records only after owner approval, final confirmation, allowed destination, provenance, source snapshot, and safe target labels are present, with no durable truth mutation |
-| OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | TODO; OMI-003/004 include a minimal create/list/review panel, but fuller status/provenance workflow remains future work |
+| OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | DONE; OMI panel shows raw ideas, candidates, selected candidate lifecycle details, owner decisions, destinations, timestamps, provenance, evidence, promotion readiness blockers, and promotion records without apply-promotion behavior |
 | OMI-007 | OMI tests for no-prose and no-silent-promotion behavior | Test coverage | TODO; verifies OMI cannot generate story prose or silently promote candidates |
 | MVP-EXIT | MVP completion test matrix | `docs/roadmap/mvp_completion_test_matrix.md` | TODO; formal exit gate covers repo safety, backend tests, frontend build, smoke checks, Story Check modes, guardrails, context, OMI, evaluation harness, and end-to-end manual acceptance |
 
@@ -46,7 +46,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 2 | Backend safety and schema foundation | COMPLETE locally for Story Check MVP; GUARD-001, GUARD-002, GUARD-003, BE-001, BE-002, SC-001, and SC-002 done |
 | Phase 3 | Mock and baseline Story Check | COMPLETE locally for Story Check MVP; App-7 mock mode, App-8 live qwen3 baseline verification, App-12 evaluation fixtures, and App-13 offline baseline harness done; remaining mock fixtures beyond Story Check are future work |
 | Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, App-5 bible/storyform context editing, and Story Check guard integration done; remaining App MVP OMI hardening remains TODO |
-| Phase 5 | OMI MVP implementation | IN PROGRESS; OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 raw idea/candidate creation, OMI-004 owner decision/destination selection, and OMI-005 promotion gate records are complete, while fuller OMI UI and broader OMI tests remain TODO |
+| Phase 5 | OMI MVP implementation | IN PROGRESS; OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 raw idea/candidate creation, OMI-004 owner decision/destination selection, OMI-005 promotion gate records, and OMI-006 status/provenance UI are complete, while broader OMI no-prose/no-silent-promotion tests remain TODO |
 | Phase 6 | MVP hardening | TODO |
 
 ## Post-MVP / Future App Track

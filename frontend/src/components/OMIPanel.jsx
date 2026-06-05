@@ -56,6 +56,79 @@ function formatDate(value) {
   return value;
 }
 
+function formatCount(count, singular, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+function formatDecision(record) {
+  const decision = record?.owner_decision ?? {};
+  if (decision.decision === 'approve' && decision.approval_confirmed) {
+    return 'Approved and confirmed';
+  }
+  if (decision.decision === 'approve') {
+    return 'Approval pending confirmation';
+  }
+  if (decision.decision === 'reject') {
+    return 'Rejected';
+  }
+  if (decision.decision === 'needs_revision') {
+    return 'Needs revision';
+  }
+  return 'Pending review';
+}
+
+function hasObject(value) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function formatValue(value) {
+  if (value === null || value === undefined || value === '') {
+    return 'Not recorded';
+  }
+  if (Array.isArray(value)) {
+    return value.length === 0 ? 'None' : value.join(', ');
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
+function provenanceRows(provenance) {
+  if (!hasObject(provenance)) {
+    return [];
+  }
+
+  return [
+    ['Source type', provenance.source_type],
+    ['Source label', provenance.source_label],
+    ['Source path', provenance.source_path],
+    ['Created by', provenance.created_by],
+    ['Tool', provenance.tool],
+    ['Model', provenance.model],
+    ['Prompt', provenance.prompt_id],
+    ['Timestamp', provenance.timestamp],
+    ['Confidence', provenance.confidence],
+    ['Notes', provenance.notes],
+  ].filter(([, value]) => value !== undefined);
+}
+
+function provenanceSummary(provenance) {
+  if (!hasObject(provenance)) {
+    return 'No provenance';
+  }
+
+  return provenance.source_label || provenance.source_type || 'Recorded provenance';
+}
+
+function evidenceSummary(evidence) {
+  if (!Array.isArray(evidence) || evidence.length === 0) {
+    return 'No evidence attached';
+  }
+
+  return formatCount(evidence.length, 'evidence item');
+}
+
 function parseCandidateContent(text) {
   let parsed;
 
@@ -120,6 +193,44 @@ function promotionReadiness(candidate) {
     ready: blockedReasons.length === 0,
     blockedReasons,
   };
+}
+
+function promotionRequirementRows(candidate, readiness) {
+  const ownerDecision = candidate.owner_decision ?? {};
+  return [
+    {
+      label: 'Owner approval',
+      met: ownerDecision.decision === 'approve',
+      detail: ownerDecision.decision ?? 'pending',
+    },
+    {
+      label: 'Approval confirmation',
+      met: ownerDecision.approval_confirmed === true,
+      detail: ownerDecision.approval_confirmed ? 'confirmed' : 'missing',
+    },
+    {
+      label: 'Allowed destination',
+      met: Boolean(candidate.destination)
+        && candidate.destination !== 'discard'
+        && DESTINATIONS.some((option) => option.value === candidate.destination),
+      detail: candidate.destination ?? 'not selected',
+    },
+    {
+      label: 'Provenance',
+      met: hasObject(candidate.provenance),
+      detail: provenanceSummary(candidate.provenance),
+    },
+    {
+      label: 'Structured content',
+      met: hasObject(candidate.candidate_content),
+      detail: hasObject(candidate.candidate_content) ? 'JSON object' : 'missing',
+    },
+    {
+      label: 'Safe target label/path',
+      met: readiness.ready,
+      detail: readiness.ready ? 'choose target when creating record' : 'blocked until ready',
+    },
+  ];
 }
 
 function OwnerDecisionForm({
@@ -379,12 +490,45 @@ export default function OMIPanel({
   const [destination, setDestination] = useState('planning_notes');
   const [candidateContent, setCandidateContent] = useState('{\n  "summary": "",\n  "fields": []\n}');
   const [formError, setFormError] = useState('');
+  const [selectedCandidateId, setSelectedCandidateId] = useState('');
+  const selectedCandidate = useMemo(
+    () => candidates.find((candidate) => candidate.candidate_id === selectedCandidateId)
+      ?? candidates[0]
+      ?? null,
+    [candidates, selectedCandidateId],
+  );
+  const selectedCandidateReadiness = selectedCandidate
+    ? promotionReadiness(selectedCandidate)
+    : null;
+  const selectedCandidatePromotions = useMemo(() => {
+    if (!selectedCandidate) {
+      return [];
+    }
+
+    return promotions.filter(
+      (promotion) => promotion.candidate_id === selectedCandidate.candidate_id,
+    );
+  }, [promotions, selectedCandidate]);
 
   useEffect(() => {
     if (!selectedIdeaId && ideas.length > 0) {
       setSelectedIdeaId(ideas[0].idea_id);
     }
   }, [ideas, selectedIdeaId]);
+
+  useEffect(() => {
+    if (!selectedCandidateId && candidates.length > 0) {
+      setSelectedCandidateId(candidates[0].candidate_id);
+      return;
+    }
+
+    if (
+      selectedCandidateId
+      && !candidates.some((candidate) => candidate.candidate_id === selectedCandidateId)
+    ) {
+      setSelectedCandidateId(candidates[0]?.candidate_id ?? '');
+    }
+  }, [candidates, selectedCandidateId]);
 
   async function handleCreateIdea(event) {
     event.preventDefault();
@@ -407,7 +551,7 @@ export default function OMIPanel({
 
     try {
       const parsedContent = parseCandidateContent(candidateContent);
-      await onCreateCandidate({
+      const candidate = await onCreateCandidate({
         idea_id: selectedIdeaId,
         candidate_type: candidateType,
         candidate_content: parsedContent,
@@ -415,6 +559,9 @@ export default function OMIPanel({
         evidence: [],
       });
       setCandidateContent('{\n  "summary": "",\n  "fields": []\n}');
+      if (candidate?.candidate_id) {
+        setSelectedCandidateId(candidate.candidate_id);
+      }
     } catch (createError) {
       setFormError(
         createError instanceof Error ? createError.message : 'Candidate create failed.',
@@ -433,6 +580,8 @@ export default function OMIPanel({
             Approving a candidate does not promote it. Promotion requires a separate confirmation step.
             {' '}
             Creating a promotion record does not change bible, storyform, scenes, or project truth.
+            {' '}
+            The app cannot write or rewrite story prose.
           </p>
         </div>
         <span className="context-status">{isLoading ? 'Loading' : status}</span>
@@ -556,6 +705,14 @@ export default function OMIPanel({
                 <p>{idea.raw_idea}</p>
                 <dl className="omi-metadata">
                   <div>
+                    <dt>Linked candidates</dt>
+                    <dd>{idea.linked_candidate_ids?.length ?? 0}</dd>
+                  </div>
+                  <div>
+                    <dt>Source</dt>
+                    <dd>{provenanceSummary(idea.provenance)}</dd>
+                  </div>
+                  <div>
                     <dt>Decision</dt>
                     <dd>{idea.owner_decision?.decision ?? 'pending'}</dd>
                   </div>
@@ -566,6 +723,14 @@ export default function OMIPanel({
                   <div>
                     <dt>By</dt>
                     <dd>{idea.owner_decision?.decided_by ?? 'Unreviewed'}</dd>
+                  </div>
+                  <div>
+                    <dt>Created</dt>
+                    <dd>{formatDate(idea.created_at)}</dd>
+                  </div>
+                  <div>
+                    <dt>Updated</dt>
+                    <dd>{formatDate(idea.updated_at)}</dd>
                   </div>
                 </dl>
                 <OwnerDecisionForm
@@ -594,6 +759,10 @@ export default function OMIPanel({
                 </div>
                 <dl className="omi-metadata">
                   <div>
+                    <dt>Idea</dt>
+                    <dd>{candidate.idea_id}</dd>
+                  </div>
+                  <div>
                     <dt>Type</dt>
                     <dd>{candidate.candidate_type}</dd>
                   </div>
@@ -603,7 +772,7 @@ export default function OMIPanel({
                   </div>
                   <div>
                     <dt>Promotion</dt>
-                    <dd>{candidate.promotion_status?.eligible ? 'Eligible' : 'Blocked'}</dd>
+                    <dd>{promotionReadiness(candidate).ready ? 'Ready' : 'Blocked'}</dd>
                   </div>
                   <div>
                     <dt>Decision</dt>
@@ -613,7 +782,24 @@ export default function OMIPanel({
                     <dt>Approved</dt>
                     <dd>{candidate.owner_decision?.approved ? 'Yes' : 'No'}</dd>
                   </div>
+                  <div>
+                    <dt>Source</dt>
+                    <dd>{provenanceSummary(candidate.provenance)}</dd>
+                  </div>
+                  <div>
+                    <dt>Evidence</dt>
+                    <dd>{evidenceSummary(candidate.evidence)}</dd>
+                  </div>
                 </dl>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => setSelectedCandidateId(candidate.candidate_id)}
+                >
+                  {selectedCandidate?.candidate_id === candidate.candidate_id
+                    ? 'Viewing details'
+                    : 'View details'}
+                </button>
                 <pre className="omi-json-preview">
                   {JSON.stringify(candidate.candidate_content ?? {}, null, 2)}
                 </pre>
@@ -638,6 +824,144 @@ export default function OMIPanel({
           )}
         </div>
       </div>
+
+      <section className="omi-detail-panel" aria-label="Selected OMI candidate details">
+        <div className="omi-detail-header">
+          <div>
+            <h3>Candidate lifecycle</h3>
+            <p className="muted-copy">
+              Approval and promotion records are review metadata only. They do not apply candidate
+              content to project truth.
+            </p>
+          </div>
+          {selectedCandidate && (
+            <span className="context-status">
+              {selectedCandidateReadiness?.ready ? 'Promotion-ready' : 'Blocked'}
+            </span>
+          )}
+        </div>
+
+        {!selectedCandidate ? (
+          <p className="muted-copy">Select or create a candidate to inspect lifecycle details.</p>
+        ) : (
+          <>
+            <div className="omi-detail-grid">
+              <dl className="omi-metadata">
+                <div>
+                  <dt>Candidate</dt>
+                  <dd>{selectedCandidate.candidate_id}</dd>
+                </div>
+                <div>
+                  <dt>Idea</dt>
+                  <dd>{selectedCandidate.idea_id}</dd>
+                </div>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{selectedCandidate.candidate_type}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{selectedCandidate.status}</dd>
+                </div>
+                <div>
+                  <dt>Decision</dt>
+                  <dd>{formatDecision(selectedCandidate)}</dd>
+                </div>
+                <div>
+                  <dt>Destination</dt>
+                  <dd>{selectedCandidate.destination}</dd>
+                </div>
+                <div>
+                  <dt>Promotion status</dt>
+                  <dd>
+                    {selectedCandidatePromotions.length > 0
+                      ? formatCount(selectedCandidatePromotions.length, 'record')
+                      : selectedCandidate.promotion_status?.eligible
+                        ? 'Eligible flag set'
+                        : 'No promotion record'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Created</dt>
+                  <dd>{formatDate(selectedCandidate.created_at)}</dd>
+                </div>
+                <div>
+                  <dt>Updated</dt>
+                  <dd>{formatDate(selectedCandidate.updated_at)}</dd>
+                </div>
+              </dl>
+
+              <div className="omi-detail-card">
+                <h4>Provenance</h4>
+                {provenanceRows(selectedCandidate.provenance).length === 0 ? (
+                  <p className="muted-copy">No provenance recorded.</p>
+                ) : (
+                  <dl className="omi-provenance-grid">
+                    {provenanceRows(selectedCandidate.provenance).map(([label, value]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{formatValue(value)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+              </div>
+
+              <div className="omi-detail-card">
+                <h4>Evidence</h4>
+                <p className="muted-copy">{evidenceSummary(selectedCandidate.evidence)}</p>
+                {Array.isArray(selectedCandidate.evidence) && selectedCandidate.evidence.length > 0 && (
+                  <pre className="omi-json-preview">
+                    {JSON.stringify(selectedCandidate.evidence, null, 2)}
+                  </pre>
+                )}
+              </div>
+            </div>
+
+            <div className="omi-detail-grid">
+              <div className="omi-detail-card">
+                <h4>Promotion readiness</h4>
+                {selectedCandidateReadiness && (
+                  <>
+                    <ul className="omi-checklist">
+                      {promotionRequirementRows(
+                        selectedCandidate,
+                        selectedCandidateReadiness,
+                      ).map((requirement) => (
+                        <li
+                          className={requirement.met ? 'is-met' : 'is-blocked'}
+                          key={requirement.label}
+                        >
+                          <strong>{requirement.label}</strong>
+                          <span>{requirement.detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {selectedCandidateReadiness.blockedReasons.length > 0 && (
+                      <div className="omi-readiness">
+                        <strong>Blockers</strong>
+                        <ul>
+                          {selectedCandidateReadiness.blockedReasons.map((reason) => (
+                            <li key={reason}>{reason}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="omi-detail-card">
+                <h4>Candidate content</h4>
+                <pre className="omi-json-preview">
+                  {JSON.stringify(selectedCandidate.candidate_content ?? {}, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
 
       <div className="omi-list" aria-label="OMI promotion records">
         <h3>Promotion records</h3>
