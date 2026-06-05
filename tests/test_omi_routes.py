@@ -427,3 +427,203 @@ def test_omi_decision_routes_do_not_call_ollama_or_promote(tmp_path, monkeypatch
 
     assert updated["promotion_status"]["eligible"] is False
     assert not hasattr(main, "promote_omi_candidate")
+
+
+def _approved_route_candidate(project_name: str = "example") -> dict:
+    idea = main.create_omi_idea(
+        project_name,
+        _payload(raw_idea="Owner-authored promotion gate input.", provenance=None),
+    )
+    candidate = main.create_omi_candidate(
+        project_name,
+        _payload(
+            idea_id=idea["idea_id"],
+            candidate_type="project_bible_candidate",
+            candidate_content={"summary": "Candidate-only context."},
+            destination="project_bible_candidate",
+            provenance=None,
+            evidence=[],
+        ),
+    )
+    reviewed = main.update_omi_candidate_decision(
+        project_name,
+        candidate["candidate_id"],
+        _payload(
+            owner_decision={"decision": "pending"},
+            status="owner_review",
+            destination=None,
+        ),
+    )
+    return main.update_omi_candidate_decision(
+        project_name,
+        reviewed["candidate_id"],
+        _payload(
+            owner_decision={"decision": "approve", "approval_confirmed": True},
+            status="approved",
+            destination=None,
+        ),
+    )
+
+
+def test_omi_promotion_routes_create_list_and_get_records(tmp_path, monkeypatch):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _approved_route_candidate()
+
+    promotion = main.create_omi_promotion(
+        "example",
+        _payload(
+            candidate_id=candidate["candidate_id"],
+            final_confirmation=True,
+            target_file="bible.json",
+            target_path="bible.json",
+            provenance=None,
+            evidence=[],
+        ),
+    )
+    summary = main.get_omi("example")
+    listed = main.get_omi_promotions("example")
+
+    assert promotion["status"] == main.project_manager.OMI_PROMOTION_RECORD_STATUS
+    assert promotion["status"] != "promoted"
+    assert promotion["source_snapshot"]["candidate_id"] == candidate["candidate_id"]
+    assert summary["index"]["promotion_ids"] == [promotion["promotion_id"]]
+    assert summary["promotions"][0]["promotion_id"] == promotion["promotion_id"]
+    assert listed["promotions"] == [promotion]
+    assert main.get_omi_promotion("example", promotion["promotion_id"]) == promotion
+
+
+def test_omi_promotion_route_rejects_missing_confirmation_and_target(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _approved_route_candidate()
+
+    for payload in [
+        _payload(
+            candidate_id=candidate["candidate_id"],
+            final_confirmation=False,
+            target_file="bible.json",
+            target_path=None,
+            provenance=None,
+            evidence=None,
+        ),
+        _payload(
+            candidate_id=candidate["candidate_id"],
+            final_confirmation=True,
+            target_file=None,
+            target_path=None,
+            provenance=None,
+            evidence=None,
+        ),
+    ]:
+        try:
+            main.create_omi_promotion("example", payload)
+        except main.HTTPException as exc:
+            assert exc.status_code == 400
+        else:
+            raise AssertionError("invalid promotion request should raise HTTPException")
+
+
+def test_omi_promotion_route_rejects_unready_candidate_and_bad_target(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    idea = main.create_omi_idea(
+        "example",
+        _payload(raw_idea="Unready promotion candidate.", provenance=None),
+    )
+    candidate = main.create_omi_candidate(
+        "example",
+        _payload(
+            idea_id=idea["idea_id"],
+            candidate_type="planning_note",
+            candidate_content={"summary": "Candidate-only context."},
+            destination="planning_notes",
+            provenance=None,
+            evidence=[],
+        ),
+    )
+
+    try:
+        main.create_omi_promotion(
+            "example",
+            _payload(
+                candidate_id=candidate["candidate_id"],
+                final_confirmation=True,
+                target_file="planning_notes",
+                target_path=None,
+                provenance=None,
+                evidence=None,
+            ),
+        )
+    except main.HTTPException as exc:
+        assert exc.status_code == 400
+        assert "not promotion ready" in exc.detail
+    else:
+        raise AssertionError("unready candidate should raise HTTPException")
+
+    approved = _approved_route_candidate()
+    try:
+        main.create_omi_promotion(
+            "example",
+            _payload(
+                candidate_id=approved["candidate_id"],
+                final_confirmation=True,
+                target_file="scenes/scene_001.md",
+                target_path=None,
+                provenance=None,
+                evidence=None,
+            ),
+        )
+    except main.HTTPException as exc:
+        assert exc.status_code == 400
+        assert "target" in exc.detail
+    else:
+        raise AssertionError("unsafe target should raise HTTPException")
+
+
+def test_omi_promotion_route_rejects_unknown_candidate(tmp_path, monkeypatch):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+
+    try:
+        main.create_omi_promotion(
+            "example",
+            _payload(
+                candidate_id="candidate_missing",
+                final_confirmation=True,
+                target_file="bible.json",
+                target_path=None,
+                provenance=None,
+                evidence=None,
+            ),
+        )
+    except main.HTTPException as exc:
+        assert exc.status_code == 404
+    else:
+        raise AssertionError("unknown promotion candidate should raise HTTPException")
+
+
+def test_omi_promotion_routes_do_not_call_ollama_or_apply_truth_mutation(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+
+    def fail_story_check(*args, **kwargs):
+        raise AssertionError("OMI promotion routes must not call analysis engine")
+
+    monkeypatch.setattr(main.analysis_engine, "run_story_check", fail_story_check)
+    candidate = _approved_route_candidate()
+    promotion = main.create_omi_promotion(
+        "example",
+        _payload(
+            candidate_id=candidate["candidate_id"],
+            final_confirmation=True,
+            target_file="storyform.json",
+            target_path="storyform.json",
+            provenance=None,
+            evidence=[],
+        ),
+    )
+
+    assert promotion["status"] != "promoted"
+    assert not hasattr(main, "apply_omi_promotion")

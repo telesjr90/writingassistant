@@ -8,6 +8,7 @@ import {
   PROJECT_ID,
   createOMICandidate,
   createOMIIdea,
+  createOMIPromotion,
   fetchBible,
   fetchScene,
   fetchScenes,
@@ -66,6 +67,7 @@ export default function App() {
   const [isSavingStoryform, setIsSavingStoryform] = useState(false);
   const [isCreatingOMIIdea, setIsCreatingOMIIdea] = useState(false);
   const [isCreatingOMICandidate, setIsCreatingOMICandidate] = useState(false);
+  const [isCreatingOMIPromotion, setIsCreatingOMIPromotion] = useState(false);
   const [isUpdatingOMI, setIsUpdatingOMI] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [bibleStatus, setBibleStatus] = useState('');
@@ -379,6 +381,30 @@ export default function App() {
     }
   }, [isUpdatingOMI, refreshOMI]);
 
+  const handleCreateOMIPromotion = useCallback(async (payload) => {
+    if (isCreatingOMIPromotion) {
+      return null;
+    }
+
+    setIsCreatingOMIPromotion(true);
+    setOmiError('');
+    setOmiStatus('Creating promotion record...');
+
+    try {
+      const promotion = await createOMIPromotion(PROJECT_ID, payload);
+      await refreshOMI();
+      setOmiStatus('Promotion record created');
+      return promotion;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Promotion record create failed.';
+      setOmiError(message);
+      setOmiStatus('Error');
+      throw error;
+    } finally {
+      setIsCreatingOMIPromotion(false);
+    }
+  }, [isCreatingOMIPromotion, refreshOMI]);
+
   useEffect(() => {
     function handleKeyDown(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
@@ -445,9 +471,11 @@ export default function App() {
           error={omiError}
           isCreatingIdea={isCreatingOMIIdea}
           isCreatingCandidate={isCreatingOMICandidate}
+          isCreatingPromotion={isCreatingOMIPromotion}
           isUpdating={isUpdatingOMI}
           onCreateIdea={handleCreateOMIIdea}
           onCreateCandidate={handleCreateOMICandidate}
+          onCreatePromotion={handleCreateOMIPromotion}
           onUpdateIdeaDecision={handleUpdateOMIIdeaDecision}
           onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
         />

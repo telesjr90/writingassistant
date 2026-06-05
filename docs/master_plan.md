@@ -83,7 +83,7 @@ Frontend:
 - `frontend/src/App.jsx` tracks scene dirty state against the last saved content and confirms before discarding unsaved edits on scene switch or unload.
 - `frontend/src/components/ProjectContext.jsx` provides owner-editable bible/storyform JSON panels with explicit save actions and validation/error states.
 - `frontend/src/components/AnalysisSidebar.jsx` renders normalized rich Story Check diagnostics as candidate analysis sections, with raw JSON preserved in a collapsed advanced view.
-- `frontend/src/components/OMIPanel.jsx` captures owner-authored raw ideas and structured candidate planning records without any prose-generation controls or promotion path.
+- `frontend/src/components/OMIPanel.jsx` captures owner-authored raw ideas and structured candidate planning records, supports owner review controls, and can create promotion-readiness audit records without any prose-generation controls or durable truth mutation.
 - `frontend/src/api.js` hard-codes `PROJECT_ID = 'example'`.
 - Components found: `ProjectNav.jsx`, `Editor.jsx`, `AnalysisSidebar.jsx`.
 
@@ -192,7 +192,7 @@ App-3 NCP compatibility subset status: `docs/roadmap/ncp_compatibility_subset.md
 
 App-3a / OMI-001 schema and lifecycle status: `docs/roadmap/omi_mvp_schema_lifecycle.md` defines OMI idea/candidate fields, lifecycle statuses, destinations, owner decisions, provenance, no-prose boundaries, and no-silent-promotion rules.
 
-OMI-003 / OMI-004 status: the first runtime OMI slices are implemented. Backend storage helpers write project-local `omi/ideas`, `omi/candidates`, and `omi/index.json` records only on explicit owner actions. The API can create/list/load raw ideas and structured candidates, and it can update explicit owner decision, status, and candidate destination fields. The frontend OMI panel exposes raw idea and candidate JSON creation plus owner review controls. No promotion route, bible/storyform/scene mutation, model-generated candidate creation, promotion gate mutation, or full OMI UI has been implemented.
+OMI-003 / OMI-004 / OMI-005 status: the first runtime OMI slices are implemented. Backend storage helpers write project-local `omi/ideas`, `omi/candidates`, `omi/promotions`, and `omi/index.json` records only on explicit owner actions. The API can create/list/load raw ideas and structured candidates, update explicit owner decision, status, and candidate destination fields, and create promotion records only after approval, confirmation, allowed destination, provenance, structured content, and safe target labels are present. The frontend OMI panel exposes raw idea and candidate JSON creation, owner review controls, promotion readiness blockers, and record-only promotion creation. No bible/storyform/scene/project mutation, apply-promotion route, model-generated candidate creation, promotion application, or full OMI UI has been implemented.
 
 Sample project alignment status: `docs/roadmap/sample_project_alignment_spec.md` defines the aligned sample requirements, replacement strategy, provenance checks, Story Check fixture implications, OMI fixture implications, and no-prose boundaries. The local ignored `projects/example` fixture now uses public-domain scene source text; `owner_sample_input.md` is OMI-only future input. No runtime files, frontend files, tests, generated prose, public-domain prose rewrites, or owner idea promotion were introduced.
 
@@ -352,6 +352,7 @@ MVP completion requires:
 - DONE: OMI-003 raw idea and structured candidate creation flow.
 - DONE: OMI owner decision flow.
 - DONE: OMI destination handling.
+- DONE: OMI promotion gate record creation without durable truth mutation.
 - OMI provenance/status display.
 - OMI must not write story prose or mutate owner-approved truth automatically.
 
@@ -387,7 +388,7 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | OMI-002 design OMI storage model | Keep candidates separate from approved truth. | Project storage model. | DONE; `docs/roadmap/omi_storage_model.md` defines OMI idea, candidate, promotion, and index storage records. | Candidate material cannot overwrite bible/storyform/project truth by default. | Design review and pytest. | OMI-001. | storage, omi |
 | OMI-003 implement OMI candidate creation flow | Capture raw idea and structured candidates. | OMI schema/storage design. | DONE; owner-authored raw ideas and structured candidate records can be created/listed/loaded under project-local OMI storage without prose generation or promotion. | Outputs are structured planning candidates only, not story prose. | Pytest and frontend build. | Phase 2, OMI-002. | backend, frontend, omi |
 | OMI-004 implement owner decision and destination selection | Require owner action before promotion. | OMI lifecycle. | DONE; explicit owner decisions, status transitions, approval confirmation, and candidate destination updates are supported without promotion. | Destination is explicit before promotion. | Pytest and frontend build. | OMI-003. | frontend, storage, omi |
-| OMI-005 prevent promotion without explicit owner approval | Enforce durable truth boundary. | Guardrails, storage model. | Approval gate. | Promotion fails unless owner approval, destination, provenance, and status are present. | Guardrail/storage tests. | OMI-004. | guardrails, omi |
+| OMI-005 prevent promotion without explicit owner approval | Enforce durable truth boundary. | Guardrails, storage model. | DONE; promotion records can be created only for approved, confirmed, candidate-only records with allowed destination, provenance, source snapshot, safe target label/path, and final confirmation. | Promotion record creation does not mutate bible, storyform, scenes, owner memory, project metadata, or planning notes. | Pytest and frontend build. | OMI-004. | guardrails, omi |
 | OMI-006 OMI UI for raw idea, candidates, status, provenance, destination | Make lifecycle visible. | OMI flow. | OMI panel/view, when implemented. | Candidate vs approved/promoted state is visible. | Browser smoke. | OMI-003, OMI-004. | frontend, omi |
 | OMI-007 OMI tests for no-prose and no-silent-promotion behavior | Verify OMI boundaries. | OMI implementation. | Test coverage. | No prose generation path and no silent promotion path pass. | Pytest/UI tests. | OMI-003 to OMI-005. | tests, guardrails, omi |
 

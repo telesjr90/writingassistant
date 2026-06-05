@@ -577,3 +577,219 @@ def test_omi_decision_update_does_not_modify_project_truth_files(tmp_path, monke
 
     for path, content in files.items():
         assert path.read_text(encoding="utf-8") == content
+
+
+def _create_approved_candidate(project_name: str = "ember") -> dict:
+    idea = project_manager.create_omi_idea(project_name, "Promotion gate input.")
+    candidate = project_manager.create_omi_candidate(
+        project_name,
+        idea["idea_id"],
+        "project_bible_candidate",
+        {"summary": "Structured candidate-only context"},
+        "project_bible_candidate",
+        evidence=[{"source": "owner", "note": "owner-approved context"}],
+    )
+    reviewed = project_manager.update_omi_candidate_decision(
+        project_name,
+        candidate["candidate_id"],
+        {"decision": "pending"},
+        status="owner_review",
+    )
+    return project_manager.update_omi_candidate_decision(
+        project_name,
+        reviewed["candidate_id"],
+        {"decision": "approve", "approval_confirmed": True},
+        status="approved",
+    )
+
+
+def _candidate_path(tmp_path: Path, project_name: str, candidate_id: str) -> Path:
+    return tmp_path / project_name / "omi" / "candidates" / f"{candidate_id}.json"
+
+
+def test_approved_candidate_can_create_promotion_record(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _create_approved_candidate()
+
+    readiness = project_manager.is_omi_candidate_promotion_ready(candidate)
+    promotion = project_manager.create_omi_promotion_record(
+        "ember",
+        candidate["candidate_id"],
+        {
+            "final_confirmation": True,
+            "target_file": "bible.json",
+            "target_path": "bible.json",
+        },
+    )
+
+    assert readiness == {"ready": True, "blocked_reasons": []}
+    assert promotion["promotion_id"].startswith("promotion_")
+    assert promotion["candidate_id"] == candidate["candidate_id"]
+    assert promotion["destination"] == "project_bible_candidate"
+    assert promotion["status"] == project_manager.OMI_PROMOTION_RECORD_STATUS
+    assert promotion["status"] != "promoted"
+    assert promotion["owner_approval"]["final_confirmation"] is True
+    assert promotion["source_snapshot"]["candidate_id"] == candidate["candidate_id"]
+    assert promotion["target_file"] == "bible.json"
+    assert project_manager.load_omi_promotion("ember", promotion["promotion_id"]) == promotion
+    assert project_manager.list_omi_promotions("ember") == [promotion]
+    assert project_manager.list_omi_promotions("ember", candidate["candidate_id"]) == [promotion]
+
+    index = project_manager.load_omi_index("ember")
+    assert index["promotion_ids"] == [promotion["promotion_id"]]
+
+
+def test_unapproved_candidate_cannot_create_promotion_record(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    idea = project_manager.create_omi_idea("ember", "Unapproved candidate.")
+    candidate = project_manager.create_omi_candidate(
+        "ember",
+        idea["idea_id"],
+        "planning_note",
+        {"summary": "Candidate-only context"},
+        "planning_notes",
+    )
+
+    with pytest.raises(ValueError, match="not promotion ready"):
+        project_manager.create_omi_promotion_record(
+            "ember",
+            candidate["candidate_id"],
+            {"final_confirmation": True, "target_file": "planning_notes"},
+        )
+
+    assert project_manager.load_omi_index("ember")["promotion_ids"] == []
+
+
+def test_candidate_without_approval_confirmation_cannot_create_promotion_record(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _create_approved_candidate()
+    candidate["owner_decision"]["approval_confirmed"] = False
+    _candidate_path(tmp_path, "ember", candidate["candidate_id"]).write_text(
+        json.dumps(candidate, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="approval confirmation"):
+        project_manager.create_omi_promotion_record(
+            "ember",
+            candidate["candidate_id"],
+            {"final_confirmation": True, "target_file": "bible.json"},
+        )
+
+
+def test_discard_or_prose_destination_cannot_create_promotion_record(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _create_approved_candidate()
+
+    for destination, message in [
+        ("discard", "discard"),
+        ("scene_prose", "destination"),
+    ]:
+        edited = dict(candidate)
+        edited["destination"] = destination
+        _candidate_path(tmp_path, "ember", candidate["candidate_id"]).write_text(
+            json.dumps(edited, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        with pytest.raises(ValueError, match=message):
+            project_manager.create_omi_promotion_record(
+                "ember",
+                candidate["candidate_id"],
+                {"final_confirmation": True, "target_file": "bible.json"},
+            )
+
+
+def test_non_object_candidate_content_cannot_create_promotion_record(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _create_approved_candidate()
+    candidate["candidate_content"] = []
+    _candidate_path(tmp_path, "ember", candidate["candidate_id"]).write_text(
+        json.dumps(candidate, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="candidate_content"):
+        project_manager.create_omi_promotion_record(
+            "ember",
+            candidate["candidate_id"],
+            {"final_confirmation": True, "target_file": "bible.json"},
+        )
+
+
+def test_promotion_record_requires_confirmation_and_target(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _create_approved_candidate()
+
+    with pytest.raises(ValueError, match="final_confirmation"):
+        project_manager.create_omi_promotion_record(
+            "ember",
+            candidate["candidate_id"],
+            {"final_confirmation": False, "target_file": "bible.json"},
+        )
+
+    with pytest.raises(ValueError, match="target_file or target_path"):
+        project_manager.create_omi_promotion_record(
+            "ember",
+            candidate["candidate_id"],
+            {"final_confirmation": True},
+        )
+
+
+def test_promotion_record_rejects_unsafe_targets_and_unknown_candidate(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    candidate = _create_approved_candidate()
+
+    for target in ["../bible.json", "scenes/scene_001.md", "scene_prose", "final_story_text"]:
+        with pytest.raises(ValueError, match="target"):
+            project_manager.create_omi_promotion_record(
+                "ember",
+                candidate["candidate_id"],
+                {"final_confirmation": True, "target_file": target},
+            )
+
+    with pytest.raises(FileNotFoundError):
+        project_manager.create_omi_promotion_record(
+            "ember",
+            "candidate_missing",
+            {"final_confirmation": True, "target_file": "bible.json"},
+        )
+
+
+def test_promotion_record_creation_does_not_modify_project_truth_files(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_dir = tmp_path / "ember"
+    scenes_dir = project_dir / "scenes"
+    scenes_dir.mkdir(parents=True)
+    files = {
+        project_dir / "project.json": '{"title": "Fixture"}\n',
+        project_dir / "bible.json": '{"characters": []}\n',
+        project_dir / "storyform.json": '{"schema_version": "ncp-0.1"}\n',
+        scenes_dir / "scene_001.md": "Owner-authored scene text.",
+    }
+    for path, content in files.items():
+        path.write_text(content, encoding="utf-8")
+
+    candidate = _create_approved_candidate()
+    project_manager.create_omi_promotion_record(
+        "ember",
+        candidate["candidate_id"],
+        {
+            "final_confirmation": True,
+            "target_file": "storyform.json",
+            "target_path": "storyform.json",
+        },
+    )
+
+    for path, content in files.items():
+        assert path.read_text(encoding="utf-8") == content

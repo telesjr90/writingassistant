@@ -36,6 +36,22 @@ OMI_BLOCKED_DESTINATIONS = {
     "final_story_text",
 }
 
+OMI_PROMOTION_TARGETS = {
+    "bible.json",
+    "owner_memory.json",
+    "planning_notes",
+    "storyform.json",
+}
+
+OMI_PROMOTION_BLOCKED_TARGETS = OMI_BLOCKED_DESTINATIONS | {
+    "scenes",
+    "scene",
+    "story",
+    "story_text",
+}
+
+OMI_PROMOTION_RECORD_STATUS = "ready_for_manual_application"
+
 OMI_OWNER_DECISIONS = {"pending", "approve", "reject", "needs_revision"}
 
 OMI_STATUSES = {"draft", "candidate", "owner_review", "approved", "rejected", "archived"}
@@ -331,6 +347,71 @@ def validate_omi_destination(destination: str) -> str:
     return _validate_omi_destination(destination)
 
 
+def _validate_omi_promotion_target(value: str | None, label: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"OMI promotion {label} must be a non-empty string")
+
+    normalized = value.strip()
+    path = Path(normalized)
+    lower_value = normalized.lower()
+
+    if (
+        path.is_absolute()
+        or ".." in path.parts
+        or normalized in {".", ".."}
+        or any(part in OMI_PROMOTION_BLOCKED_TARGETS for part in path.parts)
+    ):
+        raise ValueError(f"Unsupported OMI promotion {label}: {value}")
+
+    if lower_value not in OMI_PROMOTION_TARGETS:
+        raise ValueError(f"Unsupported OMI promotion {label}: {value}")
+
+    return normalized
+
+
+def _candidate_promotion_blockers(candidate: dict[str, Any]) -> list[str]:
+    blockers: list[str] = []
+    owner_decision = candidate.get("owner_decision")
+
+    if candidate.get("status") != "approved":
+        blockers.append("candidate status must be approved")
+
+    if not isinstance(owner_decision, dict):
+        blockers.append("owner decision required")
+    else:
+        if owner_decision.get("decision") != "approve":
+            blockers.append("owner decision must be approve")
+        if owner_decision.get("approval_confirmed") is not True:
+            blockers.append("owner approval confirmation required")
+
+    destination = candidate.get("destination")
+    try:
+        _validate_omi_destination(destination)
+    except (TypeError, ValueError):
+        blockers.append("allowed destination required")
+    else:
+        if destination == "discard":
+            blockers.append("discard destination cannot be promoted")
+
+    if not isinstance(candidate.get("provenance"), dict) or not candidate.get("provenance"):
+        blockers.append("provenance required")
+
+    if not isinstance(candidate.get("candidate_content"), dict):
+        blockers.append("candidate_content must be a JSON object")
+
+    return blockers
+
+
+def is_omi_candidate_promotion_ready(candidate: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(candidate, dict):
+        return {"ready": False, "blocked_reasons": ["candidate record required"]}
+
+    blockers = _candidate_promotion_blockers(candidate)
+    return {"ready": len(blockers) == 0, "blocked_reasons": blockers}
+
+
 def _finalize_owner_decision(owner_decision: dict[str, Any], timestamp: str) -> dict[str, Any]:
     finalized = dict(owner_decision)
     if finalized["decision"] == "pending":
@@ -577,6 +658,132 @@ def load_omi_candidate(project_name: str, candidate_id: str) -> dict[str, Any]:
     )
 
 
+def load_omi_promotion(project_name: str, promotion_id: str) -> dict[str, Any]:
+    return _load_json_object_from_path(
+        _omi_record_path(project_name, "promotions", promotion_id, "promotion_id"),
+        "OMI promotion",
+    )
+
+
+def list_omi_promotions(
+    project_name: str,
+    candidate_id: str | None = None,
+) -> list[dict[str, Any]]:
+    if candidate_id is not None:
+        _safe_path_component(candidate_id, "candidate_id")
+
+    index = load_omi_index(project_name)
+    promotions: list[dict[str, Any]] = []
+
+    for promotion_id in index.get("promotion_ids", []):
+        try:
+            promotion = load_omi_promotion(project_name, promotion_id)
+        except FileNotFoundError:
+            continue
+        if candidate_id is None or promotion.get("candidate_id") == candidate_id:
+            promotions.append(promotion)
+
+    return promotions
+
+
+def validate_omi_promotion_request(
+    project_name: str,
+    candidate_id: str,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise ValueError("OMI promotion request must be a JSON object")
+
+    candidate = load_omi_candidate(project_name, candidate_id)
+    readiness = is_omi_candidate_promotion_ready(candidate)
+    if not readiness["ready"]:
+        raise ValueError(
+            "OMI candidate is not promotion ready: "
+            + "; ".join(readiness["blocked_reasons"])
+        )
+
+    if payload.get("final_confirmation") is not True:
+        raise ValueError("OMI promotion requires final_confirmation true")
+
+    target_file = _validate_omi_promotion_target(payload.get("target_file"), "target_file")
+    target_path = _validate_omi_promotion_target(payload.get("target_path"), "target_path")
+    if target_file is None and target_path is None:
+        raise ValueError("OMI promotion requires target_file or target_path")
+
+    provenance = payload.get("provenance")
+    if provenance is not None and not isinstance(provenance, dict):
+        raise ValueError("OMI promotion provenance must be a JSON object")
+
+    evidence = payload.get("evidence")
+    if evidence is not None and not isinstance(evidence, list):
+        raise ValueError("OMI promotion evidence must be a JSON array")
+
+    return {
+        "candidate": candidate,
+        "target_file": target_file,
+        "target_path": target_path,
+        "provenance": provenance,
+        "evidence": evidence,
+    }
+
+
+def create_omi_promotion_record(
+    project_name: str,
+    candidate_id: str,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    validated = validate_omi_promotion_request(project_name, candidate_id, payload)
+    candidate = validated["candidate"]
+
+    ensure_omi_storage(project_name)
+    promotion_id = _new_record_id("promotion")
+    timestamp = _utc_now()
+    promotion = {
+        "promotion_id": promotion_id,
+        "project_id": project_name,
+        "candidate_id": candidate_id,
+        "destination": candidate["destination"],
+        "owner_approval": {
+            "decision": candidate["owner_decision"]["decision"],
+            "approved": candidate["owner_decision"]["approved"],
+            "approval_confirmed": candidate["owner_decision"]["approval_confirmed"],
+            "decided_by": candidate["owner_decision"].get("decided_by"),
+            "decided_at": candidate["owner_decision"].get("decided_at"),
+            "final_confirmation": True,
+        },
+        "provenance": {
+            "candidate": candidate["provenance"],
+            "promotion_request": _normalise_provenance(
+                validated["provenance"],
+                source_path=f"omi/candidates/{candidate_id}.json",
+                source_label="Manual OMI promotion record",
+            ),
+        },
+        "evidence": validated["evidence"] if validated["evidence"] is not None else candidate.get("evidence", []),
+        "source_snapshot": json.loads(json.dumps(candidate)),
+        "target_file": validated["target_file"],
+        "target_path": validated["target_path"],
+        "created_at": timestamp,
+        "confirmed_at": timestamp,
+        "status": OMI_PROMOTION_RECORD_STATUS,
+    }
+
+    _write_json_object(
+        _omi_record_path(project_name, "promotions", promotion_id, "promotion_id"),
+        promotion,
+        "OMI promotion",
+        overwrite=False,
+    )
+
+    index = load_omi_index(project_name)
+    index["candidate_ids"] = sorted(set(index.get("candidate_ids", [])) | {candidate_id})
+    index["promotion_ids"] = sorted(set(index.get("promotion_ids", [])) | {promotion_id})
+    index["last_updated"] = timestamp
+    save_omi_index(project_name, index)
+
+    return promotion
+
+
 def update_omi_idea_decision(
     project_name: str,
     idea_id: str,
@@ -655,4 +862,5 @@ def get_omi_summary(project_name: str) -> dict[str, Any]:
         "index": load_omi_index(project_name),
         "ideas": list_omi_ideas(project_name),
         "candidates": list_omi_candidates(project_name),
+        "promotions": list_omi_promotions(project_name),
     }

@@ -41,6 +41,13 @@ const CANDIDATE_STATUSES = [
   { value: 'archived', label: 'Archived' },
 ];
 
+const PROMOTION_TARGETS = [
+  { value: 'planning_notes', label: 'Planning notes' },
+  { value: 'bible.json', label: 'bible.json' },
+  { value: 'storyform.json', label: 'storyform.json' },
+  { value: 'owner_memory.json', label: 'owner_memory.json' },
+];
+
 function formatDate(value) {
   if (!value) {
     return 'No timestamp';
@@ -77,6 +84,42 @@ function statusForDecision(decision, fallbackStatus) {
     return 'candidate';
   }
   return fallbackStatus;
+}
+
+function promotionReadiness(candidate) {
+  const blockedReasons = [];
+  const ownerDecision = candidate.owner_decision ?? {};
+
+  if (candidate.status !== 'approved') {
+    blockedReasons.push('Candidate status must be approved.');
+  }
+  if (ownerDecision.decision !== 'approve') {
+    blockedReasons.push('Owner decision must be approve.');
+  }
+  if (!ownerDecision.approval_confirmed) {
+    blockedReasons.push('Owner approval confirmation is required.');
+  }
+  if (!candidate.destination || candidate.destination === 'discard') {
+    blockedReasons.push('A promotable destination is required.');
+  }
+  if (!DESTINATIONS.some((option) => option.value === candidate.destination)) {
+    blockedReasons.push('Destination must be allow-listed.');
+  }
+  if (!candidate.provenance || typeof candidate.provenance !== 'object') {
+    blockedReasons.push('Provenance is required.');
+  }
+  if (
+    !candidate.candidate_content
+    || typeof candidate.candidate_content !== 'object'
+    || Array.isArray(candidate.candidate_content)
+  ) {
+    blockedReasons.push('Candidate content must be a JSON object.');
+  }
+
+  return {
+    ready: blockedReasons.length === 0,
+    blockedReasons,
+  };
 }
 
 function OwnerDecisionForm({
@@ -224,6 +267,94 @@ function OwnerDecisionForm({
   );
 }
 
+function PromotionRecordForm({
+  candidate,
+  readiness,
+  isCreatingPromotion,
+  onSubmit,
+  onError,
+}) {
+  const [target, setTarget] = useState('planning_notes');
+  const [finalConfirmation, setFinalConfirmation] = useState(false);
+
+  useEffect(() => {
+    setFinalConfirmation(false);
+  }, [candidate.candidate_id]);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    try {
+      await onSubmit({
+        candidate_id: candidate.candidate_id,
+        final_confirmation: finalConfirmation,
+        target_file: target,
+        target_path: target,
+      });
+      setFinalConfirmation(false);
+    } catch (promotionError) {
+      onError(
+        promotionError instanceof Error
+          ? promotionError.message
+          : 'Promotion record create failed.',
+      );
+    }
+  }
+
+  return (
+    <div className="omi-promotion-panel">
+      <div className="omi-readiness">
+        <strong>{readiness.ready ? 'Promotion-ready' : 'Not promotion-ready'}</strong>
+        {readiness.blockedReasons.length > 0 && (
+          <ul>
+            {readiness.blockedReasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {readiness.ready && (
+        <form className="omi-promotion-form" onSubmit={handleSubmit}>
+          <label className="field-label">
+            Target file/path
+            <select
+              className="field-input"
+              value={target}
+              onChange={(event) => setTarget(event.target.value)}
+              disabled={isCreatingPromotion}
+            >
+              {PROMOTION_TARGETS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="omi-checkbox-row">
+            <input
+              type="checkbox"
+              checked={finalConfirmation}
+              onChange={(event) => setFinalConfirmation(event.target.checked)}
+              disabled={isCreatingPromotion}
+            />
+            Final confirmation
+          </label>
+
+          <button
+            className="primary-button"
+            type="submit"
+            disabled={isCreatingPromotion || !finalConfirmation}
+          >
+            {isCreatingPromotion ? 'Creating...' : 'Create promotion record'}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function OMIPanel({
   omiData,
   isLoading,
@@ -231,14 +362,17 @@ export default function OMIPanel({
   error,
   isCreatingIdea,
   isCreatingCandidate,
+  isCreatingPromotion,
   isUpdating,
   onCreateIdea,
   onCreateCandidate,
+  onCreatePromotion,
   onUpdateIdeaDecision,
   onUpdateCandidateDecision,
 }) {
   const ideas = useMemo(() => omiData?.ideas ?? [], [omiData]);
   const candidates = useMemo(() => omiData?.candidates ?? [], [omiData]);
+  const promotions = useMemo(() => omiData?.promotions ?? [], [omiData]);
   const [rawIdea, setRawIdea] = useState('');
   const [selectedIdeaId, setSelectedIdeaId] = useState('');
   const [candidateType, setCandidateType] = useState('planning_note');
@@ -297,6 +431,8 @@ export default function OMIPanel({
             OMI stores candidate planning material only. It does not write story prose or change project truth.
             {' '}
             Approving a candidate does not promote it. Promotion requires a separate confirmation step.
+            {' '}
+            Creating a promotion record does not change bible, storyform, scenes, or project truth.
           </p>
         </div>
         <span className="context-status">{isLoading ? 'Loading' : status}</span>
@@ -490,10 +626,48 @@ export default function OMIPanel({
                   )}
                   onError={setFormError}
                 />
+                <PromotionRecordForm
+                  candidate={candidate}
+                  readiness={promotionReadiness(candidate)}
+                  isCreatingPromotion={isCreatingPromotion}
+                  onSubmit={onCreatePromotion}
+                  onError={setFormError}
+                />
               </article>
             ))
           )}
         </div>
+      </div>
+
+      <div className="omi-list" aria-label="OMI promotion records">
+        <h3>Promotion records</h3>
+        {promotions.length === 0 ? (
+          <p className="muted-copy">No OMI promotion records yet.</p>
+        ) : (
+          promotions.map((promotion) => (
+            <article className="omi-record" key={promotion.promotion_id}>
+              <div className="omi-record-header">
+                <strong>{promotion.promotion_id}</strong>
+                <span>{promotion.status}</span>
+              </div>
+              <dl className="omi-metadata">
+                <div>
+                  <dt>Candidate</dt>
+                  <dd>{promotion.candidate_id}</dd>
+                </div>
+                <div>
+                  <dt>Destination</dt>
+                  <dd>{promotion.destination}</dd>
+                </div>
+                <div>
+                  <dt>Target</dt>
+                  <dd>{promotion.target_file ?? promotion.target_path}</dd>
+                </div>
+              </dl>
+              <small>Confirmed {formatDate(promotion.confirmed_at)}</small>
+            </article>
+          ))
+        )}
       </div>
     </section>
   );

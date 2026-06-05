@@ -95,3 +95,15 @@ export async function updateOMICandidateDecision(projectId = PROJECT_ID, candida
     client.patch(`/projects/${projectId}/omi/candidates/${candidateId}/decision`, payload)
   ));
 }
+
+export async function getOMIPromotions(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/omi/promotions`));
+}
+
+export async function getOMIPromotion(projectId = PROJECT_ID, promotionId) {
+  return requestData(() => client.get(`/projects/${projectId}/omi/promotions/${promotionId}`));
+}
+
+export async function createOMIPromotion(projectId = PROJECT_ID, payload) {
+  return requestData(() => client.post(`/projects/${projectId}/omi/promotions`, payload));
+}

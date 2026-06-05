@@ -42,6 +42,15 @@ class OMICandidateDecisionUpdate(BaseModel):
     destination: str | None = None
 
 
+class OMIPromotionCreate(BaseModel):
+    candidate_id: str
+    final_confirmation: bool = False
+    target_file: str | None = None
+    target_path: str | None = None
+    provenance: dict | None = None
+    evidence: list | None = None
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -237,6 +246,44 @@ def update_omi_candidate_decision(
             payload.owner_decision,
             status=payload.status,
             destination=payload.destination,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI candidate not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/projects/{project_name}/omi/promotions")
+def get_omi_promotions(project_name: str) -> dict:
+    try:
+        return {"promotions": project_manager.list_omi_promotions(project_name)}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/projects/{project_name}/omi/promotions/{promotion_id}")
+def get_omi_promotion(project_name: str, promotion_id: str) -> dict:
+    try:
+        return project_manager.load_omi_promotion(project_name, promotion_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI promotion not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/projects/{project_name}/omi/promotions")
+def create_omi_promotion(project_name: str, payload: OMIPromotionCreate) -> dict:
+    try:
+        return project_manager.create_omi_promotion_record(
+            project_name,
+            payload.candidate_id,
+            {
+                "final_confirmation": payload.final_confirmation,
+                "target_file": payload.target_file,
+                "target_path": payload.target_path,
+                "provenance": payload.provenance,
+                "evidence": payload.evidence,
+            },
         )
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="OMI candidate not found") from exc

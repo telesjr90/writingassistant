@@ -404,6 +404,45 @@ h2 {
     sans-serif;
 }
 
+.omi-promotion-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e7ecf4;
+}
+
+.omi-readiness {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #46546c;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.omi-readiness strong {
+  color: #172033;
+}
+
+.omi-readiness ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.omi-promotion-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.omi-promotion-form .field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .editor-actions {
   display: flex;
   flex-wrap: wrap;
@@ -672,6 +711,7 @@ h2 {
   .omi-grid,
   .omi-record-grid,
   .omi-decision-grid,
+  .omi-promotion-form,
   .omi-metadata {
     grid-template-columns: 1fr;
   }
