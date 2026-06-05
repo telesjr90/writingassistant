@@ -53,7 +53,7 @@ Repo/Git:
 - Current branch: `main`.
 - Remote: `origin https://github.com/telesjr90/writingassistant`.
 - First safe local baseline commit exists: `25ef64d chore: initialize safe project baseline`.
-- No push has been performed yet. The next repository step is to push the safe baseline to GitHub.
+- No push has been performed yet. Remote publication remains a separate owner-approved step after local repo hygiene is clean.
 - Safe repository metadata now exists: `.gitignore`, `README.md`, `LICENSE`, `.env.example`, `backend/requirements.txt`, `training/reports/git_setup_report.md`, and `training/reports/pre_commit_safety_audit_report.md`.
 
 Backend:
@@ -133,7 +133,7 @@ Accepted constraints:
 - Git setup: local Git is initialized/repaired on `main`, `origin` points to `https://github.com/telesjr90/writingassistant`, and the first safe local baseline commit is `25ef64d chore: initialize safe project baseline`. Pushing that baseline to GitHub remains TODO.
 - Python dependency strategy: use simple requirements files now. `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`; revisit `pyproject.toml`/`uv` later if the implementation needs it.
 - Node target: `>=22.12.0 <23`. Package metadata changes are deferred.
-- Example fixture: replace the Elena/Ember Crown mismatch later with one clean aligned fixture, preferably public-domain or owner-created.
+- Example fixture: the Elena/Ember Crown mismatch has been replaced locally with a public-domain aligned fixture; a future owner-created fixture remains optional.
 - OMI is part of the App MVP, but bounded to analysis/planning only. It must not generate story prose, continue a story, rewrite text, or silently promote ideas/model output/NotebookLM output into durable project truth. Minimum design fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`.
 - Durable memory promotion requires explicit owner approval, destination choice, attached evidence/provenance, and final confirmation.
 - No-prose enforcement must run before model call and after model output.
@@ -150,8 +150,8 @@ Remaining setup/verification tasks:
 - Push the safe local baseline commit to GitHub.
 - Keep backend requirements validated as runtime dependencies evolve, without merging them into `training/requirements-unsloth.txt`.
 - Declare the Node target in package metadata.
-- Replace the sample fixture.
-- Define the OMI MVP schema and lifecycle before runtime implementation. Do not assume OMI endpoints currently exist.
+- Optionally replace the public-domain sample fixture with an owner-created aligned fixture in a later task.
+- Keep future OMI expansion separate from the completed MVP slices; apply-promotion behavior remains unimplemented.
 - Run Book 1-3 cross-book coverage review before deciding whether Books 4-5 are needed.
 
 ## 5. Architecture Target
@@ -318,7 +318,7 @@ MVP completion requires:
 
 ### Phase 1 - App architecture audit and project model decisions
 
-- Status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, sample project alignment spec, and local public-domain `projects/example` fixture alignment are complete. Phase 2 backend foundation is next.
+- Status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, sample project alignment spec, and local public-domain `projects/example` fixture alignment are complete. Phase 6 MVP exit/preflight is the current readiness step.
 - Architecture audit report.
 - Source-of-truth cleanup.
 - NCP/storyform MVP subset.
@@ -375,6 +375,7 @@ MVP completion requires:
 - MVP exit test matrix execution.
 - Documentation cleanup.
 - Manual local run checklist.
+- MVP exit preflight executed on 2026-06-05; automated/backend/frontend checks passed, live qwen3 smoke was deferred by design, and readiness is blocked only by pre-existing dirty tracked project fixture files pending owner resolution.
 
 ## 7. Training-Independent App Roadmap
 
@@ -605,7 +606,7 @@ The backend default should not change from `qwen3:8b` until `dramatica-analyst:8
 
 ## 15. Blocked/Future Tasks
 
-- OMI is included in the App MVP as a bounded, analysis-only, owner-controlled planning workflow. Implementation remains TODO and must follow the schema/lifecycle design before any API/UI work.
+- OMI is included in the App MVP as a bounded, analysis-only, owner-controlled planning workflow. OMI-003 through OMI-007 are complete; future apply-promotion behavior remains separate and unimplemented.
 - Full storyform questionnaire later.
 - Full NCP authoring UI later.
 - Advanced Dramatica verifier claims blocked.

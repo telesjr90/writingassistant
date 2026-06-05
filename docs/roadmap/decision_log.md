@@ -22,7 +22,7 @@
 | Node target | Accepted | Target Node `>=22.12.0 <23`; package metadata update is deferred |
 | Example fixture direction | Accepted | Replace Elena/Ember Crown mismatch later with one clean aligned fixture, preferably public-domain or owner-created |
 | OMI MVP inclusion | Accepted | OMI is in the App MVP, bounded to analysis-only, no-prose, no story continuation, no rewriting, owner-controlled, candidate-first planning |
-| OMI minimum schema | Accepted | Design target fields: `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; do not assume endpoints/storage/UI exist yet |
+| OMI minimum schema | Accepted | Design target fields: `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; OMI-003 through OMI-007 now implement the MVP candidate/review/promotion-record slices without apply-promotion behavior |
 | Durable memory promotion rule | Accepted | Owner must explicitly approve, choose destination, attach evidence/provenance, and confirm promotion |
 | No-prose enforcement policy | Accepted | Enforce before model call and after model output |
 | Mock mode output | Accepted | Use deterministic fixture JSON for `story_check`, `throughline_classification`, `writer_questions`, and `out_of_scope_refusal` |
@@ -49,5 +49,5 @@
 | Revise cloud smoke config | RunPod readiness | Required before RunPod smoke |
 | Run cross-book coverage review | Books 4-5 decision | Must review Books 1-3 coverage first |
 | Define safe book artifact set | Git hygiene and provenance | Raw source text stays outside Git |
-| Run MVP completion test matrix | MVP exit | Use `docs/roadmap/mvp_completion_test_matrix.md`; live Ollama remains optional/manual unless explicitly available |
+| Run MVP completion test matrix | MVP exit | Preflight executed on 2026-06-05; automated checks passed and live Ollama was deferred by design, but repo safety is blocked by dirty tracked `projects/example` fixture files pending owner resolution |
 | Research optional extractors | Post-MVP analysis tooling | Keep extractor output candidate-only through OMI, with provenance, owner review, guardrails, and no direct promotion |

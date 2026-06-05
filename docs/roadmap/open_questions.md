@@ -37,23 +37,23 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 1. Push the safe local `main` branch to GitHub in a separate task.
 2. Declare Node `>=22.12.0 <23` in package metadata in a later implementation task.
-3. Replace the sample fixture with one aligned owner-created project for MVP.
+3. Optionally replace the public-domain sample fixture with an owner-created aligned project in a later task.
 4. Extend OMI runtime beyond the OMI-003/OMI-004/OMI-005/OMI-006 raw idea/candidate/review/promotion-record/status-provenance slices only through separately approved tasks; apply-promotion behavior remains unimplemented.
 5. Reuse shared `backend/guardrails.py` request and output guard helpers when future freeform/model routes are implemented without treating scene text as user request intent.
 6. Extend runtime schema validation patterns beyond Story Check when new analysis routes are implemented.
 7. Add broader route tests where useful without live Ollama.
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
 9. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
-10. Execute the MVP exit matrix preflight now that OMI-007 no-prose/no-silent-promotion tests are in place.
+10. Resolve the MVP exit preflight repo-safety blocker: pre-existing dirty tracked `projects/example/bible.json` and `projects/example/scenes/scene_001.md` changes must be reverted, accepted, or separately committed by owner decision.
 11. Revise or create a RunPod cloud smoke config before smoke training.
 12. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
-14. Execute the MVP completion test matrix in `docs/roadmap/mvp_completion_test_matrix.md` before declaring MVP exit.
+14. Re-run the repo safety portion of the MVP completion test matrix after the dirty fixture files are resolved before declaring MVP exit.
 15. Evaluate optional analysis extractors only after MVP exit; any segram, fabula, silverfish, AI-Reader-V2, or narrative-blueprint work remains candidate-only and routed through OMI.
 
 ## Owner Questions
 
-No additional owner decisions are required before Phase 2 backend safety and schema foundation.
+No additional owner decisions are required for the completed App MVP slices. The current owner decision needed for local MVP readiness is how to resolve the dirty tracked `projects/example` fixture files.
 
 Resolved sample/source roles:
 

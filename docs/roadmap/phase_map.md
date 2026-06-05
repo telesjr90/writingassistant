@@ -72,7 +72,8 @@ OMI must remain analysis-only, candidate-output-first, and owner-controlled. Pro
 - Inputs: working Story Check and bounded OMI MVP paths.
 - Outputs: project navigation reliability, save/reload testing, app smoke tests, documentation cleanup, manual local run checklist, and completed MVP exit test matrix.
 - Status note: `docs/roadmap/mvp_completion_test_matrix.md` defines the formal MVP exit gate across repo safety, backend tests, frontend build, Story Check modes, guardrails, context, OMI, evaluation harness, and manual acceptance.
-- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors.
+- Status note: MVP exit preflight executed on 2026-06-05. Automated backend tests, focused groups, frontend build, offline baseline harness, mock Story Check smoke, guardrail checks, OMI boundary checks, and short server smokes passed; live qwen3 smoke was deferred by design. Repo safety is blocked by pre-existing dirty tracked `projects/example` fixture files.
+- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors after the dirty tracked fixture files are resolved or explicitly accepted.
 
 ### Post-MVP: Optional Analysis Extractors
 
