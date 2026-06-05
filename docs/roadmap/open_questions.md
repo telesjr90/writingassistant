@@ -48,6 +48,8 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 11. Revise or create a RunPod cloud smoke config before smoke training.
 12. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
+14. Execute the MVP completion test matrix in `docs/roadmap/mvp_completion_test_matrix.md` before declaring MVP exit.
+15. Evaluate optional analysis extractors only after MVP exit; any segram, fabula, silverfish, AI-Reader-V2, or narrative-blueprint work remains candidate-only and routed through OMI.
 
 ## Owner Questions
 

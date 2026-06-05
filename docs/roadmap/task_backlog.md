@@ -35,6 +35,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | OMI-005 | Prevent OMI candidate promotion without explicit owner approval | Promotion guard | DONE; approved candidates can create promotion audit records only after owner approval, final confirmation, allowed destination, provenance, source snapshot, and safe target labels are present, with no durable truth mutation |
 | OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | TODO; OMI-003/004 include a minimal create/list/review panel, but fuller status/provenance workflow remains future work |
 | OMI-007 | OMI tests for no-prose and no-silent-promotion behavior | Test coverage | TODO; verifies OMI cannot generate story prose or silently promote candidates |
+| MVP-EXIT | MVP completion test matrix | `docs/roadmap/mvp_completion_test_matrix.md` | TODO; formal exit gate covers repo safety, backend tests, frontend build, smoke checks, Story Check modes, guardrails, context, OMI, evaluation harness, and end-to-end manual acceptance |
 
 ## App MVP Phase Order
 
@@ -47,6 +48,14 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 4 | Frontend MVP diagnostics | IN PROGRESS; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, App-5 bible/storyform context editing, and Story Check guard integration done; remaining App MVP OMI hardening remains TODO |
 | Phase 5 | OMI MVP implementation | IN PROGRESS; OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 raw idea/candidate creation, OMI-004 owner decision/destination selection, and OMI-005 promotion gate records are complete, while fuller OMI UI and broader OMI tests remain TODO |
 | Phase 6 | MVP hardening | TODO |
+
+## Post-MVP / Future App Track
+
+| ID | Task | Output | Acceptance |
+| --- | --- | --- | --- |
+| EXT-001 | Optional analysis extractor research | `docs/roadmap/optional_analysis_extractors.md` | FUTURE; evaluate segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as candidate-only references, not MVP blockers |
+| EXT-002 | Extractor proof of concept | Offline candidate extraction fixture/report | FUTURE; extractor output routes to OMI candidates only and never directly mutates project truth or training data |
+| EXT-003 | Extractor integration tests | Extractor/OMI candidate tests | FUTURE; verifies no prose generation, provenance, owner review, guardrails, and no direct promotion |
 
 ## Packet/Dataset
 

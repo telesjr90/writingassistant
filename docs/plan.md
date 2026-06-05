@@ -11,6 +11,8 @@ We are building a single‑UI writing tool inspired by Subtxt. The MVP will:
 
 OMI is part of the App MVP, but it is analysis/planning only. It must not write, rewrite, continue, imitate, polish, or improve story prose, and it must not silently promote ideas, candidates, model output, or NotebookLM output into durable project truth. OMI MVP fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; the current runtime slice captures owner-authored raw ideas and structured candidate planning records, supports owner review decisions, and creates promotion audit records without mutating durable truth.
 
+MVP completion is governed by `docs/roadmap/mvp_completion_test_matrix.md`. Optional analysis extractors are documented as post-MVP candidate-only tooling in `docs/roadmap/optional_analysis_extractors.md`; they are not an MVP blocker and cannot directly alter project truth or training data.
+
 The current workspace is `/home/tjrpirateking/projects/WritingAssistantApplication`. The UI is a React app served by a FastAPI backend.
 
 ---
@@ -119,7 +121,7 @@ Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP c
 | 3 | Mock and baseline Story Check | Story Check mock mode is complete; qwen3/Ollama baseline config is explicit and covered with mocked tests; live baseline reaches Windows Ollama through `OLLAMA_BASE_URL` and returns normalized schema-valid rich Story Check JSON; app-level evaluation fixtures and an offline baseline evaluation harness exist for future regression work. |
 | 4 | Frontend MVP diagnostics | FE-001 rich Story Check sidebar, App-4 scene editor hardening, App-5 bible/storyform read/write, GUARD-002 request-path policy, and GUARD-003 Story Check output guard are complete; remaining work includes evaluation fixtures, OMI, and broader MVP hardening. |
 | 5 | Bounded OMI MVP implementation | OMI captures raw ideas and structured candidates with owner decision, destination, provenance, and status; it cannot write prose or silently promote durable truth. OMI-003 implements raw idea and candidate creation, OMI-004 implements owner decision/status/destination updates, and OMI-005 creates promotion records without applying them to durable project truth. |
-| 6 | MVP hardening | Story Check mock/qwen3, no-prose guardrails, bounded OMI, save/load, docs, and local smoke checks are verified before release readiness. |
+| 6 | MVP hardening | Story Check mock/qwen3, no-prose guardrails, bounded OMI, save/load, docs, local smoke checks, and the MVP exit test matrix are verified before release readiness. |
 
 ---
 
@@ -182,6 +184,7 @@ You should see the project navigation, the editor, and the analysis sidebar with
 
 ## 5. Next Steps (Beyond MVP)
 - Dynamic storyform questionnaire.
+- Optional analysis extractor research for candidate entities/actions/relationships/timeline notes through OMI.
 - NovelClaw‑style memory banks.
 - Dramatron-style scene generation remains blocked/non-goal.
 - World‑building interface (Notebook‑inspired).

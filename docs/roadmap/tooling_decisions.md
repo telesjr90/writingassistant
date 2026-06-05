@@ -11,6 +11,7 @@
 - `llm_finetuning` only as evaluation/training lifecycle inspiration.
 - NotebookLM only as candidate packet/evidence aggregation workflow.
 - Codex only for repo inspection and documentation updates.
+- `segram`, `fabula`, `silverfish`, `AI-Reader-V2`, and `narrative-blueprint` only as optional future analysis/extractor references for candidate-only OMI workflows.
 
 ## Do Not Use Now
 
@@ -28,6 +29,7 @@
 - NARRATIS.
 - StoryExplorer.
 - Dramatron/NovelClaw/worldbuilding templates as active implementation plans.
+- Generation-heavy systems such as Inkos/story-engine-style tools as runtime app features.
 
 ## Reference Repo Role Map
 
@@ -38,6 +40,12 @@
 | dramatron | Blocked/non-goal for generation |
 | ai-story-writer | Not an implementation template |
 | notebook | Candidate aggregation inspiration only |
+| segram | Optional future semantic/action extraction reference; likely safest first extractor candidate |
+| fabula | Optional future knowledge graph/entity/event/relationship extraction reference |
+| silverfish | Optional future relationship extraction and evidence-cluster reference |
+| AI-Reader-V2 | Optional future visualization/UI reference for maps, timelines, and relationship graphs |
+| narrative-blueprint | Optional future configurable batch/evaluation pipeline reference |
+| Inkos/story-engine-style systems | Deferred or rejected for runtime use because generation-heavy behavior conflicts with the no-prose app boundary |
 
 ## Current Repo Tooling Notes
 
@@ -59,4 +67,5 @@
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.
 - Backend dependency manifest: `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`.
 - OMI: App MVP feature, but bounded to analysis-only candidate planning. No prose generation, no story continuation, no rewriting, and no silent promotion into durable truth. `docs/roadmap/omi_storage_model.md` defines the project-local `omi/ideas`, `omi/candidates`, `omi/promotions`, and `omi/index.json` storage target. OMI-003 implements owner-authored raw idea and structured candidate record creation/listing/loading; OMI-004 implements explicit owner decision, status, approval confirmation, notes, and candidate destination updates; OMI-005 implements promotion-readiness checks and record-only promotion creation under `omi/promotions/`. There is no apply-promotion route, no durable truth mutation, and no model-generated candidate path. Future OMI model calls should use shared `backend/guardrails.py` before model calls and keep owner-authored `raw_idea`, owner decision notes, and promotion metadata separate from freeform assistant request intent.
+- Optional extractors: `docs/roadmap/optional_analysis_extractors.md` defines extractor tools as post-MVP references only. No extractor may generate prose, silently alter project truth, write OMI promotions directly, write training data, update `dataset_manifest.json`, or bypass OMI owner review and promotion gates.
 - GitHub Issues/Projects: deferred until after safe baseline push and owner approval.

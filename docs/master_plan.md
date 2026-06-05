@@ -10,6 +10,8 @@ Current app architecture is FastAPI plus React with local Ollama inference. The 
 
 The MVP goal is a usable local app that can create/load a project, edit and save scenes, store bible/storyform context, run Story Check, show normalized analysis results, and support a bounded Organize My Idea (OMI) planning workflow. Fine-tuning is a separate track. The MVP does not require a fine-tuned model.
 
+MVP completion is gated by the formal matrix in `docs/roadmap/mvp_completion_test_matrix.md`. Optional analysis extractors are tracked separately in `docs/roadmap/optional_analysis_extractors.md` as post-MVP candidate-analysis tooling, not an MVP blocker.
+
 ## 2. Product Boundaries
 
 Hard prohibitions:
@@ -256,6 +258,13 @@ Project Knowledge / owner-approved truth rules:
 - Raw model, NotebookLM, and external outputs are candidate-only.
 - Retrieved definitions can support interpretation but cannot establish story truth.
 
+Optional extractor status:
+
+- `docs/roadmap/optional_analysis_extractors.md` defines a future post-MVP extractor path from owner scene/project context to candidate entities, actions, relationships, and timeline notes.
+- Extractor output is candidate analysis only and must route through OMI candidate records, owner review, and promotion gates.
+- Extractors must not directly modify `bible.json`, `storyform.json`, `scenes/`, `project.json`, `owner_memory.json`, OMI promotions, `training/data`, or `dataset_manifest.json`.
+- Candidate future references include `segram`, `fabula`, `silverfish`, `AI-Reader-V2`, and `narrative-blueprint`; no extractor dependency is currently implemented.
+
 ## 6. MVP Scope
 
 The MVP includes:
@@ -295,6 +304,7 @@ MVP completion requires:
 - OMI can create or display structured candidate planning material without generating story prose.
 - OMI can track owner decision, destination, provenance, and status.
 - OMI cannot promote output into bible, storyform, planning notes, or other durable project truth without explicit owner approval.
+- The MVP exit criteria in `docs/roadmap/mvp_completion_test_matrix.md` pass or have documented owner-approved exceptions.
 
 ## 6.1 App MVP Phases
 
@@ -361,6 +371,7 @@ MVP completion requires:
 - Project navigation reliability.
 - Save/reload testing.
 - App smoke tests.
+- MVP exit test matrix execution.
 - Documentation cleanup.
 - Manual local run checklist.
 
@@ -391,6 +402,8 @@ Suggested future labels: `app`, `backend`, `frontend`, `storage`, `ncp`, `story-
 | OMI-005 prevent promotion without explicit owner approval | Enforce durable truth boundary. | Guardrails, storage model. | DONE; promotion records can be created only for approved, confirmed, candidate-only records with allowed destination, provenance, source snapshot, safe target label/path, and final confirmation. | Promotion record creation does not mutate bible, storyform, scenes, owner memory, project metadata, or planning notes. | Pytest and frontend build. | OMI-004. | guardrails, omi |
 | OMI-006 OMI UI for raw idea, candidates, status, provenance, destination | Make lifecycle visible. | OMI flow. | OMI panel/view, when implemented. | Candidate vs approved/promoted state is visible. | Browser smoke. | OMI-003, OMI-004. | frontend, omi |
 | OMI-007 OMI tests for no-prose and no-silent-promotion behavior | Verify OMI boundaries. | OMI implementation. | Test coverage. | No prose generation path and no silent promotion path pass. | Pytest/UI tests. | OMI-003 to OMI-005. | tests, guardrails, omi |
+| MVP-EXIT test matrix | Verify MVP release readiness. | Completed MVP feature set. | `docs/roadmap/mvp_completion_test_matrix.md` execution record. | Repo safety, backend tests, frontend build, smoke tests, Story Check modes, guardrails, context, OMI, evaluation harness, and manual acceptance are recorded. | Matrix commands and manual checklist. | OMI-006, OMI-007, MVP hardening. | app, tests, docs |
+| POST-MVP optional analysis extractors | Explore candidate extraction pipeline. | Owner scene/project context, OMI flow. | `docs/roadmap/optional_analysis_extractors.md`. | Extractor output remains candidate-only and cannot directly mutate project truth or training data. | Future extractor fixtures and OMI integration tests. | MVP exit. | post-mvp, evaluation, omi |
 
 ## 8. Packet/Dataset Roadmap
 

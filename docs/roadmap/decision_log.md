@@ -32,6 +32,8 @@
 | Book folder policy | Accepted | Keep raw source text outside Git; store only safe derived metadata/review artifacts in repo |
 | IC/RS evidence threshold | Accepted | Require owner-approved exact evidence per record; target at least 15-20 strong IC and 15-20 strong RS examples, preferably 30+ each |
 | Book evidence approval format | Accepted | Use a consolidated owner-review worksheet with candidate answer, excerpt IDs, evidence, weak/contradicting evidence, confidence, owner decision, and final training status |
+| MVP exit test matrix | Accepted | MVP completion requires formal recorded validation across repo safety, backend tests, frontend build, Story Check modes, guardrails, context, OMI, evaluation harness, and manual smoke |
+| Optional extractor track | Accepted as future/post-MVP | segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint may be evaluated later as candidate-only references; no extractor may generate prose or silently alter project truth |
 
 ## Follow-Up Tasks, Not Open Decisions
 
@@ -47,3 +49,5 @@
 | Revise cloud smoke config | RunPod readiness | Required before RunPod smoke |
 | Run cross-book coverage review | Books 4-5 decision | Must review Books 1-3 coverage first |
 | Define safe book artifact set | Git hygiene and provenance | Raw source text stays outside Git |
+| Run MVP completion test matrix | MVP exit | Use `docs/roadmap/mvp_completion_test_matrix.md`; live Ollama remains optional/manual unless explicitly available |
+| Research optional extractors | Post-MVP analysis tooling | Keep extractor output candidate-only through OMI, with provenance, owner review, guardrails, and no direct promotion |

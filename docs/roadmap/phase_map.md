@@ -68,8 +68,16 @@ OMI must remain analysis-only, candidate-output-first, and owner-controlled. Pro
 ### Phase 6: MVP Hardening
 
 - Inputs: working Story Check and bounded OMI MVP paths.
-- Outputs: project navigation reliability, save/reload testing, app smoke tests, documentation cleanup, manual local run checklist.
-- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, or fine-tuning.
+- Outputs: project navigation reliability, save/reload testing, app smoke tests, documentation cleanup, manual local run checklist, and completed MVP exit test matrix.
+- Status note: `docs/roadmap/mvp_completion_test_matrix.md` defines the formal MVP exit gate across repo safety, backend tests, frontend build, Story Check modes, guardrails, context, OMI, evaluation harness, and manual acceptance.
+- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors.
+
+### Post-MVP: Optional Analysis Extractors
+
+- Inputs: owner scene/project context, OMI candidate workflow, no-prose guardrails, extractor license review.
+- Outputs: optional candidate entity/action/relationship/timeline extraction pipeline, if later approved.
+- Status note: `docs/roadmap/optional_analysis_extractors.md` records segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as future references only.
+- Exit: any extractor output remains candidate-only, routes through OMI, preserves provenance, and cannot directly mutate durable project truth, OMI promotions, training data, or `dataset_manifest.json`.
 
 ## Dataset and Training Tracks
 
@@ -132,6 +140,7 @@ gantt
     Phase 4 frontend diagnostics :p4, after p3, 1
     Phase 5 bounded OMI MVP :p5, after p4, 1
     Phase 6 MVP hardening :p6, after p5, 1
+    Optional extractor research :extractors, after p6, 1
     section Dataset
     Short-story packet completion :packets, 1, 5
     Book-backed cross-book review :books, 2, 3
