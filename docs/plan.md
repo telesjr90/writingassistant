@@ -109,9 +109,9 @@ Goal: Build a multi‑task dataset that teaches a model to diagnose narrative co
 
 ## 0.2 MVP Phase Order
 
-Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, OMI-004 owner decision and destination selection, OMI-005 promotion gate enforcement, OMI-006 fuller OMI UI/status/provenance workflow, OMI-007 no-prose/no-silent-promotion tests, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. MVP exit matrix execution/preflight ran on 2026-06-05 and is blocked only by pre-existing dirty tracked project fixture files pending owner resolution.
+Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, OMI-004 owner decision and destination selection, OMI-005 promotion gate enforcement, OMI-006 fuller OMI UI/status/provenance workflow, OMI-007 no-prose/no-silent-promotion tests, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. MVP exit matrix execution/preflight ran on 2026-06-05 and is blocked only by pre-existing dirty tracked project fixture files pending owner resolution. App MVP Phase 6 remains the recommended active phase.
 
-Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates.
+Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates. Fine-tuning prep is paused after the Book 1-3 review JSONL mapping dry-run; the next fine-tuning step when resumed is P0 evidence extraction/verification before any JSONL drafting.
 
 | Phase | Scope | Completion Definition |
 | --- | --- | --- |
@@ -127,12 +127,15 @@ Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP c
 
 ## Book-Backed Phase Status (updated)
 
-The book-backed phase is active as a candidate evidence workflow for improving Dramatica-informed analysis coverage. It does not bypass the dataset gates above.
+The book-backed phase is paused as a candidate evidence workflow for improving Dramatica-informed analysis coverage. It does not bypass the dataset gates above.
 
 - Book 1 is completed through the book-backed packet workflow, verified from the WSL-mounted folder `/mnt/e/WritingAssistantApplication/docs/books/dcc`. The repo-local folder `docs/books/dcc` is not present in this workspace.
 - Book 2 is completed through the book-backed packet workflow, verified from the WSL-mounted folder `/mnt/e/WritingAssistantApplication/docs/books/projecthm`. The repo-local folder `docs/books/projecthm` is not present in this workspace.
 - Book 3 is completed through the book-backed packet workflow, verified from the WSL-mounted folder `/mnt/e/WritingAssistantApplication/docs/books/thggalaxy`. The repo-local folder `docs/books/thggalaxy` is not present in this workspace.
-- After Book 3, the next step is cross-book review and deciding whether Books 4-5 are needed.
+- Dataset gate audit, Book 1-3 cross-book coverage matrix, owner decision extraction worksheet, owner answers implementation, and review JSONL mapping dry-run are complete as local prep artifacts.
+- No JSONL records were created, no records were promoted, `dataset_manifest.json` was not updated, and no training ran.
+- The next fine-tuning task when this track resumes is P0 evidence extraction/verification before any JSONL drafting.
+- Books 4-5 remain conditional and should not start while the fine-tuning/book-backed track is paused.
 - Books 6+ remain blocked for this phase.
 - NotebookLM output remains candidate-only, not training truth.
 - Book-level master packets remain context, not direct SFT truth.
@@ -143,6 +146,8 @@ The book-backed phase is active as a candidate evidence workflow for improving D
 ## Phase 3 – Fine‑Tuning (updated)
 
 Goal: Train Qwen2.5-7B-Instruct as a bounded structural analyst that returns JSON and refuses prose generation.
+
+Status: blocked/paused. Dataset readiness remains blocked at 149 eligible records with a 351-record gap, task mix outside target range, and unresolved source records in the train split. The fine-tuned model remains outside the MVP critical path; continue app validation through mock mode and the qwen3/Ollama baseline path while fine-tuning is paused.
 
 1. Framework: Unsloth (QLoRA) on a single ≤16GB GPU.
 2. QLoRA settings:

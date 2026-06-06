@@ -4,10 +4,10 @@
 | --- | --- | --- | --- | --- | --- |
 | R1 | Model or docs overclaim Dramatica truth | High | High | Preserve owner-approved vs candidate vs insufficient-evidence boundaries | Active |
 | R2 | Prose-generation leakage | High | Medium | Shared `backend/guardrails.py` input classifier, refusal response, request-field policy helpers, and Story Check output sanitizer implemented; current owner-authored save routes are regression-tested against overblocking; refusal eval remains TODO | Active |
-| R3 | Weak IC/RS labels become positive training truth | High | High | Owner approval plus excerpt-backed evidence required | Active |
-| R4 | CIPS/dynamics trained from insufficient evidence | High | High | Keep positive CIPS/dynamics owner-gated | Active |
-| R5 | Dataset gate remains blocked | High | High | Prioritize packets and book-backed evidence triage | Active |
-| R6 | Task mix skew persists | Medium | High | Add throughline/refusal records while reducing story_check dominance | Active |
+| R3 | Weak IC/RS labels become positive training truth | High | High | Owner approval plus excerpt-backed evidence required; Book 1-3 rows have been separated into positive, insufficient-evidence, needs-revision/blocked, and context-only queues, with no JSONL conversion | Active |
+| R4 | CIPS/dynamics trained from insufficient evidence | High | High | Keep positive CIPS/dynamics owner-gated; evidence extraction/verification remains required before any future JSONL draft | Active |
+| R5 | Dataset gate remains blocked | High | High | Fine-tuning prep is paused after mapping dry-run; resume only with P0 evidence extraction/verification before JSONL drafting | Active |
+| R6 | Task mix skew persists | Medium | High | Mapping dry-run identified future throughline-heavy candidates, but no conversion occurred; add throughline/refusal records only after evidence extraction, validation, and explicit resume | Active |
 | R7 | External datasets import unsupported Dramatica truth | High | Medium | Registry disallowed-use fields and human review | Active |
 | R8 | NotebookLM output treated as truth | High | Medium | Mark candidate-only in all plans and reports | Active |
 | R9 | Local GPU cannot train primary model | High | Confirmed | Use RunPod/larger GPU; smoke only locally if explicitly allowed | Active |
@@ -39,3 +39,5 @@
 | R35 | Extractor dependencies bloat the app | Medium | Medium | Treat segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as references until a separate dependency/license/performance review is approved | Future |
 | R36 | Extractor license uncertainty contaminates app or training data | High | Medium | Perform license review before dependency adoption; do not create training data or dataset manifest entries from extractor output without separate provenance approval | Future |
 | R37 | MVP exit declared with dirty tracked project fixture files | Medium | Medium | MVP exit preflight records dirty `projects/example` changes as a blocker; resolve by owner-approved revert, acceptance, or separate fixture commit before local-ready/release-style steps | Active |
+| R38 | Book 1-3 owner answers are over-promoted before validation | High | Medium | Owner-filled rows and mapping dry-run rows have been separated into positive, insufficient-evidence, needs-revision/blocked, and context-only queues; no JSONL conversion occurred; evidence extraction/verification remains required before any future JSONL drafting; fine-tuning prep is paused to avoid premature conversion, promotion, manifest updates, or training | Active |
+| R39 | Fine-tuning resumes prematurely from mapping dry-run | High | Medium | Track is formally paused before evidence extraction/verification; JSONL conversion, promotion, manifest update, RunPod smoke, and full training are not active next phases | Active |

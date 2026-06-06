@@ -32,6 +32,8 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 | Book folders in Git | Keep raw source text outside Git. Store only safe derived metadata/review artifacts in repo. |
 | IC/RS threshold | Require owner-approved exact evidence per record. Target at least 15-20 strong IC and 15-20 strong RS examples, preferably 30+ each. |
 | Book evidence approval format | Use a consolidated owner-review worksheet with candidate answer, excerpt IDs, evidence, weak/contradicting evidence, confidence, owner decision, and final training status. |
+| Book 1-3 owner-answer inventory | Owner supplied final row decisions for Books 1-3. These have been implemented as local prep reports and a mapping queue only; positive, insufficient-evidence, needs-revision, and context-only rows remain separated. |
+| Fine-tuning prep pause | Fine-tuning/book-backed prep is paused after the Book 1-3 review JSONL mapping dry-run. No JSONL records were created, no records were promoted, the manifest was not updated, and no training ran. |
 
 ## Remaining Verification / Setup Tasks
 
@@ -45,11 +47,29 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
 9. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
 10. Resolve the MVP exit preflight repo-safety blocker: pre-existing dirty tracked `projects/example/bible.json` and `projects/example/scenes/scene_001.md` changes must be reverted, accepted, or separately committed by owner decision.
-11. Revise or create a RunPod cloud smoke config before smoke training.
-12. Run the Book 1-3 cross-book coverage review before deciding on Books 4-5.
+11. Revise or create a RunPod cloud smoke config before smoke training in a future training task; this is not current while fine-tuning prep is paused.
+12. Fine-tuning is paused pending P0 evidence extraction/verification before any Book 1-3 JSONL drafting.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
-14. Re-run the repo safety portion of the MVP completion test matrix after the dirty fixture files are resolved before declaring MVP exit.
+14. Re-run the repo safety portion of the MVP completion test matrix after the dirty fixture files are resolved before declaring MVP exit; this is the next active project task.
 15. Evaluate optional analysis extractors only after MVP exit; any segram, fabula, silverfish, AI-Reader-V2, or narrative-blueprint work remains candidate-only and routed through OMI.
+16. Books 4-5 remain conditional and should not start while the fine-tuning/book-backed track is paused.
+
+## Book 1-3 Owner-Answer Status
+
+Resolved by owner inventory and implemented locally:
+
+- Book 1 parent rows and split/local candidates have final owner decisions recorded.
+- Book 2 parent rows and split candidates have final owner decisions recorded, with B2-010a Optionlock replacing the contradicted Timelock parent.
+- Book 3 parent/review rows and split candidates have final owner decisions recorded, with Book 3 RS validity retained as insufficient evidence.
+
+Still unresolved or blocked for direct conversion:
+
+- Parent rows marked `needs_revision` remain blocked from direct conversion.
+- Context-only master packet rows remain do-not-convert.
+- Insufficient-evidence rows remain negative calibration only.
+- P0 evidence extraction/verification remains required before any JSONL draft.
+- Later review JSONL conversion, promotion, manifest update, and training remain pending and paused.
+- App MVP Phase 6 / MVP exit matrix preflight is the next active project task.
 
 ## Owner Questions
 

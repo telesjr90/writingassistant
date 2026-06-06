@@ -35,7 +35,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | OMI-005 | Prevent OMI candidate promotion without explicit owner approval | Promotion guard | DONE; approved candidates can create promotion audit records only after owner approval, final confirmation, allowed destination, provenance, source snapshot, and safe target labels are present, with no durable truth mutation |
 | OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | DONE; OMI panel shows raw ideas, candidates, selected candidate lifecycle details, owner decisions, destinations, timestamps, provenance, evidence, promotion readiness blockers, and promotion records without apply-promotion behavior |
 | OMI-007 | OMI tests for no-prose and no-silent-promotion behavior | Test coverage | DONE; focused tests verify blocked prose destinations/types, owner-authored content remains candidate-only, promotion records do not apply durable truth mutation, promotion blockers fail closed, UI boundary copy remains present, no model path is called, and path traversal is blocked |
-| MVP-EXIT | MVP completion test matrix | `docs/roadmap/mvp_exit_preflight_report.md` | EXECUTED; automated tests, focused tests, frontend build, server smokes, offline baseline, mock Story Check, guardrails, and OMI boundaries passed; readiness is blocked only by pre-existing dirty tracked project fixture files |
+| MVP-EXIT | MVP completion test matrix | `docs/roadmap/mvp_exit_preflight_report.md` | ACTIVE NEXT; preflight executed once with automated tests, focused tests, frontend build, server smokes, offline baseline, mock Story Check, guardrails, and OMI boundaries passing; resolve repo-safety blocker from pre-existing dirty tracked project fixture files, then re-run/record preflight |
 
 ## App MVP Phase Order
 
@@ -47,7 +47,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 3 | Mock and baseline Story Check | COMPLETE locally for Story Check MVP; App-7 mock mode, App-8 live qwen3 baseline verification, App-12 evaluation fixtures, and App-13 offline baseline harness done; remaining mock fixtures beyond Story Check are future work |
 | Phase 4 | Frontend MVP diagnostics | COMPLETE locally; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, App-5 bible/storyform context editing, and Story Check guard integration done |
 | Phase 5 | OMI MVP implementation | COMPLETE locally; OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 raw idea/candidate creation, OMI-004 owner decision/destination selection, OMI-005 promotion gate records, OMI-006 status/provenance UI, and OMI-007 no-prose/no-silent-promotion tests are complete |
-| Phase 6 | MVP hardening | PREFLIGHT EXECUTED; resolve dirty tracked project fixture files before declaring local MVP ready or pushing |
+| Phase 6 | MVP hardening | ACTIVE NEXT; resolve dirty tracked project fixture files and re-run/record MVP exit preflight before declaring local MVP ready or pushing |
 
 ## Post-MVP / Future App Track
 
@@ -63,19 +63,22 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | --- | --- | --- | --- |
 | Data-1 | Finish packet 003-008 owner decision path | Owner decision application | Only owner-approved OS/MC labels advance |
 | Data-2 | Process packets 009-020 through E/F/G/H/I | Candidate review reports | No direct promotion to training |
-| Data-3 | Convert approved packets to review JSONL | Review candidates | Validation passes, candidates remain review status |
-| Data-4 | Promote validated records | Promoted JSONL and manifest | No draft, blocked, eval-only, unresolved-source, or license-unreviewed records in train |
-| Data-5 | Restore task mix | More throughline/refusal records | Manifest moves toward 40-45/25-30/20-25/5-10 mix |
-| Data-6 | Reach 500 gate | 500+ eligible records | Manifest readiness is ready |
+| Data-3 | Convert approved packets to review JSONL | Review candidates | PAUSED/BLOCKED; Book 1-3 mapping dry-run is complete, but P0 evidence extraction/verification is required before any JSONL drafting |
+| Data-4 | Promote validated records | Promoted JSONL and manifest | BLOCKED; no review JSONL exists and no validation/promotion has run |
+| Data-5 | Restore task mix | More throughline/refusal records | PAUSED; mapping dry-run would help throughline mix later, but evidence extraction and review JSONL drafting are not active now |
+| Data-6 | Reach 500 gate | 500+ eligible records | BLOCKED; manifest remains at 149 eligible records and readiness is blocked |
 
 ## Book-Backed Review
 
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
-| Book-1 | Cross-book coverage matrix | Matrix for Books 1-3 | IC, RS, MC/IC contrast, dynamics, CIPS, throughline, insufficient-evidence coverage counted |
-| Book-2 | Evidence triage | Excerpt-backed candidate list | Only owner-approved excerpt-backed evidence can feed SFT review candidates |
-| Book-3 | Books 4-5 decision | Owner decision | Proceed only if cross-book review shows coverage gaps |
+| Book-1 | Cross-book coverage matrix | Matrix for Books 1-3 | DONE; Book 1-3 coverage matrix completed in `training/reports/book_1_3_cross_book_coverage_matrix.md` |
+| Book-2 | Owner decision extraction worksheet | Owner-decision worksheet | DONE; extraction worksheet completed with 39 candidate rows across Books 1-3 |
+| Book-3 | Books 4-5 decision | Owner decision | PAUSED; Books 4-5 remain conditional and should not start while fine-tuning/book-backed prep is paused |
 | Book-4 | Books 6+ block review | Block retained or lifted | Default remains blocked for this phase |
+| Book-5 | Implement Book 1-3 owner answers as prep artifacts | Local implementation report and mapping queue | DONE; owner answers are recorded in reports only, with no JSONL creation, promotion, manifest update, training, or Ollama call |
+| Book-6 | Review JSONL mapping dry-run for Book 1-3 owner candidates | Candidate-to-review-record mapping plan | DONE; mapping dry-run completed with 51 positive structural mappings, 14 insufficient-evidence mappings, 1 refusal mapping, and 3 writer-question mappings, with no JSONL writes |
+| Book-7 | P0 evidence extraction/verification for Book 1-3 mappings | Safe evidence locator checklist | PAUSED / NEXT WHEN FINE-TUNING RESUMES; required before any review JSONL drafting |
 
 ## External Dataset Research
 
@@ -89,9 +92,9 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
-| Train-1 | RunPod environment check | Readiness report | GPU, CUDA, Unsloth, model cache verified |
-| Train-2 | Smoke training | Smoke artifact only | `smoke_only_not_final_model: true`, never deployed |
-| Train-3 | Full training gate | Gate report | 500+ eligible records and ready manifest |
+| Train-1 | RunPod environment check | Readiness report | FUTURE; not active while dataset gate is blocked and fine-tuning prep is paused |
+| Train-2 | Smoke training | Smoke artifact only | BLOCKED/NOT NOW; `smoke_only_not_final_model: true`, never deployed |
+| Train-3 | Full training gate | Gate report | BLOCKED; requires 500+ eligible records and ready manifest |
 | Train-4 | Full QLoRA | Adapter/checkpoints | Non-smoke run completes |
 | Train-5 | GGUF export | `q4_k_m`, `q8_0` | Artifacts labeled and copied back |
 | Train-6 | Ollama import/eval | `dramatica-analyst:8b` candidate | Eval passes before app swap |

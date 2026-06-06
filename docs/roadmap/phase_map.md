@@ -73,6 +73,7 @@ OMI must remain analysis-only, candidate-output-first, and owner-controlled. Pro
 - Outputs: project navigation reliability, save/reload testing, app smoke tests, documentation cleanup, manual local run checklist, and completed MVP exit test matrix.
 - Status note: `docs/roadmap/mvp_completion_test_matrix.md` defines the formal MVP exit gate across repo safety, backend tests, frontend build, Story Check modes, guardrails, context, OMI, evaluation harness, and manual acceptance.
 - Status note: MVP exit preflight executed on 2026-06-05. Automated backend tests, focused groups, frontend build, offline baseline harness, mock Story Check smoke, guardrail checks, OMI boundary checks, and short server smokes passed; live qwen3 smoke was deferred by design. Repo safety is blocked by pre-existing dirty tracked `projects/example` fixture files.
+- Status note: Phase 6 is the active recommended phase after pausing fine-tuning prep. Resolve or explicitly accept the dirty tracked fixture-file blocker, then re-run/record the MVP exit matrix rather than starting JSONL conversion, RunPod smoke, or training.
 - Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors after the dirty tracked fixture files are resolved or explicitly accepted.
 
 ### Post-MVP: Optional Analysis Extractors
@@ -95,8 +96,9 @@ These tracks are outside the App MVP critical path.
 ## Phase D: Book-Backed Cross-Book Review
 
 - Inputs: Books 1-3 completed workflow artifacts from WSL-mounted folders.
-- Outputs: coverage matrix and Books 4-5 decision.
-- Exit: excerpt-backed candidate evidence triaged for SFT review candidates.
+- Outputs: coverage matrix, owner decision extraction, owner-answer implementation, and review JSONL mapping dry-run.
+- Status: PAUSED after Book 1-3 mapping dry-run. Dataset gate audit, coverage matrix, owner decision extraction worksheet, owner answers implementation, and mapping dry-run are complete as local prep artifacts. Next step when resumed is P0 evidence extraction/verification, not JSONL drafting or training.
+- Exit: excerpt-backed candidate evidence triaged for SFT review candidates after evidence extraction/verification.
 
 ## Phase E: External Dataset Research
 
@@ -108,18 +110,21 @@ These tracks are outside the App MVP critical path.
 
 - Inputs: approved packets, book-backed evidence, external candidates.
 - Outputs: review JSONL, promoted JSONL, manifest updates.
+- Status: BLOCKED/PAUSED. No review JSONL should be created while fine-tuning prep is paused, and evidence extraction is still required before any Book 1-3 review JSONL drafting.
 - Exit: 500+ eligible records, target task mix, no unresolved-source train records.
 
 ## Phase G: RunPod Smoke
 
 - Inputs: configs, synced repo, environment.
 - Outputs: smoke-only training report/artifact.
+- Status: BLOCKED/NOT NOW while dataset gate remains blocked and fine-tuning prep is paused.
 - Exit: environment validated; smoke artifact explicitly blocked from production.
 
 ## Phase H: Full Fine-Tune
 
 - Inputs: ready manifest and RunPod GPU.
 - Outputs: QLoRA adapter/checkpoints.
+- Status: BLOCKED by dataset gate and paused fine-tuning prep.
 - Exit: non-smoke training complete.
 
 ## Phase I: Export, Eval, Model Swap
@@ -142,15 +147,15 @@ gantt
     Phase 3 mock/baseline Story Check :p3, after p2, 1
     Phase 4 frontend diagnostics :p4, after p3, 1
     Phase 5 bounded OMI MVP :p5, after p4, 1
-    Phase 6 MVP hardening :p6, after p5, 1
+    Phase 6 MVP hardening active :active, p6, after p5, 1
     Optional extractor research :extractors, after p6, 1
     section Dataset
     Short-story packet completion :packets, 1, 5
-    Book-backed cross-book review :books, 2, 3
+    Book-backed prep paused after mapping dry-run :crit, books, 2, 3
     External dataset research :external, 2, 3
     Dataset conversion/promotion :promotion, 4, 4
     section Training
-    RunPod smoke :smoke, 7, 1
-    Full fine-tune :train, 8, 2
+    RunPod smoke blocked/not now :crit, smoke, 7, 1
+    Full fine-tune blocked :crit, train, 8, 2
     Export/eval/model swap :deploy, 10, 2
 ```

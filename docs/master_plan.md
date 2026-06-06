@@ -113,6 +113,8 @@ Dataset/training:
 
 - `training/data/dataset_manifest.json` exists and reports readiness blocked with 149 eligible records counted toward the 500-record gate.
 - `training/reports/training_script_readiness_report.md` reports environment checks pass, but full training is blocked by dataset gate and 4GB local VRAM for primary 7B QLoRA.
+- Fine-tuning prep is paused at a clean stopping point after documentation-only prep work: dataset gate audit complete, Book 1-3 cross-book coverage matrix complete, owner decision extraction worksheet complete, owner answers implemented, and Book 1-3 review JSONL mapping dry-run complete. Local reports are `training/reports/dataset_gate_audit_report.md`, `training/reports/book_1_3_cross_book_coverage_matrix.md`, `training/reports/book_1_3_owner_decision_extraction_worksheet.md`, `training/reports/book_1_3_owner_answers_implementation_report.md`, `training/reports/book_1_3_review_jsonl_mapping_queue.md`, and `training/reports/book_1_3_review_jsonl_mapping_dry_run.md`. No JSONL records were created, no records were promoted, `training/data/dataset_manifest.json` was not updated, no training ran, and Ollama was not called.
+- Next fine-tuning task, when this track resumes, is P0 evidence extraction/verification for the mapped Book 1-3 candidates before any review JSONL drafting. It is not JSONL conversion, promotion, RunPod smoke, or training.
 
 Book folder status:
 
@@ -152,7 +154,8 @@ Remaining setup/verification tasks:
 - Declare the Node target in package metadata.
 - Optionally replace the public-domain sample fixture with an owner-created aligned fixture in a later task.
 - Keep future OMI expansion separate from the completed MVP slices; apply-promotion behavior remains unimplemented.
-- Run Book 1-3 cross-book coverage review before deciding whether Books 4-5 are needed.
+- Fine-tuning/book-backed dataset work is paused after the Book 1-3 review JSONL mapping dry-run; resume with P0 evidence extraction/verification only when the track is explicitly restarted.
+- Promote App MVP Phase 6 - MVP hardening / MVP exit matrix execution-preflight - as the current active project phase.
 
 ## 5. Architecture Target
 
@@ -376,6 +379,7 @@ MVP completion requires:
 - Documentation cleanup.
 - Manual local run checklist.
 - MVP exit preflight executed on 2026-06-05; automated/backend/frontend checks passed, live qwen3 smoke was deferred by design, and readiness is blocked only by pre-existing dirty tracked project fixture files pending owner resolution.
+- Current active recommended phase after pausing fine-tuning prep: Phase 6 remains the next project focus. Resolve or explicitly accept the repo-safety blocker, then re-run the MVP completion test matrix/preflight rather than starting JSONL conversion or training.
 
 ## 7. Training-Independent App Roadmap
 
@@ -465,9 +469,9 @@ Verified status:
 
 Repo-local caveat: `docs/books/dcc`, `docs/books/projecthm`, and `docs/books/thggalaxy` are missing in this workspace, so repo-relative verification is incomplete. The WSL-mounted owner-provided paths contain the observed workflow artifacts.
 
-Next step after Book 3: cross-book review.
+Book 1-3 cross-book review, owner decision extraction, owner-answer implementation, and review JSONL mapping dry-run are complete as local fine-tuning prep reports. Fine-tuning prep is paused before P0 evidence extraction/verification and before any review JSONL drafting.
 
-Books 4-5 are conditional after cross-book review. Books 6+ are blocked in this phase.
+Books 4-5 remain conditional and should not start while this track is paused. Books 6+ are blocked in this phase.
 
 NotebookLM output is candidate only. A book-level master packet is context, not direct training truth. Approved excerpt-backed evidence is preferred for SFT review candidates.
 
@@ -539,6 +543,7 @@ RunPod readiness:
 - Cloud config profiles exist, but should be reviewed against the current RunPod machine before training.
 - Revise or create a cloud smoke config before RunPod smoke.
 - Local 4GB VRAM is blocked for full primary 7B QLoRA.
+- RunPod smoke and full training are not promoted while fine-tuning prep is paused and the dataset gate remains blocked.
 
 Execution steps:
 
@@ -607,6 +612,8 @@ The backend default should not change from `qwen3:8b` until `dramatica-analyst:8
 ## 15. Blocked/Future Tasks
 
 - OMI is included in the App MVP as a bounded, analysis-only, owner-controlled planning workflow. OMI-003 through OMI-007 are complete; future apply-promotion behavior remains separate and unimplemented.
+- Active recommended next phase: App MVP Phase 6 / MVP exit matrix execution-preflight.
+- Fine-tuning prep is paused before P0 evidence extraction/verification and JSONL drafting.
 - Full storyform questionnaire later.
 - Full NCP authoring UI later.
 - Advanced Dramatica verifier claims blocked.
@@ -615,7 +622,7 @@ The backend default should not change from `qwen3:8b` until `dramatica-analyst:8
 - Dramatron-style generation blocked/non-goal.
 - Worldbuilding later.
 - NovelClaw-style memory banks later.
-- Books 4-5 conditional.
+- Books 4-5 conditional after fine-tuning prep resumes and evidence needs are reassessed.
 - Books 6+ blocked.
 
 ## 16. Risk Register Summary

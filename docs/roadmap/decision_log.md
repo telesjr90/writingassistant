@@ -34,6 +34,9 @@
 | Book evidence approval format | Accepted | Use a consolidated owner-review worksheet with candidate answer, excerpt IDs, evidence, weak/contradicting evidence, confidence, owner decision, and final training status |
 | MVP exit test matrix | Accepted | MVP completion requires formal recorded validation across repo safety, backend tests, frontend build, Story Check modes, guardrails, context, OMI, evaluation harness, and manual smoke |
 | Optional extractor track | Accepted as future/post-MVP | segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint may be evaluated later as candidate-only references; no extractor may generate prose or silently alter project truth |
+| Book 1-3 owner answers implemented as prep artifacts | Accepted | Owner answers have been received and implemented in local reports as documentation/candidate queues only; no review JSONL, training JSONL, promotion, manifest update, or training run was performed |
+| Fine-tuning prep paused after Book 1-3 mapping dry-run | Accepted | Dataset gate audit, Book 1-3 coverage matrix, owner decision extraction, owner-answer implementation, and review JSONL mapping dry-run are complete; no records were created or promoted; next fine-tuning step when resumed is evidence extraction/verification |
+| App MVP Phase 6 promoted as active phase | Accepted | Fine-tuning remains outside the MVP critical path, so current project focus returns to MVP hardening / MVP exit matrix execution-preflight and repo-safety blocker resolution |
 
 ## Follow-Up Tasks, Not Open Decisions
 
@@ -47,7 +50,8 @@
 | Build no-prose guard | Runtime safety | Must check before model call and after output |
 | Build mock fixtures | App/test foundation | Four supported task JSON fixtures required |
 | Revise cloud smoke config | RunPod readiness | Required before RunPod smoke |
-| Run cross-book coverage review | Books 4-5 decision | Must review Books 1-3 coverage first |
+| Run cross-book coverage review | Books 4-5 decision | DONE locally for Books 1-3; Books 4-5 remain conditional and are not active while fine-tuning/book-backed prep is paused |
 | Define safe book artifact set | Git hygiene and provenance | Raw source text stays outside Git |
 | Run MVP completion test matrix | MVP exit | Preflight executed on 2026-06-05; automated checks passed and live Ollama was deferred by design, but repo safety is blocked by dirty tracked `projects/example` fixture files pending owner resolution |
 | Research optional extractors | Post-MVP analysis tooling | Keep extractor output candidate-only through OMI, with provenance, owner review, guardrails, and no direct promotion |
+| Review JSONL mapping dry-run for Book 1-3 owner candidates | Fine-tuning prep | DONE locally; next fine-tuning step when resumed is P0 evidence extraction/verification, not JSONL drafting |
