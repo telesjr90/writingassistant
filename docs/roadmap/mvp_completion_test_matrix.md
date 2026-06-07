@@ -4,13 +4,15 @@
 
 This matrix defines the formal MVP exit gate for the local Dramatica-informed writing assistant. It is a planning artifact only. It does not create tests, scripts, runtime routes, frontend UI, model calls, OMI promotion behavior, training data, or model artifacts.
 
-Product pivot note: this MVP foundation remains valuable and should still be completed/recorded. After MVP foundation acceptance, the next implementation priority is Writer Assistant Core, not Dramatica/fine-tuning. Live qwen3/Dramatica baseline checks remain optional/manual and are not central to the new core direction.
+Product pivot note: this MVP foundation remains valuable and should still be completed/recorded. After MVP foundation acceptance, the next product milestone is the pre-Dramatica Project Workspace Foundation, then Writer Assistant Core. Dramatica-specific work, advanced extractors, RunPod, Books 4-5, and fine-tuning remain deferred. Live qwen3/Dramatica baseline checks remain optional/manual and are not central to the new workspace/core direction.
 
 The MVP exit gate verifies the current product boundary:
 
 - The app is analysis-only.
 - It supports local project loading, scene editing/saving, bible/storyform read/write, Story Check, rich diagnostics, mock mode, qwen3/Ollama baseline mode, no-prose guardrails, and bounded OMI candidate planning.
 - It does not write, rewrite, continue, imitate, polish, improve, or extend story prose.
+
+The next Product Workspace Foundation milestone should add its own acceptance checklist later for project creation/library, chapters/scenes/notes/materials, owner-authored prose save/reload, OMI-guided project creation, extraction trigger strategy, owner approval, no silent promotion, no AI prose generation, and project-local memory/canon visibility. Those future workspace checks do not invalidate the current MVP safety/workflow foundation.
 
 ## MVP Exit Criteria
 
@@ -189,6 +191,23 @@ Evaluation validation must cover:
 - [ ] No durable project truth mutation occurs from Story Check or OMI candidate/promotion records.
 - [ ] No generated story prose is created.
 - [ ] No training data, SFT records, dataset manifest updates, model artifacts, or raw source text changes are created by MVP validation.
+
+## Future Project Workspace Foundation Acceptance Areas
+
+These are not part of the current MVP exit gate. They define the next milestone after MVP foundation acceptance:
+
+- Project creation from scratch.
+- Project selector/library.
+- OMI-guided project creation and idea capture.
+- Chapter/scene/note/material organization.
+- User-authored prose editor save/reload without no-prose overblocking.
+- Project Overview, Chapters/Scenes, Notes/Materials, OMI Ideas/Candidates, and Approved Memory/Canon pages.
+- Candidate extraction from owner-authored material with evidence/provenance.
+- Owner approval workflow for approve/reject/revise/archive/merge/split/mark-uncertain/request-more-evidence.
+- Tests for no AI prose generation.
+- Tests for no silent promotion.
+- Tests proving pending/rejected candidates are not treated as canon.
+- Tests proving approved memory/canon is project-local.
 
 ## Pass/Fail Recording Format
 

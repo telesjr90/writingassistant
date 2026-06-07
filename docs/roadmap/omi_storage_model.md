@@ -4,7 +4,7 @@
 
 This specification defines the target MVP storage model for Organize My Idea (OMI). It is a design target only. It does not create runtime OMI files, backend endpoints, frontend UI, candidate records, promotion behavior, or generated prose.
 
-OMI storage must keep raw ideas, structured candidates, owner decisions, destinations, provenance, statuses, and promotion records separate from owner-approved project truth. OMI records are candidate planning material until an explicit owner-controlled promotion flow approves a destination and records provenance.
+OMI storage must keep raw ideas, guided project setup inputs, structured candidates, owner decisions, destinations, provenance, statuses, and promotion records separate from owner-approved project truth. OMI records are candidate planning material until an explicit owner-controlled promotion flow approves a destination and records provenance.
 
 OMI storage has a no prose generation boundary: OMI records may store structural planning candidates, diagnostic questions, evidence/provenance, and owner decisions, but they must not store generated story prose as an output or promotion target.
 
@@ -14,9 +14,11 @@ Current implementation status:
 - OMI still does not apply promotions to durable truth files.
 - Existing ignored local OMI artifacts may exist under `projects/example/omi/`, but tracked fixture files remain clean unless owner-approved separately.
 - `docs/roadmap/omi_mvp_schema_lifecycle.md` defines the OMI lifecycle and field boundary.
+- Project Workspace Foundation is the next product milestone. Future OMI storage should support guided project creation and idea capture as owner-controlled setup candidates, not canon.
 - This storage model remains the design source for expanding OMI into the central Writer Assistant Core candidate review/promotion system.
 - CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines future typed story-knowledge candidates and shared evidence/provenance models. This storage document keeps the record layout; the new schema document defines candidate content contracts.
 - CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` defines the future folder-based `memory/*.json` durable canon target. OMI promotion records remain audit intent only until a later apply-promotion step writes owner-approved records into that memory layer.
+- CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future typed candidate review, type/status filtering, owner actions, merge/dedup metadata, promotion-readiness rules, and UI requirements.
 
 ## 2. Target Storage Layout
 
@@ -39,7 +41,7 @@ This layout is not implemented yet. Future runtime tasks must create these folde
 Storage boundaries:
 
 - `omi/ideas/` stores owner-authored raw ideas and their lifecycle state.
-- `omi/candidates/` stores structured candidate planning material derived from ideas, owner project text, model output, NotebookLM output, retrieved references, extractor output, or owner review.
+- `omi/candidates/` stores structured candidate planning material derived from ideas, guided project setup, owner project text, model output, NotebookLM output, retrieved references, extractor output, or owner review.
 - `omi/promotions/` stores explicit owner-approved promotion attempts and records before any future target mutation.
 - `omi/index.json` stores references and summary metadata for OMI records.
 - OMI files cannot overwrite `bible.json`, `storyform.json`, `owner_memory.json`, `project.json`, or `scenes/`.
@@ -53,6 +55,7 @@ Writer Assistant Core candidate types planned for future OMI expansion:
 - `timeline_event_candidate`
 - `relationship_candidate`
 - `plot_thread_candidate`
+- `navigation_summary_candidate`
 - `continuity_warning_candidate`
 - `annotation_candidate`
 - `open_question_candidate`
@@ -62,6 +65,10 @@ All extracted story knowledge remains candidate-only until owner approval, desti
 These candidate classes are future OMI expansion targets. They are not runtime extractor implementations, project memory/canon files, or durable truth mutations.
 
 Future promotion path: OMI candidate -> owner review -> OMI promotion record -> future apply-promotion step -> `memory/*.json` project memory/canon record. This spec does not implement the apply step.
+
+Future scene-derived story-knowledge candidates may have `idea_id: null` if they include `source_scene_id` or `source_reference`. Runtime validation for that shape is deferred.
+
+Future OMI-guided project creation candidates may have a setup source such as `source_type: "project_setup_idea"` and a proposed destination such as `project_metadata_candidate` or `omi_candidate_only`. They must not create project canon, storyform truth, chapter prose, scene prose, or memory records without explicit owner approval and a future apply step.
 
 ## 3. OMI Idea Record
 
@@ -122,6 +129,7 @@ Rules:
 - Saving `raw_idea` must not be blocked as request intent.
 - `raw_idea` must not be copied into bible, storyform, owner memory, scenes, or analysis artifacts without a candidate and promotion record.
 - The idea record can link to candidate IDs, but linked candidates remain candidate-only.
+- For guided project creation, `raw_idea` may seed setup candidates and project metadata candidates, but it remains owner input and not canon by itself.
 
 ## 4. OMI Candidate Record
 
@@ -373,6 +381,7 @@ Allowed MVP destinations:
 | Destination | Role | Future promotable? |
 | --- | --- | --- |
 | `planning_notes` | Candidate planning note storage or owner memory note. | Yes, with owner approval and target path. |
+| `project_metadata_candidate` | Candidate project title, display metadata, format, tags, or setup fields from owner-provided ideas. | Yes, to `project.json` only after owner approval and future apply behavior; not canon by itself. |
 | `project_bible_candidate` | Candidate fact, relationship, place, object, or continuity context. | Yes, to `bible.json` after approval. |
 | `storyform_context_candidate` | Candidate NCP/storyform context. | Yes, to `storyform.json` after approval and evidence. |
 | `scene_prompt_context_candidate` | Candidate context for owner-authored scene planning. | Candidate-only for MVP; cannot write scene prose. |

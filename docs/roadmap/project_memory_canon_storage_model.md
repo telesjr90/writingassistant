@@ -4,7 +4,7 @@
 
 This specification defines the future Writer Assistant Core project memory/canon storage model. It is documentation only. It does not create runtime project memory files, backend code, frontend code, extractors, OMI candidates, promotion records, JSONL records, training data, model calls, or apply-promotion behavior.
 
-Project memory/canon is the durable owner-approved story knowledge layer that may exist after OMI candidate review and a future owner-confirmed apply-promotion step.
+Project memory/canon is the durable owner-approved story knowledge layer that may exist after Project Workspace Foundation save/edit flows, OMI candidate review, and a future owner-confirmed apply-promotion step. It comes after project creation, chapters/scenes/notes/materials, owner-authored prose storage, candidate extraction, and owner approval.
 
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
@@ -28,6 +28,7 @@ projects/{project_id}/
     timeline.json
     relationships.json
     plot_threads.json
+    summaries.json
     annotations.json
     open_questions.json
     continuity_warnings.json
@@ -44,6 +45,7 @@ Why Option B is recommended:
 - It lets OMI promotion records point to explicit target files and record IDs.
 - It keeps index/search data derived and separate from approved records.
 - It is easier to archive, supersede, or rollback one record category without rewriting the whole memory model.
+- It supports project-specific pages for approved characters, locations/settings, timeline, plot threads, continuity/consistency, navigation summaries, and approved canon/memory.
 
 Rejected alternatives:
 
@@ -66,6 +68,7 @@ The future memory model must keep these roles separate:
 | OMI candidate records | Candidate-only review material | Not canon. Shape-valid candidates do not prove story truth. |
 | OMI promotion records | Owner-approved promotion audit intent | Not canon by themselves unless a future apply step writes approved content to memory/canon. |
 | Project memory/canon records | Durable owner-approved story knowledge | Canon only after owner confirmation and successful future apply-promotion. |
+| Navigation summaries | Approved or candidate chapter/scene summaries for navigation | Must remain structural/navigation aids; they must not become AI-written replacement prose. |
 | Analysis artifacts | Transient or saved diagnostics | Candidate analysis, not durable truth. |
 | Training data | SFT/evaluation dataset material under `training/data` | Must never be written from project memory/canon automatically. |
 
@@ -77,6 +80,8 @@ Rules:
 - No model, extractor, NotebookLM output, retrieved reference, or raw analysis output can directly mutate project memory/canon.
 - Project memory/canon must not write to `training/data`, JSONL files, or `dataset_manifest.json`.
 - Raw book/source text and training artifacts must not be stored in project memory files.
+- Pending, rejected, archived, duplicate, or uncertain candidates must not be displayed as approved canon.
+- Approved memory/canon is project-local. Selecting a different project must load that project's approved memory only.
 
 ## 4. Shared Memory Record Contract
 
@@ -270,6 +275,21 @@ Additional fields:
 
 `no_rewrite_provided` must be true. A continuity warning may identify a contradiction and ask a diagnostic question, but it must not provide replacement prose.
 
+### `navigation_summary_memory_record`
+
+Additional fields:
+
+- `summary_label`
+- `target_type`
+- `target_id`
+- `summary_text`
+- `navigation_only`
+- `source_scene_ids`
+- `source_chapter_ids`
+- `no_rewrite_provided`
+
+Navigation summaries must remain analysis/navigation metadata. They are not replacement scene prose, continuation text, polish suggestions, or generated story passages.
+
 ## 6. Proposed File Shapes
 
 Each category file should use a small envelope rather than a bare array, so schema/version/index metadata can evolve.
@@ -298,6 +318,7 @@ Recommended file-to-record mapping:
 | `memory/timeline.json` | `timeline_event_memory_record` |
 | `memory/relationships.json` | `relationship_memory_record` |
 | `memory/plot_threads.json` | `plot_thread_memory_record` |
+| `memory/summaries.json` | `navigation_summary_memory_record` |
 | `memory/annotations.json` | `annotation_memory_record` |
 | `memory/open_questions.json` | `open_question_memory_record` |
 | `memory/continuity_warnings.json` | `continuity_warning_memory_record` |
@@ -307,16 +328,21 @@ Recommended file-to-record mapping:
 Future intended flow:
 
 ```text
-owner-authored scene/project text
-  -> extractor or manual candidate creation
-  -> OMI candidate
+owner-authored scene/chapter/note text
+  -> extraction orchestrator
+  -> tool-specific adapters
+  -> normalized CORE candidate schemas
+  -> evidence/provenance attachment
+  -> OMI candidate records
   -> owner review
   -> OMI promotion record
   -> future apply-promotion step
-  -> project memory/canon record
+  -> memory/*.json project memory/canon record
 ```
 
 CORE-004 only designs the target. It does not implement apply-promotion.
+
+CORE-005 OMI review behavior is defined in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`. That spec defines the future OMI-side owner review, merge/deduplication, and promotion-readiness behavior before any apply-promotion implementation exists.
 
 Future apply-promotion must fail closed if any of these are missing:
 
@@ -330,6 +356,19 @@ Future apply-promotion must fail closed if any of these are missing:
 - Atomic write/rollback-safe behavior.
 
 Promotion records should snapshot the source candidate. Memory records should reference both candidate IDs and promotion record IDs.
+
+Approved project-specific pages should read from memory/canon records only:
+
+- Project Overview approved-memory summary.
+- Approved Characters.
+- Approved Locations/Settings.
+- Approved Timeline.
+- Approved Plot Threads.
+- Continuity/Consistency.
+- Approved Navigation Summaries.
+- Approved Project Memory/Canon.
+
+The OMI Ideas and Candidates page should show pending/rejected/uncertain candidates separately from these approved pages.
 
 ## 8. Index and Search Implications
 
@@ -383,11 +422,12 @@ Design implications:
 - `relationship_memory_record` should use stable `subject_record_id` and `object_record_id`.
 - `timeline_event_memory_record` should use `sequence_position`, scene IDs, causal fields, and related character/location IDs.
 - `plot_thread_memory_record` should reference related scene and character IDs.
+- `navigation_summary_memory_record` should reference source chapters/scenes and mark `navigation_only: true`.
 - The future index can provide lightweight relationship/timeline lookup.
 - Graph visualization is future-only.
 - Storage should not require graph libraries now.
 - `AI-Reader-V2` remains UI inspiration only.
-- `fabula` and `silverfish` remain future spike candidates only.
+- Relationship/timeline extraction tools remain future adapter spikes only.
 
 ## 11. Safety and Validation Rules
 
@@ -399,6 +439,7 @@ Future runtime validation should enforce:
 - Cross-record references either resolve or are explicitly marked unresolved.
 - `no_rewrite_provided` is true for continuity warnings.
 - Annotation text remains analysis/metadata, not story prose.
+- Navigation summary text remains analysis/navigation metadata, not story prose.
 - Relationship records do not imply Dramatica Relationship Story proof.
 - Timeline/relationship/plot records preserve uncertainty where needed.
 - Memory writes do not touch `training/data`, JSONL files, model artifacts, or dataset manifests.

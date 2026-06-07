@@ -2,17 +2,23 @@
 
 ## Purpose
 
-This document defines a future Writer Assistant Core extractor track for app-level analysis tooling. Extractors may help identify candidate entities, aliases, actions, relationships, event notes, timelines, plot threads, open questions, continuity issues, contradictions, and annotations from owner-provided scene or project context, but they are not part of the current MVP exit gate and no extractor dependency should be installed now.
+This document defines a future Writer Assistant Core extractor track for app-level analysis tooling. Extractors may help identify candidate entities, aliases, actions, relationships, event notes, timelines, plot threads, open questions, chapter/scene navigation summaries, continuity issues, contradictions, and annotations from owner-provided scene, chapter, note, or project context. They are not part of the current MVP exit gate, not part of the Project Workspace Foundation implementation, and no extractor dependency should be installed now.
+
+External NLP/story-analysis tools must integrate as replaceable adapters around the app's own extraction pipeline. They are not the pipeline itself and they are never authorities for canon.
 
 The intended flow is:
 
 ```text
-Owner scene/project context
-  -> optional extractor
-  -> candidate entities/actions/relationships/timeline notes
-  -> OMI candidate record
+owner-authored scene/chapter/note text
+  -> extraction orchestrator
+  -> tool-specific adapters
+  -> normalized CORE candidate schemas
+  -> evidence/provenance attachment
+  -> OMI candidate records
   -> owner review
-  -> optional approved promotion through OMI gates
+  -> promotion record
+  -> future apply-promotion
+  -> memory/*.json canon records
 ```
 
 Extractor output is candidate analysis only. It is not durable project truth.
@@ -26,6 +32,8 @@ Extractor output is candidate analysis only. It is not durable project truth.
 - Do not treat schema-valid extractor output as verified Dramatica/NCP truth.
 - Do not add extractor dependencies until a separate implementation task evaluates license, maintenance, runtime cost, and safety.
 - Do not add extractor dependencies until schemas, OMI candidate flow, evidence spans, and tests are ready.
+- Do not add extractor dependencies until the Project Workspace Foundation can save/reload owner-authored chapters/scenes/notes/materials.
+- Do not treat adapter output as canon or as an OMI promotion record.
 
 ## Analysis-Only Boundary
 
@@ -39,6 +47,7 @@ Extractors may produce structural observations such as:
 - Open-question candidates.
 - Continuity or contradiction warning candidates.
 - Annotation candidates.
+- Navigation summary candidates.
 - Evidence clusters.
 - Ambiguity or insufficient-evidence notes.
 
@@ -57,34 +66,65 @@ Candidate output must be stored, if implemented later, as structured OMI candida
 
 Extractor output may not bypass OMI review, OMI owner decision, OMI promotion gate, or final owner confirmation.
 
+## Future Adapter Shape
+
+Documentation-only future shape; this task does not create these files:
+
+```text
+backend/story_knowledge/
+  extraction_orchestrator.py
+  schemas.py
+  evidence.py
+  normalizers.py
+  adapters/
+    spacy_adapter.py
+    segram_adapter.py
+    booknlp_adapter.py
+    gliner_adapter.py
+    langextract_adapter.py
+    renard_adapter.py
+    corenlp_adapter.py
+```
+
+The app-owned contracts should define normalized CORE candidate schemas, evidence/provenance attachment, and OMI handoff before any tool dependency is installed.
+
 ## Tool Evaluation Table
 
 | Tool | Possible Role | Strength | Primary Risk | MVP Position |
 | --- | --- | --- | --- | --- |
-| `segram` | Semantic/action/entity extraction from owner-authored text | Likely safest first candidate for entities, actions, and dependency-style structural notes | NLP output can overclaim relationships or causal meaning | First future extractor spike candidate after schemas, OMI flow, evidence spans, and tests are ready; do not install now |
-| `fabula` | Knowledge graph/entity/event/relationship extraction | Useful for graph-shaped candidate records and relationship/timeline notes | Graph output may look like truth without owner review | Second-stage candidate after basic extractor schema exists |
-| `silverfish` | Relationship extraction and evidence clusters | Could support relationship-candidate evidence grouping | Relationship extraction may be mistaken for Relationship Story proof | Later candidate after relationship review UI and evidence-span model exist |
-| `AI-Reader-V2` | Visualization/UI reference for maps, timelines, relationship graphs | Useful interaction reference for future OMI views | UI patterns could imply extractor certainty or authoring automation | Visualization/UI reference only; do not install as runtime dependency |
-| `narrative-blueprint` | Configurable batch/evaluation pipeline reference | Useful for future extractor evaluation harness shape | Pipeline scope could drift into generation or training data production | Future batch/evaluation inspiration after at least one extractor exists |
+| `spaCy` | First likely future local NLP adapter spike | NER, POS tagging, dependency parsing, sentence segmentation, lemmatization, entity linking, and rule/matcher workflows | Baseline NLP can miss fictional entities, aliases, and narrative semantics | First future implementation spike only after workspace and contracts are ready; do not install now |
+| `segram` | Later semantic/action extraction adapter spike | Semantic/action/entity extraction after basic parsing exists | Can overclaim relationship, action, or causal meaning | Later spike after spaCy-style adapter, evidence spans, and review UI exist; do not install now |
+| `BookNLP` | Later offline chapter/manuscript adapter spike | Designed for books and long English documents; literary characters, aliases, coreference, quote attribution, and events | Long-document output can look authoritative and may be costly to validate | Later offline spike after workspace document model is stable; do not install now |
+| `GLiNER` | Later custom-entity extraction adapter spike | Zero-shot NER with arbitrary labels, including fictional locations, magical objects, artifacts, organizations, factions, species, and titles; can run on consumer hardware | Arbitrary labels can hallucinate or over-tag without evidence review | Later custom-entity spike; do not install now |
+| `LangExtract` | Evidence-grounding design reference | Exact source-span/source-grounding patterns are useful for candidate evidence | Could be mistaken for required runtime dependency | Design reference only, not default runtime dependency |
+| `Renard` | Later relationship graph/reference spike | Relationship/reference graph inspiration | Graph output can imply truth before owner review | Later only after relationship review UI and evidence spans exist |
+| `Stanford CoreNLP` / OpenIE / SUTime | Later relation/timeline references | Relation extraction and temporal parsing references | Heavy dependency/runtime cost and overconfident relation/timeline claims | Later relation/timeline spike references only if needed |
+| `AI-Reader-V2` | Visualization/UI reference for maps, timelines, relationship graphs | Useful interaction reference for future OMI/project views | UI patterns could imply extractor certainty or authoring automation | Visualization/UI reference only; do not install as runtime dependency |
+| `narrative-blueprint` | Configurable batch/evaluation pipeline reference | Useful for future extractor evaluation harness shape | Pipeline scope could drift into generation or training data production | Future batch/evaluation inspiration after at least one adapter exists |
+| `NovelClaw` | Memory-bank/workspace inspiration | Useful reference for workspace/memory organization patterns | Generation/memory-bank behavior could blur no-prose and canon boundaries | Inspiration only; do not adopt generation features |
 
-Dependency rule: do not install external extractor dependencies until a dedicated spike branch/task evaluates license, maintenance, runtime cost, safety, candidate-only behavior, and integration with OMI.
+Dependency rule: do not install external extractor dependencies until a dedicated spike branch/task evaluates license, maintenance, runtime cost, privacy/local-first behavior, evidence grounding, safety, candidate-only behavior, and integration with OMI.
 
 ## Rejected or Deferred Tools
 
-Generation-heavy systems such as Inkos/story-engine-style tools are deferred or rejected for this app path. They are incompatible with the current no prose boundary when used as generation systems.
+Dramatron, ai-story-writer, Inkos, and generation-heavy story-engine systems are blocked or documentation-only references for this app path. They are incompatible with the current no prose boundary when used as generation systems.
 
 They may only be referenced at a documentation level for architecture comparison. They must not be integrated as runtime dependencies, prompt chains, UI controls, or automated authoring flows.
+
+Legacy references such as `fabula` and `silverfish` remain historical planning references only unless a future dedicated review reintroduces them as candidate-only adapters.
 
 ## OMI Integration Path
 
 Future extractor integration should use OMI as the only storage and review path:
 
-1. Owner selects a scene or project context source.
-2. Extractor runs locally or in a reviewed offline pipeline.
-3. Extractor output is normalized into a structured JSON object.
-4. Output is saved as an OMI candidate record with provenance and evidence.
-5. Owner reviews, rejects, revises, or approves the candidate.
-6. Any future durable application must use OMI promotion gates and final confirmation.
+1. Owner saves chapter, scene, note, or project material.
+2. Owner or policy triggers extraction manually, automatically after save, or through a future hybrid strategy.
+3. Extraction orchestrator calls reviewed adapters.
+4. Adapter output is normalized into CORE candidate schemas.
+5. Evidence/provenance is attached, preferably with exact source spans where practical.
+6. Output is saved as an OMI candidate record.
+7. Owner reviews, rejects, revises, merges, splits, marks uncertain, requests more evidence, or approves the candidate.
+8. Any future durable application must use OMI promotion gates, final confirmation, and future apply-promotion.
 
 No extractor path may directly create an OMI promotion record. Promotion records remain owner-confirmed audit records.
 
@@ -98,6 +138,7 @@ Future extractor work must enforce:
 - Output guard use for any model-authored extractor summaries or labels.
 - Evidence-span preservation for owner-authored source snippets.
 - Explicit insufficient-evidence reporting instead of guessing IC, RS, CIPS, dynamics, or storyform truth.
+- Navigation summaries remain navigation aids, not rewritten prose.
 
 Owner-authored source content should not be treated as assistant request intent when saved or analyzed.
 
@@ -121,13 +162,15 @@ Every extractor-derived OMI candidate should include:
 
 ## Future Implementation Phases
 
-1. Extractor research and license review.
-2. Offline proof of concept against synthetic or public-domain fixtures only.
-3. Extractor output schema and normalizer design.
-4. OMI candidate creation integration behind explicit owner action.
-5. UI display for candidate entities/actions/relationships/timeline notes.
-6. Evaluation fixtures and regression tests.
-7. Optional local extractor runtime after dependency and performance review.
+1. Project Workspace Foundation save/reload paths for chapters/scenes/notes/materials.
+2. Internal CORE candidate schemas, evidence/provenance contracts, and OMI review flow.
+3. Adapter architecture and license/privacy/runtime review.
+4. spaCy baseline adapter spike against synthetic or public-domain fixtures only.
+5. Offline proof of concept for additional adapters only if the baseline proves useful.
+6. OMI candidate creation integration behind explicit owner action or approved trigger strategy.
+7. UI display for candidate entities/actions/relationships/timeline notes/navigation summaries.
+8. Evaluation fixtures and regression tests.
+9. Optional local extractor runtime after dependency and performance review.
 
 ## Future Tests Needed
 
@@ -136,6 +179,7 @@ Every extractor-derived OMI candidate should include:
 - No prose-generation markers appear in extractor output.
 - Owner-authored evidence spans are preserved.
 - Extractor claims remain candidate-only with provenance.
+- Navigation summaries remain navigation-only and do not rewrite source prose.
 - IC, RS, CIPS, dynamics, and storyform claims remain insufficient evidence unless owner-approved evidence exists.
 - Unsafe paths and missing provenance are rejected.
 - License/provenance metadata is required before enabling a tool.
@@ -151,3 +195,5 @@ Every extractor-derived OMI candidate should include:
 | Dependency bloat | Evaluate licenses, maintenance, install size, and runtime cost before adding dependencies |
 | License uncertainty | Keep tools as references until license review is complete |
 | Relationship extraction mistaken for RS proof | Label relationship candidates as generic relationship evidence, not Relationship Story proof |
+| Tool output treated as canon | Every adapter output becomes an OMI candidate; approved canon requires owner promotion and future apply-promotion |
+| Extractor work starts before workspace is usable | Keep extractor spikes sequenced after Project Workspace Foundation and internal contracts |

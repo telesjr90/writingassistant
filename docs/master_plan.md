@@ -4,9 +4,9 @@
 
 The product vision is a local-first writing assistant that helps a writer focus on writing by identifying, organizing, connecting, and annotating story knowledge from the writer's own text without taking over authorship. The working product name can remain Dramatica-Informed Writing Assistant, but the near-term roadmap is no longer Dramatica-first. Dramatica/NCP analysis moves to a later advanced analysis layer.
 
-The next implementation priority after the MVP foundation is Writer Assistant Core: OMI-centered candidate review and promotion, story knowledge extraction, evidence spans, annotations, character/location/object/organization tracking, scene/event/timeline tracking, relationship and plot-thread tracking, open questions, continuity issues, contradiction detection, and future project memory/canon review.
+The next implementation priority after the MVP foundation is the pre-Dramatica Project Workspace Foundation. The app should first become a usable writing-project workspace: create projects, select projects from a library, create projects through OMI-guided idea capture, organize chapters/scenes/notes/materials, and let the writer store and edit owner-authored prose. After that foundation is usable, Writer Assistant Core can add OMI-centered candidate review and promotion, story knowledge extraction, evidence spans, annotations, character/location/object/organization tracking, scene/event/timeline tracking, relationship and plot-thread tracking, open questions, continuity issues, contradiction detection, and project memory/canon review.
 
-The product is analysis-only. It must never write, rewrite, continue, imitate, or improve story prose.
+The product is analysis-only. It must never write, rewrite, continue, imitate, polish, or improve story prose. The app may store, edit, and organize prose only when the prose is owner-authored.
 
 Current app architecture is FastAPI plus React with local Ollama inference. The current baseline model is `qwen3:8b` through `backend/analysis_engine.py -> Ollama -> qwen3:8b`. Live model use remains optional/manual for the new core direction. A future `dramatica-analyst:8b` model remains allowed only as a later advanced analysis layer after data gates, evidence gates, and model evaluation pass.
 
@@ -14,9 +14,40 @@ The MVP goal remains a usable local app that can create/load a project, edit and
 
 MVP completion is gated by the formal matrix in `docs/roadmap/mvp_completion_test_matrix.md`. Optional analysis extractors are now reclassified as future Writer Assistant Core implementation research, not an MVP blocker and not dependencies to install now.
 
-## 1.1 Writer Assistant Core Direction
+## 1.1 Pre-Dramatica Project Workspace Foundation
 
-The next product direction is Writer Assistant Core, not Dramatica-first analysis. The core app should help the writer identify, organize, connect, annotate, and review story knowledge already present in owner-authored project text.
+The roadmap priority order is now:
+
+1. Project creation and project workspace.
+2. Chapter, scene, note, and material storage/editing.
+3. Automatic or manual candidate extraction from owner-authored material.
+4. Owner approval plus project memory/canon pages.
+5. Later Dramatica-specific analysis, advanced extractors, fine-tuning, RunPod, and Books 4-5.
+
+The Project Workspace Foundation should provide:
+
+- Project creation from scratch.
+- Project selector/library.
+- OMI-guided project creation and idea capture.
+- Chapter, scene, note, and project-material organization.
+- User-authored prose editor and save/reload workflow.
+- Project overview, chapters/scenes, notes/materials, OMI ideas/candidates, and approved memory/canon pages.
+- Clear labels separating pending candidates from approved project truth.
+
+Product layers must remain separate:
+
+- Layer A: user-authored prose storage and editing. The writer can create, edit, save, and organize their own prose. Owner-authored content must not be misclassified as an AI prose-generation request.
+- Layer B: AI-assisted analysis of user-authored material. The AI/app may analyze owner-authored prose and project materials, but analysis output stays candidate-only unless the owner approves it.
+- Layer C: candidate extraction. Characters, locations/settings, timeline events, important objects, plot threads, unresolved questions, chapter/scene summaries for navigation, continuity/consistency flags, and possible contradictions may be extracted as candidates with evidence/provenance where practical.
+- Layer D: owner approval. The owner may approve, reject, revise, archive, merge, split, or mark candidates uncertain. Pending and rejected candidates are not canon.
+- Layer E: approved project memory/canon. Approved information becomes project-local memory/canon only through explicit owner-controlled promotion and should be visible in project-specific pages.
+- Layer F: future Dramatica-specific analysis. Storyform, throughline, IC/RS, CIPS/dynamics, and fine-tuned analyst work comes later.
+
+This foundation comes before Dramatica-specific implementation, fine-tuning, advanced extractor dependency work, graph/timeline visualization, relationship-network automation, RunPod work, or Books 4-5 promotion.
+
+## 1.2 Writer Assistant Core Direction
+
+After the Project Workspace Foundation is usable, the next product direction is Writer Assistant Core, not Dramatica-first analysis. The core app should help the writer identify, organize, connect, annotate, and review story knowledge already present in owner-authored project text.
 
 Near-term story knowledge categories:
 
@@ -26,6 +57,8 @@ Near-term story knowledge categories:
 - Annotations, provenance, and evidence spans tied to project-local sources.
 
 OMI is the central review and promotion system for this direction. Extracted story knowledge must enter OMI as candidate records before any owner-approved promotion into durable project memory, canon, bible, storyform, or other project truth. Extracted candidates cannot mutate `bible.json`, `storyform.json`, scenes, `project.json`, owner memory, future project memory, or canon without explicit owner approval, destination, evidence/provenance, and final confirmation.
+
+Future extraction tooling must wrap around the app's own Writer Assistant Core pipeline as replaceable adapters. Tool output is never authoritative by itself: owner-authored chapter/scene/note text flows through an extraction orchestrator, tool-specific adapters, normalized CORE candidate schemas, evidence/provenance attachment, OMI candidate records, owner review, promotion records, future apply-promotion, and only then `memory/*.json` canon records.
 
 Dramatica remains valuable as a later advanced analysis layer for storyform analysis, throughline classification, CIPS/dynamics, RS/IC analysis, and possible fine-tuned analyst models. It is no longer the next implementation priority.
 
@@ -283,7 +316,7 @@ Optional extractor status:
 - `docs/roadmap/optional_analysis_extractors.md` defines a future post-MVP extractor path from owner scene/project context to candidate entities, actions, relationships, and timeline notes.
 - Extractor output is candidate analysis only and must route through OMI candidate records, owner review, and promotion gates.
 - Extractors must not directly modify `bible.json`, `storyform.json`, `scenes/`, `project.json`, `owner_memory.json`, OMI promotions, `training/data`, or `dataset_manifest.json`.
-- Candidate future references include `segram`, `fabula`, `silverfish`, `AI-Reader-V2`, and `narrative-blueprint`; no extractor dependency is currently implemented.
+- Candidate future references now use a replaceable-adapter model: spaCy is the safest first future local NLP spike after workspace and internal contracts are ready; segram, BookNLP, GLiNER, LangExtract, Renard, CoreNLP/OpenIE/SUTime, AI-Reader-V2, narrative-blueprint, and NovelClaw remain later references/spikes only; Dramatron, ai-story-writer, Inkos, and generation-heavy story-engine systems remain blocked or documentation-only references. No extractor dependency is currently implemented or installed.
 
 ## 6. MVP Scope
 
@@ -626,9 +659,18 @@ Requirements:
 
 The backend default should not change from `qwen3:8b` until `dramatica-analyst:8b` is a non-smoke artifact with passed evaluation and rollback instructions.
 
-## 15. Writer Assistant Core Pivot
+## 15. Pre-Dramatica Workspace and Writer Assistant Core Pivot
 
-Status as of 2026-06-07: the active roadmap direction after Phase 6 MVP foundation acceptance is Writer Assistant Core, not Dramatica-first structural analysis.
+Status as of 2026-06-07: the active roadmap direction after Phase 6 MVP foundation acceptance is Project Workspace Foundation first, then Writer Assistant Core, not Dramatica-first structural analysis.
+
+Project Workspace Foundation will prioritize:
+
+- Project creation from scratch and OMI-guided project creation from owner-provided ideas.
+- Project selector/library and project overview.
+- Chapter, scene, note, and materials organization.
+- User-authored prose storage, editing, save, reload, and navigation.
+- Clear no-prose-generation boundaries so owner-authored saves are allowed but AI prose writing is still refused.
+- Initial project-specific pages for chapters/scenes, notes/materials, OMI ideas/candidates, approved characters, locations/settings, timeline, plot threads, continuity/consistency, and approved canon/memory.
 
 Writer Assistant Core will prioritize:
 
@@ -641,6 +683,8 @@ Writer Assistant Core will prioritize:
 
 CORE-004 storage note: the recommended future project memory/canon target is folder-based `projects/{project_id}/memory/*.json` files plus `memory/index.json`, documented in `docs/roadmap/project_memory_canon_storage_model.md`. No runtime memory files or apply-promotion behavior exist yet.
 
+CORE-005 OMI expansion note: future typed story-knowledge candidate review behavior is documented in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`, including owner actions, merge/dedup planning, promotion readiness, and review UI requirements. Runtime typed validation and apply-promotion remain unimplemented.
+
 Dramatica remains allowed, but deferred:
 
 - Dramatica/storyform analysis, throughline classification, CIPS/dynamics, RS/IC advanced structural analysis, and a fine-tuned `dramatica-analyst:8b` are later advanced layers.
@@ -650,12 +694,12 @@ Dramatica remains allowed, but deferred:
 Future Writer Assistant Core phase sequence:
 
 - Phase 6: Current MVP foundation / exit-preflight remains active until owner accepts MVP foundation status.
-- Phase 7: Writer Assistant Core planning and schemas.
-- Phase 8: OMI expansion for story knowledge candidates.
-- Phase 9: Story knowledge extraction pipeline.
-- Phase 10: Annotation, evidence, and review UI.
-- Phase 11: Project memory / canon promotion.
-- Phase 12: Continuity, relationship, timeline, and plot assistance.
+- Phase 7: Project Workspace Foundation.
+- Phase 8: Writer Assistant Core candidate schemas, OMI expansion, and adapter contracts.
+- Phase 9: Candidate extraction from owner-authored material.
+- Phase 10: Owner approval, evidence/review UI, and project memory/canon pages.
+- Phase 11: Continuity, relationship, timeline, and plot assistance.
+- Phase 12: Future graph/timeline/search assistance after approved memory is useful.
 - Later phase: Advanced Dramatica analysis.
 - Later phase: Fine-tuning / `dramatica-analyst` model.
 
@@ -663,7 +707,7 @@ Future Writer Assistant Core phase sequence:
 
 - OMI is included in the App MVP as a bounded, analysis-only, owner-controlled planning workflow. OMI-003 through OMI-007 are complete; future apply-promotion behavior remains separate and unimplemented.
 - Active recommended next phase: App MVP Phase 6 / MVP exit matrix execution-preflight.
-- Active recommended phase after owner acceptance of Phase 6 foundation: Writer Assistant Core planning and schema design.
+- Active recommended phase after owner acceptance of Phase 6 foundation: Project Workspace Foundation planning/implementation, then Writer Assistant Core schema/extraction work.
 - Fine-tuning prep is paused before P0 evidence extraction/verification and JSONL drafting.
 - Full storyform questionnaire later.
 - Full NCP authoring UI later.
@@ -678,7 +722,7 @@ Future Writer Assistant Core phase sequence:
 
 ## 17. Risk Register Summary
 
-Top risks are extracted candidates being mistaken for canon, prose-generation leakage, relationship/timeline/plot extraction overclaiming certainty, annotation clutter, external extractor dependency risk, Dramatica-first distraction from core writer-assistant value, weak IC/RS/CIPS training, dataset gate failure, local VRAM limits, OMI candidate output being mistaken for truth, and treating NotebookLM candidates as truth. See `docs/roadmap/risk_register.md`.
+Top risks are extracted candidates being mistaken for canon, prose-generation leakage, owner-authored prose saves being overblocked, relationship/timeline/plot extraction overclaiming certainty, annotation clutter, external extractor dependency risk, Dramatica-first distraction from a usable writing workspace, weak IC/RS/CIPS training, dataset gate failure, local VRAM limits, OMI candidate output being mistaken for truth, and treating NotebookLM candidates as truth. See `docs/roadmap/risk_register.md`.
 
 ## 18. Decision Log Summary
 
@@ -686,7 +730,7 @@ Current decisions preserve analysis-only scope, local-first architecture, qwen3 
 
 ## 19. Task Backlog Summary
 
-The backlog is split into app MVP, Writer Assistant Core, advanced Dramatica, packet/dataset, book-backed review, external dataset research, RunPod fine-tuning, evaluation, deployment, and blocked/future groups. See `docs/roadmap/task_backlog.md`.
+The backlog is split into app MVP, Project Workspace Foundation, Writer Assistant Core, advanced Dramatica, packet/dataset, book-backed review, external dataset research, RunPod fine-tuning, evaluation, deployment, and blocked/future groups. See `docs/roadmap/task_backlog.md`.
 
 ## 20. Mermaid Gantt / Timeline
 
@@ -703,13 +747,14 @@ gantt
     Phase 4 frontend diagnostics     :p4, after p3, 1
     Phase 5 bounded OMI MVP          :p5, after p4, 1
     Phase 6 MVP hardening            :p6, after p5, 1
+    section Project Workspace Foundation
+    Phase 7 project workspace        :workspace7, after p6, 1
     section Writer Assistant Core
-    Phase 7 planning/schemas         :core7, after p6, 1
-    Phase 8 OMI story knowledge      :core8, after core7, 1
+    Phase 8 schemas/OMI/adapters     :core8, after workspace7, 1
     Phase 9 extraction pipeline      :core9, after core8, 1
-    Phase 10 evidence/review UI      :core10, after core9, 1
-    Phase 11 memory/canon promotion  :core11, after core10, 1
-    Phase 12 continuity assistance   :core12, after core11, 1
+    Phase 10 review/canon pages      :core10, after core9, 1
+    Phase 11 continuity assistance   :core11, after core10, 1
+    Phase 12 graph/search future     :core12, after core11, 1
     section Dataset
     Short-story packet completion    :packets, 1, 5
     Book-backed cross-book review    :books, 2, 3

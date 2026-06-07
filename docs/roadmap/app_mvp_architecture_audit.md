@@ -4,7 +4,9 @@
 
 The current Dramatica-Informed Writing Assistant is a local FastAPI plus React/Vite app with Ollama as the configured inference path. It is analysis-only by product boundary, with the current backend default model set to `qwen3:8b` and the future `dramatica-analyst:8b` target blocked behind non-smoke training, evaluation, and model-swap gates.
 
-Pivot status: the architecture foundation remains useful, but the next product track is Writer Assistant Core rather than Dramatica-first analyzer expansion. Future architecture work should center OMI candidate review/promotion, story knowledge extraction, evidence spans, annotations, and project memory/canon before returning to advanced Dramatica analysis.
+Pivot status: the architecture foundation remains useful, but the next product track is the pre-Dramatica Project Workspace Foundation rather than Dramatica-first analyzer expansion. Future architecture work should first make the app a usable writing-project workspace with project creation, project library/selector, OMI-guided project setup, chapters/scenes/notes/materials, and owner-authored prose save/edit/reload. After that, Writer Assistant Core should center OMI candidate review/promotion, story knowledge extraction, evidence spans, annotations, and project memory/canon before returning to advanced Dramatica analysis.
+
+2026-06-07 workspace-first addendum: this audit is historical and still useful for MVP gaps, but roadmap sequencing is now Phase 6 MVP foundation, Phase 7 Project Workspace Foundation, then Writer Assistant Core candidate schemas/extraction/review/canon pages, then later Dramatica-specific analysis and fine-tuning.
 
 Implemented today:
 

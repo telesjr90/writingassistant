@@ -4,6 +4,8 @@
 
 This specification defines the target local project file model for the Dramatica-Informed Writing Assistant MVP. Its purpose is to make project storage explicit before implementation work starts, so future backend and frontend changes preserve the product boundary: the app analyzes structure, but it does not write or rewrite story prose.
 
+Project Workspace Foundation update: after the MVP foundation, the next product milestone is a usable writing-project workspace before Dramatica-specific analysis expands. The file model should support project creation, a project selector/library, OMI-guided project creation, chapters, scenes, notes/materials, owner-authored prose save/edit/reload, and later candidate extraction plus owner-approved memory/canon pages.
+
 What exists now:
 
 - Runtime project files live under `projects/{project_name}/`.
@@ -16,6 +18,8 @@ What exists now:
 MVP target:
 
 - Add an explicit project metadata model with `project.json`.
+- Add a project library/index for selecting projects.
+- Support chapters, scenes, notes, and project materials as owner-authored workspace content.
 - Keep owner-approved truth in separate durable files.
 - Keep Story Check and model outputs as candidate analysis artifacts.
 - Keep OMI raw ideas and OMI candidates separate from project truth.
@@ -108,15 +112,22 @@ Target folder shape:
 
 ```text
 projects/
+  index.json                            # future project library index, derived/rebuildable where possible
   {project_id}/
     project.json                         # MVP-required after migration
     bible.json                           # MVP-required
     storyform.json                       # MVP-required for Story Check with storyform context
     owner_memory.json                    # MVP-optional or deferred
+    chapters/
+      {chapter_id}.json                  # future workspace foundation
     scenes/
       {scene_id}.md                      # MVP-required for editable scenes
     scene_metadata/
       {scene_id}.json                    # MVP-optional
+    notes/
+      {note_id}.md                       # future owner-authored notes
+    materials/
+      {material_id}.json or .md          # future owner-authored project materials
     analysis/
       {scene_id}.{timestamp}.story_check.json  # MVP-optional; required only if saving analysis history
     omi/
@@ -134,6 +145,15 @@ MVP-required now or at first project-model implementation:
 - `bible.json`
 - `storyform.json`
 - `scenes/{scene_id}.md`
+
+Project Workspace Foundation target after MVP foundation:
+
+- `projects/index.json` or equivalent library index.
+- `chapters/{chapter_id}.json`
+- `scenes/{scene_id}.md`
+- `scene_metadata/{scene_id}.json`
+- `notes/{note_id}.md`
+- `materials/{material_id}.json` or `.md`
 
 MVP-optional:
 
@@ -180,6 +200,17 @@ projects/{project_id}/project_memory.json
 The single-file `project_memory.json` option remains a possible later migration/export shape, but it is not the recommended first implementation target because it is harder to review incrementally and easier to overwrite accidentally.
 
 CORE-002/CORE-003 defines candidate schemas plus evidence/provenance for future story knowledge. CORE-004 defines the default folder-based memory/canon storage target in `docs/roadmap/project_memory_canon_storage_model.md`. Until a later runtime task implements apply-promotion, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
+
+Pre-Dramatica workspace sequencing:
+
+1. Project creation and project library.
+2. Chapter/scene/note/material storage and editing.
+3. Owner-authored prose save/reload.
+4. Candidate extraction from owner-authored material.
+5. Owner approval and project memory/canon pages.
+6. Future Dramatica-specific analysis.
+
+Owner-authored prose may be stored and edited. AI-authored prose generation, rewriting, continuation, imitation, polish, improvement, and extension remain prohibited.
 
 No project file may contain secrets, raw book/source text, packet evidence, SFT records, model artifacts, or training runs.
 
@@ -311,6 +342,36 @@ Boundary:
 - Must not silently absorb Story Check diagnostics.
 - Must not silently absorb OMI candidates.
 - Must record provenance and owner decision status for promoted material.
+
+## 8.1 Project Workspace Foundation Storage Expansion
+
+The Project Workspace Foundation should extend the file model without creating runtime files in this documentation task.
+
+Project library/index:
+
+- `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
+- The index should be rebuildable from `project.json` files where practical.
+- The index is not story truth and must not contain raw model output or candidate content.
+
+Chapters:
+
+- `chapters/{chapter_id}.json` should store chapter identity, title, order, status, included scene IDs, and owner-authored metadata.
+- Chapters may contain scene references, scenes may reference a chapter, or both may be stored with consistency checks. The exact minimum model remains an open question.
+- Chapter records are organization metadata, not AI-generated prose.
+
+Notes/materials:
+
+- `notes/{note_id}.md` stores owner-authored notes.
+- `materials/{material_id}.json` or `.md` stores owner-authored or owner-supplied project materials, research links, or planning metadata.
+- Notes and materials are not automatically canon. They can be analyzed later, but extracted knowledge must enter OMI as candidates.
+
+Workspace page sources:
+
+- Project Overview reads `project.json`, project library metadata, workspace counts, OMI status summaries, and approved memory summaries.
+- Chapters/Scenes reads `chapters/`, `scenes/`, and `scene_metadata/`.
+- Notes/Materials reads `notes/` and `materials/`.
+- OMI Ideas and Candidates reads `omi/`.
+- Approved Project Memory/Canon pages read `memory/*.json` only after future apply-promotion creates approved records.
 
 ## 9. `scenes/` and Scene Metadata
 
@@ -591,9 +652,12 @@ Migration notes:
 
 - Current `projects/{project_name}/bible.json`, `storyform.json`, and `scenes/` remain valid.
 - `project.json` can be introduced later with default values derived from the folder name and scene list.
+- `projects/index.json` can be introduced later as a project library index; it should be rebuildable from project metadata where practical.
+- `chapters/`, `notes/`, and `materials/` can be introduced later without changing existing scene files.
 - `scene_metadata/` can be introduced later without changing scene text files.
 - `analysis/` can be introduced later when analysis history is implemented.
 - `omi/` can be introduced later when OMI storage/API/UI work begins.
+- `memory/` can be introduced only after owner approval/apply-promotion behavior exists; this documentation task does not create runtime memory/canon files.
 - `owner_memory.json` can be introduced later or deferred if not needed for immediate MVP safety.
 - The `projects/example` Elena/Ember Crown mismatch must be fixed as a separate sample alignment task.
 
@@ -601,10 +665,13 @@ Suggested migration order:
 
 1. Add read/default behavior for missing `project.json`.
 2. Add optional `project.json` creation for new projects.
-3. Add scene metadata defaults.
-4. Add analysis artifact save/list behavior.
-5. Add OMI idea/candidate storage.
-6. Add owner-approved promotion behavior.
+3. Add project library/index behavior.
+4. Add chapter, scene metadata, notes, and materials defaults.
+5. Add user-authored save/reload flows for chapters/scenes/notes/materials.
+6. Add analysis artifact save/list behavior if owner-approved.
+7. Add OMI idea/candidate storage for project setup and story-knowledge candidates.
+8. Add candidate extraction trigger strategy.
+9. Add owner-approved promotion behavior and memory/canon pages.
 
 ## 16. API Implications for Future Implementation
 
@@ -614,10 +681,21 @@ Design targets only; not implemented in this task:
 - `POST /api/projects`
 - `GET /api/projects/{project_id}`
 - `PUT /api/projects/{project_id}`
+- `GET /api/projects/{project_id}/overview`
+- `GET /api/projects/{project_id}/chapters`
+- `POST /api/projects/{project_id}/chapters`
+- `GET /api/projects/{project_id}/chapters/{chapter_id}`
+- `PUT /api/projects/{project_id}/chapters/{chapter_id}`
 - `GET /api/projects/{project_id}/scenes`
 - `POST /api/projects/{project_id}/scenes`
 - `GET /api/projects/{project_id}/scenes/{scene_id}`
 - `PUT /api/projects/{project_id}/scenes/{scene_id}`
+- `GET /api/projects/{project_id}/notes`
+- `POST /api/projects/{project_id}/notes`
+- `GET /api/projects/{project_id}/notes/{note_id}`
+- `PUT /api/projects/{project_id}/notes/{note_id}`
+- `GET /api/projects/{project_id}/materials`
+- `POST /api/projects/{project_id}/materials`
 - `GET /api/projects/{project_id}/bible`
 - `PUT /api/projects/{project_id}/bible`
 - `GET /api/projects/{project_id}/storyform`
@@ -632,15 +710,24 @@ Design targets only; not implemented in this task:
 - `POST /api/projects/{project_id}/omi/candidates/{candidate_id}/approve`
 - `POST /api/projects/{project_id}/omi/candidates/{candidate_id}/reject`
 - `POST /api/projects/{project_id}/omi/candidates/{candidate_id}/promote`
+- `GET /api/projects/{project_id}/memory`
+- `GET /api/projects/{project_id}/memory/{category}`
 
 All future write endpoints must enforce path safety, JSON validation, provenance/status requirements, and no-prose guardrails where model output is involved.
+
+Owner-authored chapter, scene, note, and material save endpoints must not treat saved content as assistant request intent. Freeform assistant request guards apply to assistant/model instruction fields, not to owner-authored content being stored.
 
 ## 17. Frontend Implications for Future Implementation
 
 Future frontend design targets:
 
 - Project selector or configurable project ID instead of hard-coded `example`.
+- Project creation from scratch.
+- OMI-guided project creation and idea capture.
 - Project metadata display from `project.json`.
+- Project Overview page.
+- Chapters/Scenes page.
+- Notes/Materials page.
 - Scene metadata display and editing.
 - Dirty-state handling before scene switches.
 - Save/reload status that proves scene content is durable.
@@ -650,6 +737,13 @@ Future frontend design targets:
 - Mode visibility for mock, qwen3 baseline, and future model modes.
 - OMI UI for raw idea, candidates, status, provenance, and destination.
 - Promotion UI requiring owner confirmation.
+- Approved Characters page.
+- Approved Locations/Settings page.
+- Approved Timeline page.
+- Approved Plot Threads page.
+- Continuity/Consistency page.
+- Approved Project Memory/Canon page.
+- Clear candidate vs canon labels on every page that references extracted knowledge.
 
 No frontend implementation is performed in this task.
 
@@ -657,17 +751,24 @@ No frontend implementation is performed in this task.
 
 Future tests needed:
 
+- Project creation and project selector/library behavior.
 - Project path safety for project, scene, analysis, and OMI IDs.
 - `project.json` load/default behavior.
 - `project.json` write validation.
+- Chapter model load/save and chapter-scene association.
 - Scene metadata load/save.
+- Notes/materials load/save.
 - Empty scene handling.
 - Save/reload behavior for scene text.
+- Owner-authored chapter/scene/note/material prose can be saved without no-prose overblocking.
+- No AI prose generation through workspace editor, OMI, analysis, extraction, or memory pages.
 - Analysis artifact save/list behavior.
 - Analysis artifact cannot mutate bible/storyform/owner memory.
 - OMI candidate cannot mutate truth without approval.
 - Provenance/status required for promotion.
 - Rejected/archived candidates cannot promote.
+- Pending/rejected candidates do not appear as approved canon.
+- Project-local canon/memory visibility is scoped to the selected project.
 - No-prose guard applies to OMI routes when implemented.
 - No-prose guard applies before Story Check model calls when relevant.
 - No-prose guard applies after model output parsing.

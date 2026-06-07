@@ -4,7 +4,7 @@
 
 This specification defines the first Writer Assistant Core candidate schemas and shared evidence/provenance model. It is documentation only. It does not implement runtime schemas, extractor code, OMI storage changes, project memory files, JSONL records, training data, model calls, or promotion behavior.
 
-Writer Assistant Core helps the writer identify, organize, connect, annotate, and review story knowledge from owner-authored text. All extracted story knowledge is candidate-only until reviewed through OMI.
+Writer Assistant Core helps the writer identify, organize, connect, annotate, and review story knowledge from owner-authored text. It follows the pre-Dramatica Project Workspace Foundation: project creation/library, chapters/scenes/notes/materials, and owner-authored prose save/edit/reload come before extraction. All extracted story knowledge is candidate-only until reviewed through OMI.
 
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
@@ -15,6 +15,8 @@ Standard refusal message:
 ## 2. Base Candidate Contract
 
 Every Writer Assistant Core candidate uses this base contract.
+
+CORE-005 OMI review behavior is defined in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`. That spec explains future OMI type filters, owner actions, merge/dedup metadata, promotion readiness, and UI requirements for these candidate classes.
 
 Required or expected fields:
 
@@ -46,6 +48,7 @@ Rules:
 - Candidates may be approved, rejected, revised, archived, or promoted.
 - Promotion requires owner approval, destination, evidence/provenance, and final confirmation.
 - Extractor output, model output, NotebookLM output, and retrieved references remain candidate-only until owner-approved.
+- Chapter/scene summaries are navigation-summary candidates only; they must not rewrite, continue, polish, or replace owner prose.
 - Relationship candidates are not Dramatica Relationship Story proof.
 - Dramatica/NCP truth claims remain deferred to the later advanced layer.
 
@@ -297,6 +300,26 @@ Candidate content fields:
 - `unresolved_questions`
 - `payoff_candidate`
 
+### `navigation_summary_candidate`
+
+Candidate content fields:
+
+- `summary_label`
+- `target_type`
+- `target_id`
+- `summary_text`
+- `navigation_only`
+- `source_chapter_ids`
+- `source_scene_ids`
+- `related_candidate_ids`
+- `no_rewrite_provided`
+
+Rules:
+
+- `navigation_only` must be true.
+- `no_rewrite_provided` must be true.
+- Summary text must be compact analysis/navigation metadata, not replacement prose, continuation, polish, or authorial imitation.
+
 ### `continuity_warning_candidate`
 
 Candidate content fields:
@@ -351,6 +374,7 @@ Initial proposed destination values:
 - `timeline_memory_candidate`
 - `relationship_memory_candidate`
 - `plot_thread_memory_candidate`
+- `summary_index_candidate`
 - `annotation_index_candidate`
 - `open_question_index_candidate`
 - `discard`
@@ -368,6 +392,7 @@ Future runtime validation should enforce:
 - `owner_decision.decision` is allowed.
 - `promotion_status.eligible` defaults false unless promotion requirements are met.
 - No candidate type or destination requests prose generation.
+- `navigation_summary_candidate` must be labeled as navigation-only and must not contain replacement prose.
 - Continuity warnings do not include rewrites.
 - External extractor output includes license/provenance status.
 - Schema-valid candidates remain candidate-only.

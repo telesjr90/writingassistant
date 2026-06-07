@@ -51,34 +51,67 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 
 ## Post-MVP / Future App Track
 
-## Writer Assistant Core
+## Project Workspace Foundation
 
-Near-term product direction after owner acceptance of the Phase 6 MVP foundation. These tasks are future implementation tasks, not completed runtime work. All outputs must remain analysis-only, candidate-first, routed through OMI where extracted knowledge is involved, and blocked from writing or rewriting story prose.
+Near-term pre-Dramatica product foundation after owner acceptance of the Phase 6 MVP foundation. These tasks are future implementation tasks unless explicitly marked documentation-only. They make the app a usable writing-project workspace before Dramatica-specific analysis, fine-tuning, advanced extractor dependency work, graph/timeline visualization, relationship-network automation, RunPod work, or Books 4-5.
 
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
-| CORE-001 | Product pivot documentation update | Master/roadmap pivot docs and local report | DONE locally when this documentation update is complete; no runtime code, package install, JSONL, training, or Ollama call |
+| WORKSPACE-001 | Project Workspace Foundation plan/spec | Updated master plan, roadmap docs, and local report | DONE locally as documentation only when this planning package is complete; no runtime code, tests, datasets, training records, model calls, package installs, project memory files, OMI records, staging, or commits |
+| WORKSPACE-002 | Project creation flow | Project creation implementation plan/API/UI task | Owner can create a blank project with filesystem-safe `project_id`, display title, metadata, and empty workspace files without Dramatica defaults being required |
+| WORKSPACE-003 | Project selector/library | Project library/index plan/API/UI task | Owner can see available projects, choose one, and return to a selected project; hard-coded `example` usage is removed in a later implementation task |
+| WORKSPACE-004 | OMI-guided project creation and idea capture | OMI project setup flow plan/API/UI task | OMI can capture owner-provided ideas and organize them into setup candidates without writing prose or silently creating canon |
+| WORKSPACE-005 | Chapter and scene data model | Chapter/scene storage contract | Minimum chapter/scene IDs, titles, order, status, source ownership, and save/reload metadata are defined before implementation |
+| WORKSPACE-006 | Notes/materials data model | Notes/materials storage contract | Project notes, research/material links, and owner-authored planning text are stored separately from canon and candidates |
+| WORKSPACE-007 | User-authored document editor and save/reload workflow | Editor implementation task | Owner-authored prose can be saved, reloaded, and edited without being blocked as an AI prose-generation request |
+| WORKSPACE-008 | Project overview page | Project overview UI task | Selected project shows metadata, recent chapters/scenes/notes, OMI candidate state, and approved-memory summary without implying pending candidates are canon |
+| WORKSPACE-009 | Chapters/scenes page | Chapters/scenes UI task | Owner can browse, create, reorder, open, save, and organize chapters/scenes |
+| WORKSPACE-010 | Notes/materials page | Notes/materials UI task | Owner can create, edit, save, and organize notes/materials as owner-authored project material |
+| WORKSPACE-011 | Project memory/canon page structure | Approved memory/canon UI shell | Pages distinguish approved memory/canon from OMI candidates, analysis artifacts, pending extraction, and rejected items |
+| WORKSPACE-012 | Approved characters page | Characters memory page | Approved character records display only after explicit owner-controlled promotion |
+| WORKSPACE-013 | Approved locations/settings page | Locations/settings memory page | Approved location/setting records display separately from pending candidates |
+| WORKSPACE-014 | Approved timeline page | Timeline memory page | Approved timeline events display with source/evidence links and uncertainty where retained |
+| WORKSPACE-015 | Approved plot threads page | Plot threads memory page | Approved plot-thread records display with related chapters/scenes and unresolved-question links |
+| WORKSPACE-016 | Continuity/consistency page | Continuity page | Candidate and approved continuity/consistency issues are visibly separated; no rewrite/prose fixes are generated |
+| WORKSPACE-017 | OMI ideas/candidates page | OMI workspace page | Owner can review project setup ideas and story-knowledge candidates with status, evidence, and provenance labels |
+| WORKSPACE-018 | Candidate extraction trigger strategy | Trigger policy/spec | Decide manual, after-save, scheduled, or hybrid extraction behavior with no silent promotion and no automatic canon writes |
+| WORKSPACE-019 | Owner approval workflow for extracted candidates | Approval workflow task | Owner can approve, reject, revise, archive, merge, split, mark uncertain, or request more evidence before promotion |
+| WORKSPACE-020 | Tests for user-authored prose save without no-prose overblocking | Future test task | Saving owner-authored chapters/scenes/notes/materials is allowed and not treated as assistant request intent |
+| WORKSPACE-021 | Tests for no AI prose generation | Future test task | No UI/API/model path writes, rewrites, continues, imitates, polishes, improves, or extends story prose |
+| WORKSPACE-022 | Tests for no silent promotion | Future test task | Pending/rejected candidates and promotion records cannot become canon without explicit owner approval and future apply-promotion |
+| WORKSPACE-023 | Project-local canon/memory visibility tests | Future test task | Approved project memory appears only in the selected project and pending/rejected candidates remain excluded from approved canon pages |
+
+## Writer Assistant Core
+
+Product direction after the Project Workspace Foundation is usable. These tasks are future implementation tasks, not completed runtime work unless explicitly marked documentation-only. All outputs must remain analysis-only, candidate-first, routed through OMI where extracted knowledge is involved, and blocked from writing or rewriting story prose.
+
+| ID | Task | Output | Acceptance |
+| --- | --- | --- | --- |
+| CORE-001 | Product pivot documentation update | Master/roadmap pivot docs and local report | DONE locally when the prior Writer Assistant Core documentation package is complete; no runtime code, package install, JSONL, training, or Ollama call |
 | CORE-002 | Story knowledge candidate schema design | `docs/roadmap/writer_assistant_core_candidate_schemas.md` | DONE locally as documentation; defines first candidate types, base contract, statuses, owner decision, promotion status, and candidate content fields |
 | CORE-003 | Evidence span and provenance model | `docs/roadmap/writer_assistant_core_candidate_schemas.md` | DONE locally as documentation; defines minimum reusable evidence/provenance fields with offsets/line locators optional at first |
 | CORE-004 | Project memory/canon storage model | `docs/roadmap/project_memory_canon_storage_model.md` | DONE locally as documentation; recommends folder-based `memory/*.json` plus `memory/index.json`; no runtime files or apply-promotion behavior implemented |
-| CORE-005 | OMI candidate type expansion | OMI candidate type spec/update | Adds character/location/object/organization/timeline/relationship/plot/continuity/annotation/open-question candidates while preserving no-silent-promotion |
-| CORE-006 | Character/location/object extraction candidate pipeline | Candidate extraction plan/prototype | Extracts candidate entities only into OMI with evidence and uncertainty |
-| CORE-007 | Timeline event extraction candidate pipeline | Timeline candidate plan/prototype | Extracts event/action candidates with locators; does not assert canon without owner approval |
-| CORE-008 | Relationship extraction candidate pipeline | Relationship candidate plan/prototype | Extracts relationship candidates with uncertainty; does not imply Dramatica Relationship Story proof |
-| CORE-009 | Plot thread and open-question extraction candidate pipeline | Plot/open-question candidate plan/prototype | Tracks open questions and plot threads as candidates only |
-| CORE-010 | Annotation sidebar/review UI | Review UI plan/implementation | Shows evidence spans, candidate status, approve/reject/revise controls, and no-prose boundary labels |
-| CORE-011 | Candidate-to-canon owner promotion flow | Owner-approved promotion flow | Promotes only after owner approval, destination, provenance/evidence, and final confirmation; never mutates scene prose |
-| CORE-012 | Continuity and contradiction checks | Candidate warning flow | Produces continuity/contradiction candidates with evidence and uncertainty, not automatic truth |
-| CORE-013 | Story knowledge search/query assistant | Query/search design | Helps inspect approved and candidate project knowledge without writing prose |
-| CORE-014 | Extractor evaluation harness | Evaluation fixtures/report | Evaluates extractor candidates for precision, provenance, safety, and no-prose behavior |
-| CORE-015 | `segram` spike evaluation | Spike report | First extractor candidate only after schema/OMI/evidence model exists; no dependency install outside approved spike |
-| CORE-016 | `fabula` spike evaluation | Spike report | Second-stage graph/entity/event/relationship candidate after basic extractor schema exists |
-| CORE-017 | `silverfish` spike evaluation | Spike report | Later relationship/evidence-cluster candidate after relationship review UI and evidence model exist |
-| CORE-018 | Graph/timeline visualization research | UI research report | Evaluates relationship graph/timeline/map patterns without adopting runtime dependency |
+| CORE-005 | OMI candidate type expansion | `docs/roadmap/omi_story_knowledge_candidate_expansion.md` | DONE locally as documentation; defines typed OMI review behavior, lifecycle/status targets, owner actions, merge/dedup planning, UI needs, promotion readiness, and future tests without runtime implementation |
+| CORE-006 | Extraction orchestrator and adapter contract | Candidate extraction architecture plan | Defines `backend/story_knowledge/` future shape, normalized CORE candidate schemas, evidence/provenance, OMI handoff, and replaceable adapters without creating runtime files |
+| CORE-007 | Character/location/object extraction candidate pipeline | Candidate extraction plan/prototype | Extracts candidate entities only into OMI with evidence and uncertainty after workspace save/edit paths exist |
+| CORE-008 | Timeline event extraction candidate pipeline | Timeline candidate plan/prototype | Extracts event/action candidates with locators; does not assert canon without owner approval |
+| CORE-009 | Relationship extraction candidate pipeline | Relationship candidate plan/prototype | Extracts relationship candidates with uncertainty; does not imply Dramatica Relationship Story proof |
+| CORE-010 | Plot thread, open-question, and navigation-summary candidate pipeline | Plot/open-question/summary candidate plan | Tracks plot threads, unresolved questions, and chapter/scene summaries as candidates/navigation aids only |
+| CORE-011 | Annotation sidebar/review UI | Review UI plan/implementation | Shows evidence spans, candidate status, approve/reject/revise controls, and no-prose boundary labels |
+| CORE-012 | Candidate-to-canon owner promotion flow | Owner-approved promotion flow | Promotes only after owner approval, destination, provenance/evidence, and final confirmation; never mutates scene prose |
+| CORE-013 | Continuity and contradiction checks | Candidate warning flow | Produces continuity/contradiction candidates with evidence and uncertainty, not automatic truth |
+| CORE-014 | Story knowledge search/query assistant | Query/search design | Helps inspect approved and candidate project knowledge without writing prose |
+| CORE-015 | Extractor evaluation harness | Evaluation fixtures/report | Evaluates extractor candidates for precision, provenance, safety, evidence grounding, owner review, and no-prose behavior |
+| CORE-016 | `spaCy` adapter spike evaluation | Spike report | Likely first future local NLP spike after workspace and contracts are ready; evaluate NER, POS, dependency parsing, sentence segmentation, lemmatization, entity linking, matchers, license, privacy/local-first behavior, evidence grounding, and OMI integration; do not install now |
+| CORE-017 | `segram` semantic/action extraction spike | Spike report | Later semantic/action spike only after a basic spaCy-style adapter, review UI, and evidence model exist; do not install now |
+| CORE-018 | `BookNLP` long-document/literary spike | Spike report | Later offline chapter/manuscript spike for characters, aliases, coreference, quote attribution, and events; do not install now |
+| CORE-019 | `GLiNER` custom entity spike | Spike report | Later arbitrary-label NER spike for fictional locations, magical objects, artifacts, organizations, factions, species, and titles; do not install now |
+| CORE-020 | Evidence/relationship/timeline reference spikes | Spike report | LangExtract-style grounding, Renard relationships, and CoreNLP/OpenIE/SUTime relation/timeline references evaluated only after evidence spans and review UI exist |
+| CORE-021 | Graph/timeline visualization research | UI research report | Evaluates AI-Reader-V2-style maps/timelines/relationship graphs and narrative-blueprint batch/eval inspiration without adopting runtime dependencies |
 
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
-| EXT-001 | Optional analysis extractor research | `docs/roadmap/optional_analysis_extractors.md` | RECLASSIFIED under Writer Assistant Core; evaluate segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as candidate-only references, not MVP blockers |
+| EXT-001 | Optional analysis extractor research | `docs/roadmap/optional_analysis_extractors.md` | RECLASSIFIED under Writer Assistant Core; evaluate external tools as replaceable adapters around the app-owned pipeline, not as authorities or MVP blockers |
 | EXT-002 | Extractor proof of concept | Offline candidate extraction fixture/report | FUTURE via CORE-006 to CORE-017; extractor output routes to OMI candidates only and never directly mutates project truth or training data |
 | EXT-003 | Extractor integration tests | Extractor/OMI candidate tests | FUTURE via CORE-014; verifies no prose generation, provenance, owner review, guardrails, and no direct promotion |
 

@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-This specification defines the App MVP design target for Organize My Idea (OMI). OMI is for capturing a writer's raw idea, organizing it into structured planning candidates, asking diagnostic questions, and preparing owner-review packets without taking over authorship.
+This specification defines the App MVP design target for Organize My Idea (OMI). OMI is for capturing a writer's raw idea, organizing it into structured planning candidates, asking diagnostic questions, preparing owner-review packets, and later supporting guided project creation without taking over authorship.
 
 OMI is not allowed to write, rewrite, continue, imitate, polish, improve, or extend story prose. It must not generate scenes, chapters, paragraphs, dialogue, monologues, openings, endings, or prose passages. It must not silently mutate `bible.json`, `storyform.json`, `owner_memory.json`, planning notes, analysis artifacts, or scenes.
 
@@ -13,16 +13,19 @@ What exists now:
 - App-2 defines the project file model target, including project-local OMI folders.
 - App-3 defines the safe NCP/storyform subset that OMI may use as candidate planning context, now as a later advanced layer rather than the next product backbone.
 - Story Check remains the only model-backed analysis path; Writer Assistant Core extraction is future work.
+- Project Workspace Foundation is the next product milestone before expanded extraction or Dramatica-specific work. OMI should support guided project creation and idea capture as owner-controlled setup candidates.
 
 MVP target:
 
 - OMI is project-local, analysis-only, candidate-first, owner-controlled, and no-prose.
 - OMI records `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`.
+- OMI can capture project ideas before a project is fully structured and organize owner-provided ideas into setup candidates.
 - OMI may propose candidate storyform slots and diagnostic questions, but those slots remain candidate-only until explicit owner approval.
 - Promotion requires owner approval, destination, provenance, status, source candidate ID, timestamp, and final confirmation.
 - For Writer Assistant Core, OMI becomes the central review/promotion system for extracted story knowledge. Extracted characters, aliases, locations, objects, organizations, events, relationships, plot threads, annotations, open questions, continuity warnings, and contradiction warnings must enter OMI as candidates before any durable project memory/canon promotion.
 - CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines the future Writer Assistant Core candidate types, shared base candidate contract, evidence model, provenance model, owner decision model, and promotion status model. Those candidate types are future OMI-supported classes; this spec does not make them runtime-implemented by itself.
 - CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` recommends future folder-based `memory/*.json` files as the durable project memory/canon target after OMI review and a later apply-promotion step.
+- CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future OMI typed review behavior for story-knowledge candidates, including candidate type filters, owner actions, merge/dedup planning, promotion-readiness rules, and review UI needs.
 
 Immediate next task after this spec: review and commit App-3a / OMI-001 outputs, then decide/spec the owner-created aligned sample project before Phase 2 backend safety and schema foundation.
 
@@ -36,6 +39,7 @@ OMI is:
 - Owner-controlled. The owner decides whether to reject, revise, approve, archive, or promote a candidate.
 - No-prose. OMI must never produce story prose or replacement prose.
 - No silent promotion. OMI output cannot update durable project truth without explicit approval and confirmation.
+- Project-setup capable. OMI may help create a project from owner-provided ideas by organizing metadata/setup candidates, but it must not generate premise prose, scene prose, chapter prose, dialogue, or canon automatically.
 - Compatible with Story Check, the App-3 NCP subset, and the App-2 project file model.
 - Independent from fine-tuning, RunPod, book-backed review, and dataset gates.
 
@@ -50,6 +54,7 @@ OMI does not do any of the following in the MVP:
 - Imitate style.
 - Polish or improve text.
 - Generate storyform data as truth.
+- Generate project prose, premise prose, scene text, chapter text, dialogue, or sample passages for a new project.
 - Mutate `bible.json`, `storyform.json`, `owner_memory.json`, planning notes, analysis artifacts, or scenes automatically.
 - Provide full Dramatica verifier behavior.
 - Provide a full NCP authoring UI.
@@ -184,6 +189,8 @@ Candidate types:
 The Writer Assistant Core candidate types above are future expansion targets. Runtime support remains limited to the OMI slices explicitly listed in the current implementation status until a later implementation task adds typed validation, extraction, and UI behavior.
 
 Future durable memory/canon begins only after OMI candidate review, promotion record creation, and a later apply-promotion step. OMI promotion records are audit intent, not canon by themselves.
+
+CORE-005 status clarification: future OMI work should distinguish `promotion_recorded` from `promoted`. `promotion_recorded` means an OMI promotion audit record exists; `promoted` should be reserved for successful future apply-promotion into `memory/*.json`.
 
 ## 7. OMI Status Lifecycle
 
@@ -331,6 +338,8 @@ Allowed OMI outputs:
 - Owner-review packets.
 - Provenance summaries.
 - Destination recommendations.
+- Project setup metadata candidates from owner-provided ideas.
+- Navigation summaries labeled as analysis/navigation aids, not rewritten prose.
 
 No prose generation is allowed in OMI. Allowed outputs must not include story prose. The standard refusal message is:
 
@@ -341,6 +350,8 @@ No prose generation is allowed in OMI. Allowed outputs must not include story pr
 Future backend design only; not implemented in this task:
 
 - Create OMI idea.
+- Create project setup idea before a full project structure exists.
+- Create owner-controlled project setup candidates.
 - List OMI ideas.
 - Get OMI idea.
 - Update OMI idea status.
@@ -351,6 +362,8 @@ Future backend design only; not implemented in this task:
 - Archive candidate.
 
 Future implementation should introduce shared `backend/guardrails.py` before any model call. Guardrails should reject or redirect prose-generation, rewrite, continuation, imitation, polish, and improvement requests before model invocation and check model output before returning or saving candidate material.
+
+Future OMI-guided project creation must keep owner-provided setup input, setup candidates, and approved project metadata separate. It must not silently create canon, memory, storyform truth, scene text, chapter text, or prose passages.
 
 ## 15. OMI Frontend Design Implications
 

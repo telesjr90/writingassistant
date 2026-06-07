@@ -51,23 +51,44 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 12. Fine-tuning is paused pending P0 evidence extraction/verification before any Book 1-3 JSONL drafting.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
 14. Re-run the repo safety portion of the MVP completion test matrix after the dirty fixture files are resolved before declaring MVP exit; this is the next active project task.
-15. Evaluate optional analysis extractors only after MVP exit; any segram, fabula, silverfish, AI-Reader-V2, or narrative-blueprint work remains candidate-only and routed through OMI.
+15. Evaluate optional analysis extractors only after the Project Workspace Foundation and internal contracts are ready; external tools remain replaceable adapters whose outputs are candidate-only and routed through OMI.
 16. Books 4-5 remain conditional and should not start while the fine-tuning/book-backed track is paused.
 17. Decide whether to accept the Step 2 sandbox limitation for localhost backend/frontend server smokes or rerun those smokes in a local environment where socket binding is permitted.
 
+## Project Workspace Foundation Follow-Up Questions
+
+These must be answered before or during the pre-Dramatica workspace implementation:
+
+1. What is the minimum chapter/scene data model for the first usable workspace?
+2. Should chapters contain scenes, scenes reference chapters, or should both directions be stored with an index?
+3. What fields are required for notes/materials, and how should owner-authored notes differ from approved canon/memory?
+4. What is the minimum project creation form: title only, title plus project ID, title plus format/genre metadata, or OMI-guided setup?
+5. How should OMI-created projects differ from blank projects in metadata, setup candidates, and review state?
+6. Should candidate extraction run automatically after save, manually by owner action, scheduled in batches, or through a hybrid trigger strategy?
+7. What counts as approved project canon for the first usable version?
+8. Which project memory files/pages are required first: overview, canon index, characters, locations/settings, timeline, plot threads, continuity/consistency, OMI ideas/candidates, or all of them?
+9. How should contradictions be shown to the user: inline flags, side-by-side evidence, page-level list, OMI candidate queue, or a combination?
+10. How should continuity flags be distinguished from Dramatica structural issues?
+11. Should project memory be stored in one canon file, separated by category, or category files plus a derived index?
+12. How should chapter/scene summaries be labeled so they remain navigation aids and candidate analysis, not rewritten prose?
+13. What extraction confidence or evidence threshold is required before a candidate appears in the UI?
+14. What is the first browser/manual acceptance checklist for a usable workspace?
+15. How should owner-authored prose save tests prove the no-prose guard is not overblocking while AI prose generation stays blocked?
+
 ## Writer Assistant Core Follow-Up Questions
 
-These are implementation follow-ups for the new product direction, not blockers for the completed MVP foundation:
+These are implementation follow-ups after the Project Workspace Foundation, not blockers for the completed MVP foundation:
 
 1. Project memory/canon file structure: CORE-004 recommends folder-based `memory/*.json` plus `memory/index.json` as the first implementation target; runtime implementation details remain future work.
 2. Which subset of the CORE-002 candidate types should be implemented first: characters, aliases, locations, objects, organizations, timeline events, relationships, plot threads, open questions, continuity warnings, annotations, or a smaller subset?
 3. Should the first runtime evidence-span locator use character offsets, line ranges, paragraph indices, source hashes, or a hybrid? CORE-003 defines all as optional-capable planning fields.
 4. Should annotations be stored per scene, per entity, globally, or in an OMI-linked annotation store?
-5. Should the first extractor be deterministic/rule-based, LLM-assisted, `segram`-assisted, or hybrid?
-6. What UI should approve, reject, revise, and annotate candidate story knowledge?
+5. Should the first extractor be deterministic/rule-based, `spaCy`-adapter-assisted, LLM-assisted, or hybrid?
+6. What UI should approve, reject, revise, merge, split, mark duplicate/uncertain, request more evidence, and annotate candidate story knowledge? CORE-005 documents the future action set, but not implementation.
 7. What qualifies a relationship, timeline event, or plot-thread item for promotion to canon?
 8. When should Dramatica analysis return as an advanced layer after Writer Assistant Core is stable?
-9. Which extractor spike should be first once schemas and OMI candidate flow are ready?
+9. Which adapter spike should be first once workspace storage, schemas, OMI candidate flow, and evidence contracts are ready?
+10. How should runtime typed validation handle scene-derived candidates with `idea_id: null` and source-scene/source-reference locators?
 
 ## Book 1-3 Owner-Answer Status
 
@@ -88,7 +109,7 @@ Still unresolved or blocked for direct conversion:
 
 ## Owner Questions
 
-No additional owner decisions are required for the completed App MVP slices. The current owner decision needed for local MVP readiness is whether to accept/document the current committed public-domain `projects/example` fixture state and leave ignored local `projects/example/omi/` artifacts as local-only state. The current product-direction decision has shifted: after Phase 6 owner acceptance, the next roadmap priority is Writer Assistant Core, while Dramatica, Books 4-5, and fine-tuning remain deferred.
+No additional owner decisions are required for the completed App MVP slices. The current owner decision needed for local MVP readiness is whether to accept/document the current committed public-domain `projects/example` fixture state and leave ignored local `projects/example/omi/` artifacts as local-only state. The current product-direction decision has shifted: after Phase 6 owner acceptance, the next roadmap priority is Project Workspace Foundation, then Writer Assistant Core, while Dramatica, Books 4-5, and fine-tuning remain deferred.
 
 Phase 6 Step 2 adds one MVP exit decision: true backend/frontend dev-server smokes are blocked by this sandbox's socket/listen restrictions, while in-process mock route smoke passed. The owner can either accept this as an environment limitation for documentation purposes or request a rerun in a socket-enabled local environment.
 

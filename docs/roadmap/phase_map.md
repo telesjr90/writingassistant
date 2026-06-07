@@ -77,51 +77,79 @@ OMI must remain analysis-only, candidate-output-first, and owner-controlled. Pro
 - Status note: Phase 6 Step 2 refresh on 2026-06-06 passed in-process mock backend route smoke and source/boundary inspection, but true backend/frontend localhost server smokes are blocked in this sandbox by socket/listen restrictions. Browser-rendered checks remain owner-manual, and live qwen3/Ollama remains deferred by design.
 - Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors after the current committed fixture state is owner-accepted/documented and the remaining MVP exit checks are recorded.
 
+## Project Workspace Foundation Track
+
+This is the next product direction after owner acceptance of the Phase 6 MVP foundation. It shifts the roadmap from Dramatica-first analyzer work to a usable writing-project workspace before advanced analysis expands.
+
+### Phase 7: Project Workspace Foundation
+
+- Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, MVP foundation.
+- Outputs: project creation, project selector/library, OMI-guided project creation and idea capture, chapters/scenes/notes/materials organization, owner-authored prose editor, project overview, chapters/scenes pages, notes/materials pages, OMI ideas/candidates page, and approved-memory/canon page structure.
+- Status: PLANNED/FUTURE, with roadmap documentation updated locally. No runtime project creation, selector, editor rewrite, chapter/note model, project memory files, OMI records, extractor logic, test changes, dataset files, training records, model calls, or package installs have been performed by this planning update.
+- Exit: owner can create/select a project, write and save owner-authored material, organize chapters/scenes/notes/materials, and see project-specific workspace pages without any AI prose-generation path.
+
+Workspace layer order:
+
+1. Owner-authored prose storage and editing.
+2. AI-assisted analysis of owner-authored material.
+3. Candidate extraction.
+4. Owner approval.
+5. Approved project memory/canon.
+6. Future Dramatica-specific analysis.
+
 ## Writer Assistant Core Track
 
-This is the next product direction after owner acceptance of the Phase 6 MVP foundation. It shifts the roadmap from Dramatica-first analyzer work to writer-assistant story knowledge work. All outputs remain analysis-only, candidate-first, evidence/provenance-backed where practical, and owner-controlled through OMI.
+This follows the Project Workspace Foundation. It identifies, organizes, connects, annotates, and reviews story knowledge from owner-authored text. All outputs remain analysis-only, candidate-first, evidence/provenance-backed where practical, and owner-controlled through OMI.
 
-### Phase 7: Writer Assistant Core Planning and Schemas
+### Phase 8: Writer Assistant Core Candidate Schemas, OMI Expansion, and Adapter Contracts
 
-- Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
-- Outputs: story knowledge candidate schemas, evidence span/provenance model, initial project memory/canon design target, minimum candidate type set.
-- Status: DOCUMENTED LOCALLY. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage target is recorded in `docs/roadmap/project_memory_canon_storage_model.md`. No runtime schema, extractor, storage, apply-promotion, or project memory implementation has been performed.
-- Exit: owner-approved schema plan for candidate story knowledge and project memory/canon.
+- Inputs: usable Project Workspace Foundation, current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
+- Outputs: story knowledge candidate schemas, evidence span/provenance model, initial project memory/canon design target, minimum candidate type set, OMI typed review expansion, and replaceable extractor adapter contracts.
+- Status: DOCUMENTED LOCALLY. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage target is recorded in `docs/roadmap/project_memory_canon_storage_model.md`; CORE-005 OMI expansion behavior is recorded in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`. No runtime schema, extractor, storage, apply-promotion, or project memory implementation has been performed.
+- Exit: owner-approved schema plan for candidate story knowledge, project memory/canon, OMI typed review, and adapter integration.
 
-### Phase 8: OMI Expansion for Story Knowledge Candidates
+### Phase 9: Candidate Extraction From Owner-Authored Material
 
-- Inputs: Phase 7 schemas and existing OMI candidate/review/promotion-record workflow.
-- Outputs: OMI candidate types for characters, locations, objects, organizations, timeline events, relationships, plot threads, continuity warnings, annotations, and open questions.
-- Status: PLANNED/FUTURE. Existing OMI MVP remains implemented for raw ideas and structured candidates; expanded candidate types are not implemented yet.
-- Exit: OMI can create/review expanded story knowledge candidates without writing prose or mutating durable truth.
-
-### Phase 9: Story Knowledge Extraction Pipeline
-
-- Inputs: OMI expanded candidate flow, evidence span model, extractor spike decision.
-- Outputs: candidate-only extraction pipeline for entities, aliases, actions/events, locations, objects, organizations, relationships, plot threads, open questions, continuity issues, and contradictions.
+- Inputs: OMI expanded candidate flow, evidence span model, extraction orchestrator contract, adapter spike decision.
+- Outputs: candidate-only extraction pipeline for characters, locations/settings, objects, organizations, actions/events, timeline notes, relationships, plot threads, unresolved questions, navigation summaries, continuity issues, and possible contradictions.
 - Status: PLANNED/FUTURE. No extractor dependency is installed; no extractor route or runtime has been implemented.
-- Exit: extractor output is normalized into OMI candidate records with provenance and evidence, never durable canon.
+- Exit: extractor output is normalized into CORE candidate schemas, evidence/provenance is attached, and OMI candidate records are created for owner review. Nothing is canon by default.
 
-### Phase 10: Annotation, Evidence, and Review UI
+Future internal flow:
+
+```text
+owner-authored scene/chapter/note text
+  -> extraction orchestrator
+  -> tool-specific adapters
+  -> normalized CORE candidate schemas
+  -> evidence/provenance attachment
+  -> OMI candidate records
+  -> owner review
+  -> promotion record
+  -> future apply-promotion
+  -> memory/*.json canon records
+```
+
+### Phase 10: Owner Approval, Evidence, Review UI, and Project Memory/Canon Pages
 
 - Inputs: candidate schemas, evidence/provenance records, OMI review flow.
-- Outputs: annotation sidebar/review UI, evidence span display, approve/reject/revise controls, candidate status labels.
+- Outputs: annotation sidebar/review UI, evidence span display, approve/reject/revise/archive/merge/split/mark-uncertain controls, candidate status labels, project overview, approved characters, approved locations/settings, timeline, plot threads, continuity/consistency, OMI ideas/candidates, and approved memory/canon pages.
 - Status: PLANNED/FUTURE.
-- Exit: owner can review story knowledge candidates and evidence without losing track of candidate vs approved status.
+- Exit: owner can review story knowledge candidates and evidence without losing track of candidate vs approved status; pending and rejected candidates are not shown as canon.
 
-### Phase 11: Project Memory / Canon Promotion
+### Phase 11: Continuity, Relationship, Timeline, and Plot Assistance
 
-- Inputs: OMI promotion gates, project memory/canon storage decision, evidence requirements.
-- Outputs: owner-approved promotion flow into durable project memory/canon records, with destination and confirmation.
-- Status: PLANNED/FUTURE. CORE-004 documents the target `memory/*.json` layout, but no project memory/canon files or apply-promotion behavior are implemented.
-- Exit: approved candidate records can be promoted to durable memory/canon without mutating scene prose or silently overwriting truth.
-
-### Phase 12: Continuity, Relationship, Timeline, and Plot Assistance
-
-- Inputs: approved memory/canon records, candidate extraction, annotation UI.
+- Inputs: approved memory/canon records, candidate extraction, annotation UI, owner-reviewed continuity flags.
 - Outputs: continuity checks, contradiction warnings, relationship/timeline/plot-thread assistance, search/query assistant.
 - Status: PLANNED/FUTURE.
 - Exit: assistant helps the writer inspect project knowledge and continuity without generating or rewriting prose.
+
+### Phase 12: Future Visualization and Query Assistance
+
+- Inputs: approved memory/canon records, reliable review UI, stable evidence/provenance.
+- Outputs: optional graph, timeline, map, relationship, and project-memory query views.
+- Status: PLANNED/FUTURE. Visualization references remain documentation-only until a dedicated spike.
+- Exit: visuals help navigation and review without implying pending candidates are approved truth.
 
 ### Later Phase: Advanced Dramatica Analysis
 
@@ -141,7 +169,7 @@ This is the next product direction after owner acceptance of the Phase 6 MVP fou
 
 - Inputs: owner scene/project context, OMI candidate workflow, no-prose guardrails, extractor license review.
 - Outputs: optional candidate entity/action/relationship/timeline extraction pipeline, if later approved.
-- Status note: `docs/roadmap/optional_analysis_extractors.md` records segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as future Writer Assistant Core references only.
+- Status note: `docs/roadmap/optional_analysis_extractors.md` records external tools as replaceable future adapters around the app-owned pipeline. spaCy is the likely first future local NLP spike after workspace and contracts are ready; segram, BookNLP, GLiNER, LangExtract, Renard, CoreNLP/OpenIE/SUTime, AI-Reader-V2, narrative-blueprint, and NovelClaw remain later references/spikes only; generation-heavy tools remain blocked or documentation-only.
 - Exit: any extractor output remains candidate-only, routes through OMI, preserves provenance, and cannot directly mutate durable project truth, OMI promotions, training data, or `dataset_manifest.json`.
 
 ## Dataset and Training Tracks
@@ -209,14 +237,15 @@ gantt
     Phase 4 frontend diagnostics :p4, after p3, 1
     Phase 5 bounded OMI MVP :p5, after p4, 1
     Phase 6 MVP hardening active :active, p6, after p5, 1
+    section Project Workspace Foundation
+    Phase 7 project workspace :workspace7, after p6, 1
     section Writer Assistant Core
-    Phase 7 planning/schemas :core7, after p6, 1
-    Phase 8 OMI story knowledge :core8, after core7, 1
+    Phase 8 schemas OMI adapters :core8, after workspace7, 1
     Phase 9 extraction pipeline :core9, after core8, 1
-    Phase 10 evidence/review UI :core10, after core9, 1
-    Phase 11 memory/canon promotion :core11, after core10, 1
-    Phase 12 continuity assistance :core12, after core11, 1
-    Extractor research spikes :extractors, after core7, 1
+    Phase 10 review canon pages :core10, after core9, 1
+    Phase 11 continuity assistance :core11, after core10, 1
+    Phase 12 visualization query future :core12, after core11, 1
+    Extractor research spikes :extractors, after core8, 1
     section Dataset
     Short-story packet completion :packets, 1, 5
     Book-backed prep paused after mapping dry-run :crit, books, 2, 3
