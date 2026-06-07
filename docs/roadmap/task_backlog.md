@@ -57,7 +57,7 @@ Near-term pre-Dramatica product foundation after owner acceptance of the Phase 6
 
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
-| WORKSPACE-001 | Project Workspace Foundation plan/spec | Updated master plan, roadmap docs, and local report | DONE locally as documentation only when this planning package is complete; no runtime code, tests, datasets, training records, model calls, package installs, project memory files, OMI records, staging, or commits |
+| WORKSPACE-001 | Project Workspace Foundation plan/spec | `docs/roadmap/project_workspace_foundation_spec.md` plus roadmap references and local report | DONE locally as documentation only when the spec is complete; defines the first usable workspace target, creation flows, project library, pages, storage/model targets, safety rules, candidate/canon display rules, task sequence, and acceptance checklist without runtime code, tests, datasets, training records, model calls, package installs, project memory files, OMI records, staging, or commits |
 | WORKSPACE-002 | Project creation flow | Project creation implementation plan/API/UI task | Owner can create a blank project with filesystem-safe `project_id`, display title, metadata, and empty workspace files without Dramatica defaults being required |
 | WORKSPACE-003 | Project selector/library | Project library/index plan/API/UI task | Owner can see available projects, choose one, and return to a selected project; hard-coded `example` usage is removed in a later implementation task |
 | WORKSPACE-004 | OMI-guided project creation and idea capture | OMI project setup flow plan/API/UI task | OMI can capture owner-provided ideas and organize them into setup candidates without writing prose or silently creating canon |

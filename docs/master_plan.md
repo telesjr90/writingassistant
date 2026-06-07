@@ -672,6 +672,8 @@ Project Workspace Foundation will prioritize:
 - Clear no-prose-generation boundaries so owner-authored saves are allowed but AI prose writing is still refused.
 - Initial project-specific pages for chapters/scenes, notes/materials, OMI ideas/candidates, approved characters, locations/settings, timeline, plot threads, continuity/consistency, and approved canon/memory.
 
+WORKSPACE-001 planning handoff: `docs/roadmap/project_workspace_foundation_spec.md` defines the first usable workspace target, blank and OMI-guided project creation flows, project library/selector requirements, workspace pages, chapter/scene/note/material model, target file layout, owner-authored prose safety rules, candidate/canon display rules, task sequence, and acceptance checklist. It is documentation only and does not implement runtime behavior.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

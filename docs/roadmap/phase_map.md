@@ -85,7 +85,7 @@ This is the next product direction after owner acceptance of the Phase 6 MVP fou
 
 - Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, MVP foundation.
 - Outputs: project creation, project selector/library, OMI-guided project creation and idea capture, chapters/scenes/notes/materials organization, owner-authored prose editor, project overview, chapters/scenes pages, notes/materials pages, OMI ideas/candidates page, and approved-memory/canon page structure.
-- Status: PLANNED/FUTURE, with roadmap documentation updated locally. No runtime project creation, selector, editor rewrite, chapter/note model, project memory files, OMI records, extractor logic, test changes, dataset files, training records, model calls, or package installs have been performed by this planning update.
+- Status: PLANNED/FUTURE, with the detailed `WORKSPACE-001` implementation planning spec documented in `docs/roadmap/project_workspace_foundation_spec.md`. No runtime project creation, selector, editor rewrite, chapter/note model, project memory files, OMI records, extractor logic, test changes, dataset files, training records, model calls, or package installs have been performed by this planning update.
 - Exit: owner can create/select a project, write and save owner-authored material, organize chapters/scenes/notes/materials, and see project-specific workspace pages without any AI prose-generation path.
 
 Workspace layer order:

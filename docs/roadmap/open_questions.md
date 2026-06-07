@@ -59,6 +59,8 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 These must be answered before or during the pre-Dramatica workspace implementation:
 
+WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspace_foundation_spec.md`. The questions below remain implementation decisions to confirm or refine during WORKSPACE-002 through WORKSPACE-023.
+
 1. What is the minimum chapter/scene data model for the first usable workspace?
 2. Should chapters contain scenes, scenes reference chapters, or should both directions be stored with an index?
 3. What fields are required for notes/materials, and how should owner-authored notes differ from approved canon/memory?

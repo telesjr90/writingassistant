@@ -347,6 +347,8 @@ Boundary:
 
 The Project Workspace Foundation should extend the file model without creating runtime files in this documentation task.
 
+Detailed WORKSPACE-001 planning lives in `docs/roadmap/project_workspace_foundation_spec.md`. That spec is the implementation handoff for first usable workspace flows, project library behavior, workspace pages, chapter/scene/note/material records, target file layout, owner-authored prose safety, candidate/canon display rules, and acceptance criteria.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
