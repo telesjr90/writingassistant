@@ -176,6 +176,8 @@ projects/{project_id}/project_memory.json
 
 The final durable memory/canon structure is open. It must be decided in CORE-004 before implementation. Until then, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
 
+CORE-002/CORE-003 defines candidate schemas plus evidence/provenance for future story knowledge. CORE-004 must still decide which approved candidates can feed future project memory/canon storage and what file layout should hold that approved truth.
+
 No project file may contain secrets, raw book/source text, packet evidence, SFT records, model artifacts, or training runs.
 
 ## 5. `project.json` Specification

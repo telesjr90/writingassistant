@@ -42,6 +42,7 @@
 | Product pivot to Writer Assistant Core | Accepted | Near-term work shifts from Dramatica-first analyzer planning to a local writer assistant core that identifies, organizes, connects, and annotates story knowledge from owner-authored text. Dramatica remains a later advanced analysis layer. |
 | OMI as central story knowledge review system | Accepted | Extracted story knowledge must enter OMI as candidate records with provenance/evidence where practical before any owner-approved promotion into durable project memory/canon. |
 | External extractor dependency rule | Accepted | Do not install segram, fabula, silverfish, or other extractor dependencies until a dedicated spike evaluates license, maintenance, runtime cost, safety, candidate-only behavior, and OMI integration. |
+| CORE-002/CORE-003 candidate and evidence model | Accepted as documentation | `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines the first Writer Assistant Core candidate types plus shared base, evidence, provenance, owner decision, and promotion status models. Runtime implementation and project memory/canon layout remain future work. |
 
 ## Follow-Up Tasks, Not Open Decisions
 
@@ -60,4 +61,4 @@
 | Run MVP completion test matrix | MVP exit | Preflight executed on 2026-06-05; Step 1 cleared the prior dirty-fixture blocker and passed automated tests/build/mock/offline checks; Step 2 passed in-process route smoke but sandbox blocks localhost server/dev-server smokes, so final MVP exit needs owner exception or rerun in a socket-enabled local environment |
 | Research optional extractors | Post-MVP analysis tooling | Keep extractor output candidate-only through OMI, with provenance, owner review, guardrails, and no direct promotion |
 | Review JSONL mapping dry-run for Book 1-3 owner candidates | Fine-tuning prep | DONE locally; next fine-tuning step when resumed is P0 evidence extraction/verification, not JSONL drafting |
-| Define Writer Assistant Core schemas | Next product track | Future CORE task: candidate types, evidence spans, provenance, project memory/canon, and OMI expansion |
+| Define Writer Assistant Core schemas | Next product track | DONE locally as documentation in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage remains next |

@@ -58,8 +58,8 @@ Near-term product direction after owner acceptance of the Phase 6 MVP foundation
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
 | CORE-001 | Product pivot documentation update | Master/roadmap pivot docs and local report | DONE locally when this documentation update is complete; no runtime code, package install, JSONL, training, or Ollama call |
-| CORE-002 | Story knowledge candidate schema design | Candidate schema spec | Defines candidate types, fields, statuses, evidence/provenance, uncertainty, and owner decision requirements |
-| CORE-003 | Evidence span and provenance model | Evidence/provenance spec | Defines minimum source path, span/locator, source hash where practical, confidence, uncertainty, and owner review metadata |
+| CORE-002 | Story knowledge candidate schema design | `docs/roadmap/writer_assistant_core_candidate_schemas.md` | DONE locally as documentation; defines first candidate types, base contract, statuses, owner decision, promotion status, and candidate content fields |
+| CORE-003 | Evidence span and provenance model | `docs/roadmap/writer_assistant_core_candidate_schemas.md` | DONE locally as documentation; defines minimum reusable evidence/provenance fields with offsets/line locators optional at first |
 | CORE-004 | Project memory/canon storage model | Project memory/canon design | Chooses or narrows future `memory/` files vs `project_memory.json`; no runtime files until approved |
 | CORE-005 | OMI candidate type expansion | OMI candidate type spec/update | Adds character/location/object/organization/timeline/relationship/plot/continuity/annotation/open-question candidates while preserving no-silent-promotion |
 | CORE-006 | Character/location/object extraction candidate pipeline | Candidate extraction plan/prototype | Extracts candidate entities only into OMI with evidence and uncertainty |

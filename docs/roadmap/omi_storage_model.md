@@ -15,6 +15,7 @@ Current implementation status:
 - Existing ignored local OMI artifacts may exist under `projects/example/omi/`, but tracked fixture files remain clean unless owner-approved separately.
 - `docs/roadmap/omi_mvp_schema_lifecycle.md` defines the OMI lifecycle and field boundary.
 - This storage model remains the design source for expanding OMI into the central Writer Assistant Core candidate review/promotion system.
+- CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines future typed story-knowledge candidates and shared evidence/provenance models. This storage document keeps the record layout; the new schema document defines candidate content contracts.
 
 ## 2. Target Storage Layout
 
@@ -56,6 +57,8 @@ Writer Assistant Core candidate types planned for future OMI expansion:
 - `open_question_candidate`
 
 All extracted story knowledge remains candidate-only until owner approval, destination selection, evidence/provenance review, and final confirmation. OMI promotion records are not automatic canon mutation.
+
+These candidate classes are future OMI expansion targets. They are not runtime extractor implementations, project memory/canon files, or durable truth mutations.
 
 ## 3. OMI Idea Record
 

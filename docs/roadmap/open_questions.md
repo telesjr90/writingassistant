@@ -57,24 +57,11 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 ## Writer Assistant Core Follow-Up Questions
 
-These are implementation follow-ups for the new product direction, not blockers to recording the pivot.
-
-1. What durable project memory/canon file structure should be used: separate `memory/*.json` files, a single `project_memory.json`, or another layout?
-2. Which candidate types are required for the first Writer Assistant Core release: character, location, object, organization, timeline event, relationship, plot thread, continuity warning, annotation, open question, or a smaller subset?
-3. What is the minimum evidence-span format: exact text span, scene-relative character offsets, line/paragraph locators, source hashes, or a hybrid?
-4. Should annotations be stored per scene, per entity, globally, or in a combined index?
-5. Should the first extractor be deterministic/rule-based, LLM-assisted, `segram`-assisted, or hybrid?
-6. What UI should approve, reject, revise, merge, or annotate candidate story knowledge?
-7. What qualifies a relationship or timeline event for owner-approved promotion to canon?
-8. When should Dramatica analysis return as an advanced layer after Writer Assistant Core?
-
-## Writer Assistant Core Follow-Up Questions
-
 These are implementation follow-ups for the new product direction, not blockers for the completed MVP foundation:
 
 1. What durable project memory/canon file structure should be used: `memory/*.json`, one `project_memory.json`, or another layout?
-2. Which candidate types are required for the first Writer Assistant Core release: characters, aliases, locations, objects, organizations, events, relationships, plot threads, open questions, continuity warnings, annotations, or a smaller subset?
-3. What is the minimum evidence-span format: file path plus character offsets, line ranges, excerpt IDs, source hashes, or a hybrid?
+2. Which subset of the CORE-002 candidate types should be implemented first: characters, aliases, locations, objects, organizations, timeline events, relationships, plot threads, open questions, continuity warnings, annotations, or a smaller subset?
+3. Should the first runtime evidence-span locator use character offsets, line ranges, paragraph indices, source hashes, or a hybrid? CORE-003 defines all as optional-capable planning fields.
 4. Should annotations be stored per scene, per entity, globally, or in an OMI-linked annotation store?
 5. Should the first extractor be deterministic/rule-based, LLM-assisted, `segram`-assisted, or hybrid?
 6. What UI should approve, reject, revise, and annotate candidate story knowledge?

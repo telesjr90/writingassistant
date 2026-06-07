@@ -21,6 +21,7 @@ MVP target:
 - OMI may propose candidate storyform slots and diagnostic questions, but those slots remain candidate-only until explicit owner approval.
 - Promotion requires owner approval, destination, provenance, status, source candidate ID, timestamp, and final confirmation.
 - For Writer Assistant Core, OMI becomes the central review/promotion system for extracted story knowledge. Extracted characters, aliases, locations, objects, organizations, events, relationships, plot threads, annotations, open questions, continuity warnings, and contradiction warnings must enter OMI as candidates before any durable project memory/canon promotion.
+- CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines the future Writer Assistant Core candidate types, shared base candidate contract, evidence model, provenance model, owner decision model, and promotion status model. Those candidate types are future OMI-supported classes; this spec does not make them runtime-implemented by itself.
 
 Immediate next task after this spec: review and commit App-3a / OMI-001 outputs, then decide/spec the owner-created aligned sample project before Phase 2 backend safety and schema foundation.
 
@@ -178,6 +179,8 @@ Candidate types:
 - `continuity_warning_candidate`: candidate continuity issue or contradiction warning.
 - `annotation_candidate`: candidate scene/entity/global annotation with evidence.
 - `open_question_candidate`: candidate open question for owner review.
+
+The Writer Assistant Core candidate types above are future expansion targets. Runtime support remains limited to the OMI slices explicitly listed in the current implementation status until a later implementation task adds typed validation, extraction, and UI behavior.
 
 ## 7. OMI Status Lifecycle
 

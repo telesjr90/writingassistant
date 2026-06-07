@@ -85,7 +85,7 @@ This is the next product direction after owner acceptance of the Phase 6 MVP fou
 
 - Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
 - Outputs: story knowledge candidate schemas, evidence span/provenance model, initial project memory/canon design target, minimum candidate type set.
-- Status: PLANNED/FUTURE. Documentation pivot recorded; no runtime schema or storage implementation has been performed.
+- Status: IN PROGRESS LOCALLY. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; no runtime schema, extractor, storage, or project memory implementation has been performed.
 - Exit: owner-approved schema plan for candidate story knowledge and project memory/canon.
 
 ### Phase 8: OMI Expansion for Story Knowledge Candidates
