@@ -197,6 +197,7 @@ Evaluation validation must cover:
 These are not part of the current MVP exit gate. They define the next milestone after MVP foundation acceptance:
 
 `WORKSPACE-001` defines the detailed first usable workspace acceptance checklist in `docs/roadmap/project_workspace_foundation_spec.md`.
+`WORKSPACE-002` defines project creation planning in `docs/roadmap/project_creation_flow_spec.md`, including blank creation, OMI-guided setup, safe `project_id` behavior, `project.json`, initial folder strategy, API/UI surfaces, and future project-creation tests.
 
 - Project creation from scratch.
 - Project selector/library.

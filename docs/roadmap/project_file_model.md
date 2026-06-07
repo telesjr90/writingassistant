@@ -349,11 +349,14 @@ The Project Workspace Foundation should extend the file model without creating r
 
 Detailed WORKSPACE-001 planning lives in `docs/roadmap/project_workspace_foundation_spec.md`. That spec is the implementation handoff for first usable workspace flows, project library behavior, workspace pages, chapter/scene/note/material records, target file layout, owner-authored prose safety, candidate/canon display rules, and acceptance criteria.
 
+Detailed WORKSPACE-002 planning lives in `docs/roadmap/project_creation_flow_spec.md`. That spec narrows the first project creation implementation target: title-derived owner-editable filesystem-safe `project_id`, metadata-only `project.json`, blank and OMI-guided creation boundaries, hybrid core-folder creation, scan-first project library support, no model calls, no generated prose, and no candidate/canon promotion during creation.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
 - The index should be rebuildable from `project.json` files where practical.
 - The index is not story truth and must not contain raw model output or candidate content.
+- WORKSPACE-002 recommends scanning project folders with valid `project.json` files before introducing a maintained `projects/index.json`, so the first library implementation avoids stale-index authority.
 
 Chapters:
 

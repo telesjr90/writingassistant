@@ -56,6 +56,7 @@
 | Approved project knowledge is project-local canon only by explicit promotion | Accepted | Approved information becomes project-local memory/canon only through owner-controlled promotion, evidence/provenance, destination, final confirmation, and future apply-promotion. |
 | External NLP/story tools integrate as adapters | Accepted | External tools may become replaceable adapters around the app-owned Writer Assistant Core pipeline; tool output is never authoritative and becomes OMI candidates, not canon. |
 | Future extractor spike order | Accepted | spaCy is the likely first future local NLP spike after workspace and contracts are ready; segram, BookNLP, GLiNER, LangExtract, Renard, CoreNLP/OpenIE/SUTime, AI-Reader-V2, narrative-blueprint, and NovelClaw are later references/spikes only. Generation-heavy systems remain blocked or documentation-only. |
+| WORKSPACE-002 project creation flow | Accepted as documentation | `docs/roadmap/project_creation_flow_spec.md` defines the future blank and OMI-guided project creation flow. First implementation should use a title-derived, owner-editable, filesystem-safe `project_id`, a metadata-only `project.json`, hybrid core-folder creation, scan-first project library support, no model calls, no generated prose, and candidate-only OMI setup until explicit owner confirmation. Runtime implementation remains future work. |
 
 ## Follow-Up Tasks, Not Open Decisions
 

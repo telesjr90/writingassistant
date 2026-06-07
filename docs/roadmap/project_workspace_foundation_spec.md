@@ -494,7 +494,7 @@ The first workspace implementation should follow this sequence:
 | ID | Task | Planning output |
 | --- | --- | --- |
 | WORKSPACE-001 | Project Workspace Foundation Spec | This document |
-| WORKSPACE-002 | Project creation flow | Blank project creation API/UI/storage plan |
+| WORKSPACE-002 | Project creation flow | `docs/roadmap/project_creation_flow_spec.md` defines blank and OMI-guided creation API/UI/storage planning |
 | WORKSPACE-003 | Project selector/library | Local library/index API/UI plan |
 | WORKSPACE-004 | OMI-guided project creation and idea capture | Owner-input setup candidate workflow |
 | WORKSPACE-005 | Chapter and scene data model | Chapter/scene storage contract and migration plan |

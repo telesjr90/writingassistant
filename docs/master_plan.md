@@ -674,6 +674,8 @@ Project Workspace Foundation will prioritize:
 
 WORKSPACE-001 planning handoff: `docs/roadmap/project_workspace_foundation_spec.md` defines the first usable workspace target, blank and OMI-guided project creation flows, project library/selector requirements, workspace pages, chapter/scene/note/material model, target file layout, owner-authored prose safety rules, candidate/canon display rules, task sequence, and acceptance checklist. It is documentation only and does not implement runtime behavior.
 
+WORKSPACE-002 planning handoff: `docs/roadmap/project_creation_flow_spec.md` defines the future project creation flow in implementation-ready planning detail: blank project creation, OMI-guided setup, `project_id` validation and collision handling, metadata-only `project.json`, hybrid folder creation, scan-first library support, API/UI planning, future tests, and no-prose/candidate-canon safety boundaries. It is documentation only and does not implement runtime project creation.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

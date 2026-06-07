@@ -59,7 +59,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 These must be answered before or during the pre-Dramatica workspace implementation:
 
-WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspace_foundation_spec.md`. The questions below remain implementation decisions to confirm or refine during WORKSPACE-002 through WORKSPACE-023.
+WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspace_foundation_spec.md`. WORKSPACE-002 project creation defaults are documented in `docs/roadmap/project_creation_flow_spec.md`, including the recommended title-derived owner-editable `project_id`, metadata-only `project.json`, hybrid folder strategy, scan-first library support, and OMI-guided setup boundaries. The questions below remain implementation decisions to confirm or refine during WORKSPACE-003 through WORKSPACE-023.
 
 1. What is the minimum chapter/scene data model for the first usable workspace?
 2. Should chapters contain scenes, scenes reference chapters, or should both directions be stored with an index?
@@ -76,6 +76,11 @@ WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspac
 13. What extraction confidence or evidence threshold is required before a candidate appears in the UI?
 14. What is the first browser/manual acceptance checklist for a usable workspace?
 15. How should owner-authored prose save tests prove the no-prose guard is not overblocking while AI prose generation stays blocked?
+16. Should `project_id` collision suffixes be generated server-side, client-side, or both?
+17. Should OMI-guided project setup use temporary wizard state, browser-local draft state, or a durable pre-project inbox before a `project_id` exists?
+18. Should blank project creation immediately create `omi/index.json`, or should OMI folders remain lazy until the first idea/candidate is created?
+19. Should new blank workspace projects create compatibility `bible.json` and `storyform.json`, or defer them until Story Check or later Dramatica context is explicitly enabled?
+20. Should project title rename ever migrate `project_id`, or should `project_id` remain stable after creation?
 
 ## Writer Assistant Core Follow-Up Questions
 
