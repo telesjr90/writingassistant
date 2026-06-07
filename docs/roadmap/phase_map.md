@@ -85,7 +85,7 @@ This is the next product direction after owner acceptance of the Phase 6 MVP fou
 
 - Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
 - Outputs: story knowledge candidate schemas, evidence span/provenance model, initial project memory/canon design target, minimum candidate type set.
-- Status: IN PROGRESS LOCALLY. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; no runtime schema, extractor, storage, or project memory implementation has been performed.
+- Status: DOCUMENTED LOCALLY. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage target is recorded in `docs/roadmap/project_memory_canon_storage_model.md`. No runtime schema, extractor, storage, apply-promotion, or project memory implementation has been performed.
 - Exit: owner-approved schema plan for candidate story knowledge and project memory/canon.
 
 ### Phase 8: OMI Expansion for Story Knowledge Candidates
@@ -113,7 +113,7 @@ This is the next product direction after owner acceptance of the Phase 6 MVP fou
 
 - Inputs: OMI promotion gates, project memory/canon storage decision, evidence requirements.
 - Outputs: owner-approved promotion flow into durable project memory/canon records, with destination and confirmation.
-- Status: PLANNED/FUTURE. No project memory/canon files are implemented by this documentation update.
+- Status: PLANNED/FUTURE. CORE-004 documents the target `memory/*.json` layout, but no project memory/canon files or apply-promotion behavior are implemented.
 - Exit: approved candidate records can be promoted to durable memory/canon without mutating scene prose or silently overwriting truth.
 
 ### Phase 12: Continuity, Relationship, Timeline, and Plot Assistance

@@ -16,6 +16,7 @@ Current implementation status:
 - `docs/roadmap/omi_mvp_schema_lifecycle.md` defines the OMI lifecycle and field boundary.
 - This storage model remains the design source for expanding OMI into the central Writer Assistant Core candidate review/promotion system.
 - CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines future typed story-knowledge candidates and shared evidence/provenance models. This storage document keeps the record layout; the new schema document defines candidate content contracts.
+- CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` defines the future folder-based `memory/*.json` durable canon target. OMI promotion records remain audit intent only until a later apply-promotion step writes owner-approved records into that memory layer.
 
 ## 2. Target Storage Layout
 
@@ -59,6 +60,8 @@ Writer Assistant Core candidate types planned for future OMI expansion:
 All extracted story knowledge remains candidate-only until owner approval, destination selection, evidence/provenance review, and final confirmation. OMI promotion records are not automatic canon mutation.
 
 These candidate classes are future OMI expansion targets. They are not runtime extractor implementations, project memory/canon files, or durable truth mutations.
+
+Future promotion path: OMI candidate -> owner review -> OMI promotion record -> future apply-promotion step -> `memory/*.json` project memory/canon record. This spec does not implement the apply step.
 
 ## 3. OMI Idea Record
 

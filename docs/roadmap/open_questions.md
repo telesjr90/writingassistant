@@ -59,7 +59,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 These are implementation follow-ups for the new product direction, not blockers for the completed MVP foundation:
 
-1. What durable project memory/canon file structure should be used: `memory/*.json`, one `project_memory.json`, or another layout?
+1. Project memory/canon file structure: CORE-004 recommends folder-based `memory/*.json` plus `memory/index.json` as the first implementation target; runtime implementation details remain future work.
 2. Which subset of the CORE-002 candidate types should be implemented first: characters, aliases, locations, objects, organizations, timeline events, relationships, plot threads, open questions, continuity warnings, annotations, or a smaller subset?
 3. Should the first runtime evidence-span locator use character offsets, line ranges, paragraph indices, source hashes, or a hybrid? CORE-003 defines all as optional-capable planning fields.
 4. Should annotations be stored per scene, per entity, globally, or in an OMI-linked annotation store?

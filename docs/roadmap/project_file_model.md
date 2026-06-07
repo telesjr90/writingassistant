@@ -153,7 +153,7 @@ Future-only:
 - model-specific caches
 - collaboration/sync metadata
 
-Future Writer Assistant Core memory/canon target, not implemented:
+Future Writer Assistant Core memory/canon target, not implemented. CORE-004 recommends the folder-based memory layout as the default future implementation target:
 
 ```text
 projects/{project_id}/
@@ -166,17 +166,20 @@ projects/{project_id}/
     relationships.json
     plot_threads.json
     annotations.json
+    open_questions.json
+    continuity_warnings.json
+    index.json
 ```
 
-Alternative future target, also not decided:
+Rejected as the default first implementation target:
 
 ```text
 projects/{project_id}/project_memory.json
 ```
 
-The final durable memory/canon structure is open. It must be decided in CORE-004 before implementation. Until then, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
+The single-file `project_memory.json` option remains a possible later migration/export shape, but it is not the recommended first implementation target because it is harder to review incrementally and easier to overwrite accidentally.
 
-CORE-002/CORE-003 defines candidate schemas plus evidence/provenance for future story knowledge. CORE-004 must still decide which approved candidates can feed future project memory/canon storage and what file layout should hold that approved truth.
+CORE-002/CORE-003 defines candidate schemas plus evidence/provenance for future story knowledge. CORE-004 defines the default folder-based memory/canon storage target in `docs/roadmap/project_memory_canon_storage_model.md`. Until a later runtime task implements apply-promotion, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
 
 No project file may contain secrets, raw book/source text, packet evidence, SFT records, model artifacts, or training runs.
 

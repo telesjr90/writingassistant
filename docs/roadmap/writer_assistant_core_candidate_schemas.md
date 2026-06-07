@@ -355,7 +355,7 @@ Initial proposed destination values:
 - `open_question_index_candidate`
 - `discard`
 
-These are candidate destinations only. CORE-004 must decide the durable project memory/canon structure before any runtime apply-promotion behavior exists.
+These are candidate destinations only. CORE-004 recommends future folder-based `memory/*.json` project memory/canon storage in `docs/roadmap/project_memory_canon_storage_model.md`. Runtime apply-promotion behavior still does not exist.
 
 ## 10. Validation and Safety Rules
 
@@ -374,10 +374,8 @@ Future runtime validation should enforce:
 
 ## 11. Deferred Decisions
 
-Deferred to CORE-004 or later:
+Deferred to later tasks:
 
-- Final project memory/canon file layout.
-- Whether approved candidates apply to separate `memory/*.json` files, one `project_memory.json`, existing `bible.json`, or another structure.
 - Exact runtime ID format.
 - Exact source hash and snapshot hash implementation.
 - Whether evidence offsets use character offsets, line ranges, paragraph indices, or a hybrid.
@@ -385,3 +383,4 @@ Deferred to CORE-004 or later:
 - First extractor strategy and dependency spike.
 - Merge/deduplication behavior for duplicate candidate entities.
 - Apply-promotion behavior and rollback model.
+- Exact runtime implementation of the CORE-004 folder-based `memory/*.json` storage model.

@@ -22,6 +22,7 @@ MVP target:
 - Promotion requires owner approval, destination, provenance, status, source candidate ID, timestamp, and final confirmation.
 - For Writer Assistant Core, OMI becomes the central review/promotion system for extracted story knowledge. Extracted characters, aliases, locations, objects, organizations, events, relationships, plot threads, annotations, open questions, continuity warnings, and contradiction warnings must enter OMI as candidates before any durable project memory/canon promotion.
 - CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines the future Writer Assistant Core candidate types, shared base candidate contract, evidence model, provenance model, owner decision model, and promotion status model. Those candidate types are future OMI-supported classes; this spec does not make them runtime-implemented by itself.
+- CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` recommends future folder-based `memory/*.json` files as the durable project memory/canon target after OMI review and a later apply-promotion step.
 
 Immediate next task after this spec: review and commit App-3a / OMI-001 outputs, then decide/spec the owner-created aligned sample project before Phase 2 backend safety and schema foundation.
 
@@ -181,6 +182,8 @@ Candidate types:
 - `open_question_candidate`: candidate open question for owner review.
 
 The Writer Assistant Core candidate types above are future expansion targets. Runtime support remains limited to the OMI slices explicitly listed in the current implementation status until a later implementation task adds typed validation, extraction, and UI behavior.
+
+Future durable memory/canon begins only after OMI candidate review, promotion record creation, and a later apply-promotion step. OMI promotion records are audit intent, not canon by themselves.
 
 ## 7. OMI Status Lifecycle
 

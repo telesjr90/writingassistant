@@ -43,6 +43,7 @@
 | OMI as central story knowledge review system | Accepted | Extracted story knowledge must enter OMI as candidate records with provenance/evidence where practical before any owner-approved promotion into durable project memory/canon. |
 | External extractor dependency rule | Accepted | Do not install segram, fabula, silverfish, or other extractor dependencies until a dedicated spike evaluates license, maintenance, runtime cost, safety, candidate-only behavior, and OMI integration. |
 | CORE-002/CORE-003 candidate and evidence model | Accepted as documentation | `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines the first Writer Assistant Core candidate types plus shared base, evidence, provenance, owner decision, and promotion status models. Runtime implementation and project memory/canon layout remain future work. |
+| CORE-004 project memory/canon storage model | Accepted as documentation | `docs/roadmap/project_memory_canon_storage_model.md` recommends folder-based `memory/*.json` files plus `memory/index.json` as the future durable story-knowledge target after OMI review and a later apply-promotion step. |
 
 ## Follow-Up Tasks, Not Open Decisions
 
@@ -62,3 +63,4 @@
 | Research optional extractors | Post-MVP analysis tooling | Keep extractor output candidate-only through OMI, with provenance, owner review, guardrails, and no direct promotion |
 | Review JSONL mapping dry-run for Book 1-3 owner candidates | Fine-tuning prep | DONE locally; next fine-tuning step when resumed is P0 evidence extraction/verification, not JSONL drafting |
 | Define Writer Assistant Core schemas | Next product track | DONE locally as documentation in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage remains next |
+| Define project memory/canon storage | Writer Assistant Core storage | DONE locally as documentation; runtime apply-promotion, rollback tests, deduplication, IDs/hashes, and extractor strategy remain future tasks |

@@ -204,6 +204,7 @@ You should see the project navigation, the editor, and the analysis sidebar with
 
 ## 5. Next Steps (Beyond MVP)
 - Writer Assistant Core schema planning for story knowledge candidates, evidence spans, provenance, and project memory/canon.
+- Project memory/canon storage planning now recommends future folder-based `memory/*.json` files plus `memory/index.json`; runtime apply-promotion remains unimplemented.
 - OMI expansion for `character_candidate`, `location_candidate`, `object_candidate`, `organization_candidate`, `timeline_event_candidate`, `relationship_candidate`, `plot_thread_candidate`, `continuity_warning_candidate`, `annotation_candidate`, and `open_question_candidate`.
 - Story knowledge extraction pipeline research for candidate entities/actions/relationships/timeline notes through OMI.
 - Dynamic storyform questionnaire as a later advanced Dramatica layer.

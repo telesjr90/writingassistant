@@ -639,6 +639,8 @@ Writer Assistant Core will prioritize:
 - Project memory/canon design and owner-approved promotion paths.
 - Later graph, timeline, relationship, and search/query views.
 
+CORE-004 storage note: the recommended future project memory/canon target is folder-based `projects/{project_id}/memory/*.json` files plus `memory/index.json`, documented in `docs/roadmap/project_memory_canon_storage_model.md`. No runtime memory files or apply-promotion behavior exist yet.
+
 Dramatica remains allowed, but deferred:
 
 - Dramatica/storyform analysis, throughline classification, CIPS/dynamics, RS/IC advanced structural analysis, and a fine-tuned `dramatica-analyst:8b` are later advanced layers.
