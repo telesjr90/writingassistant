@@ -36,7 +36,12 @@
 | Optional extractor track | Accepted as future/post-MVP | segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint may be evaluated later as candidate-only references; no extractor may generate prose or silently alter project truth |
 | Book 1-3 owner answers implemented as prep artifacts | Accepted | Owner answers have been received and implemented in local reports as documentation/candidate queues only; no review JSONL, training JSONL, promotion, manifest update, or training run was performed |
 | Fine-tuning prep paused after Book 1-3 mapping dry-run | Accepted | Dataset gate audit, Book 1-3 coverage matrix, owner decision extraction, owner-answer implementation, and review JSONL mapping dry-run are complete; no records were created or promoted; next fine-tuning step when resumed is evidence extraction/verification |
-| App MVP Phase 6 promoted as active phase | Accepted | Fine-tuning remains outside the MVP critical path, so current project focus returns to MVP hardening / MVP exit matrix execution-preflight and repo-safety blocker resolution |
+| App MVP Phase 6 promoted as active phase | Accepted | Fine-tuning remains outside the MVP critical path, so current project focus returns to MVP hardening / MVP exit matrix execution-preflight |
+| Phase 6 Step 1 repo-safety refresh | Accepted | 2026-06-06 refresh found no dirty tracked `projects/example` fixture files; full backend tests, focused backend groups, frontend build, offline baseline eval, and mock Story Check smoke passed; live qwen3 remains deferred by design |
+| Phase 6 Step 2 smoke refresh | Accepted | In-process mock backend route smoke passed, but true localhost backend/frontend server smokes are blocked by the current sandbox socket/listen restriction; browser checks remain owner-manual and live qwen3 remains deferred |
+| Product pivot to Writer Assistant Core | Accepted | Near-term work shifts from Dramatica-first analyzer planning to a local writer assistant core that identifies, organizes, connects, and annotates story knowledge from owner-authored text. Dramatica remains a later advanced analysis layer. |
+| OMI as central story knowledge review system | Accepted | Extracted story knowledge must enter OMI as candidate records with provenance/evidence where practical before any owner-approved promotion into durable project memory/canon. |
+| External extractor dependency rule | Accepted | Do not install segram, fabula, silverfish, or other extractor dependencies until a dedicated spike evaluates license, maintenance, runtime cost, safety, candidate-only behavior, and OMI integration. |
 
 ## Follow-Up Tasks, Not Open Decisions
 
@@ -52,6 +57,7 @@
 | Revise cloud smoke config | RunPod readiness | Required before RunPod smoke |
 | Run cross-book coverage review | Books 4-5 decision | DONE locally for Books 1-3; Books 4-5 remain conditional and are not active while fine-tuning/book-backed prep is paused |
 | Define safe book artifact set | Git hygiene and provenance | Raw source text stays outside Git |
-| Run MVP completion test matrix | MVP exit | Preflight executed on 2026-06-05; automated checks passed and live Ollama was deferred by design, but repo safety is blocked by dirty tracked `projects/example` fixture files pending owner resolution |
+| Run MVP completion test matrix | MVP exit | Preflight executed on 2026-06-05; Step 1 cleared the prior dirty-fixture blocker and passed automated tests/build/mock/offline checks; Step 2 passed in-process route smoke but sandbox blocks localhost server/dev-server smokes, so final MVP exit needs owner exception or rerun in a socket-enabled local environment |
 | Research optional extractors | Post-MVP analysis tooling | Keep extractor output candidate-only through OMI, with provenance, owner review, guardrails, and no direct promotion |
 | Review JSONL mapping dry-run for Book 1-3 owner candidates | Fine-tuning prep | DONE locally; next fine-tuning step when resumed is P0 evidence extraction/verification, not JSONL drafting |
+| Define Writer Assistant Core schemas | Next product track | Future CORE task: candidate types, evidence spans, provenance, project memory/canon, and OMI expansion |

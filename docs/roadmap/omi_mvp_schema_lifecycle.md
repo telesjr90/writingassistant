@@ -8,10 +8,11 @@ OMI is not allowed to write, rewrite, continue, imitate, polish, improve, or ext
 
 What exists now:
 
-- No OMI backend routes, storage manager, storage files, API client calls, or frontend components exist.
-- App-2 defines the project file model target, including future project-local OMI folders.
-- App-3 defines the safe NCP/storyform subset that OMI may use as candidate planning context.
-- Story Check currently exists as the only model-backed analysis path.
+- OMI MVP runtime slices now exist for owner-authored raw idea and structured candidate records, owner decisions, destination/status updates, record-only promotion creation, and UI lifecycle/status/provenance display.
+- OMI still has no apply-promotion behavior and does not mutate durable project truth.
+- App-2 defines the project file model target, including project-local OMI folders.
+- App-3 defines the safe NCP/storyform subset that OMI may use as candidate planning context, now as a later advanced layer rather than the next product backbone.
+- Story Check remains the only model-backed analysis path; Writer Assistant Core extraction is future work.
 
 MVP target:
 
@@ -19,6 +20,7 @@ MVP target:
 - OMI records `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`.
 - OMI may propose candidate storyform slots and diagnostic questions, but those slots remain candidate-only until explicit owner approval.
 - Promotion requires owner approval, destination, provenance, status, source candidate ID, timestamp, and final confirmation.
+- For Writer Assistant Core, OMI becomes the central review/promotion system for extracted story knowledge. Extracted characters, aliases, locations, objects, organizations, events, relationships, plot threads, annotations, open questions, continuity warnings, and contradiction warnings must enter OMI as candidates before any durable project memory/canon promotion.
 
 Immediate next task after this spec: review and commit App-3a / OMI-001 outputs, then decide/spec the owner-created aligned sample project before Phase 2 backend safety and schema foundation.
 
@@ -166,6 +168,16 @@ Candidate types:
 - `scene_prompt_context_candidate`: structural context for later owner-authored scene work; not scene prose.
 - `template_starter_candidate`: structural scaffolding only, such as fields to fill or diagnostic slots. It is not prose and must not contain sample scene text.
 - `diagnostic_question_set`: owner-facing structural questions.
+- `character_candidate`: candidate character identity, traits, aliases, or role notes.
+- `location_candidate`: candidate place or setting note.
+- `object_candidate`: candidate object/item note.
+- `organization_candidate`: candidate group, faction, institution, or team note.
+- `timeline_event_candidate`: candidate event/action with time/order context.
+- `relationship_candidate`: candidate relationship link or relationship-state note; not Dramatica Relationship Story proof.
+- `plot_thread_candidate`: candidate plot thread, unresolved thread, or thread status note.
+- `continuity_warning_candidate`: candidate continuity issue or contradiction warning.
+- `annotation_candidate`: candidate scene/entity/global annotation with evidence.
+- `open_question_candidate`: candidate open question for owner review.
 
 ## 7. OMI Status Lifecycle
 
@@ -257,6 +269,8 @@ Provenance sources:
 Every OMI record should preserve provenance. Retrieved references and NotebookLM output cannot establish story truth without owner approval and evidence.
 
 ## 11. OMI and NCP/Storyform Interaction
+
+Product pivot note: NCP/Dramatica is no longer the main near-term app backbone. OMI may still use NCP/storyform as reference context, but Writer Assistant Core should use a simpler story-knowledge model first. Dramatica-specific truth claims remain owner-gated and deferred to a later advanced analysis layer.
 
 OMI follows the App-3 NCP compatibility rules:
 

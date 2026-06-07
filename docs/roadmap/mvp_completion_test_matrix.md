@@ -4,6 +4,8 @@
 
 This matrix defines the formal MVP exit gate for the local Dramatica-informed writing assistant. It is a planning artifact only. It does not create tests, scripts, runtime routes, frontend UI, model calls, OMI promotion behavior, training data, or model artifacts.
 
+Product pivot note: this MVP foundation remains valuable and should still be completed/recorded. After MVP foundation acceptance, the next implementation priority is Writer Assistant Core, not Dramatica/fine-tuning. Live qwen3/Dramatica baseline checks remain optional/manual and are not central to the new core direction.
+
 The MVP exit gate verifies the current product boundary:
 
 - The app is analysis-only.

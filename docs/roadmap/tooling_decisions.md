@@ -9,9 +9,9 @@
 - GitHub Issues/GitHub Projects later, after the safe local baseline is pushed.
 - `ai-llm-project-file-structure-template` only as a checklist.
 - `llm_finetuning` only as evaluation/training lifecycle inspiration.
-- NotebookLM only as candidate packet/evidence aggregation workflow.
+- NotebookLM only as manual candidate aggregation/research workflow, not runtime app architecture.
 - Codex only for repo inspection and documentation updates.
-- `segram`, `fabula`, `silverfish`, `AI-Reader-V2`, and `narrative-blueprint` only as optional future analysis/extractor references for candidate-only OMI workflows.
+- `segram`, `fabula`, `silverfish`, `AI-Reader-V2`, and `narrative-blueprint` only as future Writer Assistant Core references for candidate-only OMI workflows.
 
 ## Do Not Use Now
 
@@ -35,17 +35,19 @@
 
 | Reference | Current role |
 | --- | --- |
-| narrative-context-protocol | NCP/schema inspiration and compatibility reference |
+| narrative-context-protocol | Downgraded from central near-term backbone to later structural/Dramatica reference and optional schema inspiration |
 | NovelClaw | Future memory-bank inspiration only |
-| dramatron | Blocked/non-goal for generation |
-| ai-story-writer | Not an implementation template |
-| notebook | Candidate aggregation inspiration only |
-| segram | Optional future semantic/action extraction reference; likely safest first extractor candidate |
-| fabula | Optional future knowledge graph/entity/event/relationship extraction reference |
-| silverfish | Optional future relationship extraction and evidence-cluster reference |
-| AI-Reader-V2 | Optional future visualization/UI reference for maps, timelines, and relationship graphs |
-| narrative-blueprint | Optional future configurable batch/evaluation pipeline reference |
+| dramatron | Blocked/non-goal for runtime because generation-oriented |
+| ai-story-writer | Not an implementation template; do not install |
+| notebook / NotebookLM workflow | Manual candidate aggregation/research only, not runtime app architecture |
+| segram | First future extractor spike candidate for semantic/action/entity extraction after schemas, OMI candidate flow, evidence spans, and tests are ready; do not install now |
+| fabula | Second-stage graph/entity/event/relationship extraction candidate after basic extractor schema exists |
+| silverfish | Later relationship/evidence-cluster candidate after relationship review UI and evidence-span model exist |
+| AI-Reader-V2 | Visualization/UI reference for maps, timelines, and relationship graphs; do not install as runtime dependency |
+| narrative-blueprint | Future batch/evaluation pipeline inspiration after at least one extractor exists |
 | Inkos/story-engine-style systems | Deferred or rejected for runtime use because generation-heavy behavior conflicts with the no-prose app boundary |
+
+External extractor dependency rule: do not install extractor dependencies until a dedicated spike branch/task evaluates license, maintenance, runtime cost, safety, candidate-only behavior, and integration with OMI.
 
 ## Current Repo Tooling Notes
 
@@ -67,6 +69,6 @@
 - GitHub push: still TODO; do not claim the safe baseline has been pushed.
 - Backend dependency manifest: `backend/requirements.txt` exists and remains separate from `training/requirements-unsloth.txt`.
 - OMI: App MVP feature, but bounded to analysis-only candidate planning. No prose generation, no story continuation, no rewriting, and no silent promotion into durable truth. `docs/roadmap/omi_storage_model.md` defines the project-local `omi/ideas`, `omi/candidates`, `omi/promotions`, and `omi/index.json` storage target. OMI-003 implements owner-authored raw idea and structured candidate record creation/listing/loading; OMI-004 implements explicit owner decision, status, approval confirmation, notes, and candidate destination updates; OMI-005 implements promotion-readiness checks and record-only promotion creation under `omi/promotions/`; OMI-006 makes raw idea metadata, candidate lifecycle, status, provenance, evidence, blockers, and promotion records visible in the panel; OMI-007 adds focused no-prose/no-silent-promotion boundary tests. There is no apply-promotion route, no durable truth mutation, and no model-generated candidate path. Future OMI model calls should use shared `backend/guardrails.py` before model calls and keep owner-authored `raw_idea`, owner decision notes, and promotion metadata separate from freeform assistant request intent.
-- Optional extractors: `docs/roadmap/optional_analysis_extractors.md` defines extractor tools as post-MVP references only. No extractor may generate prose, silently alter project truth, write OMI promotions directly, write training data, update `dataset_manifest.json`, or bypass OMI owner review and promotion gates.
-- MVP exit preflight: executed locally on 2026-06-05 with automated checks passing, live qwen3 deferred by design, and repo readiness blocked by pre-existing dirty tracked `projects/example` fixture files.
+- Optional extractors: `docs/roadmap/optional_analysis_extractors.md` now defines extractor tools as future Writer Assistant Core references only. No extractor may generate prose, silently alter project truth, write OMI promotions directly, write training data, update `dataset_manifest.json`, or bypass OMI owner review and promotion gates.
+- MVP exit preflight: executed locally on 2026-06-05 with automated checks passing and live qwen3 deferred by design. Step 1 refresh on 2026-06-06 found no dirty tracked `projects/example` fixture files and passed full/focused backend tests, frontend build, offline baseline eval, and mock Story Check smoke.
 - GitHub Issues/Projects: deferred until after safe baseline push and owner approval.

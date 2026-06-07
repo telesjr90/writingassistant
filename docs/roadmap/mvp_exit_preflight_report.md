@@ -151,3 +151,27 @@ Reason: automated validation passed, but repo safety did not pass because tracke
 ## Recommended Next Step
 
 Resolve the dirty tracked `projects/example` fixture files, then rerun the MVP exit repo-safety check and commit the preflight documentation if the owner wants it recorded in Git.
+
+## Step 1 Refresh Addendum
+
+- Date: 2026-06-06
+- Report: `training/reports/mvp_phase_6_exit_preflight_step_1_report.md`
+- Result: repo-safety blocker from this historical report is no longer present in the current working tree.
+- Current tracked status: `git status --short --branch` reports `main...origin/main [ahead 1]` with no dirty tracked files.
+- Current fixture diff: no diff for `projects/example/bible.json`, `projects/example/storyform.json`, `projects/example/project.json`, or `projects/example/scenes/scene_001.md`.
+- Validation refresh: full backend tests passed, focused backend groups passed, frontend build passed, offline baseline eval passed, and mock Story Check smoke passed.
+- Live qwen3/Ollama verification: deferred by design and not run.
+- Updated recommendation: owner-accept/document the current tracked `projects/example` fixture state as the MVP sample fixture, then continue the remaining server/manual MVP exit matrix checks.
+
+## Step 2 Refresh Addendum
+
+- Date: 2026-06-06
+- Report: `training/reports/mvp_phase_6_exit_preflight_step_2_report.md`
+- Result: PARTIAL.
+- Backend server smoke: attempted in `ANALYSIS_MODE=mock`; app import/startup began, but localhost socket binding failed in this sandbox. Direct Python socket bind also failed with `PermissionError: [Errno 1] Operation not permitted`.
+- Backend route smoke: PASS via in-process route calls for scenes, scene load, bible, storyform, storyform context, mock Story Check, and OMI summary.
+- Story Check mock route: PASS with `task=story_check`, `analysis_mode=mock`, `schema_valid=true`, and insufficient evidence present.
+- Frontend dev-server smoke: BLOCKED by the same sandbox socket/listen restriction; Vite reported `listen EPERM` on `127.0.0.1:5173`.
+- Browser/manual checks: OWNER-MANUAL where rendering or clicking through the UI is required.
+- Live qwen3/Ollama verification: deferred by design and not run.
+- Updated recommendation: record final MVP exit status only after the owner either accepts the sandbox limitation for server/browser smokes or reruns those smokes in an environment where localhost binding is permitted.

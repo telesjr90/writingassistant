@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines a future optional extractor track for app-level analysis tooling. Extractors may help identify candidate entities, actions, relationships, event notes, and timeline facts from owner-provided scene or project context, but they are not part of the current MVP exit gate.
+This document defines a future Writer Assistant Core extractor track for app-level analysis tooling. Extractors may help identify candidate entities, aliases, actions, relationships, event notes, timelines, plot threads, open questions, continuity issues, contradictions, and annotations from owner-provided scene or project context, but they are not part of the current MVP exit gate and no extractor dependency should be installed now.
 
 The intended flow is:
 
@@ -25,6 +25,7 @@ Extractor output is candidate analysis only. It is not durable project truth.
 - Do not directly update `bible.json`, `storyform.json`, `scenes/`, `project.json`, `owner_memory.json`, OMI promotions, `training/data`, or `dataset_manifest.json`.
 - Do not treat schema-valid extractor output as verified Dramatica/NCP truth.
 - Do not add extractor dependencies until a separate implementation task evaluates license, maintenance, runtime cost, and safety.
+- Do not add extractor dependencies until schemas, OMI candidate flow, evidence spans, and tests are ready.
 
 ## Analysis-Only Boundary
 
@@ -34,6 +35,10 @@ Extractors may produce structural observations such as:
 - Action or event candidates.
 - Relationship candidates.
 - Timeline note candidates.
+- Plot thread candidates.
+- Open-question candidates.
+- Continuity or contradiction warning candidates.
+- Annotation candidates.
 - Evidence clusters.
 - Ambiguity or insufficient-evidence notes.
 
@@ -56,11 +61,13 @@ Extractor output may not bypass OMI review, OMI owner decision, OMI promotion ga
 
 | Tool | Possible Role | Strength | Primary Risk | MVP Position |
 | --- | --- | --- | --- | --- |
-| `segram` | Semantic/action extraction from owner-authored text | Likely safest first candidate for entities, actions, and dependency-style structural notes | NLP output can overclaim relationships or causal meaning | Future optional extractor candidate; evaluate first if extractor work starts |
-| `fabula` | Knowledge graph/entity/event/relationship extraction | Useful for graph-shaped candidate records and relationship/timeline notes | Graph output may look like truth without owner review | Future optional extractor candidate, behind OMI candidate-only storage |
-| `silverfish` | Relationship extraction and evidence clusters | Could support relationship-candidate evidence grouping | Relationship extraction may be mistaken for Relationship Story proof | Future optional extractor candidate with explicit insufficient-evidence labels |
-| `AI-Reader-V2` | Visualization/UI reference for maps, timelines, relationship graphs | Useful interaction reference for future OMI views | UI patterns could imply extractor certainty or authoring automation | Reference only; no dependency or runtime adoption now |
-| `narrative-blueprint` | Configurable batch/evaluation pipeline reference | Useful for future extractor evaluation harness shape | Pipeline scope could drift into generation or training data production | Reference only for future evaluation design |
+| `segram` | Semantic/action/entity extraction from owner-authored text | Likely safest first candidate for entities, actions, and dependency-style structural notes | NLP output can overclaim relationships or causal meaning | First future extractor spike candidate after schemas, OMI flow, evidence spans, and tests are ready; do not install now |
+| `fabula` | Knowledge graph/entity/event/relationship extraction | Useful for graph-shaped candidate records and relationship/timeline notes | Graph output may look like truth without owner review | Second-stage candidate after basic extractor schema exists |
+| `silverfish` | Relationship extraction and evidence clusters | Could support relationship-candidate evidence grouping | Relationship extraction may be mistaken for Relationship Story proof | Later candidate after relationship review UI and evidence-span model exist |
+| `AI-Reader-V2` | Visualization/UI reference for maps, timelines, relationship graphs | Useful interaction reference for future OMI views | UI patterns could imply extractor certainty or authoring automation | Visualization/UI reference only; do not install as runtime dependency |
+| `narrative-blueprint` | Configurable batch/evaluation pipeline reference | Useful for future extractor evaluation harness shape | Pipeline scope could drift into generation or training data production | Future batch/evaluation inspiration after at least one extractor exists |
+
+Dependency rule: do not install external extractor dependencies until a dedicated spike branch/task evaluates license, maintenance, runtime cost, safety, candidate-only behavior, and integration with OMI.
 
 ## Rejected or Deferred Tools
 

@@ -4,6 +4,8 @@
 
 This specification defines the Narrative Context Protocol (NCP) and storyform subset that the Dramatica-Informed Writing Assistant App MVP may safely support. Its purpose is to let Story Check and future OMI use structural context without claiming full Dramatica verifier parity or turning candidate analysis into durable project truth.
 
+Product pivot status: NCP/Dramatica remains useful for future structural analysis, but it is no longer the main near-term app backbone. The next product track is Writer Assistant Core, which should use a simpler writer-assistant story knowledge model first: characters, aliases, locations, objects, organizations, events, timelines, relationships, plot threads, open questions, continuity issues, contradictions, annotations, and evidence spans. Dramatica-specific truth claims remain owner-gated and deferred to a later advanced analysis layer.
+
 What exists now:
 
 - `projects/{project_name}/storyform.json` is loaded by `backend/storyform.py`.
@@ -72,6 +74,7 @@ Current example mismatch:
 ## 3. NCP Compatibility Goals
 
 - Support Story Check context safely without overclaiming structural certainty.
+- Keep NCP/Dramatica available as reference context while the near-term app prioritizes Writer Assistant Core story knowledge workflows.
 - Preserve OS/MC/IC/RS separation in storage, prompt context, diagnostics, and future UI.
 - Preserve owner-approved truth boundaries: `storyform.json` is durable only when owner-approved.
 - Preserve unresolved, absent, or unsupported fields instead of guessing.
@@ -79,6 +82,7 @@ Current example mismatch:
 - Keep the subset compatible with mock mode, qwen3/Ollama baseline mode, future `dramatica-analyst:8b`, and OMI candidate planning.
 - Keep retrieved Dramatica/NCP definitions as reference-only material.
 - Keep raw model output, OMI output, NotebookLM output, and external reference output as candidate material until owner-approved.
+- Avoid forcing every story knowledge candidate into a Dramatica schema. Character, timeline, relationship, plot, continuity, and annotation candidates may use simpler project-memory schemas first.
 
 ## 4. MVP-Supported NCP/Storyform Fields
 

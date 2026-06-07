@@ -153,6 +153,29 @@ Future-only:
 - model-specific caches
 - collaboration/sync metadata
 
+Future Writer Assistant Core memory/canon target, not implemented:
+
+```text
+projects/{project_id}/
+  memory/
+    characters.json
+    locations.json
+    objects.json
+    organizations.json
+    timeline.json
+    relationships.json
+    plot_threads.json
+    annotations.json
+```
+
+Alternative future target, also not decided:
+
+```text
+projects/{project_id}/project_memory.json
+```
+
+The final durable memory/canon structure is open. It must be decided in CORE-004 before implementation. Until then, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
+
 No project file may contain secrets, raw book/source text, packet evidence, SFT records, model artifacts, or training runs.
 
 ## 5. `project.json` Specification
@@ -261,6 +284,8 @@ Conservative claim rules:
 ## 8. `owner_memory.json` Role and Boundary
 
 `owner_memory.json` is durable owner-approved project memory. It may be deferred until after basic Story Check and OMI flows if the MVP can preserve boundaries without it.
+
+Writer Assistant Core update: owner memory/project canon becomes a central future design target after the MVP foundation. The app should eventually support owner-approved records for characters, aliases/nicknames, locations, objects/items, organizations/groups, scenes, events/actions, timelines, relationships, plot threads, open questions, continuity issues, contradictions, annotations, and evidence spans. No such files are implemented by this documentation update.
 
 Purpose:
 

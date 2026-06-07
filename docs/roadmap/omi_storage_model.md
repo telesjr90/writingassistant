@@ -10,12 +10,11 @@ OMI storage has a no prose generation boundary: OMI records may store structural
 
 Current implementation status:
 
-- No OMI backend routes exist.
-- No OMI frontend components exist.
-- No OMI storage helper exists.
-- No runtime OMI files are created under `projects/example`.
-- `docs/roadmap/omi_mvp_schema_lifecycle.md` defines the OMI-001 lifecycle and field boundary.
-- This OMI-002 spec narrows the storage layout and promotion-gate model for future implementation.
+- OMI MVP backend/frontend slices now exist for raw idea and structured candidate creation/list/load, owner decision/status/destination updates, record-only promotion creation, and UI lifecycle/status/provenance display.
+- OMI still does not apply promotions to durable truth files.
+- Existing ignored local OMI artifacts may exist under `projects/example/omi/`, but tracked fixture files remain clean unless owner-approved separately.
+- `docs/roadmap/omi_mvp_schema_lifecycle.md` defines the OMI lifecycle and field boundary.
+- This storage model remains the design source for expanding OMI into the central Writer Assistant Core candidate review/promotion system.
 
 ## 2. Target Storage Layout
 
@@ -38,10 +37,25 @@ This layout is not implemented yet. Future runtime tasks must create these folde
 Storage boundaries:
 
 - `omi/ideas/` stores owner-authored raw ideas and their lifecycle state.
-- `omi/candidates/` stores structured candidate planning material derived from ideas, model output, NotebookLM output, retrieved references, or owner review.
+- `omi/candidates/` stores structured candidate planning material derived from ideas, owner project text, model output, NotebookLM output, retrieved references, extractor output, or owner review.
 - `omi/promotions/` stores explicit owner-approved promotion attempts and records before any future target mutation.
 - `omi/index.json` stores references and summary metadata for OMI records.
 - OMI files cannot overwrite `bible.json`, `storyform.json`, `owner_memory.json`, `project.json`, or `scenes/`.
+
+Writer Assistant Core candidate types planned for future OMI expansion:
+
+- `character_candidate`
+- `location_candidate`
+- `object_candidate`
+- `organization_candidate`
+- `timeline_event_candidate`
+- `relationship_candidate`
+- `plot_thread_candidate`
+- `continuity_warning_candidate`
+- `annotation_candidate`
+- `open_question_candidate`
+
+All extracted story knowledge remains candidate-only until owner approval, destination selection, evidence/provenance review, and final confirmation. OMI promotion records are not automatic canon mutation.
 
 ## 3. OMI Idea Record
 
@@ -183,6 +197,8 @@ Rules:
 - Candidate records cannot overwrite durable project truth.
 - Candidate records can reference evidence, but evidence does not establish story truth without owner approval.
 - Positive OS/MC/IC/RS/CIPS/dynamics claims remain candidate-only unless owner-approved and evidence-backed.
+- Character, location, object, organization, event, relationship, plot, continuity, annotation, and open-question candidates must preserve uncertainty and evidence locators where practical.
+- Relationship candidates are generic story-knowledge candidates by default and must not be treated as Dramatica Relationship Story proof.
 
 ## 5. OMI Promotion Record
 

@@ -46,13 +46,41 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 7. Add broader route tests where useful without live Ollama.
 8. Create remaining deterministic mock-mode fixtures beyond Story Check: `throughline_classification`, `writer_questions`, `out_of_scope_refusal`, malformed JSON, OS/MC confusion, IC/Antagonist confusion, and generic relationship/RS confusion.
 9. Continue frontend hardening after FE-001, App-4, and App-5; rich Story Check UI sections, scene editor dirty-state handling, and owner-controlled bible/storyform JSON editing are implemented.
-10. Resolve the MVP exit preflight repo-safety blocker: pre-existing dirty tracked `projects/example/bible.json` and `projects/example/scenes/scene_001.md` changes must be reverted, accepted, or separately committed by owner decision.
+10. Record owner acceptance/documentation of the current committed public-domain `projects/example` fixture state. Phase 6 Step 1 refresh found no dirty tracked fixture files; ignored local `projects/example/omi/` artifacts remain local-only.
 11. Revise or create a RunPod cloud smoke config before smoke training in a future training task; this is not current while fine-tuning prep is paused.
 12. Fine-tuning is paused pending P0 evidence extraction/verification before any Book 1-3 JSONL drafting.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
 14. Re-run the repo safety portion of the MVP completion test matrix after the dirty fixture files are resolved before declaring MVP exit; this is the next active project task.
 15. Evaluate optional analysis extractors only after MVP exit; any segram, fabula, silverfish, AI-Reader-V2, or narrative-blueprint work remains candidate-only and routed through OMI.
 16. Books 4-5 remain conditional and should not start while the fine-tuning/book-backed track is paused.
+17. Decide whether to accept the Step 2 sandbox limitation for localhost backend/frontend server smokes or rerun those smokes in a local environment where socket binding is permitted.
+
+## Writer Assistant Core Follow-Up Questions
+
+These are implementation follow-ups for the new product direction, not blockers to recording the pivot.
+
+1. What durable project memory/canon file structure should be used: separate `memory/*.json` files, a single `project_memory.json`, or another layout?
+2. Which candidate types are required for the first Writer Assistant Core release: character, location, object, organization, timeline event, relationship, plot thread, continuity warning, annotation, open question, or a smaller subset?
+3. What is the minimum evidence-span format: exact text span, scene-relative character offsets, line/paragraph locators, source hashes, or a hybrid?
+4. Should annotations be stored per scene, per entity, globally, or in a combined index?
+5. Should the first extractor be deterministic/rule-based, LLM-assisted, `segram`-assisted, or hybrid?
+6. What UI should approve, reject, revise, merge, or annotate candidate story knowledge?
+7. What qualifies a relationship or timeline event for owner-approved promotion to canon?
+8. When should Dramatica analysis return as an advanced layer after Writer Assistant Core?
+
+## Writer Assistant Core Follow-Up Questions
+
+These are implementation follow-ups for the new product direction, not blockers for the completed MVP foundation:
+
+1. What durable project memory/canon file structure should be used: `memory/*.json`, one `project_memory.json`, or another layout?
+2. Which candidate types are required for the first Writer Assistant Core release: characters, aliases, locations, objects, organizations, events, relationships, plot threads, open questions, continuity warnings, annotations, or a smaller subset?
+3. What is the minimum evidence-span format: file path plus character offsets, line ranges, excerpt IDs, source hashes, or a hybrid?
+4. Should annotations be stored per scene, per entity, globally, or in an OMI-linked annotation store?
+5. Should the first extractor be deterministic/rule-based, LLM-assisted, `segram`-assisted, or hybrid?
+6. What UI should approve, reject, revise, and annotate candidate story knowledge?
+7. What qualifies a relationship, timeline event, or plot-thread item for promotion to canon?
+8. When should Dramatica analysis return as an advanced layer after Writer Assistant Core is stable?
+9. Which extractor spike should be first once schemas and OMI candidate flow are ready?
 
 ## Book 1-3 Owner-Answer Status
 
@@ -73,7 +101,9 @@ Still unresolved or blocked for direct conversion:
 
 ## Owner Questions
 
-No additional owner decisions are required for the completed App MVP slices. The current owner decision needed for local MVP readiness is how to resolve the dirty tracked `projects/example` fixture files.
+No additional owner decisions are required for the completed App MVP slices. The current owner decision needed for local MVP readiness is whether to accept/document the current committed public-domain `projects/example` fixture state and leave ignored local `projects/example/omi/` artifacts as local-only state. The current product-direction decision has shifted: after Phase 6 owner acceptance, the next roadmap priority is Writer Assistant Core, while Dramatica, Books 4-5, and fine-tuning remain deferred.
+
+Phase 6 Step 2 adds one MVP exit decision: true backend/frontend dev-server smokes are blocked by this sandbox's socket/listen restrictions, while in-process mock route smoke passed. The owner can either accept this as an environment limitation for documentation purposes or request a rerun in a socket-enabled local environment.
 
 Resolved sample/source roles:
 
@@ -82,4 +112,4 @@ Resolved sample/source roles:
 3. First scene text: copied verbatim from `/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt` into the local ignored fixture.
 4. `/mnt/e/WritingAssistantApplication/docs/owner_sample_input.md`: reserved for future OMI raw idea/candidate-planning tests only, not Story Check fixture prose or project truth.
 5. MC, IC, RS, CIPS, and dynamics evidence: not asserted for the public-domain fixture, so these remain unresolved for insufficient-evidence behavior.
-6. Commit status: project fixture changes remain unstaged/uncommitted until explicitly requested.
+6. Commit status: tracked project fixture files are clean in `HEAD` as of the Phase 6 Step 1 refresh; no revert is needed unless the owner rejects the committed fixture state.

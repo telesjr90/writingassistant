@@ -72,15 +72,76 @@ OMI must remain analysis-only, candidate-output-first, and owner-controlled. Pro
 - Inputs: working Story Check and bounded OMI MVP paths.
 - Outputs: project navigation reliability, save/reload testing, app smoke tests, documentation cleanup, manual local run checklist, and completed MVP exit test matrix.
 - Status note: `docs/roadmap/mvp_completion_test_matrix.md` defines the formal MVP exit gate across repo safety, backend tests, frontend build, Story Check modes, guardrails, context, OMI, evaluation harness, and manual acceptance.
-- Status note: MVP exit preflight executed on 2026-06-05. Automated backend tests, focused groups, frontend build, offline baseline harness, mock Story Check smoke, guardrail checks, OMI boundary checks, and short server smokes passed; live qwen3 smoke was deferred by design. Repo safety is blocked by pre-existing dirty tracked `projects/example` fixture files.
-- Status note: Phase 6 is the active recommended phase after pausing fine-tuning prep. Resolve or explicitly accept the dirty tracked fixture-file blocker, then re-run/record the MVP exit matrix rather than starting JSONL conversion, RunPod smoke, or training.
-- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors after the dirty tracked fixture files are resolved or explicitly accepted.
+- Status note: MVP exit preflight executed on 2026-06-05. Automated backend tests, focused groups, frontend build, offline baseline harness, mock Story Check smoke, guardrail checks, OMI boundary checks, and short server smokes passed; live qwen3 smoke was deferred by design.
+- Status note: Phase 6 Step 1 refresh on 2026-06-06 found no dirty tracked `projects/example` fixture files. Tracked fixture files are clean in `HEAD`; ignored local `projects/example/omi/` artifacts remain local-only. Phase 6 remains active: record owner fixture-state acceptance and re-run/record the MVP exit matrix rather than starting JSONL conversion, RunPod smoke, or training.
+- Status note: Phase 6 Step 2 refresh on 2026-06-06 passed in-process mock backend route smoke and source/boundary inspection, but true backend/frontend localhost server smokes are blocked in this sandbox by socket/listen restrictions. Browser-rendered checks remain owner-manual, and live qwen3/Ollama remains deferred by design.
+- Exit: App MVP is locally usable and documented without depending on RunPod, book-backed workflow, fine-tuning, or optional extractors after the current committed fixture state is owner-accepted/documented and the remaining MVP exit checks are recorded.
 
-### Post-MVP: Optional Analysis Extractors
+## Writer Assistant Core Track
+
+This is the next product direction after owner acceptance of the Phase 6 MVP foundation. It shifts the roadmap from Dramatica-first analyzer work to writer-assistant story knowledge work. All outputs remain analysis-only, candidate-first, evidence/provenance-backed where practical, and owner-controlled through OMI.
+
+### Phase 7: Writer Assistant Core Planning and Schemas
+
+- Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
+- Outputs: story knowledge candidate schemas, evidence span/provenance model, initial project memory/canon design target, minimum candidate type set.
+- Status: PLANNED/FUTURE. Documentation pivot recorded; no runtime schema or storage implementation has been performed.
+- Exit: owner-approved schema plan for candidate story knowledge and project memory/canon.
+
+### Phase 8: OMI Expansion for Story Knowledge Candidates
+
+- Inputs: Phase 7 schemas and existing OMI candidate/review/promotion-record workflow.
+- Outputs: OMI candidate types for characters, locations, objects, organizations, timeline events, relationships, plot threads, continuity warnings, annotations, and open questions.
+- Status: PLANNED/FUTURE. Existing OMI MVP remains implemented for raw ideas and structured candidates; expanded candidate types are not implemented yet.
+- Exit: OMI can create/review expanded story knowledge candidates without writing prose or mutating durable truth.
+
+### Phase 9: Story Knowledge Extraction Pipeline
+
+- Inputs: OMI expanded candidate flow, evidence span model, extractor spike decision.
+- Outputs: candidate-only extraction pipeline for entities, aliases, actions/events, locations, objects, organizations, relationships, plot threads, open questions, continuity issues, and contradictions.
+- Status: PLANNED/FUTURE. No extractor dependency is installed; no extractor route or runtime has been implemented.
+- Exit: extractor output is normalized into OMI candidate records with provenance and evidence, never durable canon.
+
+### Phase 10: Annotation, Evidence, and Review UI
+
+- Inputs: candidate schemas, evidence/provenance records, OMI review flow.
+- Outputs: annotation sidebar/review UI, evidence span display, approve/reject/revise controls, candidate status labels.
+- Status: PLANNED/FUTURE.
+- Exit: owner can review story knowledge candidates and evidence without losing track of candidate vs approved status.
+
+### Phase 11: Project Memory / Canon Promotion
+
+- Inputs: OMI promotion gates, project memory/canon storage decision, evidence requirements.
+- Outputs: owner-approved promotion flow into durable project memory/canon records, with destination and confirmation.
+- Status: PLANNED/FUTURE. No project memory/canon files are implemented by this documentation update.
+- Exit: approved candidate records can be promoted to durable memory/canon without mutating scene prose or silently overwriting truth.
+
+### Phase 12: Continuity, Relationship, Timeline, and Plot Assistance
+
+- Inputs: approved memory/canon records, candidate extraction, annotation UI.
+- Outputs: continuity checks, contradiction warnings, relationship/timeline/plot-thread assistance, search/query assistant.
+- Status: PLANNED/FUTURE.
+- Exit: assistant helps the writer inspect project knowledge and continuity without generating or rewriting prose.
+
+### Later Phase: Advanced Dramatica Analysis
+
+- Inputs: stable Writer Assistant Core, owner-approved project memory/canon, deferred Dramatica/NCP structural context.
+- Outputs: advanced storyform/throughline/CIPS/dynamics/IC/RS analysis as a separate layer.
+- Status: DEFERRED. Dramatica-specific truth claims remain owner-gated and evidence-backed.
+- Exit: advanced structural analysis is useful without becoming the main writer-assistant backbone.
+
+### Later Phase: Fine-Tuning / Dramatica Analyst Model
+
+- Inputs: resumed evidence extraction, validated review JSONL, promoted records, ready manifest, GPU/cloud plan.
+- Outputs: evaluated `dramatica-analyst` model candidate.
+- Status: BLOCKED/PAUSED. Dataset gate remains blocked and fine-tuning prep is paused.
+- Exit: non-smoke model passes evaluation before any app default swap.
+
+### Future Writer Assistant Core: Extractor Research
 
 - Inputs: owner scene/project context, OMI candidate workflow, no-prose guardrails, extractor license review.
 - Outputs: optional candidate entity/action/relationship/timeline extraction pipeline, if later approved.
-- Status note: `docs/roadmap/optional_analysis_extractors.md` records segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as future references only.
+- Status note: `docs/roadmap/optional_analysis_extractors.md` records segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as future Writer Assistant Core references only.
 - Exit: any extractor output remains candidate-only, routes through OMI, preserves provenance, and cannot directly mutate durable project truth, OMI promotions, training data, or `dataset_manifest.json`.
 
 ## Dataset and Training Tracks
@@ -148,7 +209,14 @@ gantt
     Phase 4 frontend diagnostics :p4, after p3, 1
     Phase 5 bounded OMI MVP :p5, after p4, 1
     Phase 6 MVP hardening active :active, p6, after p5, 1
-    Optional extractor research :extractors, after p6, 1
+    section Writer Assistant Core
+    Phase 7 planning/schemas :core7, after p6, 1
+    Phase 8 OMI story knowledge :core8, after core7, 1
+    Phase 9 extraction pipeline :core9, after core8, 1
+    Phase 10 evidence/review UI :core10, after core9, 1
+    Phase 11 memory/canon promotion :core11, after core10, 1
+    Phase 12 continuity assistance :core12, after core11, 1
+    Extractor research spikes :extractors, after core7, 1
     section Dataset
     Short-story packet completion :packets, 1, 5
     Book-backed prep paused after mapping dry-run :crit, books, 2, 3

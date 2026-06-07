@@ -2,8 +2,10 @@
 # Dramatica-Informed Writing Assistant – Minimal Viable Core Plan
 
 ## 0. Project Overview
-We are building a single‑UI writing tool inspired by Subtxt. The MVP will:
-- Use the **Narrative Context Protocol (NCP)** as the structural backbone.
+We are building a single‑UI local writer assistant inspired by Subtxt. The MVP foundation remains useful, but the next implementation priority has pivoted from Dramatica-first analysis to **Writer Assistant Core**: identifying, organizing, connecting, and annotating story knowledge from the writer's own text.
+
+The MVP foundation will:
+- Use the **Narrative Context Protocol (NCP)** as a bounded structural reference, not the near-term product backbone.
 - Allow writing & editing scenes in a local project.
 - Perform a **Story Check** analysis that flags narrative drift, inconsistency, and missing beats.
 - Include bounded **Organize My Idea (OMI)** planning that captures raw ideas and structured candidates without generating story prose.
@@ -11,7 +13,7 @@ We are building a single‑UI writing tool inspired by Subtxt. The MVP will:
 
 OMI is part of the App MVP, but it is analysis/planning only. It must not write, rewrite, continue, imitate, polish, or improve story prose, and it must not silently promote ideas, candidates, model output, or NotebookLM output into durable project truth. OMI MVP fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; the current runtime slice captures owner-authored raw ideas and structured candidate planning records, supports owner review decisions, creates promotion audit records without mutating durable truth, and shows lifecycle/status/provenance details in the OMI panel.
 
-MVP completion is governed by `docs/roadmap/mvp_completion_test_matrix.md`. Optional analysis extractors are documented as post-MVP candidate-only tooling in `docs/roadmap/optional_analysis_extractors.md`; they are not an MVP blocker and cannot directly alter project truth or training data.
+MVP completion is governed by `docs/roadmap/mvp_completion_test_matrix.md`. Optional analysis extractors are now future Writer Assistant Core research, not MVP blockers and not dependencies to install now. Extractor output must route through OMI as candidate-only records before any owner-approved promotion.
 
 The current workspace is `/home/tjrpirateking/projects/WritingAssistantApplication`. The UI is a React app served by a FastAPI backend.
 
@@ -27,7 +29,7 @@ The current workspace is `/home/tjrpirateking/projects/WritingAssistantApplicati
 
 ## Phase 2 – Data Preparation (updated)
 
-Goal: Build a multi‑task dataset that teaches a model to diagnose narrative coherence against a Dramatica storyform and to ask writer‑focused questions, **never to generate prose**.
+Goal: Paused future track. If resumed, build a multi-task dataset that teaches a model to diagnose narrative coherence against approved structural context and to ask writer-focused questions, **never to generate prose**. This is no longer the next implementation priority for the app.
 
 1. Base model: **Qwen/Qwen2.5-7B-Instruct** (primary). Fallback: Qwen3-4B-Instruct-2507 if GPU is constrained.
 2. Dataset structure: multi‑task SFT records. Each example includes:
@@ -109,9 +111,22 @@ Goal: Build a multi‑task dataset that teaches a model to diagnose narrative co
 
 ## 0.2 MVP Phase Order
 
-Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, OMI-004 owner decision and destination selection, OMI-005 promotion gate enforcement, OMI-006 fuller OMI UI/status/provenance workflow, OMI-007 no-prose/no-silent-promotion tests, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. MVP exit matrix execution/preflight ran on 2026-06-05 and is blocked only by pre-existing dirty tracked project fixture files pending owner resolution. App MVP Phase 6 remains the recommended active phase.
+Current status: App-1 architecture audit, App-2 project file model, App-3 NCP compatibility subset, App-3a / OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 candidate creation flow, OMI-004 owner decision and destination selection, OMI-005 promotion gate enforcement, OMI-006 fuller OMI UI/status/provenance workflow, OMI-007 no-prose/no-silent-promotion tests, sample project alignment spec, local public-domain `projects/example` fixture alignment, GUARD-001 shared runtime no-prose guard, GUARD-002 request-path guard policy, GUARD-003 post-model Story Check output guard, BE-001 analysis mode config, BE-002 Story Check normalizer, SC-001 rich Story Check prompt alignment, SC-002 minimal-to-rich route/UI compatibility checks, App-7 mock Story Check mode, App-8 live qwen3/Ollama baseline verification, App-12 app-level evaluation fixtures, App-13 offline baseline evaluation harness, FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, and App-5 bible/storyform read/write layer are complete locally. `owner_sample_input.md` is reserved for future OMI raw idea/candidate testing, not project truth. MVP exit matrix execution/preflight ran on 2026-06-05. Step 1 refresh on 2026-06-06 found no dirty tracked `projects/example` fixture files; Step 2 refresh passed mock backend server smoke, backend route smoke, mock Story Check route smoke, and frontend dev-server smoke after approved localhost execution. Owner acceptance/documentation of the committed public-domain fixture state and browser/manual checklist items remains recommended. App MVP Phase 6 remains the recommended active phase.
 
 Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP critical path; the app can progress through mock mode and qwen3/Ollama baseline mode without those gates. Fine-tuning prep is paused after the Book 1-3 review JSONL mapping dry-run; the next fine-tuning step when resumed is P0 evidence extraction/verification before any JSONL drafting.
+
+After owner acceptance of the Phase 6 MVP foundation, the next implementation priority is Writer Assistant Core:
+
+- Phase 7: Writer Assistant Core planning and schemas.
+- Phase 8: OMI expansion for story knowledge candidates.
+- Phase 9: Story knowledge extraction pipeline.
+- Phase 10: Annotation, evidence, and review UI.
+- Phase 11: Project memory / canon promotion.
+- Phase 12: Continuity, relationship, timeline, and plot assistance.
+- Later: Advanced Dramatica analysis.
+- Later: fine-tuning / `dramatica-analyst` model.
+
+Dramatica analysis remains allowed as a later advanced layer. It is not the next implementation priority, and the fine-tuned model remains outside the MVP/core critical path.
 
 | Phase | Scope | Completion Definition |
 | --- | --- | --- |
@@ -188,9 +203,11 @@ You should see the project navigation, the editor, and the analysis sidebar with
 ---
 
 ## 5. Next Steps (Beyond MVP)
-- Dynamic storyform questionnaire.
-- Optional analysis extractor research for candidate entities/actions/relationships/timeline notes through OMI.
-- NovelClaw‑style memory banks.
+- Writer Assistant Core schema planning for story knowledge candidates, evidence spans, provenance, and project memory/canon.
+- OMI expansion for `character_candidate`, `location_candidate`, `object_candidate`, `organization_candidate`, `timeline_event_candidate`, `relationship_candidate`, `plot_thread_candidate`, `continuity_warning_candidate`, `annotation_candidate`, and `open_question_candidate`.
+- Story knowledge extraction pipeline research for candidate entities/actions/relationships/timeline notes through OMI.
+- Dynamic storyform questionnaire as a later advanced Dramatica layer.
+- NovelClaw‑style memory banks as future inspiration only.
 - Dramatron-style scene generation remains blocked/non-goal.
 - World‑building interface (Notebook‑inspired).
 - Support for local LLMs (Ollama).

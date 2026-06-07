@@ -35,7 +35,7 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | OMI-005 | Prevent OMI candidate promotion without explicit owner approval | Promotion guard | DONE; approved candidates can create promotion audit records only after owner approval, final confirmation, allowed destination, provenance, source snapshot, and safe target labels are present, with no durable truth mutation |
 | OMI-006 | OMI UI for raw idea, candidates, status, provenance, and destination | OMI UI | DONE; OMI panel shows raw ideas, candidates, selected candidate lifecycle details, owner decisions, destinations, timestamps, provenance, evidence, promotion readiness blockers, and promotion records without apply-promotion behavior |
 | OMI-007 | OMI tests for no-prose and no-silent-promotion behavior | Test coverage | DONE; focused tests verify blocked prose destinations/types, owner-authored content remains candidate-only, promotion records do not apply durable truth mutation, promotion blockers fail closed, UI boundary copy remains present, no model path is called, and path traversal is blocked |
-| MVP-EXIT | MVP completion test matrix | `docs/roadmap/mvp_exit_preflight_report.md` | ACTIVE NEXT; preflight executed once with automated tests, focused tests, frontend build, server smokes, offline baseline, mock Story Check, guardrails, and OMI boundaries passing; resolve repo-safety blocker from pre-existing dirty tracked project fixture files, then re-run/record preflight |
+| MVP-EXIT | MVP completion test matrix | `docs/roadmap/mvp_exit_preflight_report.md` | ACTIVE NEXT; Step 1 refresh found no dirty tracked `projects/example` fixture files and automated checks passed; Step 2 passed mock backend server smoke, backend route smoke, mock Story Check route smoke, and frontend dev-server smoke after approved localhost execution. Final exit recording needs owner acceptance of fixture state and browser/manual checklist disposition |
 
 ## App MVP Phase Order
 
@@ -47,15 +47,40 @@ This backlog is implementation-ready but not yet converted into GitHub Issues. C
 | Phase 3 | Mock and baseline Story Check | COMPLETE locally for Story Check MVP; App-7 mock mode, App-8 live qwen3 baseline verification, App-12 evaluation fixtures, and App-13 offline baseline harness done; remaining mock fixtures beyond Story Check are future work |
 | Phase 4 | Frontend MVP diagnostics | COMPLETE locally; FE-001 rich Story Check diagnostics sidebar, App-4 scene editor hardening, App-5 bible/storyform context editing, and Story Check guard integration done |
 | Phase 5 | OMI MVP implementation | COMPLETE locally; OMI-001 schema/lifecycle, OMI-002 storage model, OMI-003 raw idea/candidate creation, OMI-004 owner decision/destination selection, OMI-005 promotion gate records, OMI-006 status/provenance UI, and OMI-007 no-prose/no-silent-promotion tests are complete |
-| Phase 6 | MVP hardening | ACTIVE NEXT; resolve dirty tracked project fixture files and re-run/record MVP exit preflight before declaring local MVP ready or pushing |
+| Phase 6 | MVP hardening | ACTIVE NEXT; tracked fixture files are clean, automated checks pass, and Step 2 safe CLI/server smokes pass. Final exit recording needs owner acceptance of fixture state plus OWNER-MANUAL browser checklist disposition |
 
 ## Post-MVP / Future App Track
 
+## Writer Assistant Core
+
+Near-term product direction after owner acceptance of the Phase 6 MVP foundation. These tasks are future implementation tasks, not completed runtime work. All outputs must remain analysis-only, candidate-first, routed through OMI where extracted knowledge is involved, and blocked from writing or rewriting story prose.
+
 | ID | Task | Output | Acceptance |
 | --- | --- | --- | --- |
-| EXT-001 | Optional analysis extractor research | `docs/roadmap/optional_analysis_extractors.md` | FUTURE; evaluate segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as candidate-only references, not MVP blockers |
-| EXT-002 | Extractor proof of concept | Offline candidate extraction fixture/report | FUTURE; extractor output routes to OMI candidates only and never directly mutates project truth or training data |
-| EXT-003 | Extractor integration tests | Extractor/OMI candidate tests | FUTURE; verifies no prose generation, provenance, owner review, guardrails, and no direct promotion |
+| CORE-001 | Product pivot documentation update | Master/roadmap pivot docs and local report | DONE locally when this documentation update is complete; no runtime code, package install, JSONL, training, or Ollama call |
+| CORE-002 | Story knowledge candidate schema design | Candidate schema spec | Defines candidate types, fields, statuses, evidence/provenance, uncertainty, and owner decision requirements |
+| CORE-003 | Evidence span and provenance model | Evidence/provenance spec | Defines minimum source path, span/locator, source hash where practical, confidence, uncertainty, and owner review metadata |
+| CORE-004 | Project memory/canon storage model | Project memory/canon design | Chooses or narrows future `memory/` files vs `project_memory.json`; no runtime files until approved |
+| CORE-005 | OMI candidate type expansion | OMI candidate type spec/update | Adds character/location/object/organization/timeline/relationship/plot/continuity/annotation/open-question candidates while preserving no-silent-promotion |
+| CORE-006 | Character/location/object extraction candidate pipeline | Candidate extraction plan/prototype | Extracts candidate entities only into OMI with evidence and uncertainty |
+| CORE-007 | Timeline event extraction candidate pipeline | Timeline candidate plan/prototype | Extracts event/action candidates with locators; does not assert canon without owner approval |
+| CORE-008 | Relationship extraction candidate pipeline | Relationship candidate plan/prototype | Extracts relationship candidates with uncertainty; does not imply Dramatica Relationship Story proof |
+| CORE-009 | Plot thread and open-question extraction candidate pipeline | Plot/open-question candidate plan/prototype | Tracks open questions and plot threads as candidates only |
+| CORE-010 | Annotation sidebar/review UI | Review UI plan/implementation | Shows evidence spans, candidate status, approve/reject/revise controls, and no-prose boundary labels |
+| CORE-011 | Candidate-to-canon owner promotion flow | Owner-approved promotion flow | Promotes only after owner approval, destination, provenance/evidence, and final confirmation; never mutates scene prose |
+| CORE-012 | Continuity and contradiction checks | Candidate warning flow | Produces continuity/contradiction candidates with evidence and uncertainty, not automatic truth |
+| CORE-013 | Story knowledge search/query assistant | Query/search design | Helps inspect approved and candidate project knowledge without writing prose |
+| CORE-014 | Extractor evaluation harness | Evaluation fixtures/report | Evaluates extractor candidates for precision, provenance, safety, and no-prose behavior |
+| CORE-015 | `segram` spike evaluation | Spike report | First extractor candidate only after schema/OMI/evidence model exists; no dependency install outside approved spike |
+| CORE-016 | `fabula` spike evaluation | Spike report | Second-stage graph/entity/event/relationship candidate after basic extractor schema exists |
+| CORE-017 | `silverfish` spike evaluation | Spike report | Later relationship/evidence-cluster candidate after relationship review UI and evidence model exist |
+| CORE-018 | Graph/timeline visualization research | UI research report | Evaluates relationship graph/timeline/map patterns without adopting runtime dependency |
+
+| ID | Task | Output | Acceptance |
+| --- | --- | --- | --- |
+| EXT-001 | Optional analysis extractor research | `docs/roadmap/optional_analysis_extractors.md` | RECLASSIFIED under Writer Assistant Core; evaluate segram, fabula, silverfish, AI-Reader-V2, and narrative-blueprint as candidate-only references, not MVP blockers |
+| EXT-002 | Extractor proof of concept | Offline candidate extraction fixture/report | FUTURE via CORE-006 to CORE-017; extractor output routes to OMI candidates only and never directly mutates project truth or training data |
+| EXT-003 | Extractor integration tests | Extractor/OMI candidate tests | FUTURE via CORE-014; verifies no prose generation, provenance, owner review, guardrails, and no direct promotion |
 
 ## Packet/Dataset
 

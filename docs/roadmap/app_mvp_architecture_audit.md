@@ -4,6 +4,8 @@
 
 The current Dramatica-Informed Writing Assistant is a local FastAPI plus React/Vite app with Ollama as the configured inference path. It is analysis-only by product boundary, with the current backend default model set to `qwen3:8b` and the future `dramatica-analyst:8b` target blocked behind non-smoke training, evaluation, and model-swap gates.
 
+Pivot status: the architecture foundation remains useful, but the next product track is Writer Assistant Core rather than Dramatica-first analyzer expansion. Future architecture work should center OMI candidate review/promotion, story knowledge extraction, evidence spans, annotations, and project memory/canon before returning to advanced Dramatica analysis.
+
 Implemented today:
 
 - FastAPI routes for listing scenes, loading one scene, saving one scene, loading bible JSON, running Story Check, and returning storyform prompt context.
