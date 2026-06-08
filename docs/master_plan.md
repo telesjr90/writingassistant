@@ -682,6 +682,8 @@ WORKSPACE-004 planning handoff: `docs/roadmap/omi_guided_project_creation_spec.m
 
 WORKSPACE-005 planning handoff: `docs/roadmap/chapter_scene_data_model_spec.md` defines the future chapter and scene data model in implementation-ready planning detail: chapter records, scene Markdown compatibility, separate scene metadata, ID strategy, ordering/movement behavior, save/reload safety, API/UI planning, future extraction provenance, and no-prose/candidate-canon safety boundaries. It is documentation only and does not implement chapter routes, scene model changes, or frontend editor changes.
 
+WORKSPACE-006 planning handoff: `docs/roadmap/notes_materials_data_model_spec.md` defines the future notes and materials data model in implementation-ready planning detail: note/material body storage, separate metadata, ID strategy, organization/linking, save/reload safety, local search/filter planning, API/UI planning, reference/license boundaries, future extraction provenance, and no-prose/candidate-canon/training-data safety boundaries. It is documentation only and does not implement note/material routes or UI.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

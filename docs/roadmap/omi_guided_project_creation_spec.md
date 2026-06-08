@@ -109,6 +109,7 @@ Candidate rules:
 
 - Setup candidates are not canon.
 - WORKSPACE-005 defines the future chapter/scene metadata contract that any later import of `initial_chapter_candidate` or `initial_scene_placeholder_candidate` must follow.
+- WORKSPACE-006 defines the future notes/materials metadata contract that any later import of `research_note_candidate` or setup note material must follow.
 - Candidates need owner review.
 - Pending candidates must not initialize project metadata.
 - Rejected candidates must not initialize project metadata.

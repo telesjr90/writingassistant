@@ -357,6 +357,8 @@ Detailed WORKSPACE-004 planning lives in `docs/roadmap/omi_guided_project_creati
 
 Detailed WORKSPACE-005 planning lives in `docs/roadmap/chapter_scene_data_model_spec.md`. That spec defines the future chapter and scene storage contract: `chapters/{chapter_id}.json`, Markdown scene content in `scenes/{scene_id}.md`, separate `scene_metadata/{scene_id}.json`, generated stable IDs, chapter/scene ordering, scene movement, save/reload safety, API/UI planning, future extraction provenance, and tests for no-prose overblocking.
 
+Detailed WORKSPACE-006 planning lives in `docs/roadmap/notes_materials_data_model_spec.md`. That spec defines the future notes and materials storage contract: Markdown/text body files, separate metadata JSON, generated stable IDs, organization/linking, local search/filter, reference/license boundaries, save/reload safety, API/UI planning, future extraction provenance, and tests for no-prose overblocking and no training-data confusion.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
@@ -373,8 +375,8 @@ Chapters:
 
 Notes/materials:
 
-- `notes/{note_id}.md` stores owner-authored notes.
-- `materials/{material_id}.json` or `.md` stores owner-authored or owner-supplied project materials, research links, or planning metadata.
+- `notes/{note_id}.md` stores owner-authored notes, with `note_metadata/{note_id}.json` storing organization metadata.
+- `materials/{material_id}.md` stores first-version owner-authored or owner-provided text materials, with `material_metadata/{material_id}.json` storing reference, provenance, and license metadata.
 - Notes and materials are not automatically canon. They can be analyzed later, but extracted knowledge must enter OMI as candidates.
 
 Workspace page sources:

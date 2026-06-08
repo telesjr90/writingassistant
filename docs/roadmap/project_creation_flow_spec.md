@@ -438,6 +438,8 @@ projects/{project_id}/
   material_metadata/
 ```
 
+WORKSPACE-006 defines the future notes/materials body and metadata model for these folders. Project creation may create the folders, but it must not create note/material content unless a later explicit owner action requests it.
+
 For blank projects:
 
 - Create the core workspace folders above.
