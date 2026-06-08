@@ -680,6 +680,8 @@ WORKSPACE-003 planning handoff: `docs/roadmap/project_selector_library_spec.md` 
 
 WORKSPACE-004 planning handoff: `docs/roadmap/omi_guided_project_creation_spec.md` defines future OMI-guided project creation and owner-authored idea capture in implementation-ready planning detail: allowed setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, API/UI planning, future tests, and no-prose/no-silent-promotion safety boundaries. It is documentation only and does not implement runtime OMI-guided creation.
 
+WORKSPACE-005 planning handoff: `docs/roadmap/chapter_scene_data_model_spec.md` defines the future chapter and scene data model in implementation-ready planning detail: chapter records, scene Markdown compatibility, separate scene metadata, ID strategy, ordering/movement behavior, save/reload safety, API/UI planning, future extraction provenance, and no-prose/candidate-canon safety boundaries. It is documentation only and does not implement chapter routes, scene model changes, or frontend editor changes.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

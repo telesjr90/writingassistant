@@ -497,7 +497,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-002 | Project creation flow | `docs/roadmap/project_creation_flow_spec.md` defines blank and OMI-guided creation API/UI/storage planning |
 | WORKSPACE-003 | Project selector/library | `docs/roadmap/project_selector_library_spec.md` defines scan-first local project discovery, metadata cards/lists, opening/switching behavior, invalid/corrupt handling, archive/delete planning, API/UI planning, path safety, and future tests |
 | WORKSPACE-004 | OMI-guided project creation and idea capture | `docs/roadmap/omi_guided_project_creation_spec.md` defines owner-authored setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, API/UI planning, no-prose/no-silent-promotion rules, and future tests |
-| WORKSPACE-005 | Chapter and scene data model | Chapter/scene storage contract and migration plan |
+| WORKSPACE-005 | Chapter and scene data model | `docs/roadmap/chapter_scene_data_model_spec.md`; chapter records, scene Markdown compatibility, scene metadata, IDs, ordering/movement, save/reload, API/UI planning, future extraction provenance, and migration/legacy behavior |
 | WORKSPACE-006 | Notes/materials data model | Notes/materials storage contract |
 | WORKSPACE-007 | User-authored document editor and save/reload workflow | Editor/save/reload implementation plan |
 | WORKSPACE-008 | Project overview page | Overview UI and data-source plan |

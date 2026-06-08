@@ -154,6 +154,7 @@ Content read limits:
 
 - Listing must not read full `scenes/*.md`, `notes/*.md`, `materials/*.md`, chapter prose, or long source material.
 - Counts should use directory/file existence, metadata files, small derived indexes, or stored counts when available.
+- WORKSPACE-005 defines the future chapter/scene metadata sources for cheap chapter and scene counts. The library should use those metadata sources when available and still avoid reading full scene prose during listing.
 - Navigation summaries shown in the library must already be owner-authored or owner-approved metadata; listing must not create summaries.
 
 ## 5. Library Metadata

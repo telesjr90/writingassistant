@@ -186,6 +186,8 @@ OMI-guided creation must not generate:
 - Style imitation examples.
 - AI text inserted into any editor field.
 
+WORKSPACE-005 defines the future chapter/scene metadata model that any initial chapter or scene placeholder import must follow. Until that model is implemented, OMI-guided creation should treat initial chapter/scene setup as candidate metadata only and must not create scene prose.
+
 If the owner asks OMI to write or rewrite prose, the standard refusal message applies.
 
 ### Candidate and Canon Boundary

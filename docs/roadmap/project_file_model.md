@@ -355,6 +355,8 @@ Detailed WORKSPACE-003 planning lives in `docs/roadmap/project_selector_library_
 
 Detailed WORKSPACE-004 planning lives in `docs/roadmap/omi_guided_project_creation_spec.md`. That spec defines owner-authored OMI setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, no-prose/no-silent-promotion rules, and future API/UI/tests for guided creation.
 
+Detailed WORKSPACE-005 planning lives in `docs/roadmap/chapter_scene_data_model_spec.md`. That spec defines the future chapter and scene storage contract: `chapters/{chapter_id}.json`, Markdown scene content in `scenes/{scene_id}.md`, separate `scene_metadata/{scene_id}.json`, generated stable IDs, chapter/scene ordering, scene movement, save/reload safety, API/UI planning, future extraction provenance, and tests for no-prose overblocking.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
@@ -366,7 +368,7 @@ Project library/index:
 Chapters:
 
 - `chapters/{chapter_id}.json` should store chapter identity, title, order, status, included scene IDs, and owner-authored metadata.
-- Chapters may contain scene references, scenes may reference a chapter, or both may be stored with consistency checks. The exact minimum model remains an open question.
+- WORKSPACE-005 recommends `chapter.scene_ids` as the canonical first-version scene ordering source, with `scene_metadata.chapter_id` retained only as a consistency and recovery aid.
 - Chapter records are organization metadata, not AI-generated prose.
 
 Notes/materials:

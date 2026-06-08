@@ -200,6 +200,7 @@ These are not part of the current MVP exit gate. They define the next milestone 
 `WORKSPACE-002` defines project creation planning in `docs/roadmap/project_creation_flow_spec.md`, including blank creation, OMI-guided setup, safe `project_id` behavior, `project.json`, initial folder strategy, API/UI surfaces, and future project-creation tests.
 `WORKSPACE-003` defines selector/library planning in `docs/roadmap/project_selector_library_spec.md`, including scan-first discovery, metadata cards/lists, sorting/filtering/search, opening/switching behavior, invalid/corrupt handling, archive/delete planning, API/UI surfaces, path safety, and future selector tests.
 `WORKSPACE-004` defines OMI-guided creation planning in `docs/roadmap/omi_guided_project_creation_spec.md`, including owner-authored setup inputs, setup candidates, wizard/storage model, OMI-to-project handoff, no-prose/no-silent-promotion rules, API/UI surfaces, and future guided-creation tests.
+`WORKSPACE-005` defines chapter/scene data model planning in `docs/roadmap/chapter_scene_data_model_spec.md`, including chapter records, scene Markdown compatibility, separate scene metadata, ID/order/movement rules, save/reload behavior, API/UI surfaces, future extraction provenance, and future chapter/scene tests.
 
 - Project creation from scratch.
 - Project selector/library.
