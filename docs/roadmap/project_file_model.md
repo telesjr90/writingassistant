@@ -353,6 +353,8 @@ Detailed WORKSPACE-002 planning lives in `docs/roadmap/project_creation_flow_spe
 
 Detailed WORKSPACE-003 planning lives in `docs/roadmap/project_selector_library_spec.md`. That spec defines scan-first local project discovery, valid and invalid project states, card/list metadata, sorting/filtering/search, opening/switching behavior, archive/delete planning, API/UI planning, path safety, and future tests for the selector/library.
 
+Detailed WORKSPACE-004 planning lives in `docs/roadmap/omi_guided_project_creation_spec.md`. That spec defines owner-authored OMI setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, no-prose/no-silent-promotion rules, and future API/UI/tests for guided creation.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.

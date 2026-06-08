@@ -678,6 +678,8 @@ WORKSPACE-002 planning handoff: `docs/roadmap/project_creation_flow_spec.md` def
 
 WORKSPACE-003 planning handoff: `docs/roadmap/project_selector_library_spec.md` defines the future Project Selector / Project Library flow in implementation-ready planning detail: scan-first local project discovery, valid and invalid project states, card/list metadata, sorting/filtering/search, opening/switching behavior, archive/delete planning, API/UI planning, path safety, future tests, and no-prose/candidate-canon safety boundaries. It is documentation only and does not implement runtime project selection.
 
+WORKSPACE-004 planning handoff: `docs/roadmap/omi_guided_project_creation_spec.md` defines future OMI-guided project creation and owner-authored idea capture in implementation-ready planning detail: allowed setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, API/UI planning, future tests, and no-prose/no-silent-promotion safety boundaries. It is documentation only and does not implement runtime OMI-guided creation.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

@@ -19,6 +19,7 @@ Current implementation status:
 - CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines future typed story-knowledge candidates and shared evidence/provenance models. This storage document keeps the record layout; the new schema document defines candidate content contracts.
 - CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` defines the future folder-based `memory/*.json` durable canon target. OMI promotion records remain audit intent only until a later apply-promotion step writes owner-approved records into that memory layer.
 - CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future typed candidate review, type/status filtering, owner actions, merge/dedup metadata, promotion-readiness rules, and UI requirements.
+- WORKSPACE-004 guided-creation reference: `docs/roadmap/omi_guided_project_creation_spec.md` defines future OMI-guided setup storage and recommends staged setup state before project creation, converted into project-local OMI records only after owner confirmation.
 
 ## 2. Target Storage Layout
 
@@ -69,6 +70,8 @@ Future promotion path: OMI candidate -> owner review -> OMI promotion record -> 
 Future scene-derived story-knowledge candidates may have `idea_id: null` if they include `source_scene_id` or `source_reference`. Runtime validation for that shape is deferred.
 
 Future OMI-guided project creation candidates may have a setup source such as `source_type: "project_setup_idea"` and a proposed destination such as `project_metadata_candidate` or `omi_candidate_only`. They must not create project canon, storyform truth, chapter prose, scene prose, or memory records without explicit owner approval and a future apply step.
+
+WORKSPACE-004 narrows the first guided-creation implementation target: keep pre-confirmation setup in staged setup state, create the project through WORKSPACE-002 rules only after final owner confirmation, and then copy selected raw idea/candidate records into project-local `omi/` for traceability.
 
 ## 3. OMI Idea Record
 

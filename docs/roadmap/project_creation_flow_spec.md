@@ -116,6 +116,8 @@ Write behavior:
 
 OMI-guided project creation is a future guided setup path. It helps organize owner-provided ideas into setup candidates. It must not author story prose.
 
+Detailed WORKSPACE-004 planning lives in `docs/roadmap/omi_guided_project_creation_spec.md`. This section remains the high-level creation-flow bridge; the dedicated spec defines owner-authored setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, API/UI planning, no-prose/no-silent-promotion rules, and future tests.
+
 ### Current vs Future
 
 Current OMI:
@@ -880,6 +882,7 @@ These remain for implementation or later planning tasks:
 - Whether Unicode transliteration for slugs uses a dependency-free standard-library approach or a small local helper.
 - Whether `projects/index.json` is introduced in WORKSPACE-003 or deferred until after scanning works.
 - Whether OMI-guided setup uses temporary wizard state, session-local storage, or a durable pre-project inbox.
+- WORKSPACE-004 recommends staged setup state for the first implementation, converted into project-local OMI records only after owner confirmation and successful project creation.
 - Whether a blank project should create `omi/index.json` immediately for UI convenience.
 - Whether a blank project should create compatibility `bible.json` and `storyform.json` or defer those until Story Check is used.
 - Whether `description` is enough for a first owner-authored premise note or whether a separate `notes/` record should be created after confirmation.
@@ -891,6 +894,7 @@ These remain for implementation or later planning tasks:
 
 - `docs/roadmap/project_workspace_foundation_spec.md`
 - `docs/roadmap/project_selector_library_spec.md`
+- `docs/roadmap/omi_guided_project_creation_spec.md`
 - `docs/roadmap/project_file_model.md`
 - `docs/roadmap/omi_mvp_schema_lifecycle.md`
 - `docs/roadmap/omi_storage_model.md`

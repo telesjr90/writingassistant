@@ -713,7 +713,7 @@ Future UI surfaces:
 - Empty library state.
 - Invalid/corrupt project warning state.
 - Open Project action.
-- Create Project action linking to WORKSPACE-002.
+- Create Project action linking to WORKSPACE-002 and the WORKSPACE-004 OMI-guided creation path.
 - Archive/delete placeholders only if future-approved.
 - Project Overview as the open target.
 
@@ -875,6 +875,7 @@ These remain for implementation or later planning tasks:
 
 - `docs/roadmap/project_workspace_foundation_spec.md`
 - `docs/roadmap/project_creation_flow_spec.md`
+- `docs/roadmap/omi_guided_project_creation_spec.md`
 - `docs/roadmap/project_file_model.md`
 - `docs/roadmap/omi_mvp_schema_lifecycle.md`
 - `docs/roadmap/omi_storage_model.md`

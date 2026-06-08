@@ -14,6 +14,7 @@ What exists now:
 - App-3 defines the safe NCP/storyform subset that OMI may use as candidate planning context, now as a later advanced layer rather than the next product backbone.
 - Story Check remains the only model-backed analysis path; Writer Assistant Core extraction is future work.
 - Project Workspace Foundation is the next product milestone before expanded extraction or Dramatica-specific work. OMI should support guided project creation and idea capture as owner-controlled setup candidates.
+- WORKSPACE-004 dedicated planning for guided setup lives in `docs/roadmap/omi_guided_project_creation_spec.md`; it recommends staged setup state before project creation, then project-local OMI records after owner confirmation.
 
 MVP target:
 

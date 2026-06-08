@@ -496,7 +496,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-001 | Project Workspace Foundation Spec | This document |
 | WORKSPACE-002 | Project creation flow | `docs/roadmap/project_creation_flow_spec.md` defines blank and OMI-guided creation API/UI/storage planning |
 | WORKSPACE-003 | Project selector/library | `docs/roadmap/project_selector_library_spec.md` defines scan-first local project discovery, metadata cards/lists, opening/switching behavior, invalid/corrupt handling, archive/delete planning, API/UI planning, path safety, and future tests |
-| WORKSPACE-004 | OMI-guided project creation and idea capture | Owner-input setup candidate workflow |
+| WORKSPACE-004 | OMI-guided project creation and idea capture | `docs/roadmap/omi_guided_project_creation_spec.md` defines owner-authored setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, API/UI planning, no-prose/no-silent-promotion rules, and future tests |
 | WORKSPACE-005 | Chapter and scene data model | Chapter/scene storage contract and migration plan |
 | WORKSPACE-006 | Notes/materials data model | Notes/materials storage contract |
 | WORKSPACE-007 | User-authored document editor and save/reload workflow | Editor/save/reload implementation plan |
@@ -554,7 +554,7 @@ These remain follow-up decisions for later implementation tasks:
 - Exact `project_id` slug collision strategy.
 - Whether `projects/index.json` is eagerly maintained or rebuilt on library load.
 - Whether project creation creates all empty directories immediately or lazily on first use.
-- Whether OMI-guided setup uses temporary wizard state or a durable pre-project inbox before project confirmation.
+- Whether OMI-guided setup uses temporary wizard state or a durable pre-project inbox before project confirmation. WORKSPACE-004 recommends a first implementation with staged setup state converted into project-local OMI records only after final project creation confirmation.
 - Whether chapter ordering lives only in chapter records, in a separate index, or in both with consistency checks.
 - Whether scenes can belong to multiple chapters or exactly one chapter.
 - Whether notes and materials share one metadata model or stay separate.
@@ -573,6 +573,7 @@ These remain follow-up decisions for later implementation tasks:
 - `docs/roadmap/project_file_model.md`
 - `docs/roadmap/project_creation_flow_spec.md`
 - `docs/roadmap/project_selector_library_spec.md`
+- `docs/roadmap/omi_guided_project_creation_spec.md`
 - `docs/roadmap/omi_mvp_schema_lifecycle.md`
 - `docs/roadmap/omi_storage_model.md`
 - `docs/roadmap/omi_story_knowledge_candidate_expansion.md`
