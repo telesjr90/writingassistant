@@ -501,7 +501,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-006 | Notes/materials data model | `docs/roadmap/notes_materials_data_model_spec.md`; note/material body files, separate metadata, IDs, organization/linking, save/reload, local search/filter, reference/license boundaries, future extraction provenance, and legacy/recovery behavior |
 | WORKSPACE-007 | User-authored document editor and save/reload workflow | `docs/roadmap/user_authored_document_editor_workflow_spec.md`; shared scene/note/material editor state, save/reload semantics, unsaved-change protections, conflict detection, no-prose UI safety, analysis separation, API/UI planning, and future tests |
 | WORKSPACE-008 | Project overview page | `docs/roadmap/project_overview_page_spec.md`; safe landing page content, sections, quick actions, recent documents, OMI status, approved memory/canon snapshot, health warnings, API/UI planning, and future tests |
-| WORKSPACE-009 | Chapters/scenes page | Browse/create/reorder/open/save plan |
+| WORKSPACE-009 | Chapters/scenes page | `docs/roadmap/chapters_scenes_page_spec.md`; page layout, chapter operations, scene operations, shared editor behavior, ordering/consistency behavior, local search/filter, analysis/extraction separation, API/UI planning, and future tests |
 | WORKSPACE-010 | Notes/materials page | Notes/materials UI plan |
 | WORKSPACE-011 | Project memory/canon page structure | Approved memory/canon shell plan |
 | WORKSPACE-012 | Approved characters page | Approved-character page plan |

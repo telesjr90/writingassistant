@@ -107,6 +107,7 @@ Save/reload expectations:
 - Save updates owner-authored scene body and optional metadata.
 - Reload reads body and metadata from disk/server.
 - Save/reload must not call a model, write OMI promotions, or mutate memory/canon.
+- WORKSPACE-009 defines how the Chapters / Scenes page should apply this shared editor behavior to scene selection, chapter switching, scene movement, page navigation, and candidate-only analysis separation.
 
 ### Note Document
 

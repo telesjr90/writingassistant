@@ -29,6 +29,8 @@ The first implementation should support:
 - Future navigation, continuity, and timeline features through metadata and candidate provenance.
 - No Dramatica-specific requirements in the chapter/scene storage contract.
 
+WORKSPACE-009 defines the future Chapters / Scenes page that should use this storage model for page layout, operations, editor integration, ordering, local search/filter, and candidate-only analysis placeholders.
+
 The model must not introduce any AI prose-writing path. The application may store, edit, and organize owner-authored prose. The AI must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:

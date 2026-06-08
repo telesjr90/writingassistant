@@ -260,6 +260,8 @@ Recommended cards:
 - Future Plot Threads.
 - Future Continuity / Consistency.
 
+WORKSPACE-009 defines the detailed target for the Chapters / Scenes navigation card and destination page.
+
 ### Recent Documents
 
 Purpose:
@@ -808,4 +810,3 @@ WORKSPACE-008 does not implement:
 - Training or fine-tuning.
 - Ollama/live model verification.
 - Package/dependency changes.
-

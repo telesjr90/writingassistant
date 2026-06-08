@@ -688,6 +688,8 @@ WORKSPACE-007 planning handoff: `docs/roadmap/user_authored_document_editor_work
 
 WORKSPACE-008 planning handoff: `docs/roadmap/project_overview_page_spec.md` defines the future Project Overview landing page in implementation-ready planning detail: safe overview content, page sections, quick actions, recent documents, OMI status, approved memory/canon snapshot, project health warnings, API/UI planning, future tests, and no-prose/candidate-canon safety boundaries. It is documentation only and does not implement overview UI or backend routes.
 
+WORKSPACE-009 planning handoff: `docs/roadmap/chapters_scenes_page_spec.md` defines the future Chapters / Scenes page in implementation-ready planning detail: page layout, chapter operations, scene operations, shared editor behavior, ordering/consistency behavior, analysis/extraction separation, local search/filter planning, API/UI planning, and future tests. It is documentation only and does not implement chapter/scene UI, routes, editor changes, extractor logic, or runtime project files.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.
