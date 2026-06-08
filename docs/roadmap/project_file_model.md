@@ -351,12 +351,15 @@ Detailed WORKSPACE-001 planning lives in `docs/roadmap/project_workspace_foundat
 
 Detailed WORKSPACE-002 planning lives in `docs/roadmap/project_creation_flow_spec.md`. That spec narrows the first project creation implementation target: title-derived owner-editable filesystem-safe `project_id`, metadata-only `project.json`, blank and OMI-guided creation boundaries, hybrid core-folder creation, scan-first project library support, no model calls, no generated prose, and no candidate/canon promotion during creation.
 
+Detailed WORKSPACE-003 planning lives in `docs/roadmap/project_selector_library_spec.md`. That spec defines scan-first local project discovery, valid and invalid project states, card/list metadata, sorting/filtering/search, opening/switching behavior, archive/delete planning, API/UI planning, path safety, and future tests for the selector/library.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
 - The index should be rebuildable from `project.json` files where practical.
 - The index is not story truth and must not contain raw model output or candidate content.
 - WORKSPACE-002 recommends scanning project folders with valid `project.json` files before introducing a maintained `projects/index.json`, so the first library implementation avoids stale-index authority.
+- WORKSPACE-003 keeps that scan-first recommendation and treats missing/corrupt/duplicate/unsafe folders as warning or recovery states, not as automatically imported projects.
 
 Chapters:
 

@@ -59,7 +59,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 
 These must be answered before or during the pre-Dramatica workspace implementation:
 
-WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspace_foundation_spec.md`. WORKSPACE-002 project creation defaults are documented in `docs/roadmap/project_creation_flow_spec.md`, including the recommended title-derived owner-editable `project_id`, metadata-only `project.json`, hybrid folder strategy, scan-first library support, and OMI-guided setup boundaries. The questions below remain implementation decisions to confirm or refine during WORKSPACE-003 through WORKSPACE-023.
+WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspace_foundation_spec.md`. WORKSPACE-002 project creation defaults are documented in `docs/roadmap/project_creation_flow_spec.md`, including the recommended title-derived owner-editable `project_id`, metadata-only `project.json`, hybrid folder strategy, scan-first library support, and OMI-guided setup boundaries. WORKSPACE-003 project selector/library defaults are documented in `docs/roadmap/project_selector_library_spec.md`, including scan-first discovery, invalid/corrupt warning states, lightweight metadata, local search/filter/sort, Project Overview opening, unsaved-change warnings on switch, future-only archive/delete, and rebuildable-only `projects/index.json`. The questions below remain implementation decisions to confirm or refine during WORKSPACE-004 through WORKSPACE-023.
 
 1. What is the minimum chapter/scene data model for the first usable workspace?
 2. Should chapters contain scenes, scenes reference chapters, or should both directions be stored with an index?
@@ -81,6 +81,10 @@ WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspac
 18. Should blank project creation immediately create `omi/index.json`, or should OMI folders remain lazy until the first idea/candidate is created?
 19. Should new blank workspace projects create compatibility `bible.json` and `storyform.json`, or defer them until Story Check or later Dramatica context is explicitly enabled?
 20. Should project title rename ever migrate `project_id`, or should `project_id` remain stable after creation?
+21. Should invalid project folders be hidden by default, shown in a warning section, or shown in a recovery tab?
+22. Should the first Project Library UI use project cards, a table, or both?
+23. Should unsaved project-specific editor state be preserved per project, or should project switching require explicit save/discard?
+24. When should archive support be added relative to the selector implementation, and should permanent delete remain absent until a separate owner-approved task?
 
 ## Writer Assistant Core Follow-Up Questions
 

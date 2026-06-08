@@ -495,7 +495,7 @@ The first workspace implementation should follow this sequence:
 | --- | --- | --- |
 | WORKSPACE-001 | Project Workspace Foundation Spec | This document |
 | WORKSPACE-002 | Project creation flow | `docs/roadmap/project_creation_flow_spec.md` defines blank and OMI-guided creation API/UI/storage planning |
-| WORKSPACE-003 | Project selector/library | Local library/index API/UI plan |
+| WORKSPACE-003 | Project selector/library | `docs/roadmap/project_selector_library_spec.md` defines scan-first local project discovery, metadata cards/lists, opening/switching behavior, invalid/corrupt handling, archive/delete planning, API/UI planning, path safety, and future tests |
 | WORKSPACE-004 | OMI-guided project creation and idea capture | Owner-input setup candidate workflow |
 | WORKSPACE-005 | Chapter and scene data model | Chapter/scene storage contract and migration plan |
 | WORKSPACE-006 | Notes/materials data model | Notes/materials storage contract |
@@ -571,6 +571,8 @@ These remain follow-up decisions for later implementation tasks:
 - `docs/roadmap/task_backlog.md`
 - `docs/roadmap/phase_map.md`
 - `docs/roadmap/project_file_model.md`
+- `docs/roadmap/project_creation_flow_spec.md`
+- `docs/roadmap/project_selector_library_spec.md`
 - `docs/roadmap/omi_mvp_schema_lifecycle.md`
 - `docs/roadmap/omi_storage_model.md`
 - `docs/roadmap/omi_story_knowledge_candidate_expansion.md`

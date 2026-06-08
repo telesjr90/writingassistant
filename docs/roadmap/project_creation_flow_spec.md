@@ -466,7 +466,7 @@ Rollback:
 
 ## 9. Project Library and Index Strategy
 
-Project library behavior is implemented in `WORKSPACE-003`, but project creation must support it.
+Project library behavior is specified in `WORKSPACE-003` at `docs/roadmap/project_selector_library_spec.md`, but project creation must support it.
 
 ### Recommended First Implementation
 
@@ -890,6 +890,7 @@ These remain for implementation or later planning tasks:
 ## 14. Related Specifications
 
 - `docs/roadmap/project_workspace_foundation_spec.md`
+- `docs/roadmap/project_selector_library_spec.md`
 - `docs/roadmap/project_file_model.md`
 - `docs/roadmap/omi_mvp_schema_lifecycle.md`
 - `docs/roadmap/omi_storage_model.md`
