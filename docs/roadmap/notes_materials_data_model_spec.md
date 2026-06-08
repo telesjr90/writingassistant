@@ -129,6 +129,7 @@ Rules:
 - Material body content remains owner-authored or owner-provided Markdown/text in `materials/{material_id}.md`.
 - Note metadata lives in `note_metadata/{note_id}.json`.
 - Material metadata lives in `material_metadata/{material_id}.json`.
+- Shared editor save/reload behavior for note and material bodies is defined by WORKSPACE-007.
 - Metadata may link to chapters, scenes, OMI candidates, and future memory/canon records.
 - `scenes/` remains separate from notes/materials.
 - `chapters/` remains separate from notes/materials.
@@ -1025,4 +1026,3 @@ WORKSPACE-006 does not implement:
 - Training or fine-tuning.
 - Ollama/live model verification.
 - Package/dependency changes.
-

@@ -684,6 +684,8 @@ WORKSPACE-005 planning handoff: `docs/roadmap/chapter_scene_data_model_spec.md` 
 
 WORKSPACE-006 planning handoff: `docs/roadmap/notes_materials_data_model_spec.md` defines the future notes and materials data model in implementation-ready planning detail: note/material body storage, separate metadata, ID strategy, organization/linking, save/reload safety, local search/filter planning, API/UI planning, reference/license boundaries, future extraction provenance, and no-prose/candidate-canon/training-data safety boundaries. It is documentation only and does not implement note/material routes or UI.
 
+WORKSPACE-007 planning handoff: `docs/roadmap/user_authored_document_editor_workflow_spec.md` defines the future shared user-authored document editor and save/reload workflow in implementation-ready planning detail: supported scene/note/material document types, editor state model, save/reload semantics, unsaved-change protections, conflict detection planning, no-prose UI safety, analysis/extraction separation, API/UI planning, and future tests. It is documentation only and does not implement editor or save/reload changes.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

@@ -359,6 +359,8 @@ Detailed WORKSPACE-005 planning lives in `docs/roadmap/chapter_scene_data_model_
 
 Detailed WORKSPACE-006 planning lives in `docs/roadmap/notes_materials_data_model_spec.md`. That spec defines the future notes and materials storage contract: Markdown/text body files, separate metadata JSON, generated stable IDs, organization/linking, local search/filter, reference/license boundaries, save/reload safety, API/UI planning, future extraction provenance, and tests for no-prose overblocking and no training-data confusion.
 
+Detailed WORKSPACE-007 planning lives in `docs/roadmap/user_authored_document_editor_workflow_spec.md`. That spec defines the future shared editor workflow for scene, note, and material documents: editor state, dirty tracking, save/reload behavior, unsaved-change protection, conflict handling, no-prose UI safety, analysis/extraction separation, API/UI planning, and tests.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.

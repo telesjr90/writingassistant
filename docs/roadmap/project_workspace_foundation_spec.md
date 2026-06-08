@@ -499,7 +499,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-004 | OMI-guided project creation and idea capture | `docs/roadmap/omi_guided_project_creation_spec.md` defines owner-authored setup inputs, setup candidate classes, wizard flow, staged setup storage, OMI-to-project handoff, API/UI planning, no-prose/no-silent-promotion rules, and future tests |
 | WORKSPACE-005 | Chapter and scene data model | `docs/roadmap/chapter_scene_data_model_spec.md`; chapter records, scene Markdown compatibility, scene metadata, IDs, ordering/movement, save/reload, API/UI planning, future extraction provenance, and migration/legacy behavior |
 | WORKSPACE-006 | Notes/materials data model | `docs/roadmap/notes_materials_data_model_spec.md`; note/material body files, separate metadata, IDs, organization/linking, save/reload, local search/filter, reference/license boundaries, future extraction provenance, and legacy/recovery behavior |
-| WORKSPACE-007 | User-authored document editor and save/reload workflow | Editor/save/reload implementation plan |
+| WORKSPACE-007 | User-authored document editor and save/reload workflow | `docs/roadmap/user_authored_document_editor_workflow_spec.md`; shared scene/note/material editor state, save/reload semantics, unsaved-change protections, conflict detection, no-prose UI safety, analysis separation, API/UI planning, and future tests |
 | WORKSPACE-008 | Project overview page | Overview UI and data-source plan |
 | WORKSPACE-009 | Chapters/scenes page | Browse/create/reorder/open/save plan |
 | WORKSPACE-010 | Notes/materials page | Notes/materials UI plan |

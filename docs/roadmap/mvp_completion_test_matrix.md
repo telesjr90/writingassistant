@@ -202,6 +202,7 @@ These are not part of the current MVP exit gate. They define the next milestone 
 `WORKSPACE-004` defines OMI-guided creation planning in `docs/roadmap/omi_guided_project_creation_spec.md`, including owner-authored setup inputs, setup candidates, wizard/storage model, OMI-to-project handoff, no-prose/no-silent-promotion rules, API/UI surfaces, and future guided-creation tests.
 `WORKSPACE-005` defines chapter/scene data model planning in `docs/roadmap/chapter_scene_data_model_spec.md`, including chapter records, scene Markdown compatibility, separate scene metadata, ID/order/movement rules, save/reload behavior, API/UI surfaces, future extraction provenance, and future chapter/scene tests.
 `WORKSPACE-006` defines notes/materials data model planning in `docs/roadmap/notes_materials_data_model_spec.md`, including note/material body files, separate metadata, ID/linking rules, save/reload behavior, local search/filter, reference/license boundaries, API/UI surfaces, future extraction provenance, and future notes/materials tests.
+`WORKSPACE-007` defines shared user-authored document editor workflow planning in `docs/roadmap/user_authored_document_editor_workflow_spec.md`, including scene/note/material document types, editor state, save/reload behavior, unsaved-change protections, conflict detection, no-prose UI safety, analysis/extraction separation, API/UI surfaces, and future editor workflow tests.
 
 - Project creation from scratch.
 - Project selector/library.

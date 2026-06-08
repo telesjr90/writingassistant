@@ -57,6 +57,7 @@ Rules:
 - Scene metadata lives in `scene_metadata/{scene_id}.json`.
 - Chapter records live in `chapters/{chapter_id}.json`.
 - Notes/materials are separate workspace content defined by WORKSPACE-006 and must not be stored inside chapter or scene metadata.
+- Shared editor save/reload behavior for scene bodies is defined by WORKSPACE-007.
 - Chapter records store chapter-level metadata and scene ordering.
 - `chapter.scene_ids` is the canonical first-version scene ordering model.
 - `scene_metadata.chapter_id` may exist as a consistency aid, filter aid, and recovery signal, but it must not be the only ordering source.
