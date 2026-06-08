@@ -749,6 +749,7 @@ Expected errors:
 Purpose:
 
 - Future lightweight Project Overview data.
+- WORKSPACE-008 supersedes this high-level sketch with the detailed Project Overview page and API planning.
 
 Response shape:
 

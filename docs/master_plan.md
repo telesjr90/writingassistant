@@ -686,6 +686,8 @@ WORKSPACE-006 planning handoff: `docs/roadmap/notes_materials_data_model_spec.md
 
 WORKSPACE-007 planning handoff: `docs/roadmap/user_authored_document_editor_workflow_spec.md` defines the future shared user-authored document editor and save/reload workflow in implementation-ready planning detail: supported scene/note/material document types, editor state model, save/reload semantics, unsaved-change protections, conflict detection planning, no-prose UI safety, analysis/extraction separation, API/UI planning, and future tests. It is documentation only and does not implement editor or save/reload changes.
 
+WORKSPACE-008 planning handoff: `docs/roadmap/project_overview_page_spec.md` defines the future Project Overview landing page in implementation-ready planning detail: safe overview content, page sections, quick actions, recent documents, OMI status, approved memory/canon snapshot, project health warnings, API/UI planning, future tests, and no-prose/candidate-canon safety boundaries. It is documentation only and does not implement overview UI or backend routes.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

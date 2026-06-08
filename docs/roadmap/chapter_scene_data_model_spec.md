@@ -63,6 +63,7 @@ Rules:
 - `scene_metadata.chapter_id` may exist as a consistency aid, filter aid, and recovery signal, but it must not be the only ordering source.
 - Existing scene files such as `projects/example/scenes/{scene_id}.md` remain compatible.
 - Full scene/chapter prose should not be read just to list projects in the Project Library.
+- Project Overview recent-document and count behavior is defined by WORKSPACE-008 and should use metadata rather than full body reads.
 - Metadata files may be read for chapter/scene pages, but prose should be loaded only when opening or previewing a scene.
 
 ### Compatibility With Existing Scene Files

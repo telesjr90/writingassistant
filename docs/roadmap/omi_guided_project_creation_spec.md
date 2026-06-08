@@ -135,6 +135,8 @@ Future wizard flow:
 10. Owner lands on Project Overview.
 11. Unapproved candidates remain in OMI, not canon.
 
+WORKSPACE-008 defines the Project Overview landing page that should open after successful OMI-guided project creation.
+
 Current vs future:
 
 - Current runtime OMI can store raw ideas and structured candidates under an existing project.

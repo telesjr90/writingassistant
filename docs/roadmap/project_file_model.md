@@ -361,6 +361,8 @@ Detailed WORKSPACE-006 planning lives in `docs/roadmap/notes_materials_data_mode
 
 Detailed WORKSPACE-007 planning lives in `docs/roadmap/user_authored_document_editor_workflow_spec.md`. That spec defines the future shared editor workflow for scene, note, and material documents: editor state, dirty tracking, save/reload behavior, unsaved-change protection, conflict handling, no-prose UI safety, analysis/extraction separation, API/UI planning, and tests.
 
+Detailed WORKSPACE-008 planning lives in `docs/roadmap/project_overview_page_spec.md`. That spec defines the future Project Overview landing page: safe project metadata, lightweight counts, recent document metadata, OMI status, approved memory/canon snapshot, health warnings, quick actions, API/UI planning, and no-prose/candidate-canon boundaries.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
@@ -383,7 +385,7 @@ Notes/materials:
 
 Workspace page sources:
 
-- Project Overview reads `project.json`, project library metadata, workspace counts, OMI status summaries, and approved memory summaries.
+- Project Overview reads `project.json`, project library metadata, workspace counts, OMI status summaries, and approved memory summaries, following WORKSPACE-008 boundaries.
 - Chapters/Scenes reads `chapters/`, `scenes/`, and `scene_metadata/`.
 - Notes/Materials reads `notes/` and `materials/`.
 - OMI Ideas and Candidates reads `omi/`.

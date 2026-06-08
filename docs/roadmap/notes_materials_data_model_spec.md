@@ -137,6 +137,7 @@ Rules:
 - Notes/materials must not be silently copied into `bible.json` or `storyform.json`.
 - Notes/materials must not be silently copied into OMI promotion records.
 - Full body text should not be read just to list projects in the Project Library.
+- Project Overview recent-document and count behavior is defined by WORKSPACE-008 and should use metadata rather than full body reads.
 
 ### Compatibility and Lazy Creation
 

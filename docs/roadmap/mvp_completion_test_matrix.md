@@ -203,6 +203,7 @@ These are not part of the current MVP exit gate. They define the next milestone 
 `WORKSPACE-005` defines chapter/scene data model planning in `docs/roadmap/chapter_scene_data_model_spec.md`, including chapter records, scene Markdown compatibility, separate scene metadata, ID/order/movement rules, save/reload behavior, API/UI surfaces, future extraction provenance, and future chapter/scene tests.
 `WORKSPACE-006` defines notes/materials data model planning in `docs/roadmap/notes_materials_data_model_spec.md`, including note/material body files, separate metadata, ID/linking rules, save/reload behavior, local search/filter, reference/license boundaries, API/UI surfaces, future extraction provenance, and future notes/materials tests.
 `WORKSPACE-007` defines shared user-authored document editor workflow planning in `docs/roadmap/user_authored_document_editor_workflow_spec.md`, including scene/note/material document types, editor state, save/reload behavior, unsaved-change protections, conflict detection, no-prose UI safety, analysis/extraction separation, API/UI surfaces, and future editor workflow tests.
+`WORKSPACE-008` defines Project Overview page planning in `docs/roadmap/project_overview_page_spec.md`, including safe overview content, sections, quick actions, recent document metadata, OMI status, approved memory/canon snapshot, health warnings, API/UI surfaces, and future overview tests.
 
 - Project creation from scratch.
 - Project selector/library.

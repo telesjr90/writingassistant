@@ -60,6 +60,7 @@ Optional/future document types:
 
 - `chapter_note`
 - `project_overview_note`
+- Project Overview itself is a landing/navigation page defined by WORKSPACE-008, not a document body editor in the first implementation.
 - `omi_raw_idea_view`, read-only or OMI-scoped unless separately designed.
 - `approved_memory_record_editor`, only after a separate memory/canon editing safety design.
 
@@ -738,4 +739,3 @@ WORKSPACE-007 does not implement:
 - Training or fine-tuning.
 - Ollama/live model verification.
 - Package/dependency changes.
-

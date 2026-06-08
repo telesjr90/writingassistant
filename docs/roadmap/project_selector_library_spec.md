@@ -249,6 +249,8 @@ Search rules:
 
 Opening a project means making one validated project active in the app shell and loading the Project Overview.
 
+WORKSPACE-008 defines the detailed Project Overview landing page that should load after this selector/open action succeeds.
+
 Required opening behavior:
 
 1. Owner selects a project from the library.
