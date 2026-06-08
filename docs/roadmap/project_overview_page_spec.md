@@ -262,6 +262,8 @@ Recommended cards:
 
 WORKSPACE-009 defines the detailed target for the Chapters / Scenes navigation card and destination page.
 
+WORKSPACE-010 defines the detailed target for the Notes / Materials navigation card and destination page.
+
 ### Recent Documents
 
 Purpose:

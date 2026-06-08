@@ -153,6 +153,7 @@ Save/reload expectations:
 - Save updates owner-authored note body and optional metadata.
 - Reload reads body and metadata from disk/server.
 - Save/reload must not call a model, write OMI promotions, or mutate memory/canon.
+- WORKSPACE-010 defines how the Notes / Materials page should apply this shared editor behavior to note selection, material selection, page navigation, provenance/license warnings, local search/filter, and candidate-only extraction separation.
 
 ### Material Document
 
@@ -200,6 +201,7 @@ Save/reload expectations:
 - Save updates owner-authored or owner-provided material body and optional metadata.
 - Reload reads body and metadata from disk/server.
 - Save/reload must not fetch web content, call a model, write OMI promotions, or mutate memory/canon.
+- WORKSPACE-010 defines the material-specific page behavior for text/Markdown editing, reference-only metadata, source/provenance/license warnings, and missing-body versus empty-body states.
 
 ## 3. Editor State Model
 

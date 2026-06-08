@@ -16,6 +16,7 @@ Related planning:
 - WORKSPACE-006: `docs/roadmap/notes_materials_data_model_spec.md`
 - WORKSPACE-007: `docs/roadmap/user_authored_document_editor_workflow_spec.md`
 - WORKSPACE-008: `docs/roadmap/project_overview_page_spec.md`
+- WORKSPACE-010: `docs/roadmap/notes_materials_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 
 ## 1. Purpose

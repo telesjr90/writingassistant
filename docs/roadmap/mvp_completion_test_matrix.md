@@ -205,6 +205,7 @@ These are not part of the current MVP exit gate. They define the next milestone 
 `WORKSPACE-007` defines shared user-authored document editor workflow planning in `docs/roadmap/user_authored_document_editor_workflow_spec.md`, including scene/note/material document types, editor state, save/reload behavior, unsaved-change protections, conflict detection, no-prose UI safety, analysis/extraction separation, API/UI surfaces, and future editor workflow tests.
 `WORKSPACE-008` defines Project Overview page planning in `docs/roadmap/project_overview_page_spec.md`, including safe overview content, sections, quick actions, recent document metadata, OMI status, approved memory/canon snapshot, health warnings, API/UI surfaces, and future overview tests.
 `WORKSPACE-009` defines Chapters / Scenes page planning in `docs/roadmap/chapters_scenes_page_spec.md`, including page layout, chapter/scene operations, editor integration, ordering/consistency behavior, local search/filter, candidate-only analysis placeholder, API/UI surfaces, and future page tests.
+`WORKSPACE-010` defines Notes / Materials page planning in `docs/roadmap/notes_materials_page_spec.md`, including page layout, note/material operations, editor integration, organization/linking behavior, local search/filter, provenance/license warnings, candidate-only extraction placeholder, API/UI surfaces, and future page tests.
 
 - Project creation from scratch.
 - Project selector/library.

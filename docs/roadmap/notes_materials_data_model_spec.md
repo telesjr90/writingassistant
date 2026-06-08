@@ -13,6 +13,7 @@ Related planning:
 - WORKSPACE-003: `docs/roadmap/project_selector_library_spec.md`
 - WORKSPACE-004: `docs/roadmap/omi_guided_project_creation_spec.md`
 - WORKSPACE-005: `docs/roadmap/chapter_scene_data_model_spec.md`
+- WORKSPACE-010: `docs/roadmap/notes_materials_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
 - Project memory/canon storage model: `docs/roadmap/project_memory_canon_storage_model.md`
@@ -138,6 +139,7 @@ Rules:
 - Notes/materials must not be silently copied into OMI promotion records.
 - Full body text should not be read just to list projects in the Project Library.
 - Project Overview recent-document and count behavior is defined by WORKSPACE-008 and should use metadata rather than full body reads.
+- WORKSPACE-010 defines the future Notes / Materials page that should use this storage model for page layout, note/material operations, editor integration, organization/linking, local search/filter, provenance/license warnings, and candidate-only extraction placeholders.
 
 ### Compatibility and Lazy Creation
 

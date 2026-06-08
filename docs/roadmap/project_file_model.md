@@ -365,6 +365,8 @@ Detailed WORKSPACE-008 planning lives in `docs/roadmap/project_overview_page_spe
 
 Detailed WORKSPACE-009 planning lives in `docs/roadmap/chapters_scenes_page_spec.md`. That spec defines the future Chapters / Scenes page: layout, chapter and scene operations, shared editor integration, ordering/consistency behavior, local search/filter, candidate-only analysis placeholder, API/UI planning, and no-prose/editor safety boundaries.
 
+Detailed WORKSPACE-010 planning lives in `docs/roadmap/notes_materials_page_spec.md`. That spec defines the future Notes / Materials page: layout, note and material operations, shared editor integration, organization/linking behavior, local search/filter, provenance/license warnings, candidate-only extraction placeholder, API/UI planning, and no-prose/candidate-canon/training-data safety boundaries.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
@@ -389,7 +391,7 @@ Workspace page sources:
 
 - Project Overview reads `project.json`, project library metadata, workspace counts, OMI status summaries, and approved memory summaries, following WORKSPACE-008 boundaries.
 - Chapters/Scenes reads `chapters/`, `scenes/`, and `scene_metadata/`, following WORKSPACE-009 page and editor boundaries.
-- Notes/Materials reads `notes/` and `materials/`.
+- Notes/Materials reads `notes/`, `note_metadata/`, `materials/`, and `material_metadata/`, following WORKSPACE-010 page and editor boundaries.
 - OMI Ideas and Candidates reads `omi/`.
 - Approved Project Memory/Canon pages read `memory/*.json` only after future apply-promotion creates approved records.
 
