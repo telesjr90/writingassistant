@@ -18,6 +18,8 @@ Every Writer Assistant Core candidate uses this base contract.
 
 CORE-005 OMI review behavior is defined in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`. That spec explains future OMI type filters, owner actions, merge/dedup metadata, promotion readiness, and UI requirements for these candidate classes.
 
+WORKSPACE-011 page-structure behavior is defined in `docs/roadmap/project_memory_canon_page_structure_spec.md`. That spec defines how future Project Memory / Canon pages should keep these candidates separate from applied memory/canon records until apply-promotion succeeds.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

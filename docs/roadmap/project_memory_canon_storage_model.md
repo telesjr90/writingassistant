@@ -6,6 +6,8 @@ This specification defines the future Writer Assistant Core project memory/canon
 
 Project memory/canon is the durable owner-approved story knowledge layer that may exist after Project Workspace Foundation save/edit flows, OMI candidate review, and a future owner-confirmed apply-promotion step. It comes after project creation, chapters/scenes/notes/materials, owner-authored prose storage, candidate extraction, and owner approval.
 
+WORKSPACE-011 page-structure planning lives in `docs/roadmap/project_memory_canon_page_structure_spec.md`. That spec defines the future Project Memory / Canon page, approved-vs-candidate labels, category cards, promotion-record snapshots, empty states before apply-promotion exists, health warnings, API/UI planning, and page-level no-silent-promotion boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:

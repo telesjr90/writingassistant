@@ -27,6 +27,7 @@ MVP target:
 - CORE-002/CORE-003 schema reference: `docs/roadmap/writer_assistant_core_candidate_schemas.md` defines the future Writer Assistant Core candidate types, shared base candidate contract, evidence model, provenance model, owner decision model, and promotion status model. Those candidate types are future OMI-supported classes; this spec does not make them runtime-implemented by itself.
 - CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` recommends future folder-based `memory/*.json` files as the durable project memory/canon target after OMI review and a later apply-promotion step.
 - CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future OMI typed review behavior for story-knowledge candidates, including candidate type filters, owner actions, merge/dedup planning, promotion-readiness rules, and review UI needs.
+- WORKSPACE-011 page-structure reference: `docs/roadmap/project_memory_canon_page_structure_spec.md` defines how future Project Memory / Canon pages should display applied memory separately from OMI candidates and promotion records before apply-promotion exists.
 
 Immediate next task after this spec: review and commit App-3a / OMI-001 outputs, then decide/spec the owner-created aligned sample project before Phase 2 backend safety and schema foundation.
 

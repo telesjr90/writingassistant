@@ -692,6 +692,8 @@ WORKSPACE-009 planning handoff: `docs/roadmap/chapters_scenes_page_spec.md` defi
 
 WORKSPACE-010 planning handoff: `docs/roadmap/notes_materials_page_spec.md` defines the future Notes / Materials page in implementation-ready planning detail: page layout, note operations, material operations, shared editor behavior, organization/linking behavior, local search/filter planning, analysis/extraction separation, API/UI planning, provenance/license warnings, and future tests. It is documentation only and does not implement notes/materials UI, backend routes, editor changes, extractor logic, or runtime project files.
 
+WORKSPACE-011 planning handoff: `docs/roadmap/project_memory_canon_page_structure_spec.md` defines the future Project Memory / Canon page structure in implementation-ready planning detail: approved-only page purpose, memory/canon concepts, approved-vs-candidate labeling, category cards, empty states before apply-promotion exists, promotion-record snapshots, API/UI planning, health warnings, future tests, and apply-promotion boundaries. It is documentation only and does not implement memory/canon UI, backend routes, apply-promotion, extractor logic, OMI records, memory files, or runtime project files.
+
 Writer Assistant Core will prioritize:
 
 - OMI candidate review and promotion as the central workflow for extracted story knowledge.

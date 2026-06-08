@@ -20,6 +20,7 @@ Current implementation status:
 - CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` defines the future folder-based `memory/*.json` durable canon target. OMI promotion records remain audit intent only until a later apply-promotion step writes owner-approved records into that memory layer.
 - CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future typed candidate review, type/status filtering, owner actions, merge/dedup metadata, promotion-readiness rules, and UI requirements.
 - WORKSPACE-004 guided-creation reference: `docs/roadmap/omi_guided_project_creation_spec.md` defines future OMI-guided setup storage and recommends staged setup state before project creation, converted into project-local OMI records only after owner confirmation.
+- WORKSPACE-011 page-structure reference: `docs/roadmap/project_memory_canon_page_structure_spec.md` defines how promotion records should appear as audit-only snapshots and how OMI candidates must remain visually separate from approved memory/canon pages.
 
 ## 2. Target Storage Layout
 

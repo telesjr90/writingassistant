@@ -35,6 +35,7 @@ Core boundaries:
 - Story-knowledge candidates may originate from scenes or project context instead of an OMI raw idea. Future runtime records should allow `idea_id: null` when `source_scene_id` or `source_reference` identifies the source.
 - OMI-created project setup remains owner-controlled. OMI may organize owner-provided ideas into structured setup candidates, but blank projects and OMI-created projects must both keep pending candidates separate from project metadata and canon.
 - WORKSPACE-004 dedicated planning lives in `docs/roadmap/omi_guided_project_creation_spec.md` and defines the first guided-creation handoff from staged setup state into `project.json` metadata and project-local OMI records.
+- WORKSPACE-011 dedicated page-structure planning lives in `docs/roadmap/project_memory_canon_page_structure_spec.md` and defines how future Project Memory / Canon pages must keep applied memory separate from OMI candidates and promotion records before apply-promotion exists.
 
 Future flow:
 

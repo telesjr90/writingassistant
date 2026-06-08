@@ -503,7 +503,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-008 | Project overview page | `docs/roadmap/project_overview_page_spec.md`; safe landing page content, sections, quick actions, recent documents, OMI status, approved memory/canon snapshot, health warnings, API/UI planning, and future tests |
 | WORKSPACE-009 | Chapters/scenes page | `docs/roadmap/chapters_scenes_page_spec.md`; page layout, chapter operations, scene operations, shared editor behavior, ordering/consistency behavior, local search/filter, analysis/extraction separation, API/UI planning, and future tests |
 | WORKSPACE-010 | Notes/materials page | `docs/roadmap/notes_materials_page_spec.md`; page layout, note operations, material operations, shared editor behavior, organization/linking behavior, local search/filter, analysis/extraction separation, provenance/license warnings, API/UI planning, and future tests |
-| WORKSPACE-011 | Project memory/canon page structure | Approved memory/canon shell plan |
+| WORKSPACE-011 | Project memory/canon page structure | `docs/roadmap/project_memory_canon_page_structure_spec.md`; approved-only page purpose, memory/canon concepts, approved-vs-candidate labeling, category cards, promotion-record snapshots, empty states before apply-promotion, API/UI planning, health warnings, and future tests |
 | WORKSPACE-012 | Approved characters page | Approved-character page plan |
 | WORKSPACE-013 | Approved locations/settings page | Approved-location page plan |
 | WORKSPACE-014 | Approved timeline page | Approved-timeline page plan |
