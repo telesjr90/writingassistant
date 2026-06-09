@@ -38,6 +38,7 @@ Core boundaries:
 - WORKSPACE-011 dedicated page-structure planning lives in `docs/roadmap/project_memory_canon_page_structure_spec.md` and defines how future Project Memory / Canon pages must keep applied memory separate from OMI candidates and promotion records before apply-promotion exists.
 - WORKSPACE-012 dedicated OMI page planning lives in `docs/roadmap/omi_ideas_candidates_page_spec.md` and defines the future raw idea, candidate review, evidence/provenance, promotion readiness, promotion record, local filter/search, and OMI health warning page.
 - WORKSPACE-013 dedicated Approved Characters page planning lives in `docs/roadmap/approved_characters_page_spec.md` and defines the first approved-only category page: applied `character_memory_record` display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, and no-prose/no-silent-promotion boundaries.
+- WORKSPACE-014 dedicated Approved Locations / Settings page planning lives in `docs/roadmap/approved_locations_settings_page_spec.md` and defines the second approved-only category page: applied `location_memory_record` display, evidence/provenance panel, linked sources panel, place hierarchy placeholder, scene usage snapshot, candidate backlog snapshot, warning states including parent/child cycle detection, and no-prose/no-silent-promotion boundaries.
 
 Future flow:
 

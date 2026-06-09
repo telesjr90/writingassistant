@@ -12,6 +12,8 @@ WORKSPACE-012 OMI page planning lives in `docs/roadmap/omi_ideas_candidates_page
 
 WORKSPACE-013 Approved Characters page planning lives in `docs/roadmap/approved_characters_page_spec.md`. That spec defines the first approved-only category page: applied `character_memory_record` display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries for the characters category.
 
+WORKSPACE-014 Approved Locations / Settings page planning lives in `docs/roadmap/approved_locations_settings_page_spec.md`. That spec defines the second approved-only category page: applied `location_memory_record` display, evidence/provenance panel, linked sources panel, place hierarchy placeholder, scene usage snapshot, candidate backlog snapshot, warning states including parent/child cycle detection, API/UI planning, and no-prose/no-silent-promotion boundaries for the locations/settings category.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:

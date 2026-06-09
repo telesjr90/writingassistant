@@ -369,6 +369,10 @@ Detailed WORKSPACE-010 planning lives in `docs/roadmap/notes_materials_page_spec
 
 Detailed WORKSPACE-011 planning lives in `docs/roadmap/project_memory_canon_page_structure_spec.md`. That spec defines the future Project Memory / Canon page structure: approved-only display, candidate-vs-canon labels, category cards, promotion-record snapshots, empty states before apply-promotion, health warnings, API/UI planning, and no-prose/no-silent-promotion boundaries.
 
+Detailed WORKSPACE-013 planning lives in `docs/roadmap/approved_characters_page_spec.md`. That spec defines the first approved-only category page: applied `character_memory_record` display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries for the characters category.
+
+Detailed WORKSPACE-014 planning lives in `docs/roadmap/approved_locations_settings_page_spec.md`. That spec defines the second approved-only category page: applied `location_memory_record` display, evidence/provenance panel, linked sources panel, place hierarchy placeholder, scene usage snapshot, candidate backlog snapshot, warning states including parent/child cycle detection, API/UI planning, and no-prose/no-silent-promotion boundaries for the locations/settings category.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
