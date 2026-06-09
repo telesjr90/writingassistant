@@ -22,6 +22,7 @@ Related planning:
 - WORKSPACE-012: `docs/roadmap/omi_ideas_candidates_page_spec.md`
 - WORKSPACE-014: `docs/roadmap/approved_locations_settings_page_spec.md`
 - WORKSPACE-015: `docs/roadmap/approved_timeline_page_spec.md`
+- WORKSPACE-016: `docs/roadmap/approved_plot_threads_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
