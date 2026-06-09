@@ -508,8 +508,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-012 | OMI ideas/candidates page | `docs/roadmap/omi_ideas_candidates_page_spec.md`; owner raw ideas, candidate review, evidence/provenance, promotion readiness, promotion audit records, filters/search, health warnings, API/UI planning, and future tests |
 | WORKSPACE-013 | Approved characters page | `docs/roadmap/approved_characters_page_spec.md`; approved-character record display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
 | WORKSPACE-014 | Approved locations/settings page | `docs/roadmap/approved_locations_settings_page_spec.md`; approved-location record display, evidence/provenance panel, linked sources panel, place hierarchy placeholder, scene usage snapshot, candidate backlog snapshot, warning states including parent/child cycle detection, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
-| WORKSPACE-014 | Approved locations/settings page | Approved-location page plan |
-| WORKSPACE-015 | Approved timeline page | Approved-timeline page plan |
+| WORKSPACE-015 | Approved timeline page | `docs/roadmap/approved_timeline_page_spec.md`; approved-timeline-event record display, evidence/provenance panel, linked sources panel, chronology/ordering placeholder, cause/effect placeholder, scene usage snapshot, candidate backlog snapshot, warning states including sequence collisions, chronology conflicts, and cause/effect cycles, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
 | WORKSPACE-016 | Approved plot threads page | Approved-plot-thread page plan |
 | WORKSPACE-017 | Continuity/consistency page | Candidate/approved continuity separation plan |
 | WORKSPACE-018 | Candidate extraction trigger strategy | Manual/after-save/hybrid trigger decision |

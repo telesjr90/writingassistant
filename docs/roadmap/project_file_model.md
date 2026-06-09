@@ -373,6 +373,8 @@ Detailed WORKSPACE-013 planning lives in `docs/roadmap/approved_characters_page_
 
 Detailed WORKSPACE-014 planning lives in `docs/roadmap/approved_locations_settings_page_spec.md`. That spec defines the second approved-only category page: applied `location_memory_record` display, evidence/provenance panel, linked sources panel, place hierarchy placeholder, scene usage snapshot, candidate backlog snapshot, warning states including parent/child cycle detection, API/UI planning, and no-prose/no-silent-promotion boundaries for the locations/settings category.
 
+Detailed WORKSPACE-015 planning lives in `docs/roadmap/approved_timeline_page_spec.md`. That spec defines the third approved-only category page: applied `timeline_event_memory_record` display, evidence/provenance panel, linked sources panel, chronology/ordering placeholder, cause/effect placeholder, scene usage snapshot, candidate backlog snapshot, warning states including sequence collisions, chronology conflicts, and cause/effect cycles, API/UI planning, and no-prose/no-silent-promotion boundaries for the timeline category.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
