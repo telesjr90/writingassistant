@@ -15,6 +15,8 @@ Related planning:
 - WORKSPACE-005: `docs/roadmap/chapter_scene_data_model_spec.md`
 - WORKSPACE-006: `docs/roadmap/notes_materials_data_model_spec.md`
 - WORKSPACE-007: `docs/roadmap/user_authored_document_editor_workflow_spec.md`
+- WORKSPACE-011: `docs/roadmap/project_memory_canon_page_structure_spec.md`
+- WORKSPACE-012: `docs/roadmap/omi_ideas_candidates_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage: `docs/roadmap/omi_storage_model.md`

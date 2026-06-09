@@ -179,6 +179,7 @@ These pages should be usable in the first workspace implementation:
 - **OMI Ideas and Candidates**
   - Shows guided project setup ideas/candidates and later story-knowledge candidates.
   - Candidate status, owner decision, provenance, and destination must be visible.
+  - Dedicated page planning: `docs/roadmap/omi_ideas_candidates_page_spec.md`.
 
 - **Approved Project Memory / Canon**
   - Shows approved memory/canon categories and empty states.
@@ -504,12 +505,12 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-009 | Chapters/scenes page | `docs/roadmap/chapters_scenes_page_spec.md`; page layout, chapter operations, scene operations, shared editor behavior, ordering/consistency behavior, local search/filter, analysis/extraction separation, API/UI planning, and future tests |
 | WORKSPACE-010 | Notes/materials page | `docs/roadmap/notes_materials_page_spec.md`; page layout, note operations, material operations, shared editor behavior, organization/linking behavior, local search/filter, analysis/extraction separation, provenance/license warnings, API/UI planning, and future tests |
 | WORKSPACE-011 | Project memory/canon page structure | `docs/roadmap/project_memory_canon_page_structure_spec.md`; approved-only page purpose, memory/canon concepts, approved-vs-candidate labeling, category cards, promotion-record snapshots, empty states before apply-promotion, API/UI planning, health warnings, and future tests |
-| WORKSPACE-012 | Approved characters page | Approved-character page plan |
-| WORKSPACE-013 | Approved locations/settings page | Approved-location page plan |
-| WORKSPACE-014 | Approved timeline page | Approved-timeline page plan |
-| WORKSPACE-015 | Approved plot threads page | Approved-plot-thread page plan |
-| WORKSPACE-016 | Continuity/consistency page | Candidate/approved continuity separation plan |
-| WORKSPACE-017 | OMI ideas/candidates page | OMI setup and candidate review page plan |
+| WORKSPACE-012 | OMI ideas/candidates page | `docs/roadmap/omi_ideas_candidates_page_spec.md`; owner raw ideas, candidate review, evidence/provenance, promotion readiness, promotion audit records, filters/search, health warnings, API/UI planning, and future tests |
+| WORKSPACE-013 | Approved characters page | Approved-character page plan |
+| WORKSPACE-014 | Approved locations/settings page | Approved-location page plan |
+| WORKSPACE-015 | Approved timeline page | Approved-timeline page plan |
+| WORKSPACE-016 | Approved plot threads page | Approved-plot-thread page plan |
+| WORKSPACE-017 | Continuity/consistency page | Candidate/approved continuity separation plan |
 | WORKSPACE-018 | Candidate extraction trigger strategy | Manual/after-save/hybrid trigger decision |
 | WORKSPACE-019 | Owner approval workflow for extracted candidates | Review action workflow |
 | WORKSPACE-020 | Tests for user-authored prose save without no-prose overblocking | Future test task |

@@ -28,6 +28,7 @@ MVP target:
 - CORE-004 storage reference: `docs/roadmap/project_memory_canon_storage_model.md` recommends future folder-based `memory/*.json` files as the durable project memory/canon target after OMI review and a later apply-promotion step.
 - CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future OMI typed review behavior for story-knowledge candidates, including candidate type filters, owner actions, merge/dedup planning, promotion-readiness rules, and review UI needs.
 - WORKSPACE-011 page-structure reference: `docs/roadmap/project_memory_canon_page_structure_spec.md` defines how future Project Memory / Canon pages should display applied memory separately from OMI candidates and promotion records before apply-promotion exists.
+- WORKSPACE-012 page reference: `docs/roadmap/omi_ideas_candidates_page_spec.md` defines the future dedicated OMI Ideas / Candidates workspace page for raw ideas, candidate review, evidence/provenance, readiness blockers, promotion audit records, and local filters/search.
 
 Immediate next task after this spec: review and commit App-3a / OMI-001 outputs, then decide/spec the owner-created aligned sample project before Phase 2 backend safety and schema foundation.
 

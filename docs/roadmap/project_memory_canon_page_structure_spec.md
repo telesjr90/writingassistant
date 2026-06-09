@@ -18,6 +18,7 @@ Related planning:
 - WORKSPACE-008: `docs/roadmap/project_overview_page_spec.md`
 - WORKSPACE-009: `docs/roadmap/chapters_scenes_page_spec.md`
 - WORKSPACE-010: `docs/roadmap/notes_materials_page_spec.md`
+- WORKSPACE-012: `docs/roadmap/omi_ideas_candidates_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -506,7 +507,8 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Approved Characters page, planned by WORKSPACE-012.
+- OMI Ideas / Candidates page, planned by WORKSPACE-012, is the candidate review page linked from this approved-only memory/canon page.
+- Approved Characters page planning follows after WORKSPACE-012.
 
 Empty state:
 

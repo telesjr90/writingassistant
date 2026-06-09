@@ -21,6 +21,7 @@ Current implementation status:
 - CORE-005 OMI expansion reference: `docs/roadmap/omi_story_knowledge_candidate_expansion.md` defines future typed candidate review, type/status filtering, owner actions, merge/dedup metadata, promotion-readiness rules, and UI requirements.
 - WORKSPACE-004 guided-creation reference: `docs/roadmap/omi_guided_project_creation_spec.md` defines future OMI-guided setup storage and recommends staged setup state before project creation, converted into project-local OMI records only after owner confirmation.
 - WORKSPACE-011 page-structure reference: `docs/roadmap/project_memory_canon_page_structure_spec.md` defines how promotion records should appear as audit-only snapshots and how OMI candidates must remain visually separate from approved memory/canon pages.
+- WORKSPACE-012 OMI page reference: `docs/roadmap/omi_ideas_candidates_page_spec.md` defines the future dedicated page for raw ideas, candidates, owner review, evidence/provenance, promotion readiness, promotion records, local filters/search, and OMI health warnings.
 
 ## 2. Target Storage Layout
 
