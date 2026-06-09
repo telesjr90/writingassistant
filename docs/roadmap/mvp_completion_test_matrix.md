@@ -208,6 +208,7 @@ These are not part of the current MVP exit gate. They define the next milestone 
 `WORKSPACE-010` defines Notes / Materials page planning in `docs/roadmap/notes_materials_page_spec.md`, including page layout, note/material operations, editor integration, organization/linking behavior, local search/filter, provenance/license warnings, candidate-only extraction placeholder, API/UI surfaces, and future page tests.
 `WORKSPACE-011` defines Project Memory / Canon page structure planning in `docs/roadmap/project_memory_canon_page_structure_spec.md`, including approved-only page purpose, memory/canon concepts, approved-vs-candidate labels, category cards, promotion-record snapshots, empty states before apply-promotion, health warnings, API/UI surfaces, and future page tests.
 `WORKSPACE-012` defines OMI Ideas / Candidates page planning in `docs/roadmap/omi_ideas_candidates_page_spec.md`, including owner raw ideas, candidate review, owner decisions, destinations, evidence/provenance, promotion readiness, promotion audit records, local filters/search, warning states, API/UI surfaces, page relationships, and future page tests.
+`WORKSPACE-013` defines Approved Characters page planning in `docs/roadmap/approved_characters_page_spec.md`, including applied `character_memory_record` display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI surfaces, no-prose/no-silent-promotion boundaries, and future page tests.
 
 - Project creation from scratch.
 - Project selector/library.

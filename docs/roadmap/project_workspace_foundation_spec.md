@@ -506,7 +506,7 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-010 | Notes/materials page | `docs/roadmap/notes_materials_page_spec.md`; page layout, note operations, material operations, shared editor behavior, organization/linking behavior, local search/filter, analysis/extraction separation, provenance/license warnings, API/UI planning, and future tests |
 | WORKSPACE-011 | Project memory/canon page structure | `docs/roadmap/project_memory_canon_page_structure_spec.md`; approved-only page purpose, memory/canon concepts, approved-vs-candidate labeling, category cards, promotion-record snapshots, empty states before apply-promotion, API/UI planning, health warnings, and future tests |
 | WORKSPACE-012 | OMI ideas/candidates page | `docs/roadmap/omi_ideas_candidates_page_spec.md`; owner raw ideas, candidate review, evidence/provenance, promotion readiness, promotion audit records, filters/search, health warnings, API/UI planning, and future tests |
-| WORKSPACE-013 | Approved characters page | Approved-character page plan |
+| WORKSPACE-013 | Approved characters page | `docs/roadmap/approved_characters_page_spec.md`; approved-character record display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
 | WORKSPACE-014 | Approved locations/settings page | Approved-location page plan |
 | WORKSPACE-015 | Approved timeline page | Approved-timeline page plan |
 | WORKSPACE-016 | Approved plot threads page | Approved-plot-thread page plan |

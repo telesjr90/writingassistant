@@ -20,6 +20,10 @@ CORE-005 OMI review behavior is defined in `docs/roadmap/omi_story_knowledge_can
 
 WORKSPACE-011 page-structure behavior is defined in `docs/roadmap/project_memory_canon_page_structure_spec.md`. That spec defines how future Project Memory / Canon pages should keep these candidates separate from applied memory/canon records until apply-promotion succeeds.
 
+WORKSPACE-012 OMI page behavior is defined in `docs/roadmap/omi_ideas_candidates_page_spec.md`. That spec defines the future OMI workspace page for owner raw ideas, candidate review, evidence/provenance, promotion readiness, audit-only promotion records, local filters/search, warning states, and page relationships.
+
+WORKSPACE-013 Approved Characters page behavior is defined in `docs/roadmap/approved_characters_page_spec.md`. That spec defines the first approved-only category page: applied `character_memory_record` display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries for the characters category.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

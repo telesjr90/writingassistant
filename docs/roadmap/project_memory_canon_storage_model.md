@@ -8,6 +8,10 @@ Project memory/canon is the durable owner-approved story knowledge layer that ma
 
 WORKSPACE-011 page-structure planning lives in `docs/roadmap/project_memory_canon_page_structure_spec.md`. That spec defines the future Project Memory / Canon page, approved-vs-candidate labels, category cards, promotion-record snapshots, empty states before apply-promotion exists, health warnings, API/UI planning, and page-level no-silent-promotion boundaries.
 
+WORKSPACE-012 OMI page planning lives in `docs/roadmap/omi_ideas_candidates_page_spec.md`. That spec defines the future OMI raw idea, candidate review, evidence/provenance, promotion readiness, promotion audit records, local filter/search, and OMI health warning page.
+
+WORKSPACE-013 Approved Characters page planning lives in `docs/roadmap/approved_characters_page_spec.md`. That spec defines the first approved-only category page: applied `character_memory_record` display, evidence/provenance panel, linked sources panel, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries for the characters category.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
