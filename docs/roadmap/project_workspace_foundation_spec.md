@@ -199,6 +199,7 @@ These pages should be represented early but may start as empty-state placeholder
 - **Open Questions**
 - **Relationships**
 - **Organizations / Groups**
+- **Annotations / Evidence / Provenance**
 
 Placeholder requirements:
 
@@ -519,10 +520,11 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-019 | Approved relationships page | `docs/roadmap/approved_relationships_page_spec.md`; approved-relationship record display, participant snapshot, linked story-knowledge snapshot, related plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states including participant/type/status conflicts, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica Relationship Story boundaries |
 | WORKSPACE-020 | Approved organizations/groups page | `docs/roadmap/approved_organizations_groups_page_spec.md`; approved organization/group record display, members/leadership snapshot, hierarchy snapshot, linked story-knowledge snapshot, related relationship/plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural-claim boundaries |
 | WORKSPACE-021 | Approved objects/items page | `docs/roadmap/approved_objects_items_page_spec.md`; approved object/item record display, ownership/holder snapshot, location/movement snapshot, linked story-knowledge snapshot, related plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural/thematic-claim boundaries |
-| WORKSPACE-022 | Tests for user-authored prose save without no-prose overblocking | Future test task |
-| WORKSPACE-023 | Tests for no AI prose generation | Future test task |
-| WORKSPACE-024 | Tests for no silent promotion | Future test task |
-| WORKSPACE-025 | Project-local canon/memory visibility tests | Future test task |
+| WORKSPACE-022 | Approved annotations/evidence/provenance page | `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`; approved annotation/evidence/provenance record display, source locator panel, evidence span panel, provenance chain panel, linked approved-memory snapshot, linked candidate/promotion audit snapshot, copyright/source safety notice, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries |
+| WORKSPACE-023 | Tests for user-authored prose save without no-prose overblocking | Future test task |
+| WORKSPACE-024 | Tests for no AI prose generation | Future test task |
+| WORKSPACE-025 | Tests for no silent promotion | Future test task |
+| WORKSPACE-026 | Project-local canon/memory visibility tests | Future test task |
 
 Implementation should not start Dramatica-specific analysis, extractor dependencies, or memory/canon apply-promotion before the basic workspace create/select/save/reload flows exist.
 
@@ -544,7 +546,7 @@ The first implementation can be accepted when:
 - Notes/Materials page supports basic organization and navigation.
 - OMI Ideas and Candidates page or panel is visible for project setup/candidate review.
 - Approved Project Memory/Canon page or shell is visible and does not show pending candidates as canon.
-- Characters, Locations/Settings, Objects/Items, Timeline, Plot Threads, Continuity/Consistency, Open Questions, Relationships, and Organizations/Groups pages have at least clear empty states or placeholders.
+- Characters, Locations/Settings, Objects/Items, Timeline, Plot Threads, Continuity/Consistency, Open Questions, Relationships, Organizations/Groups, and Annotations/Evidence/Provenance pages have at least clear empty states or placeholders.
 - Owner-authored prose saves are not blocked by no-prose guards.
 - No AI prose-generation controls are exposed.
 - AI output is not inserted into editor content.
@@ -587,6 +589,7 @@ These remain follow-up decisions for later implementation tasks:
 - `docs/roadmap/writer_assistant_core_candidate_schemas.md`
 - `docs/roadmap/project_memory_canon_storage_model.md`
 - `docs/roadmap/approved_objects_items_page_spec.md`
+- `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - `docs/roadmap/mvp_completion_test_matrix.md`
 - `docs/roadmap/risk_register.md`
 - `docs/roadmap/open_questions.md`

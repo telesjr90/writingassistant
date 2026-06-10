@@ -28,6 +28,7 @@ Related planning:
 - WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
 - WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
 - WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
+- WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -1293,6 +1294,12 @@ Project Memory / Canon:
 - Shows only applied approved memory/canon records.
 - May link back here for pending, rejected, approved-but-not-applied, or promotion-record-only OMI records.
 - Must not display OMI candidates as approved canon.
+
+Approved Annotations / Evidence / Provenance:
+
+- Shows only applied approved annotation/evidence/provenance records.
+- May link back here for pending annotation/evidence/provenance candidates, approved-but-not-applied candidates, and promotion-record-only audit records.
+- Must not display OMI annotation/evidence/provenance candidates as approved evidence/provenance truth.
 
 Project Context / Bible / Storyform:
 

@@ -40,6 +40,8 @@ WORKSPACE-020 Approved Organizations / Groups page behavior is defined in `docs/
 
 WORKSPACE-021 Approved Objects / Items page behavior is defined in `docs/roadmap/approved_objects_items_page_spec.md`. That spec defines the approved-only objects/items page behavior and keeps object/item candidates, promotion records, generated object analysis, graph generation, symbolic interpretation, item fixes, Dramatica structural/thematic claims, and approved object/item memory/canon visibly separate.
 
+WORKSPACE-022 Approved Annotations / Evidence / Provenance page behavior is defined in `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`. That spec defines the approved-only annotation/evidence/provenance page behavior and keeps annotation/evidence/provenance candidates, promotion records, generated summaries, generated interpretations, invented evidence, semantic search, contradiction detection, Dramatica proof claims, and approved annotation/evidence/provenance records visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

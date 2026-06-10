@@ -186,6 +186,8 @@ projects/{project_id}/
     relationships.json
     plot_threads.json
     annotations.json
+    evidence_spans.json
+    provenance.json
     open_questions.json
     continuity_warnings.json
     index.json

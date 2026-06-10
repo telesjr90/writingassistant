@@ -28,6 +28,8 @@ WORKSPACE-020 Approved Organizations / Groups page planning lives in `docs/roadm
 
 WORKSPACE-021 Approved Objects / Items page planning lives in `docs/roadmap/approved_objects_items_page_spec.md`. That spec defines the approved-only objects/items page: applied `object_memory_record` or `item_memory_record` display, ownership/holder snapshot, location/movement snapshot, linked story-knowledge snapshot, related plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural/thematic-claim boundaries.
 
+WORKSPACE-022 Approved Annotations / Evidence / Provenance page planning lives in `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`. That spec defines the approved-only annotations/evidence/provenance page: applied annotation/evidence/provenance record display, source locator panel, evidence span panel, provenance chain panel, linked approved-memory snapshot, linked candidate/promotion audit snapshot, copyright/source safety notice, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
@@ -52,6 +54,8 @@ projects/{project_id}/
     plot_threads.json
     summaries.json
     annotations.json
+    evidence_spans.json
+    provenance.json
     open_questions.json
     continuity_warnings.json
     index.json
@@ -342,6 +346,8 @@ Recommended file-to-record mapping:
 | `memory/plot_threads.json` | `plot_thread_memory_record` |
 | `memory/summaries.json` | `navigation_summary_memory_record` |
 | `memory/annotations.json` | `annotation_memory_record` |
+| `memory/evidence_spans.json` | `evidence_span_memory_record` or equivalent approved evidence/audit record |
+| `memory/provenance.json` | `provenance_record` or equivalent approved audit record |
 | `memory/open_questions.json` | `open_question_memory_record` |
 | `memory/continuity_warnings.json` | `continuity_warning_memory_record` |
 
@@ -392,6 +398,7 @@ Approved project-specific pages should read from memory/canon records only:
 - Approved Open Questions.
 - Approved Relationships.
 - Approved Navigation Summaries.
+- Approved Annotations / Evidence / Provenance.
 - Approved Project Memory/Canon.
 
 The OMI Ideas and Candidates page should show pending/rejected/uncertain candidates separately from these approved pages.

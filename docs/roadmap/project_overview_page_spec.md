@@ -26,6 +26,7 @@ Related planning:
 - WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
 - WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
 - WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
+- WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage: `docs/roadmap/omi_storage_model.md`
@@ -274,6 +275,7 @@ Recommended cards:
 - Future Approved Relationships.
 - Future Approved Organizations / Groups.
 - Future Approved Objects / Items.
+- Future Approved Annotations / Evidence / Provenance.
 
 WORKSPACE-009 defines the detailed target for the Chapters / Scenes navigation card and destination page.
 

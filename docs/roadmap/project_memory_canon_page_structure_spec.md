@@ -28,6 +28,7 @@ Related planning:
 - WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
 - WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
 - WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
+- WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -42,7 +43,7 @@ The page should:
 
 - Show approved project truth only when explicitly promoted by the owner and applied by a future apply-promotion flow.
 - Clearly separate approved memory/canon from pending candidates, rejected candidates, archived candidates, approved candidates that are not applied, and promotion records.
-- Provide category-specific navigation to approved characters, locations/settings, objects/items, organizations/groups, timeline events, relationships, plot threads, open questions, annotations, and continuity warnings.
+- Provide category-specific navigation to approved characters, locations/settings, objects/items, organizations/groups, timeline events, relationships, plot threads, open questions, annotations/evidence/provenance, and continuity warnings.
 - Show empty states before apply-promotion exists.
 - Avoid implying that OMI candidates are canon.
 - Avoid creating or editing story truth automatically.
@@ -729,7 +730,7 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Future annotations page or annotation sidebar if later scheduled.
+- Approved Annotations / Evidence / Provenance page, planned by WORKSPACE-022.
 
 Empty state:
 
