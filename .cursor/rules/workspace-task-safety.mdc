@@ -1,0 +1,51 @@
+---
+description: Safety workflow for WORKSPACE and documentation-only project tasks.
+alwaysApply: true
+---
+
+# Workspace Task Safety
+
+WORKSPACE tasks must start by checking current state:
+
+```bash
+pwd
+git status --short --branch
+git log -8 --oneline
+git diff --stat
+git diff --check
+```
+
+If the working tree has uncommitted changes from previous WORKSPACE tasks that could be overwritten, stop and report `BLOCKED`. Do not revert, overwrite, stage, or clean up user or previous-agent changes unless the user explicitly requests it.
+
+Documentation-only WORKSPACE tasks must not modify:
+
+- backend runtime code
+- frontend runtime code
+- tests
+- package or dependency files
+- dataset files
+- JSONL files
+- `training/data/dataset_manifest.json`
+- runtime project files under `projects/`
+- OMI runtime records
+- memory/canon runtime files
+
+Documentation-only WORKSPACE tasks must not run backend or frontend tests unless code/tests were accidentally modified and the smallest safe validation is needed. Do not run training, fine-tuning, Ollama/live model checks, package installs, backend route implementation, frontend UI implementation, extraction, contradiction detection, apply-promotion, or Dramatica-specific logic during documentation-only tasks.
+
+Documentation-only validation should usually be:
+
+```bash
+git status --short --branch
+git diff --stat
+git diff --check
+```
+
+Use `git diff --cached --name-only` only when the project docs or task explicitly require confirming nothing is staged.
+
+Leave files unstaged and uncommitted. Do not push.
+
+Report every created or modified file in the final response.
+
+Create the requested local report under `training/reports/` when the task asks for one. Local reports are documentation artifacts, not training data or JSONL records.
+
+Do not over-edit roadmap docs. Only update docs required for consistency with the requested task.

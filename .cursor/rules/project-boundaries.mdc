@@ -1,0 +1,38 @@
+---
+description: Non-negotiable product and safety boundaries for this repo.
+alwaysApply: true
+---
+
+# Project Boundaries
+
+Product name: Dramatica-Informed Writing Assistant.
+
+Repo path: `/home/tjrpirateking/projects/WritingAssistantApplication`.
+
+GitHub repo: `telesjr90/writingassistant`.
+
+This app is local-first and analysis-only. It may store, edit, save, reload, and organize owner-authored prose, notes, research, references, metadata, and materials, but AI must not generate story prose.
+
+Never write, rewrite, continue, imitate, polish, improve, expand, or extend story prose. Never generate dialogue, chapters, scenes, story passages, replacement prose, bridge prose, or style imitation.
+
+Use the standard refusal message exactly when refusing prose-writing requests:
+
+```text
+I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose.
+```
+
+Owner-authored content saves must not be overblocked as AI prose generation. Scene, chapter, note, material, bible, storyform, raw idea, and owner decision fields can store owner-authored text when the owner is saving their own material.
+
+Story Check, OMI, future extractors, NotebookLM-like outputs, retrieved references, and future Writer Assistant Core outputs remain candidate-only until owner approval. Schema validity, model confidence, extractor output, and NotebookLM aggregation do not establish story truth.
+
+OMI is the central candidate review and promotion system. Extracted, manual, and future model-assisted story knowledge must create OMI candidates first, with evidence/provenance where practical.
+
+Approved project truth comes only from owner-approved memory/canon records. Pending, rejected, archived, duplicate, uncertain, and needs-revision candidates are not canon. Approved candidates are not durable canon until future apply-promotion explicitly applies them into approved memory/canon.
+
+Promotion records are audit-only until future apply-promotion exists. Runtime apply-promotion remains unimplemented unless a task explicitly implements it. Do not imply that promotion records mutate `memory/*.json`, `bible.json`, `storyform.json`, scenes, notes, materials, or project metadata.
+
+Dramatica-specific implementation remains deferred unless a task explicitly says otherwise. General story-knowledge relationships, timeline, continuity, and plot-thread assistance must not be labeled as Dramatica proof.
+
+Fine-tuning remains paused unless explicitly restarted. Do not create JSONL, promote dataset records, update `training/data/dataset_manifest.json`, run training, run RunPod smoke, or call Ollama/live models unless the user explicitly requests that track.
+
+External extractor dependencies remain future-only unless explicitly approved after a dedicated spike evaluates license, maintenance, runtime cost, privacy/local-first behavior, evidence grounding, safety, candidate-only behavior, and OMI integration.

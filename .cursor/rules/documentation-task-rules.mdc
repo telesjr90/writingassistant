@@ -1,0 +1,43 @@
+---
+description: Documentation and spec-writing rules for roadmap and workspace tasks.
+alwaysApply: true
+---
+
+# Documentation Task Rules
+
+Treat `docs/master_plan.md` as the roadmap source of truth unless the user gives a newer explicit instruction.
+
+Documentation specs must clearly separate:
+
+- approved memory/canon truth
+- OMI candidates
+- promotion audit records
+- future-only behavior
+- unimplemented runtime behavior
+
+Specs must not imply that planned routes, UI, extractors, memory files, or apply-promotion already exist. If a route, UI page, storage file, extractor, model path, or mutation behavior is only planned, label it as future-only or documentation-only.
+
+Missing, unknown, unsupported, unresolved, insufficient-evidence, and unapproved fields must be labeled honestly. Do not invent project truth, Dramatica truth, approved memory, evidence, or runtime status.
+
+Avoid Dramatica-specific claims unless the task explicitly calls for them and the claim is evidence-backed and owner-approved. General relationship, timeline, plot, continuity, and story-knowledge claims are not Dramatica Relationship Story, Signpost, Concern, Issue, Problem/Solution, CIPS, dynamics, or throughline proof.
+
+No generated prose examples. Do not include story passages, replacement prose, dialogue, scene continuations, style imitation, polished rewrites, or sample chapters.
+
+Do not add controls or planned controls such as:
+
+- fix continuity
+- rewrite scene
+- continue scene
+- generate bridge scene
+- patch plot hole
+- polish prose
+- improve scene
+- imitate style
+- write next chapter
+- draft dialogue
+
+Continuity, contradiction, timeline, relationship, plot-thread, and annotation specs may identify issues, evidence, labels, and diagnostic questions, but must not provide replacement prose or generated fixes.
+
+Future tests should include no-prose, no-silent-promotion, no model call, no mutation, path safety, corrupt/missing file warnings, candidate/canon separation, evidence/provenance requirements, owner-authored save overblocking checks, and `dataset_manifest.json` unchanged checks as applicable.
+
+Reports must include safety confirmations for the task scope, including no runtime code, tests, package/dependency files, dataset files, JSONL/training records, training/fine-tuning, Ollama/live model calls, package installs, runtime project files, OMI records, memory/canon files, staging, commits, or pushes when those are prohibited.

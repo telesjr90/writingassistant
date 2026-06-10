@@ -1,37 +1,28 @@
 ---
-description: "lean-ctx hybrid: MUST use ctx_read/ctx_search (MCP) + lean-ctx -c (CLI). NEVER use native Read/Grep/Shell."
+description: Prefer LeanCTX for context-efficient navigation when available.
 alwaysApply: true
 ---
 
-# lean-ctx — Context Engineering Layer
-<!-- lean-ctx-rules-v11 -->
+# LeanCTX Context Rule
 
-## Mode: Hybrid (MCP reads + CLI shell)
+LeanCTX is installed for Cursor workflows and may reduce context and tool-call waste. Use LeanCTX where available for context-efficient navigation, especially for repeated reads, targeted searches, and compressed shell output.
 
-CRITICAL: ALWAYS use lean-ctx tools. This is NOT optional.
+Do not use LeanCTX as a substitute for the repo's source-of-truth docs. For roadmap and safety decisions, prefer:
 
-## Tool Mapping (MANDATORY)
-| Instead of | MUST USE | Example |
-|------------|----------|---------|
-| Read/cat/head/tail | `ctx_read(path, mode)` | `ctx_read("src/main.rs", "full")` |
-| Grep/rg/find | `ctx_search(pattern, path)` | `ctx_search("fn handle", "src/")` |
-| Shell/bash | `lean-ctx -c "<cmd>"` | `lean-ctx -c "cargo test"` |
-| ls/find | `lean-ctx ls [path]` | `lean-ctx ls src/ --depth 3` |
-| Edit (when Read unavail.) | `ctx_edit(path, old, new)` | `ctx_edit("f.rs", "old", "new")` |
+- `docs/master_plan.md`
+- task-relevant `docs/roadmap/*.md` specs
+- task-specific Repomix packs when present
+- Graphify reports or task-specific Graphify queries when graphs are present
+- `AGENTS.md`, `CLAUDE.md`, and `.cursor/rules/*.mdc`
 
-## ctx_read Modes
-| Goal | Mode |
-|------|------|
-| Edit target | `full` |
-| API surface | `signatures` |
-| Post-edit check | `diff` |
-| Overview | `map` |
-| Region | `lines:N-M` |
+Preferred workflow:
 
-## Workflow: Orient → Locate → Read → Edit → Verify → Record
-Use `ctx_overview` or `ctx_compose` first. Then `ctx_search`/`ctx_semantic_search`.
-Read with `ctx_read(path, mode)`. Edit with native Edit or `ctx_edit`.
-Verify: `ctx_read(path, "diff")` + `lean-ctx -c "test cmd"`.
+1. Read the relevant source-of-truth docs first.
+2. Use Graphify before broad raw source search when a graph exists.
+3. Use task-specific Repomix context when available.
+4. Use LeanCTX for efficient navigation and verification.
+5. Fall back to targeted file reads/searches only when LeanCTX, Graphify, or Repomix context is unavailable or insufficient.
 
-REMINDER: You MUST use lean-ctx tools. NEVER use native Read, Grep, or Shell directly.
-<!-- /lean-ctx -->
+Do not rely on Code Context Engine for this repo right now because it previously tried to index too many files. Prefer Repomix plus Graphify plus LeanCTX.
+
+If LeanCTX is missing or fails, report the failure and continue conservatively with targeted source-of-truth reads and the smallest necessary search scope.

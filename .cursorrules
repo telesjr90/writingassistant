@@ -1,13 +1,17 @@
-# lean-ctx — Context Engineering Layer
+# Cursor Entry Rules
 
-CRITICAL: ALWAYS use lean-ctx tools instead of native equivalents. This is NOT optional.
+This repo is the Dramatica-Informed Writing Assistant.
 
-| MUST USE | NEVER USE | Why |
-|----------|-----------|-----|
-| `ctx_read(path, mode)` | `Read` / `cat` / `head` / `tail` | Cached, 10 read modes, re-reads ~13 tokens |
-| `ctx_search(pattern, path)` | `Grep` / `rg` | Compact, token-efficient results |
-| `lean-ctx -c "<cmd>"` (via Shell) | `ctx_shell` / raw `Shell` | CLI compression, no MCP overhead |
+Before editing, Cursor must read `AGENTS.md`, relevant `.cursor/rules/*.mdc`, and the task-relevant roadmap docs. `docs/master_plan.md` is the current source of truth for roadmap direction and constraints.
 
-File editing: use native Edit/StrReplace. Write, Delete, Glob → use normally.
-NEVER loop on Edit failures — switch to ctx_edit immediately.
-REMINDER: You MUST use lean-ctx tools. NEVER use native Read, Grep, or Shell directly.
+The app is analysis-only. The assistant must never write, rewrite, continue, imitate, polish, improve, expand, or extend story prose.
+
+Preserve the standard refusal message exactly:
+
+`I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose.`
+
+OMI candidates are not canon. Approved project truth must come only from owner-approved memory/canon records.
+
+Do not stage, commit, or push unless the user explicitly asks.
+
+Use Graphify and Repomix context before broad raw search or large edits. Use LeanCTX where available for context-efficient navigation.

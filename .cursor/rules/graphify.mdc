@@ -1,11 +1,32 @@
 ---
-description: graphify knowledge graph context
+description: Use Graphify knowledge graphs before broad project search.
 alwaysApply: true
 ---
 
-This project has a graphify knowledge graph at graphify-out/.
+# Graphify Context Rule
 
-- For codebase or architecture questions, when `graphify-out/graph.json` exists, first run `graphify query "<question>"` (or `graphify path "<A>" "<B>"` / `graphify explain "<concept>"`). These return a scoped subgraph, usually much smaller than `GRAPH_REPORT.md` or raw grep output.
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context
-- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+Use Graphify before asking Cursor to scan broad raw directories. Prefer task-specific Graphify queries before broad file search or large edits.
+
+Graph reports may exist at:
+
+```text
+docs/graphify-out/GRAPH_REPORT.md
+backend/graphify-out/GRAPH_REPORT.md
+frontend/src/graphify-out/GRAPH_REPORT.md
+tests/graphify-out/GRAPH_REPORT.md
+```
+
+Graph JSON files may exist under matching `graphify-out/graph.json` folders.
+
+To query a graph, first `cd` into the mapped folder, then run `graphify query`:
+
+```bash
+cd /home/tjrpirateking/projects/WritingAssistantApplication/docs
+graphify query "Which roadmap specs define approved memory canon pages and OMI candidate boundaries?"
+```
+
+Use `graphify path "<A>" "<B>"` for relationship questions and `graphify explain "<concept>"` for focused concepts when those are more direct than a query.
+
+Do not require reading huge raw directories before checking Graphify reports or queries. If Graphify is missing, there is no `graphify-out/graph.json`, or a query fails, report the failure and continue conservatively with targeted source-of-truth file reads.
+
+After modifying runtime code files, run `graphify update .` to keep the graph current when Graphify is available. Documentation/configuration-only tasks do not require graph updates.
