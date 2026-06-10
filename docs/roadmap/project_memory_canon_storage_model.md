@@ -18,6 +18,10 @@ WORKSPACE-015 Approved Timeline page planning lives in `docs/roadmap/approved_ti
 
 WORKSPACE-016 Approved Plot Threads page planning lives in `docs/roadmap/approved_plot_threads_page_spec.md`. That spec defines the fourth approved-only category page: applied `plot_thread_memory_record` display, evidence/provenance panel, linked sources panel, linked timeline/scene snapshot, related characters/locations/objects snapshot, related open-questions and continuity-warnings placeholders, candidate backlog snapshot, warning states including thread status conflicts, API/UI planning, and no-prose/no-silent-promotion boundaries for the plot-thread category.
 
+WORKSPACE-017 Continuity / Consistency page planning lives in `docs/roadmap/continuity_consistency_page_spec.md`. That spec defines the approved-only continuity/consistency page: applied `continuity_warning_memory_record` or `consistency_issue_memory_record` display, evidence/provenance panel, linked sources panel, affected story-knowledge snapshot, resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries.
+
+WORKSPACE-018 Approved Open Questions page planning lives in `docs/roadmap/approved_open_questions_page_spec.md`. That spec defines the approved-only open-questions page: applied `open_question_memory_record` or `unresolved_question_memory_record` display, evidence/provenance panel, linked sources panel, linked story-knowledge snapshot, owner-answer/resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
@@ -377,6 +381,7 @@ Approved project-specific pages should read from memory/canon records only:
 - Approved Timeline.
 - Approved Plot Threads.
 - Continuity/Consistency.
+- Approved Open Questions.
 - Approved Navigation Summaries.
 - Approved Project Memory/Canon.
 

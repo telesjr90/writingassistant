@@ -377,6 +377,10 @@ Detailed WORKSPACE-015 planning lives in `docs/roadmap/approved_timeline_page_sp
 
 Detailed WORKSPACE-016 planning lives in `docs/roadmap/approved_plot_threads_page_spec.md`. That spec defines the fourth approved-only category page: applied `plot_thread_memory_record` display, evidence/provenance panel, linked sources panel, linked timeline/scene snapshot, related characters/locations/objects snapshot, related open-questions and continuity-warnings placeholders, candidate backlog snapshot, warning states including thread status conflicts, API/UI planning, and no-prose/no-silent-promotion boundaries for the plot-thread category.
 
+Detailed WORKSPACE-017 planning lives in `docs/roadmap/continuity_consistency_page_spec.md`. That spec defines the approved-only continuity/consistency page: applied continuity/consistency records, evidence/provenance, linked sources, linked story knowledge, resolution placeholders, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries.
+
+Detailed WORKSPACE-018 planning lives in `docs/roadmap/approved_open_questions_page_spec.md`. That spec defines the approved-only open-questions page: applied open-question records, evidence/provenance, linked sources, linked story knowledge, owner-answer/resolution placeholders, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
@@ -774,6 +778,7 @@ Future frontend design targets:
 - Approved Timeline page.
 - Approved Plot Threads page.
 - Continuity/Consistency page.
+- Approved Open Questions page.
 - Approved Project Memory/Canon page.
 - Clear candidate vs canon labels on every page that references extracted knowledge.
 

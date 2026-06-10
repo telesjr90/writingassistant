@@ -30,6 +30,10 @@ WORKSPACE-015 Approved Timeline page behavior is defined in `docs/roadmap/approv
 
 WORKSPACE-016 Approved Plot Threads page behavior is defined in `docs/roadmap/approved_plot_threads_page_spec.md`. That spec defines the fourth approved-only category page: applied `plot_thread_memory_record` display, evidence/provenance panel, linked sources panel, linked timeline/scene snapshot, related characters/locations/objects snapshot, related open-questions and continuity-warnings placeholders, candidate backlog snapshot, warning states including thread status conflicts, API/UI planning, and no-prose/no-silent-promotion boundaries for the plot-thread category.
 
+WORKSPACE-017 Continuity / Consistency page behavior is defined in `docs/roadmap/continuity_consistency_page_spec.md`. That spec defines the approved-only continuity/consistency page behavior and keeps continuity candidates, promotion records, and approved continuity memory/canon visibly separate.
+
+WORKSPACE-018 Approved Open Questions page behavior is defined in `docs/roadmap/approved_open_questions_page_spec.md`. That spec defines the approved-only open-questions page behavior and keeps open-question candidates, promotion records, generated answers, and approved open-question memory/canon visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

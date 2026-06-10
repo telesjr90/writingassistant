@@ -195,6 +195,7 @@ These pages should be represented early but may start as empty-state placeholder
 - **Timeline**
 - **Plot Threads**
 - **Continuity / Consistency**
+- **Open Questions**
 
 Placeholder requirements:
 
@@ -510,9 +511,8 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-014 | Approved locations/settings page | `docs/roadmap/approved_locations_settings_page_spec.md`; approved-location record display, evidence/provenance panel, linked sources panel, place hierarchy placeholder, scene usage snapshot, candidate backlog snapshot, warning states including parent/child cycle detection, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
 | WORKSPACE-015 | Approved timeline page | `docs/roadmap/approved_timeline_page_spec.md`; approved-timeline-event record display, evidence/provenance panel, linked sources panel, chronology/ordering placeholder, cause/effect placeholder, scene usage snapshot, candidate backlog snapshot, warning states including sequence collisions, chronology conflicts, and cause/effect cycles, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
 | WORKSPACE-016 | Approved plot threads page | `docs/roadmap/approved_plot_threads_page_spec.md`; approved-plot-thread record display, evidence/provenance panel, linked sources panel, linked timeline/scene snapshot, related characters/locations/objects snapshot, related open-questions and continuity-warnings placeholders, candidate backlog snapshot, warning states including thread status conflicts, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
-| WORKSPACE-016 | Approved plot threads page | Approved-plot-thread page plan |
-| WORKSPACE-017 | Continuity/consistency page | Candidate/approved continuity separation plan |
-| WORKSPACE-018 | Candidate extraction trigger strategy | Manual/after-save/hybrid trigger decision |
+| WORKSPACE-017 | Continuity/consistency page | `docs/roadmap/continuity_consistency_page_spec.md`; approved continuity/consistency issue display, evidence/provenance panel, linked sources panel, linked story-knowledge snapshot, resolution placeholder, candidate backlog snapshot, warning states including status/resolution conflicts, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
+| WORKSPACE-018 | Approved open questions page | `docs/roadmap/approved_open_questions_page_spec.md`; approved open-question record display, evidence/provenance panel, linked sources panel, linked story-knowledge snapshot, related plot-thread/continuity snapshot, owner-answer/resolution placeholder, candidate backlog snapshot, warning states including answer/resolution conflicts and related-question link issues, API/UI planning, no-prose/no-silent-promotion boundaries, and future tests |
 | WORKSPACE-019 | Owner approval workflow for extracted candidates | Review action workflow |
 | WORKSPACE-020 | Tests for user-authored prose save without no-prose overblocking | Future test task |
 | WORKSPACE-021 | Tests for no AI prose generation | Future test task |
@@ -539,7 +539,7 @@ The first implementation can be accepted when:
 - Notes/Materials page supports basic organization and navigation.
 - OMI Ideas and Candidates page or panel is visible for project setup/candidate review.
 - Approved Project Memory/Canon page or shell is visible and does not show pending candidates as canon.
-- Characters, Locations/Settings, Timeline, Plot Threads, and Continuity/Consistency pages have at least clear empty states or placeholders.
+- Characters, Locations/Settings, Timeline, Plot Threads, Continuity/Consistency, and Open Questions pages have at least clear empty states or placeholders.
 - Owner-authored prose saves are not blocked by no-prose guards.
 - No AI prose-generation controls are exposed.
 - AI output is not inserted into editor content.

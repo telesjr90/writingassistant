@@ -672,7 +672,7 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Approved Plot Threads page, planned by WORKSPACE-015.
+- Approved Plot Threads page, planned by WORKSPACE-016.
 
 Empty state:
 
@@ -698,7 +698,7 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Future approved open questions page or part of Continuity / Consistency if later scheduled.
+- Approved Open Questions page, planned by WORKSPACE-018.
 
 Empty state:
 
@@ -754,7 +754,7 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Continuity / Consistency page, planned by WORKSPACE-016.
+- Continuity / Consistency page, planned by WORKSPACE-017.
 
 Empty state:
 
