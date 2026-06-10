@@ -13,6 +13,13 @@ except ImportError:  # pragma: no cover - supports uvicorn main:app from backend
     import storyform
 
 
+class ProjectCreate(BaseModel):
+    title: str
+
+    class Config:
+        extra = "forbid"
+
+
 class SceneUpdate(BaseModel):
     content: str
 
@@ -64,6 +71,28 @@ app.add_middleware(
 
 def _patch_route(path: str):
     return getattr(app, "patch", app.post)(path)
+
+
+def _safe_create_project_error_detail(exc: ValueError) -> str:
+    message = str(exc)
+    if "Project path " in message or "projects dir" in message.lower():
+        return "Unable to create project with the given title"
+    return message
+
+
+@app.post("/api/projects")
+def post_project(payload: ProjectCreate) -> dict:
+    try:
+        return project_manager.create_project(title=payload.title)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=_safe_create_project_error_detail(exc),
+        ) from exc
+    except FileExistsError as exc:
+        raise HTTPException(status_code=409, detail="Project already exists") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Failed to create project") from exc
 
 
 @app.get("/api/projects/{project_name}/scenes")

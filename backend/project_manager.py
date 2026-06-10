@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import re
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -9,6 +11,222 @@ from uuid import uuid4
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROJECTS_DIR = REPO_ROOT / "projects"
+
+
+# Project creation primitives (PHASE7-IMPL-001) follow
+# `docs/roadmap/project_creation_flow_spec.md` and the
+# `docs/roadmap/project_file_model.md` `project.json` shape. They never
+# create story prose, generated summaries, candidates, OMI records,
+# memory/canon files, training data, or model artifacts.
+PROJECT_SCHEMA_VERSION = "0.1.0"
+
+MAX_PROJECT_TITLE_LENGTH = 160
+MAX_PROJECT_ID_LENGTH = 64
+MAX_PROJECT_ID_COLLISION_ATTEMPTS = 1000
+
+PROJECT_CREATION_METHOD_BLANK = "blank"
+
+_PROJECT_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
+_PROJECT_ID_INVALID_CHAR_RUN = re.compile(r"[^a-z0-9]+")
+_PROJECT_ID_REPEAT_HYPHEN = re.compile(r"-{2,}")
+
+# Reserved names follow `project_creation_flow_spec.md` §6 plus the
+# Windows reserved device names that would be unsafe on case-insensitive
+# host filesystems.
+RESERVED_PROJECT_IDS: frozenset[str] = frozenset(
+    {
+        ".",
+        "..",
+        "index",
+        "new",
+        "create",
+        "api",
+        "projects",
+        "project",
+        "memory",
+        "omi",
+        "scenes",
+        "chapters",
+        "notes",
+        "materials",
+        "con",
+        "prn",
+        "aux",
+        "nul",
+    }
+    | {f"com{i}" for i in range(1, 10)}
+    | {f"lpt{i}" for i in range(1, 10)}
+)
+
+# Hybrid core-folder creation per `project_creation_flow_spec.md` §8 and
+# `project_workspace_foundation_spec.md` §8. Memory, OMI, bible, and
+# storyform files are intentionally not created at blank-project
+# creation time and remain lazy per the WORKSPACE-026 decision sweep.
+WORKSPACE_CORE_FOLDERS: tuple[str, ...] = (
+    "chapters",
+    "scenes",
+    "scene_metadata",
+    "notes",
+    "note_metadata",
+    "materials",
+    "material_metadata",
+)
+
+STANDARD_REFUSAL_MESSAGE = (
+    "I can analyze structure and ask diagnostic questions, "
+    "but I cannot write or rewrite story prose."
+)
+
+OWNER_APPROVED_TRUTH_POLICY: dict[str, Any] = {
+    "durable_truth_requires_owner_approval": True,
+    "candidate_outputs_do_not_promote_automatically": True,
+    "ai_prose_generation_prohibited": True,
+    "standard_refusal_message": STANDARD_REFUSAL_MESSAGE,
+}
+
+
+# ---------------------------------------------------------------------------
+# Project creation helpers (PHASE7-IMPL-001)
+# These never call Ollama, analysis_engine, or Story Check.
+# They never create bible.json, storyform.json, OMI records, memory/canon
+# files, generated summaries, candidates, training data, or model artifacts.
+# ---------------------------------------------------------------------------
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _validate_project_title(title: str) -> str:
+    if not isinstance(title, str):
+        raise TypeError("Project title must be a string")
+    stripped = title.strip()
+    if not stripped:
+        raise ValueError("Project title must not be blank")
+    if len(stripped) > MAX_PROJECT_TITLE_LENGTH:
+        raise ValueError(
+            f"Project title must not exceed {MAX_PROJECT_TITLE_LENGTH} characters"
+        )
+    return stripped
+
+
+def derive_project_id(title: str) -> str:
+    validated_title = _validate_project_title(title)
+    # Unicode normalize to NFKD then ASCII-fold
+    normalized = unicodedata.normalize("NFKD", validated_title)
+    ascii_folded = normalized.encode("ascii", errors="ignore").decode("ascii")
+    lowered = ascii_folded.lower()
+    # Replace runs of unsafe characters with a single hyphen
+    slugged = _PROJECT_ID_INVALID_CHAR_RUN.sub("-", lowered)
+    # Collapse repeated hyphens
+    slugged = _PROJECT_ID_REPEAT_HYPHEN.sub("-", slugged)
+    # Strip leading/trailing hyphens, underscores, spaces, and dots
+    slugged = slugged.strip("-_. ")
+    if not slugged:
+        raise ValueError(
+            f"Project title {title!r} produces an empty project ID after normalization"
+        )
+    # Truncate to the length limit before final validation
+    slugged = slugged[:MAX_PROJECT_ID_LENGTH].strip("-_. ")
+    if not slugged:
+        raise ValueError(
+            f"Project title {title!r} produces an empty project ID after truncation"
+        )
+    return validate_project_id(slugged)
+
+
+def validate_project_id(project_id: str) -> str:
+    if not isinstance(project_id, str) or not project_id:
+        raise ValueError("Project ID must be a non-empty string")
+    if Path(project_id).is_absolute():
+        raise ValueError(f"Project ID must not be an absolute path: {project_id!r}")
+    if ".." in project_id or project_id == ".":
+        raise ValueError(f"Project ID must not contain path traversal: {project_id!r}")
+    if "/" in project_id or "\\" in project_id:
+        raise ValueError(f"Project ID must not contain path separators: {project_id!r}")
+    # Windows drive letter (e.g. "c:")
+    if len(project_id) >= 2 and project_id[1] == ":" and project_id[0].isalpha():
+        raise ValueError(f"Project ID must not be a Windows drive path: {project_id!r}")
+    if project_id.lower() in RESERVED_PROJECT_IDS:
+        raise ValueError(f"Project ID is reserved: {project_id!r}")
+    if not _PROJECT_ID_PATTERN.match(project_id):
+        raise ValueError(
+            f"Project ID {project_id!r} does not match the required pattern "
+            f"(lowercase alphanumeric start, hyphens/underscores allowed, "
+            f"max {MAX_PROJECT_ID_LENGTH} chars)"
+        )
+    return project_id
+
+
+def resolve_project_id_with_collision(
+    base_project_id: str,
+    projects_dir: Path = PROJECTS_DIR,
+) -> str:
+    validate_project_id(base_project_id)
+    if not (projects_dir / base_project_id).exists():
+        return base_project_id
+    for attempt in range(2, MAX_PROJECT_ID_COLLISION_ATTEMPTS + 2):
+        candidate = f"{base_project_id}-{attempt}"
+        if len(candidate) > MAX_PROJECT_ID_LENGTH:
+            raise ValueError(
+                f"Cannot resolve collision for project ID {base_project_id!r}: "
+                "suffix would exceed maximum ID length"
+            )
+        if not (projects_dir / candidate).exists():
+            return candidate
+    raise ValueError(
+        f"Cannot create project {base_project_id!r}: "
+        f"all {MAX_PROJECT_ID_COLLISION_ATTEMPTS} collision attempts are taken"
+    )
+
+
+def create_project(
+    title: str,
+    projects_dir: Path = PROJECTS_DIR,
+) -> dict[str, Any]:
+    validated_title = _validate_project_title(title)
+    base_id = derive_project_id(validated_title)
+    project_id = resolve_project_id_with_collision(base_id, projects_dir)
+
+    resolved_root = projects_dir.resolve()
+    project_path = (projects_dir / project_id).resolve()
+
+    # Path-safety guard: final project path must be inside the resolved projects root
+    try:
+        project_path.relative_to(resolved_root)
+    except ValueError:
+        raise ValueError(
+            f"Project path {project_path} is not inside the projects directory "
+            f"{resolved_root}"
+        )
+
+    if project_path.exists():
+        raise FileExistsError(f"Project directory already exists: {project_path}")
+
+    project_path.mkdir(parents=True, exist_ok=False)
+    for folder in WORKSPACE_CORE_FOLDERS:
+        (project_path / folder).mkdir(exist_ok=False)
+
+    timestamp = _utc_now_iso()
+    metadata: dict[str, Any] = {
+        "project_id": project_id,
+        "title": validated_title,
+        "created_at": timestamp,
+        "updated_at": timestamp,
+        "schema_version": PROJECT_SCHEMA_VERSION,
+        "creation_method": PROJECT_CREATION_METHOD_BLANK,
+        "owner_approved_truth_policy": OWNER_APPROVED_TRUTH_POLICY,
+    }
+
+    _write_json_object(project_path / "project.json", metadata, "project.json", overwrite=False)
+
+    return metadata
+
+
+# ---------------------------------------------------------------------------
+# End project creation helpers
+# ---------------------------------------------------------------------------
+
 
 OMI_CANDIDATE_TYPES = {
     "planning_note",
