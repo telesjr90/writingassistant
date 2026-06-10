@@ -31,6 +31,7 @@ Related planning:
 - WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - WORKSPACE-023: `docs/roadmap/approved_contradictions_page_spec.md`
 - WORKSPACE-024: `docs/roadmap/approved_scene_event_causality_review_spec.md`
+- WORKSPACE-025: `docs/roadmap/project_memory_canon_cross_linking_health_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -1313,6 +1314,8 @@ Prohibited UI controls:
 - Summarize story with AI.
 
 ## 10. Health and Warning States
+
+WORKSPACE-025 expands this page-level warning area into project-level cross-linking and health planning for shared record/link identity, category registry, `memory/index.json`, category counts, broken references, unsafe IDs, duplicate IDs, unsupported schemas, source/evidence/provenance links, and non-destructive index mismatch behavior.
 
 Warnings to support:
 

@@ -46,6 +46,8 @@ WORKSPACE-023 Approved Contradictions page behavior is defined in `docs/roadmap/
 
 WORKSPACE-024 Approved Scene / Event / Causality Review page behavior is defined in `docs/roadmap/approved_scene_event_causality_review_spec.md`. That spec defines approved-only scene-review, event/action, and causality-note display behavior and keeps scene/event/action/causality candidates, promotion records, generated scene summaries, generated event analysis, generated causal explanations, generated fixes, rewrites, semantic search, extraction, causal inference, source re-anchoring, timeline/causality visualization, Dramatica proof claims, and approved scene/event/causality memory/canon visibly separate.
 
+WORKSPACE-025 Project Memory / Canon Cross-Linking and Health behavior is defined in `docs/roadmap/project_memory_canon_cross_linking_health_spec.md`. That spec defines shared approved-memory record/link identity, future `memory/index.json` and category registry planning, category count snapshots, non-destructive health warnings, local health filtering, API/UI planning, and candidate/canon separation across approved memory, OMI candidates, promotion records, source documents, evidence, and provenance.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

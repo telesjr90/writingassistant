@@ -185,12 +185,15 @@ projects/{project_id}/
     timeline.json
     relationships.json
     plot_threads.json
+    continuity.json
     annotations.json
     evidence_spans.json
     provenance.json
     open_questions.json
-    continuity_warnings.json
     contradictions.json
+    scene_reviews.json
+    events.json
+    causality.json
     index.json
 ```
 
@@ -202,7 +205,7 @@ projects/{project_id}/project_memory.json
 
 The single-file `project_memory.json` option remains a possible later migration/export shape, but it is not the recommended first implementation target because it is harder to review incrementally and easier to overwrite accidentally.
 
-CORE-002/CORE-003 defines candidate schemas plus evidence/provenance for future story knowledge. CORE-004 defines the default folder-based memory/canon storage target in `docs/roadmap/project_memory_canon_storage_model.md`. Until a later runtime task implements apply-promotion, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
+CORE-002/CORE-003 defines candidate schemas plus evidence/provenance for future story knowledge. CORE-004 defines the default folder-based memory/canon storage target in `docs/roadmap/project_memory_canon_storage_model.md`. WORKSPACE-025 defines future shared cross-linking, `memory/index.json`, category registry, count snapshot, and health-warning planning in `docs/roadmap/project_memory_canon_cross_linking_health_spec.md`. Until a later runtime task implements apply-promotion, extracted story knowledge must remain in OMI candidate records and promotion audit records, not durable canon.
 
 Pre-Dramatica workspace sequencing:
 

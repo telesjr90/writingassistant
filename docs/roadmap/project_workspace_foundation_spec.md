@@ -185,6 +185,7 @@ These pages should be usable in the first workspace implementation:
   - Shows approved memory/canon categories and empty states.
   - Reads only approved memory/canon records after future apply-promotion exists.
   - Before apply-promotion exists, it should clearly say no approved memory/canon records exist yet.
+  - Shared cross-linking, `memory/index.json`, category registry, count snapshots, and non-destructive health warning planning are defined in `docs/roadmap/project_memory_canon_cross_linking_health_spec.md`.
 
 ### Required Navigation Entries With Placeholder Support
 
