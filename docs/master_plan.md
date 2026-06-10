@@ -34,6 +34,8 @@ The Project Workspace Foundation should provide:
 - Project overview, chapters/scenes, notes/materials, OMI ideas/candidates, and approved memory/canon pages.
 - Clear labels separating pending candidates from approved project truth.
 
+`WORKSPACE-001` through `WORKSPACE-025` define the Project Workspace Foundation planning specs. `WORKSPACE-026`, documented in `docs/roadmap/project_workspace_implementation_decision_sweep.md`, consolidates those specs into implementation-readiness decisions and recommends `PHASE7-IMPL-001 - Project Creation and Safe Project Metadata Backend` as the first Phase 7 runtime implementation task after MVP exit disposition.
+
 Product layers must remain separate:
 
 - Layer A: user-authored prose storage and editing. The writer can create, edit, save, and organize their own prose. Owner-authored content must not be misclassified as an AI prose-generation request.

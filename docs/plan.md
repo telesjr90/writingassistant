@@ -135,6 +135,8 @@ After owner acceptance of the Phase 6 MVP foundation, the next implementation pr
 - Later: Advanced Dramatica analysis.
 - Later: fine-tuning / `dramatica-analyst` model.
 
+WORKSPACE-026 now consolidates WORKSPACE-001 through WORKSPACE-025 into the Phase 7 implementation decision sweep in `docs/roadmap/project_workspace_implementation_decision_sweep.md`. The recommended first runtime implementation task is `PHASE7-IMPL-001 - Project Creation and Safe Project Metadata Backend`, followed by selector/library, frontend project switching, chapter/scene metadata compatibility, notes/materials storage, shared editor UI, Project Overview shell, OMI-guided setup, memory/canon shell, and the Phase 7 implementation readiness checklist.
+
 Dramatica analysis remains allowed as a later advanced layer. It is not the next implementation priority, and the fine-tuned model remains outside the MVP/core critical path.
 
 | Phase | Scope | Completion Definition |

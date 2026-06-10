@@ -88,6 +88,42 @@ WORKSPACE-001 planning defaults are documented in `docs/roadmap/project_workspac
 23. Should unsaved project-specific editor state be preserved per project, or should project switching require explicit save/discard? WORKSPACE-007 recommends explicit Save/Discard/Cancel before project switch for the first implementation unless per-project draft preservation is deliberately implemented later.
 24. When should archive support be added relative to the selector implementation, and should permanent delete remain absent until a separate owner-approved task?
 
+## WORKSPACE-026 Implementation Decision Sweep
+
+`docs/roadmap/project_workspace_implementation_decision_sweep.md` consolidates WORKSPACE-001 through WORKSPACE-025 into Phase 7 implementation-readiness defaults and the recommended `PHASE7-IMPL` sequence.
+
+Immediate owner decisions before starting Phase 7 runtime implementation:
+
+1. Accept/document the current public-domain `projects/example` fixture state, or request fixture replacement before Phase 7 begins.
+2. Accept the prior localhost smoke-test sandbox limitation as documented, or request a socket-enabled rerun before declaring MVP foundation acceptance.
+3. Confirm `PHASE7-IMPL-001 - Project Creation and Safe Project Metadata Backend` as the first runtime implementation slice.
+4. Decide whether to push local `main` before implementation begins.
+
+Deferrable Phase 7 decisions:
+
+1. Node engine metadata timing.
+2. Invalid project folder warning section versus recovery tab.
+3. Lazy versus eager `bible.json` and `storyform.json` compatibility files.
+4. Lazy versus eager OMI folder initialization.
+5. Candidate extraction trigger policy.
+6. First approved-memory implementation depth.
+7. `memory/index.json` read-only stub timing.
+8. Project Library cards/table/both.
+9. Archive/delete timing.
+10. Durable pre-project OMI inbox versus staged wizard state.
+
+Already-defaulted implementation decisions:
+
+1. `project_id` remains separate from display title and stable after title rename.
+2. Project creation uses title-derived, owner-editable, filesystem-safe IDs and collision fail-closed behavior.
+3. Project Library is scan-first and local with no permanent delete in the first version.
+4. Scene prose remains owner-authored Markdown in `scenes/{scene_id}.md`.
+5. Notes/materials are Markdown/text plus metadata and are not canon or training data by default.
+6. Owner-authored saves must not be blocked as assistant prose-generation requests.
+7. OMI candidates are not canon and promotion records are audit-only until apply-promotion exists.
+8. Approved memory/canon pages show applied memory only; empty states are valid before apply-promotion.
+9. Dramatica-specific implementation, extraction, semantic search, graph visualization, fine-tuning, JSONL, and model calls remain deferred unless a future task explicitly approves them.
+
 ## Writer Assistant Core Follow-Up Questions
 
 These are implementation follow-ups after the Project Workspace Foundation, not blockers for the completed MVP foundation:

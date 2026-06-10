@@ -220,6 +220,8 @@ These are not part of the current MVP exit gate. They define the next milestone 
 `WORKSPACE-022` defines Approved Annotations / Evidence / Provenance page planning in `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`, including approved annotation/evidence/provenance record display, source locator panel, evidence span panel, provenance chain panel, linked approved-memory snapshot, linked candidate/promotion audit snapshot, copyright/source safety notice, candidate backlog snapshot, warning states, API/UI surfaces, no-prose/no-silent-promotion boundaries, explicit non-Dramatica proof boundaries, and future page tests.
 `WORKSPACE-023` defines Approved Contradictions page planning in `docs/roadmap/approved_contradictions_page_spec.md`, including approved contradiction/cross-record conflict record display, claim pair panel, evidence/provenance panel, linked sources panel, linked approved-memory/story-knowledge snapshots, related continuity/open-question snapshots, resolution placeholder, candidate backlog snapshot, warning states, API/UI surfaces, no-prose/no-silent-promotion boundaries, explicit non-Dramatica proof boundaries, and future page tests.
 `WORKSPACE-024` defines Approved Scene / Event / Causality Review page planning in `docs/roadmap/approved_scene_event_causality_review_spec.md`, including approved scene-review, event/action, and causality-note record display, source locator panel, cause/effect panel, evidence/provenance panel, linked sources panel, linked approved-memory/story-knowledge snapshots, related timeline/plot/continuity/contradiction snapshots, candidate backlog snapshot, warning states, API/UI surfaces, no-prose/no-silent-promotion boundaries, explicit non-Dramatica proof boundaries, and future page tests.
+`WORKSPACE-025` defines Project Memory / Canon Cross-Linking and Health planning in `docs/roadmap/project_memory_canon_cross_linking_health_spec.md`, including shared approved-memory record/link identity, future `memory/index.json` and category registry planning, count snapshots, non-destructive health warnings, local filtering, candidate/canon separation, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
+`WORKSPACE-026` defines the implementation decision sweep in `docs/roadmap/project_workspace_implementation_decision_sweep.md`, including WORKSPACE-001 through WORKSPACE-025 readiness, implementation defaults, owner decisions, the recommended PHASE7-IMPL sequence, the recommended first runtime task, future implementation safety prompt, and the Phase 7 acceptance checklist.
 
 - Project creation from scratch.
 - Project selector/library.
@@ -233,6 +235,8 @@ These are not part of the current MVP exit gate. They define the next milestone 
 - Tests for no silent promotion.
 - Tests proving pending/rejected candidates are not treated as canon.
 - Tests proving approved memory/canon is project-local.
+- Tests proving no model calls occur during storage, search, listing, project switching, or navigation.
+- Frontend build and manual browser checklist for implemented Phase 7 slices.
 
 ## Pass/Fail Recording Format
 
