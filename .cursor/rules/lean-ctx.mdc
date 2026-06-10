@@ -7,6 +7,20 @@ alwaysApply: true
 
 LeanCTX is installed for Cursor workflows and may reduce context and tool-call waste. Use LeanCTX where available for context-efficient navigation, especially for repeated reads, targeted searches, and compressed shell output.
 
+## Execution boundary
+
+Do not use LeanCTX to run required preflight, validation, Git, test, build, or safety-check commands.
+
+Required commands such as `pwd`, `git status`, `git diff --check`, `pytest`, or `npm run build` must run directly in the WSL shell unless the user explicitly requests otherwise.
+
+Do not inspect MCP descriptors, callable schemas, Cursor internal tool metadata, or MCP server metadata as part of normal project tasks.
+
+Do not use ReadFile/Glob to discover MCP tools during normal project tasks.
+
+If LeanCTX is unavailable, misconfigured, returns no usable output, or appears to route into MCP/tool discovery behavior, report that briefly and continue with targeted file reads.
+
+LeanCTX is optional context/navigation assistance only. It must never block the task.
+
 Do not use LeanCTX as a substitute for the repo's source-of-truth docs. For roadmap and safety decisions, prefer:
 
 - `docs/master_plan.md`

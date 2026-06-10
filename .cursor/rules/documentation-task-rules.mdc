@@ -7,6 +7,12 @@ alwaysApply: true
 
 Treat `docs/master_plan.md` as the roadmap source of truth unless the user gives a newer explicit instruction.
 
+## Tooling fallback for documentation tasks
+
+For documentation-only tasks, do not spend time debugging Cursor, MCP, LeanCTX, Graphify, or context tooling.
+
+If optional context tooling is unavailable, report the fallback and continue with targeted reads of the source-of-truth docs and task-listed files.
+
 Documentation specs must clearly separate:
 
 - approved memory/canon truth

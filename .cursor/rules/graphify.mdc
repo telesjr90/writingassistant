@@ -7,6 +7,18 @@ alwaysApply: true
 
 Use Graphify before asking Cursor to scan broad raw directories. Prefer task-specific Graphify queries before broad file search or large edits.
 
+## Fallback behavior
+
+Graphify is helpful but not mandatory.
+
+Use Graphify only if it is directly available from the WSL shell.
+
+If `graphify query` is unavailable or does not return usable output from the WSL shell, do not debug Graphify during the task.
+
+Report the fallback briefly and continue with targeted reads of the task-listed files.
+
+Do not inspect MCP descriptors or Cursor internal tool metadata to discover Graphify.
+
 Graph reports may exist at:
 
 ```text
