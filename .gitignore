@@ -12,7 +12,6 @@ __pycache__/
 .venv*/
 venv/
 ENV/
-
 # Node and frontend build output
 node_modules/
 dist/
@@ -20,7 +19,6 @@ build/
 frontend/node_modules/
 frontend/dist/
 frontend/build/
-
 # Local editor, OS, and tool state
 .DS_Store
 Thumbs.db
@@ -32,13 +30,10 @@ Desktop.ini
 .agents/
 .codex/
 .playwright-mcp/
-
 # Local project/user writing content pending explicit review
 projects/
-
 # Reference repositories are documentation-only, not app source
 open_source_repos/
-
 # Training data, runs, checkpoints, caches, and outputs
 training/data/
 training/configs/
@@ -48,13 +43,11 @@ training/runs/
 training/checkpoints/
 training/outputs/
 unsloth_compiled_cache/
-
 # Training reports are excluded by default because many contain packet evidence.
 training/reports/*
 !training/reports/git_setup_report.md
 !training/reports/master_plan_creation_report.md
 !training/reports/pre_commit_safety_audit_report.md
-
 # Raw book/source text and packet evidence pending provenance review
 docs/books/
 books/
@@ -68,7 +61,6 @@ source-text/
 **/source-text/
 **/*full_text*
 **/*raw_text*
-
 # Model artifacts and large generated binaries
 models/
 artifacts/
@@ -83,3 +75,28 @@ artifacts/
 *.ckpt
 *.onnx
 *.tflite
+# AI context/token tooling outputs
+ai_context/
+repomix-output.*
+repomix-*.xml
+repomix-*.md
+graphify-out/
+graph.html
+GRAPH_REPORT.md
+graph.json
+.prismo/
+.claudeignore.prismo-suggested
+.cursorignore.prismo-suggested
+prismo-optimized-CLAUDE.template.md
+.mcp.json
+# Local virtual environments and dependency caches
+.venv-unsloth/
+.venv-unsloth-clean/
+# Local research/reference repos - do not index by default
+# Local model/cache artifacts
+training/models/
+training/models/hf_cache/
+# Local assistant settings / secrets
+.claude/settings.local.json
+# Generated Graphify outputs
+**/graphify-out/

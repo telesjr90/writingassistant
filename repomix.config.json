@@ -1,0 +1,50 @@
+{
+  "output": {
+    "filePath": "ai_context/repomix-workspace-context.xml",
+    "style": "xml",
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "showLineNumbers": false,
+    "topFilesLength": 20
+  },
+  "include": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "README.md",
+    "docs/master_plan.md",
+    "docs/plan.md",
+    "docs/roadmap/*.md",
+    "backend/**/*.py",
+    "frontend/src/**/*.{js,jsx,ts,tsx,css}",
+    "tests/**/*.py"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "projects/**",
+      "training/reports/**",
+      "training/runs/**",
+      "training/data/**",
+      "frontend/dist/**",
+      "node_modules/**",
+      ".venv*/**",
+      "ai_context/**",
+      ".prismo/**",
+      "graphify-out/**",
+      "graph.html",
+      "GRAPH_REPORT.md",
+      "graph.json",
+      "*.jsonl",
+      "*.xlsx",
+      "*.pdf",
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.webp"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

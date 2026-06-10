@@ -1,0 +1,66 @@
+{
+  "output": {
+    "filePath": "ai_context/repomix-workspace-docs-context.xml",
+    "style": "xml",
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "showLineNumbers": false,
+    "topFilesLength": 30
+  },
+  "include": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "README.md",
+    "docs/master_plan.md",
+    "docs/plan.md",
+    "docs/roadmap/project_workspace_foundation_spec.md",
+    "docs/roadmap/project_overview_page_spec.md",
+    "docs/roadmap/project_selector_library_spec.md",
+    "docs/roadmap/project_creation_flow_spec.md",
+    "docs/roadmap/chapters_scenes_page_spec.md",
+    "docs/roadmap/notes_materials_page_spec.md",
+    "docs/roadmap/project_memory_canon_page_structure_spec.md",
+    "docs/roadmap/omi_ideas_candidates_page_spec.md",
+    "docs/roadmap/approved_characters_page_spec.md",
+    "docs/roadmap/approved_locations_settings_page_spec.md",
+    "docs/roadmap/approved_timeline_page_spec.md",
+    "docs/roadmap/approved_plot_threads_page_spec.md",
+    "docs/roadmap/project_memory_canon_storage_model.md",
+    "docs/roadmap/writer_assistant_core_candidate_schemas.md",
+    "docs/roadmap/omi_story_knowledge_candidate_expansion.md",
+    "docs/roadmap/project_file_model.md",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/phase_map.md",
+    "docs/roadmap/open_questions.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/mvp_completion_test_matrix.md",
+    "docs/roadmap/tooling_decisions.md"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "backend/**",
+      "frontend/**",
+      "tests/**",
+      "projects/**",
+      "training/**",
+      "node_modules/**",
+      ".venv*/**",
+      "ai_context/**",
+      ".prismo/**",
+      "graphify-out/**",
+      "*.jsonl",
+      "*.xlsx",
+      "*.pdf",
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.webp"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

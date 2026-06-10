@@ -1,0 +1,32 @@
+.git/
+.venv*/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+projects/
+training/reports/
+training/runs/
+training/data/
+*.jsonl
+*.xlsx
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.webp
+ai_context/
+.prismo/
+graphify-out/
+graph.html
+GRAPH_REPORT.md
+graph.json
+
+# Local virtual environments and dependency caches
+.venv-unsloth/
+.venv-unsloth-clean/
+venv/
+# Local research/reference repos - do not index by default
+open_source_repos/
+# Local model/cache artifacts
+training/models/
+training/models/hf_cache/

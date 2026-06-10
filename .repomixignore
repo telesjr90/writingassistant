@@ -1,0 +1,62 @@
+.git/
+.venv*/
+venv/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+dist/
+build/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.DS_Store
+
+# Local/generated project data
+projects/
+training/reports/
+training/runs/
+training/output/
+training/checkpoints/
+training/data/
+*.jsonl
+*.sqlite
+*.db
+# AI context and graph outputs
+ai_context/
+.prismo/
+.claudeignore.prismo-suggested
+.cursorignore.prismo-suggested
+prismo-optimized-CLAUDE.template.md
+graphify-out/
+graph.html
+GRAPH_REPORT.md
+graph.json
+repomix-output.*
+repomix-*.xml
+repomix-*.md
+# Large/binary/non-source files
+*.xlsx
+*.xls
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.mp3
+*.wav
+*.mp4
+*.mov
+*.zip
+*.tar
+*.gz
+# Local virtual environments and dependency caches
+.venv-unsloth/
+.venv-unsloth-clean/
+# Local research/reference repos - do not index by default
+open_source_repos/
+# Local model/cache artifacts
+training/models/
+training/models/hf_cache/
