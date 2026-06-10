@@ -190,6 +190,7 @@ projects/{project_id}/
     provenance.json
     open_questions.json
     continuity_warnings.json
+    contradictions.json
     index.json
 ```
 
@@ -388,6 +389,8 @@ Detailed WORKSPACE-019 planning lives in `docs/roadmap/approved_relationships_pa
 Detailed WORKSPACE-020 planning lives in `docs/roadmap/approved_organizations_groups_page_spec.md`. That spec defines the approved-only organizations/groups page: applied organization/group records, members/leadership snapshot, hierarchy snapshot, linked story knowledge, related relationship/plot/timeline/open-question/continuity snapshots, evidence/provenance, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural-claim boundaries.
 
 Detailed WORKSPACE-021 planning lives in `docs/roadmap/approved_objects_items_page_spec.md`. That spec defines the approved-only objects/items page: applied object/item records, ownership/holder snapshot, location/movement snapshot, linked story knowledge, related plot/timeline/open-question/continuity snapshots, evidence/provenance, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural/thematic-claim boundaries.
+
+Detailed WORKSPACE-023 planning lives in `docs/roadmap/approved_contradictions_page_spec.md`. That spec defines the approved-only contradictions page: applied contradiction/cross-record conflict record display, claim pair panel, linked sources, evidence/provenance, linked approved memory/story knowledge, related continuity/open-question snapshots, resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
 
 Project library/index:
 
@@ -790,6 +793,7 @@ Future frontend design targets:
 - Approved Relationships page.
 - Approved Organizations/Groups page.
 - Approved Objects/Items page.
+- Approved Contradictions page.
 - Approved Project Memory/Canon page.
 - Clear candidate vs canon labels on every page that references extracted knowledge.
 

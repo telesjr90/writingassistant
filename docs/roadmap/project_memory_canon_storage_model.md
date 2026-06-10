@@ -30,6 +30,8 @@ WORKSPACE-021 Approved Objects / Items page planning lives in `docs/roadmap/appr
 
 WORKSPACE-022 Approved Annotations / Evidence / Provenance page planning lives in `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`. That spec defines the approved-only annotations/evidence/provenance page: applied annotation/evidence/provenance record display, source locator panel, evidence span panel, provenance chain panel, linked approved-memory snapshot, linked candidate/promotion audit snapshot, copyright/source safety notice, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
 
+WORKSPACE-023 Approved Contradictions page planning lives in `docs/roadmap/approved_contradictions_page_spec.md`. That spec defines the approved-only contradictions page: applied contradiction/cross-record conflict record display, claim pair panel, evidence/provenance panel, linked sources panel, linked approved-memory and story-knowledge snapshots, related continuity/open-question snapshots, resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
@@ -58,6 +60,7 @@ projects/{project_id}/
     provenance.json
     open_questions.json
     continuity_warnings.json
+    contradictions.json
     index.json
 ```
 
@@ -301,6 +304,35 @@ Additional fields:
 
 `no_rewrite_provided` must be true. A continuity warning may identify a contradiction and ask a diagnostic question, but it must not provide replacement prose.
 
+### `contradiction_memory_record`
+
+Additional fields:
+
+- `contradiction_id`
+- `display_title`
+- `contradiction_type`
+- `contradiction_status`
+- `severity`
+- `resolution_status`
+- `claim_a_summary`
+- `claim_b_summary`
+- `claim_a_source_type`
+- `claim_a_source_id`
+- `claim_a_source_locator`
+- `claim_b_source_type`
+- `claim_b_source_id`
+- `claim_b_source_locator`
+- `claim_a_linked_memory_record_ids`
+- `claim_b_linked_memory_record_ids`
+- `linked_continuity_issue_ids`
+- `linked_evidence_record_ids`
+- `linked_provenance_record_ids`
+- `source_candidate_ids`
+- `promotion_record_ids`
+- `owner_resolution_note`
+
+Contradiction memory records document owner-approved contradiction or cross-record conflict truth/audit context. They must not detect contradictions, generate explanations, generate fixes, rewrite scenes, re-anchor sources, or present generic conflicts as Dramatica structural/thematic proof.
+
 ### `navigation_summary_memory_record`
 
 Additional fields:
@@ -350,6 +382,7 @@ Recommended file-to-record mapping:
 | `memory/provenance.json` | `provenance_record` or equivalent approved audit record |
 | `memory/open_questions.json` | `open_question_memory_record` |
 | `memory/continuity_warnings.json` | `continuity_warning_memory_record` |
+| `memory/contradictions.json` | `contradiction_memory_record` or equivalent approved cross-record conflict record |
 
 ## 7. Promotion Path From OMI to Memory/Canon
 
@@ -399,6 +432,7 @@ Approved project-specific pages should read from memory/canon records only:
 - Approved Relationships.
 - Approved Navigation Summaries.
 - Approved Annotations / Evidence / Provenance.
+- Approved Contradictions.
 - Approved Project Memory/Canon.
 
 The OMI Ideas and Candidates page should show pending/rejected/uncertain candidates separately from these approved pages.

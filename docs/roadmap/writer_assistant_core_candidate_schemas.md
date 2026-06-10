@@ -42,6 +42,8 @@ WORKSPACE-021 Approved Objects / Items page behavior is defined in `docs/roadmap
 
 WORKSPACE-022 Approved Annotations / Evidence / Provenance page behavior is defined in `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`. That spec defines the approved-only annotation/evidence/provenance page behavior and keeps annotation/evidence/provenance candidates, promotion records, generated summaries, generated interpretations, invented evidence, semantic search, contradiction detection, Dramatica proof claims, and approved annotation/evidence/provenance records visibly separate.
 
+WORKSPACE-023 Approved Contradictions page behavior is defined in `docs/roadmap/approved_contradictions_page_spec.md`. That spec defines the approved-only contradictions page behavior and keeps contradiction candidates, promotion records, generated contradiction analysis, generated summaries, generated explanations, generated fixes, rewrites, semantic search, detection, source re-anchoring, Dramatica proof claims, and approved contradiction memory/canon visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |
@@ -358,6 +360,28 @@ Candidate content fields:
 
 `no_rewrite_provided` must be true. Continuity warnings may ask diagnostic questions but must not provide replacement prose.
 
+### `contradiction_candidate`
+
+Candidate content fields:
+
+- `contradiction_type`
+- `claim_a_summary`
+- `claim_b_summary`
+- `claim_a_source_reference`
+- `claim_b_source_reference`
+- `affected_candidates`
+- `linked_memory_record_ids`
+- `severity`
+- `resolution_status`
+- `suggested_review_question`
+- `no_rewrite_provided`
+
+Rules:
+
+- `no_rewrite_provided` must be true.
+- Contradiction candidates may identify a possible conflict for owner review but must not provide generated fixes, generated explanations, rewrite suggestions, bridge scenes, retcons, or Dramatica proof.
+- Contradiction candidates remain OMI candidates until owner approval, promotion audit creation, and future apply-promotion create an approved contradiction memory record.
+
 ### `annotation_candidate`
 
 Candidate content fields:
@@ -401,6 +425,7 @@ Initial proposed destination values:
 - `summary_index_candidate`
 - `annotation_index_candidate`
 - `open_question_index_candidate`
+- `contradiction_memory_candidate`
 - `discard`
 
 These are candidate destinations only. CORE-004 recommends future folder-based `memory/*.json` project memory/canon storage in `docs/roadmap/project_memory_canon_storage_model.md`. Runtime apply-promotion behavior still does not exist.

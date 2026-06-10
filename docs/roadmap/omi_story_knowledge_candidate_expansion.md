@@ -47,6 +47,7 @@ Core boundaries:
 - WORKSPACE-020 dedicated Approved Organizations / Groups page planning lives in `docs/roadmap/approved_organizations_groups_page_spec.md` and defines the approved-only organizations/groups page: applied organization/group records, candidate separation, members/leadership snapshot, hierarchy snapshot, evidence/provenance, linked sources, linked story knowledge, related relationship/plot/timeline/open-question/continuity snapshots, warning states, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural-claim boundaries.
 - WORKSPACE-021 dedicated Approved Objects / Items page planning lives in `docs/roadmap/approved_objects_items_page_spec.md` and defines the approved-only objects/items page: applied object/item records, candidate separation, ownership/holder snapshot, location/movement snapshot, evidence/provenance, linked sources, linked story knowledge, related plot/timeline/open-question/continuity snapshots, warning states, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural/thematic-claim boundaries.
 - WORKSPACE-022 dedicated Approved Annotations / Evidence / Provenance page planning lives in `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md` and defines the approved-only annotation/evidence/provenance page: approved records, candidate separation, source locator panel, evidence span panel, provenance chain panel, linked approved-memory snapshot, linked candidate/promotion audit snapshot, copyright/source safety notice, warning states, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
+- WORKSPACE-023 dedicated Approved Contradictions page planning lives in `docs/roadmap/approved_contradictions_page_spec.md` and defines the approved-only contradictions page: approved contradiction/cross-record conflict records, candidate separation, claim pair panel, evidence/provenance panel, linked sources, linked approved-memory/story-knowledge snapshots, related continuity/open-question snapshots, resolution placeholder, warning states, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
 
 Future flow:
 
@@ -165,6 +166,17 @@ Each future candidate class uses the CORE-002/CORE-003 base candidate contract f
 - Likely memory target: `memory/continuity_warnings.json`.
 - Risks: false contradiction; generating a fix instead of asking a diagnostic question.
 - UI review needs: side-by-side evidence, severity selector, diagnostic question display, no-prose boundary label.
+
+### `contradiction_candidate`
+
+- Purpose: candidate contradiction or cross-record conflict requiring owner review.
+- Minimum required fields: claim A source reference, claim B source reference, contradiction type, evidence/provenance, `no_rewrite_provided: true`.
+- Recommended evidence: both sides of the conflict with project-local source locators, linked approved memory records where available, and uncertainty notes.
+- Allowed proposed destinations: `contradiction_memory_candidate`, `project_memory_candidate`, `omi_candidate_only`, `discard`.
+- Promotion readiness: both claim sides identified, evidence/provenance reviewed, severity/resolution uncertainty recorded, no rewrite/prose suggestion, final confirmation.
+- Likely memory target: `memory/contradictions.json`.
+- Risks: false contradiction, one-sided evidence, source locator drift, generating a fix instead of surfacing owner review.
+- UI review needs: claim-pair panel, side-by-side evidence, source safety warning, resolution placeholder, no-prose boundary label.
 
 ### `annotation_candidate`
 
@@ -326,6 +338,7 @@ Type-specific readiness examples:
 - `plot_thread_candidate`: must include thread label, status, and source/related scene context.
 - `navigation_summary_candidate`: must include `navigation_only: true`, target/source references, and `no_rewrite_provided: true`.
 - `continuity_warning_candidate`: must include conflicting sources and `no_rewrite_provided: true`.
+- `contradiction_candidate`: must include both claim-side source references, evidence/provenance, and `no_rewrite_provided: true`.
 - `annotation_candidate`: must identify target type plus source scene or memory record.
 - `open_question_candidate`: must be diagnostic, related to source/candidate context, and not request prose generation.
 

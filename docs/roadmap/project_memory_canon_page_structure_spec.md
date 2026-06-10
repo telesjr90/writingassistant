@@ -29,6 +29,7 @@ Related planning:
 - WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
 - WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
 - WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
+- WORKSPACE-023: `docs/roadmap/approved_contradictions_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -43,7 +44,7 @@ The page should:
 
 - Show approved project truth only when explicitly promoted by the owner and applied by a future apply-promotion flow.
 - Clearly separate approved memory/canon from pending candidates, rejected candidates, archived candidates, approved candidates that are not applied, and promotion records.
-- Provide category-specific navigation to approved characters, locations/settings, objects/items, organizations/groups, timeline events, relationships, plot threads, open questions, annotations/evidence/provenance, and continuity warnings.
+- Provide category-specific navigation to approved characters, locations/settings, objects/items, organizations/groups, timeline events, relationships, plot threads, open questions, annotations/evidence/provenance, continuity warnings, and contradictions.
 - Show empty states before apply-promotion exists.
 - Avoid implying that OMI candidates are canon.
 - Avoid creating or editing story truth automatically.
@@ -774,6 +775,36 @@ Boundary:
 
 - Continuity warnings may ask diagnostic questions but must not provide replacement prose.
 
+### Contradictions
+
+Expected record type:
+
+- `contradiction_memory_record` or equivalent approved cross-record conflict record from `memory/contradictions.json`.
+
+Approved-only display rule:
+
+- Show only applied contradiction records.
+
+Evidence/provenance expectation:
+
+- Show claim A/B source locators, linked approved memory records, source candidate IDs, promotion record IDs, evidence/provenance, source-safety state, resolution metadata, and uncertainty warnings where retained.
+
+Future page:
+
+- Approved Contradictions page, planned by WORKSPACE-023.
+
+Empty state:
+
+- "No approved contradictions yet" or equivalent.
+
+Warning state:
+
+- Duplicate contradiction IDs, broken claim source links, unsupported or out-of-range locators, same-locator warnings, severity/status/resolution conflicts, broken related contradiction links, missing evidence/provenance, unsafe excerpts, or corrupt category file.
+
+Boundary:
+
+- Contradiction records are approved story-knowledge/audit records only. They must not generate fixes, rewrite scenes, repair contradictions automatically, or present generic conflicts as Dramatica proof.
+
 ### Future Dramatica / Storyform Truth Placeholder
 
 Expected record type:
@@ -1028,7 +1059,7 @@ Page dependency:
 Validation:
 
 - Safe `project_id`.
-- Category allow-list only: `characters`, `locations`, `objects`, `organizations`, `timeline`, `relationships`, `plot_threads`, `open_questions`, `annotations`, `continuity_warnings`, and future allowed categories.
+- Category allow-list only: `characters`, `locations`, `objects`, `organizations`, `timeline`, `relationships`, `plot_threads`, `open_questions`, `annotations`, `continuity_warnings`, `contradictions`, and future allowed categories.
 - Category file envelope and record type match expected category.
 - Record IDs unique.
 

@@ -27,6 +27,7 @@ Related planning:
 - WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
 - WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
 - WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
+- WORKSPACE-023: `docs/roadmap/approved_contradictions_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage: `docs/roadmap/omi_storage_model.md`
@@ -271,6 +272,7 @@ Recommended cards:
 - Future Timeline.
 - Future Plot Threads.
 - Future Continuity / Consistency.
+- Future Approved Contradictions.
 - Future Approved Open Questions.
 - Future Approved Relationships.
 - Future Approved Organizations / Groups.
