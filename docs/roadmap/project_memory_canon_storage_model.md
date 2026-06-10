@@ -32,6 +32,8 @@ WORKSPACE-022 Approved Annotations / Evidence / Provenance page planning lives i
 
 WORKSPACE-023 Approved Contradictions page planning lives in `docs/roadmap/approved_contradictions_page_spec.md`. That spec defines the approved-only contradictions page: applied contradiction/cross-record conflict record display, claim pair panel, evidence/provenance panel, linked sources panel, linked approved-memory and story-knowledge snapshots, related continuity/open-question snapshots, resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
 
+WORKSPACE-024 Approved Scene / Event / Causality Review page planning lives in `docs/roadmap/approved_scene_event_causality_review_spec.md`. That spec defines the approved-only scene/event/causality review page: applied `scene_review_memory_record`, `event_action_memory_record`, `causality_note_memory_record`, or equivalent approved record display; source locator and cause/effect panels; evidence/provenance and linked source panels; linked approved-memory and related timeline/plot/continuity/contradiction snapshots; candidate backlog links; warning states; API/UI planning; no-prose/no-silent-promotion boundaries; and explicit non-Dramatica proof boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
@@ -433,6 +435,7 @@ Approved project-specific pages should read from memory/canon records only:
 - Approved Navigation Summaries.
 - Approved Annotations / Evidence / Provenance.
 - Approved Contradictions.
+- Approved Scene / Event / Causality Review.
 - Approved Project Memory/Canon.
 
 The OMI Ideas and Candidates page should show pending/rejected/uncertain candidates separately from these approved pages.

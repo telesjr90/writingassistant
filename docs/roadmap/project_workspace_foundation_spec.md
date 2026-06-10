@@ -197,6 +197,7 @@ These pages should be represented early but may start as empty-state placeholder
 - **Objects / Items**
 - **Continuity / Consistency**
 - **Approved Contradictions**
+- **Approved Scene / Event / Causality Review**
 - **Open Questions**
 - **Relationships**
 - **Organizations / Groups**
@@ -524,10 +525,11 @@ The first workspace implementation should follow this sequence:
 | WORKSPACE-021 | Approved objects/items page | `docs/roadmap/approved_objects_items_page_spec.md`; approved object/item record display, ownership/holder snapshot, location/movement snapshot, linked story-knowledge snapshot, related plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural/thematic-claim boundaries |
 | WORKSPACE-022 | Approved annotations/evidence/provenance page | `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`; approved annotation/evidence/provenance record display, source locator panel, evidence span panel, provenance chain panel, linked approved-memory snapshot, linked candidate/promotion audit snapshot, copyright/source safety notice, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries |
 | WORKSPACE-023 | Approved contradictions page | `docs/roadmap/approved_contradictions_page_spec.md`; approved contradiction record display, claim pair panel, evidence/provenance panel, linked sources panel, linked approved-memory/story-knowledge snapshots, related continuity/open-question snapshots, resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries |
-| WORKSPACE-024 | Tests for user-authored prose save without no-prose overblocking | Future test task |
-| WORKSPACE-025 | Tests for no AI prose generation | Future test task |
-| WORKSPACE-026 | Tests for no silent promotion | Future test task |
-| WORKSPACE-027 | Project-local canon/memory visibility tests | Future test task |
+| WORKSPACE-024 | Approved scene/event/causality review page | `docs/roadmap/approved_scene_event_causality_review_spec.md`; approved scene-review, event/action, and causality-note record display, source locator panel, cause/effect panel, evidence/provenance panel, linked sources panel, linked approved-memory/story-knowledge snapshots, related timeline/plot/continuity/contradiction snapshots, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries |
+| WORKSPACE-025 | Tests for user-authored prose save without no-prose overblocking | Future test task |
+| WORKSPACE-026 | Tests for no AI prose generation | Future test task |
+| WORKSPACE-027 | Tests for no silent promotion | Future test task |
+| WORKSPACE-028 | Project-local canon/memory visibility tests | Future test task |
 
 Implementation should not start Dramatica-specific analysis, extractor dependencies, or memory/canon apply-promotion before the basic workspace create/select/save/reload flows exist.
 
@@ -549,7 +551,7 @@ The first implementation can be accepted when:
 - Notes/Materials page supports basic organization and navigation.
 - OMI Ideas and Candidates page or panel is visible for project setup/candidate review.
 - Approved Project Memory/Canon page or shell is visible and does not show pending candidates as canon.
-- Characters, Locations/Settings, Objects/Items, Timeline, Plot Threads, Continuity/Consistency, Approved Contradictions, Open Questions, Relationships, Organizations/Groups, and Annotations/Evidence/Provenance pages have at least clear empty states or placeholders.
+- Characters, Locations/Settings, Objects/Items, Timeline, Plot Threads, Continuity/Consistency, Approved Contradictions, Approved Scene / Event / Causality Review, Open Questions, Relationships, Organizations/Groups, and Annotations/Evidence/Provenance pages have at least clear empty states or placeholders.
 - Owner-authored prose saves are not blocked by no-prose guards.
 - No AI prose-generation controls are exposed.
 - AI output is not inserted into editor content.
@@ -575,6 +577,7 @@ These remain follow-up decisions for later implementation tasks:
 - Which approved memory/canon category pages must be fully functional before extraction exists.
 - How navigation summaries are written, reviewed, approved, and displayed without becoming generated story prose.
 - How contradictions are shown: side-by-side evidence, page-level lists, inline flags, OMI candidate queues, or a combination. WORKSPACE-023 recommends a future approved-only page with claim-pair and evidence/provenance panels, while pending contradiction candidates remain in OMI.
+- How approved scene/event/causality review records are stored: separate `memory/scene_reviews.json`, `memory/events.json`, `memory/actions.json`, `memory/causality.json`, a shared scene-events store, timeline extensions, or an approved audit store. WORKSPACE-024 recommends a future approved-only page but defers the exact runtime schema and file layout.
 
 ## 14. Related Specifications
 
@@ -594,6 +597,7 @@ These remain follow-up decisions for later implementation tasks:
 - `docs/roadmap/approved_objects_items_page_spec.md`
 - `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - `docs/roadmap/approved_contradictions_page_spec.md`
+- `docs/roadmap/approved_scene_event_causality_review_spec.md`
 - `docs/roadmap/mvp_completion_test_matrix.md`
 - `docs/roadmap/risk_register.md`
 - `docs/roadmap/open_questions.md`

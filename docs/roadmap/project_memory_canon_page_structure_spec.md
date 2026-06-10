@@ -30,6 +30,7 @@ Related planning:
 - WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
 - WORKSPACE-022: `docs/roadmap/approved_annotations_evidence_provenance_page_spec.md`
 - WORKSPACE-023: `docs/roadmap/approved_contradictions_page_spec.md`
+- WORKSPACE-024: `docs/roadmap/approved_scene_event_causality_review_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -796,6 +797,29 @@ Future page:
 Empty state:
 
 - "No approved contradictions yet" or equivalent.
+
+### Approved Scene / Event / Causality Review
+
+Purpose:
+
+- Show approved scene-review, event/action, and causality-note records after future apply-promotion or an equivalent owner-approved approved-memory process.
+
+Candidate/canon boundary:
+
+- Show only applied `scene_review_memory_record`, `event_action_memory_record`, `causality_note_memory_record`, or equivalent approved records.
+- OMI scene/event/action/causality candidates, approved-but-not-applied candidates, and promotion records remain candidate/audit context only.
+
+Evidence/provenance expectation:
+
+- Show source locators, cause/effect links, linked approved memory records, linked source scenes/chapters/notes/materials, source candidate IDs, promotion record IDs, evidence/provenance, source-safety state, uncertainty/resolution metadata, and broken-link warnings where retained.
+
+Future page:
+
+- Approved Scene / Event / Causality Review page, planned by WORKSPACE-024.
+
+Empty state:
+
+- "No approved scene/event/causality records yet" or equivalent.
 
 Warning state:
 

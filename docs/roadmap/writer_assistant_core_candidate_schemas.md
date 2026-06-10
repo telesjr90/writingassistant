@@ -44,6 +44,8 @@ WORKSPACE-022 Approved Annotations / Evidence / Provenance page behavior is defi
 
 WORKSPACE-023 Approved Contradictions page behavior is defined in `docs/roadmap/approved_contradictions_page_spec.md`. That spec defines the approved-only contradictions page behavior and keeps contradiction candidates, promotion records, generated contradiction analysis, generated summaries, generated explanations, generated fixes, rewrites, semantic search, detection, source re-anchoring, Dramatica proof claims, and approved contradiction memory/canon visibly separate.
 
+WORKSPACE-024 Approved Scene / Event / Causality Review page behavior is defined in `docs/roadmap/approved_scene_event_causality_review_spec.md`. That spec defines approved-only scene-review, event/action, and causality-note display behavior and keeps scene/event/action/causality candidates, promotion records, generated scene summaries, generated event analysis, generated causal explanations, generated fixes, rewrites, semantic search, extraction, causal inference, source re-anchoring, timeline/causality visualization, Dramatica proof claims, and approved scene/event/causality memory/canon visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

@@ -392,6 +392,8 @@ Detailed WORKSPACE-021 planning lives in `docs/roadmap/approved_objects_items_pa
 
 Detailed WORKSPACE-023 planning lives in `docs/roadmap/approved_contradictions_page_spec.md`. That spec defines the approved-only contradictions page: applied contradiction/cross-record conflict record display, claim pair panel, linked sources, evidence/provenance, linked approved memory/story knowledge, related continuity/open-question snapshots, resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
 
+Detailed WORKSPACE-024 planning lives in `docs/roadmap/approved_scene_event_causality_review_spec.md`. That spec defines the approved-only scene/event/causality review page: applied scene-review, event/action, and causality-note records, source locator panel, cause/effect panel, linked sources, evidence/provenance, linked approved memory/story knowledge, related timeline/plot/continuity/contradiction snapshots, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries. Future storage may use `memory/scene_reviews.json`, `memory/events.json`, `memory/actions.json`, `memory/causality.json`, or an equivalent approved memory/audit store; the exact runtime layout remains deferred.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
