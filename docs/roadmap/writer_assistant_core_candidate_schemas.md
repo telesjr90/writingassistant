@@ -38,6 +38,8 @@ WORKSPACE-019 Approved Relationships page behavior is defined in `docs/roadmap/a
 
 WORKSPACE-020 Approved Organizations / Groups page behavior is defined in `docs/roadmap/approved_organizations_groups_page_spec.md`. That spec defines the approved-only organizations/groups page behavior and keeps organization/group candidates, promotion records, generated organization analysis, graph generation, faction fixes, Dramatica structural claims, and approved organization/group memory/canon visibly separate.
 
+WORKSPACE-021 Approved Objects / Items page behavior is defined in `docs/roadmap/approved_objects_items_page_spec.md`. That spec defines the approved-only objects/items page behavior and keeps object/item candidates, promotion records, generated object analysis, graph generation, symbolic interpretation, item fixes, Dramatica structural/thematic claims, and approved object/item memory/canon visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

@@ -26,6 +26,8 @@ Related planning:
 - WORKSPACE-017: `docs/roadmap/continuity_consistency_page_spec.md`
 - WORKSPACE-018: `docs/roadmap/approved_open_questions_page_spec.md`
 - WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
+- WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
+- WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
@@ -567,7 +569,7 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Future approved objects/items page if later scheduled.
+- Approved Objects / Items page, planned by WORKSPACE-021.
 
 Empty state:
 

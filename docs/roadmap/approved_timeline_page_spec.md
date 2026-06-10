@@ -28,6 +28,8 @@ Related planning:
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
 - OMI story knowledge expansion: `docs/roadmap/omi_story_knowledge_candidate_expansion.md`
 - WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
+- WORKSPACE-020: `docs/roadmap/approved_organizations_groups_page_spec.md`
+- WORKSPACE-021: `docs/roadmap/approved_objects_items_page_spec.md`
 - Writer Assistant Core candidate schemas: `docs/roadmap/writer_assistant_core_candidate_schemas.md`
 
 ## 1. Purpose
