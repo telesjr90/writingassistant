@@ -270,6 +270,7 @@ Recommended cards:
 - Future Continuity / Consistency.
 - Future Approved Open Questions.
 - Future Approved Relationships.
+- Future Approved Organizations / Groups.
 
 WORKSPACE-009 defines the detailed target for the Chapters / Scenes navigation card and destination page.
 

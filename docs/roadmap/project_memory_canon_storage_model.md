@@ -24,6 +24,8 @@ WORKSPACE-018 Approved Open Questions page planning lives in `docs/roadmap/appro
 
 WORKSPACE-019 Approved Relationships page planning lives in `docs/roadmap/approved_relationships_page_spec.md`. That spec defines the approved-only relationships page: applied `relationship_memory_record` display, participant snapshot, linked story-knowledge snapshot, related plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica Relationship Story boundaries.
 
+WORKSPACE-020 Approved Organizations / Groups page planning lives in `docs/roadmap/approved_organizations_groups_page_spec.md`. That spec defines the approved-only organizations/groups page: applied `organization_memory_record` or `group_memory_record` display, members/leadership snapshot, hierarchy snapshot, linked story-knowledge snapshot, related relationship/plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica structural-claim boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
@@ -380,6 +382,7 @@ Approved project-specific pages should read from memory/canon records only:
 - Project Overview approved-memory summary.
 - Approved Characters.
 - Approved Locations/Settings.
+- Approved Organizations/Groups.
 - Approved Timeline.
 - Approved Plot Threads.
 - Continuity/Consistency.

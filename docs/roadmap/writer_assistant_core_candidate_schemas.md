@@ -36,6 +36,8 @@ WORKSPACE-018 Approved Open Questions page behavior is defined in `docs/roadmap/
 
 WORKSPACE-019 Approved Relationships page behavior is defined in `docs/roadmap/approved_relationships_page_spec.md`. That spec defines the approved-only relationships page behavior and keeps relationship candidates, promotion records, generated relationship analysis, graph generation, Dramatica RS claims, and approved relationship memory/canon visibly separate.
 
+WORKSPACE-020 Approved Organizations / Groups page behavior is defined in `docs/roadmap/approved_organizations_groups_page_spec.md`. That spec defines the approved-only organizations/groups page behavior and keeps organization/group candidates, promotion records, generated organization analysis, graph generation, faction fixes, Dramatica structural claims, and approved organization/group memory/canon visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

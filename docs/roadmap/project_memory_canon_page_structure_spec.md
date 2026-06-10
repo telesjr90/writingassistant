@@ -593,7 +593,7 @@ Evidence/provenance expectation:
 
 Future page:
 
-- Future approved organizations/groups page if later scheduled.
+- Approved Organizations / Groups page, planned by WORKSPACE-020.
 
 Empty state:
 
@@ -601,7 +601,7 @@ Empty state:
 
 Warning state:
 
-- Duplicate organization IDs, broken member/location/plot links, missing evidence/provenance, or corrupt category file.
+- Duplicate organization IDs, broken member/leader/location/plot links, parent/child hierarchy cycles, missing evidence/provenance, or corrupt category file.
 
 ### Timeline Events
 
