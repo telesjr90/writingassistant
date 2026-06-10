@@ -381,6 +381,8 @@ Detailed WORKSPACE-017 planning lives in `docs/roadmap/continuity_consistency_pa
 
 Detailed WORKSPACE-018 planning lives in `docs/roadmap/approved_open_questions_page_spec.md`. That spec defines the approved-only open-questions page: applied open-question records, evidence/provenance, linked sources, linked story knowledge, owner-answer/resolution placeholders, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries.
 
+Detailed WORKSPACE-019 planning lives in `docs/roadmap/approved_relationships_page_spec.md`. That spec defines the approved-only relationships page: applied relationship records, participant snapshot, linked story knowledge, related plot/timeline/open-question/continuity snapshots, evidence/provenance, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica Relationship Story boundaries.
+
 Project library/index:
 
 - `projects/index.json` can list project IDs, display titles, updated timestamps, and lightweight navigation metadata.
@@ -779,6 +781,7 @@ Future frontend design targets:
 - Approved Plot Threads page.
 - Continuity/Consistency page.
 - Approved Open Questions page.
+- Approved Relationships page.
 - Approved Project Memory/Canon page.
 - Clear candidate vs canon labels on every page that references extracted knowledge.
 

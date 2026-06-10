@@ -21,6 +21,9 @@ Related planning:
 - WORKSPACE-014: `docs/roadmap/approved_locations_settings_page_spec.md`
 - WORKSPACE-015: `docs/roadmap/approved_timeline_page_spec.md`
 - WORKSPACE-016: `docs/roadmap/approved_plot_threads_page_spec.md`
+- WORKSPACE-017: `docs/roadmap/continuity_consistency_page_spec.md`
+- WORKSPACE-018: `docs/roadmap/approved_open_questions_page_spec.md`
+- WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
 - Project file model: `docs/roadmap/project_file_model.md`
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage: `docs/roadmap/omi_storage_model.md`
@@ -265,6 +268,8 @@ Recommended cards:
 - Future Timeline.
 - Future Plot Threads.
 - Future Continuity / Consistency.
+- Future Approved Open Questions.
+- Future Approved Relationships.
 
 WORKSPACE-009 defines the detailed target for the Chapters / Scenes navigation card and destination page.
 

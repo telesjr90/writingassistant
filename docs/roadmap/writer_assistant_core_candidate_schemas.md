@@ -34,6 +34,8 @@ WORKSPACE-017 Continuity / Consistency page behavior is defined in `docs/roadmap
 
 WORKSPACE-018 Approved Open Questions page behavior is defined in `docs/roadmap/approved_open_questions_page_spec.md`. That spec defines the approved-only open-questions page behavior and keeps open-question candidates, promotion records, generated answers, and approved open-question memory/canon visibly separate.
 
+WORKSPACE-019 Approved Relationships page behavior is defined in `docs/roadmap/approved_relationships_page_spec.md`. That spec defines the approved-only relationships page behavior and keeps relationship candidates, promotion records, generated relationship analysis, graph generation, Dramatica RS claims, and approved relationship memory/canon visibly separate.
+
 Required or expected fields:
 
 | Field | Type | Purpose |

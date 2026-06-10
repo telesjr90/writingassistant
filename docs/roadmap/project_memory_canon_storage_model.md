@@ -22,6 +22,8 @@ WORKSPACE-017 Continuity / Consistency page planning lives in `docs/roadmap/cont
 
 WORKSPACE-018 Approved Open Questions page planning lives in `docs/roadmap/approved_open_questions_page_spec.md`. That spec defines the approved-only open-questions page: applied `open_question_memory_record` or `unresolved_question_memory_record` display, evidence/provenance panel, linked sources panel, linked story-knowledge snapshot, owner-answer/resolution placeholder, candidate backlog snapshot, warning states, API/UI planning, and no-prose/no-silent-promotion boundaries.
 
+WORKSPACE-019 Approved Relationships page planning lives in `docs/roadmap/approved_relationships_page_spec.md`. That spec defines the approved-only relationships page: applied `relationship_memory_record` display, participant snapshot, linked story-knowledge snapshot, related plot/timeline/open-question/continuity snapshots, evidence/provenance panel, candidate backlog snapshot, warning states, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica Relationship Story boundaries.
+
 The app remains analysis-only. It must never write, rewrite, continue, imitate, polish, improve, or extend story prose.
 
 Standard refusal message:
@@ -382,6 +384,7 @@ Approved project-specific pages should read from memory/canon records only:
 - Approved Plot Threads.
 - Continuity/Consistency.
 - Approved Open Questions.
+- Approved Relationships.
 - Approved Navigation Summaries.
 - Approved Project Memory/Canon.
 

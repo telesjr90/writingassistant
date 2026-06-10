@@ -27,6 +27,7 @@ Related planning:
 - Project memory/canon storage: `docs/roadmap/project_memory_canon_storage_model.md`
 - OMI storage model: `docs/roadmap/omi_storage_model.md`
 - OMI story knowledge expansion: `docs/roadmap/omi_story_knowledge_candidate_expansion.md`
+- WORKSPACE-019: `docs/roadmap/approved_relationships_page_spec.md`
 - Writer Assistant Core candidate schemas: `docs/roadmap/writer_assistant_core_candidate_schemas.md`
 
 ## 1. Purpose
@@ -414,7 +415,7 @@ No-prose boundary:
 Candidate/canon boundary:
 
 - Future relationship memory records are not Dramatica Relationship Story proof.
-- Placeholder should say "future approved relationships page" only.
+- Placeholder should link to the WORKSPACE-019 Approved Relationships page when implemented.
 
 Empty state:
 
@@ -1045,13 +1046,13 @@ Future implementation should include tests for:
 
 Deferred to future implementation tasks:
 
-- Whether relationships are first-class on the characters page, on a separate approved relationships page, or both.
+- Whether relationships appear only as links to the WORKSPACE-019 Approved Relationships page or also as an expanded snapshot on the characters page.
 - Whether the first character list loads from `memory/characters.json` directly, from `memory/index.json` plus category files, or from a backend summary endpoint.
 - Whether approved character records support per-record files in addition to category files.
 - Whether `role_label` becomes a bounded allowed list before it appears in the UI.
 - Whether `aliases` editor is owner-controlled only or also candidate-driven.
 - Whether navigation summaries may mention approved characters in approved navigation contexts.
-- Whether cross-record links include a future approved relationships page and what minimum fields it requires.
+- Whether cross-record links include the WORKSPACE-019 Approved Relationships page and what minimum runtime fields it requires.
 - Whether `memory/index.json` is required before the first character page implementation or remains derived/lazy.
 - Whether applied character records can ever carry a future Dramatica character role claim and under what approval/evidence conditions.
 - Whether future apply-promotion is allowed to merge or split characters atomically.
