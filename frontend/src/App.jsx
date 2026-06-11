@@ -6,6 +6,7 @@ import ProjectContext from './components/ProjectContext.jsx';
 import OMIPanel from './components/OMIPanel.jsx';
 import {
   PROJECT_ID,
+  createProject,
   createOMICandidate,
   createOMIIdea,
   createOMIPromotion,
@@ -15,6 +16,7 @@ import {
   fetchStoryform,
   fetchStoryformContext,
   getOMI,
+  listProjects,
   runStoryCheck,
   saveBible,
   saveScene,
@@ -24,6 +26,9 @@ import {
 } from './api.js';
 
 const UNSAVED_CHANGES_MESSAGE = 'Discard unsaved changes and load another scene?';
+const UNSAVED_PROJECT_SWITCH_MESSAGE = 'Discard unsaved scene changes and switch projects?';
+const UNSAVED_PROJECT_CREATE_MESSAGE =
+  'Create a new project and discard unsaved scene changes from the current project?';
 
 function formatJson(value) {
   return JSON.stringify(value ?? {}, null, 2);
@@ -47,6 +52,13 @@ function parseJsonObject(text, label) {
 }
 
 export default function App() {
+  const [activeProjectId, setActiveProjectId] = useState(PROJECT_ID);
+  const [projects, setProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsError, setProjectsError] = useState('');
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [createProjectError, setCreateProjectError] = useState('');
+  const [createProjectStatus, setCreateProjectStatus] = useState('');
   const [scenes, setScenes] = useState([]);
   const [selectedSceneId, setSelectedSceneId] = useState('');
   const [sceneContent, setSceneContent] = useState('');
@@ -77,8 +89,89 @@ export default function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
 
+  const loadProjects = useCallback(async () => {
+    setProjectsLoading(true);
+    setProjectsError('');
+
+    try {
+      const payload = await listProjects();
+      setProjects(Array.isArray(payload) ? payload : payload.projects ?? []);
+    } catch (error) {
+      setProjects([]);
+      setProjectsError(error instanceof Error ? error.message : 'Failed to load projects.');
+    } finally {
+      setProjectsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  const handleSelectProject = useCallback((projectId) => {
+    if (!projectId || projectId === activeProjectId) {
+      return;
+    }
+
+    if (isDirty && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
+      return;
+    }
+
+    setActiveProjectId(projectId);
+  }, [activeProjectId, isDirty]);
+
+  const handleCreateProject = useCallback(async (title) => {
+    const trimmedTitle = typeof title === 'string' ? title.trim() : '';
+
+    if (!trimmedTitle) {
+      setCreateProjectError('Enter a project title.');
+      setCreateProjectStatus('');
+      return false;
+    }
+
+    if (isDirty && !window.confirm(UNSAVED_PROJECT_CREATE_MESSAGE)) {
+      return false;
+    }
+
+    if (isCreatingProject) {
+      return false;
+    }
+
+    setIsCreatingProject(true);
+    setCreateProjectError('');
+    setCreateProjectStatus('Creating project...');
+
+    try {
+      const metadata = await createProject(trimmedTitle);
+      const newProjectId = metadata?.project_id;
+
+      if (!newProjectId) {
+        throw new Error('Created project did not return a project ID.');
+      }
+
+      await loadProjects();
+      setActiveProjectId(newProjectId);
+      setCreateProjectStatus('Project created');
+      setCreateProjectError('');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create project.';
+      setCreateProjectError(message);
+      setCreateProjectStatus('');
+      return false;
+    } finally {
+      setIsCreatingProject(false);
+    }
+  }, [isCreatingProject, isDirty, loadProjects]);
+
   useEffect(() => {
     let isMounted = true;
+
+    setSelectedSceneId('');
+    setSceneContent('');
+    setLastSavedContent('');
+    setAnalysisReport(null);
+    setSaveStatus('');
 
     async function loadInitialData() {
       setIsLoadingScenes(true);
@@ -86,11 +179,11 @@ export default function App() {
 
       try {
         const [scenePayload, biblePayload, storyformPayload, contextPayload, omiPayload] = await Promise.all([
-          fetchScenes(),
-          fetchBible(),
-          fetchStoryform(),
-          fetchStoryformContext(),
-          getOMI(PROJECT_ID),
+          fetchScenes(activeProjectId),
+          fetchBible(activeProjectId),
+          fetchStoryform(activeProjectId),
+          fetchStoryformContext(activeProjectId),
+          getOMI(activeProjectId),
         ]);
 
         if (!isMounted) {
@@ -125,14 +218,14 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [activeProjectId]);
 
   const refreshOMI = useCallback(async () => {
     setIsLoadingOMI(true);
     setOmiError('');
 
     try {
-      const payload = await getOMI(PROJECT_ID);
+      const payload = await getOMI(activeProjectId);
       setOmiData(payload);
       setOmiStatus('Ready');
       return payload;
@@ -144,7 +237,7 @@ export default function App() {
     } finally {
       setIsLoadingOMI(false);
     }
-  }, []);
+  }, [activeProjectId]);
 
   const handleSelectScene = useCallback(async (sceneId) => {
     if (sceneId === selectedSceneId) {
@@ -164,7 +257,7 @@ export default function App() {
     setIsLoadingScene(true);
 
     try {
-      const data = await fetchScene(sceneId);
+      const data = await fetchScene(sceneId, activeProjectId);
       const loadedContent = data.content ?? '';
       setSceneContent(loadedContent);
       setLastSavedContent(loadedContent);
@@ -177,7 +270,7 @@ export default function App() {
     } finally {
       setIsLoadingScene(false);
     }
-  }, [isDirty, selectedSceneId]);
+  }, [activeProjectId, isDirty, selectedSceneId]);
 
   const handleSceneContentChange = useCallback((nextContent) => {
     setSceneContent(nextContent);
@@ -222,7 +315,7 @@ export default function App() {
     setSaveStatus('');
 
     try {
-      await saveScene(selectedSceneId, sceneContent);
+      await saveScene(selectedSceneId, sceneContent, activeProjectId);
       setLastSavedContent(sceneContent);
       setSaveStatus('Saved');
     } catch (error) {
@@ -231,7 +324,7 @@ export default function App() {
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, sceneContent, selectedSceneId]);
+  }, [activeProjectId, isSaving, sceneContent, selectedSceneId]);
 
   const handleSaveBible = useCallback(async () => {
     if (isSavingBible) {
@@ -242,7 +335,7 @@ export default function App() {
 
     try {
       const parsed = parseJsonObject(bibleText, 'Bible');
-      await saveBible(parsed);
+      await saveBible(parsed, activeProjectId);
       const formatted = formatJson(parsed);
       setBibleText(formatted);
       setLastSavedBibleText(formatted);
@@ -253,7 +346,7 @@ export default function App() {
     } finally {
       setIsSavingBible(false);
     }
-  }, [bibleText, isSavingBible]);
+  }, [activeProjectId, bibleText, isSavingBible]);
 
   const handleSaveStoryform = useCallback(async () => {
     if (isSavingStoryform) {
@@ -264,14 +357,14 @@ export default function App() {
 
     try {
       const parsed = parseJsonObject(storyformText, 'Storyform');
-      await saveStoryform(parsed);
+      await saveStoryform(parsed, activeProjectId);
       const formatted = formatJson(parsed);
       setStoryformText(formatted);
       setLastSavedStoryformText(formatted);
       setStoryformStatus('Saved');
 
       try {
-        const contextPayload = await fetchStoryformContext();
+        const contextPayload = await fetchStoryformContext(activeProjectId);
         setStoryformContext(contextPayload.context ?? '');
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Context refresh failed.';
@@ -283,7 +376,7 @@ export default function App() {
     } finally {
       setIsSavingStoryform(false);
     }
-  }, [isSavingStoryform, storyformText]);
+  }, [activeProjectId, isSavingStoryform, storyformText]);
 
   const handleCreateOMIIdea = useCallback(async (rawIdea) => {
     if (isCreatingOMIIdea) {
@@ -295,7 +388,7 @@ export default function App() {
     setOmiStatus('Creating idea...');
 
     try {
-      const idea = await createOMIIdea(PROJECT_ID, { raw_idea: rawIdea });
+      const idea = await createOMIIdea(activeProjectId, { raw_idea: rawIdea });
       await refreshOMI();
       setOmiStatus('Idea created');
       return idea;
@@ -307,7 +400,7 @@ export default function App() {
     } finally {
       setIsCreatingOMIIdea(false);
     }
-  }, [isCreatingOMIIdea, refreshOMI]);
+  }, [activeProjectId, isCreatingOMIIdea, refreshOMI]);
 
   const handleCreateOMICandidate = useCallback(async (payload) => {
     if (isCreatingOMICandidate) {
@@ -319,7 +412,7 @@ export default function App() {
     setOmiStatus('Creating candidate...');
 
     try {
-      const candidate = await createOMICandidate(PROJECT_ID, payload);
+      const candidate = await createOMICandidate(activeProjectId, payload);
       await refreshOMI();
       setOmiStatus('Candidate created');
       return candidate;
@@ -331,7 +424,7 @@ export default function App() {
     } finally {
       setIsCreatingOMICandidate(false);
     }
-  }, [isCreatingOMICandidate, refreshOMI]);
+  }, [activeProjectId, isCreatingOMICandidate, refreshOMI]);
 
   const handleUpdateOMIIdeaDecision = useCallback(async (ideaId, payload) => {
     if (isUpdatingOMI) {
@@ -343,7 +436,7 @@ export default function App() {
     setOmiStatus('Updating idea...');
 
     try {
-      const idea = await updateOMIIdeaDecision(PROJECT_ID, ideaId, payload);
+      const idea = await updateOMIIdeaDecision(activeProjectId, ideaId, payload);
       await refreshOMI();
       setOmiStatus('Idea updated');
       return idea;
@@ -355,7 +448,7 @@ export default function App() {
     } finally {
       setIsUpdatingOMI(false);
     }
-  }, [isUpdatingOMI, refreshOMI]);
+  }, [activeProjectId, isUpdatingOMI, refreshOMI]);
 
   const handleUpdateOMICandidateDecision = useCallback(async (candidateId, payload) => {
     if (isUpdatingOMI) {
@@ -367,7 +460,7 @@ export default function App() {
     setOmiStatus('Updating candidate...');
 
     try {
-      const candidate = await updateOMICandidateDecision(PROJECT_ID, candidateId, payload);
+      const candidate = await updateOMICandidateDecision(activeProjectId, candidateId, payload);
       await refreshOMI();
       setOmiStatus('Candidate updated');
       return candidate;
@@ -379,7 +472,7 @@ export default function App() {
     } finally {
       setIsUpdatingOMI(false);
     }
-  }, [isUpdatingOMI, refreshOMI]);
+  }, [activeProjectId, isUpdatingOMI, refreshOMI]);
 
   const handleCreateOMIPromotion = useCallback(async (payload) => {
     if (isCreatingOMIPromotion) {
@@ -391,7 +484,7 @@ export default function App() {
     setOmiStatus('Creating promotion record...');
 
     try {
-      const promotion = await createOMIPromotion(PROJECT_ID, payload);
+      const promotion = await createOMIPromotion(activeProjectId, payload);
       await refreshOMI();
       setOmiStatus('Promotion record created');
       return promotion;
@@ -403,7 +496,7 @@ export default function App() {
     } finally {
       setIsCreatingOMIPromotion(false);
     }
-  }, [isCreatingOMIPromotion, refreshOMI]);
+  }, [activeProjectId, isCreatingOMIPromotion, refreshOMI]);
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -429,7 +522,7 @@ export default function App() {
     setAnalysisReport(null);
 
     try {
-      const data = await runStoryCheck(selectedSceneId);
+      const data = await runStoryCheck(selectedSceneId, activeProjectId);
       setAnalysisReport(data);
     } catch (error) {
       setAnalysisReport({
@@ -438,11 +531,21 @@ export default function App() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [selectedSceneId]);
+  }, [activeProjectId, selectedSceneId]);
 
   return (
     <div className="app-shell">
       <ProjectNav
+        activeProjectId={activeProjectId}
+        projects={projects}
+        projectsLoading={projectsLoading}
+        projectsError={projectsError}
+        onSelectProject={handleSelectProject}
+        onCreateProject={handleCreateProject}
+        isCreatingProject={isCreatingProject}
+        createProjectError={createProjectError}
+        createProjectStatus={createProjectStatus}
+        onRefreshProjects={loadProjects}
         scenes={scenes}
         selectedSceneId={selectedSceneId}
         isLoading={isLoadingScenes}

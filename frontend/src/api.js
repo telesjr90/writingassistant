@@ -30,40 +30,48 @@ async function requestData(request) {
   }
 }
 
-export async function fetchScenes() {
-  return requestData(() => client.get(`/projects/${PROJECT_ID}/scenes`));
+export async function listProjects() {
+  return requestData(() => client.get('/projects'));
 }
 
-export async function fetchScene(sceneId) {
-  return requestData(() => client.get(`/projects/${PROJECT_ID}/scenes/${sceneId}`));
+export async function createProject(title) {
+  return requestData(() => client.post('/projects', { title }));
 }
 
-export async function saveScene(sceneId, content) {
-  return requestData(() => client.put(`/projects/${PROJECT_ID}/scenes/${sceneId}`, { content }));
+export async function fetchScenes(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/scenes`));
 }
 
-export async function fetchBible() {
-  return requestData(() => client.get(`/projects/${PROJECT_ID}/bible`));
+export async function fetchScene(sceneId, projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/scenes/${sceneId}`));
 }
 
-export async function saveBible(data) {
-  return requestData(() => client.put(`/projects/${PROJECT_ID}/bible`, data));
+export async function saveScene(sceneId, content, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/scenes/${sceneId}`, { content }));
 }
 
-export async function fetchStoryform() {
-  return requestData(() => client.get(`/projects/${PROJECT_ID}/storyform`));
+export async function fetchBible(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/bible`));
 }
 
-export async function saveStoryform(data) {
-  return requestData(() => client.put(`/projects/${PROJECT_ID}/storyform`, data));
+export async function saveBible(data, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/bible`, data));
 }
 
-export async function runStoryCheck(sceneId) {
-  return requestData(() => client.post(`/projects/${PROJECT_ID}/story-check/${sceneId}`));
+export async function fetchStoryform(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/storyform`));
 }
 
-export async function fetchStoryformContext() {
-  return requestData(() => client.get(`/projects/${PROJECT_ID}/storyform-context`));
+export async function saveStoryform(data, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/storyform`, data));
+}
+
+export async function runStoryCheck(sceneId, projectId = PROJECT_ID) {
+  return requestData(() => client.post(`/projects/${projectId}/story-check/${sceneId}`));
+}
+
+export async function fetchStoryformContext(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/storyform-context`));
 }
 
 export async function getOMI(projectId = PROJECT_ID) {
