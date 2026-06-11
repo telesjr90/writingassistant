@@ -228,6 +228,354 @@ def create_project(
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Project library scan helpers (PHASE7-IMPL-002 micro-task 1)
+# Scan-first listing for a future GET /api/projects route. These helpers never
+# call Ollama, analysis_engine, or Story Check. They never read or mutate OMI
+# records, memory/canon files, scene prose, training data, or model artifacts.
+# They do not create or update projects/index.json.
+# ---------------------------------------------------------------------------
+
+
+def _is_path_contained_in(child: Path, parent: Path) -> bool:
+    try:
+        child.resolve().relative_to(parent.resolve())
+        return True
+    except (OSError, ValueError):
+        return False
+
+
+def _project_path_for_id(project_id: str, projects_dir: Path) -> Path:
+    validate_project_id(project_id)
+    resolved_root = projects_dir.resolve()
+    project_path = (projects_dir / project_id).resolve()
+    try:
+        project_path.relative_to(resolved_root)
+    except ValueError:
+        raise ValueError(
+            f"Project path for {project_id!r} is not inside the projects directory"
+        )
+    return project_path
+
+
+def _safe_folder_label(folder_name: str) -> str:
+    try:
+        return validate_project_id(folder_name)
+    except ValueError:
+        if (
+            folder_name
+            and "/" not in folder_name
+            and "\\" not in folder_name
+            and folder_name not in {".", ".."}
+            and not Path(folder_name).is_absolute()
+        ):
+            return folder_name[:MAX_PROJECT_ID_LENGTH]
+        return "invalid-folder"
+
+
+def _project_library_warning_record(
+    folder_name: str,
+    *,
+    status: str = "invalid",
+    warnings: list[str],
+    project_id: str | None = None,
+    **extra: Any,
+) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "project_id": project_id if project_id is not None else _safe_folder_label(folder_name),
+        "status": status,
+        "warnings": warnings,
+    }
+    for key, value in extra.items():
+        if value is not None:
+            record[key] = value
+    return record
+
+
+def _read_project_json(project_path: Path) -> dict[str, Any]:
+    json_path = project_path / "project.json"
+    if not json_path.exists():
+        raise FileNotFoundError("project.json is missing")
+    if not json_path.is_file():
+        raise ValueError("project.json is not a file")
+
+    with json_path.open(encoding="utf-8") as handle:
+        data = json.load(handle)
+
+    if not isinstance(data, dict):
+        raise ValueError("project.json must contain a JSON object")
+
+    return data
+
+
+def _inspect_project_folder(folder_name: str, projects_dir: Path) -> dict[str, Any]:
+    try:
+        validate_project_id(folder_name)
+    except ValueError:
+        return _project_library_warning_record(
+            folder_name,
+            status="invalid",
+            warnings=["unsafe folder name"],
+        )
+
+    entry_path = projects_dir / folder_name
+    resolved_root = projects_dir.resolve()
+
+    try:
+        resolved_entry = entry_path.resolve(strict=False)
+    except OSError:
+        return _project_library_warning_record(
+            folder_name,
+            status="warning",
+            warnings=["unreadable project folder"],
+            project_id=folder_name,
+        )
+
+    if not _is_path_contained_in(resolved_entry, resolved_root):
+        return _project_library_warning_record(
+            folder_name,
+            status="invalid",
+            warnings=["project folder resolves outside projects directory"],
+            project_id=folder_name,
+        )
+
+    warnings: list[str] = []
+    if entry_path.is_symlink():
+        warnings.append("project folder is a symlink")
+
+    if not resolved_entry.is_dir():
+        return _project_library_warning_record(
+            folder_name,
+            status="invalid",
+            warnings=["project folder is not a directory"],
+            project_id=folder_name,
+        )
+
+    json_path = resolved_entry / "project.json"
+    if not json_path.exists():
+        return _project_library_warning_record(
+            folder_name,
+            status="invalid",
+            warnings=["missing project.json"],
+            project_id=folder_name,
+            relative_path=folder_name,
+        )
+
+    try:
+        metadata = _read_project_json(resolved_entry)
+    except json.JSONDecodeError:
+        return _project_library_warning_record(
+            folder_name,
+            status="invalid",
+            warnings=["project.json contains invalid JSON"],
+            project_id=folder_name,
+            relative_path=folder_name,
+        )
+    except (OSError, ValueError):
+        return _project_library_warning_record(
+            folder_name,
+            status="warning",
+            warnings=["unreadable project.json"],
+            project_id=folder_name,
+            relative_path=folder_name,
+        )
+
+    json_project_id = metadata.get("project_id")
+    metadata_project_id = folder_name
+    if json_project_id is not None:
+        if not isinstance(json_project_id, str):
+            return _project_library_warning_record(
+                folder_name,
+                status="invalid",
+                warnings=["project.json project_id must be a string"],
+                project_id=folder_name,
+                relative_path=folder_name,
+            )
+        try:
+            validate_project_id(json_project_id)
+        except ValueError:
+            return _project_library_warning_record(
+                folder_name,
+                status="invalid",
+                warnings=["project.json project_id is unsafe"],
+                project_id=folder_name,
+                relative_path=folder_name,
+            )
+        metadata_project_id = json_project_id
+        if json_project_id != folder_name:
+            return _project_library_warning_record(
+                folder_name,
+                status="invalid",
+                warnings=["project_id mismatch between folder and project.json"],
+                project_id=folder_name,
+                relative_path=folder_name,
+                title=metadata.get("title")
+                if isinstance(metadata.get("title"), str)
+                else None,
+                _metadata_project_id=metadata_project_id,
+            )
+
+    title = metadata.get("title")
+    if title is not None and not isinstance(title, str):
+        warnings.append("project.json title must be a string")
+        title = folder_name
+    elif not title:
+        title = folder_name
+
+    record: dict[str, Any] = {
+        "project_id": folder_name,
+        "title": title,
+        "created_at": metadata.get("created_at"),
+        "updated_at": metadata.get("updated_at"),
+        "schema_version": metadata.get("schema_version"),
+        "creation_method": metadata.get("creation_method"),
+        "relative_path": folder_name,
+        "status": "valid",
+        "warnings": list(warnings),
+        "_metadata_project_id": metadata_project_id,
+    }
+    if warnings:
+        record["status"] = "warning"
+    return record
+
+
+def _apply_duplicate_project_id_warnings(
+    records: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    metadata_id_to_indices: dict[str, list[int]] = {}
+    for index, record in enumerate(records):
+        metadata_project_id = record.get("_metadata_project_id")
+        if not isinstance(metadata_project_id, str):
+            continue
+        metadata_id_to_indices.setdefault(metadata_project_id, []).append(index)
+
+    for metadata_project_id, indices in metadata_id_to_indices.items():
+        if len(indices) < 2:
+            continue
+        for index in indices:
+            updated = dict(records[index])
+            updated_warnings = list(updated.get("warnings", []))
+            updated_warnings.append(
+                f"duplicate project_id: {metadata_project_id!r}"
+            )
+            updated["warnings"] = updated_warnings
+            updated["status"] = "invalid"
+            records[index] = updated
+
+    return records
+
+
+def _strip_internal_library_fields(record: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in record.items() if not key.startswith("_")}
+
+
+def _sort_project_library_records(
+    records: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    valid_records = [record for record in records if record.get("status") == "valid"]
+    other_records = [record for record in records if record.get("status") != "valid"]
+
+    valid_records.sort(key=lambda record: (record.get("project_id") or "").lower())
+    valid_records.sort(key=lambda record: (record.get("title") or "").lower())
+    valid_records.sort(
+        key=lambda record: record.get("updated_at")
+        if isinstance(record.get("updated_at"), str)
+        else "",
+        reverse=True,
+    )
+    other_records.sort(key=lambda record: (record.get("project_id") or "").lower())
+
+    return valid_records + other_records
+
+
+def load_project_metadata(
+    project_id: str,
+    projects_dir: Path = PROJECTS_DIR,
+) -> dict[str, Any]:
+    try:
+        validate_project_id(project_id)
+    except ValueError:
+        return _strip_internal_library_fields(
+            _project_library_warning_record(
+                project_id,
+                status="invalid",
+                warnings=["unsafe project_id"],
+            )
+        )
+
+    try:
+        project_path = _project_path_for_id(project_id, projects_dir)
+    except ValueError:
+        return _strip_internal_library_fields(
+            _project_library_warning_record(
+                project_id,
+                status="invalid",
+                warnings=["unsafe project path"],
+                project_id=project_id,
+            )
+        )
+
+    if not project_path.exists():
+        return _strip_internal_library_fields(
+            _project_library_warning_record(
+                project_id,
+                status="invalid",
+                warnings=["project folder does not exist"],
+                project_id=project_id,
+            )
+        )
+
+    if not project_path.is_dir():
+        return _strip_internal_library_fields(
+            _project_library_warning_record(
+                project_id,
+                status="invalid",
+                warnings=["project path is not a directory"],
+                project_id=project_id,
+            )
+        )
+
+    return _strip_internal_library_fields(
+        _inspect_project_folder(project_id, projects_dir)
+    )
+
+
+def list_projects(projects_dir: Path = PROJECTS_DIR) -> list[dict[str, Any]]:
+    if not projects_dir.exists() or not projects_dir.is_dir():
+        return []
+
+    records: list[dict[str, Any]] = []
+    try:
+        child_entries = list(projects_dir.iterdir())
+    except OSError:
+        return []
+
+    for entry in sorted(child_entries, key=lambda path: path.name.lower()):
+        try:
+            if not entry.is_dir():
+                continue
+        except OSError:
+            records.append(
+                _project_library_warning_record(
+                    entry.name,
+                    status="warning",
+                    warnings=["unreadable directory entry"],
+                )
+            )
+            continue
+
+        records.append(_inspect_project_folder(entry.name, projects_dir))
+
+    records = _apply_duplicate_project_id_warnings(records)
+    records = _sort_project_library_records(records)
+    return [_strip_internal_library_fields(record) for record in records]
+
+
+# ---------------------------------------------------------------------------
+# End project library scan helpers
+# ---------------------------------------------------------------------------
+
+
 OMI_CANDIDATE_TYPES = {
     "planning_note",
     "project_bible_candidate",

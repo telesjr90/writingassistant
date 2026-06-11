@@ -80,6 +80,30 @@ def _safe_create_project_error_detail(exc: ValueError) -> str:
     return message
 
 
+def _safe_list_projects_error_detail(exc: ValueError) -> str:
+    message = str(exc)
+    if "Project path " in message or "projects dir" in message.lower():
+        return "Unable to list projects"
+    return message
+
+
+@app.get("/api/projects")
+def get_projects() -> dict:
+    try:
+        projects = project_manager.list_projects()
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=_safe_list_projects_error_detail(exc),
+        ) from exc
+    except FileNotFoundError:
+        return {"projects": [], "count": 0}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Failed to list projects") from exc
+
+    return {"projects": projects, "count": len(projects)}
+
+
 @app.post("/api/projects")
 def post_project(payload: ProjectCreate) -> dict:
     try:
