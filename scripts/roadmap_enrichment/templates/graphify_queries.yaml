@@ -1,0 +1,10 @@
+default:
+  - "Which modules, routes, components, and tests are directly related to task {{ task_id }}: {{ title }}?"
+  - "What dependency relationships constrain this task?"
+
+PHASE7-IMPL-004:
+  - "Which backend routes call which project storage helpers for scenes?"
+  - "Which frontend components depend on project selection state?"
+  - "Which modules depend on frontend project constants or project selection APIs?"
+  - "Which tests cover scene route and project manager behavior?"
+

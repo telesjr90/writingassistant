@@ -1,0 +1,12 @@
+default:
+  - "Find files directly related to task {{ task_id }}: {{ title }}."
+  - "Find tests directly related to task {{ task_id }}: {{ title }}."
+  - "Find code paths, constants, or assumptions that may constrain task {{ task_id }}."
+
+PHASE7-IMPL-004:
+  - "Find backend files that list, read, write, or create scenes."
+  - "Find backend files that reference chapter metadata, scene metadata, scene ordering, or scene IDs."
+  - "Find frontend files that display scene lists, selected scene IDs, scene titles, project IDs, or hard-coded project assumptions."
+  - "Find tests related to projects, scenes, project_manager, scene routes, or project switching."
+  - "Find code that assumes projects/example, PROJECT_ID, scenes/*.md, or scene Markdown body as the only scene data."
+

@@ -39,7 +39,11 @@
         "no_generated_prose",
         "no_memory_canon_mutation",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-001.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-001.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-001.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-001/"
     },
     {
       "id": "PHASE7-IMPL-002",
@@ -56,7 +60,11 @@
         "no_model_calls",
         "no_generated_prose",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-002.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-002.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-002.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-002/"
     },
     {
       "id": "PHASE7-IMPL-003",
@@ -72,7 +80,11 @@
         "no_generated_prose",
         "no_model_calls",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-003.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-003.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-003.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-003/"
     },
     {
       "id": "PHASE7-IMPL-004",
@@ -91,7 +103,11 @@
         "no_generated_prose",
         "no_memory_canon_mutation",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-004.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-004.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-004.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-004/"
     },
     {
       "id": "PHASE7-IMPL-005",
@@ -110,7 +126,11 @@
         "no_generated_prose",
         "no_memory_canon_mutation",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-005.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-005.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-005.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-005/"
     },
     {
       "id": "PHASE7-IMPL-006",
@@ -128,7 +148,11 @@
         "no_scene_rewrite",
         "no_model_calls",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-006.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-006.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-006.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-006/"
     },
     {
       "id": "PHASE7-IMPL-007",
@@ -147,7 +171,11 @@
         "no_model_calls",
         "no_generated_prose",
         "no_memory_canon_mutation"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-007.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-007.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-007.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-007/"
     },
     {
       "id": "PHASE7-IMPL-008",
@@ -167,7 +195,11 @@
         "no_generated_prose",
         "no_memory_canon_mutation",
         "local_first"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-008.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-008.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-008.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-008/"
     },
     {
       "id": "PHASE7-IMPL-009",
@@ -185,7 +217,11 @@
         "no_model_calls",
         "no_generated_prose",
         "no_memory_canon_mutation"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-009.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-009.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-009.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-009/"
     },
     {
       "id": "PHASE7-IMPL-010",
@@ -205,7 +241,11 @@
         "validation",
         "manual_smoke",
         "no_runtime_feature_scope"
-      ]
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE7-IMPL-010.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-010.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json",
+      "context_pack": ".codex-context/PHASE7-IMPL-010/"
     },
     {
       "id": "PHASE7-IMPL-004-T001",

@@ -40,3 +40,32 @@ Context packs and generated maps are refreshable artifacts, not roadmap truth. T
 1. `docs/roadmap/roadmap_index.yaml`
 2. `docs/roadmap/implementation_status.md`
 3. `docs/roadmap/validation/latest_roadmap_validation.md`
+
+## Roadmap enrichment scaffold
+
+- The orchestrator scaffold is local and deterministic.
+- The orchestrator must not decide task order.
+- The orchestrator must not change `active_frontier` automatically.
+- The orchestrator must not mark tasks complete.
+- The orchestrator must not modify application code.
+- The orchestrator may create task manifests, evidence files, enrichment JSON, and rendered task records.
+- Generated context files are evidence artifacts, not source of truth.
+- Source of truth remains `implementation_status.md`, `roadmap_index.yaml`, reviewed task records, `decision_log.md`, `risk_register.md`, and `open_questions.md`.
+- CCE, Graphify, and Repomix may only be run in explicit collect mode after this scaffold is validated.
+- `PHASE7-IMPL-004` should be the first orchestrator test case.
+
+## Local tool command syntax
+
+- Local tool command syntax discovery exists for CCE, Graphify, Repomix, and `scripts/generate_ai_context.sh`.
+- Exact discovered syntax is recorded in `scripts/roadmap_enrichment/tool_commands.md`.
+- AI Context command candidates for `PHASE7-IMPL-004` are recorded under `.codex-context/PHASE7-IMPL-004/`.
+- Command discovery does not mean context collection has run.
+- `collect-plan` mode exists for the enrichment orchestrator.
+- `collect-plan` creates planned evidence files but does not run context tools.
+- `PHASE7-IMPL-004` is the first planned collection target.
+- CCE readiness was checked before collection.
+- Exact CCE syntax is recorded in `scripts/roadmap_enrichment/tool_commands.md`.
+- CCE readiness is now ready for explicit authorized collection.
+- This does not mean CCE evidence has been collected.
+- The first actual use of CCE should happen only in a future explicit collect step for `PHASE7-IMPL-004`.
+- `cce init` remains prohibited.
