@@ -1,0 +1,26 @@
+compression:
+  level: standard
+  output: off
+
+indexer:
+  watch: true
+  ignore:
+    - .git
+    - node_modules
+    - dist
+    - build
+    - .venv
+    - **pycache**
+    - .pytest_cache
+    - .mypy_cache
+    - .ruff_cache
+    - .codex-context
+    - ai_context
+    - training/data
+    - training/outputs
+    - projects
+
+retrieval:
+  top_k: 8
+  confidence_threshold: 0.6
+

@@ -1,0 +1,32 @@
+name: Roadmap validation
+
+on:
+  pull_request:
+    paths:
+      - "docs/roadmap/**"
+      - "scripts/validate_roadmap.py"
+      - ".github/workflows/roadmap-validation.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/roadmap/**"
+      - "scripts/validate_roadmap.py"
+      - ".github/workflows/roadmap-validation.yml"
+
+jobs:
+  validate-roadmap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate roadmap registry
+        run: python scripts/validate_roadmap.py
+
