@@ -107,6 +107,323 @@ def test_list_scenes_returns_empty_list_when_scenes_dir_is_missing(tmp_path, mon
     assert project_manager.list_scenes("ember") == []
 
 
+def test_load_scene_metadata_returns_legacy_read_model_without_creating_metadata(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "# Scene One\n\nMara checks the map."
+    project_manager.save_scene("ember", "scene_001", content)
+
+    metadata = project_manager.load_scene_metadata("ember", "scene_001")
+
+    assert metadata == {
+        "metadata_version": 1,
+        "project_id": "ember",
+        "scene_id": "scene_001",
+        "chapter_id": None,
+        "title": "",
+        "order_index": None,
+        "content_path": "scenes/scene_001.md",
+        "metadata_exists": False,
+        "metadata_path": None,
+    }
+    assert not (tmp_path / "ember" / "scene_metadata" / "scene_001.json").exists()
+    assert project_manager.load_scene("ember", "scene_001") == content
+
+
+def test_load_scene_metadata_reads_existing_metadata_without_rewriting_scene(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "# Scene One\n\nMara checks the map."
+    project_manager.save_scene("ember", "scene_001", content)
+    metadata_dir = tmp_path / "ember" / "scene_metadata"
+    metadata_dir.mkdir()
+    (metadata_dir / "scene_001.json").write_text(
+        json.dumps(
+            {
+                "metadata_version": 1,
+                "project_id": "ember",
+                "scene_id": "scene_001",
+                "chapter_id": "chapter_001",
+                "title": "Owner title",
+                "content_path": "scenes/scene_001.md",
+                "tags": ["map"],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = project_manager.load_scene_metadata("ember", "scene_001")
+
+    assert metadata["metadata_exists"] is True
+    assert metadata["metadata_path"] == "scene_metadata/scene_001.json"
+    assert metadata["chapter_id"] == "chapter_001"
+    assert metadata["title"] == "Owner title"
+    assert metadata["tags"] == ["map"]
+    assert project_manager.load_scene("ember", "scene_001") == content
+
+
+def test_load_scene_metadata_normalizes_identity_and_content_path(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_scene("ember", "scene_001", "Owner-authored scene text.")
+    metadata_dir = tmp_path / "ember" / "scene_metadata"
+    metadata_dir.mkdir()
+    (metadata_dir / "scene_001.json").write_text(
+        json.dumps(
+            {
+                "project_id": "wrong_project",
+                "scene_id": "../outside",
+                "content_path": "../outside.md",
+                "title": "Owner title",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = project_manager.load_scene_metadata("ember", "scene_001")
+
+    assert metadata["project_id"] == "ember"
+    assert metadata["scene_id"] == "scene_001"
+    assert metadata["content_path"] == "scenes/scene_001.md"
+    assert metadata["title"] == "Owner title"
+
+
+def test_load_scene_record_combines_legacy_content_and_metadata(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_scene("ember", "scene_001", "Owner-authored scene text.")
+    metadata_path = tmp_path / "ember" / "scene_metadata" / "scene_001.json"
+    assert not metadata_path.exists()
+
+    record = project_manager.load_scene_record("ember", "scene_001")
+
+    assert record["scene_id"] == "scene_001"
+    assert record["content"] == "Owner-authored scene text."
+    assert record["metadata"]["scene_id"] == "scene_001"
+    assert record["metadata"]["metadata_exists"] is False
+    assert record["metadata"]["title"] == ""
+    assert record["metadata"]["chapter_id"] is None
+    assert record["metadata"]["content_path"] == "scenes/scene_001.md"
+    assert not metadata_path.exists()
+
+
+def test_list_scene_metadata_includes_metadata_backed_and_legacy_standalone_scenes(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_scene("ember", "scene_010", "Owner-authored scene ten.")
+    project_manager.save_scene("ember", "scene_002", "Owner-authored scene two.")
+    project_manager.create_scene_metadata(
+        "ember",
+        "scene_010",
+        {"title": "Metadata backed", "chapter_id": "chapter_001"},
+    )
+    legacy_metadata_path = tmp_path / "ember" / "scene_metadata" / "scene_002.json"
+    assert not legacy_metadata_path.exists()
+
+    scene_metadata = project_manager.list_scene_metadata("ember")
+
+    assert [metadata["scene_id"] for metadata in scene_metadata] == [
+        "scene_002",
+        "scene_010",
+    ]
+    assert scene_metadata[0]["metadata_exists"] is False
+    assert scene_metadata[0]["chapter_id"] is None
+    assert scene_metadata[0]["title"] == ""
+    assert scene_metadata[0]["content_path"] == "scenes/scene_002.md"
+    assert scene_metadata[1]["metadata_exists"] is True
+    assert scene_metadata[1]["chapter_id"] == "chapter_001"
+    assert scene_metadata[1]["title"] == "Metadata backed"
+    assert project_manager.list_scenes("ember") == ["scene_002", "scene_010"]
+    assert project_manager.load_scene("ember", "scene_002") == "Owner-authored scene two."
+    assert project_manager.load_scene("ember", "scene_010") == "Owner-authored scene ten."
+    assert not legacy_metadata_path.exists()
+
+
+def test_create_scene_metadata_writes_json_without_changing_scene_body(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "# Scene One\n\nOwner-authored scene text."
+    project_manager.save_scene("ember", "scene_001", content)
+
+    metadata = project_manager.create_scene_metadata(
+        "ember",
+        "scene_001",
+        {
+            "title": "Owner scene title",
+            "chapter_id": "chapter_001",
+            "order": 2,
+            "status": "active",
+            "tags": ["draft"],
+            "metadata_exists": True,
+            "metadata_path": "unsafe",
+        },
+    )
+
+    metadata_path = tmp_path / "ember" / "scene_metadata" / "scene_001.json"
+    persisted = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert persisted["metadata_version"] == 1
+    assert persisted["project_id"] == "ember"
+    assert persisted["scene_id"] == "scene_001"
+    assert persisted["content_path"] == "scenes/scene_001.md"
+    assert persisted["chapter_id"] == "chapter_001"
+    assert persisted["order_index"] == 2
+    assert persisted["title"] == "Owner scene title"
+    assert "metadata_exists" not in persisted
+    assert "metadata_path" not in persisted
+    assert metadata["metadata_exists"] is True
+    assert metadata["metadata_path"] == "scene_metadata/scene_001.json"
+    assert project_manager.load_scene("ember", "scene_001") == content
+
+
+def test_update_scene_metadata_derives_safe_identity_without_changing_scene_body(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "Owner-authored scene text."
+    project_manager.save_scene("ember", "scene_001", content)
+    project_manager.create_scene_metadata("ember", "scene_001", {"title": "First"})
+
+    metadata = project_manager.update_scene_metadata(
+        "ember",
+        "scene_001",
+        {
+            "project_id": "wrong_project",
+            "scene_id": "../outside",
+            "content_path": "../outside.md",
+            "title": "Updated",
+            "chapter_id": "chapter_002",
+        },
+    )
+
+    persisted = json.loads(
+        (tmp_path / "ember" / "scene_metadata" / "scene_001.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert persisted["project_id"] == "ember"
+    assert persisted["scene_id"] == "scene_001"
+    assert persisted["content_path"] == "scenes/scene_001.md"
+    assert persisted["title"] == "Updated"
+    assert persisted["chapter_id"] == "chapter_002"
+    assert metadata["project_id"] == "ember"
+    assert metadata["scene_id"] == "scene_001"
+    assert metadata["content_path"] == "scenes/scene_001.md"
+    assert project_manager.load_scene("ember", "scene_001") == content
+
+
+def test_scene_metadata_write_rejects_unsafe_scene_id_and_chapter_id(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_scene("ember", "scene_001", "Owner-authored scene text.")
+
+    with pytest.raises(ValueError):
+        project_manager.create_scene_metadata("ember", "../outside", {})
+
+    with pytest.raises(ValueError):
+        project_manager.create_scene_metadata(
+            "ember",
+            "scene_001",
+            {"chapter_id": "../outside"},
+        )
+
+    assert not (tmp_path / "ember" / "scene_metadata" / "scene_001.json").exists()
+
+
+def test_scene_metadata_write_requires_existing_scene_body(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    with pytest.raises(FileNotFoundError):
+        project_manager.create_scene_metadata(
+            "ember",
+            "scene_001",
+            {"title": "Missing"},
+        )
+
+    assert not (tmp_path / "ember" / "scene_metadata" / "scene_001.json").exists()
+    assert not (tmp_path / "ember" / "scenes" / "scene_001.md").exists()
+
+
+def test_create_chapter_metadata_writes_json_with_safe_defaults(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    chapter = project_manager.create_chapter_metadata(
+        "ember",
+        "chapter_001",
+        {
+            "project_id": "wrong_project",
+            "chapter_id": "../outside",
+            "title": "Owner chapter title",
+            "order": 1,
+            "scene_ids": ["scene_001"],
+            "owner_metadata": {"color": "blue"},
+        },
+    )
+
+    chapter_path = tmp_path / "ember" / "chapters" / "chapter_001.json"
+    persisted = json.loads(chapter_path.read_text(encoding="utf-8"))
+    assert persisted["metadata_version"] == 1
+    assert persisted["project_id"] == "ember"
+    assert persisted["chapter_id"] == "chapter_001"
+    assert persisted["title"] == "Owner chapter title"
+    assert persisted["order_index"] == 1
+    assert persisted["scene_ids"] == ["scene_001"]
+    assert persisted["owner_metadata"] == {"color": "blue"}
+    assert chapter["project_id"] == "ember"
+    assert chapter["chapter_id"] == "chapter_001"
+    assert not (tmp_path / "ember" / "scenes").exists()
+
+
+def test_update_chapter_metadata_validates_scene_ids_without_overwriting(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.create_chapter_metadata(
+        "ember",
+        "chapter_001",
+        {"scene_ids": ["scene_001"], "title": "Chapter"},
+    )
+    chapter_path = tmp_path / "ember" / "chapters" / "chapter_001.json"
+    original = chapter_path.read_text(encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        project_manager.update_chapter_metadata(
+            "ember",
+            "chapter_001",
+            {"scene_ids": ["scene_001", "../outside"]},
+        )
+
+    assert chapter_path.read_text(encoding="utf-8") == original
+
+
+def test_chapter_metadata_helpers_do_not_create_or_modify_scene_bodies(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    scenes_dir = tmp_path / "ember" / "scenes"
+    scenes_dir.mkdir(parents=True)
+    scene_path = scenes_dir / "scene_001.md"
+    scene_path.write_text("Owner-authored scene text.", encoding="utf-8")
+    original = scene_path.read_text(encoding="utf-8")
+
+    project_manager.create_chapter_metadata(
+        "ember",
+        "chapter_001",
+        {"scene_ids": ["scene_001"]},
+    )
+    project_manager.update_chapter_metadata(
+        "ember",
+        "chapter_001",
+        {"scene_ids": ["scene_001"], "title": "Updated chapter"},
+    )
+
+    assert scene_path.read_text(encoding="utf-8") == original
+
+
 def test_project_name_and_scene_id_must_be_single_path_components(
     tmp_path, monkeypatch
 ):

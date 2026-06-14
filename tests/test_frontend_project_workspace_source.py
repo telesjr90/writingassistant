@@ -210,6 +210,64 @@ class TestProjectNavSelectorUi:
         assert "project-title-input" in project_nav_source
         assert "Create blank project" in project_nav_source
 
+
+class TestSceneMetadataDisplayCompatibility:
+    def test_normalizes_legacy_scene_string_ids(self, project_nav_source: str) -> None:
+        assert "function normalizeSceneOption" in project_nav_source
+        assert "typeof scene === 'string'" in project_nav_source
+        assert "sceneId: scene" in project_nav_source
+        assert "label: scene" in project_nav_source
+        assert "chapterId: null" in project_nav_source
+        assert "metadataExists: false" in project_nav_source
+
+    def test_normalizes_metadata_shaped_scene_records(self, project_nav_source: str) -> None:
+        assert "function normalizeSceneList" in project_nav_source
+        assert "scene.scene_id" in project_nav_source
+        assert "scene.sceneId" in project_nav_source
+        assert "scene.id" in project_nav_source
+        assert "scene.chapter_id" in project_nav_source
+        assert "scene.metadata_exists" in project_nav_source
+
+    def test_scene_title_label_falls_back_to_scene_id(self, project_nav_source: str) -> None:
+        assert "function getSceneOptionLabel" in project_nav_source
+        assert ".trim()" in project_nav_source
+        assert "const title = rawTitle || sceneId || ''" in project_nav_source
+        assert "sceneOption.label || sceneOption.sceneId" in project_nav_source
+
+    def test_scene_order_uses_metadata_order_fields_only_for_display_order(
+        self, project_nav_source: str
+    ) -> None:
+        assert "function normalizeSceneOrder" in project_nav_source
+        assert "scene.order_index" in project_nav_source
+        assert "scene.orderIndex" in project_nav_source
+        assert "scene.order" in project_nav_source
+        assert "left.orderIndex - right.orderIndex" in project_nav_source
+        assert "left.originalIndex - right.originalIndex" in project_nav_source
+
+    def test_scene_selection_uses_scene_id_not_title(self, project_nav_source: str) -> None:
+        assert "function getSceneOptionId" in project_nav_source
+        assert "const sceneId = getSceneOptionId(scene)" in project_nav_source
+        assert "onSelectScene(sceneId)" in project_nav_source
+        assert "onSelectScene(sceneLabel)" not in project_nav_source
+
+    def test_mixed_metadata_and_legacy_scenes_remain_display_safe(
+        self, project_nav_source: str
+    ) -> None:
+        assert ".map(normalizeSceneOption)" in project_nav_source
+        assert ".filter((scene) => scene?.sceneId)" in project_nav_source
+        assert "scene.metadata_exists" in project_nav_source
+        assert "const sceneLabel = getSceneOptionLabel(scene)" in project_nav_source
+        assert "<span>{sceneLabel}</span>" in project_nav_source
+        assert "onSelectScene(sceneId)" in project_nav_source
+
+    def test_scene_display_does_not_inject_metadata_into_editor_body(
+        self, project_nav_source: str
+    ) -> None:
+        assert "fetchScene" not in project_nav_source
+        assert "saveScene" not in project_nav_source
+        assert "content_path" not in project_nav_source
+        assert "sceneContent" not in project_nav_source
+
     @pytest.mark.parametrize(
         "unsafe_phrase",
         [
@@ -219,6 +277,8 @@ class TestProjectNavSelectorUi:
             "rewrite",
             "improve prose",
             "generate project idea",
+            "generate summary",
+            "scene summary",
         ],
     )
     def test_project_nav_excludes_unsafe_prose_generation_copy(

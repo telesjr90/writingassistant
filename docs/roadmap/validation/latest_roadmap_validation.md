@@ -100,8 +100,51 @@
 - `python3 scripts/validate_roadmap.py`: PASS.
 - `python3 scripts/check_enrichment.py`: PASS.
 
+## Collection Repair Planning
+
+- Collection repair planning completed for `PHASE7-IMPL-004`.
+- Repair plan: `.codex-context/PHASE7-IMPL-004/collection_repair_plan.md`.
+- First attempt status: CCE not indexed, Graphify graph missing, AI Context broad pack created, Repomix skipped.
+- Enrichment JSON and task record rendering remain deferred.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- No CCE indexing/search, Graphify graph generation/query, Repomix generation, AI Context generation, app tests, or app servers were run in this repair-planning task.
+
 ## Notes
 
 LeanCTX was used only as a local hook-required validation wrapper for the two git commands. It was not used for planning, context generation, file inspection, code search, summarization, exploration, CCE, Repomix, Graphify, MCP work, or broad repository discovery.
 
 Minimal roadmap CI and `.context-engine.yaml` were created after the local validator passed with `python3`.
+
+## PHASE7-IMPL-004-T002 Completion Recording
+
+- `PHASE7-IMPL-004-T002` implementation and review completed.
+- Runtime files changed by implementation/review: `backend/project_manager.py`, `tests/test_project_manager.py`.
+- Final behavior: read-only scene metadata helpers surface metadata-compatible data for legacy `scenes/{scene_id}.md` files without creating `scene_metadata/*.json`.
+- Missing metadata defaults include `chapter_id: None`, empty `title`, safe derived `content_path`, and `metadata_exists: False`.
+- Existing metadata JSON is normalized so stale or unsafe `project_id`, `scene_id`, and `content_path` cannot be echoed back.
+- `load_scene()` and `save_scene()` remain unchanged.
+- Scene routes and frontend behavior remain unchanged.
+- Next child task remains `PHASE7-IMPL-004-T003`; write/create, migration, route, frontend, and fallback-test work were not started.
+- Validation reported for T002 review: `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py` PASS with 40 passed; `python3 scripts/check_enrichment.py` PASS; `python3 scripts/validate_roadmap.py` PASS; `git diff --check` PASS via approved LeanCTX fallback; `git status --short --branch` PASS via approved LeanCTX fallback.
+
+## PHASE7-IMPL-004 Closeout Validation
+
+- Date: 2026-06-14.
+- Parent task: `PHASE7-IMPL-004` - Chapter / Scene Metadata Compatibility Layer.
+- Result: PASS.
+- `PHASE7-IMPL-004-T002`: PASS; read-only scene metadata compatibility helpers.
+- `PHASE7-IMPL-004-T003`: PASS; backend scene/chapter metadata write/create helpers.
+- `PHASE7-IMPL-004-T004`: PASS; route compatibility tests.
+- `PHASE7-IMPL-004-T005`: PASS; frontend display compatibility for metadata-shaped scene records while preserving legacy string scene IDs.
+- `PHASE7-IMPL-004-T006`: PASS; legacy scene fallback regression tests.
+- `PHASE7-IMPL-004-T007`: PASS; roadmap/status closeout.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py`: PASS, 47 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_scene_routes.py`: PASS, 11 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_frontend_project_workspace_source.py`: PASS, 63 passed.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: PASS via approved LeanCTX fallback.
+- `git status --short --branch`: PASS via approved LeanCTX fallback.
+- Active frontier moved to `PHASE7-IMPL-005` - Notes / Materials Storage.
+- No app servers, model calls, Ollama calls, frontend builds, CCE, Graphify, Repomix, AI Context generation, MCP tools, staging, commits, or pushes were run.

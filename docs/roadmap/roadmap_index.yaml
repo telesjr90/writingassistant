@@ -3,8 +3,8 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-004",
-    "current_parent_task_title": "Chapter / Scene Metadata Compatibility Layer"
+    "current_parent_task_id": "PHASE7-IMPL-005",
+    "current_parent_task_title": "Notes / Materials Storage"
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -90,7 +90,7 @@
       "id": "PHASE7-IMPL-004",
       "title": "Chapter / Scene Metadata Compatibility Layer",
       "type": "runtime",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-003"
@@ -113,7 +113,7 @@
       "id": "PHASE7-IMPL-005",
       "title": "Notes / Materials Storage",
       "type": "runtime",
-      "status": "future",
+      "status": "active_next",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-003"
@@ -269,7 +269,7 @@
       "id": "PHASE7-IMPL-004-T002",
       "title": "Implement legacy scene Markdown compatibility metadata reads",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-004",
       "depends_on": [
         "PHASE7-IMPL-004-T001"
@@ -286,7 +286,7 @@
       "id": "PHASE7-IMPL-004-T003",
       "title": "Backend metadata write/create helpers",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-004",
       "depends_on": [
         "PHASE7-IMPL-004-T002"
@@ -303,7 +303,7 @@
       "id": "PHASE7-IMPL-004-T004",
       "title": "Route compatibility tests",
       "type": "validation_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-004",
       "depends_on": [
         "PHASE7-IMPL-004-T002",
@@ -321,7 +321,7 @@
       "id": "PHASE7-IMPL-004-T005",
       "title": "Frontend display of scene titles/order if metadata exists",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-004",
       "depends_on": [
         "PHASE7-IMPL-004-T002"
@@ -338,7 +338,7 @@
       "id": "PHASE7-IMPL-004-T006",
       "title": "Legacy scene fallback tests",
       "type": "validation_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-004",
       "depends_on": [
         "PHASE7-IMPL-004-T004"
@@ -355,7 +355,7 @@
       "id": "PHASE7-IMPL-004-T007",
       "title": "Roadmap/status update after PHASE7-IMPL-004 completion",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-004",
       "depends_on": [
         "PHASE7-IMPL-004-T006"

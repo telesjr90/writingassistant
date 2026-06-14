@@ -1,21 +1,76 @@
 import { useState } from 'react';
 
-function normalizeScene(scene) {
+function normalizeSceneOrder(scene) {
+  const rawOrder = scene.order_index ?? scene.orderIndex ?? scene.order;
+
+  if (rawOrder === null || rawOrder === undefined || rawOrder === '') {
+    return null;
+  }
+
+  const orderIndex = Number(rawOrder);
+  return Number.isFinite(orderIndex) ? orderIndex : null;
+}
+
+function normalizeSceneOption(scene, originalIndex = 0) {
   if (typeof scene === 'string') {
     return {
-      id: scene,
+      sceneId: scene,
       title: scene,
+      label: scene,
+      chapterId: null,
+      orderIndex: null,
+      metadataExists: false,
       status: 'Scene',
+      originalIndex,
     };
   }
 
-  const id = scene.id ?? scene.scene_id ?? scene.name;
+  if (!scene || typeof scene !== 'object') {
+    return null;
+  }
+
+  const sceneId = scene.scene_id ?? scene.sceneId ?? scene.id ?? scene.name;
+  const rawTitle = typeof scene.title === 'string' ? scene.title.trim() : '';
+  const title = rawTitle || sceneId || '';
 
   return {
-    id,
-    title: scene.title ?? id ?? '',
+    sceneId,
+    title,
+    label: title,
+    chapterId: scene.chapter_id ?? scene.chapterId ?? null,
+    orderIndex: normalizeSceneOrder(scene),
+    metadataExists: Boolean(scene.metadata_exists ?? scene.metadataExists),
     status: scene.status ?? 'Scene',
+    originalIndex,
   };
+}
+
+function getSceneOptionId(sceneOption) {
+  return sceneOption.sceneId;
+}
+
+function getSceneOptionLabel(sceneOption) {
+  return sceneOption.label || sceneOption.sceneId;
+}
+
+function normalizeSceneList(scenes) {
+  return scenes
+    .map(normalizeSceneOption)
+    .filter((scene) => scene?.sceneId)
+    .sort((left, right) => {
+      const leftHasOrder = left.orderIndex !== null;
+      const rightHasOrder = right.orderIndex !== null;
+
+      if (leftHasOrder && rightHasOrder && left.orderIndex !== right.orderIndex) {
+        return left.orderIndex - right.orderIndex;
+      }
+
+      if (leftHasOrder !== rightHasOrder) {
+        return leftHasOrder ? -1 : 1;
+      }
+
+      return left.originalIndex - right.originalIndex;
+    });
 }
 
 function normalizeProject(project) {
@@ -87,7 +142,7 @@ export default function ProjectNav({
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const trimmedProjectTitle = newProjectTitle.trim();
   const canCreateProject = Boolean(trimmedProjectTitle) && !isCreatingProject;
-  const normalizedScenes = scenes.map(normalizeScene).filter((scene) => scene.id);
+  const normalizedScenes = normalizeSceneList(scenes);
   const projectOptions = buildProjectOptions(projects, activeProjectId);
   const activeProject = projectOptions.find((project) => project.id === activeProjectId);
   const activeProjectLabel = activeProject?.title ?? activeProjectId ?? 'Project';
@@ -205,17 +260,22 @@ export default function ProjectNav({
         {!isLoading && !error && normalizedScenes.length === 0 && (
           <p className="muted-copy">No scenes yet.</p>
         )}
-        {normalizedScenes.map((scene) => (
-          <button
-            className={`scene-item${selectedSceneId === scene.id ? ' is-active' : ''}`}
-            type="button"
-            key={scene.id}
-            onClick={() => onSelectScene(scene.id)}
-          >
-            <span>{scene.title}</span>
-            <small>{scene.status}</small>
-          </button>
-        ))}
+        {normalizedScenes.map((scene) => {
+          const sceneId = getSceneOptionId(scene);
+          const sceneLabel = getSceneOptionLabel(scene);
+
+          return (
+            <button
+              className={`scene-item${selectedSceneId === sceneId ? ' is-active' : ''}`}
+              type="button"
+              key={sceneId}
+              onClick={() => onSelectScene(sceneId)}
+            >
+              <span>{sceneLabel}</span>
+              <small>{scene.status}</small>
+            </button>
+          );
+        })}
       </nav>
     </aside>
   );

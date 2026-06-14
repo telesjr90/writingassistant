@@ -5,11 +5,23 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-004`.
-- Canonical title: Chapter / Scene Metadata Compatibility Layer.
-- First ready planning/inventory micro-task: `PHASE7-IMPL-004-T001` - Read-only chapter and scene metadata compatibility inventory.
+- Immediate active parent task: `PHASE7-IMPL-005`.
+- Canonical title: Notes / Materials Storage.
+- Last completed parent task: `PHASE7-IMPL-004` - Chapter / Scene Metadata Compatibility Layer.
+- Next parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
+
+`PHASE7-IMPL-004` is complete as of the T007 closeout. Completed child records:
+
+- `PHASE7-IMPL-004-T002`: read-only backend scene metadata compatibility for legacy Markdown scenes.
+- `PHASE7-IMPL-004-T003`: backend scene/chapter metadata write/create helpers.
+- `PHASE7-IMPL-004-T004`: route compatibility tests preserving legacy scene route contracts.
+- `PHASE7-IMPL-004-T005`: frontend display compatibility for metadata-shaped scene records while preserving legacy string scene IDs.
+- `PHASE7-IMPL-004-T006`: legacy scene fallback regression tests.
+- `PHASE7-IMPL-004-T007`: roadmap/status closeout.
+
+Final `PHASE7-IMPL-004` behavior preserves existing `scenes/{scene_id}.md` scene bodies, keeps chapter and scene metadata separate from owner-authored Markdown, preserves legacy list/read route shapes, and does not add model calls, generated prose, extraction, OMI/memory/canon mutation, training/JSONL/dataset changes, or browser/manual validation scope.
 
 Browser/manual validation belongs under `PHASE7-IMPL-010`.
 
@@ -69,3 +81,6 @@ Context packs and generated maps are refreshable artifacts, not roadmap truth. T
 - This does not mean CCE evidence has been collected.
 - The first actual use of CCE should happen only in a future explicit collect step for `PHASE7-IMPL-004`.
 - `cce init` remains prohibited.
+- `PHASE7-IMPL-004` collection attempt 1 produced mixed evidence.
+- Enrichment JSON and task record rendering are intentionally deferred.
+- `.codex-context/PHASE7-IMPL-004/collection_repair_plan.md` controls the next evidence pass.

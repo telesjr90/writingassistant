@@ -19,6 +19,8 @@ PROJECTS_DIR = REPO_ROOT / "projects"
 # create story prose, generated summaries, candidates, OMI records,
 # memory/canon files, training data, or model artifacts.
 PROJECT_SCHEMA_VERSION = "0.1.0"
+SCENE_METADATA_VERSION = 1
+CHAPTER_METADATA_VERSION = 1
 
 MAX_PROJECT_TITLE_LENGTH = 160
 MAX_PROJECT_ID_LENGTH = 64
@@ -653,6 +655,16 @@ def _scene_path(project_name: str, scene_id: str) -> Path:
     return _project_dir(project_name) / "scenes" / f"{safe_scene_id}.md"
 
 
+def _scene_metadata_path(project_name: str, scene_id: str) -> Path:
+    safe_scene_id = _safe_path_component(scene_id, "scene_id")
+    return _project_dir(project_name) / "scene_metadata" / f"{safe_scene_id}.json"
+
+
+def _chapter_metadata_path(project_name: str, chapter_id: str) -> Path:
+    safe_chapter_id = _safe_path_component(chapter_id, "chapter_id")
+    return _project_dir(project_name) / "chapters" / f"{safe_chapter_id}.json"
+
+
 def _json_path(project_name: str, filename: str) -> Path:
     return _project_dir(project_name) / filename
 
@@ -1020,6 +1032,290 @@ def load_scene(project_name: str, scene_id: str) -> str:
     return _scene_path(project_name, scene_id).read_text(encoding="utf-8")
 
 
+def _scene_content_path_value(scene_id: str) -> str:
+    safe_scene_id = _safe_path_component(scene_id, "scene_id")
+    return f"scenes/{safe_scene_id}.md"
+
+
+def _copy_metadata_payload(value: dict[str, Any] | None, label: str) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} metadata must be a JSON object")
+    return dict(value)
+
+
+def _string_or_none(value: Any, label: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError(f"{label} must be a string or null")
+    return value
+
+
+def _string_list(value: Any, label: str) -> list[str]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise ValueError(f"{label} must be a list")
+    if not all(isinstance(item, str) for item in value):
+        raise ValueError(f"{label} must contain only strings")
+    return list(value)
+
+
+def _safe_scene_id_list(value: Any) -> list[str]:
+    return [
+        _safe_path_component(scene_id, "scene_id")
+        for scene_id in _string_list(value, "scene_ids")
+    ]
+
+
+def _metadata_object(value: Any, label: str) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be a JSON object")
+    return dict(value)
+
+
+def _normalise_scene_metadata_read(
+    project_name: str,
+    scene_id: str,
+    metadata: dict[str, Any],
+    *,
+    metadata_exists: bool,
+) -> dict[str, Any]:
+    safe_scene_id = _safe_path_component(scene_id, "scene_id")
+    content_path = _scene_content_path_value(safe_scene_id)
+    normalized = dict(metadata)
+    normalized.setdefault("metadata_version", SCENE_METADATA_VERSION)
+    normalized.setdefault("chapter_id", None)
+    normalized.setdefault("title", "")
+    normalized.setdefault("order_index", None)
+    normalized["project_id"] = project_name
+    normalized["scene_id"] = safe_scene_id
+    normalized["content_path"] = content_path
+    normalized["metadata_exists"] = metadata_exists
+    normalized["metadata_path"] = (
+        f"scene_metadata/{safe_scene_id}.json" if metadata_exists else None
+    )
+    return normalized
+
+
+def _normalise_scene_metadata_write(
+    project_name: str,
+    scene_id: str,
+    metadata: dict[str, Any] | None,
+    *,
+    existing: dict[str, Any] | None,
+) -> dict[str, Any]:
+    safe_scene_id = _safe_path_component(scene_id, "scene_id")
+    payload = _copy_metadata_payload(metadata, "Scene")
+    previous = dict(existing or {})
+    record = dict(previous)
+    record.update(payload)
+
+    if "order_index" not in record and "order" in record:
+        record["order_index"] = record["order"]
+    record.pop("order", None)
+    record.pop("schema_version", None)
+    record.pop("metadata_exists", None)
+    record.pop("metadata_path", None)
+
+    chapter_id = record.get("chapter_id")
+    if chapter_id is not None:
+        record["chapter_id"] = _safe_path_component(chapter_id, "chapter_id")
+
+    timestamp = _utc_after(_string_or_none(previous.get("updated_at"), "updated_at"))
+    created_at = _string_or_none(previous.get("created_at"), "created_at") or timestamp
+
+    record.setdefault("title", "")
+    record.setdefault("status", "draft")
+    record.setdefault("owner_notes", "")
+    record.setdefault("pov_character_id", None)
+    record.setdefault("location_ids", [])
+    record.setdefault("timeline_position", None)
+    record.setdefault("order_index", None)
+    record.setdefault("word_count", 0)
+    record.setdefault("summary_candidate_id", None)
+    record.setdefault("approved_navigation_summary", None)
+    record.setdefault("tags", [])
+    record.setdefault(
+        "provenance",
+        {"created_by": "owner", "creation_method": "manual", "source": "manual"},
+    )
+
+    record["metadata_version"] = SCENE_METADATA_VERSION
+    record["project_id"] = project_name
+    record["scene_id"] = safe_scene_id
+    record["content_path"] = _scene_content_path_value(safe_scene_id)
+    record["created_at"] = created_at
+    record["updated_at"] = timestamp
+    record["location_ids"] = _string_list(record.get("location_ids"), "location_ids")
+    record["tags"] = _string_list(record.get("tags"), "tags")
+    record["provenance"] = _metadata_object(record.get("provenance"), "provenance")
+    return record
+
+
+def _normalise_chapter_metadata_write(
+    project_name: str,
+    chapter_id: str,
+    metadata: dict[str, Any] | None,
+    *,
+    existing: dict[str, Any] | None,
+) -> dict[str, Any]:
+    safe_chapter_id = _safe_path_component(chapter_id, "chapter_id")
+    payload = _copy_metadata_payload(metadata, "Chapter")
+    previous = dict(existing or {})
+    record = dict(previous)
+    record.update(payload)
+
+    if "order_index" not in record and "order" in record:
+        record["order_index"] = record["order"]
+    record.pop("order", None)
+    record.pop("schema_version", None)
+
+    timestamp = _utc_after(_string_or_none(previous.get("updated_at"), "updated_at"))
+    created_at = _string_or_none(previous.get("created_at"), "created_at") or timestamp
+
+    record.setdefault("title", "")
+    record.setdefault("order_index", 0)
+    record.setdefault("status", "draft")
+    record.setdefault("scene_ids", [])
+    record.setdefault("owner_notes", "")
+    record.setdefault("owner_metadata", {})
+    record.setdefault("summary_candidate_id", None)
+    record.setdefault("approved_navigation_summary", None)
+    record.setdefault("tags", [])
+    record.setdefault(
+        "provenance",
+        {"created_by": "owner", "creation_method": "manual", "source": "manual"},
+    )
+
+    record["metadata_version"] = CHAPTER_METADATA_VERSION
+    record["project_id"] = project_name
+    record["chapter_id"] = safe_chapter_id
+    record["created_at"] = created_at
+    record["updated_at"] = timestamp
+    record["scene_ids"] = _safe_scene_id_list(record.get("scene_ids"))
+    record["owner_metadata"] = _metadata_object(
+        record.get("owner_metadata"),
+        "owner_metadata",
+    )
+    record["tags"] = _string_list(record.get("tags"), "tags")
+    record["provenance"] = _metadata_object(record.get("provenance"), "provenance")
+    return record
+
+
+def _normalise_chapter_metadata_read(
+    project_name: str,
+    chapter_id: str,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    safe_chapter_id = _safe_path_component(chapter_id, "chapter_id")
+    normalized = dict(metadata)
+    normalized.setdefault("metadata_version", CHAPTER_METADATA_VERSION)
+    normalized.setdefault("title", "")
+    normalized.setdefault("order_index", 0)
+    normalized.setdefault("status", "draft")
+    normalized.setdefault("scene_ids", [])
+    normalized.setdefault("owner_notes", "")
+    normalized.setdefault("owner_metadata", {})
+    normalized.setdefault("summary_candidate_id", None)
+    normalized.setdefault("approved_navigation_summary", None)
+    normalized.setdefault("tags", [])
+    normalized["project_id"] = project_name
+    normalized["chapter_id"] = safe_chapter_id
+    normalized["scene_ids"] = _safe_scene_id_list(normalized.get("scene_ids"))
+    normalized["owner_metadata"] = _metadata_object(
+        normalized.get("owner_metadata"),
+        "owner_metadata",
+    )
+    normalized["tags"] = _string_list(normalized.get("tags"), "tags")
+    return normalized
+
+
+def load_scene_metadata(project_name: str, scene_id: str) -> dict[str, Any]:
+    scene_path = _scene_path(project_name, scene_id)
+    if not scene_path.exists():
+        raise FileNotFoundError(scene_path)
+
+    metadata_path = _scene_metadata_path(project_name, scene_id)
+    if not metadata_path.exists():
+        return _normalise_scene_metadata_read(
+            project_name,
+            scene_id,
+            {},
+            metadata_exists=False,
+        )
+
+    metadata = _load_json_object_from_path(metadata_path, "Scene metadata")
+    return _normalise_scene_metadata_read(
+        project_name,
+        scene_id,
+        metadata,
+        metadata_exists=True,
+    )
+
+
+def create_scene_metadata(
+    project_name: str,
+    scene_id: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    scene_path = _scene_path(project_name, scene_id)
+    if not scene_path.exists():
+        raise FileNotFoundError(scene_path)
+
+    record = _normalise_scene_metadata_write(
+        project_name,
+        scene_id,
+        metadata,
+        existing=None,
+    )
+    _write_json_object(
+        _scene_metadata_path(project_name, scene_id),
+        record,
+        "Scene metadata",
+        overwrite=False,
+    )
+    return load_scene_metadata(project_name, scene_id)
+
+
+def update_scene_metadata(
+    project_name: str,
+    scene_id: str,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    scene_path = _scene_path(project_name, scene_id)
+    if not scene_path.exists():
+        raise FileNotFoundError(scene_path)
+
+    metadata_path = _scene_metadata_path(project_name, scene_id)
+    existing = _load_json_object_from_path(metadata_path, "Scene metadata")
+    record = _normalise_scene_metadata_write(
+        project_name,
+        scene_id,
+        metadata,
+        existing=existing,
+    )
+    _write_json_object(
+        metadata_path,
+        record,
+        "Scene metadata",
+        overwrite=True,
+    )
+    return load_scene_metadata(project_name, scene_id)
+
+
+def load_scene_record(project_name: str, scene_id: str) -> dict[str, Any]:
+    return {
+        "scene_id": _safe_path_component(scene_id, "scene_id"),
+        "content": load_scene(project_name, scene_id),
+        "metadata": load_scene_metadata(project_name, scene_id),
+    }
+
+
 def save_scene(project_name: str, scene_id: str, content: str) -> None:
     path = _scene_path(project_name, scene_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1032,6 +1328,56 @@ def list_scenes(project_name: str) -> list[str]:
         return []
 
     return [path.stem for path in sorted(scenes_dir.glob("*.md")) if path.is_file()]
+
+
+def list_scene_metadata(project_name: str) -> list[dict[str, Any]]:
+    return [
+        load_scene_metadata(project_name, scene_id)
+        for scene_id in list_scenes(project_name)
+    ]
+
+
+def load_chapter_metadata(project_name: str, chapter_id: str) -> dict[str, Any]:
+    path = _chapter_metadata_path(project_name, chapter_id)
+    metadata = _load_json_object_from_path(path, "Chapter metadata")
+    return _normalise_chapter_metadata_read(project_name, chapter_id, metadata)
+
+
+def create_chapter_metadata(
+    project_name: str,
+    chapter_id: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    record = _normalise_chapter_metadata_write(
+        project_name,
+        chapter_id,
+        metadata,
+        existing=None,
+    )
+    _write_json_object(
+        _chapter_metadata_path(project_name, chapter_id),
+        record,
+        "Chapter metadata",
+        overwrite=False,
+    )
+    return load_chapter_metadata(project_name, chapter_id)
+
+
+def update_chapter_metadata(
+    project_name: str,
+    chapter_id: str,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    path = _chapter_metadata_path(project_name, chapter_id)
+    existing = _load_json_object_from_path(path, "Chapter metadata")
+    record = _normalise_chapter_metadata_write(
+        project_name,
+        chapter_id,
+        metadata,
+        existing=existing,
+    )
+    _write_json_object(path, record, "Chapter metadata", overwrite=True)
+    return load_chapter_metadata(project_name, chapter_id)
 
 
 def ensure_omi_storage(project_name: str) -> None:
