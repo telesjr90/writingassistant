@@ -72,13 +72,13 @@ Exclude:
 
 ## Child Task Plan
 
-1. `PHASE7-IMPL-006-T001` - Shared owner-authored document editor inventory and child-task plan. Status: complete after validation.
-2. `PHASE7-IMPL-006-T002` - Shared document state contract and source-level tests.
-3. `PHASE7-IMPL-006-T003` - Extract shared editor controller helpers.
-4. `PHASE7-IMPL-006-T004` - Editor component prop cleanup and behavior parity.
-5. `PHASE7-IMPL-006-T005` - Project navigation document selection parity.
-6. `PHASE7-IMPL-006-T006` - Shared editor regression coverage.
-7. `PHASE7-IMPL-006-T007` - Roadmap/status closeout.
+1. `PHASE7-IMPL-006-T001` - Shared owner-authored document editor inventory and child-task plan. Status: complete.
+2. `PHASE7-IMPL-006-T002` - Shared document state contract and source-level tests. Status: complete.
+3. `PHASE7-IMPL-006-T003` - Extract shared editor controller helpers. Status: complete.
+4. `PHASE7-IMPL-006-T004` - Editor component prop cleanup and behavior parity. Status: complete.
+5. `PHASE7-IMPL-006-T005` - Project navigation document selection parity. Status: complete.
+6. `PHASE7-IMPL-006-T006` - Shared editor regression coverage. Status: complete.
+7. `PHASE7-IMPL-006-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -141,4 +141,27 @@ For later implementation children, use focused frontend source tests and the exi
 
 ## Current Status
 
-`PHASE7-IMPL-006-T001` is the active child task. Runtime implementation has not started. The next recommended child task is `PHASE7-IMPL-006-T002` - Shared document state contract and source-level tests.
+`PHASE7-IMPL-006` is complete as of the `PHASE7-IMPL-006-T007` closeout.
+
+Completed child records:
+
+- `PHASE7-IMPL-006-T001`: inventoried current editor surfaces and created the task/enrichment records.
+- `PHASE7-IMPL-006-T002`: locked source-level shared document state contract coverage.
+- `PHASE7-IMPL-006-T003`: extracted shared editor controller helpers for document types, body extraction, descriptors, unsaved-change aggregation, switch messages, and save eligibility.
+- `PHASE7-IMPL-006-T004`: cleaned `Editor.jsx` props to document-neutral naming and shared document type defaults.
+- `PHASE7-IMPL-006-T005`: aligned `ProjectNav.jsx` selection parity with generic active document type and ID handling.
+- `PHASE7-IMPL-006-T006`: added shared editor regression coverage for body-only load/save, dirty state, keyboard save, project/document switch guards, Editor neutrality, ProjectNav parity, API route shape, and no unsafe future behavior.
+- `PHASE7-IMPL-006-T007`: recorded roadmap/status closeout.
+
+Final behavior:
+
+- Scene, note, and material selection remains ID-based.
+- Load/save paths use exact owner-authored body content.
+- Save helpers send content only; metadata is not injected into editor bodies.
+- Metadata editing UI, note/material create/import/upload UI, generated prose, summaries, extraction, model/Ollama calls, OMI/canon/memory mutation, and training/JSONL/dataset behavior remain out of scope and absent.
+
+Remaining acceptable gaps:
+
+- `App.jsx` still has some internal document-specific state names even though the shared document contract and navigation/editor surfaces are aligned.
+- Browser/manual validation remains deferred to `PHASE7-IMPL-010`.
+- Metadata editing and note/material create/import/upload flows remain future-only unless explicitly scoped later.

@@ -3,8 +3,8 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-006",
-    "current_parent_task_title": "Shared owner-authored document editor"
+    "current_parent_task_id": "PHASE7-IMPL-007",
+    "current_parent_task_title": "Project Overview shell"
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -136,7 +136,7 @@
       "id": "PHASE7-IMPL-006",
       "title": "Shared owner-authored document editor",
       "type": "runtime",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-004",
@@ -158,7 +158,7 @@
       "id": "PHASE7-IMPL-007",
       "title": "Project Overview shell",
       "type": "runtime",
-      "status": "future",
+      "status": "active_next",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-002",
@@ -501,6 +501,107 @@
       "boundary_tags": [
         "read_only",
         "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T002",
+      "title": "Shared document state contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006-T001"
+      ],
+      "boundary_tags": [
+        "validation",
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T003",
+      "title": "Extract shared editor controller helpers",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006-T002"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T004",
+      "title": "Editor component prop cleanup and behavior parity",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006-T003"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T005",
+      "title": "Project navigation document selection parity",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006-T004"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T006",
+      "title": "Shared editor regression coverage",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006-T006"
+      ],
+      "boundary_tags": [
+        "read_only",
         "no_model_calls",
         "no_generated_prose",
         "no_memory_canon_mutation"

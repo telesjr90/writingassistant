@@ -5,13 +5,14 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-006`.
-- Canonical title: Shared owner-authored document editor.
-- Last completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
-- Next parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- Immediate active parent task: `PHASE7-IMPL-007`.
+- Canonical title: Project Overview shell.
+- Last completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- Next parent task: `PHASE7-IMPL-007` - Project Overview shell.
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
-- Completed planning/inventory micro-task: `PHASE7-IMPL-006-T001` - Shared owner-authored document editor inventory and child-task plan.
-- Next draft child task: `PHASE7-IMPL-006-T002` - Shared document state contract and source-level tests.
+- Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- Completed closeout micro-task: `PHASE7-IMPL-006-T007` - Roadmap/status closeout.
+- Next draft parent task: `PHASE7-IMPL-007` - Project Overview shell.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -38,7 +39,17 @@ Final `PHASE7-IMPL-004` behavior preserves existing `scenes/{scene_id}.md` scene
 
 Final `PHASE7-IMPL-005` behavior stores owner-authored notes and owner-provided materials as separate body and metadata files; keeps body saves from creating metadata; requires existing bodies for metadata writes in this slice; keeps reads/lists side-effect free; enforces safe identity/path derivation; wires route/API/frontend shell compatibility; and does not add generated prose, note/material summaries, extraction, semantic search, model/Ollama calls, metadata editing UI, full shared editor refactor, OMI/memory/canon mutation, or training/JSONL/dataset changes.
 
-`PHASE7-IMPL-006-T001` is complete as an inventory/artifact task. It created the PHASE7-IMPL-006 task record, inventory, and enrichment JSON; identified current frontend scene/note/material editor surfaces; documented risks from the minimal PHASE7-IMPL-005-T006 shell; and recommended `PHASE7-IMPL-006-T002` as the next child limited to shared document state contract and source-level tests. Runtime frontend implementation, backend implementation, tests, app servers, frontend builds, model calls, extraction, context generation, project fixture writes, OMI/memory/canon mutation, and training/JSONL/dataset changes were not performed.
+`PHASE7-IMPL-006` is complete as of the T007 closeout. Completed child records:
+
+- `PHASE7-IMPL-006-T001`: shared owner-authored document editor inventory and child-task plan.
+- `PHASE7-IMPL-006-T002`: shared document state contract and source-level tests.
+- `PHASE7-IMPL-006-T003`: shared editor controller helpers.
+- `PHASE7-IMPL-006-T004`: document-neutral `Editor.jsx` prop cleanup and behavior parity.
+- `PHASE7-IMPL-006-T005`: `ProjectNav.jsx` scene/note/material document selection parity.
+- `PHASE7-IMPL-006-T006`: shared editor regression coverage.
+- `PHASE7-IMPL-006-T007`: roadmap/status closeout.
+
+Final `PHASE7-IMPL-006` behavior keeps scene/note/material document selection ID-based; loads and saves exact owner-authored body content only; keeps metadata out of editor bodies; preserves dirty-state, keyboard-save, project-switch, and document-switch guards; and does not add metadata editing UI, note/material create/import/upload UI, generated prose, summaries, extraction, model/Ollama calls, OMI/memory/canon mutation, or training/JSONL/dataset changes. Browser/manual validation remains deferred to `PHASE7-IMPL-010`.
 
 Browser/manual validation belongs under `PHASE7-IMPL-010`.
 
