@@ -5,10 +5,12 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-005`.
-- Canonical title: Notes / Materials Storage.
-- Last completed parent task: `PHASE7-IMPL-004` - Chapter / Scene Metadata Compatibility Layer.
-- Next parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
+- Immediate active parent task: `PHASE7-IMPL-006`.
+- Canonical title: Shared owner-authored document editor.
+- Last completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
+- Next parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
+- Next draft child task: not generated; create a focused `PHASE7-IMPL-006` inventory/task handoff before implementation.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -22,6 +24,18 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - `PHASE7-IMPL-004-T007`: roadmap/status closeout.
 
 Final `PHASE7-IMPL-004` behavior preserves existing `scenes/{scene_id}.md` scene bodies, keeps chapter and scene metadata separate from owner-authored Markdown, preserves legacy list/read route shapes, and does not add model calls, generated prose, extraction, OMI/memory/canon mutation, training/JSONL/dataset changes, or browser/manual validation scope.
+
+`PHASE7-IMPL-005` is complete as of the T007 closeout. Completed child records:
+
+- `PHASE7-IMPL-005-T001`: inventory/task/enrichment setup for notes/materials storage and routes.
+- `PHASE7-IMPL-005-T002`: backend note/material body and metadata storage helpers.
+- `PHASE7-IMPL-005-T003`: backend note/material routes.
+- `PHASE7-IMPL-005-T004`: route compatibility and path-safety tests.
+- `PHASE7-IMPL-005-T005`: frontend API compatibility helpers.
+- `PHASE7-IMPL-005-T006`: minimal notes/materials navigation/display shell.
+- `PHASE7-IMPL-005-T007`: roadmap/status closeout.
+
+Final `PHASE7-IMPL-005` behavior stores owner-authored notes and owner-provided materials as separate body and metadata files; keeps body saves from creating metadata; requires existing bodies for metadata writes in this slice; keeps reads/lists side-effect free; enforces safe identity/path derivation; wires route/API/frontend shell compatibility; and does not add generated prose, note/material summaries, extraction, semantic search, model/Ollama calls, metadata editing UI, full shared editor refactor, OMI/memory/canon mutation, or training/JSONL/dataset changes.
 
 Browser/manual validation belongs under `PHASE7-IMPL-010`.
 

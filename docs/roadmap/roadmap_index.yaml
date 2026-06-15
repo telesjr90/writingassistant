@@ -3,8 +3,8 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-005",
-    "current_parent_task_title": "Notes / Materials Storage"
+    "current_parent_task_id": "PHASE7-IMPL-006",
+    "current_parent_task_title": "Shared owner-authored document editor"
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -113,7 +113,7 @@
       "id": "PHASE7-IMPL-005",
       "title": "Notes / Materials Storage",
       "type": "runtime",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-003"
@@ -136,7 +136,7 @@
       "id": "PHASE7-IMPL-006",
       "title": "Shared owner-authored document editor",
       "type": "runtime",
-      "status": "future",
+      "status": "active_next",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-004",
@@ -362,6 +362,127 @@
       ],
       "boundary_tags": [
         "metadata_only",
+        "read_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T001",
+      "title": "Notes / Materials Storage and Routes Inventory",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "metadata_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T002",
+      "title": "Backend note/material storage helpers",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005-T001"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "owner_supplied_material",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T003",
+      "title": "Backend note/material routes",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005-T002"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "owner_supplied_material",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T004",
+      "title": "Route compatibility and path-safety tests",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005-T003"
+      ],
+      "boundary_tags": [
+        "validation",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T005",
+      "title": "Frontend API compatibility helpers",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005-T004"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "owner_supplied_material",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T006",
+      "title": "Minimal notes/materials navigation/display shell",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005-T005"
+      ],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "owner_supplied_material",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-005",
+      "depends_on": [
+        "PHASE7-IMPL-005-T006"
+      ],
+      "boundary_tags": [
         "read_only",
         "no_model_calls",
         "no_generated_prose",

@@ -148,3 +148,45 @@ Minimal roadmap CI and `.context-engine.yaml` were created after the local valid
 - `git status --short --branch`: PASS via approved LeanCTX fallback.
 - Active frontier moved to `PHASE7-IMPL-005` - Notes / Materials Storage.
 - No app servers, model calls, Ollama calls, frontend builds, CCE, Graphify, Repomix, AI Context generation, MCP tools, staging, commits, or pushes were run.
+
+## PHASE7-IMPL-005-T001 Inventory Validation
+
+- Date: 2026-06-14.
+- Parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
+- Result: PASS.
+- Created/updated:
+  - `docs/roadmap/tasks/PHASE7-IMPL-005.md`
+  - `docs/roadmap/inventory/PHASE7-IMPL-005.md`
+  - `docs/roadmap/enrichment/PHASE7-IMPL-005.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: PASS via approved LeanCTX fallback.
+- `git status --short --branch`: PASS via approved LeanCTX fallback.
+- Recommended next child task: `PHASE7-IMPL-005-T002` - Backend note/material storage helpers.
+- No pytest commands were run because this was documentation/inventory only and validators did not require test fixture changes.
+- No app servers, frontend builds, model calls, Ollama calls, CCE, Graphify, Repomix, AI Context generation, MCP tools, broad discovery, staging, commits, or pushes were run.
+
+## PHASE7-IMPL-005 Closeout Validation
+
+- Date: 2026-06-15.
+- Parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
+- Result: PASS.
+- `PHASE7-IMPL-005-T001`: PASS; inventory/task/enrichment setup.
+- `PHASE7-IMPL-005-T002`: PASS; backend note/material storage helpers.
+- `PHASE7-IMPL-005-T003`: PASS; backend note/material routes.
+- `PHASE7-IMPL-005-T004`: PASS; route compatibility and path-safety tests.
+- `PHASE7-IMPL-005-T005`: PASS; frontend API compatibility helpers.
+- `PHASE7-IMPL-005-T006`: PASS; minimal notes/materials navigation/display shell.
+- `PHASE7-IMPL-005-T007`: PASS; roadmap/status closeout.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py`: PASS, 65 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_note_material_routes.py`: PASS, 73 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_frontend_project_workspace_source.py`: PASS, 106 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_scene_routes.py`: PASS, 11 passed.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: SKIPPED; raw git command blocked by local hook; LeanCTX fallback disabled because it failed repeatedly in this session. Hook output: `Command blocked by PreToolUse hook: Command should run via lean-ctx for compact output. Do not retry the original command. Re-run with: /home/tjrpirateking/.nvm/versions/node/v24.16.0/bin/lean-ctx -c 'git diff --check'. Command: git diff --check`
+- `git status --short --branch`: SKIPPED; raw git command blocked by local hook; LeanCTX fallback disabled because it failed repeatedly in this session. Hook output: `Command blocked by PreToolUse hook: Command should run via lean-ctx for compact output. Do not retry the original command. Re-run with: /home/tjrpirateking/.nvm/versions/node/v24.16.0/bin/lean-ctx -c 'git status --short --branch'. Command: git status --short --branch`
+- Active frontier moved to `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- No app servers, frontend builds, model calls, Ollama calls, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, broad discovery, staging, commits, or pushes were run.
