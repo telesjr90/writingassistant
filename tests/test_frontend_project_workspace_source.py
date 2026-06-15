@@ -10,6 +10,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_SRC = REPO_ROOT / "frontend" / "src"
+BACKEND_SRC = REPO_ROOT / "backend"
+ROADMAP_ROOT = REPO_ROOT / "docs" / "roadmap"
 
 API_JS = FRONTEND_SRC / "api.js"
 APP_JSX = FRONTEND_SRC / "App.jsx"
@@ -17,6 +19,12 @@ SHARED_DOCUMENT_CONTROLLER_JS = FRONTEND_SRC / "sharedDocumentController.js"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
 PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
+BACKEND_MAIN_PY = BACKEND_SRC / "main.py"
+PROJECT_MANAGER_PY = BACKEND_SRC / "project_manager.py"
+TASK_007_MD = ROADMAP_ROOT / "tasks" / "PHASE7-IMPL-007.md"
+INVENTORY_007_MD = ROADMAP_ROOT / "inventory" / "PHASE7-IMPL-007.md"
+ENRICHMENT_007_JSON = ROADMAP_ROOT / "enrichment" / "PHASE7-IMPL-007.enrichment.json"
+PROJECT_OVERVIEW_SPEC_MD = ROADMAP_ROOT / "project_overview_page_spec.md"
 
 
 def read_source(path: Path) -> str:
@@ -51,6 +59,36 @@ def editor_source() -> str:
 @pytest.fixture(scope="module")
 def project_context_source() -> str:
     return read_source(PROJECT_CONTEXT_JSX)
+
+
+@pytest.fixture(scope="module")
+def backend_main_source() -> str:
+    return read_source(BACKEND_MAIN_PY)
+
+
+@pytest.fixture(scope="module")
+def project_manager_source() -> str:
+    return read_source(PROJECT_MANAGER_PY)
+
+
+@pytest.fixture(scope="module")
+def task_007_source() -> str:
+    return read_source(TASK_007_MD)
+
+
+@pytest.fixture(scope="module")
+def inventory_007_source() -> str:
+    return read_source(INVENTORY_007_MD)
+
+
+@pytest.fixture(scope="module")
+def enrichment_007_source() -> str:
+    return read_source(ENRICHMENT_007_JSON)
+
+
+@pytest.fixture(scope="module")
+def project_overview_spec_source() -> str:
+    return read_source(PROJECT_OVERVIEW_SPEC_MD)
 
 
 class TestApiProjectHelpers:
@@ -227,6 +265,270 @@ class TestProjectNavSelectorUi:
         assert "Project title" in project_nav_source
         assert "project-title-input" in project_nav_source
         assert "Create blank project" in project_nav_source
+
+
+class TestProjectOverviewDataContract:
+    """PHASE7-IMPL-007-T002 source contract before overview runtime work."""
+
+    def test_allowed_overview_data_is_deterministic_and_local(
+        self,
+        task_007_source: str,
+        inventory_007_source: str,
+        enrichment_007_source: str,
+    ) -> None:
+        allowed_contract_terms = (
+            "project title/ID/status",
+            "warnings",
+            "timestamps",
+            "cheap counts",
+            "scene/note/material counts",
+            "safe empty states",
+            "deterministic project-local metadata/status/counts/empty states",
+        )
+        combined_contract = "\n".join(
+            [task_007_source, inventory_007_source, enrichment_007_source]
+        )
+        for term in allowed_contract_terms:
+            assert term in combined_contract, (
+                f"PHASE7-IMPL-007 contract should allow deterministic overview data: {term}"
+            )
+
+        forbidden_contract_outputs = (
+            "AI-generated project summaries",
+            "note summaries",
+            "material summaries",
+            "Story Check auto-runs",
+            "model/Ollama calls",
+            "OMI/canon/memory mutation",
+            "training/JSONL/dataset",
+        )
+        for term in forbidden_contract_outputs:
+            assert term in combined_contract, (
+                f"PHASE7-IMPL-007 contract should explicitly exclude {term}"
+            )
+
+    def test_project_identity_inputs_exist_without_dedicated_overview_route(
+        self,
+        app_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+        inventory_007_source: str,
+    ) -> None:
+        for frontend_token in (
+            "const [activeProjectId, setActiveProjectId] = useState(PROJECT_ID)",
+            "const [projects, setProjects] = useState([])",
+            "listProjects()",
+            "setActiveProjectId(newProjectId)",
+        ):
+            assert frontend_token in app_source
+
+        assert "export async function listProjects()" in api_source
+        assert "export async function createProject(title)" in api_source
+        assert '@app.get("/api/projects")' in backend_main_source
+        assert "def get_projects()" in backend_main_source
+        assert "def list_projects(" in project_manager_source
+        assert "def load_project_metadata(" in project_manager_source
+
+        for metadata_field in (
+            '"project_id"',
+            '"title"',
+            '"created_at"',
+            '"updated_at"',
+            '"creation_method"',
+            '"status"',
+            '"warnings"',
+        ):
+            assert metadata_field in project_manager_source
+
+        assert "There is no dedicated project overview route today." in inventory_007_source
+
+    def test_overview_counts_must_use_existing_lists_not_analysis(
+        self,
+        app_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+        task_007_source: str,
+        inventory_007_source: str,
+    ) -> None:
+        for list_call in (
+            "fetchScenes(activeProjectId)",
+            "fetchNotes(activeProjectId)",
+            "fetchMaterials(activeProjectId)",
+        ):
+            assert list_call in app_source
+
+        for route_name in ("def get_scenes(", "def get_notes(", "def get_materials("):
+            assert route_name in backend_main_source
+
+        for helper_name in (
+            "def list_scenes(",
+            "def list_note_metadata(",
+            "def list_material_metadata(",
+        ):
+            assert helper_name in project_manager_source
+
+        assert "Chapter count if chapter metadata helpers provide a cheap count; otherwise defer." in (
+            inventory_007_source
+        )
+        assert "scene/note/material counts" in task_007_source
+
+        initial_load_block = app_source.split("async function loadInitialData()", 1)[1].split(
+            "const refreshOMI",
+            1,
+        )[0]
+        assert "runStoryCheck" not in initial_load_block
+        assert "analysis_engine" not in initial_load_block
+        assert "extract" not in initial_load_block.lower()
+
+    def test_safe_overview_sections_are_shell_status_sections(
+        self, inventory_007_source: str, project_overview_spec_source: str
+    ) -> None:
+        for section_label in (
+            "Project Header",
+            "Workspace Navigation Cards",
+            "Scenes",
+            "Notes",
+            "Materials",
+            "OMI",
+            "Approved Memory / Canon",
+        ):
+            assert section_label in project_overview_spec_source or section_label in inventory_007_source
+
+        assert "Approved memory/canon snapshot as an empty-state shell only" in (
+            inventory_007_source
+        )
+        assert "OMI and memory/canon sections should remain status/empty-state shells" in (
+            inventory_007_source
+        )
+        assert "must not promote candidates or create memory files" in inventory_007_source
+
+    def test_empty_state_contract_is_factual_not_story_guidance(
+        self, inventory_007_source: str, project_nav_source: str
+    ) -> None:
+        for existing_empty_state in ("No scenes yet.", "No notes yet.", "No materials yet."):
+            assert existing_empty_state in project_nav_source
+
+        for planned_empty_state in (
+            "missing optional metadata",
+            "no scenes",
+            "no notes",
+            "no materials",
+            "no approved memory/canon yet",
+        ):
+            assert planned_empty_state in inventory_007_source
+
+        assert "generated next step" in inventory_007_source
+        lower_runtime_nav = project_nav_source.lower()
+        for forbidden_empty_state_behavior in (
+            "story suggestions",
+            "generated next step",
+            "ai story summary",
+            "extracted character",
+            "extracted location",
+            "extracted timeline",
+        ):
+            assert forbidden_empty_state_behavior not in lower_runtime_nav
+
+    def test_navigation_contract_uses_existing_workspace_surfaces_without_mutation(
+        self,
+        app_source: str,
+        project_nav_source: str,
+        inventory_007_source: str,
+    ) -> None:
+        for nav_callback in (
+            "onSelectScene(sceneId)",
+            "onSelectNote?.(noteId)",
+            "onSelectMaterial?.(materialId)",
+        ):
+            assert nav_callback in project_nav_source
+
+        for existing_surface in ("ProjectNav", "ProjectContext", "OMIPanel", "Editor"):
+            assert existing_surface in app_source
+
+        assert "Workspace navigation cards or buttons" in inventory_007_source
+        assert "does not trigger body reads, model calls, or project writes" in (
+            inventory_007_source
+        )
+
+        project_nav_source_lower = project_nav_source.lower()
+        for forbidden_nav_behavior in (
+            "metadata editor",
+            "edit metadata",
+            "upload material",
+            "import material",
+            "apply promotion",
+        ):
+            assert forbidden_nav_behavior not in project_nav_source_lower
+
+    def test_app_and_project_nav_have_safe_overview_integration_surfaces(
+        self, app_source: str, project_nav_source: str, inventory_007_source: str
+    ) -> None:
+        assert "activeProjectId" in app_source
+        assert "activeDocumentType" in app_source
+        assert "activeDocumentId={activeDocument.id}" in app_source
+        assert "hasUnsavedDocumentChanges" in app_source
+        assert "activeProjectLabel" in project_nav_source
+
+        assert "There is no dedicated Project Overview component or landing surface today." in (
+            inventory_007_source
+        )
+        assert "There is no Overview nav item today." in inventory_007_source
+        assert "must not break the shared editor's document selection" in inventory_007_source
+
+    def test_backend_overview_helper_is_optional_and_must_be_deterministic(
+        self,
+        backend_main_source: str,
+        project_manager_source: str,
+        task_007_source: str,
+        inventory_007_source: str,
+    ) -> None:
+        assert "/overview" not in backend_main_source
+        assert "overview" not in project_manager_source.lower()
+        assert "There is no dedicated overview API helper today." in inventory_007_source
+        assert "deterministic project overview data helpers only if existing project/list/metadata helpers are insufficient" in (
+            task_007_source
+        )
+
+        for backend_source in (backend_main_source, project_manager_source):
+            assert "analysis_engine.run_story_check" not in backend_source.split("def get_projects", 1)[0]
+            assert "summarize" not in backend_source.lower()
+            assert "semantic search" not in backend_source.lower()
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, PROJECT_CONTEXT_JSX, API_JS, SHARED_DOCUMENT_CONTROLLER_JS],
+    )
+    def test_runtime_sources_exclude_overview_forbidden_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = read_source(source_path).lower()
+        forbidden_terms = [
+            "generated summary",
+            "ai summary",
+            "summarize project",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "training data",
+            "jsonl",
+            "dataset",
+        ]
+        for term in forbidden_terms:
+            assert term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain overview-forbidden term {term!r}"
+            )
+
+        if source_path in {APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, PROJECT_CONTEXT_JSX}:
+            assert "ollama" not in lower_source
+            assert "dramatica" not in lower_source
 
 
 class TestSceneMetadataDisplayCompatibility:
