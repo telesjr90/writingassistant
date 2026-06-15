@@ -13,6 +13,7 @@ FRONTEND_SRC = REPO_ROOT / "frontend" / "src"
 
 API_JS = FRONTEND_SRC / "api.js"
 APP_JSX = FRONTEND_SRC / "App.jsx"
+SHARED_DOCUMENT_CONTROLLER_JS = FRONTEND_SRC / "sharedDocumentController.js"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
 PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
@@ -30,6 +31,11 @@ def api_source() -> str:
 @pytest.fixture(scope="module")
 def app_source() -> str:
     return read_source(APP_JSX)
+
+
+@pytest.fixture(scope="module")
+def shared_document_controller_source() -> str:
+    return read_source(SHARED_DOCUMENT_CONTROLLER_JS)
 
 
 @pytest.fixture(scope="module")
@@ -650,7 +656,7 @@ class TestNoteMaterialShellSource:
         assert "fetchMaterials(activeProjectId)" in app_source
         assert "fetchNote(noteId, activeProjectId)" in app_source
         assert "fetchMaterial(materialId, activeProjectId)" in app_source
-        assert "const loadedContent = data.content ?? ''" in app_source
+        assert "const loadedContent = getDocumentResponseContent(data)" in app_source
         assert "setNoteContent(loadedContent)" in app_source
         assert "setMaterialContent(loadedContent)" in app_source
 
@@ -678,10 +684,9 @@ class TestNoteMaterialShellSource:
         self, app_source: str
     ) -> None:
         assert "selectedDocumentType" in app_source
-        assert "documentType=\"note\"" in app_source
-        assert "documentType=\"material\"" in app_source
-        assert "documentError={noteError}" in app_source
-        assert "documentError={materialError}" in app_source
+        assert "activeDocumentType" in app_source
+        assert "documentType={activeEditorDocument.type}" in app_source
+        assert "documentError={activeEditorDocument.error}" in app_source
         assert "fetchNoteMetadata" not in app_source
         assert "saveNoteMetadata" not in app_source
         assert "fetchMaterialMetadata" not in app_source
@@ -694,6 +699,62 @@ class TestNoteMaterialShellSource:
         assert "fetchMaterial" not in project_context_source
         assert "saveNote" not in project_context_source
         assert "saveMaterial" not in project_context_source
+
+
+class TestSharedDocumentControllerSource:
+    def test_shared_document_controller_module_exists(
+        self, shared_document_controller_source: str, app_source: str
+    ) -> None:
+        assert "from './sharedDocumentController.js'" in app_source
+        assert "export const DOCUMENT_TYPES" in shared_document_controller_source
+        assert "export const DEFAULT_DOCUMENT_TYPE" in shared_document_controller_source
+
+    def test_supported_document_types_are_exact(
+        self, shared_document_controller_source: str
+    ) -> None:
+        for expected in ("SCENE: 'scene'", "NOTE: 'note'", "MATERIAL: 'material'"):
+            assert expected in shared_document_controller_source
+
+        assert "DOCUMENT_TYPE_VALUES = Object.freeze(Object.values(DOCUMENT_TYPES))" in (
+            shared_document_controller_source
+        )
+        assert "export function isSupportedDocumentType" in shared_document_controller_source
+        assert "export function resolveActiveDocumentType" in shared_document_controller_source
+
+    def test_helper_extracts_content_without_metadata(
+        self, shared_document_controller_source: str
+    ) -> None:
+        assert "export function getDocumentResponseContent" in shared_document_controller_source
+        assert "return response?.content ?? ''" in shared_document_controller_source
+        assert "metadata" not in shared_document_controller_source
+
+    def test_helper_builds_document_descriptors(
+        self, shared_document_controller_source: str
+    ) -> None:
+        assert "export function createDocumentDescriptor" in shared_document_controller_source
+        for field in (
+            "type: resolveActiveDocumentType(type)",
+            "id: id ?? ''",
+            "content: content ?? ''",
+            "isDirty: Boolean(isDirty)",
+            "isLoading: Boolean(isLoading)",
+            "isSaving: Boolean(isSaving)",
+            "error: error ?? ''",
+            "saveStatus: saveStatus ?? ''",
+            "onChange",
+            "onSave",
+        ):
+            assert field in shared_document_controller_source
+
+    def test_helper_controls_save_eligibility_and_unsaved_state(
+        self, shared_document_controller_source: str
+    ) -> None:
+        assert "export function hasUnsavedDocumentEdits" in shared_document_controller_source
+        assert "Boolean(scene || note || material)" in shared_document_controller_source
+        assert "export function canSaveDocument" in shared_document_controller_source
+        assert "Boolean(document?.id) && !document.isLoading && !document.isSaving" in (
+            shared_document_controller_source
+        )
 
 
 class TestSharedDocumentStateContract:
@@ -718,16 +779,19 @@ class TestSharedDocumentStateContract:
         assert "setSelectedDocumentType" in app_source
 
         expected_setters = {
-            "scene": "setSelectedDocumentType('scene')",
-            "note": "setSelectedDocumentType('note')",
-            "material": "setSelectedDocumentType('material')",
+            "scene": "setSelectedDocumentType(DOCUMENT_TYPES.SCENE)",
+            "note": "setSelectedDocumentType(DOCUMENT_TYPES.NOTE)",
+            "material": "setSelectedDocumentType(DOCUMENT_TYPES.MATERIAL)",
         }
         for document_type, setter in expected_setters.items():
             assert setter in app_source, (
                 f"{document_type} selection must set active document type"
             )
 
-        assert "activeDocumentType={selectedDocumentType || 'scene'}" in app_source
+        assert "const activeDocumentType = resolveActiveDocumentType(selectedDocumentType)" in (
+            app_source
+        )
+        assert "activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}" in app_source
 
     def test_editor_receives_generic_selected_document_ids(
         self, app_source: str, editor_source: str
@@ -737,24 +801,20 @@ class TestSharedDocumentStateContract:
         assert "selectedNoteId" not in editor_source
         assert "selectedMaterialId" not in editor_source
 
-        for expected_prop in (
-            "selectedDocumentId={selectedSceneId}",
-            "selectedDocumentId={selectedNoteId}",
-            "selectedDocumentId={selectedMaterialId}",
-        ):
-            assert expected_prop in app_source
+        assert "selectedDocumentId={activeEditorDocument.id}" in app_source
+        assert "id: selectedSceneId" in app_source
+        assert "id: selectedNoteId" in app_source
+        assert "id: selectedMaterialId" in app_source
 
     def test_editor_body_content_comes_from_document_body_state(
         self, app_source: str
     ) -> None:
-        for expected_prop in (
-            "content={sceneContent}",
-            "content={noteContent}",
-            "content={materialContent}",
-        ):
-            assert expected_prop in app_source
+        assert "content={activeEditorDocument.content}" in app_source
+        assert "content: sceneContent" in app_source
+        assert "content: noteContent" in app_source
+        assert "content: materialContent" in app_source
 
-        assert "const loadedContent = data.content ?? ''" in app_source
+        assert "const loadedContent = getDocumentResponseContent(data)" in app_source
         assert "setSceneContent(loadedContent)" in app_source
         assert "setNoteContent(loadedContent)" in app_source
         assert "setMaterialContent(loadedContent)" in app_source
@@ -798,7 +858,7 @@ class TestSharedDocumentStateContract:
             "const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent",
             "selectedNoteId !== '' && noteContent !== lastSavedNoteContent",
             "selectedMaterialId !== '' && materialContent !== lastSavedMaterialContent",
-            "const hasUnsavedDocumentChanges = isDirty || isNoteDirty || isMaterialDirty",
+            "const hasUnsavedDocumentChanges = hasUnsavedDocumentEdits({",
         )
         for check in expected_dirty_checks:
             assert check in app_source
@@ -833,7 +893,11 @@ class TestSharedDocumentStateContract:
         ):
             body = self._callback_body(app_source, callback_name)
             assert "hasUnsavedDocumentChanges" in body
-            assert message in body
+            if callback_name in {"handleSelectProject", "handleCreateProject"}:
+                assert message in body
+            else:
+                assert "getDocumentSwitchMessage" in body
+                assert "DOCUMENT_SWITCH_MESSAGES" in body
             assert "window.confirm" in body
 
     def test_loading_error_and_save_status_contract_is_document_typed(
@@ -844,18 +908,22 @@ class TestSharedDocumentStateContract:
             assert f"{document_type}:" in editor_source
 
         for expected_prop in (
-            "isLoading={isLoadingScene}",
-            "isLoading={isLoadingNote}",
-            "isLoading={isLoadingMaterial}",
-            "isSaving={isSaving}",
-            "isSaving={isSavingNote}",
-            "isSaving={isSavingMaterial}",
-            "saveStatus={saveStatus}",
-            "saveStatus={noteSaveStatus}",
-            "saveStatus={materialSaveStatus}",
-            "documentError={sceneError}",
-            "documentError={noteError}",
-            "documentError={materialError}",
+            "isLoading={activeEditorDocument.isLoading}",
+            "isSaving={activeEditorDocument.isSaving}",
+            "saveStatus={activeEditorDocument.saveStatus}",
+            "documentError={activeEditorDocument.error}",
+            "isLoading: isLoadingScene",
+            "isLoading: isLoadingNote",
+            "isLoading: isLoadingMaterial",
+            "isSaving",
+            "isSaving: isSavingNote",
+            "isSaving: isSavingMaterial",
+            "saveStatus",
+            "saveStatus: noteSaveStatus",
+            "saveStatus: materialSaveStatus",
+            "error: sceneError",
+            "error: noteError",
+            "error: materialError",
         ):
             assert expected_prop in app_source
 
@@ -874,9 +942,9 @@ class TestSharedDocumentStateContract:
     ) -> None:
         assert "function handleKeyDown(event)" in app_source
         assert "event.key.toLowerCase() === 's'" in app_source
-        assert "selectedDocumentType === 'note'" in app_source
+        assert "activeDocumentType === DOCUMENT_TYPES.NOTE" in app_source
         assert "handleSaveNote()" in app_source
-        assert "selectedDocumentType === 'material'" in app_source
+        assert "activeDocumentType === DOCUMENT_TYPES.MATERIAL" in app_source
         assert "handleSaveMaterial()" in app_source
         assert "handleSave();" in app_source
 

@@ -5,6 +5,17 @@ import AnalysisSidebar from './components/AnalysisSidebar.jsx';
 import ProjectContext from './components/ProjectContext.jsx';
 import OMIPanel from './components/OMIPanel.jsx';
 import {
+  DEFAULT_DOCUMENT_TYPE,
+  DOCUMENT_TYPES,
+  canSaveDocument,
+  createDocumentDescriptor,
+  getActiveDocumentDescriptor,
+  getDocumentResponseContent,
+  getDocumentSwitchMessage,
+  hasUnsavedDocumentEdits,
+  resolveActiveDocumentType,
+} from './sharedDocumentController.js';
+import {
   PROJECT_ID,
   createProject,
   createOMICandidate,
@@ -37,6 +48,11 @@ const UNSAVED_MATERIAL_SWITCH_MESSAGE = 'Discard unsaved changes and load anothe
 const UNSAVED_PROJECT_SWITCH_MESSAGE = 'Discard unsaved document changes and switch projects?';
 const UNSAVED_PROJECT_CREATE_MESSAGE =
   'Create a new project and discard unsaved document changes from the current project?';
+const DOCUMENT_SWITCH_MESSAGES = {
+  [DOCUMENT_TYPES.SCENE]: UNSAVED_CHANGES_MESSAGE,
+  [DOCUMENT_TYPES.NOTE]: UNSAVED_NOTE_SWITCH_MESSAGE,
+  [DOCUMENT_TYPES.MATERIAL]: UNSAVED_MATERIAL_SWITCH_MESSAGE,
+};
 
 function formatJson(value) {
   return JSON.stringify(value ?? {}, null, 2);
@@ -122,7 +138,12 @@ export default function App() {
     selectedNoteId !== '' && noteContent !== lastSavedNoteContent;
   const isMaterialDirty =
     selectedMaterialId !== '' && materialContent !== lastSavedMaterialContent;
-  const hasUnsavedDocumentChanges = isDirty || isNoteDirty || isMaterialDirty;
+  const hasUnsavedDocumentChanges = hasUnsavedDocumentEdits({
+    scene: isDirty,
+    note: isNoteDirty,
+    material: isMaterialDirty,
+  });
+  const activeDocumentType = resolveActiveDocumentType(selectedDocumentType);
 
   const loadProjects = useCallback(async () => {
     setProjectsLoading(true);
@@ -307,15 +328,18 @@ export default function App() {
   }, [activeProjectId]);
 
   const handleSelectScene = useCallback(async (sceneId) => {
-    if (selectedDocumentType === 'scene' && sceneId === selectedSceneId) {
+    if (selectedDocumentType === DOCUMENT_TYPES.SCENE && sceneId === selectedSceneId) {
       return;
     }
 
-    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_CHANGES_MESSAGE)) {
+    if (
+      hasUnsavedDocumentChanges
+      && !window.confirm(getDocumentSwitchMessage(DOCUMENT_TYPES.SCENE, DOCUMENT_SWITCH_MESSAGES))
+    ) {
       return;
     }
 
-    setSelectedDocumentType('scene');
+    setSelectedDocumentType(DOCUMENT_TYPES.SCENE);
     setSelectedSceneId(sceneId);
     setSceneContent('');
     setLastSavedContent('');
@@ -326,7 +350,7 @@ export default function App() {
 
     try {
       const data = await fetchScene(sceneId, activeProjectId);
-      const loadedContent = data.content ?? '';
+      const loadedContent = getDocumentResponseContent(data);
       setSceneContent(loadedContent);
       setLastSavedContent(loadedContent);
       setSaveStatus('Saved');
@@ -348,15 +372,18 @@ export default function App() {
   }, []);
 
   const handleSelectNote = useCallback(async (noteId) => {
-    if (!noteId || (selectedDocumentType === 'note' && noteId === selectedNoteId)) {
+    if (!noteId || (selectedDocumentType === DOCUMENT_TYPES.NOTE && noteId === selectedNoteId)) {
       return;
     }
 
-    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_NOTE_SWITCH_MESSAGE)) {
+    if (
+      hasUnsavedDocumentChanges
+      && !window.confirm(getDocumentSwitchMessage(DOCUMENT_TYPES.NOTE, DOCUMENT_SWITCH_MESSAGES))
+    ) {
       return;
     }
 
-    setSelectedDocumentType('note');
+    setSelectedDocumentType(DOCUMENT_TYPES.NOTE);
     setSelectedNoteId(noteId);
     setNoteContent('');
     setLastSavedNoteContent('');
@@ -366,7 +393,7 @@ export default function App() {
 
     try {
       const data = await fetchNote(noteId, activeProjectId);
-      const loadedContent = data.content ?? '';
+      const loadedContent = getDocumentResponseContent(data);
       setNoteContent(loadedContent);
       setLastSavedNoteContent(loadedContent);
       setNoteSaveStatus('Saved');
@@ -383,16 +410,22 @@ export default function App() {
   const handleSelectMaterial = useCallback(async (materialId) => {
     if (
       !materialId
-      || (selectedDocumentType === 'material' && materialId === selectedMaterialId)
+      || (
+        selectedDocumentType === DOCUMENT_TYPES.MATERIAL
+        && materialId === selectedMaterialId
+      )
     ) {
       return;
     }
 
-    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_MATERIAL_SWITCH_MESSAGE)) {
+    if (
+      hasUnsavedDocumentChanges
+      && !window.confirm(getDocumentSwitchMessage(DOCUMENT_TYPES.MATERIAL, DOCUMENT_SWITCH_MESSAGES))
+    ) {
       return;
     }
 
-    setSelectedDocumentType('material');
+    setSelectedDocumentType(DOCUMENT_TYPES.MATERIAL);
     setSelectedMaterialId(materialId);
     setMaterialContent('');
     setLastSavedMaterialContent('');
@@ -402,7 +435,7 @@ export default function App() {
 
     try {
       const data = await fetchMaterial(materialId, activeProjectId);
-      const loadedContent = data.content ?? '';
+      const loadedContent = getDocumentResponseContent(data);
       setMaterialContent(loadedContent);
       setLastSavedMaterialContent(loadedContent);
       setMaterialSaveStatus('Saved');
@@ -693,11 +726,11 @@ export default function App() {
     function handleKeyDown(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
-        if (selectedDocumentType === 'note') {
+        if (activeDocumentType === DOCUMENT_TYPES.NOTE) {
           handleSaveNote();
           return;
         }
-        if (selectedDocumentType === 'material') {
+        if (activeDocumentType === DOCUMENT_TYPES.MATERIAL) {
           handleSaveMaterial();
           return;
         }
@@ -710,7 +743,7 @@ export default function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleSave, handleSaveMaterial, handleSaveNote, selectedDocumentType]);
+  }, [activeDocumentType, handleSave, handleSaveMaterial, handleSaveNote]);
 
   const handleRunStoryCheck = useCallback(async () => {
     if (!selectedSceneId) {
@@ -731,6 +764,54 @@ export default function App() {
       setIsAnalyzing(false);
     }
   }, [activeProjectId, selectedSceneId]);
+
+  const sceneDocument = createDocumentDescriptor({
+    type: DOCUMENT_TYPES.SCENE,
+    id: selectedSceneId,
+    content: sceneContent,
+    isDirty,
+    isLoading: isLoadingScene,
+    isSaving,
+    error: sceneError,
+    saveStatus,
+    onChange: handleSceneContentChange,
+    onSave: handleSave,
+  });
+  const noteDocument = createDocumentDescriptor({
+    type: DOCUMENT_TYPES.NOTE,
+    id: selectedNoteId,
+    content: noteContent,
+    isDirty: isNoteDirty,
+    isLoading: isLoadingNote,
+    isSaving: isSavingNote,
+    error: noteError,
+    saveStatus: noteSaveStatus,
+    onChange: handleNoteContentChange,
+    onSave: handleSaveNote,
+  });
+  const materialDocument = createDocumentDescriptor({
+    type: DOCUMENT_TYPES.MATERIAL,
+    id: selectedMaterialId,
+    content: materialContent,
+    isDirty: isMaterialDirty,
+    isLoading: isLoadingMaterial,
+    isSaving: isSavingMaterial,
+    error: materialError,
+    saveStatus: materialSaveStatus,
+    onChange: handleMaterialContentChange,
+    onSave: handleSaveMaterial,
+  });
+  const activeDocument = getActiveDocumentDescriptor(activeDocumentType, {
+    [DOCUMENT_TYPES.SCENE]: sceneDocument,
+    [DOCUMENT_TYPES.NOTE]: noteDocument,
+    [DOCUMENT_TYPES.MATERIAL]: materialDocument,
+  });
+  const activeEditorDocument =
+    activeDocument.type === DOCUMENT_TYPES.NOTE && activeDocument.id
+      ? activeDocument
+      : activeDocument.type === DOCUMENT_TYPES.MATERIAL && activeDocument.id
+        ? activeDocument
+        : sceneDocument;
 
   return (
     <div className="app-shell">
@@ -754,7 +835,7 @@ export default function App() {
         materials={materials}
         selectedNoteId={selectedNoteId}
         selectedMaterialId={selectedMaterialId}
-        activeDocumentType={selectedDocumentType || 'scene'}
+        activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}
         isLoadingNotes={isLoadingNotes}
         isLoadingMaterials={isLoadingMaterials}
         notesError={notesError}
@@ -793,55 +874,21 @@ export default function App() {
           onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
         />
 
-        {selectedDocumentType === 'note' && selectedNoteId ? (
-          <Editor
-            key={`note-${selectedNoteId}`}
-            documentType="note"
-            content={noteContent}
-            disabled={!selectedNoteId || isLoadingNote}
-            hasUnsavedChanges={isNoteDirty}
-            isLoading={isLoadingNote}
-            isSaving={isSavingNote}
-            onChange={handleNoteContentChange}
-            onSave={handleSaveNote}
-            saveDisabled={!selectedNoteId || isLoadingNote || isSavingNote}
-            saveStatus={noteSaveStatus}
-            documentError={noteError}
-            selectedDocumentId={selectedNoteId}
-          />
-        ) : selectedDocumentType === 'material' && selectedMaterialId ? (
-          <Editor
-            key={`material-${selectedMaterialId}`}
-            documentType="material"
-            content={materialContent}
-            disabled={!selectedMaterialId || isLoadingMaterial}
-            hasUnsavedChanges={isMaterialDirty}
-            isLoading={isLoadingMaterial}
-            isSaving={isSavingMaterial}
-            onChange={handleMaterialContentChange}
-            onSave={handleSaveMaterial}
-            saveDisabled={!selectedMaterialId || isLoadingMaterial || isSavingMaterial}
-            saveStatus={materialSaveStatus}
-            documentError={materialError}
-            selectedDocumentId={selectedMaterialId}
-          />
-        ) : (
-          <Editor
-            key={`scene-${selectedSceneId}`}
-            documentType="scene"
-            content={sceneContent}
-            disabled={!selectedSceneId || isLoadingScene}
-            hasUnsavedChanges={isDirty}
-            isLoading={isLoadingScene}
-            isSaving={isSaving}
-            onChange={handleSceneContentChange}
-            onSave={handleSave}
-            saveDisabled={!selectedSceneId || isLoadingScene || isSaving}
-            saveStatus={saveStatus}
-            documentError={sceneError}
-            selectedDocumentId={selectedSceneId}
-          />
-        )}
+        <Editor
+          key={`${activeEditorDocument.type}-${activeEditorDocument.id}`}
+          documentType={activeEditorDocument.type}
+          content={activeEditorDocument.content}
+          disabled={!activeEditorDocument.id || activeEditorDocument.isLoading}
+          hasUnsavedChanges={activeEditorDocument.isDirty}
+          isLoading={activeEditorDocument.isLoading}
+          isSaving={activeEditorDocument.isSaving}
+          onChange={activeEditorDocument.onChange}
+          onSave={activeEditorDocument.onSave}
+          saveDisabled={!canSaveDocument(activeEditorDocument)}
+          saveStatus={activeEditorDocument.saveStatus}
+          documentError={activeEditorDocument.error}
+          selectedDocumentId={activeEditorDocument.id}
+        />
       </main>
       <AnalysisSidebar
         report={analysisReport}
