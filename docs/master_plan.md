@@ -34,7 +34,9 @@ The Project Workspace Foundation should provide:
 - Project overview, chapters/scenes, notes/materials, OMI ideas/candidates, and approved memory/canon pages.
 - Clear labels separating pending candidates from approved project truth.
 
-`WORKSPACE-001` through `WORKSPACE-025` define the Project Workspace Foundation planning specs. `WORKSPACE-026`, documented in `docs/roadmap/project_workspace_implementation_decision_sweep.md`, consolidates those specs into implementation-readiness decisions and recommends `PHASE7-IMPL-001 - Project Creation and Safe Project Metadata Backend` as the first Phase 7 runtime implementation task after MVP exit disposition.
+`WORKSPACE-001` through `WORKSPACE-025` define the Project Workspace Foundation planning specs. `WORKSPACE-026`, documented in `docs/roadmap/project_workspace_implementation_decision_sweep.md`, consolidates those specs into implementation-readiness decisions. Phase 7 implementation has advanced through `PHASE7-IMPL-005 - Notes / Materials Storage`: notes/materials now have backend storage helpers, backend routes, route/path-safety coverage, frontend API helpers, and a minimal navigation/display shell. Notes/materials remain owner-authored or owner-provided content only; no generated prose, summaries, extraction, model calls, OMI promotion, memory/canon mutation, or training/dataset changes were added.
+
+The active Phase 7 frontier is now `PHASE7-IMPL-006 - Shared owner-authored document editor`. The next child task should start as `PHASE7-IMPL-006-T001 - Shared owner-authored document editor inventory and child-task plan`. `PHASE7-IMPL-006` should consolidate the current scene/note/material editor behavior into a shared owner-authored document editor pattern focused on save/load, dirty-state handling, keyboard save behavior, active document type handling, and consistent document selection behavior. It is not a place for extraction, summaries, OMI/canon/memory work, Dramatica analysis, model calls, or generated prose.
 
 Product layers must remain separate:
 
@@ -125,9 +127,19 @@ Backend:
   - `GET /api/projects/{project_name}/omi/ideas/{idea_id}`
   - `POST /api/projects/{project_name}/omi/candidates`
   - `GET /api/projects/{project_name}/omi/candidates/{candidate_id}`
+  - `GET /api/projects/{project_name}/notes`
+  - `GET /api/projects/{project_name}/notes/{note_id}`
+  - `PUT /api/projects/{project_name}/notes/{note_id}`
+  - `GET /api/projects/{project_name}/notes/{note_id}/metadata`
+  - `PUT /api/projects/{project_name}/notes/{note_id}/metadata`
+  - `GET /api/projects/{project_name}/materials`
+  - `GET /api/projects/{project_name}/materials/{material_id}`
+  - `PUT /api/projects/{project_name}/materials/{material_id}`
+  - `GET /api/projects/{project_name}/materials/{material_id}/metadata`
+  - `PUT /api/projects/{project_name}/materials/{material_id}/metadata`
 - `backend/analysis_engine.py` calls Ollama chat at `{OLLAMA_BASE_URL}/api/chat`, defaults `OLLAMA_BASE_URL` to `http://localhost:11434`, defaults `OLLAMA_MODEL` to `qwen3:8b`, requests JSON, and normalizes Story Check output.
 - `backend/prompts/story_check.txt` contains rich Story Check JSON instructions and explicit no-prose rules.
-- `backend/project_manager.py` stores projects under `projects/{project_name}` with `bible.json`, `storyform.json`, and `scenes/{scene_id}.md`.
+- `backend/project_manager.py` stores projects under `projects/{project_name}` with `bible.json`, `storyform.json`, `scenes/{scene_id}.md`, note bodies under `notes/{note_id}.md`, note metadata under `note_metadata/{note_id}.json`, material bodies under `materials/{material_id}.md`, and material metadata under `material_metadata/{material_id}.json`.
 - `backend/storyform.py` validates NCP-style storyforms against the schema embedded in `docs/repo_knowledge.md`.
 
 Frontend:
@@ -138,6 +150,7 @@ Frontend:
 - `frontend/src/components/ProjectContext.jsx` provides owner-editable bible/storyform JSON panels with explicit save actions and validation/error states.
 - `frontend/src/components/AnalysisSidebar.jsx` renders normalized rich Story Check diagnostics as candidate analysis sections, with raw JSON preserved in a collapsed advanced view.
 - `frontend/src/components/OMIPanel.jsx` captures owner-authored raw ideas and structured candidate planning records, supports owner review controls, and can create promotion-readiness audit records without any prose-generation controls or durable truth mutation.
+- The Phase 7 notes/materials shell lists and selects notes/materials by ID, loads exact owner-authored body content, and saves explicit owner-authored note/material body content without metadata injection, summaries, extraction, or model calls.
 - `frontend/src/api.js` hard-codes `PROJECT_ID = 'example'`.
 - Components found: `ProjectNav.jsx`, `Editor.jsx`, `AnalysisSidebar.jsx`.
 
@@ -221,7 +234,7 @@ Remaining setup/verification tasks:
 - Use `docs/roadmap/approved_scene_event_causality_review_spec.md` as the WORKSPACE-024 planning handoff for the Approved Scene / Event / Causality Review page: owner-approved scene-review, event/action, and causality-note records; source locator and cause/effect panels; evidence/provenance and linked source panels; related timeline, plot, continuity, contradiction, and approved-memory snapshots; candidate backlog links; warning states; API/UI planning; no-prose/no-silent-promotion boundaries; and explicit non-Dramatica proof boundaries.
 - Use `docs/roadmap/project_memory_canon_cross_linking_health_spec.md` as the WORKSPACE-025 planning handoff for project-level approved memory/canon cross-linking and health: shared approved-record/link identity, future `memory/index.json` and category registry planning, category count snapshots, broken-reference/index/ID/schema/source/evidence warning states, local deterministic health filtering, API/UI planning, no-prose/no-silent-promotion boundaries, and explicit non-Dramatica proof boundaries.
 - Fine-tuning/book-backed dataset work is paused after the Book 1-3 review JSONL mapping dry-run; resume with P0 evidence extraction/verification only when the track is explicitly restarted.
-- Promote App MVP Phase 6 - MVP hardening / MVP exit matrix execution-preflight - as the current active project phase.
+- Current Phase 7 active frontier is `PHASE7-IMPL-006 - Shared owner-authored document editor`; begin with `PHASE7-IMPL-006-T001 - Shared owner-authored document editor inventory and child-task plan`.
 
 ## 5. Architecture Target
 
