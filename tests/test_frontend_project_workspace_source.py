@@ -838,7 +838,152 @@ class TestProjectOverviewShellComponent:
         ):
             assert forbidden_overview_dependency not in combined_runtime
 
-        assert "ProjectOverview" not in app_source
+        assert "ProjectOverview" in app_source
+
+
+class TestProjectOverviewIntegration:
+    """PHASE7-IMPL-007-T005 source contract for App/ProjectNav overview wiring."""
+
+    def test_app_imports_and_conditionally_renders_project_overview(
+        self, app_source: str
+    ) -> None:
+        assert "import ProjectOverview from './components/ProjectOverview.jsx';" in app_source
+        assert "const WORKSPACE_VIEWS = {" in app_source
+        assert "OVERVIEW: 'overview'" in app_source
+        assert "EDITOR: 'editor'" in app_source
+        assert "const [activeWorkspaceView, setActiveWorkspaceView] = useState(WORKSPACE_VIEWS.OVERVIEW)" in (
+            app_source
+        )
+        assert "activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (" in app_source
+        assert "<ProjectOverview" in app_source
+
+    def test_app_passes_deterministic_overview_props_only(
+        self, app_source: str
+    ) -> None:
+        for prop in (
+            "project={activeProject}",
+            "scenes={scenes}",
+            "notes={notes}",
+            "materials={materials}",
+            "omiStatus={{",
+            "approvedMemoryStatus=\"No approved memory/canon items shown here yet.\"",
+        ):
+            assert prop in app_source
+
+        overview_render = app_source.split("<ProjectOverview", 1)[1].split("/>", 1)[0]
+        for forbidden_prop_or_helper in (
+            "sceneContent",
+            "noteContent",
+            "materialContent",
+            "saveNoteMetadata",
+            "saveMaterialMetadata",
+            "fetchOverview",
+            "getProjectOverview",
+            "saveOverview",
+        ):
+            assert forbidden_prop_or_helper not in overview_render
+
+    def test_project_nav_accepts_and_renders_overview_workspace_item(
+        self, app_source: str, project_nav_source: str
+    ) -> None:
+        assert "activeWorkspaceView = 'overview'" in project_nav_source
+        assert "onSelectOverview" in project_nav_source
+        assert 'aria-label="Workspace"' in project_nav_source
+        assert "Overview" in project_nav_source
+        assert "activeWorkspaceView === 'overview' ? ' is-active' : ''" in project_nav_source
+        assert "onClick={() => onSelectOverview?.()}" in project_nav_source
+        assert "activeWorkspaceView={activeWorkspaceView}" in app_source
+        assert "onSelectOverview={handleSelectOverview}" in app_source
+
+    def test_document_selection_switches_to_editor_view_and_keeps_id_callbacks(
+        self, app_source: str, project_nav_source: str
+    ) -> None:
+        for callback_name, id_token in (
+            ("handleSelectScene", "sceneId"),
+            ("handleSelectNote", "noteId"),
+            ("handleSelectMaterial", "materialId"),
+        ):
+            body = TestSharedDocumentStateContract._callback_body(app_source, callback_name)
+            assert "setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR)" in body
+            assert id_token in body
+
+        for nav_callback in (
+            "onSelectScene(sceneId)",
+            "onSelectNote?.(noteId)",
+            "onSelectMaterial?.(materialId)",
+        ):
+            assert nav_callback in project_nav_source
+
+    def test_overview_selection_and_project_switch_preserve_dirty_guard(
+        self, app_source: str
+    ) -> None:
+        overview_body = TestSharedDocumentStateContract._callback_body(
+            app_source,
+            "handleSelectOverview",
+        )
+        assert "hasUnsavedDocumentChanges" in overview_body
+        assert "window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)" in overview_body
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)" in overview_body
+
+        project_switch_body = TestSharedDocumentStateContract._callback_body(
+            app_source,
+            "handleSelectProject",
+        )
+        assert "hasUnsavedDocumentChanges" in project_switch_body
+        assert "window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)" in project_switch_body
+        assert "setActiveProjectId(projectId)" in project_switch_body
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)" in app_source
+
+    def test_keyboard_save_is_editor_view_only(self, app_source: str) -> None:
+        assert "function handleKeyDown(event)" in app_source
+        keydown_body = app_source.split("function handleKeyDown(event)", 1)[1].split(
+            "window.addEventListener('keydown'",
+            1,
+        )[0]
+        assert "event.preventDefault()" in keydown_body
+        assert "activeWorkspaceView !== WORKSPACE_VIEWS.EDITOR" in keydown_body
+        assert "handleSaveNote()" in keydown_body
+        assert "handleSaveMaterial()" in keydown_body
+        assert "handleSave();" in keydown_body
+
+    def test_overview_callbacks_are_safe_view_switches(
+        self, app_source: str
+    ) -> None:
+        callback_body = TestSharedDocumentStateContract._callback_body(
+            app_source,
+            "handleOpenEditorWorkspace",
+        )
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR)" in callback_body
+        for forbidden_operation in (
+            "save",
+            "fetch",
+            "runStoryCheck",
+            "createOMI",
+            "updateOMI",
+            "Promotion",
+        ):
+            assert forbidden_operation not in callback_body
+
+        overview_render = app_source.split("<ProjectOverview", 1)[1].split("/>", 1)[0]
+        for callback_prop in (
+            "onOpenScenes={handleOpenEditorWorkspace}",
+            "onOpenNotes={handleOpenEditorWorkspace}",
+            "onOpenMaterials={handleOpenEditorWorkspace}",
+            "onOpenOmi={handleOpenEditorWorkspace}",
+        ):
+            assert callback_prop in overview_render
+
+    def test_no_backend_or_api_overview_dependency_after_integration(
+        self, app_source: str, api_source: str, project_overview_source: str
+    ) -> None:
+        combined_runtime = "\n".join([app_source, api_source, project_overview_source])
+        for forbidden_dependency in (
+            "/overview",
+            "fetchOverview",
+            "getProjectOverview",
+            "saveOverview",
+        ):
+            assert forbidden_dependency not in combined_runtime
 
 
 class TestSceneMetadataDisplayCompatibility:

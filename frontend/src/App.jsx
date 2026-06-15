@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import ProjectNav from './components/ProjectNav.jsx';
+import ProjectOverview from './components/ProjectOverview.jsx';
 import Editor from './components/Editor.jsx';
 import AnalysisSidebar from './components/AnalysisSidebar.jsx';
 import ProjectContext from './components/ProjectContext.jsx';
@@ -52,6 +53,10 @@ const DOCUMENT_SWITCH_MESSAGES = {
   [DOCUMENT_TYPES.SCENE]: UNSAVED_CHANGES_MESSAGE,
   [DOCUMENT_TYPES.NOTE]: UNSAVED_NOTE_SWITCH_MESSAGE,
   [DOCUMENT_TYPES.MATERIAL]: UNSAVED_MATERIAL_SWITCH_MESSAGE,
+};
+const WORKSPACE_VIEWS = {
+  OVERVIEW: 'overview',
+  EDITOR: 'editor',
 };
 
 function formatJson(value) {
@@ -133,6 +138,7 @@ export default function App() {
   const [materialError, setMaterialError] = useState('');
   const [noteSaveStatus, setNoteSaveStatus] = useState('');
   const [materialSaveStatus, setMaterialSaveStatus] = useState('');
+  const [activeWorkspaceView, setActiveWorkspaceView] = useState(WORKSPACE_VIEWS.OVERVIEW);
   const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
   const isNoteDirty =
     selectedNoteId !== '' && noteContent !== lastSavedNoteContent;
@@ -239,6 +245,7 @@ export default function App() {
     setMaterialSaveStatus('');
     setNoteError('');
     setMaterialError('');
+    setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
 
     async function loadInitialData() {
       setIsLoadingScenes(true);
@@ -308,6 +315,22 @@ export default function App() {
     };
   }, [activeProjectId]);
 
+  const handleSelectOverview = useCallback(() => {
+    if (activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW) {
+      return;
+    }
+
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
+      return;
+    }
+
+    setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
+  }, [activeWorkspaceView, hasUnsavedDocumentChanges]);
+
+  const handleOpenEditorWorkspace = useCallback(() => {
+    setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR);
+  }, []);
+
   const refreshOMI = useCallback(async () => {
     setIsLoadingOMI(true);
     setOmiError('');
@@ -340,6 +363,7 @@ export default function App() {
     }
 
     setSelectedDocumentType(DOCUMENT_TYPES.SCENE);
+    setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR);
     setSelectedSceneId(sceneId);
     setSceneContent('');
     setLastSavedContent('');
@@ -384,6 +408,7 @@ export default function App() {
     }
 
     setSelectedDocumentType(DOCUMENT_TYPES.NOTE);
+    setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR);
     setSelectedNoteId(noteId);
     setNoteContent('');
     setLastSavedNoteContent('');
@@ -426,6 +451,7 @@ export default function App() {
     }
 
     setSelectedDocumentType(DOCUMENT_TYPES.MATERIAL);
+    setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR);
     setSelectedMaterialId(materialId);
     setMaterialContent('');
     setLastSavedMaterialContent('');
@@ -726,6 +752,9 @@ export default function App() {
     function handleKeyDown(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
+        if (activeWorkspaceView !== WORKSPACE_VIEWS.EDITOR) {
+          return;
+        }
         if (activeDocumentType === DOCUMENT_TYPES.NOTE) {
           handleSaveNote();
           return;
@@ -743,7 +772,7 @@ export default function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [activeDocumentType, handleSave, handleSaveMaterial, handleSaveNote]);
+  }, [activeDocumentType, activeWorkspaceView, handleSave, handleSaveMaterial, handleSaveNote]);
 
   const handleRunStoryCheck = useCallback(async () => {
     if (!selectedSceneId) {
@@ -812,6 +841,12 @@ export default function App() {
       : activeDocument.type === DOCUMENT_TYPES.MATERIAL && activeDocument.id
         ? activeDocument
         : sceneDocument;
+  const activeProject =
+    projects.find((project) => (
+      project?.project_id === activeProjectId
+      || project?.projectId === activeProjectId
+      || project?.id === activeProjectId
+    )) ?? { project_id: activeProjectId, title: activeProjectId, status: 'Not available' };
 
   return (
     <div className="app-shell">
@@ -832,6 +867,8 @@ export default function App() {
         onSelectScene={handleSelectScene}
         notes={notes}
         materials={materials}
+        activeWorkspaceView={activeWorkspaceView}
+        onSelectOverview={handleSelectOverview}
         activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}
         activeDocumentId={activeDocument.id}
         isLoadingNotes={isLoadingNotes}
@@ -841,52 +878,73 @@ export default function App() {
         onSelectNote={handleSelectNote}
         onSelectMaterial={handleSelectMaterial}
       />
-      <main className="editor-column" aria-label="Document editor">
-        <ProjectContext
-          bibleText={bibleText}
-          bibleStatus={bibleStatus}
-          isSavingBible={isSavingBible}
-          onBibleChange={handleBibleTextChange}
-          onSaveBible={handleSaveBible}
-          storyformText={storyformText}
-          storyformStatus={storyformStatus}
-          isSavingStoryform={isSavingStoryform}
-          onStoryformChange={handleStoryformTextChange}
-          onSaveStoryform={handleSaveStoryform}
-          storyformContext={storyformContext}
-        />
+      <main className="editor-column" aria-label="Project workspace">
+        {activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (
+          <ProjectOverview
+            project={activeProject}
+            scenes={scenes}
+            notes={notes}
+            materials={materials}
+            omiStatus={{
+              status: isLoadingOMI ? 'Loading OMI status...' : omiStatus || 'Ready',
+              ideas: omiData?.ideas,
+              candidates: omiData?.candidates,
+            }}
+            approvedMemoryStatus="No approved memory/canon items shown here yet."
+            onOpenScenes={handleOpenEditorWorkspace}
+            onOpenNotes={handleOpenEditorWorkspace}
+            onOpenMaterials={handleOpenEditorWorkspace}
+            onOpenOmi={handleOpenEditorWorkspace}
+          />
+        ) : (
+          <>
+            <ProjectContext
+              bibleText={bibleText}
+              bibleStatus={bibleStatus}
+              isSavingBible={isSavingBible}
+              onBibleChange={handleBibleTextChange}
+              onSaveBible={handleSaveBible}
+              storyformText={storyformText}
+              storyformStatus={storyformStatus}
+              isSavingStoryform={isSavingStoryform}
+              onStoryformChange={handleStoryformTextChange}
+              onSaveStoryform={handleSaveStoryform}
+              storyformContext={storyformContext}
+            />
 
-        <OMIPanel
-          omiData={omiData}
-          isLoading={isLoadingOMI}
-          status={omiStatus}
-          error={omiError}
-          isCreatingIdea={isCreatingOMIIdea}
-          isCreatingCandidate={isCreatingOMICandidate}
-          isCreatingPromotion={isCreatingOMIPromotion}
-          isUpdating={isUpdatingOMI}
-          onCreateIdea={handleCreateOMIIdea}
-          onCreateCandidate={handleCreateOMICandidate}
-          onCreatePromotion={handleCreateOMIPromotion}
-          onUpdateIdeaDecision={handleUpdateOMIIdeaDecision}
-          onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
-        />
+            <OMIPanel
+              omiData={omiData}
+              isLoading={isLoadingOMI}
+              status={omiStatus}
+              error={omiError}
+              isCreatingIdea={isCreatingOMIIdea}
+              isCreatingCandidate={isCreatingOMICandidate}
+              isCreatingPromotion={isCreatingOMIPromotion}
+              isUpdating={isUpdatingOMI}
+              onCreateIdea={handleCreateOMIIdea}
+              onCreateCandidate={handleCreateOMICandidate}
+              onCreatePromotion={handleCreateOMIPromotion}
+              onUpdateIdeaDecision={handleUpdateOMIIdeaDecision}
+              onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
+            />
 
-        <Editor
-          key={`${activeEditorDocument.type}-${activeEditorDocument.id}`}
-          documentType={activeEditorDocument.type}
-          content={activeEditorDocument.content}
-          disabled={!activeEditorDocument.id || activeEditorDocument.isLoading}
-          isDirty={activeEditorDocument.isDirty}
-          isLoading={activeEditorDocument.isLoading}
-          isSaving={activeEditorDocument.isSaving}
-          onChange={activeEditorDocument.onChange}
-          onSave={activeEditorDocument.onSave}
-          saveDisabled={!canSaveDocument(activeEditorDocument)}
-          saveStatus={activeEditorDocument.saveStatus}
-          documentError={activeEditorDocument.error}
-          selectedDocumentId={activeEditorDocument.id}
-        />
+            <Editor
+              key={`${activeEditorDocument.type}-${activeEditorDocument.id}`}
+              documentType={activeEditorDocument.type}
+              content={activeEditorDocument.content}
+              disabled={!activeEditorDocument.id || activeEditorDocument.isLoading}
+              isDirty={activeEditorDocument.isDirty}
+              isLoading={activeEditorDocument.isLoading}
+              isSaving={activeEditorDocument.isSaving}
+              onChange={activeEditorDocument.onChange}
+              onSave={activeEditorDocument.onSave}
+              saveDisabled={!canSaveDocument(activeEditorDocument)}
+              saveStatus={activeEditorDocument.saveStatus}
+              documentError={activeEditorDocument.error}
+              selectedDocumentId={activeEditorDocument.id}
+            />
+          </>
+        )}
       </main>
       <AnalysisSidebar
         report={analysisReport}

@@ -236,6 +236,8 @@ export default function ProjectNav({
   onSelectScene,
   notes = [],
   materials = [],
+  activeWorkspaceView = 'overview',
+  onSelectOverview,
   activeDocumentType = DEFAULT_DOCUMENT_TYPE,
   activeDocumentId = '',
   isLoadingNotes = false,
@@ -361,6 +363,20 @@ export default function ProjectNav({
           </button>
         )}
       </section>
+
+      <nav className="scene-list" aria-label="Workspace">
+        <div className="panel-header">
+          <p className="eyebrow">Workspace</p>
+        </div>
+        <button
+          className={`scene-item${activeWorkspaceView === 'overview' ? ' is-active' : ''}`}
+          type="button"
+          onClick={() => onSelectOverview?.()}
+        >
+          <span>Overview</span>
+          <small>Project status</small>
+        </button>
+      </nav>
 
       <nav className="scene-list" aria-label="Scenes">
         {isLoading && <p className="muted-copy">Loading scenes...</p>}
