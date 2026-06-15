@@ -986,6 +986,354 @@ class TestProjectOverviewIntegration:
             assert forbidden_dependency not in combined_runtime
 
 
+class TestProjectOverviewRegressionCoverage:
+    """PHASE7-IMPL-007-T006 regression guard for the integrated overview view."""
+
+    def test_overview_is_workspace_view_not_document_type(
+        self, app_source: str, shared_document_controller_source: str
+    ) -> None:
+        assert "const WORKSPACE_VIEWS = {" in app_source
+        assert "OVERVIEW: 'overview'" in app_source
+        assert "EDITOR: 'editor'" in app_source
+        assert "const [activeWorkspaceView, setActiveWorkspaceView]" in app_source
+
+        document_types_block = shared_document_controller_source.split(
+            "export const DOCUMENT_TYPES = Object.freeze({",
+            1,
+        )[1].split("});", 1)[0]
+        assert "SCENE: 'scene'" in document_types_block
+        assert "NOTE: 'note'" in document_types_block
+        assert "MATERIAL: 'material'" in document_types_block
+        assert "overview" not in document_types_block
+
+    def test_overview_selection_is_not_document_body_load_or_save(
+        self, app_source: str
+    ) -> None:
+        overview_body = TestSharedDocumentStateContract._callback_body(
+            app_source,
+            "handleSelectOverview",
+        )
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)" in overview_body
+        for forbidden_operation in (
+            "setSelectedDocumentType",
+            "setSelectedSceneId",
+            "setSelectedNoteId",
+            "setSelectedMaterialId",
+            "fetchScene",
+            "fetchNote",
+            "fetchMaterial",
+            "saveScene",
+            "saveNote",
+            "saveMaterial",
+        ):
+            assert forbidden_operation not in overview_body
+
+    def test_editor_and_overview_rendering_are_separate_branches(
+        self, app_source: str
+    ) -> None:
+        overview_branch = app_source.split(
+            "activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (",
+            1,
+        )[1].split(") : (", 1)[0]
+        editor_branch = app_source.split(") : (", 1)[1].split("</main>", 1)[0]
+
+        assert "<ProjectOverview" in overview_branch
+        assert "<Editor" not in overview_branch
+        assert "<ProjectContext" not in overview_branch
+        assert "<OMIPanel" not in overview_branch
+        assert "<Editor" in editor_branch
+        assert "<ProjectOverview" not in editor_branch
+
+    def test_project_overview_props_remain_deterministic_and_body_free(
+        self, app_source: str
+    ) -> None:
+        overview_render = app_source.split("<ProjectOverview", 1)[1].split("/>", 1)[0]
+        for expected_prop in (
+            "project={activeProject}",
+            "scenes={scenes}",
+            "notes={notes}",
+            "materials={materials}",
+            "omiStatus={{",
+            "ideas: omiData?.ideas",
+            "candidates: omiData?.candidates",
+            "approvedMemoryStatus=\"No approved memory/canon items shown here yet.\"",
+        ):
+            assert expected_prop in overview_render
+
+        for forbidden_prop in (
+            "sceneContent",
+            "noteContent",
+            "materialContent",
+            "lastSavedContent",
+            "lastSavedNoteContent",
+            "lastSavedMaterialContent",
+            "saveScene",
+            "saveNote",
+            "saveMaterial",
+            "runStoryCheck",
+            "createOMICandidate",
+            "createOMIPromotion",
+        ):
+            assert forbidden_prop not in overview_render
+
+    def test_project_overview_count_and_status_contract_remains_shell_only(
+        self, project_overview_source: str
+    ) -> None:
+        assert "Array.isArray(items) ? items.length : 0" in project_overview_source
+        for count_line in (
+            "const sceneCount = countItems(scenes)",
+            "const noteCount = countItems(notes)",
+            "const materialCount = countItems(materials)",
+            "{getStatusCount(omiStatus, 'ideas')} ideas",
+            "{getStatusCount(omiStatus, 'candidates')} candidates",
+        ):
+            assert count_line in project_overview_source
+
+        assert "No approved memory/canon items shown here yet." in project_overview_source
+        assert "OMI workspace status is not available yet." in project_overview_source
+        assert "chapter" not in project_overview_source.lower()
+        for forbidden_body_source in ("content", "body", "fetchScene", "fetchNote", "fetchMaterial"):
+            assert forbidden_body_source not in project_overview_source
+
+    def test_project_nav_overview_item_is_workspace_only(
+        self, project_nav_source: str
+    ) -> None:
+        workspace_nav = project_nav_source.split('aria-label="Workspace"', 1)[1].split(
+            "</nav>",
+            1,
+        )[0]
+        assert "activeWorkspaceView === 'overview' ? ' is-active' : ''" in workspace_nav
+        assert "onClick={() => onSelectOverview?.()}" in workspace_nav
+        assert "Overview" in workspace_nav
+        assert "Project status" in workspace_nav
+
+        for forbidden_workspace_action in (
+            "onSelectScene",
+            "onSelectNote",
+            "onSelectMaterial",
+            "activeDocumentType",
+            "activeDocumentId",
+            "DOCUMENT_TYPES",
+            "save",
+            "fetch",
+            "import",
+            "upload",
+            "promotion",
+        ):
+            assert forbidden_workspace_action not in workspace_nav
+
+    def test_document_highlighting_and_callbacks_still_use_type_and_id(
+        self, project_nav_source: str
+    ) -> None:
+        for active_check in (
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.SCENE, sceneId)",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.NOTE, noteId)",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.MATERIAL, materialId)",
+        ):
+            assert active_check in project_nav_source
+
+        for id_callback in (
+            "onSelectScene(sceneId)",
+            "onSelectNote?.(noteId)",
+            "onSelectMaterial?.(materialId)",
+        ):
+            assert id_callback in project_nav_source
+
+    def test_overview_navigation_callbacks_only_switch_local_view(
+        self, app_source: str
+    ) -> None:
+        callback_body = TestSharedDocumentStateContract._callback_body(
+            app_source,
+            "handleOpenEditorWorkspace",
+        )
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR)" in callback_body
+        for forbidden_operation in (
+            "save",
+            "fetch",
+            "runStoryCheck",
+            "createOMI",
+            "updateOMI",
+            "Promotion",
+            "metadata",
+        ):
+            assert forbidden_operation not in callback_body
+
+        overview_render = app_source.split("<ProjectOverview", 1)[1].split("/>", 1)[0]
+        for callback_prop in (
+            "onOpenScenes={handleOpenEditorWorkspace}",
+            "onOpenNotes={handleOpenEditorWorkspace}",
+            "onOpenMaterials={handleOpenEditorWorkspace}",
+            "onOpenOmi={handleOpenEditorWorkspace}",
+        ):
+            assert callback_prop in overview_render
+
+    def test_dirty_state_guards_overview_document_and_project_switches(
+        self, app_source: str
+    ) -> None:
+        for callback_name in (
+            "handleSelectOverview",
+            "handleSelectProject",
+            "handleSelectScene",
+            "handleSelectNote",
+            "handleSelectMaterial",
+        ):
+            body = TestSharedDocumentStateContract._callback_body(app_source, callback_name)
+            assert "hasUnsavedDocumentChanges" in body
+            assert "window.confirm" in body
+
+        assert "const hasUnsavedDocumentChanges = hasUnsavedDocumentEdits({" in app_source
+        assert "activeWorkspaceView" not in app_source.split(
+            "const hasUnsavedDocumentChanges = hasUnsavedDocumentEdits({",
+            1,
+        )[1].split("});", 1)[0]
+
+    def test_keyboard_save_is_gated_to_editor_view_and_document_save_handlers(
+        self, app_source: str
+    ) -> None:
+        keydown_body = app_source.split("function handleKeyDown(event)", 1)[1].split(
+            "window.addEventListener('keydown'",
+            1,
+        )[0]
+        assert "event.preventDefault()" in keydown_body
+        assert "activeWorkspaceView !== WORKSPACE_VIEWS.EDITOR" in keydown_body
+        assert keydown_body.index("activeWorkspaceView !== WORKSPACE_VIEWS.EDITOR") < keydown_body.index(
+            "handleSaveNote()"
+        )
+        assert "handleSaveNote()" in keydown_body
+        assert "handleSaveMaterial()" in keydown_body
+        assert "handleSave();" in keydown_body
+        assert "ProjectOverview" not in keydown_body
+
+    def test_project_switch_resets_overview_and_clears_stale_document_state(
+        self, app_source: str
+    ) -> None:
+        project_reset_block = app_source.split("useEffect(() => {", 1)[1].split(
+            "async function loadInitialData()",
+            1,
+        )[0]
+        for reset in (
+            "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)",
+            "setSelectedSceneId('')",
+            "setSelectedDocumentType('')",
+            "setSelectedNoteId('')",
+            "setSelectedMaterialId('')",
+            "setSceneContent('')",
+            "setNoteContent('')",
+            "setMaterialContent('')",
+            "setLastSavedContent('')",
+            "setLastSavedNoteContent('')",
+            "setLastSavedMaterialContent('')",
+        ):
+            assert reset in project_reset_block
+
+        initial_load_block = app_source.split("async function loadInitialData()", 1)[1].split(
+            "const refreshOMI",
+            1,
+        )[0]
+        assert "fetchOverview" not in initial_load_block
+        assert "/overview" not in initial_load_block
+        assert "setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? [])" in (
+            initial_load_block
+        )
+        assert "setNotes(notesPayload?.notes ?? [])" in initial_load_block
+        assert "setMaterials(materialsPayload?.materials ?? [])" in initial_load_block
+
+    def test_no_runtime_overview_backend_or_api_dependency_exists(
+        self,
+        app_source: str,
+        api_source: str,
+        project_overview_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        runtime_sources = (
+            app_source,
+            api_source,
+            project_overview_source,
+            backend_main_source,
+            project_manager_source,
+        )
+        for source in runtime_sources:
+            for forbidden_dependency in (
+                "'/overview",
+                '"/overview',
+                "`/overview",
+                "@app.get(\"/api/projects/{project_name}/overview\")",
+                "fetchOverview",
+                "getProjectOverview",
+                "saveOverview",
+                "overview route",
+                "project overview api",
+            ):
+                assert forbidden_dependency not in source.lower()
+
+    def test_editor_and_metadata_contracts_remain_separate_from_overview(
+        self, app_source: str, editor_source: str, project_nav_source: str
+    ) -> None:
+        assert "selectedDocumentId={activeEditorDocument.id}" in app_source
+        assert "documentType={activeEditorDocument.type}" in app_source
+        assert "documentError={activeEditorDocument.error}" in app_source
+        assert "selectedDocumentId" in editor_source
+        assert "selectedSceneId" not in editor_source
+
+        for save_call in (
+            "saveScene(selectedSceneId, sceneContent, activeProjectId)",
+            "saveNote(selectedNoteId, noteContent, activeProjectId)",
+            "saveMaterial(selectedMaterialId, materialContent, activeProjectId)",
+        ):
+            assert save_call in app_source
+
+        for metadata_helper in (
+            "fetchNoteMetadata",
+            "saveNoteMetadata",
+            "fetchMaterialMetadata",
+            "saveMaterialMetadata",
+        ):
+            assert metadata_helper not in app_source
+
+        assert "onSelectOverview?.()" in project_nav_source
+        assert "onSelectOverview?.(activeDocumentId)" not in project_nav_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            APP_JSX,
+            PROJECT_NAV_JSX,
+            PROJECT_OVERVIEW_JSX,
+            EDITOR_JSX,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+            API_JS,
+        ],
+    )
+    def test_overview_frontend_runtime_excludes_unsafe_terms(
+        self, source_path: Path
+    ) -> None:
+        lower_source = read_source(source_path).lower()
+        for forbidden_term in (
+            "generated summary",
+            "ai summary",
+            "summarize project",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "training data",
+            "jsonl",
+            "dataset",
+        ):
+            assert forbidden_term not in lower_source
+
+
 class TestSceneMetadataDisplayCompatibility:
     def test_normalizes_legacy_scene_string_ids(self, project_nav_source: str) -> None:
         assert "function normalizeSceneOption" in project_nav_source
