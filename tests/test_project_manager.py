@@ -424,6 +424,429 @@ def test_chapter_metadata_helpers_do_not_create_or_modify_scene_bodies(
     assert scene_path.read_text(encoding="utf-8") == original
 
 
+def test_save_and_load_note_round_trips_markdown_without_metadata(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "# Planning Note\n\nOwner-authored note text."
+
+    project_manager.save_note("ember", "note_001", content)
+
+    note_path = tmp_path / "ember" / "notes" / "note_001.md"
+    assert note_path.read_text(encoding="utf-8") == content
+    assert project_manager.load_note("ember", "note_001") == content
+    assert not (tmp_path / "ember" / "note_metadata" / "note_001.json").exists()
+
+
+def test_list_notes_returns_sorted_markdown_note_ids(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    notes_dir = tmp_path / "ember" / "notes"
+    notes_dir.mkdir(parents=True)
+    (notes_dir / "note_010.md").write_text("ten", encoding="utf-8")
+    (notes_dir / "note_002.md").write_text("two", encoding="utf-8")
+    (notes_dir / "notes.txt").write_text("ignore", encoding="utf-8")
+
+    assert project_manager.list_notes("ember") == ["note_002", "note_010"]
+
+
+def test_save_note_rejects_unsafe_note_ids(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    for unsafe_note_id in ("../outside", "bad\\id", ".hidden", "notes", "Bad"):
+        with pytest.raises(ValueError):
+            project_manager.save_note("ember", unsafe_note_id, "Owner note.")
+
+    assert not (tmp_path / "outside.md").exists()
+
+
+def test_load_note_metadata_returns_compatibility_defaults_without_creating_metadata(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_note("ember", "note_001", "Owner-authored note text.")
+
+    metadata = project_manager.load_note_metadata("ember", "note_001")
+
+    assert metadata["metadata_version"] == 1
+    assert metadata["project_id"] == "ember"
+    assert metadata["note_id"] == "note_001"
+    assert metadata["title"] == ""
+    assert metadata["note_type"] == "general"
+    assert metadata["status"] == "draft"
+    assert metadata["tags"] == []
+    assert metadata["linked_chapter_ids"] == []
+    assert metadata["linked_scene_ids"] == []
+    assert metadata["linked_candidate_ids"] == []
+    assert metadata["linked_memory_record_ids"] == []
+    assert metadata["created_at"] is None
+    assert metadata["updated_at"] is None
+    assert metadata["content_path"] == "notes/note_001.md"
+    assert metadata["word_count"] == 0
+    assert metadata["owner_notes"] == ""
+    assert metadata["summary_candidate_id"] is None
+    assert metadata["approved_navigation_summary"] is None
+    assert metadata["metadata_exists"] is False
+    assert metadata["metadata_path"] is None
+    assert not (tmp_path / "ember" / "note_metadata" / "note_001.json").exists()
+
+
+def test_create_note_metadata_writes_json_without_changing_note_body(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "Owner-authored note text."
+    project_manager.save_note("ember", "note_001", content)
+
+    metadata = project_manager.create_note_metadata(
+        "ember",
+        "note_001",
+        {
+            "title": "Planning",
+            "note_type": "research",
+            "tags": ["map"],
+            "linked_scene_ids": ["scene_001"],
+            "metadata_exists": True,
+            "metadata_path": "unsafe",
+        },
+    )
+
+    metadata_path = tmp_path / "ember" / "note_metadata" / "note_001.json"
+    persisted = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert persisted["metadata_version"] == 1
+    assert persisted["project_id"] == "ember"
+    assert persisted["note_id"] == "note_001"
+    assert persisted["content_path"] == "notes/note_001.md"
+    assert persisted["title"] == "Planning"
+    assert persisted["note_type"] == "research"
+    assert persisted["tags"] == ["map"]
+    assert persisted["linked_scene_ids"] == ["scene_001"]
+    assert "metadata_exists" not in persisted
+    assert "metadata_path" not in persisted
+    assert metadata["metadata_exists"] is True
+    assert metadata["metadata_path"] == "note_metadata/note_001.json"
+    assert project_manager.load_note("ember", "note_001") == content
+
+
+def test_update_note_metadata_derives_safe_identity_without_changing_note_body(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "Owner-authored note text."
+    project_manager.save_note("ember", "note_001", content)
+    project_manager.create_note_metadata("ember", "note_001", {"title": "First"})
+
+    metadata = project_manager.update_note_metadata(
+        "ember",
+        "note_001",
+        {
+            "project_id": "wrong_project",
+            "note_id": "../outside",
+            "content_path": "../outside.md",
+            "title": "Updated",
+            "linked_chapter_ids": ["chapter_001"],
+        },
+    )
+
+    persisted = json.loads(
+        (tmp_path / "ember" / "note_metadata" / "note_001.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert persisted["project_id"] == "ember"
+    assert persisted["note_id"] == "note_001"
+    assert persisted["content_path"] == "notes/note_001.md"
+    assert persisted["title"] == "Updated"
+    assert persisted["linked_chapter_ids"] == ["chapter_001"]
+    assert metadata["project_id"] == "ember"
+    assert metadata["note_id"] == "note_001"
+    assert metadata["content_path"] == "notes/note_001.md"
+    assert project_manager.load_note("ember", "note_001") == content
+
+
+def test_note_metadata_helpers_reject_unsafe_ids_and_metadata_fields(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_note("ember", "note_001", "Owner-authored note text.")
+
+    with pytest.raises(ValueError):
+        project_manager.create_note_metadata("ember", "../outside", {})
+
+    with pytest.raises(ValueError):
+        project_manager.create_note_metadata(
+            "ember",
+            "note_001",
+            {"linked_scene_ids": ["scene_001", "../outside"]},
+        )
+
+    with pytest.raises(ValueError):
+        project_manager.create_note_metadata(
+            "ember",
+            "note_001",
+            {"tags": "not-a-list"},
+        )
+
+    assert not (tmp_path / "ember" / "note_metadata" / "note_001.json").exists()
+    assert project_manager.load_note("ember", "note_001") == "Owner-authored note text."
+
+
+def test_list_note_metadata_includes_metadata_backed_and_body_only_notes(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_note("ember", "note_010", "Ten")
+    project_manager.save_note("ember", "note_002", "Two")
+    project_manager.create_note_metadata(
+        "ember",
+        "note_010",
+        {"title": "Metadata backed", "note_type": "plot"},
+    )
+    legacy_metadata_path = tmp_path / "ember" / "note_metadata" / "note_002.json"
+
+    note_metadata = project_manager.list_note_metadata("ember")
+
+    assert [metadata["note_id"] for metadata in note_metadata] == ["note_002", "note_010"]
+    assert note_metadata[0]["metadata_exists"] is False
+    assert note_metadata[0]["title"] == ""
+    assert note_metadata[0]["content_path"] == "notes/note_002.md"
+    assert note_metadata[1]["metadata_exists"] is True
+    assert note_metadata[1]["title"] == "Metadata backed"
+    assert note_metadata[1]["note_type"] == "plot"
+    assert project_manager.list_notes("ember") == ["note_002", "note_010"]
+    assert not legacy_metadata_path.exists()
+
+
+def test_note_metadata_write_requires_existing_note_body(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    with pytest.raises(FileNotFoundError):
+        project_manager.create_note_metadata("ember", "note_001", {"title": "Missing"})
+
+    assert not (tmp_path / "ember" / "notes" / "note_001.md").exists()
+    assert not (tmp_path / "ember" / "note_metadata" / "note_001.json").exists()
+
+
+def test_save_and_load_material_round_trips_markdown_without_metadata(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "# Research Material\n\nOwner-provided material text."
+
+    project_manager.save_material("ember", "material_001", content)
+
+    material_path = tmp_path / "ember" / "materials" / "material_001.md"
+    assert material_path.read_text(encoding="utf-8") == content
+    assert project_manager.load_material("ember", "material_001") == content
+    assert not (tmp_path / "ember" / "material_metadata" / "material_001.json").exists()
+
+
+def test_list_materials_returns_sorted_markdown_material_ids(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    materials_dir = tmp_path / "ember" / "materials"
+    materials_dir.mkdir(parents=True)
+    (materials_dir / "material_010.md").write_text("ten", encoding="utf-8")
+    (materials_dir / "material_002.md").write_text("two", encoding="utf-8")
+    (materials_dir / "materials.txt").write_text("ignore", encoding="utf-8")
+
+    assert project_manager.list_materials("ember") == ["material_002", "material_010"]
+
+
+def test_save_material_rejects_unsafe_material_ids(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    for unsafe_material_id in (
+        "../outside",
+        "bad\\id",
+        ".hidden",
+        "materials",
+        "Bad",
+    ):
+        with pytest.raises(ValueError):
+            project_manager.save_material("ember", unsafe_material_id, "Owner material.")
+
+    assert not (tmp_path / "outside.md").exists()
+
+
+def test_load_material_metadata_returns_compatibility_defaults_without_creating_metadata(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_material("ember", "material_001", "Owner-provided text.")
+
+    metadata = project_manager.load_material_metadata("ember", "material_001")
+
+    assert metadata["metadata_version"] == 1
+    assert metadata["project_id"] == "ember"
+    assert metadata["material_id"] == "material_001"
+    assert metadata["title"] == ""
+    assert metadata["material_type"] == "text_reference"
+    assert metadata["status"] == "draft"
+    assert metadata["source_kind"] == "owner_text"
+    assert metadata["source_url"] is None
+    assert metadata["source_citation"] is None
+    assert metadata["local_reference_path"] is None
+    assert metadata["license_status"] == "owner_provided"
+    assert metadata["usage_restrictions"] == []
+    assert metadata["source_warnings"] == []
+    assert metadata["content_path"] == "materials/material_001.md"
+    assert metadata["metadata_exists"] is False
+    assert metadata["metadata_path"] is None
+    assert not (
+        tmp_path / "ember" / "material_metadata" / "material_001.json"
+    ).exists()
+
+
+def test_create_material_metadata_writes_json_without_changing_material_body(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "Owner-provided material text."
+    project_manager.save_material("ember", "material_001", content)
+
+    metadata = project_manager.create_material_metadata(
+        "ember",
+        "material_001",
+        {
+            "title": "Research",
+            "material_type": "research",
+            "source_kind": "citation",
+            "source_citation": "Owner-provided citation",
+            "license_status": "reference_only",
+            "usage_restrictions": ["no_training"],
+            "source_warnings": ["review_license"],
+            "tags": ["reference"],
+        },
+    )
+
+    metadata_path = tmp_path / "ember" / "material_metadata" / "material_001.json"
+    persisted = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert persisted["metadata_version"] == 1
+    assert persisted["project_id"] == "ember"
+    assert persisted["material_id"] == "material_001"
+    assert persisted["content_path"] == "materials/material_001.md"
+    assert persisted["title"] == "Research"
+    assert persisted["material_type"] == "research"
+    assert persisted["source_kind"] == "citation"
+    assert persisted["source_citation"] == "Owner-provided citation"
+    assert persisted["license_status"] == "reference_only"
+    assert persisted["usage_restrictions"] == ["no_training"]
+    assert persisted["source_warnings"] == ["review_license"]
+    assert persisted["tags"] == ["reference"]
+    assert metadata["metadata_exists"] is True
+    assert metadata["metadata_path"] == "material_metadata/material_001.json"
+    assert project_manager.load_material("ember", "material_001") == content
+
+
+def test_update_material_metadata_derives_safe_identity_without_changing_body(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    content = "Owner-provided material text."
+    project_manager.save_material("ember", "material_001", content)
+    project_manager.create_material_metadata("ember", "material_001", {"title": "First"})
+
+    metadata = project_manager.update_material_metadata(
+        "ember",
+        "material_001",
+        {
+            "project_id": "wrong_project",
+            "material_id": "../outside",
+            "content_path": "../outside.md",
+            "title": "Updated",
+            "local_reference_path": "references/source.md",
+        },
+    )
+
+    persisted = json.loads(
+        (tmp_path / "ember" / "material_metadata" / "material_001.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert persisted["project_id"] == "ember"
+    assert persisted["material_id"] == "material_001"
+    assert persisted["content_path"] == "materials/material_001.md"
+    assert persisted["title"] == "Updated"
+    assert persisted["local_reference_path"] == "references/source.md"
+    assert metadata["project_id"] == "ember"
+    assert metadata["material_id"] == "material_001"
+    assert metadata["content_path"] == "materials/material_001.md"
+    assert project_manager.load_material("ember", "material_001") == content
+
+
+def test_material_metadata_helpers_reject_unsafe_ids_and_metadata_fields(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_material("ember", "material_001", "Owner-provided text.")
+
+    with pytest.raises(ValueError):
+        project_manager.create_material_metadata("ember", "../outside", {})
+
+    with pytest.raises(ValueError):
+        project_manager.create_material_metadata(
+            "ember",
+            "material_001",
+            {"linked_candidate_ids": ["candidate_001", "../outside"]},
+        )
+
+    with pytest.raises(ValueError):
+        project_manager.create_material_metadata(
+            "ember",
+            "material_001",
+            {"local_reference_path": "../outside.md"},
+        )
+
+    assert not (
+        tmp_path / "ember" / "material_metadata" / "material_001.json"
+    ).exists()
+    assert project_manager.load_material("ember", "material_001") == "Owner-provided text."
+
+
+def test_list_material_metadata_includes_metadata_backed_and_body_only_materials(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.save_material("ember", "material_010", "Ten")
+    project_manager.save_material("ember", "material_002", "Two")
+    project_manager.create_material_metadata(
+        "ember",
+        "material_010",
+        {"title": "Metadata backed", "material_type": "outline"},
+    )
+    legacy_metadata_path = (
+        tmp_path / "ember" / "material_metadata" / "material_002.json"
+    )
+
+    material_metadata = project_manager.list_material_metadata("ember")
+
+    assert [metadata["material_id"] for metadata in material_metadata] == [
+        "material_002",
+        "material_010",
+    ]
+    assert material_metadata[0]["metadata_exists"] is False
+    assert material_metadata[0]["title"] == ""
+    assert material_metadata[0]["content_path"] == "materials/material_002.md"
+    assert material_metadata[1]["metadata_exists"] is True
+    assert material_metadata[1]["title"] == "Metadata backed"
+    assert material_metadata[1]["material_type"] == "outline"
+    assert project_manager.list_materials("ember") == ["material_002", "material_010"]
+    assert not legacy_metadata_path.exists()
+
+
+def test_material_metadata_write_requires_existing_material_body(tmp_path, monkeypatch):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    with pytest.raises(FileNotFoundError):
+        project_manager.create_material_metadata(
+            "ember",
+            "material_001",
+            {"title": "Missing"},
+        )
+
+    assert not (tmp_path / "ember" / "materials" / "material_001.md").exists()
+    assert not (
+        tmp_path / "ember" / "material_metadata" / "material_001.json"
+    ).exists()
+
+
 def test_project_name_and_scene_id_must_be_single_path_components(
     tmp_path, monkeypatch
 ):

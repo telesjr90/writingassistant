@@ -21,16 +21,20 @@ PROJECTS_DIR = REPO_ROOT / "projects"
 PROJECT_SCHEMA_VERSION = "0.1.0"
 SCENE_METADATA_VERSION = 1
 CHAPTER_METADATA_VERSION = 1
+NOTE_METADATA_VERSION = 1
+MATERIAL_METADATA_VERSION = 1
 
 MAX_PROJECT_TITLE_LENGTH = 160
 MAX_PROJECT_ID_LENGTH = 64
 MAX_PROJECT_ID_COLLISION_ATTEMPTS = 1000
+MAX_DOCUMENT_ID_LENGTH = 64
 
 PROJECT_CREATION_METHOD_BLANK = "blank"
 
 _PROJECT_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
 _PROJECT_ID_INVALID_CHAR_RUN = re.compile(r"[^a-z0-9]+")
 _PROJECT_ID_REPEAT_HYPHEN = re.compile(r"-{2,}")
+_DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_]{0,63}$")
 
 # Reserved names follow `project_creation_flow_spec.md` §6 plus the
 # Windows reserved device names that would be unsafe on case-insensitive
@@ -58,6 +62,22 @@ RESERVED_PROJECT_IDS: frozenset[str] = frozenset(
     }
     | {f"com{i}" for i in range(1, 10)}
     | {f"lpt{i}" for i in range(1, 10)}
+)
+
+RESERVED_DOCUMENT_IDS: frozenset[str] = frozenset(
+    RESERVED_PROJECT_IDS
+    | {
+        "project_json",
+        "bible",
+        "storyform",
+        "chapters",
+        "scenes",
+        "scene_metadata",
+        "notes",
+        "note_metadata",
+        "materials",
+        "material_metadata",
+    }
 )
 
 # Hybrid core-folder creation per `project_creation_flow_spec.md` §8 and
@@ -665,6 +685,41 @@ def _chapter_metadata_path(project_name: str, chapter_id: str) -> Path:
     return _project_dir(project_name) / "chapters" / f"{safe_chapter_id}.json"
 
 
+def _safe_document_id(value: str, label: str) -> str:
+    safe_value = _safe_path_component(value, label)
+    if "\\" in safe_value or ":" in safe_value:
+        raise ValueError(f"{label} must be a safe document ID")
+    if safe_value.startswith("."):
+        raise ValueError(f"{label} must not start with a dot")
+    if len(safe_value) > MAX_DOCUMENT_ID_LENGTH:
+        raise ValueError(f"{label} must not exceed {MAX_DOCUMENT_ID_LENGTH} characters")
+    if not _DOCUMENT_ID_PATTERN.fullmatch(safe_value):
+        raise ValueError(f"{label} must contain only lowercase letters, digits, and underscores")
+    if safe_value.lower() in RESERVED_DOCUMENT_IDS:
+        raise ValueError(f"{label} is reserved")
+    return safe_value
+
+
+def _note_path(project_name: str, note_id: str) -> Path:
+    safe_note_id = _safe_document_id(note_id, "note_id")
+    return _project_dir(project_name) / "notes" / f"{safe_note_id}.md"
+
+
+def _note_metadata_path(project_name: str, note_id: str) -> Path:
+    safe_note_id = _safe_document_id(note_id, "note_id")
+    return _project_dir(project_name) / "note_metadata" / f"{safe_note_id}.json"
+
+
+def _material_path(project_name: str, material_id: str) -> Path:
+    safe_material_id = _safe_document_id(material_id, "material_id")
+    return _project_dir(project_name) / "materials" / f"{safe_material_id}.md"
+
+
+def _material_metadata_path(project_name: str, material_id: str) -> Path:
+    safe_material_id = _safe_document_id(material_id, "material_id")
+    return _project_dir(project_name) / "material_metadata" / f"{safe_material_id}.json"
+
+
 def _json_path(project_name: str, filename: str) -> Path:
     return _project_dir(project_name) / filename
 
@@ -1037,6 +1092,16 @@ def _scene_content_path_value(scene_id: str) -> str:
     return f"scenes/{safe_scene_id}.md"
 
 
+def _note_content_path_value(note_id: str) -> str:
+    safe_note_id = _safe_document_id(note_id, "note_id")
+    return f"notes/{safe_note_id}.md"
+
+
+def _material_content_path_value(material_id: str) -> str:
+    safe_material_id = _safe_document_id(material_id, "material_id")
+    return f"materials/{safe_material_id}.md"
+
+
 def _copy_metadata_payload(value: dict[str, Any] | None, label: str) -> dict[str, Any]:
     if value is None:
         return {}
@@ -1070,12 +1135,300 @@ def _safe_scene_id_list(value: Any) -> list[str]:
     ]
 
 
+def _safe_component_list(value: Any, label: str, item_label: str) -> list[str]:
+    safe_values: list[str] = []
+    for item in _string_list(value, label):
+        safe_values.append(_safe_document_id(item, item_label))
+    return safe_values
+
+
+def _safe_string_or_none(value: Any, label: str) -> str | None:
+    value = _string_or_none(value, label)
+    if value is None:
+        return None
+    return _safe_document_id(value, label)
+
+
+def _relative_reference_path_or_none(value: Any, label: str) -> str | None:
+    value = _string_or_none(value, label)
+    if value is None:
+        return None
+    path = Path(value)
+    if path.is_absolute() or ".." in path.parts or "\\" in value or ":" in value:
+        raise ValueError(f"{label} must be a safe relative reference path")
+    return value
+
+
 def _metadata_object(value: Any, label: str) -> dict[str, Any]:
     if value is None:
         return {}
     if not isinstance(value, dict):
         raise ValueError(f"{label} must be a JSON object")
     return dict(value)
+
+
+def _normalise_document_link_fields(record: dict[str, Any]) -> None:
+    record["tags"] = _string_list(record.get("tags"), "tags")
+    record["linked_chapter_ids"] = _safe_component_list(
+        record.get("linked_chapter_ids"),
+        "linked_chapter_ids",
+        "chapter_id",
+    )
+    record["linked_scene_ids"] = _safe_component_list(
+        record.get("linked_scene_ids"),
+        "linked_scene_ids",
+        "scene_id",
+    )
+    record["linked_candidate_ids"] = _safe_component_list(
+        record.get("linked_candidate_ids"),
+        "linked_candidate_ids",
+        "candidate_id",
+    )
+    record["linked_memory_record_ids"] = _safe_component_list(
+        record.get("linked_memory_record_ids"),
+        "linked_memory_record_ids",
+        "memory_record_id",
+    )
+    record["provenance"] = _metadata_object(record.get("provenance"), "provenance")
+
+
+def _normalise_note_link_fields(record: dict[str, Any]) -> None:
+    _normalise_document_link_fields(record)
+    record["summary_candidate_id"] = _safe_string_or_none(
+        record.get("summary_candidate_id"),
+        "summary_candidate_id",
+    )
+
+
+def _normalise_material_metadata_fields(record: dict[str, Any]) -> None:
+    _normalise_document_link_fields(record)
+    record["source_kind"] = record.get("source_kind", "owner_text")
+    if not isinstance(record["source_kind"], str):
+        raise ValueError("source_kind must be a string")
+    record["source_url"] = _string_or_none(record.get("source_url"), "source_url")
+    record["source_citation"] = _string_or_none(
+        record.get("source_citation"),
+        "source_citation",
+    )
+    record["local_reference_path"] = _relative_reference_path_or_none(
+        record.get("local_reference_path"),
+        "local_reference_path",
+    )
+    record["license_status"] = record.get("license_status", "owner_provided")
+    if not isinstance(record["license_status"], str):
+        raise ValueError("license_status must be a string")
+    record["usage_restrictions"] = _string_list(
+        record.get("usage_restrictions"),
+        "usage_restrictions",
+    )
+    record["source_warnings"] = _string_list(
+        record.get("source_warnings"),
+        "source_warnings",
+    )
+
+
+def _normalise_note_metadata_read(
+    project_name: str,
+    note_id: str,
+    metadata: dict[str, Any],
+    *,
+    metadata_exists: bool,
+) -> dict[str, Any]:
+    safe_note_id = _safe_document_id(note_id, "note_id")
+    normalized = dict(metadata)
+    normalized.setdefault("metadata_version", NOTE_METADATA_VERSION)
+    normalized.setdefault("title", "")
+    normalized.setdefault("note_type", "general")
+    normalized.setdefault("status", "draft")
+    normalized.setdefault("tags", [])
+    normalized.setdefault("linked_chapter_ids", [])
+    normalized.setdefault("linked_scene_ids", [])
+    normalized.setdefault("linked_candidate_ids", [])
+    normalized.setdefault("linked_memory_record_ids", [])
+    normalized.setdefault("created_at", None)
+    normalized.setdefault("updated_at", None)
+    normalized.setdefault("word_count", 0)
+    normalized.setdefault("owner_notes", "")
+    normalized.setdefault("summary_candidate_id", None)
+    normalized.setdefault("approved_navigation_summary", None)
+    normalized.setdefault(
+        "provenance",
+        {"created_by": "owner", "creation_method": "manual", "source": "manual"},
+    )
+    normalized["project_id"] = project_name
+    normalized["note_id"] = safe_note_id
+    normalized["content_path"] = _note_content_path_value(safe_note_id)
+    normalized["metadata_exists"] = metadata_exists
+    normalized["metadata_path"] = (
+        f"note_metadata/{safe_note_id}.json" if metadata_exists else None
+    )
+    _normalise_note_link_fields(normalized)
+    return normalized
+
+
+def _normalise_note_metadata_write(
+    project_name: str,
+    note_id: str,
+    metadata: dict[str, Any] | None,
+    *,
+    existing: dict[str, Any] | None,
+) -> dict[str, Any]:
+    safe_note_id = _safe_document_id(note_id, "note_id")
+    payload = _copy_metadata_payload(metadata, "Note")
+    previous = dict(existing or {})
+    record = dict(previous)
+    record.update(payload)
+
+    for field in ("project_id", "note_id", "content_path", "metadata_exists", "metadata_path"):
+        record.pop(field, None)
+
+    timestamp = _utc_after(_string_or_none(previous.get("updated_at"), "updated_at"))
+    created_at = _string_or_none(previous.get("created_at"), "created_at") or timestamp
+
+    record.setdefault("title", "")
+    record.setdefault("note_type", "general")
+    record.setdefault("status", "draft")
+    record.setdefault("tags", [])
+    record.setdefault("linked_chapter_ids", [])
+    record.setdefault("linked_scene_ids", [])
+    record.setdefault("linked_candidate_ids", [])
+    record.setdefault("linked_memory_record_ids", [])
+    record.setdefault("word_count", 0)
+    record.setdefault("owner_notes", "")
+    record.setdefault("summary_candidate_id", None)
+    record.setdefault("approved_navigation_summary", None)
+    record.setdefault(
+        "provenance",
+        {"created_by": "owner", "creation_method": "manual", "source": "manual"},
+    )
+
+    if not isinstance(record["title"], str):
+        raise ValueError("title must be a string")
+    if not isinstance(record["note_type"], str):
+        raise ValueError("note_type must be a string")
+    if not isinstance(record["status"], str):
+        raise ValueError("status must be a string")
+    if not isinstance(record["owner_notes"], str):
+        raise ValueError("owner_notes must be a string")
+    if not isinstance(record["word_count"], int):
+        raise ValueError("word_count must be an integer")
+
+    record["metadata_version"] = NOTE_METADATA_VERSION
+    record["project_id"] = project_name
+    record["note_id"] = safe_note_id
+    record["content_path"] = _note_content_path_value(safe_note_id)
+    record["created_at"] = created_at
+    record["updated_at"] = timestamp
+    _normalise_note_link_fields(record)
+    return record
+
+
+def _normalise_material_metadata_read(
+    project_name: str,
+    material_id: str,
+    metadata: dict[str, Any],
+    *,
+    metadata_exists: bool,
+) -> dict[str, Any]:
+    safe_material_id = _safe_document_id(material_id, "material_id")
+    normalized = dict(metadata)
+    normalized.setdefault("metadata_version", MATERIAL_METADATA_VERSION)
+    normalized.setdefault("title", "")
+    normalized.setdefault("material_type", "text_reference")
+    normalized.setdefault("status", "draft")
+    normalized.setdefault("tags", [])
+    normalized.setdefault("source_kind", "owner_text")
+    normalized.setdefault("source_url", None)
+    normalized.setdefault("source_citation", None)
+    normalized.setdefault("local_reference_path", None)
+    normalized.setdefault("linked_chapter_ids", [])
+    normalized.setdefault("linked_scene_ids", [])
+    normalized.setdefault("linked_candidate_ids", [])
+    normalized.setdefault("linked_memory_record_ids", [])
+    normalized.setdefault("created_at", None)
+    normalized.setdefault("updated_at", None)
+    normalized.setdefault("owner_notes", "")
+    normalized.setdefault(
+        "provenance",
+        {"created_by": "owner", "creation_method": "manual", "source": "manual"},
+    )
+    normalized.setdefault("license_status", "owner_provided")
+    normalized.setdefault("usage_restrictions", [])
+    normalized.setdefault("source_warnings", [])
+    normalized["project_id"] = project_name
+    normalized["material_id"] = safe_material_id
+    normalized["content_path"] = _material_content_path_value(safe_material_id)
+    normalized["metadata_exists"] = metadata_exists
+    normalized["metadata_path"] = (
+        f"material_metadata/{safe_material_id}.json" if metadata_exists else None
+    )
+    _normalise_material_metadata_fields(normalized)
+    return normalized
+
+
+def _normalise_material_metadata_write(
+    project_name: str,
+    material_id: str,
+    metadata: dict[str, Any] | None,
+    *,
+    existing: dict[str, Any] | None,
+) -> dict[str, Any]:
+    safe_material_id = _safe_document_id(material_id, "material_id")
+    payload = _copy_metadata_payload(metadata, "Material")
+    previous = dict(existing or {})
+    record = dict(previous)
+    record.update(payload)
+
+    for field in (
+        "project_id",
+        "material_id",
+        "content_path",
+        "metadata_exists",
+        "metadata_path",
+    ):
+        record.pop(field, None)
+
+    timestamp = _utc_after(_string_or_none(previous.get("updated_at"), "updated_at"))
+    created_at = _string_or_none(previous.get("created_at"), "created_at") or timestamp
+
+    record.setdefault("title", "")
+    record.setdefault("material_type", "text_reference")
+    record.setdefault("status", "draft")
+    record.setdefault("tags", [])
+    record.setdefault("source_kind", "owner_text")
+    record.setdefault("source_url", None)
+    record.setdefault("source_citation", None)
+    record.setdefault("local_reference_path", None)
+    record.setdefault("linked_chapter_ids", [])
+    record.setdefault("linked_scene_ids", [])
+    record.setdefault("linked_candidate_ids", [])
+    record.setdefault("linked_memory_record_ids", [])
+    record.setdefault("owner_notes", "")
+    record.setdefault(
+        "provenance",
+        {"created_by": "owner", "creation_method": "manual", "source": "manual"},
+    )
+    record.setdefault("license_status", "owner_provided")
+    record.setdefault("usage_restrictions", [])
+    record.setdefault("source_warnings", [])
+
+    if not isinstance(record["title"], str):
+        raise ValueError("title must be a string")
+    if not isinstance(record["material_type"], str):
+        raise ValueError("material_type must be a string")
+    if not isinstance(record["status"], str):
+        raise ValueError("status must be a string")
+    if not isinstance(record["owner_notes"], str):
+        raise ValueError("owner_notes must be a string")
+
+    record["metadata_version"] = MATERIAL_METADATA_VERSION
+    record["project_id"] = project_name
+    record["material_id"] = safe_material_id
+    record["content_path"] = _material_content_path_value(safe_material_id)
+    record["created_at"] = created_at
+    record["updated_at"] = timestamp
+    _normalise_material_metadata_fields(record)
+    return record
 
 
 def _normalise_scene_metadata_read(
@@ -1334,6 +1687,192 @@ def list_scene_metadata(project_name: str) -> list[dict[str, Any]]:
     return [
         load_scene_metadata(project_name, scene_id)
         for scene_id in list_scenes(project_name)
+    ]
+
+
+def load_note(project_name: str, note_id: str) -> str:
+    return _note_path(project_name, note_id).read_text(encoding="utf-8")
+
+
+def save_note(project_name: str, note_id: str, content: str) -> None:
+    path = _note_path(project_name, note_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def list_notes(project_name: str) -> list[str]:
+    notes_dir = _project_dir(project_name) / "notes"
+    if not notes_dir.exists():
+        return []
+
+    return [path.stem for path in sorted(notes_dir.glob("*.md")) if path.is_file()]
+
+
+def load_note_metadata(project_name: str, note_id: str) -> dict[str, Any]:
+    note_path = _note_path(project_name, note_id)
+    if not note_path.exists():
+        raise FileNotFoundError(note_path)
+
+    metadata_path = _note_metadata_path(project_name, note_id)
+    if not metadata_path.exists():
+        return _normalise_note_metadata_read(
+            project_name,
+            note_id,
+            {},
+            metadata_exists=False,
+        )
+
+    metadata = _load_json_object_from_path(metadata_path, "Note metadata")
+    return _normalise_note_metadata_read(
+        project_name,
+        note_id,
+        metadata,
+        metadata_exists=True,
+    )
+
+
+def create_note_metadata(
+    project_name: str,
+    note_id: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    note_path = _note_path(project_name, note_id)
+    if not note_path.exists():
+        raise FileNotFoundError(note_path)
+
+    record = _normalise_note_metadata_write(
+        project_name,
+        note_id,
+        metadata,
+        existing=None,
+    )
+    _write_json_object(
+        _note_metadata_path(project_name, note_id),
+        record,
+        "Note metadata",
+        overwrite=False,
+    )
+    return load_note_metadata(project_name, note_id)
+
+
+def update_note_metadata(
+    project_name: str,
+    note_id: str,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    note_path = _note_path(project_name, note_id)
+    if not note_path.exists():
+        raise FileNotFoundError(note_path)
+
+    metadata_path = _note_metadata_path(project_name, note_id)
+    existing = _load_json_object_from_path(metadata_path, "Note metadata")
+    record = _normalise_note_metadata_write(
+        project_name,
+        note_id,
+        metadata,
+        existing=existing,
+    )
+    _write_json_object(metadata_path, record, "Note metadata", overwrite=True)
+    return load_note_metadata(project_name, note_id)
+
+
+def list_note_metadata(project_name: str) -> list[dict[str, Any]]:
+    return [
+        load_note_metadata(project_name, note_id)
+        for note_id in list_notes(project_name)
+    ]
+
+
+def load_material(project_name: str, material_id: str) -> str:
+    return _material_path(project_name, material_id).read_text(encoding="utf-8")
+
+
+def save_material(project_name: str, material_id: str, content: str) -> None:
+    path = _material_path(project_name, material_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def list_materials(project_name: str) -> list[str]:
+    materials_dir = _project_dir(project_name) / "materials"
+    if not materials_dir.exists():
+        return []
+
+    return [path.stem for path in sorted(materials_dir.glob("*.md")) if path.is_file()]
+
+
+def load_material_metadata(project_name: str, material_id: str) -> dict[str, Any]:
+    material_path = _material_path(project_name, material_id)
+    if not material_path.exists():
+        raise FileNotFoundError(material_path)
+
+    metadata_path = _material_metadata_path(project_name, material_id)
+    if not metadata_path.exists():
+        return _normalise_material_metadata_read(
+            project_name,
+            material_id,
+            {},
+            metadata_exists=False,
+        )
+
+    metadata = _load_json_object_from_path(metadata_path, "Material metadata")
+    return _normalise_material_metadata_read(
+        project_name,
+        material_id,
+        metadata,
+        metadata_exists=True,
+    )
+
+
+def create_material_metadata(
+    project_name: str,
+    material_id: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    material_path = _material_path(project_name, material_id)
+    if not material_path.exists():
+        raise FileNotFoundError(material_path)
+
+    record = _normalise_material_metadata_write(
+        project_name,
+        material_id,
+        metadata,
+        existing=None,
+    )
+    _write_json_object(
+        _material_metadata_path(project_name, material_id),
+        record,
+        "Material metadata",
+        overwrite=False,
+    )
+    return load_material_metadata(project_name, material_id)
+
+
+def update_material_metadata(
+    project_name: str,
+    material_id: str,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    material_path = _material_path(project_name, material_id)
+    if not material_path.exists():
+        raise FileNotFoundError(material_path)
+
+    metadata_path = _material_metadata_path(project_name, material_id)
+    existing = _load_json_object_from_path(metadata_path, "Material metadata")
+    record = _normalise_material_metadata_write(
+        project_name,
+        material_id,
+        metadata,
+        existing=existing,
+    )
+    _write_json_object(metadata_path, record, "Material metadata", overwrite=True)
+    return load_material_metadata(project_name, material_id)
+
+
+def list_material_metadata(project_name: str) -> list[dict[str, Any]]:
+    return [
+        load_material_metadata(project_name, material_id)
+        for material_id in list_materials(project_name)
     ]
 
 
