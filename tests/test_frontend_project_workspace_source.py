@@ -1128,6 +1128,249 @@ class TestSharedDocumentStateContract:
         assert "selectedNoteId=" not in project_nav_call
         assert "selectedMaterialId=" not in project_nav_call
 
+
+class TestSharedEditorRegressionCoverage:
+    """PHASE7-IMPL-006-T006 regression guard for the shared editor path."""
+
+    @staticmethod
+    def _callback_body(source: str, callback_name: str) -> str:
+        pattern = (
+            rf"const {callback_name}\s*=\s*useCallback"
+            rf"\((?:async\s*)?\([^)]*\)\s*=>\s*\{{(?P<body>.*?)\n\s*\}},\s*\["
+        )
+        match = re.search(pattern, source, re.DOTALL)
+        assert match is not None, f"Expected useCallback body for {callback_name}"
+        return match.group("body")
+
+    def test_shared_controller_contract_remains_complete(
+        self, shared_document_controller_source: str
+    ) -> None:
+        expected_exports = (
+            "export const DOCUMENT_TYPES",
+            "export const DOCUMENT_TYPE_VALUES",
+            "export const DEFAULT_DOCUMENT_TYPE",
+            "export function isSupportedDocumentType",
+            "export function resolveActiveDocumentType",
+            "export function getDocumentResponseContent",
+            "export function hasUnsavedDocumentEdits",
+            "export function getDocumentSwitchMessage",
+            "export function createDocumentDescriptor",
+            "export function getActiveDocumentDescriptor",
+            "export function canSaveDocument",
+        )
+        for expected_export in expected_exports:
+            assert expected_export in shared_document_controller_source
+
+        for document_type in ("SCENE: 'scene'", "NOTE: 'note'", "MATERIAL: 'material'"):
+            assert document_type in shared_document_controller_source
+        assert "isSupportedDocumentType(documentType) ? documentType : DEFAULT_DOCUMENT_TYPE" in (
+            shared_document_controller_source
+        )
+        assert "return response?.content ?? ''" in shared_document_controller_source
+        assert "descriptors[resolvedType] ?? descriptors[DEFAULT_DOCUMENT_TYPE]" in (
+            shared_document_controller_source
+        )
+
+    def test_exact_body_load_paths_cover_scene_note_and_material(
+        self, app_source: str
+    ) -> None:
+        expected_loads = (
+            ("handleSelectScene", "fetchScene(sceneId, activeProjectId)", "setSceneContent(loadedContent)"),
+            ("handleSelectNote", "fetchNote(noteId, activeProjectId)", "setNoteContent(loadedContent)"),
+            (
+                "handleSelectMaterial",
+                "fetchMaterial(materialId, activeProjectId)",
+                "setMaterialContent(loadedContent)",
+            ),
+        )
+        for callback_name, fetch_call, content_setter in expected_loads:
+            body = self._callback_body(app_source, callback_name)
+            assert fetch_call in body
+            assert "const loadedContent = getDocumentResponseContent(data)" in body
+            assert content_setter in body
+            assert ".metadata" not in body
+
+    def test_exact_body_save_paths_cover_scene_note_and_material(
+        self, app_source: str
+    ) -> None:
+        expected_saves = (
+            ("handleSave", "saveScene(selectedSceneId, sceneContent, activeProjectId)"),
+            ("handleSaveNote", "saveNote(selectedNoteId, noteContent, activeProjectId)"),
+            (
+                "handleSaveMaterial",
+                "saveMaterial(selectedMaterialId, materialContent, activeProjectId)",
+            ),
+        )
+        for callback_name, save_call in expected_saves:
+            body = self._callback_body(app_source, callback_name)
+            assert save_call in body
+            assert "metadata" not in body
+            assert "Label" not in body
+            assert ".title" not in body
+
+        for metadata_helper in (
+            "fetchNoteMetadata",
+            "saveNoteMetadata",
+            "fetchMaterialMetadata",
+            "saveMaterialMetadata",
+        ):
+            assert metadata_helper not in app_source
+
+    def test_dirty_state_load_save_and_switch_baselines_are_preserved(
+        self, app_source: str
+    ) -> None:
+        for dirty_check in (
+            "sceneContent !== lastSavedContent",
+            "noteContent !== lastSavedNoteContent",
+            "materialContent !== lastSavedMaterialContent",
+            "const hasUnsavedDocumentChanges = hasUnsavedDocumentEdits({",
+        ):
+            assert dirty_check in app_source
+
+        expected_baselines = (
+            ("handleSelectScene", "setLastSavedContent(loadedContent)"),
+            ("handleSelectNote", "setLastSavedNoteContent(loadedContent)"),
+            ("handleSelectMaterial", "setLastSavedMaterialContent(loadedContent)"),
+            ("handleSave", "setLastSavedContent(sceneContent)"),
+            ("handleSaveNote", "setLastSavedNoteContent(noteContent)"),
+            ("handleSaveMaterial", "setLastSavedMaterialContent(materialContent)"),
+        )
+        for callback_name, baseline_update in expected_baselines:
+            body = self._callback_body(app_source, callback_name)
+            assert baseline_update in body
+
+    def test_keyboard_save_dispatch_and_save_guards_are_document_type_aware(
+        self, app_source: str
+    ) -> None:
+        assert "function handleKeyDown(event)" in app_source
+        assert "event.preventDefault()" in app_source
+        assert "activeDocumentType === DOCUMENT_TYPES.NOTE" in app_source
+        assert "activeDocumentType === DOCUMENT_TYPES.MATERIAL" in app_source
+        assert "handleSaveNote()" in app_source
+        assert "handleSaveMaterial()" in app_source
+        assert "handleSave();" in app_source
+
+        for callback_name, guard in (
+            ("handleSave", "if (!selectedSceneId || isSaving)"),
+            ("handleSaveNote", "if (!selectedNoteId || isSavingNote)"),
+            ("handleSaveMaterial", "if (!selectedMaterialId || isSavingMaterial)"),
+        ):
+            body = self._callback_body(app_source, callback_name)
+            assert guard in body
+            assert "return;" in body
+
+    def test_project_and_document_switch_guards_remain_in_place(
+        self, app_source: str
+    ) -> None:
+        for callback_name in (
+            "handleSelectProject",
+            "handleCreateProject",
+            "handleSelectScene",
+            "handleSelectNote",
+            "handleSelectMaterial",
+        ):
+            body = self._callback_body(app_source, callback_name)
+            assert "hasUnsavedDocumentChanges" in body
+            assert "window.confirm" in body
+
+        for switch_message in (
+            "Discard unsaved changes and load another scene?",
+            "Discard unsaved changes and load another note?",
+            "Discard unsaved changes and load another material?",
+            "Discard unsaved document changes and switch projects?",
+        ):
+            assert switch_message in app_source
+
+    def test_project_switch_clears_stale_document_selection_and_bodies(
+        self, app_source: str
+    ) -> None:
+        reset_block = app_source.split("async function loadInitialData()", 1)[0]
+        for reset_call in (
+            "setSelectedSceneId('')",
+            "setSelectedDocumentType('')",
+            "setSelectedNoteId('')",
+            "setSelectedMaterialId('')",
+            "setSceneContent('')",
+            "setLastSavedContent('')",
+            "setNoteContent('')",
+            "setLastSavedNoteContent('')",
+            "setMaterialContent('')",
+            "setLastSavedMaterialContent('')",
+        ):
+            assert reset_call in reset_block
+
+    def test_editor_remains_document_neutral_and_body_only(
+        self, editor_source: str
+    ) -> None:
+        for expected in (
+            "selectedDocumentId",
+            "documentError",
+            "documentType = DEFAULT_DOCUMENT_TYPE",
+            "resolveActiveDocumentType(documentType)",
+            "EditorContent editor={editor}",
+            "onChange(currentEditor.getText({ blockSeparator: '\\n\\n' }))",
+        ):
+            assert expected in editor_source
+
+        for forbidden in (
+            "selectedSceneId",
+            "sceneError",
+            "metadata",
+            "summary",
+        ):
+            assert forbidden not in editor_source
+
+    def test_project_nav_remains_type_and_id_parity_aligned(
+        self, project_nav_source: str
+    ) -> None:
+        assert "activeDocumentType = DEFAULT_DOCUMENT_TYPE" in project_nav_source
+        assert "activeDocumentId = ''" in project_nav_source
+        assert "function isActiveDocument" in project_nav_source
+        for active_check in (
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.SCENE, sceneId)",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.NOTE, noteId)",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.MATERIAL, materialId)",
+        ):
+            assert active_check in project_nav_source
+
+        for id_callback in (
+            "onSelectScene(sceneId)",
+            "onSelectNote?.(noteId)",
+            "onSelectMaterial?.(materialId)",
+        ):
+            assert id_callback in project_nav_source
+
+        for forbidden_ui in (
+            "metadata editor",
+            "edit metadata",
+            "upload material",
+            "import material",
+            "create note",
+        ):
+            assert forbidden_ui not in project_nav_source.lower()
+
+    def test_api_helper_route_shapes_remain_body_and_metadata_separated(
+        self, api_source: str, app_source: str
+    ) -> None:
+        expected_body_helpers = (
+            "client.get(`/projects/${projectId}/scenes/${sceneId}`)",
+            "client.put(`/projects/${projectId}/scenes/${sceneId}`, { content })",
+            "client.get(`/projects/${projectId}/notes/${noteId}`)",
+            "client.put(`/projects/${projectId}/notes/${noteId}`, { content })",
+            "client.get(`/projects/${projectId}/materials/${materialId}`)",
+            "client.put(`/projects/${projectId}/materials/${materialId}`, { content })",
+        )
+        for helper_shape in expected_body_helpers:
+            assert helper_shape in api_source
+
+        expected_metadata_helpers = (
+            "client.put(`/projects/${projectId}/notes/${noteId}/metadata`, { metadata })",
+            "client.put(`/projects/${projectId}/materials/${materialId}/metadata`, { metadata })",
+        )
+        for helper_shape in expected_metadata_helpers:
+            assert helper_shape in api_source
+            assert helper_shape not in app_source
+
     @pytest.mark.parametrize(
         "source_path",
         [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, API_JS, SHARED_DOCUMENT_CONTROLLER_JS],
@@ -1149,6 +1392,9 @@ class TestSharedDocumentStateContract:
             "memory mutation",
             "storyform inference",
             "dramatica analysis",
+            "training data",
+            "jsonl",
+            "dataset",
         ]
         for term in forbidden_terms:
             assert term not in lower_source, (
