@@ -58,6 +58,22 @@ class OMIPromotionCreate(BaseModel):
     evidence: list | None = None
 
 
+class NoteUpdate(BaseModel):
+    content: str
+
+
+class MaterialUpdate(BaseModel):
+    content: str
+
+
+class NoteMetadataUpdate(BaseModel):
+    metadata: dict
+
+
+class MaterialMetadataUpdate(BaseModel):
+    metadata: dict
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -342,3 +358,149 @@ def create_omi_promotion(project_name: str, payload: OMIPromotionCreate) -> dict
         raise HTTPException(status_code=404, detail="OMI candidate not found") from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/projects/{project_name}/notes")
+def get_notes(project_name: str) -> dict:
+    try:
+        notes = project_manager.list_note_metadata(project_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"notes": notes}
+
+
+@app.get("/api/projects/{project_name}/notes/{note_id}")
+def get_note(project_name: str, note_id: str) -> dict:
+    try:
+        content = project_manager.load_note(project_name, note_id)
+        metadata = project_manager.load_note_metadata(project_name, note_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Note not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"content": content, "metadata": metadata}
+
+
+@app.put("/api/projects/{project_name}/notes/{note_id}")
+def update_note(
+    project_name: str,
+    note_id: str,
+    update: NoteUpdate,
+) -> dict[str, str]:
+    project_manager.save_note(project_name, note_id, update.content)
+    return {"status": "saved"}
+
+
+@app.get("/api/projects/{project_name}/notes/{note_id}/metadata")
+def get_note_metadata_route(project_name: str, note_id: str) -> dict:
+    try:
+        metadata = project_manager.load_note_metadata(project_name, note_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Note not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"metadata": metadata}
+
+
+@app.put("/api/projects/{project_name}/notes/{note_id}/metadata")
+def update_note_metadata_route(
+    project_name: str,
+    note_id: str,
+    update: NoteMetadataUpdate,
+) -> dict:
+    try:
+        current = project_manager.load_note_metadata(project_name, note_id)
+        if current["metadata_exists"]:
+            metadata = project_manager.update_note_metadata(
+                project_name,
+                note_id,
+                update.metadata,
+            )
+        else:
+            metadata = project_manager.create_note_metadata(
+                project_name,
+                note_id,
+                update.metadata,
+            )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Note not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"metadata": metadata}
+
+
+@app.get("/api/projects/{project_name}/materials")
+def get_materials(project_name: str) -> dict:
+    try:
+        materials = project_manager.list_material_metadata(project_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"materials": materials}
+
+
+@app.get("/api/projects/{project_name}/materials/{material_id}")
+def get_material(project_name: str, material_id: str) -> dict:
+    try:
+        content = project_manager.load_material(project_name, material_id)
+        metadata = project_manager.load_material_metadata(project_name, material_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Material not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"content": content, "metadata": metadata}
+
+
+@app.put("/api/projects/{project_name}/materials/{material_id}")
+def update_material(
+    project_name: str,
+    material_id: str,
+    update: MaterialUpdate,
+) -> dict[str, str]:
+    project_manager.save_material(project_name, material_id, update.content)
+    return {"status": "saved"}
+
+
+@app.get("/api/projects/{project_name}/materials/{material_id}/metadata")
+def get_material_metadata_route(project_name: str, material_id: str) -> dict:
+    try:
+        metadata = project_manager.load_material_metadata(project_name, material_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Material not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"metadata": metadata}
+
+
+@app.put("/api/projects/{project_name}/materials/{material_id}/metadata")
+def update_material_metadata_route(
+    project_name: str,
+    material_id: str,
+    update: MaterialMetadataUpdate,
+) -> dict:
+    try:
+        current = project_manager.load_material_metadata(project_name, material_id)
+        if current["metadata_exists"]:
+            metadata = project_manager.update_material_metadata(
+                project_name,
+                material_id,
+                update.metadata,
+            )
+        else:
+            metadata = project_manager.create_material_metadata(
+                project_name,
+                material_id,
+                update.metadata,
+            )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Material not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"metadata": metadata}
