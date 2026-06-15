@@ -11,6 +11,10 @@ import {
   createOMIIdea,
   createOMIPromotion,
   fetchBible,
+  fetchMaterials,
+  fetchMaterial,
+  fetchNotes,
+  fetchNote,
   fetchScene,
   fetchScenes,
   fetchStoryform,
@@ -19,6 +23,8 @@ import {
   listProjects,
   runStoryCheck,
   saveBible,
+  saveMaterial,
+  saveNote,
   saveScene,
   saveStoryform,
   updateOMICandidateDecision,
@@ -26,9 +32,11 @@ import {
 } from './api.js';
 
 const UNSAVED_CHANGES_MESSAGE = 'Discard unsaved changes and load another scene?';
-const UNSAVED_PROJECT_SWITCH_MESSAGE = 'Discard unsaved scene changes and switch projects?';
+const UNSAVED_NOTE_SWITCH_MESSAGE = 'Discard unsaved changes and load another note?';
+const UNSAVED_MATERIAL_SWITCH_MESSAGE = 'Discard unsaved changes and load another material?';
+const UNSAVED_PROJECT_SWITCH_MESSAGE = 'Discard unsaved document changes and switch projects?';
 const UNSAVED_PROJECT_CREATE_MESSAGE =
-  'Create a new project and discard unsaved scene changes from the current project?';
+  'Create a new project and discard unsaved document changes from the current project?';
 
 function formatJson(value) {
   return JSON.stringify(value ?? {}, null, 2);
@@ -87,7 +95,34 @@ export default function App() {
   const [omiStatus, setOmiStatus] = useState('');
   const [omiError, setOmiError] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  // Notes / materials minimal shell (PHASE7-IMPL-005-T006)
+  const [notes, setNotes] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [selectedDocumentType, setSelectedDocumentType] = useState('');
+  const [selectedNoteId, setSelectedNoteId] = useState('');
+  const [selectedMaterialId, setSelectedMaterialId] = useState('');
+  const [noteContent, setNoteContent] = useState('');
+  const [lastSavedNoteContent, setLastSavedNoteContent] = useState('');
+  const [materialContent, setMaterialContent] = useState('');
+  const [lastSavedMaterialContent, setLastSavedMaterialContent] = useState('');
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+  const [isLoadingMaterials, setIsLoadingMaterials] = useState(true);
+  const [isLoadingNote, setIsLoadingNote] = useState(false);
+  const [isLoadingMaterial, setIsLoadingMaterial] = useState(false);
+  const [isSavingNote, setIsSavingNote] = useState(false);
+  const [isSavingMaterial, setIsSavingMaterial] = useState(false);
+  const [notesError, setNotesError] = useState('');
+  const [materialsError, setMaterialsError] = useState('');
+  const [noteError, setNoteError] = useState('');
+  const [materialError, setMaterialError] = useState('');
+  const [noteSaveStatus, setNoteSaveStatus] = useState('');
+  const [materialSaveStatus, setMaterialSaveStatus] = useState('');
   const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
+  const isNoteDirty =
+    selectedNoteId !== '' && noteContent !== lastSavedNoteContent;
+  const isMaterialDirty =
+    selectedMaterialId !== '' && materialContent !== lastSavedMaterialContent;
+  const hasUnsavedDocumentChanges = isDirty || isNoteDirty || isMaterialDirty;
 
   const loadProjects = useCallback(async () => {
     setProjectsLoading(true);
@@ -113,12 +148,12 @@ export default function App() {
       return;
     }
 
-    if (isDirty && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
       return;
     }
 
     setActiveProjectId(projectId);
-  }, [activeProjectId, isDirty]);
+  }, [activeProjectId, hasUnsavedDocumentChanges]);
 
   const handleCreateProject = useCallback(async (title) => {
     const trimmedTitle = typeof title === 'string' ? title.trim() : '';
@@ -129,7 +164,7 @@ export default function App() {
       return false;
     }
 
-    if (isDirty && !window.confirm(UNSAVED_PROJECT_CREATE_MESSAGE)) {
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_CREATE_MESSAGE)) {
       return false;
     }
 
@@ -162,7 +197,7 @@ export default function App() {
     } finally {
       setIsCreatingProject(false);
     }
-  }, [isCreatingProject, isDirty, loadProjects]);
+  }, [hasUnsavedDocumentChanges, isCreatingProject, loadProjects]);
 
   useEffect(() => {
     let isMounted = true;
@@ -172,14 +207,39 @@ export default function App() {
     setLastSavedContent('');
     setAnalysisReport(null);
     setSaveStatus('');
+    setSelectedDocumentType('');
+    setSelectedNoteId('');
+    setSelectedMaterialId('');
+    setNoteContent('');
+    setLastSavedNoteContent('');
+    setMaterialContent('');
+    setLastSavedMaterialContent('');
+    setNoteSaveStatus('');
+    setMaterialSaveStatus('');
+    setNoteError('');
+    setMaterialError('');
 
     async function loadInitialData() {
       setIsLoadingScenes(true);
+      setIsLoadingNotes(true);
+      setIsLoadingMaterials(true);
       setSceneError('');
+      setNotesError('');
+      setMaterialsError('');
 
       try {
-        const [scenePayload, biblePayload, storyformPayload, contextPayload, omiPayload] = await Promise.all([
+        const [
+          scenePayload,
+          notesPayload,
+          materialsPayload,
+          biblePayload,
+          storyformPayload,
+          contextPayload,
+          omiPayload,
+        ] = await Promise.all([
           fetchScenes(activeProjectId),
+          fetchNotes(activeProjectId),
+          fetchMaterials(activeProjectId),
           fetchBible(activeProjectId),
           fetchStoryform(activeProjectId),
           fetchStoryformContext(activeProjectId),
@@ -191,6 +251,8 @@ export default function App() {
         }
 
         setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? []);
+        setNotes(notesPayload?.notes ?? []);
+        setMaterials(materialsPayload?.materials ?? []);
         const formattedBible = formatJson(biblePayload);
         const formattedStoryform = formatJson(storyformPayload);
         setBibleText(formattedBible);
@@ -204,11 +266,16 @@ export default function App() {
         setOmiStatus('Ready');
       } catch (error) {
         if (isMounted) {
-          setSceneError(error instanceof Error ? error.message : 'Failed to load project data.');
+          const message = error instanceof Error ? error.message : 'Failed to load project data.';
+          setSceneError(message);
+          setNotesError(message);
+          setMaterialsError(message);
         }
       } finally {
         if (isMounted) {
           setIsLoadingScenes(false);
+          setIsLoadingNotes(false);
+          setIsLoadingMaterials(false);
         }
       }
     }
@@ -240,14 +307,15 @@ export default function App() {
   }, [activeProjectId]);
 
   const handleSelectScene = useCallback(async (sceneId) => {
-    if (sceneId === selectedSceneId) {
+    if (selectedDocumentType === 'scene' && sceneId === selectedSceneId) {
       return;
     }
 
-    if (isDirty && !window.confirm(UNSAVED_CHANGES_MESSAGE)) {
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_CHANGES_MESSAGE)) {
       return;
     }
 
+    setSelectedDocumentType('scene');
     setSelectedSceneId(sceneId);
     setSceneContent('');
     setLastSavedContent('');
@@ -270,7 +338,7 @@ export default function App() {
     } finally {
       setIsLoadingScene(false);
     }
-  }, [activeProjectId, isDirty, selectedSceneId]);
+  }, [activeProjectId, hasUnsavedDocumentChanges, selectedDocumentType, selectedSceneId]);
 
   const handleSceneContentChange = useCallback((nextContent) => {
     setSceneContent(nextContent);
@@ -278,6 +346,129 @@ export default function App() {
       currentStatus.startsWith('Save failed') ? 'Unsaved changes' : currentStatus
     ));
   }, []);
+
+  const handleSelectNote = useCallback(async (noteId) => {
+    if (!noteId || (selectedDocumentType === 'note' && noteId === selectedNoteId)) {
+      return;
+    }
+
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_NOTE_SWITCH_MESSAGE)) {
+      return;
+    }
+
+    setSelectedDocumentType('note');
+    setSelectedNoteId(noteId);
+    setNoteContent('');
+    setLastSavedNoteContent('');
+    setNoteSaveStatus('');
+    setNoteError('');
+    setIsLoadingNote(true);
+
+    try {
+      const data = await fetchNote(noteId, activeProjectId);
+      const loadedContent = data.content ?? '';
+      setNoteContent(loadedContent);
+      setLastSavedNoteContent(loadedContent);
+      setNoteSaveStatus('Saved');
+    } catch (error) {
+      setNoteError(error instanceof Error ? error.message : 'Failed to load note.');
+      setSelectedNoteId('');
+      setNoteContent('');
+      setLastSavedNoteContent('');
+    } finally {
+      setIsLoadingNote(false);
+    }
+  }, [activeProjectId, hasUnsavedDocumentChanges, selectedDocumentType, selectedNoteId]);
+
+  const handleSelectMaterial = useCallback(async (materialId) => {
+    if (
+      !materialId
+      || (selectedDocumentType === 'material' && materialId === selectedMaterialId)
+    ) {
+      return;
+    }
+
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_MATERIAL_SWITCH_MESSAGE)) {
+      return;
+    }
+
+    setSelectedDocumentType('material');
+    setSelectedMaterialId(materialId);
+    setMaterialContent('');
+    setLastSavedMaterialContent('');
+    setMaterialSaveStatus('');
+    setMaterialError('');
+    setIsLoadingMaterial(true);
+
+    try {
+      const data = await fetchMaterial(materialId, activeProjectId);
+      const loadedContent = data.content ?? '';
+      setMaterialContent(loadedContent);
+      setLastSavedMaterialContent(loadedContent);
+      setMaterialSaveStatus('Saved');
+    } catch (error) {
+      setMaterialError(error instanceof Error ? error.message : 'Failed to load material.');
+      setSelectedMaterialId('');
+      setMaterialContent('');
+      setLastSavedMaterialContent('');
+    } finally {
+      setIsLoadingMaterial(false);
+    }
+  }, [activeProjectId, hasUnsavedDocumentChanges, selectedDocumentType, selectedMaterialId]);
+
+  const handleNoteContentChange = useCallback((nextContent) => {
+    setNoteContent(nextContent);
+    setNoteSaveStatus((currentStatus) => (
+      currentStatus.startsWith('Save failed') ? 'Unsaved changes' : currentStatus
+    ));
+  }, []);
+
+  const handleMaterialContentChange = useCallback((nextContent) => {
+    setMaterialContent(nextContent);
+    setMaterialSaveStatus((currentStatus) => (
+      currentStatus.startsWith('Save failed') ? 'Unsaved changes' : currentStatus
+    ));
+  }, []);
+
+  const handleSaveNote = useCallback(async () => {
+    if (!selectedNoteId || isSavingNote) {
+      return;
+    }
+
+    setIsSavingNote(true);
+    setNoteSaveStatus('');
+
+    try {
+      await saveNote(selectedNoteId, noteContent, activeProjectId);
+      setLastSavedNoteContent(noteContent);
+      setNoteSaveStatus('Saved');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Save failed.';
+      setNoteSaveStatus(`Save failed: ${message}`);
+    } finally {
+      setIsSavingNote(false);
+    }
+  }, [activeProjectId, isSavingNote, noteContent, selectedNoteId]);
+
+  const handleSaveMaterial = useCallback(async () => {
+    if (!selectedMaterialId || isSavingMaterial) {
+      return;
+    }
+
+    setIsSavingMaterial(true);
+    setMaterialSaveStatus('');
+
+    try {
+      await saveMaterial(selectedMaterialId, materialContent, activeProjectId);
+      setLastSavedMaterialContent(materialContent);
+      setMaterialSaveStatus('Saved');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Save failed.';
+      setMaterialSaveStatus(`Save failed: ${message}`);
+    } finally {
+      setIsSavingMaterial(false);
+    }
+  }, [activeProjectId, isSavingMaterial, materialContent, selectedMaterialId]);
 
   const handleBibleTextChange = useCallback((nextText) => {
     setBibleText(nextText);
@@ -291,7 +482,7 @@ export default function App() {
 
   useEffect(() => {
     function handleBeforeUnload(event) {
-      if (!isDirty) {
+      if (!hasUnsavedDocumentChanges) {
         return;
       }
 
@@ -304,7 +495,7 @@ export default function App() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isDirty]);
+  }, [hasUnsavedDocumentChanges]);
 
   const handleSave = useCallback(async () => {
     if (!selectedSceneId || isSaving) {
@@ -502,6 +693,14 @@ export default function App() {
     function handleKeyDown(event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
+        if (selectedDocumentType === 'note') {
+          handleSaveNote();
+          return;
+        }
+        if (selectedDocumentType === 'material') {
+          handleSaveMaterial();
+          return;
+        }
         handleSave();
       }
     }
@@ -511,7 +710,7 @@ export default function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleSave]);
+  }, [handleSave, handleSaveMaterial, handleSaveNote, selectedDocumentType]);
 
   const handleRunStoryCheck = useCallback(async () => {
     if (!selectedSceneId) {
@@ -551,8 +750,19 @@ export default function App() {
         isLoading={isLoadingScenes}
         error={sceneError}
         onSelectScene={handleSelectScene}
+        notes={notes}
+        materials={materials}
+        selectedNoteId={selectedNoteId}
+        selectedMaterialId={selectedMaterialId}
+        activeDocumentType={selectedDocumentType || 'scene'}
+        isLoadingNotes={isLoadingNotes}
+        isLoadingMaterials={isLoadingMaterials}
+        notesError={notesError}
+        materialsError={materialsError}
+        onSelectNote={handleSelectNote}
+        onSelectMaterial={handleSelectMaterial}
       />
-      <main className="editor-column" aria-label="Scene editor">
+      <main className="editor-column" aria-label="Document editor">
         <ProjectContext
           bibleText={bibleText}
           bibleStatus={bibleStatus}
@@ -583,19 +793,55 @@ export default function App() {
           onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
         />
 
-        <Editor
-          content={sceneContent}
-          disabled={!selectedSceneId || isLoadingScene}
-          hasUnsavedChanges={isDirty}
-          isLoading={isLoadingScene}
-          isSaving={isSaving}
-          onChange={handleSceneContentChange}
-          onSave={handleSave}
-          saveDisabled={!selectedSceneId || isLoadingScene || isSaving}
-          saveStatus={saveStatus}
-          sceneError={sceneError}
-          selectedSceneId={selectedSceneId}
-        />
+        {selectedDocumentType === 'note' && selectedNoteId ? (
+          <Editor
+            key={`note-${selectedNoteId}`}
+            documentType="note"
+            content={noteContent}
+            disabled={!selectedNoteId || isLoadingNote}
+            hasUnsavedChanges={isNoteDirty}
+            isLoading={isLoadingNote}
+            isSaving={isSavingNote}
+            onChange={handleNoteContentChange}
+            onSave={handleSaveNote}
+            saveDisabled={!selectedNoteId || isLoadingNote || isSavingNote}
+            saveStatus={noteSaveStatus}
+            documentError={noteError}
+            selectedDocumentId={selectedNoteId}
+          />
+        ) : selectedDocumentType === 'material' && selectedMaterialId ? (
+          <Editor
+            key={`material-${selectedMaterialId}`}
+            documentType="material"
+            content={materialContent}
+            disabled={!selectedMaterialId || isLoadingMaterial}
+            hasUnsavedChanges={isMaterialDirty}
+            isLoading={isLoadingMaterial}
+            isSaving={isSavingMaterial}
+            onChange={handleMaterialContentChange}
+            onSave={handleSaveMaterial}
+            saveDisabled={!selectedMaterialId || isLoadingMaterial || isSavingMaterial}
+            saveStatus={materialSaveStatus}
+            documentError={materialError}
+            selectedDocumentId={selectedMaterialId}
+          />
+        ) : (
+          <Editor
+            key={`scene-${selectedSceneId}`}
+            documentType="scene"
+            content={sceneContent}
+            disabled={!selectedSceneId || isLoadingScene}
+            hasUnsavedChanges={isDirty}
+            isLoading={isLoadingScene}
+            isSaving={isSaving}
+            onChange={handleSceneContentChange}
+            onSave={handleSave}
+            saveDisabled={!selectedSceneId || isLoadingScene || isSaving}
+            saveStatus={saveStatus}
+            documentError={sceneError}
+            selectedDocumentId={selectedSceneId}
+          />
+        )}
       </main>
       <AnalysisSidebar
         report={analysisReport}

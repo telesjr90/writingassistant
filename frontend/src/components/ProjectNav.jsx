@@ -122,6 +122,82 @@ function formatProjectOptionLabel(project) {
   return `${project.title} — ${statusLabel}`;
 }
 
+function normalizeNoteOption(note, originalIndex = 0) {
+  if (typeof note === 'string') {
+    return {
+      noteId: note,
+      title: note,
+      label: note,
+      status: 'Note',
+      originalIndex,
+    };
+  }
+
+  if (!note || typeof note !== 'object') {
+    return null;
+  }
+
+  const noteId = note.note_id ?? note.noteId ?? note.id ?? note.name;
+  if (!noteId) {
+    return null;
+  }
+
+  const rawTitle = typeof note.title === 'string' ? note.title.trim() : '';
+  const title = rawTitle || noteId;
+
+  return {
+    noteId,
+    title,
+    label: title,
+    status: note.status ?? 'Note',
+    originalIndex,
+  };
+}
+
+function normalizeNoteList(notes) {
+  return notes
+    .map(normalizeNoteOption)
+    .filter((note) => note?.noteId);
+}
+
+function normalizeMaterialOption(material, originalIndex = 0) {
+  if (typeof material === 'string') {
+    return {
+      materialId: material,
+      title: material,
+      label: material,
+      status: 'Material',
+      originalIndex,
+    };
+  }
+
+  if (!material || typeof material !== 'object') {
+    return null;
+  }
+
+  const materialId = material.material_id ?? material.materialId ?? material.id ?? material.name;
+  if (!materialId) {
+    return null;
+  }
+
+  const rawTitle = typeof material.title === 'string' ? material.title.trim() : '';
+  const title = rawTitle || materialId;
+
+  return {
+    materialId,
+    title,
+    label: title,
+    status: material.status ?? 'Material',
+    originalIndex,
+  };
+}
+
+function normalizeMaterialList(materials) {
+  return materials
+    .map(normalizeMaterialOption)
+    .filter((material) => material?.materialId);
+}
+
 export default function ProjectNav({
   activeProjectId,
   projects,
@@ -138,11 +214,24 @@ export default function ProjectNav({
   isLoading,
   error,
   onSelectScene,
+  notes = [],
+  materials = [],
+  selectedNoteId = '',
+  selectedMaterialId = '',
+  activeDocumentType = 'scene',
+  isLoadingNotes = false,
+  isLoadingMaterials = false,
+  notesError = '',
+  materialsError = '',
+  onSelectNote,
+  onSelectMaterial,
 }) {
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const trimmedProjectTitle = newProjectTitle.trim();
   const canCreateProject = Boolean(trimmedProjectTitle) && !isCreatingProject;
   const normalizedScenes = normalizeSceneList(scenes);
+  const normalizedNotes = normalizeNoteList(notes);
+  const normalizedMaterials = normalizeMaterialList(materials);
   const projectOptions = buildProjectOptions(projects, activeProjectId);
   const activeProject = projectOptions.find((project) => project.id === activeProjectId);
   const activeProjectLabel = activeProject?.title ?? activeProjectId ?? 'Project';
@@ -266,13 +355,73 @@ export default function ProjectNav({
 
           return (
             <button
-              className={`scene-item${selectedSceneId === sceneId ? ' is-active' : ''}`}
+              className={
+                `scene-item${activeDocumentType === 'scene' && selectedSceneId === sceneId ? ' is-active' : ''}`
+              }
               type="button"
               key={sceneId}
               onClick={() => onSelectScene(sceneId)}
             >
               <span>{sceneLabel}</span>
               <small>{scene.status}</small>
+            </button>
+          );
+        })}
+      </nav>
+
+      <nav className="scene-list" aria-label="Notes">
+        <div className="panel-header">
+          <p className="eyebrow">Notes</p>
+        </div>
+        {isLoadingNotes && <p className="muted-copy">Loading notes...</p>}
+        {!isLoadingNotes && notesError && <p className="error-copy">{notesError}</p>}
+        {!isLoadingNotes && !notesError && normalizedNotes.length === 0 && (
+          <p className="muted-copy">No notes yet.</p>
+        )}
+        {normalizedNotes.map((note) => {
+          const noteId = note.noteId;
+          const noteLabel = note.label || note.title || noteId;
+
+          return (
+            <button
+              className={
+                `scene-item${activeDocumentType === 'note' && selectedNoteId === noteId ? ' is-active' : ''}`
+              }
+              type="button"
+              key={noteId}
+              onClick={() => onSelectNote?.(noteId)}
+            >
+              <span>{noteLabel}</span>
+              <small>{note.status}</small>
+            </button>
+          );
+        })}
+      </nav>
+
+      <nav className="scene-list" aria-label="Materials">
+        <div className="panel-header">
+          <p className="eyebrow">Materials</p>
+        </div>
+        {isLoadingMaterials && <p className="muted-copy">Loading materials...</p>}
+        {!isLoadingMaterials && materialsError && <p className="error-copy">{materialsError}</p>}
+        {!isLoadingMaterials && !materialsError && normalizedMaterials.length === 0 && (
+          <p className="muted-copy">No materials yet.</p>
+        )}
+        {normalizedMaterials.map((material) => {
+          const materialId = material.materialId;
+          const materialLabel = material.label || material.title || materialId;
+
+          return (
+            <button
+              className={
+                `scene-item${activeDocumentType === 'material' && selectedMaterialId === materialId ? ' is-active' : ''}`
+              }
+              type="button"
+              key={materialId}
+              onClick={() => onSelectMaterial?.(materialId)}
+            >
+              <span>{materialLabel}</span>
+              <small>{material.status}</small>
             </button>
           );
         })}

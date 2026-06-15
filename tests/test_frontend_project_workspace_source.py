@@ -371,12 +371,7 @@ class TestNoBackendOrNetworkMutation:
 
 
 class TestApiNoteMaterialHelpers:
-    """PHASE7-IMPL-005-T005 frontend API compatibility helpers for
-    notes and materials.
-
-    These tests verify the API layer is wired up but UI components
-    remain untouched in this slice.
-    """
+    """PHASE7-IMPL-005 frontend API compatibility helpers for notes and materials."""
 
     NOTE_HELPERS = (
         "fetchNotes",
@@ -519,22 +514,7 @@ class TestApiNoteMaterialHelpers:
             in api_source
         )
 
-    # ---- 9: UI components do not import or render notes/materials yet ----
-
-    @pytest.mark.parametrize(
-        "ui_source",
-        ["app_source", "project_nav_source", "editor_source", "project_context_source"],
-    )
-    def test_ui_components_do_not_import_new_helpers(
-        self, request, ui_source: str
-    ) -> None:
-        source = request.getfixturevalue(ui_source)
-        for fn in self.ALL_NEW_HELPERS:
-            assert fn not in source, (
-                f"{ui_source} should not reference {fn} in T005 API-only slice"
-            )
-
-    # ---- 10: No prose, summary, extraction, model, OMI, memory/canon, or
+    # ---- 9: No prose, summary, extraction, model, OMI, memory/canon, or
     #          training/dataset behaviour was introduced ----
 
     def test_api_js_excludes_forbidden_workspace_terms(
@@ -613,3 +593,104 @@ class TestApiNoteMaterialHelpers:
             assert "content" not in payload, (
                 f"{label} metadata payload must not include content: {payload!r}"
             )
+
+
+class TestNoteMaterialShellSource:
+    def test_app_imports_only_body_level_note_material_helpers(
+        self, app_source: str
+    ) -> None:
+        for helper in (
+            "fetchNotes",
+            "fetchNote",
+            "saveNote",
+            "fetchMaterials",
+            "fetchMaterial",
+            "saveMaterial",
+        ):
+            assert helper in app_source
+
+        for metadata_helper in (
+            "fetchNoteMetadata",
+            "saveNoteMetadata",
+            "fetchMaterialMetadata",
+            "saveMaterialMetadata",
+        ):
+            assert metadata_helper not in app_source
+
+    def test_project_nav_has_notes_and_materials_sections(
+        self, project_nav_source: str
+    ) -> None:
+        assert 'aria-label="Notes"' in project_nav_source
+        assert 'aria-label="Materials"' in project_nav_source
+        assert "No notes yet." in project_nav_source
+        assert "No materials yet." in project_nav_source
+        assert "Loading notes..." in project_nav_source
+        assert "Loading materials..." in project_nav_source
+
+    def test_note_material_labels_fallback_to_ids(self, project_nav_source: str) -> None:
+        assert "function normalizeNoteOption" in project_nav_source
+        assert "function normalizeMaterialOption" in project_nav_source
+        assert "note.note_id" in project_nav_source
+        assert "material.material_id" in project_nav_source
+        assert "const title = rawTitle || noteId" in project_nav_source
+        assert "const title = rawTitle || materialId" in project_nav_source
+
+    def test_note_material_selection_uses_ids_not_titles(
+        self, project_nav_source: str
+    ) -> None:
+        assert "const noteId = note.noteId" in project_nav_source
+        assert "const materialId = material.materialId" in project_nav_source
+        assert "onSelectNote?.(noteId)" in project_nav_source
+        assert "onSelectMaterial?.(materialId)" in project_nav_source
+        assert "onSelectNote?.(noteLabel)" not in project_nav_source
+        assert "onSelectMaterial?.(materialLabel)" not in project_nav_source
+
+    def test_app_fetches_exact_note_and_material_bodies(self, app_source: str) -> None:
+        assert "fetchNotes(activeProjectId)" in app_source
+        assert "fetchMaterials(activeProjectId)" in app_source
+        assert "fetchNote(noteId, activeProjectId)" in app_source
+        assert "fetchMaterial(materialId, activeProjectId)" in app_source
+        assert "const loadedContent = data.content ?? ''" in app_source
+        assert "setNoteContent(loadedContent)" in app_source
+        assert "setMaterialContent(loadedContent)" in app_source
+
+    def test_app_saves_body_content_by_id(self, app_source: str) -> None:
+        assert "saveNote(selectedNoteId, noteContent, activeProjectId)" in app_source
+        assert (
+            "saveMaterial(selectedMaterialId, materialContent, activeProjectId)"
+            in app_source
+        )
+        assert "saveNote(selectedNoteId, noteLabel" not in app_source
+        assert "saveMaterial(selectedMaterialId, materialLabel" not in app_source
+
+    def test_editor_supports_document_type_without_shared_refactor(
+        self, editor_source: str
+    ) -> None:
+        assert "DOCUMENT_TYPE_LABELS" in editor_source
+        assert "selectedDocumentId" in editor_source
+        assert "documentType = 'scene'" in editor_source
+        assert "documentError" in editor_source
+        assert "selectedSceneId" not in editor_source
+        assert "sceneError" not in editor_source
+        assert "shared editor" not in editor_source.lower()
+
+    def test_app_uses_active_document_type_without_metadata_editing_ui(
+        self, app_source: str
+    ) -> None:
+        assert "selectedDocumentType" in app_source
+        assert "documentType=\"note\"" in app_source
+        assert "documentType=\"material\"" in app_source
+        assert "documentError={noteError}" in app_source
+        assert "documentError={materialError}" in app_source
+        assert "fetchNoteMetadata" not in app_source
+        assert "saveNoteMetadata" not in app_source
+        assert "fetchMaterialMetadata" not in app_source
+        assert "saveMaterialMetadata" not in app_source
+
+    def test_project_context_is_not_used_for_notes_materials(
+        self, project_context_source: str
+    ) -> None:
+        assert "fetchNote" not in project_context_source
+        assert "fetchMaterial" not in project_context_source
+        assert "saveNote" not in project_context_source
+        assert "saveMaterial" not in project_context_source

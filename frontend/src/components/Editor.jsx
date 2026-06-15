@@ -22,6 +22,27 @@ function textToHtml(content) {
     .join('');
 }
 
+const DOCUMENT_TYPE_LABELS = {
+  scene: {
+    eyebrow: 'Editor',
+    empty: 'Select a scene to begin editing.',
+    emptyContent: 'This scene is empty. Saving an empty scene is allowed.',
+    surfaceAria: 'Scene draft editor',
+  },
+  note: {
+    eyebrow: 'Note',
+    empty: 'Select a note to begin editing.',
+    emptyContent: 'This note is empty. Saving an empty note is allowed.',
+    surfaceAria: 'Note draft editor',
+  },
+  material: {
+    eyebrow: 'Material',
+    empty: 'Select a material to begin editing.',
+    emptyContent: 'This material is empty. Saving an empty material is allowed.',
+    surfaceAria: 'Material draft editor',
+  },
+};
+
 export default function Editor({
   content,
   disabled,
@@ -32,9 +53,11 @@ export default function Editor({
   onSave,
   saveDisabled,
   saveStatus,
-  sceneError,
-  selectedSceneId,
+  documentError,
+  selectedDocumentId,
+  documentType = 'scene',
 }) {
+  const labels = DOCUMENT_TYPE_LABELS[documentType] ?? DOCUMENT_TYPE_LABELS.scene;
   const editor = useEditor({
     extensions: [StarterKit],
     content: textToHtml(content),
@@ -45,7 +68,7 @@ export default function Editor({
     editorProps: {
       attributes: {
         class: 'tiptap-surface',
-        'aria-label': 'Scene draft editor',
+        'aria-label': labels.surfaceAria,
       },
     },
   });
@@ -66,7 +89,9 @@ export default function Editor({
     editor?.setEditable(!disabled);
   }, [disabled, editor]);
 
-  const title = selectedSceneId ? selectedSceneId.replace(/[-_]+/g, ' ') : 'No scene selected';
+  const title = selectedDocumentId
+    ? selectedDocumentId.replace(/[-_]+/g, ' ')
+    : `No ${documentType} selected`;
   const displayedSaveStatus = (() => {
     if (isLoading) {
       return 'Loading...';
@@ -88,7 +113,7 @@ export default function Editor({
       return saveStatus;
     }
 
-    return selectedSceneId ? 'Saved' : '';
+    return selectedDocumentId ? 'Saved' : '';
   })();
   const saveStatusClass = displayedSaveStatus.startsWith('Save failed')
     ? 'save-status is-error'
@@ -98,7 +123,7 @@ export default function Editor({
     <section className="editor-panel">
       <header className="editor-header">
         <div>
-          <p className="eyebrow">Editor</p>
+          <p className="eyebrow">{labels.eyebrow}</p>
           <h2>{title}</h2>
         </div>
         <div className="editor-actions" aria-label="Editor actions">
@@ -115,10 +140,10 @@ export default function Editor({
         </div>
       </header>
 
-      {!selectedSceneId && <p className="editor-empty">Select a scene to begin editing.</p>}
-      {selectedSceneId && sceneError && <p className="error-copy">{sceneError}</p>}
-      {selectedSceneId && !isLoading && content.length === 0 && (
-        <p className="muted-copy">This scene is empty. Saving an empty scene is allowed.</p>
+      {!selectedDocumentId && <p className="editor-empty">{labels.empty}</p>}
+      {selectedDocumentId && documentError && <p className="error-copy">{documentError}</p>}
+      {selectedDocumentId && !isLoading && content.length === 0 && (
+        <p className="muted-copy">{labels.emptyContent}</p>
       )}
       <EditorContent editor={editor} />
     </section>
