@@ -1,0 +1,228 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-006",
+  "title": "Shared owner-authored document editor",
+  "type": "runtime",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-004",
+    "PHASE7-IMPL-005"
+  ],
+  "boundary_tags": [
+    "owner_authored_prose_storage",
+    "no_generated_prose",
+    "no_model_calls",
+    "no_extraction",
+    "no_memory_canon_mutation",
+    "local_first"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-006.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-006.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-006.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-006/"
+  },
+  "goal": "Consolidate and harden the current scene/note/material owner-authored editing flow into a shared editor pattern that preserves exact user-authored content and consistent selection/load/save/dirty-state behavior without generated prose, extraction, summaries, model calls, or memory/canon mutation.",
+  "why_now": "PHASE7-IMPL-005 completed note/material storage, routes, API helpers, and a minimal navigation/display shell. The workspace now has scenes, notes, and materials available in the frontend, but the editor state and handlers remain duplicated and need a shared owner-authored document contract before later workspace pages build on them.",
+  "scope": {
+    "include": [
+      "Inventory current scene/note/material editor surfaces.",
+      "Define a conservative PHASE7-IMPL-006 child sequence.",
+      "Prepare status and roadmap records before runtime implementation begins.",
+      "Identify PHASE7-IMPL-006-T002 as the next source-level contract/test child."
+    ],
+    "exclude": [
+      "Runtime frontend implementation during T001.",
+      "Runtime backend implementation during T001.",
+      "Test edits during T001.",
+      "Generated prose, rewriting, summaries, extraction, semantic search, model/Ollama calls, OMI promotion, memory/canon mutation, metadata editing UI, Dramatica analysis, training data, JSONL, dataset artifacts, package changes, app servers, frontend builds, and runtime project fixture writes."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md"
+    ],
+    "specs": [
+      "docs/roadmap/user_authored_document_editor_workflow_spec.md",
+      "docs/roadmap/project_workspace_foundation_spec.md",
+      "docs/roadmap/chapter_scene_data_model_spec.md",
+      "docs/roadmap/notes_materials_data_model_spec.md",
+      "docs/roadmap/notes_materials_page_spec.md"
+    ],
+    "source_files": [
+      "frontend/src/App.jsx",
+      "frontend/src/components/Editor.jsx",
+      "frontend/src/components/ProjectNav.jsx",
+      "frontend/src/components/ProjectContext.jsx",
+      "frontend/src/api.js",
+      "tests/test_frontend_project_workspace_source.py",
+      "tests/test_scene_routes.py",
+      "tests/test_note_material_routes.py",
+      "backend/main.py",
+      "backend/project_manager.py"
+    ],
+    "quality_notes": [
+      "Roadmap index and implementation status are primary authority for task identity and active frontier.",
+      "Direct reads of named source files were used for implementation-surface inventory.",
+      "Existing frontend tests are source-level guards and do not substitute for browser/manual validation.",
+      "No CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, or broad discovery were run."
+    ]
+  },
+  "implementation_surfaces": {
+    "frontend": [
+      {
+        "path": "frontend/src/App.jsx",
+        "notes": "Owns separate scene, note, and material state groups plus selectedDocumentType; load/save and dirty-state logic is duplicated across document types."
+      },
+      {
+        "path": "frontend/src/components/Editor.jsx",
+        "notes": "Accepts documentType, selectedDocumentId, generic documentError, and body content props; uses TipTap and currently provides document-type labels."
+      },
+      {
+        "path": "frontend/src/components/ProjectNav.jsx",
+        "notes": "Renders scene, note, and material lists; normalizes display labels; active highlighting uses activeDocumentType plus selected IDs."
+      },
+      {
+        "path": "frontend/src/api.js",
+        "notes": "Exposes scene, note, and material body helpers; note/material metadata helpers exist but are not used by the minimal shell."
+      }
+    ],
+    "backend": [
+      {
+        "path": "backend/main.py",
+        "notes": "Provides scene and note/material body routes; PHASE7-IMPL-006 is expected to avoid backend route changes unless a later narrow bug fix is scoped."
+      },
+      {
+        "path": "backend/project_manager.py",
+        "notes": "Provides safe body/metadata storage helpers for scenes, notes, and materials."
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/test_frontend_project_workspace_source.py",
+        "notes": "Primary source-level regression target for shared editor contract work."
+      },
+      {
+        "path": "tests/test_scene_routes.py",
+        "notes": "Existing scene route regression surface."
+      },
+      {
+        "path": "tests/test_note_material_routes.py",
+        "notes": "Existing note/material route regression surface."
+      }
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE7-IMPL-006-T001",
+      "title": "Shared owner-authored document editor inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE7-IMPL-006"
+      ],
+      "file_allowlist": [
+        "docs/roadmap/tasks/PHASE7-IMPL-006.md",
+        "docs/roadmap/inventory/PHASE7-IMPL-006.md",
+        "docs/roadmap/enrichment/PHASE7-IMPL-006.enrichment.json",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md",
+        "docs/roadmap/roadmap_index.yaml"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T002",
+      "title": "Shared document state contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-006-T001"
+      ],
+      "file_allowlist": [
+        "tests/test_frontend_project_workspace_source.py"
+      ],
+      "scope": [
+        "Define source-level expectations for active document type, document ID, content, dirty state, loading state, save status, and errors.",
+        "Add source-level regression checks before runtime refactor.",
+        "Avoid runtime implementation unless explicitly scoped by T002."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T003",
+      "title": "Extract shared editor controller helpers",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-006-T002"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T004",
+      "title": "Editor component prop cleanup and behavior parity",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-006-T003"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T005",
+      "title": "Project navigation document selection parity",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-006-T004"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T006",
+      "title": "Shared editor regression coverage",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-006-T005"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-006-T006"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Scene, note, and material body editing share a documented frontend contract.",
+    "Selection/load/save behavior uses document IDs rather than display titles.",
+    "Body saves preserve exact owner-authored content and do not inject metadata.",
+    "Dirty-state, save-status, loading-state, and error handling are consistent across document types.",
+    "Project switching remains guarded when owner-authored document content has unsaved changes.",
+    "Existing scene behavior and PHASE7-IMPL-005 note/material shell behavior remain stable.",
+    "No generated prose, summaries, extraction, model/Ollama calls, OMI/canon/memory mutation, Dramatica analysis, training/JSONL/dataset work, package changes, app servers, frontend builds, or runtime project fixture writes are introduced."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "git diff -- docs/roadmap/tasks/PHASE7-IMPL-006.md docs/roadmap/inventory/PHASE7-IMPL-006.md docs/roadmap/enrichment/PHASE7-IMPL-006.enrichment.json docs/roadmap/implementation_status.md docs/roadmap/roadmap_index.yaml docs/roadmap/task_backlog.md docs/roadmap/phase_map.md docs/roadmap/validation/latest_roadmap_validation.md"
+    ],
+    "notes": "Do not use LeanCTX. If raw git diff is blocked by the local hook, record the skip."
+  },
+  "safety_notes": [
+    "Editor body content is owner-authored or owner-provided content.",
+    "Saving editor body content must not be blocked as AI prose generation.",
+    "AI output must never be inserted into scene, note, or material body content.",
+    "Future analysis/extraction must remain separate from editor body content and produce diagnostics or candidates only."
+  ],
+  "deferred_work": [
+    "Browser/manual validation under PHASE7-IMPL-010.",
+    "Metadata editing UI unless separately scoped.",
+    "Extraction, summaries, semantic search, OMI promotion, memory/canon mutation, Dramatica analysis, model/Ollama calls, training/JSONL/dataset work, and runtime project fixture changes."
+  ]
+}

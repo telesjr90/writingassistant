@@ -488,6 +488,23 @@
         "no_generated_prose",
         "no_memory_canon_mutation"
       ]
+    },
+    {
+      "id": "PHASE7-IMPL-006-T001",
+      "title": "Shared owner-authored document editor inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-006",
+      "depends_on": [
+        "PHASE7-IMPL-006"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
     }
   ]
 }
