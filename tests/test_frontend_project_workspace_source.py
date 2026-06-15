@@ -495,6 +495,149 @@ class TestProjectOverviewDataContract:
             assert "summarize" not in backend_source.lower()
             assert "semantic search" not in backend_source.lower()
 
+    def test_existing_data_sources_are_sufficient_for_first_overview_shell(
+        self, app_source: str, api_source: str
+    ) -> None:
+        for state_token in (
+            "const [projects, setProjects] = useState([])",
+            "const [activeProjectId, setActiveProjectId] = useState(PROJECT_ID)",
+            "const [scenes, setScenes] = useState([])",
+            "const [notes, setNotes] = useState([])",
+            "const [materials, setMaterials] = useState([])",
+            "const [omiData, setOmiData] = useState({ index: null, ideas: [], candidates: [] })",
+        ):
+            assert state_token in app_source
+
+        for load_call in (
+            "listProjects()",
+            "fetchScenes(activeProjectId)",
+            "fetchNotes(activeProjectId)",
+            "fetchMaterials(activeProjectId)",
+            "getOMI(activeProjectId)",
+        ):
+            assert load_call in app_source
+
+        for api_helper in (
+            "export async function listProjects()",
+            "export async function fetchScenes(",
+            "export async function fetchNotes(",
+            "export async function fetchMaterials(",
+            "export async function getOMI(",
+        ):
+            assert api_helper in api_source
+
+        assert "/overview" not in api_source
+
+    def test_overview_counts_can_be_derived_from_loaded_lists_without_body_reads(
+        self, app_source: str
+    ) -> None:
+        initial_load_block = app_source.split("async function loadInitialData()", 1)[1].split(
+            "const refreshOMI",
+            1,
+        )[0]
+
+        for list_setter in (
+            "setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? [])",
+            "setNotes(notesPayload?.notes ?? [])",
+            "setMaterials(materialsPayload?.materials ?? [])",
+        ):
+            assert list_setter in initial_load_block
+
+        for body_fetch in ("fetchScene(", "fetchNote(", "fetchMaterial("):
+            assert body_fetch not in initial_load_block
+
+        for unsafe_count_source in (
+            "runStoryCheck",
+            "extract",
+            "summar",
+            "analysis",
+            "model",
+        ):
+            assert unsafe_count_source not in initial_load_block.lower()
+
+    def test_chapter_count_is_deferred_without_blocking_overview_shell(
+        self,
+        app_source: str,
+        api_source: str,
+        inventory_007_source: str,
+    ) -> None:
+        assert "Chapter count if chapter metadata helpers provide a cheap count; otherwise defer." in (
+            inventory_007_source
+        )
+        assert "Chapter count may need helper support or may be deferred if no cheap path exists." in (
+            inventory_007_source
+        )
+        assert "fetchChapters" not in app_source
+        assert "fetchChapters" not in api_source
+        assert "chapter count" not in api_source.lower()
+
+    def test_t004_does_not_require_dedicated_backend_overview_route(
+        self,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+        task_007_source: str,
+        inventory_007_source: str,
+    ) -> None:
+        for source in (api_source, backend_main_source, project_manager_source):
+            assert "/overview" not in source
+            assert "get_project_overview" not in source
+            assert "load_project_overview" not in source
+
+        assert "Frontend overview shell component" in task_007_source
+        assert "Add a minimal overview component using deterministic data." in (
+            task_007_source
+        )
+        assert "There is no dedicated project overview route today." in inventory_007_source
+        assert "There is no dedicated overview API helper today." in inventory_007_source
+
+    def test_optional_future_backend_helper_must_remain_read_only_and_local(
+        self, task_007_source: str, inventory_007_source: str
+    ) -> None:
+        combined_contract = "\n".join([task_007_source, inventory_007_source])
+        for required_boundary in (
+            "project-local",
+            "full body reads",
+            "extraction",
+            "model calls",
+            "OMI/canon/memory mutation",
+            "no Story Check auto-runs",
+        ):
+            assert required_boundary in combined_contract
+
+        for deferred_or_optional in (
+            "Backend/project data helper compatibility, if needed",
+            "if existing project/list/metadata helpers are insufficient",
+        ):
+            assert deferred_or_optional in combined_contract
+
+    def test_overview_runtime_must_not_depend_on_mutating_or_model_api_helpers(
+        self, app_source: str, api_source: str
+    ) -> None:
+        assert "fetchNoteMetadata" not in app_source
+        assert "saveNoteMetadata" not in app_source
+        assert "fetchMaterialMetadata" not in app_source
+        assert "saveMaterialMetadata" not in app_source
+
+        initial_load_block = app_source.split("async function loadInitialData()", 1)[1].split(
+            "const refreshOMI",
+            1,
+        )[0]
+        for mutating_or_model_helper in (
+            "saveNoteMetadata(",
+            "saveMaterialMetadata(",
+            "runStoryCheck(",
+            "saveBible(",
+            "saveStoryform(",
+            "approveOMICandidate(",
+            "rejectOMICandidate(",
+        ):
+            assert mutating_or_model_helper not in initial_load_block
+
+        assert "export async function runStoryCheck(" in api_source
+        assert "const handleRunStoryCheck" in app_source
+        assert "onRunStoryCheck={handleRunStoryCheck}" in app_source
+
     @pytest.mark.parametrize(
         "source_path",
         [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, PROJECT_CONTEXT_JSX, API_JS, SHARED_DOCUMENT_CONTROLLER_JS],
