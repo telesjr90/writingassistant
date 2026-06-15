@@ -1,6 +1,11 @@
 import { useEffect } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import {
+  DEFAULT_DOCUMENT_TYPE,
+  DOCUMENT_TYPES,
+  resolveActiveDocumentType,
+} from '../sharedDocumentController.js';
 
 function escapeHtml(value) {
   return value
@@ -23,19 +28,19 @@ function textToHtml(content) {
 }
 
 const DOCUMENT_TYPE_LABELS = {
-  scene: {
+  [DOCUMENT_TYPES.SCENE]: {
     eyebrow: 'Editor',
     empty: 'Select a scene to begin editing.',
     emptyContent: 'This scene is empty. Saving an empty scene is allowed.',
     surfaceAria: 'Scene draft editor',
   },
-  note: {
+  [DOCUMENT_TYPES.NOTE]: {
     eyebrow: 'Note',
     empty: 'Select a note to begin editing.',
     emptyContent: 'This note is empty. Saving an empty note is allowed.',
     surfaceAria: 'Note draft editor',
   },
-  material: {
+  [DOCUMENT_TYPES.MATERIAL]: {
     eyebrow: 'Material',
     empty: 'Select a material to begin editing.',
     emptyContent: 'This material is empty. Saving an empty material is allowed.',
@@ -46,7 +51,7 @@ const DOCUMENT_TYPE_LABELS = {
 export default function Editor({
   content,
   disabled,
-  hasUnsavedChanges,
+  isDirty,
   isLoading,
   isSaving,
   onChange,
@@ -55,9 +60,10 @@ export default function Editor({
   saveStatus,
   documentError,
   selectedDocumentId,
-  documentType = 'scene',
+  documentType = DEFAULT_DOCUMENT_TYPE,
 }) {
-  const labels = DOCUMENT_TYPE_LABELS[documentType] ?? DOCUMENT_TYPE_LABELS.scene;
+  const resolvedDocumentType = resolveActiveDocumentType(documentType);
+  const labels = DOCUMENT_TYPE_LABELS[resolvedDocumentType];
   const editor = useEditor({
     extensions: [StarterKit],
     content: textToHtml(content),
@@ -91,7 +97,7 @@ export default function Editor({
 
   const title = selectedDocumentId
     ? selectedDocumentId.replace(/[-_]+/g, ' ')
-    : `No ${documentType} selected`;
+    : `No ${resolvedDocumentType} selected`;
   const displayedSaveStatus = (() => {
     if (isLoading) {
       return 'Loading...';
@@ -105,7 +111,7 @@ export default function Editor({
       return saveStatus;
     }
 
-    if (hasUnsavedChanges) {
+    if (isDirty) {
       return 'Unsaved changes';
     }
 
@@ -117,7 +123,7 @@ export default function Editor({
   })();
   const saveStatusClass = displayedSaveStatus.startsWith('Save failed')
     ? 'save-status is-error'
-    : `save-status${hasUnsavedChanges ? ' is-unsaved' : ''}`;
+    : `save-status${isDirty ? ' is-unsaved' : ''}`;
 
   return (
     <section className="editor-panel">

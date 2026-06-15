@@ -674,10 +674,13 @@ class TestNoteMaterialShellSource:
     ) -> None:
         assert "DOCUMENT_TYPE_LABELS" in editor_source
         assert "selectedDocumentId" in editor_source
-        assert "documentType = 'scene'" in editor_source
+        assert "documentType = DEFAULT_DOCUMENT_TYPE" in editor_source
         assert "documentError" in editor_source
+        assert "isDirty" in editor_source
+        assert "resolveActiveDocumentType(documentType)" in editor_source
         assert "selectedSceneId" not in editor_source
         assert "sceneError" not in editor_source
+        assert "hasUnsavedChanges" not in editor_source
         assert "shared editor" not in editor_source.lower()
 
     def test_app_uses_active_document_type_without_metadata_editing_ui(
@@ -687,6 +690,8 @@ class TestNoteMaterialShellSource:
         assert "activeDocumentType" in app_source
         assert "documentType={activeEditorDocument.type}" in app_source
         assert "documentError={activeEditorDocument.error}" in app_source
+        assert "isDirty={activeEditorDocument.isDirty}" in app_source
+        assert "hasUnsavedChanges={activeEditorDocument.isDirty}" not in app_source
         assert "fetchNoteMetadata" not in app_source
         assert "saveNoteMetadata" not in app_source
         assert "fetchMaterialMetadata" not in app_source
@@ -755,6 +760,79 @@ class TestSharedDocumentControllerSource:
         assert "Boolean(document?.id) && !document.isLoading && !document.isSaving" in (
             shared_document_controller_source
         )
+
+
+class TestEditorDocumentNeutralContract:
+    def test_editor_uses_document_neutral_props(self, editor_source: str) -> None:
+        for expected_prop in (
+            "selectedDocumentId",
+            "documentError",
+            "documentType = DEFAULT_DOCUMENT_TYPE",
+            "isDirty",
+        ):
+            assert expected_prop in editor_source
+
+        for scene_specific_prop in (
+            "selectedSceneId",
+            "sceneError",
+            "hasUnsavedChanges",
+        ):
+            assert scene_specific_prop not in editor_source
+
+    def test_app_passes_document_neutral_editor_props(self, app_source: str) -> None:
+        for expected_prop in (
+            "selectedDocumentId={activeEditorDocument.id}",
+            "documentType={activeEditorDocument.type}",
+            "documentError={activeEditorDocument.error}",
+            "isDirty={activeEditorDocument.isDirty}",
+        ):
+            assert expected_prop in app_source
+
+        editor_call = app_source.split("<Editor", 1)[1].split("/>", 1)[0]
+        assert "selectedSceneId=" not in editor_call
+        assert "sceneError=" not in editor_call
+        assert "hasUnsavedChanges={activeEditorDocument.isDirty}" not in app_source
+
+    def test_editor_labels_are_document_type_aware(self, editor_source: str) -> None:
+        for document_type_key in (
+            "[DOCUMENT_TYPES.SCENE]",
+            "[DOCUMENT_TYPES.NOTE]",
+            "[DOCUMENT_TYPES.MATERIAL]",
+        ):
+            assert document_type_key in editor_source
+
+        assert "resolveActiveDocumentType(documentType)" in editor_source
+        assert "DOCUMENT_TYPE_LABELS[resolvedDocumentType]" in editor_source
+        assert "'aria-label': labels.surfaceAria" in editor_source
+        assert "`No ${resolvedDocumentType} selected`" in editor_source
+
+    def test_editor_save_status_and_loading_are_generic(
+        self, editor_source: str
+    ) -> None:
+        assert "if (isLoading)" in editor_source
+        assert "if (isSaving)" in editor_source
+        assert "if (isDirty)" in editor_source
+        assert "save-status${isDirty ? ' is-unsaved' : ''}" in editor_source
+        assert "disabled={saveDisabled}" in editor_source
+        assert "{isSaving ? 'Saving...' : 'Save'}" in editor_source
+
+    def test_editor_preserves_exact_body_content_path(
+        self, editor_source: str
+    ) -> None:
+        assert "content: textToHtml(content)" in editor_source
+        assert "currentEditor.getText({ blockSeparator: '\\n\\n' })" in editor_source
+        assert "editor.commands.setContent(textToHtml(content), { emitUpdate: false })" in (
+            editor_source
+        )
+        assert "<EditorContent editor={editor} />" in editor_source
+
+        for forbidden_body_injection in (
+            "metadata",
+            "title:",
+            "summary",
+            "documentTitle",
+        ):
+            assert forbidden_body_injection not in editor_source
 
 
 class TestSharedDocumentStateContract:
@@ -904,8 +982,12 @@ class TestSharedDocumentStateContract:
         self, app_source: str, editor_source: str
     ) -> None:
         assert "DOCUMENT_TYPE_LABELS" in editor_source
-        for document_type in self.DOCUMENT_TYPES:
-            assert f"{document_type}:" in editor_source
+        for document_type_key in (
+            "[DOCUMENT_TYPES.SCENE]",
+            "[DOCUMENT_TYPES.NOTE]",
+            "[DOCUMENT_TYPES.MATERIAL]",
+        ):
+            assert document_type_key in editor_source
 
         for expected_prop in (
             "isLoading={activeEditorDocument.isLoading}",
@@ -1009,7 +1091,10 @@ class TestSharedDocumentStateContract:
         for empty_state in ("No scenes yet.", "No notes yet.", "No materials yet."):
             assert empty_state in project_nav_source
 
-    @pytest.mark.parametrize("source_path", [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, API_JS])
+    @pytest.mark.parametrize(
+        "source_path",
+        [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, API_JS, SHARED_DOCUMENT_CONTROLLER_JS],
+    )
     def test_shared_editor_sources_exclude_unsafe_future_behavior(
         self, source_path: Path
     ) -> None:
@@ -1019,6 +1104,7 @@ class TestSharedDocumentStateContract:
             "improve prose",
             "summarize note",
             "summarize material",
+            "extraction",
             "semantic search",
             "ollama",
             "apply promotion",

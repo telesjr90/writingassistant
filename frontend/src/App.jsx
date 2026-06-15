@@ -879,7 +879,7 @@ export default function App() {
           documentType={activeEditorDocument.type}
           content={activeEditorDocument.content}
           disabled={!activeEditorDocument.id || activeEditorDocument.isLoading}
-          hasUnsavedChanges={activeEditorDocument.isDirty}
+          isDirty={activeEditorDocument.isDirty}
           isLoading={activeEditorDocument.isLoading}
           isSaving={activeEditorDocument.isSaving}
           onChange={activeEditorDocument.onChange}
