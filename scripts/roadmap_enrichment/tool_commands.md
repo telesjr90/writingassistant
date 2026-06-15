@@ -21,6 +21,8 @@ These commands are for explicit collection mode only and must not be run during 
   - Top-level syntax: `cce [OPTIONS] COMMAND [ARGS]...`
   - Alias syntax: `code-context-engine [OPTIONS] COMMAND [ARGS]...`
   - Commands shown by help include `index`, `search`, `status`, `list`, `init`, `serve`, `sessions`, and service commands.
+  - Init syntax: `cce init [--agent auto|claude|codex|copilot|all]`; no no-write or no-agent-config flag was shown.
+  - Index syntax: `cce index [--full] [--path TEXT]`.
   - Search syntax: `cce search [OPTIONS] QUERY`
   - Official docs show `cce search "auth flow"` as the CLI query-test command.
   - Search options shown by help: `--top-k INTEGER`, default `5`
@@ -46,6 +48,7 @@ These commands are for explicit collection mode only and must not be run during 
   - Do not run `cce index` or `cce search` during Codex implementation micro-tasks.
   - CCE command syntax is known, but actual retrieval/search/indexing has intentionally not been run.
   - Future collect mode may use CCE only after explicit user authorization.
+  - For a repaired evidence pass, prefer scoped `cce index --path <exact file-or-directory>` over `cce init`.
   - Graphify, Repomix, and AI Context command syntax were not retested during the CCE readiness repair.
 
 ## Graphify
@@ -57,6 +60,8 @@ These commands are for explicit collection mode only and must not be run during 
   - `graphify --help`: succeeded
 - observed syntax:
   - Top-level syntax: `graphify <command>`
+  - Graph update syntax from help: `graphify update <path> [--force] [--no-cluster]`; help says it re-extracts code files and updates the graph with no LLM needed.
+  - Full extraction syntax from help: `graphify extract <path> [options]`; help says it writes `<DIR>/graphify-out/`.
   - Query syntax from help: `graphify query "<question>" [--dfs] [--context C] [--budget N] [--graph <path>]`
   - Path syntax from help: `graphify path "A" "B" [--graph <path>]`
   - Explain syntax from help: `graphify explain "X" [--graph <path>]`
@@ -70,6 +75,7 @@ These commands are for explicit collection mode only and must not be run during 
 - notes:
   - This command was not run.
   - Future collect mode may use read-only query/path/explain against an existing graph if explicitly authorized.
+  - If `graphify-out/graph.json` is missing, a future explicit collection pass must create or locate it before running `graphify query`.
   - Do not run `graphify update`, `graphify extract`, or install commands unless explicitly authorized.
 
 ## Repomix
@@ -86,6 +92,7 @@ These commands are for explicit collection mode only and must not be run during 
   - Config syntax: `repomix --config <path>`
   - Stdin file list syntax: `repomix --stdin`
   - Output syntax: `repomix --output <file>`
+  - Markdown output syntax: `repomix --style markdown`
   - Compression syntax: `repomix --compress`
   - Token count tree syntax: `repomix --token-count-tree`
 - config required:

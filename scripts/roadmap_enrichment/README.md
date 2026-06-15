@@ -75,3 +75,9 @@ CCE can be used in explicit collect mode after user authorization.
 - `cce init` is not allowed in this orchestrated workflow because it writes editor/agent configuration.
 - CCE results are evidence artifacts, not roadmap authority.
 - Actual CCE retrieval/search/indexing has not been run yet.
+
+## Repair Plans
+
+Failed or partial collection attempts should produce a repair plan before enrichment JSON is generated.
+
+A repair plan should summarize evidence quality, identify blocked tools, list safe commands for the next explicit collection pass, keep prohibited commands visible, and state whether enrichment JSON and task record rendering should remain deferred.

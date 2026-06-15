@@ -19,6 +19,13 @@ indexer:
     - training/data
     - training/outputs
     - projects
+    - graphify-out
+    - graphify-out/**
+    - "**/graphify-out"
+    - "**/graphify-out/**"
+    - graph.json
+    - graph.html
+    - GRAPH_REPORT.md
 
 retrieval:
   top_k: 8

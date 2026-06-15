@@ -1,0 +1,38 @@
+# Generated Graphify outputs
+graphify-out/
+**/graphify-out/
+graph.json
+graph.html
+GRAPH_REPORT.md
+
+# Generated context artifacts
+.codex-context/
+ai_context/
+
+# Dependency/build/cache folders
+.git/
+node_modules/
+dist/
+build/
+.venv/
+.venv*/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Project/runtime/generated data
+projects/
+training/data/
+training/outputs/
+training/runs/
+training/reports/
+
+# Large/binary/non-source files
+*.jsonl
+*.xlsx
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.webp
