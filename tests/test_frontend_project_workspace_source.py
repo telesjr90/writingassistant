@@ -14,6 +14,8 @@ FRONTEND_SRC = REPO_ROOT / "frontend" / "src"
 API_JS = FRONTEND_SRC / "api.js"
 APP_JSX = FRONTEND_SRC / "App.jsx"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
+EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
+PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
 
 
 def read_source(path: Path) -> str:
@@ -33,6 +35,16 @@ def app_source() -> str:
 @pytest.fixture(scope="module")
 def project_nav_source() -> str:
     return read_source(PROJECT_NAV_JSX)
+
+
+@pytest.fixture(scope="module")
+def editor_source() -> str:
+    return read_source(EDITOR_JSX)
+
+
+@pytest.fixture(scope="module")
+def project_context_source() -> str:
+    return read_source(PROJECT_CONTEXT_JSX)
 
 
 class TestApiProjectHelpers:
@@ -356,3 +368,248 @@ class TestNoBackendOrNetworkMutation:
                 root = node.module.split(".")[0]
                 assert root not in forbidden_roots
                 assert node.module != "fastapi.testclient"
+
+
+class TestApiNoteMaterialHelpers:
+    """PHASE7-IMPL-005-T005 frontend API compatibility helpers for
+    notes and materials.
+
+    These tests verify the API layer is wired up but UI components
+    remain untouched in this slice.
+    """
+
+    NOTE_HELPERS = (
+        "fetchNotes",
+        "fetchNote",
+        "saveNote",
+        "fetchNoteMetadata",
+        "saveNoteMetadata",
+    )
+
+    MATERIAL_HELPERS = (
+        "fetchMaterials",
+        "fetchMaterial",
+        "saveMaterial",
+        "fetchMaterialMetadata",
+        "saveMaterialMetadata",
+    )
+
+    ALL_NEW_HELPERS = NOTE_HELPERS + MATERIAL_HELPERS
+
+    # ---- 1 & 2: All 10 helpers are exported ----
+
+    @pytest.mark.parametrize("function_name", NOTE_HELPERS)
+    def test_note_helpers_are_exported(
+        self, api_source: str, function_name: str
+    ) -> None:
+        pattern = rf"export async function {function_name}\s*\("
+        assert re.search(pattern, api_source), (
+            f"{function_name} should be exported as async function"
+        )
+
+    @pytest.mark.parametrize("function_name", MATERIAL_HELPERS)
+    def test_material_helpers_are_exported(
+        self, api_source: str, function_name: str
+    ) -> None:
+        pattern = rf"export async function {function_name}\s*\("
+        assert re.search(pattern, api_source), (
+            f"{function_name} should be exported as async function"
+        )
+
+    # ---- 3: Note helpers call the correct endpoint strings ----
+
+    def test_fetch_notes_uses_list_endpoint(self, api_source: str) -> None:
+        assert (
+            "client.get(`/projects/${projectId}/notes`)" in api_source
+        )
+
+    def test_fetch_note_uses_id_endpoint(self, api_source: str) -> None:
+        assert (
+            "client.get(`/projects/${projectId}/notes/${noteId}`)"
+            in api_source
+        )
+
+    def test_fetch_note_metadata_uses_metadata_endpoint(
+        self, api_source: str
+    ) -> None:
+        assert (
+            "client.get(`/projects/${projectId}/notes/${noteId}/metadata`)"
+            in api_source
+        )
+
+    # ---- 4: Material helpers call the correct endpoint strings ----
+
+    def test_fetch_materials_uses_list_endpoint(self, api_source: str) -> None:
+        assert (
+            "client.get(`/projects/${projectId}/materials`)" in api_source
+        )
+
+    def test_fetch_material_uses_id_endpoint(self, api_source: str) -> None:
+        assert (
+            "client.get(`/projects/${projectId}/materials/${materialId}`)"
+            in api_source
+        )
+
+    def test_fetch_material_metadata_uses_metadata_endpoint(
+        self, api_source: str
+    ) -> None:
+        assert (
+            "client.get(`/projects/${projectId}/materials/${materialId}/metadata`)"
+            in api_source
+        )
+
+    # ---- 5: Save helpers send body payloads with { content } ----
+
+    def test_save_note_sends_content_payload(self, api_source: str) -> None:
+        assert (
+            "client.put(`/projects/${projectId}/notes/${noteId}`, { content })"
+            in api_source
+        )
+
+    def test_save_material_sends_content_payload(self, api_source: str) -> None:
+        assert (
+            "client.put(`/projects/${projectId}/materials/${materialId}`, { content })"
+            in api_source
+        )
+
+    # ---- 6: Metadata save helpers send payloads with { metadata } ----
+
+    def test_save_note_metadata_sends_metadata_payload(
+        self, api_source: str
+    ) -> None:
+        assert (
+            "client.put(`/projects/${projectId}/notes/${noteId}/metadata`, { metadata })"
+            in api_source
+        )
+
+    def test_save_material_metadata_sends_metadata_payload(
+        self, api_source: str
+    ) -> None:
+        assert (
+            "client.put(`/projects/${projectId}/materials/${materialId}/metadata`, { metadata })"
+            in api_source
+        )
+
+    # ---- 7: Helpers preserve existing PROJECT_ID default behaviour ----
+
+    @pytest.mark.parametrize("function_name", ALL_NEW_HELPERS)
+    def test_new_helpers_preserve_project_id_default(
+        self, api_source: str, function_name: str
+    ) -> None:
+        pattern = (
+            rf"export async function {function_name}\([^)]*projectId = PROJECT_ID"
+        )
+        assert re.search(pattern, api_source), (
+            f"{function_name} should accept optional projectId defaulting to PROJECT_ID"
+        )
+
+    # ---- 8: Existing scene API helper source patterns remain intact ----
+
+    def test_existing_scene_helpers_remain_intact(self, api_source: str) -> None:
+        for fn in ("fetchScenes", "fetchScene", "saveScene"):
+            pattern = rf"export async function {fn}\s*\("
+            assert re.search(pattern, api_source), (
+                f"existing helper {fn} should remain exported"
+            )
+        assert (
+            "client.get(`/projects/${projectId}/scenes/${sceneId}`)" in api_source
+        )
+        assert (
+            "client.put(`/projects/${projectId}/scenes/${sceneId}`, { content })"
+            in api_source
+        )
+
+    # ---- 9: UI components do not import or render notes/materials yet ----
+
+    @pytest.mark.parametrize(
+        "ui_source",
+        ["app_source", "project_nav_source", "editor_source", "project_context_source"],
+    )
+    def test_ui_components_do_not_import_new_helpers(
+        self, request, ui_source: str
+    ) -> None:
+        source = request.getfixturevalue(ui_source)
+        for fn in self.ALL_NEW_HELPERS:
+            assert fn not in source, (
+                f"{ui_source} should not reference {fn} in T005 API-only slice"
+            )
+
+    # ---- 10: No prose, summary, extraction, model, OMI, memory/canon, or
+    #          training/dataset behaviour was introduced ----
+
+    def test_api_js_excludes_forbidden_workspace_terms(
+        self, api_source: str
+    ) -> None:
+        lower_source = api_source.lower()
+        forbidden_terms = [
+            "apply-promotion",
+            "apply promotion",
+            "canon promotion",
+            "extraction",
+            "dramatica",
+            "ollama",
+            "model generation",
+            "notes summary",
+            "material summary",
+            "navigation prose",
+        ]
+        for term in forbidden_terms:
+            assert term not in lower_source, (
+                f"api.js should not contain forbidden term {term!r}"
+            )
+
+    def test_api_js_does_not_inject_metadata_into_content_payload(
+        self, api_source: str
+    ) -> None:
+        """Save body helpers must not bundle metadata into the body payload.
+
+        The saveNote and saveMaterial helpers are body-only; metadata writes
+        use the dedicated metadata PUT helpers.
+        """
+        for endpoint_pattern, id_label in (
+            (
+                r"client\.put\(`/projects/\$\{projectId\}/notes/\$\{noteId\}`,\s*(\{[^}]*\})\)",
+                "note",
+            ),
+            (
+                r"client\.put\(`/projects/\$\{projectId\}/materials/\$\{materialId\}`,\s*(\{[^}]*\})\)",
+                "material",
+            ),
+        ):
+            match = re.search(endpoint_pattern, api_source)
+            assert match is not None, (
+                f"expected save body endpoint for {id_label}"
+            )
+            payload = match.group(1)
+            assert "metadata" not in payload, (
+                f"{id_label} body save payload must not include metadata: {payload!r}"
+            )
+            assert "content" in payload, (
+                f"{id_label} body save payload must include content: {payload!r}"
+            )
+
+    def test_metadata_helpers_carry_no_extra_body_fields(
+        self, api_source: str
+    ) -> None:
+        """Metadata PUT helpers must send a flat { metadata } payload only."""
+        for endpoint_pattern, label in (
+            (
+                r"client\.put\(`/projects/\$\{projectId\}/notes/\$\{noteId\}/metadata`,\s*(\{[^}]*\})\)",
+                "note",
+            ),
+            (
+                r"client\.put\(`/projects/\$\{projectId\}/materials/\$\{materialId\}/metadata`,\s*(\{[^}]*\})\)",
+                "material",
+            ),
+        ):
+            match = re.search(endpoint_pattern, api_source)
+            assert match is not None, (
+                f"expected metadata PUT endpoint for {label}"
+            )
+            payload = match.group(1)
+            assert "metadata" in payload, (
+                f"{label} metadata payload must include metadata: {payload!r}"
+            )
+            assert "content" not in payload, (
+                f"{label} metadata payload must not include content: {payload!r}"
+            )

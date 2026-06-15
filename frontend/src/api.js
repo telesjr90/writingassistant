@@ -115,3 +115,45 @@ export async function getOMIPromotion(projectId = PROJECT_ID, promotionId) {
 export async function createOMIPromotion(projectId = PROJECT_ID, payload) {
   return requestData(() => client.post(`/projects/${projectId}/omi/promotions`, payload));
 }
+
+// Note API helpers (PHASE7-IMPL-005-T005)
+export async function fetchNotes(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/notes`));
+}
+
+export async function fetchNote(noteId, projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/notes/${noteId}`));
+}
+
+export async function saveNote(noteId, content, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/notes/${noteId}`, { content }));
+}
+
+export async function fetchNoteMetadata(noteId, projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/notes/${noteId}/metadata`));
+}
+
+export async function saveNoteMetadata(noteId, metadata, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/notes/${noteId}/metadata`, { metadata }));
+}
+
+// Material API helpers (PHASE7-IMPL-005-T005)
+export async function fetchMaterials(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/materials`));
+}
+
+export async function fetchMaterial(materialId, projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/materials/${materialId}`));
+}
+
+export async function saveMaterial(materialId, content, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/materials/${materialId}`, { content }));
+}
+
+export async function fetchMaterialMetadata(materialId, projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/materials/${materialId}/metadata`));
+}
+
+export async function saveMaterialMetadata(materialId, metadata, projectId = PROJECT_ID) {
+  return requestData(() => client.put(`/projects/${projectId}/materials/${materialId}/metadata`, { metadata }));
+}
