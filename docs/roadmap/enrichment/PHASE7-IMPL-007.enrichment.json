@@ -1,0 +1,237 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-007",
+  "title": "Project Overview shell",
+  "type": "runtime",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-006"
+  ],
+  "boundary_tags": [
+    "read_only_overview",
+    "empty_states_only",
+    "owner_authored_prose_storage",
+    "no_generated_prose",
+    "no_model_calls",
+    "no_memory_canon_mutation",
+    "local_first"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-007.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-007.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-007.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-007/"
+  },
+  "goal": "Add a safe project overview landing shell that gives the writer project-local workspace status and navigation using existing deterministic project data, while preserving owner-authored content boundaries and avoiding generated prose, extraction, model calls, OMI/canon/memory mutation, or Dramatica analysis.",
+  "why_now": "PHASE7-IMPL-006 completed the shared owner-authored scene/note/material editor path. The next Project Workspace Foundation parent should provide a safe overview landing shell before later workspace pages expand.",
+  "scope": {
+    "include": [
+      "Inventory current project workspace surfaces relevant to a safe overview shell.",
+      "Define a conservative PHASE7-IMPL-007 child sequence.",
+      "Prepare task, inventory, enrichment, and status records before runtime implementation begins.",
+      "Identify PHASE7-IMPL-007-T002 as the next source-level data contract/test child."
+    ],
+    "exclude": [
+      "Runtime frontend implementation during T001.",
+      "Runtime backend implementation during T001.",
+      "Test edits during T001.",
+      "Generated prose, project summaries, note/material summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI promotion, memory/canon mutation, metadata editing UI, Dramatica analysis, training data, JSONL, dataset artifacts, package changes, app servers, frontend builds, browser/manual validation, and runtime project fixture writes."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md"
+    ],
+    "specs": [
+      "docs/roadmap/project_overview_page_spec.md",
+      "docs/roadmap/project_workspace_foundation_spec.md",
+      "docs/roadmap/project_file_model.md",
+      "docs/roadmap/chapter_scene_data_model_spec.md",
+      "docs/roadmap/notes_materials_data_model_spec.md",
+      "docs/roadmap/user_authored_document_editor_workflow_spec.md"
+    ],
+    "source_files": [
+      "frontend/src/App.jsx",
+      "frontend/src/sharedDocumentController.js",
+      "frontend/src/components/Editor.jsx",
+      "frontend/src/components/ProjectNav.jsx",
+      "frontend/src/components/ProjectContext.jsx",
+      "frontend/src/api.js",
+      "tests/test_frontend_project_workspace_source.py",
+      "backend/main.py",
+      "backend/project_manager.py",
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_note_material_routes.py"
+    ],
+    "quality_notes": [
+      "Roadmap index and implementation status are primary authority for task identity and active frontier.",
+      "Direct reads of named source files were used for implementation-surface inventory.",
+      "Existing frontend tests are source-level guards and do not substitute for browser/manual validation.",
+      "No CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, or broad discovery were run."
+    ]
+  },
+  "implementation_surfaces": {
+    "frontend": [
+      {
+        "path": "frontend/src/App.jsx",
+        "notes": "Owns active project state, project list metadata, scene/note/material lists, OMI summary state, and the shared editor composition. No dedicated overview component exists today."
+      },
+      {
+        "path": "frontend/src/components/ProjectNav.jsx",
+        "notes": "Provides project and scene/note/material navigation with ID-based selection and no Overview nav item today."
+      },
+      {
+        "path": "frontend/src/components/Editor.jsx",
+        "notes": "Document-neutral owner-authored body editor; should remain separate from overview display."
+      },
+      {
+        "path": "frontend/src/api.js",
+        "notes": "Provides project list/create helpers and scene/note/material/OMI helpers; no dedicated overview helper exists today."
+      }
+    ],
+    "backend": [
+      {
+        "path": "backend/main.py",
+        "notes": "Provides project, scene, note/material, OMI, bible/storyform, and Story Check routes; no dedicated overview route exists today."
+      },
+      {
+        "path": "backend/project_manager.py",
+        "notes": "Provides project metadata listing plus scene/chapter/note/material helpers that may support cheap counts if a later child needs a narrow overview helper."
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/test_frontend_project_workspace_source.py",
+        "notes": "Primary source-level regression surface for overview shell contract work."
+      },
+      {
+        "path": "tests/test_project_manager.py",
+        "notes": "Backend helper regression surface if a later child touches deterministic overview helper code."
+      },
+      {
+        "path": "tests/test_scene_routes.py",
+        "notes": "Scene route regression surface."
+      },
+      {
+        "path": "tests/test_note_material_routes.py",
+        "notes": "Note/material route regression surface."
+      }
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE7-IMPL-007-T001",
+      "title": "Project Overview shell inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE7-IMPL-007"
+      ],
+      "file_allowlist": [
+        "docs/roadmap/tasks/PHASE7-IMPL-007.md",
+        "docs/roadmap/inventory/PHASE7-IMPL-007.md",
+        "docs/roadmap/enrichment/PHASE7-IMPL-007.enrichment.json",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md",
+        "docs/roadmap/roadmap_index.yaml",
+        "docs/roadmap/task_backlog.md",
+        "docs/roadmap/phase_map.md",
+        "docs/master_plan.md"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T002",
+      "title": "Overview data contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-007-T001"
+      ],
+      "file_allowlist": [
+        "tests/test_frontend_project_workspace_source.py"
+      ],
+      "scope": [
+        "Define source-level expectations for project title/ID/status, counts, safe empty states, overview navigation, and no hidden model/extraction calls.",
+        "Avoid runtime implementation unless explicitly scoped by T002."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T003",
+      "title": "Backend/project data helper compatibility, if needed",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-007-T002"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T004",
+      "title": "Frontend overview shell component",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-007-T003"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T005",
+      "title": "ProjectNav/App overview integration",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-007-T004"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T006",
+      "title": "Overview regression coverage",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-007-T005"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-007-T006"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Project Overview shell has a documented data contract before runtime implementation.",
+    "Overview displays only deterministic project-local metadata/status/counts/empty states.",
+    "Overview navigation uses existing workspace routes/surfaces and does not trigger model-backed behavior.",
+    "Scene, note, material, and shared editor behavior remain stable.",
+    "Overview rendering does not read document bodies to generate summaries.",
+    "No generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI/canon/memory mutation, Dramatica analysis, training/JSONL/dataset work, browser/manual validation, package changes, app servers, or runtime project fixture changes are introduced."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "git diff -- docs/roadmap/tasks/PHASE7-IMPL-007.md docs/roadmap/inventory/PHASE7-IMPL-007.md docs/roadmap/enrichment/PHASE7-IMPL-007.enrichment.json docs/roadmap/implementation_status.md docs/roadmap/roadmap_index.yaml docs/roadmap/task_backlog.md docs/roadmap/phase_map.md docs/master_plan.md docs/roadmap/validation/latest_roadmap_validation.md"
+    ],
+    "notes": "Do not use LeanCTX. If raw git diff is blocked by the local hook, record the skip."
+  },
+  "safety_notes": [
+    "Overview content must be factual UI/status content from project metadata or deterministic local records.",
+    "Owner-authored project metadata may be displayed as stored.",
+    "Overview rendering must not create files, repair metadata, promote candidates, mutate memory/canon, run Story Check, or call models.",
+    "Approved memory/canon sections are empty-state placeholders until later approved-memory implementation exists."
+  ],
+  "deferred_work": [
+    "Runtime overview implementation after the T002 data contract.",
+    "Dedicated backend overview helper or route unless existing deterministic data proves insufficient.",
+    "Browser/manual validation under PHASE7-IMPL-010.",
+    "OMI-guided setup, memory/canon shell, extraction, semantic search, generated summaries, and Dramatica analysis."
+  ]
+}
