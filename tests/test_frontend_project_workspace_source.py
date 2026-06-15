@@ -17,6 +17,7 @@ API_JS = FRONTEND_SRC / "api.js"
 APP_JSX = FRONTEND_SRC / "App.jsx"
 SHARED_DOCUMENT_CONTROLLER_JS = FRONTEND_SRC / "sharedDocumentController.js"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
+PROJECT_OVERVIEW_JSX = FRONTEND_SRC / "components" / "ProjectOverview.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
 PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
 BACKEND_MAIN_PY = BACKEND_SRC / "main.py"
@@ -49,6 +50,11 @@ def shared_document_controller_source() -> str:
 @pytest.fixture(scope="module")
 def project_nav_source() -> str:
     return read_source(PROJECT_NAV_JSX)
+
+
+@pytest.fixture(scope="module")
+def project_overview_source() -> str:
+    return read_source(PROJECT_OVERVIEW_JSX)
 
 
 @pytest.fixture(scope="module")
@@ -640,7 +646,15 @@ class TestProjectOverviewDataContract:
 
     @pytest.mark.parametrize(
         "source_path",
-        [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, PROJECT_CONTEXT_JSX, API_JS, SHARED_DOCUMENT_CONTROLLER_JS],
+        [
+            APP_JSX,
+            PROJECT_NAV_JSX,
+            PROJECT_OVERVIEW_JSX,
+            EDITOR_JSX,
+            PROJECT_CONTEXT_JSX,
+            API_JS,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+        ],
     )
     def test_runtime_sources_exclude_overview_forbidden_behavior(
         self, source_path: Path
@@ -672,6 +686,159 @@ class TestProjectOverviewDataContract:
         if source_path in {APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, PROJECT_CONTEXT_JSX}:
             assert "ollama" not in lower_source
             assert "dramatica" not in lower_source
+
+
+class TestProjectOverviewShellComponent:
+    """PHASE7-IMPL-007-T004 source contract for the standalone overview shell."""
+
+    def test_component_exists_and_exports_default_project_overview(
+        self, project_overview_source: str
+    ) -> None:
+        assert PROJECT_OVERVIEW_JSX.exists()
+        assert "export default function ProjectOverview({" in project_overview_source
+
+    def test_component_is_prop_driven_and_has_no_api_dependency(
+        self, project_overview_source: str
+    ) -> None:
+        for prop_name in (
+            "project",
+            "scenes",
+            "notes",
+            "materials",
+            "omiStatus",
+            "approvedMemoryStatus",
+        ):
+            assert prop_name in project_overview_source
+
+        assert "import " not in project_overview_source
+        for forbidden_runtime_dependency in (
+            "../api",
+            "fetch(",
+            "client.",
+            "axios",
+            "save",
+            "metadata",
+            "/overview",
+        ):
+            assert forbidden_runtime_dependency not in project_overview_source
+
+    def test_project_identity_uses_safe_prop_fallbacks(
+        self, project_overview_source: str
+    ) -> None:
+        for helper_name in (
+            "function getProjectTitle(project)",
+            "function getProjectId(project)",
+            "function getOptionalProjectField(project, fieldName)",
+        ):
+            assert helper_name in project_overview_source
+
+        for fallback in (
+            "Untitled project",
+            "Unknown project ID",
+            "Not available",
+            "project.project_id ?? project.projectId ?? project.id",
+            "project.title ?? project.name",
+            "creation_method",
+            "'status'",
+        ):
+            assert fallback in project_overview_source
+
+    def test_counts_are_derived_from_arrays_and_chapter_count_is_omitted(
+        self, project_overview_source: str
+    ) -> None:
+        assert "function countItems(items)" in project_overview_source
+        assert "Array.isArray(items) ? items.length : 0" in project_overview_source
+        for count_assignment in (
+            "const sceneCount = countItems(scenes)",
+            "const noteCount = countItems(notes)",
+            "const materialCount = countItems(materials)",
+        ):
+            assert count_assignment in project_overview_source
+
+        assert "chapter" not in project_overview_source.lower()
+        for body_access in ("content", "body", "fetchScene", "fetchNote", "fetchMaterial"):
+            assert body_access not in project_overview_source
+
+    def test_shell_sections_are_factual_workspace_status_sections(
+        self, project_overview_source: str
+    ) -> None:
+        for section_label in (
+            "Project",
+            "Scenes",
+            "Notes",
+            "Materials",
+            "OMI",
+            "Approved Memory / Canon",
+        ):
+            assert section_label in project_overview_source
+
+        assert "Project overview" in project_overview_source
+        assert "Project ID" in project_overview_source
+        assert "Creation method" in project_overview_source
+
+    def test_empty_states_are_simple_and_non_generative(
+        self, project_overview_source: str
+    ) -> None:
+        for empty_state in (
+            "No scenes yet.",
+            "No notes yet.",
+            "No materials yet.",
+            "OMI workspace status is not available yet.",
+            "No approved memory/canon items shown here yet.",
+        ):
+            assert empty_state in project_overview_source
+
+        for forbidden_empty_state in (
+            "suggest",
+            "next step",
+            "summary",
+            "premise",
+            "logline",
+        ):
+            assert forbidden_empty_state not in project_overview_source.lower()
+
+    def test_navigation_callbacks_are_direct_optional_buttons(
+        self, project_overview_source: str
+    ) -> None:
+        assert "function OverviewAction({ onClick, children })" in project_overview_source
+        assert '<button type="button" onClick={onClick}>' in project_overview_source
+        for callback_name in (
+            "onOpenScenes",
+            "onOpenNotes",
+            "onOpenMaterials",
+            "onOpenOmi",
+            "onOpenApprovedMemory",
+        ):
+            assert callback_name in project_overview_source
+
+        for label in (
+            "Open scenes",
+            "Open notes",
+            "Open materials",
+            "Open OMI",
+            "Open approved memory",
+        ):
+            assert label in project_overview_source
+
+    def test_no_backend_overview_or_api_helper_dependency_was_added(
+        self,
+        app_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_overview_source: str,
+    ) -> None:
+        combined_runtime = "\n".join(
+            [app_source, api_source, backend_main_source, project_overview_source]
+        )
+        for forbidden_overview_dependency in (
+            "/overview",
+            "fetchOverview",
+            "getProjectOverview",
+            "saveOverview",
+        ):
+            assert forbidden_overview_dependency not in combined_runtime
+
+        assert "ProjectOverview" not in app_source
 
 
 class TestSceneMetadataDisplayCompatibility:
