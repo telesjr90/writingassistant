@@ -694,3 +694,276 @@ class TestNoteMaterialShellSource:
         assert "fetchMaterial" not in project_context_source
         assert "saveNote" not in project_context_source
         assert "saveMaterial" not in project_context_source
+
+
+class TestSharedDocumentStateContract:
+    """PHASE7-IMPL-006-T002 source contract before shared editor refactor."""
+
+    DOCUMENT_TYPES = ("scene", "note", "material")
+
+    @staticmethod
+    def _callback_body(source: str, callback_name: str) -> str:
+        pattern = (
+            rf"const {callback_name}\s*=\s*useCallback"
+            rf"\((?:async\s*)?\([^)]*\)\s*=>\s*\{{(?P<body>.*?)\n\s*\}},\s*\["
+        )
+        match = re.search(pattern, source, re.DOTALL)
+        assert match is not None, f"Expected useCallback body for {callback_name}"
+        return match.group("body")
+
+    def test_active_document_type_contract_covers_all_document_types(
+        self, app_source: str
+    ) -> None:
+        assert "selectedDocumentType" in app_source
+        assert "setSelectedDocumentType" in app_source
+
+        expected_setters = {
+            "scene": "setSelectedDocumentType('scene')",
+            "note": "setSelectedDocumentType('note')",
+            "material": "setSelectedDocumentType('material')",
+        }
+        for document_type, setter in expected_setters.items():
+            assert setter in app_source, (
+                f"{document_type} selection must set active document type"
+            )
+
+        assert "activeDocumentType={selectedDocumentType || 'scene'}" in app_source
+
+    def test_editor_receives_generic_selected_document_ids(
+        self, app_source: str, editor_source: str
+    ) -> None:
+        assert "selectedDocumentId" in editor_source
+        assert "selectedSceneId" not in editor_source
+        assert "selectedNoteId" not in editor_source
+        assert "selectedMaterialId" not in editor_source
+
+        for expected_prop in (
+            "selectedDocumentId={selectedSceneId}",
+            "selectedDocumentId={selectedNoteId}",
+            "selectedDocumentId={selectedMaterialId}",
+        ):
+            assert expected_prop in app_source
+
+    def test_editor_body_content_comes_from_document_body_state(
+        self, app_source: str
+    ) -> None:
+        for expected_prop in (
+            "content={sceneContent}",
+            "content={noteContent}",
+            "content={materialContent}",
+        ):
+            assert expected_prop in app_source
+
+        assert "const loadedContent = data.content ?? ''" in app_source
+        assert "setSceneContent(loadedContent)" in app_source
+        assert "setNoteContent(loadedContent)" in app_source
+        assert "setMaterialContent(loadedContent)" in app_source
+        assert "setSceneContent(data.metadata" not in app_source
+        assert "setNoteContent(data.metadata" not in app_source
+        assert "setMaterialContent(data.metadata" not in app_source
+
+    def test_save_handlers_use_document_ids_and_body_content_only(
+        self, app_source: str, api_source: str
+    ) -> None:
+        expected_app_calls = (
+            "saveScene(selectedSceneId, sceneContent, activeProjectId)",
+            "saveNote(selectedNoteId, noteContent, activeProjectId)",
+            "saveMaterial(selectedMaterialId, materialContent, activeProjectId)",
+        )
+        for call in expected_app_calls:
+            assert call in app_source
+
+        forbidden_title_calls = (
+            "saveScene(selectedSceneId, sceneLabel",
+            "saveNote(selectedNoteId, noteLabel",
+            "saveMaterial(selectedMaterialId, materialLabel",
+            "saveNote(selectedNoteId, note.title",
+            "saveMaterial(selectedMaterialId, material.title",
+        )
+        for call in forbidden_title_calls:
+            assert call not in app_source
+
+        expected_payloads = (
+            "client.put(`/projects/${projectId}/scenes/${sceneId}`, { content })",
+            "client.put(`/projects/${projectId}/notes/${noteId}`, { content })",
+            "client.put(`/projects/${projectId}/materials/${materialId}`, { content })",
+        )
+        for payload in expected_payloads:
+            assert payload in api_source
+
+    def test_dirty_state_contract_spans_scene_note_and_material(
+        self, app_source: str
+    ) -> None:
+        expected_dirty_checks = (
+            "const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent",
+            "selectedNoteId !== '' && noteContent !== lastSavedNoteContent",
+            "selectedMaterialId !== '' && materialContent !== lastSavedMaterialContent",
+            "const hasUnsavedDocumentChanges = isDirty || isNoteDirty || isMaterialDirty",
+        )
+        for check in expected_dirty_checks:
+            assert check in app_source
+
+        for handler_name, setter in (
+            ("handleSceneContentChange", "setSceneContent(nextContent)"),
+            ("handleNoteContentChange", "setNoteContent(nextContent)"),
+            ("handleMaterialContentChange", "setMaterialContent(nextContent)"),
+        ):
+            body = self._callback_body(app_source, handler_name)
+            assert setter in body
+            assert "Unsaved changes" in body
+
+        for save_handler, last_saved_setter in (
+            ("handleSave", "setLastSavedContent(sceneContent)"),
+            ("handleSaveNote", "setLastSavedNoteContent(noteContent)"),
+            ("handleSaveMaterial", "setLastSavedMaterialContent(materialContent)"),
+        ):
+            body = self._callback_body(app_source, save_handler)
+            assert last_saved_setter in body
+            assert "set" in body and "SaveStatus('Saved')" in body
+
+    def test_dirty_state_blocks_document_and_project_switches(
+        self, app_source: str
+    ) -> None:
+        for callback_name, message in (
+            ("handleSelectScene", "UNSAVED_CHANGES_MESSAGE"),
+            ("handleSelectNote", "UNSAVED_NOTE_SWITCH_MESSAGE"),
+            ("handleSelectMaterial", "UNSAVED_MATERIAL_SWITCH_MESSAGE"),
+            ("handleSelectProject", "UNSAVED_PROJECT_SWITCH_MESSAGE"),
+            ("handleCreateProject", "UNSAVED_PROJECT_CREATE_MESSAGE"),
+        ):
+            body = self._callback_body(app_source, callback_name)
+            assert "hasUnsavedDocumentChanges" in body
+            assert message in body
+            assert "window.confirm" in body
+
+    def test_loading_error_and_save_status_contract_is_document_typed(
+        self, app_source: str, editor_source: str
+    ) -> None:
+        assert "DOCUMENT_TYPE_LABELS" in editor_source
+        for document_type in self.DOCUMENT_TYPES:
+            assert f"{document_type}:" in editor_source
+
+        for expected_prop in (
+            "isLoading={isLoadingScene}",
+            "isLoading={isLoadingNote}",
+            "isLoading={isLoadingMaterial}",
+            "isSaving={isSaving}",
+            "isSaving={isSavingNote}",
+            "isSaving={isSavingMaterial}",
+            "saveStatus={saveStatus}",
+            "saveStatus={noteSaveStatus}",
+            "saveStatus={materialSaveStatus}",
+            "documentError={sceneError}",
+            "documentError={noteError}",
+            "documentError={materialError}",
+        ):
+            assert expected_prop in app_source
+
+        for callback_name, loading_setter, error_setter in (
+            ("handleSelectScene", "setIsLoadingScene(true)", "setSceneError('')"),
+            ("handleSelectNote", "setIsLoadingNote(true)", "setNoteError('')"),
+            ("handleSelectMaterial", "setIsLoadingMaterial(true)", "setMaterialError('')"),
+        ):
+            body = self._callback_body(app_source, callback_name)
+            assert loading_setter in body
+            assert error_setter in body
+            assert "finally" in body
+
+    def test_keyboard_save_dispatches_by_active_document_type_and_save_guards(
+        self, app_source: str
+    ) -> None:
+        assert "function handleKeyDown(event)" in app_source
+        assert "event.key.toLowerCase() === 's'" in app_source
+        assert "selectedDocumentType === 'note'" in app_source
+        assert "handleSaveNote()" in app_source
+        assert "selectedDocumentType === 'material'" in app_source
+        assert "handleSaveMaterial()" in app_source
+        assert "handleSave();" in app_source
+
+        for callback_name, selected_id, saving_flag in (
+            ("handleSave", "selectedSceneId", "isSaving"),
+            ("handleSaveNote", "selectedNoteId", "isSavingNote"),
+            ("handleSaveMaterial", "selectedMaterialId", "isSavingMaterial"),
+        ):
+            body = self._callback_body(app_source, callback_name)
+            assert f"if (!{selected_id} || {saving_flag})" in body
+            assert "return;" in body
+
+    def test_project_switch_resets_active_document_state_and_body_content(
+        self, app_source: str
+    ) -> None:
+        assert "useEffect(() => {" in app_source
+        assert "}, [activeProjectId]);" in app_source
+
+        for reset in (
+            "setSelectedSceneId('')",
+            "setSelectedDocumentType('')",
+            "setSelectedNoteId('')",
+            "setSelectedMaterialId('')",
+            "setSceneContent('')",
+            "setLastSavedContent('')",
+            "setNoteContent('')",
+            "setLastSavedNoteContent('')",
+            "setMaterialContent('')",
+            "setLastSavedMaterialContent('')",
+            "setNoteError('')",
+            "setMaterialError('')",
+        ):
+            assert reset in app_source
+
+    def test_project_nav_selection_parity_for_scene_note_and_material(
+        self, project_nav_source: str
+    ) -> None:
+        expected_active_checks = (
+            "activeDocumentType === 'scene' && selectedSceneId === sceneId",
+            "activeDocumentType === 'note' && selectedNoteId === noteId",
+            "activeDocumentType === 'material' && selectedMaterialId === materialId",
+        )
+        for check in expected_active_checks:
+            assert check in project_nav_source
+
+        expected_id_callbacks = (
+            "onSelectScene(sceneId)",
+            "onSelectNote?.(noteId)",
+            "onSelectMaterial?.(materialId)",
+        )
+        for callback in expected_id_callbacks:
+            assert callback in project_nav_source
+
+        forbidden_label_callbacks = (
+            "onSelectScene(sceneLabel)",
+            "onSelectNote?.(noteLabel)",
+            "onSelectMaterial?.(materialLabel)",
+        )
+        for callback in forbidden_label_callbacks:
+            assert callback not in project_nav_source
+
+        for empty_state in ("No scenes yet.", "No notes yet.", "No materials yet."):
+            assert empty_state in project_nav_source
+
+    @pytest.mark.parametrize("source_path", [APP_JSX, PROJECT_NAV_JSX, EDITOR_JSX, API_JS])
+    def test_shared_editor_sources_exclude_unsafe_future_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = read_source(source_path).lower()
+        forbidden_terms = [
+            "generated prose",
+            "improve prose",
+            "summarize note",
+            "summarize material",
+            "semantic search",
+            "ollama",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "storyform inference",
+            "dramatica analysis",
+        ]
+        for term in forbidden_terms:
+            assert term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} should not contain {term!r}"
+            )
+
+        assert "rewrite scene" not in lower_source
+        assert "rewrite note" not in lower_source
+        assert "rewrite material" not in lower_source
