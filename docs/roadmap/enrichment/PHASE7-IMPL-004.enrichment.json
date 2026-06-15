@@ -1,0 +1,232 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-004",
+  "title": "Chapter / Scene Metadata Compatibility Layer",
+  "type": "runtime",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-003"
+  ],
+  "boundary_tags": [
+    "owner_authored_prose_storage",
+    "metadata_only",
+    "no_scene_rewrite",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "local_first"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-004.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-004.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-004.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-004/"
+  },
+  "goal": "Add a metadata-only chapter and scene compatibility layer while preserving legacy flat Markdown scene files and owner-authored scene prose.",
+  "why_now": "Project creation, selector/library, and frontend project switching precede chapter/scene metadata in the Phase 7 sequence; the active frontier now points to PHASE7-IMPL-004.",
+  "scope": {
+    "include": [
+      "Inventory current scene route, storage, frontend API, UI, and test assumptions.",
+      "Plan metadata reads that preserve legacy scenes/{scene_id}.md compatibility.",
+      "Plan separate chapter and scene metadata writes that do not rewrite scene bodies.",
+      "Plan route and fallback tests for metadata-backed and legacy standalone scenes.",
+      "Plan frontend display of metadata-backed titles/order only after backend read compatibility exists."
+    ],
+    "exclude": [
+      "Runtime app implementation in this enrichment artifact task.",
+      "Backend behavior changes during artifact generation.",
+      "Frontend behavior changes during artifact generation.",
+      "Owner-authored prose rewrites or generated prose.",
+      "Story Check, Ollama, live model calls, extraction tools, Dramatica-specific logic, OMI promotion, memory/canon mutation, and training data changes."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      ".codex-context/PHASE7-IMPL-004/task_manifest.json"
+    ],
+    "strong_supporting": [
+      ".codex-context/PHASE7-IMPL-004/cce-clean-index-verification.md",
+      ".codex-context/PHASE7-IMPL-004/cce-index-cleanup-resolution.md",
+      ".codex-context/PHASE7-IMPL-004/cce-findings.md",
+      ".codex-context/PHASE7-IMPL-004/repomix-output.md"
+    ],
+    "weak_supporting": [
+      ".codex-context/PHASE7-IMPL-004/graphify-output.md",
+      ".codex-context/PHASE7-IMPL-004/scoped-ai-context-output.md"
+    ],
+    "quality_notes": [
+      "CCE evidence was repaired by clearing a polluted index and rebuilding with scoped paths only.",
+      "Graphify output was noisy and should be treated as weak topology evidence only.",
+      "AI Context is fallback status evidence only because task mode writes to a shared path.",
+      "Generated context and evidence artifacts are supporting evidence, not roadmap authority."
+    ]
+  },
+  "inventory": {
+    "backend_files": [
+      {
+        "path": "backend/project_manager.py",
+        "symbols": [
+          "_scene_path(project_name: str, scene_id: str) -> Path",
+          "save_scene(project_name: str, scene_id: str, content: str) -> None",
+          "list_scenes(project_name: str) -> list[str]"
+        ],
+        "notes": "Current evidence shows flat Markdown scene path, save, and sorted scene ID listing behavior."
+      },
+      {
+        "path": "backend/main.py",
+        "symbols": [
+          "get_scenes(project_name: str) -> dict[str, list[str]]",
+          "get_scene(project_name: str, scene_id: str) -> dict[str, str]",
+          "story_check(project_name: str, scene_id: str) -> dict"
+        ],
+        "notes": "Scene list/read routes and Story Check scene lookup are compatibility-sensitive."
+      }
+    ],
+    "frontend_files": [
+      {
+        "path": "frontend/src/api.js",
+        "symbols": [
+          "GET /projects/${projectId}/scenes",
+          "GET /projects/${projectId}/scenes/${sceneId}",
+          "PUT /projects/${projectId}/scenes/${sceneId}"
+        ],
+        "notes": "Current API helpers assume project-scoped scene IDs and Markdown content save/load."
+      },
+      {
+        "path": "frontend/src/App.jsx",
+        "symbols": [],
+        "notes": "Scoped Repomix includes this as project workspace UI context."
+      },
+      {
+        "path": "frontend/src/components/Editor.jsx",
+        "symbols": [],
+        "notes": "Owner-authored scene editor surface; body content must remain owner-authored."
+      },
+      {
+        "path": "frontend/src/components/ProjectContext.jsx",
+        "symbols": [],
+        "notes": "Project context UI; not proven to directly handle scene metadata."
+      },
+      {
+        "path": "frontend/src/components/ProjectNav.jsx",
+        "symbols": [
+          "formatProjectOptionLabel()"
+        ],
+        "notes": "Graphify mentions project selection labeling, but scene topology evidence is weak."
+      }
+    ],
+    "tests": [
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_frontend_project_workspace_source.py",
+      "tests/test_project_library.py",
+      "tests/test_story_check_route.py"
+    ],
+    "roadmap_files": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/roadmap/chapter_scene_data_model_spec.md",
+      "docs/roadmap/chapters_scenes_page_spec.md",
+      "docs/roadmap/project_file_model.md",
+      "docs/roadmap/decision_log.md",
+      "docs/roadmap/risk_register.md",
+      "docs/roadmap/open_questions.md"
+    ]
+  },
+  "microtasks": [
+    {
+      "id": "PHASE7-IMPL-004-T001",
+      "title": "Read-only chapter and scene metadata compatibility inventory",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE7-IMPL-004"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-004-T002",
+      "title": "Implement legacy scene Markdown compatibility metadata reads",
+      "type": "runtime_microtask",
+      "status": "done",
+      "depends_on": [
+        "PHASE7-IMPL-004-T001"
+      ],
+      "completion_summary": "Implemented and reviewed read-only scene metadata compatibility for legacy Markdown scenes without metadata writes, metadata creation, migrations, route expansion, or frontend display changes."
+    },
+    {
+      "id": "PHASE7-IMPL-004-T003",
+      "title": "Backend metadata write/create helpers",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-004-T002"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-004-T004",
+      "title": "Route compatibility tests",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-004-T002",
+        "PHASE7-IMPL-004-T003"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-004-T005",
+      "title": "Frontend display of scene titles/order if metadata exists",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-004-T002"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-004-T006",
+      "title": "Legacy scene fallback tests",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-004-T004"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-004-T007",
+      "title": "Roadmap/status update after PHASE7-IMPL-004 completion",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-004-T006"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Legacy scenes/{scene_id}.md files remain readable and writable through existing compatibility paths.",
+    "Metadata reads tolerate missing chapter and scene metadata for legacy standalone scenes.",
+    "Metadata writes and ordering operations do not rewrite owner-authored scene Markdown bodies.",
+    "Route and helper tests cover metadata-backed scenes and legacy fallback behavior.",
+    "Frontend metadata display remains conditional on supported backend responses and does not generate prose."
+  ],
+  "validation": {
+    "artifact_generation_commands": [
+      "python3 scripts/roadmap_enrichment/render_task_record.py --task PHASE7-IMPL-004 --dry-run",
+      "python3 scripts/roadmap_enrichment/render_task_record.py --task PHASE7-IMPL-004",
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "git diff --check",
+      "git status --short --branch"
+    ],
+    "renderer_note": "The current renderer supports dry-run planning but its non-dry-run path is scaffold-only and returns a deliberate failure."
+  },
+  "deferred_work": [
+    "PHASE7-IMPL-004-T003 is the next child task after completed T002 and should remain limited to backend metadata write/create helpers when explicitly started.",
+    "Renderer implementation for task records remains scaffold work unless separately authorized.",
+    "Graphify/CCE/Repomix/AI Context refreshes remain explicit context-generation or collection tasks only."
+  ]
+}

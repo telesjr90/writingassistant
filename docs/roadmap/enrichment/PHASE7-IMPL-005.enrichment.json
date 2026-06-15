@@ -1,0 +1,234 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-005",
+  "title": "Notes / Materials Storage",
+  "type": "runtime",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-003"
+  ],
+  "boundary_tags": [
+    "owner_authored_prose_storage",
+    "owner_supplied_material",
+    "metadata_only",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "local_first"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-005.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-005.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-005.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-005/"
+  },
+  "goal": "Add owner-authored notes and owner-provided materials storage/routes using Markdown/text bodies plus separate metadata while preserving no-prose, no-model, no-extraction, and no-canon boundaries.",
+  "why_now": "PHASE7-IMPL-004 completed chapter/scene metadata compatibility; notes/materials are the next active Phase 7 parent task before shared editor expansion.",
+  "scope": {
+    "include": [
+      "Inventory backend helper patterns for safe path handling, Markdown/text body storage, JSON metadata, timestamps, and validation.",
+      "Inventory route, frontend API, navigation, editor, and test surfaces relevant to notes/materials.",
+      "Define a conservative PHASE7-IMPL-005 child sequence.",
+      "Identify PHASE7-IMPL-005-T002 as the next backend helper implementation child."
+    ],
+    "exclude": [
+      "Runtime backend implementation during T001.",
+      "Runtime frontend implementation during T001.",
+      "Test edits during T001.",
+      "Model/Ollama calls, generated prose, extraction, semantic search, web fetching, OCR, binary import, attachments, external sync, package installs, OMI mutation, memory/canon mutation, training data, JSONL, dataset manifests, and runtime project fixture writes."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md",
+      "docs/roadmap/task_backlog.md"
+    ],
+    "specs": [
+      "docs/roadmap/notes_materials_data_model_spec.md",
+      "docs/roadmap/notes_materials_page_spec.md",
+      "docs/roadmap/user_authored_document_editor_workflow_spec.md",
+      "docs/roadmap/project_file_model.md"
+    ],
+    "source_files": [
+      "backend/project_manager.py",
+      "backend/main.py",
+      "frontend/src/api.js",
+      "frontend/src/App.jsx",
+      "frontend/src/components/ProjectNav.jsx",
+      "frontend/src/components/Editor.jsx",
+      "frontend/src/components/ProjectContext.jsx",
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_frontend_project_workspace_source.py"
+    ],
+    "quality_notes": [
+      "Roadmap control files and local specs are primary authority for identity, boundaries, and child sequencing.",
+      "Focused direct reads of existing source files were used for helper, route, frontend, and test inventory.",
+      "No CCE, Graphify, Repomix, AI Context generation, MCP tools, or broad discovery were run."
+    ]
+  },
+  "inventory": {
+    "backend_files": [
+      {
+        "path": "backend/project_manager.py",
+        "symbols": [
+          "WORKSPACE_CORE_FOLDERS",
+          "_safe_path_component(value: str, label: str) -> str",
+          "_project_dir(project_name: str) -> Path",
+          "_scene_path(project_name: str, scene_id: str) -> Path",
+          "_scene_metadata_path(project_name: str, scene_id: str) -> Path",
+          "_write_json_object(path: Path, data: dict[str, Any], label: str, *, overwrite: bool) -> None",
+          "_load_json_object_from_path(path: Path, label: str) -> dict[str, Any]",
+          "_utc_now() -> str",
+          "_utc_after(previous_timestamp: str | None) -> str",
+          "load_scene(project_name: str, scene_id: str) -> str",
+          "save_scene(project_name: str, scene_id: str, content: str) -> None",
+          "list_scenes(project_name: str) -> list[str]"
+        ],
+        "notes": "Existing path, body storage, metadata, and timestamp patterns should be reused for note/material helpers."
+      },
+      {
+        "path": "backend/main.py",
+        "symbols": [
+          "ProjectCreate",
+          "SceneUpdate",
+          "get_projects()",
+          "post_project(payload: ProjectCreate)",
+          "get_scenes(project_name: str)",
+          "get_scene(project_name: str, scene_id: str)",
+          "update_scene(project_name: str, scene_id: str, update: SceneUpdate)"
+        ],
+        "notes": "Existing project and scene route patterns should inform future note/material routes; no note/material routes exist yet."
+      }
+    ],
+    "frontend_files": [
+      {
+        "path": "frontend/src/api.js",
+        "notes": "Project-scoped API helper pattern exists for scenes; no note/material helpers exist yet."
+      },
+      {
+        "path": "frontend/src/App.jsx",
+        "notes": "Owns active project, scene load/save, dirty state, and project-scoped calls."
+      },
+      {
+        "path": "frontend/src/components/ProjectNav.jsx",
+        "notes": "Renders project and scene navigation; no notes/materials navigation yet."
+      },
+      {
+        "path": "frontend/src/components/Editor.jsx",
+        "notes": "Current owner-authored body editor; shared editor expansion belongs to PHASE7-IMPL-006 unless separately scoped."
+      },
+      {
+        "path": "frontend/src/components/ProjectContext.jsx",
+        "notes": "Bible/storyform context UI, not notes/materials."
+      }
+    ],
+    "tests": [
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_frontend_project_workspace_source.py"
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE7-IMPL-005-T001",
+      "title": "Notes / Materials Storage and Routes Inventory",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE7-IMPL-005"
+      ],
+      "file_allowlist": [
+        "docs/roadmap/tasks/PHASE7-IMPL-005.md",
+        "docs/roadmap/inventory/PHASE7-IMPL-005.md",
+        "docs/roadmap/enrichment/PHASE7-IMPL-005.enrichment.json",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T002",
+      "title": "Backend note/material storage helpers",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-005-T001"
+      ],
+      "file_allowlist": [
+        "backend/project_manager.py",
+        "tests/test_project_manager.py"
+      ],
+      "scope": [
+        "Safe note/material path helpers.",
+        "Note and material body save/load/list helpers.",
+        "Note and material metadata create/update/load/list helpers.",
+        "Metadata-only source/provenance/license fields.",
+        "Focused helper tests."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T003",
+      "title": "Backend note/material routes",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-005-T002"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T004",
+      "title": "Route compatibility and path-safety tests",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-005-T003"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T005",
+      "title": "Frontend API compatibility helpers for notes/materials",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-005-T003"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T006",
+      "title": "Minimal notes/materials navigation/display shell",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-005-T005"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-005-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-005-T006"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Notes and materials are stored as Markdown/text body files plus separate metadata.",
+    "Notes/materials are not canon or training data by default.",
+    "Metadata includes safe derived identity, relative content paths, timestamps, provenance/source/license fields, tags, and owner-controlled status fields as scoped by local specs.",
+    "Storage operations do not call models, generate prose, run extraction, create OMI candidates, promote candidates, mutate memory/canon, or write training artifacts.",
+    "Future route/frontend work is split into later child tasks."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "git diff --check",
+      "git status --short --branch"
+    ],
+    "notes": "Use the approved LeanCTX wrapper only if raw git diff/status commands are blocked by the local hook."
+  }
+}
