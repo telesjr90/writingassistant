@@ -644,8 +644,8 @@ class TestNoteMaterialShellSource:
     def test_note_material_selection_uses_ids_not_titles(
         self, project_nav_source: str
     ) -> None:
-        assert "const noteId = note.noteId" in project_nav_source
-        assert "const materialId = material.materialId" in project_nav_source
+        assert "const noteId = getNoteOptionId(note)" in project_nav_source
+        assert "const materialId = getMaterialOptionId(material)" in project_nav_source
         assert "onSelectNote?.(noteId)" in project_nav_source
         assert "onSelectMaterial?.(materialId)" in project_nav_source
         assert "onSelectNote?.(noteLabel)" not in project_nav_source
@@ -1062,12 +1062,17 @@ class TestSharedDocumentStateContract:
             assert reset in app_source
 
     def test_project_nav_selection_parity_for_scene_note_and_material(
-        self, project_nav_source: str
+        self, app_source: str, project_nav_source: str
     ) -> None:
+        assert "activeDocumentType = DEFAULT_DOCUMENT_TYPE" in project_nav_source
+        assert "activeDocumentId = ''" in project_nav_source
+        assert "activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}" in app_source
+        assert "activeDocumentId={activeDocument.id}" in app_source
+
         expected_active_checks = (
-            "activeDocumentType === 'scene' && selectedSceneId === sceneId",
-            "activeDocumentType === 'note' && selectedNoteId === noteId",
-            "activeDocumentType === 'material' && selectedMaterialId === materialId",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.SCENE, sceneId)",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.NOTE, noteId)",
+            "isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.MATERIAL, materialId)",
         )
         for check in expected_active_checks:
             assert check in project_nav_source
@@ -1090,6 +1095,38 @@ class TestSharedDocumentStateContract:
 
         for empty_state in ("No scenes yet.", "No notes yet.", "No materials yet."):
             assert empty_state in project_nav_source
+
+    def test_project_nav_label_fallback_parity_for_document_groups(
+        self, project_nav_source: str
+    ) -> None:
+        for helper_name in (
+            "getSceneOptionLabel",
+            "getNoteOptionLabel",
+            "getMaterialOptionLabel",
+        ):
+            assert f"function {helper_name}" in project_nav_source
+
+        assert "return sceneOption.label || sceneOption.sceneId" in project_nav_source
+        assert "return noteOption.label || noteOption.title || noteOption.noteId" in project_nav_source
+        assert (
+            "return materialOption.label || materialOption.title || materialOption.materialId"
+            in project_nav_source
+        )
+        assert "const title = rawTitle || sceneId || ''" in project_nav_source
+        assert "const title = rawTitle || noteId" in project_nav_source
+        assert "const title = rawTitle || materialId" in project_nav_source
+
+    def test_project_nav_app_call_uses_generic_active_document_props(
+        self, app_source: str
+    ) -> None:
+        project_nav_call = app_source.split("<ProjectNav", 1)[1].split("/>", 1)[0]
+        assert "activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}" in (
+            project_nav_call
+        )
+        assert "activeDocumentId={activeDocument.id}" in project_nav_call
+        assert "selectedSceneId=" not in project_nav_call
+        assert "selectedNoteId=" not in project_nav_call
+        assert "selectedMaterialId=" not in project_nav_call
 
     @pytest.mark.parametrize(
         "source_path",

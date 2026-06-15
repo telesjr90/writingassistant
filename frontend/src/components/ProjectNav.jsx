@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DEFAULT_DOCUMENT_TYPE, DOCUMENT_TYPES } from '../sharedDocumentController.js';
 
 function normalizeSceneOrder(scene) {
   const rawOrder = scene.order_index ?? scene.orderIndex ?? scene.order;
@@ -51,6 +52,10 @@ function getSceneOptionId(sceneOption) {
 
 function getSceneOptionLabel(sceneOption) {
   return sceneOption.label || sceneOption.sceneId;
+}
+
+function isActiveDocument(activeDocumentType, activeDocumentId, documentType, documentId) {
+  return activeDocumentType === documentType && activeDocumentId === documentId;
 }
 
 function normalizeSceneList(scenes) {
@@ -160,6 +165,14 @@ function normalizeNoteList(notes) {
     .filter((note) => note?.noteId);
 }
 
+function getNoteOptionId(noteOption) {
+  return noteOption.noteId;
+}
+
+function getNoteOptionLabel(noteOption) {
+  return noteOption.label || noteOption.title || noteOption.noteId;
+}
+
 function normalizeMaterialOption(material, originalIndex = 0) {
   if (typeof material === 'string') {
     return {
@@ -198,6 +211,14 @@ function normalizeMaterialList(materials) {
     .filter((material) => material?.materialId);
 }
 
+function getMaterialOptionId(materialOption) {
+  return materialOption.materialId;
+}
+
+function getMaterialOptionLabel(materialOption) {
+  return materialOption.label || materialOption.title || materialOption.materialId;
+}
+
 export default function ProjectNav({
   activeProjectId,
   projects,
@@ -210,15 +231,13 @@ export default function ProjectNav({
   createProjectStatus = '',
   onRefreshProjects,
   scenes,
-  selectedSceneId,
   isLoading,
   error,
   onSelectScene,
   notes = [],
   materials = [],
-  selectedNoteId = '',
-  selectedMaterialId = '',
-  activeDocumentType = 'scene',
+  activeDocumentType = DEFAULT_DOCUMENT_TYPE,
+  activeDocumentId = '',
   isLoadingNotes = false,
   isLoadingMaterials = false,
   notesError = '',
@@ -356,7 +375,11 @@ export default function ProjectNav({
           return (
             <button
               className={
-                `scene-item${activeDocumentType === 'scene' && selectedSceneId === sceneId ? ' is-active' : ''}`
+                `scene-item${
+                  isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.SCENE, sceneId)
+                    ? ' is-active'
+                    : ''
+                }`
               }
               type="button"
               key={sceneId}
@@ -379,13 +402,17 @@ export default function ProjectNav({
           <p className="muted-copy">No notes yet.</p>
         )}
         {normalizedNotes.map((note) => {
-          const noteId = note.noteId;
-          const noteLabel = note.label || note.title || noteId;
+          const noteId = getNoteOptionId(note);
+          const noteLabel = getNoteOptionLabel(note);
 
           return (
             <button
               className={
-                `scene-item${activeDocumentType === 'note' && selectedNoteId === noteId ? ' is-active' : ''}`
+                `scene-item${
+                  isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.NOTE, noteId)
+                    ? ' is-active'
+                    : ''
+                }`
               }
               type="button"
               key={noteId}
@@ -408,13 +435,17 @@ export default function ProjectNav({
           <p className="muted-copy">No materials yet.</p>
         )}
         {normalizedMaterials.map((material) => {
-          const materialId = material.materialId;
-          const materialLabel = material.label || material.title || materialId;
+          const materialId = getMaterialOptionId(material);
+          const materialLabel = getMaterialOptionLabel(material);
 
           return (
             <button
               className={
-                `scene-item${activeDocumentType === 'material' && selectedMaterialId === materialId ? ' is-active' : ''}`
+                `scene-item${
+                  isActiveDocument(activeDocumentType, activeDocumentId, DOCUMENT_TYPES.MATERIAL, materialId)
+                    ? ' is-active'
+                    : ''
+                }`
               }
               type="button"
               key={materialId}

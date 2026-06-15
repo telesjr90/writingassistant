@@ -827,15 +827,13 @@ export default function App() {
         createProjectStatus={createProjectStatus}
         onRefreshProjects={loadProjects}
         scenes={scenes}
-        selectedSceneId={selectedSceneId}
         isLoading={isLoadingScenes}
         error={sceneError}
         onSelectScene={handleSelectScene}
         notes={notes}
         materials={materials}
-        selectedNoteId={selectedNoteId}
-        selectedMaterialId={selectedMaterialId}
         activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}
+        activeDocumentId={activeDocument.id}
         isLoadingNotes={isLoadingNotes}
         isLoadingMaterials={isLoadingMaterials}
         notesError={notesError}
