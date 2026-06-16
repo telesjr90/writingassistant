@@ -1749,6 +1749,227 @@ class TestOmiGuidedProjectCreationStagedFlowContract:
                 assert absent_surface not in source.lower()
 
 
+class TestOmiGuidedProjectCreationBackendStorageDecision:
+    """PHASE7-IMPL-008-T003 compatibility guard for deferred backend storage."""
+
+    @staticmethod
+    def _without_line_comments(source: str) -> str:
+        lines = []
+        for line in source.splitlines():
+            stripped = line.lstrip()
+            if stripped.startswith("#") or stripped.startswith("//"):
+                continue
+            lines.append(line)
+        return "\n".join(lines)
+
+    def test_backend_staged_setup_storage_is_deferred_by_contract(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for decision_evidence in (
+            "transient frontend state",
+            "staged setup helpers only if needed",
+            "No staged setup helpers exist yet",
+            "No staged-setup routes exist today",
+            "A first implementation can keep the wizard in transient frontend state until final confirmation.",
+        ):
+            assert decision_evidence in combined_contract
+
+        for absent_backend_surface in (
+            "create_staged_setup",
+            "load_staged_setup",
+            "update_staged_setup",
+            "delete_staged_setup",
+            "finalize_staged_setup",
+            "PROJECT_CREATION_METHOD_OMI_GUIDED",
+            "setup_id",
+            "staged_setup",
+            "project-setups",
+            "setup-drafts",
+            "projects/from-omi",
+        ):
+            assert absent_backend_surface not in backend_main_source
+            assert absent_backend_surface not in project_manager_source
+
+    def test_t005_can_remain_frontend_transient_until_final_confirmation(
+        self,
+        app_source: str,
+        api_source: str,
+        project_nav_source: str,
+        task_008_source: str,
+        inventory_008_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for frontend_transient_rule in (
+            "transient frontend state only",
+            "before any durable project files are written",
+            "final confirmation",
+            "Routing the owner to the Project Overview shell after the new project is created.",
+        ):
+            assert frontend_transient_rule in combined_contract
+
+        assert "Create blank project" in project_nav_source
+        assert "handleCreateProject" in app_source
+        assert "createProject(trimmedTitle)" in app_source
+        assert "export async function createProject(title)" in api_source
+
+        for absent_frontend_backend_dependency in (
+            "createOMISetup",
+            "updateOMISetup",
+            "fetchOMISetup",
+            "deleteOMISetup",
+            "createProjectFromOMISetup",
+            "from-omi",
+            "project-setups",
+            "setup-drafts",
+        ):
+            assert absent_frontend_backend_dependency not in app_source
+            assert absent_frontend_backend_dependency not in api_source
+
+    def test_existing_project_creation_remains_final_durable_path(
+        self,
+        app_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        assert "createProject(trimmedTitle)" in app_source
+        assert "export async function createProject(title)" in api_source
+        assert "client.post('/projects', { title })" in api_source
+        assert "class ProjectCreate(BaseModel)" in backend_main_source
+        assert '@app.post("/api/projects")' in backend_main_source
+        assert "return project_manager.create_project(title=payload.title)" in backend_main_source
+        assert "def create_project(" in project_manager_source
+        assert "PROJECT_CREATION_METHOD_BLANK = \"blank\"" in project_manager_source
+
+        for creation_safety_helper in (
+            "def derive_project_id(",
+            "def validate_project_id(",
+            "def resolve_project_id_with_collision(",
+            "WORKSPACE_CORE_FOLDERS",
+            "_write_json_object(project_path / \"project.json\"",
+        ):
+            assert creation_safety_helper in project_manager_source
+
+    def test_deferred_backend_storage_avoids_hidden_pre_confirmation_writes(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for hidden_write_boundary in (
+            "No hidden project writes during wizard steps",
+            "before any durable project files are written",
+            "before final confirmation",
+            "Only the confirmed finalize step may create `projects/{project_id}/`.",
+        ):
+            assert hidden_write_boundary in combined_contract
+
+        runtime_without_comments = "\n".join(
+            [
+                self._without_line_comments(backend_main_source),
+                self._without_line_comments(project_manager_source),
+            ]
+        ).lower()
+        for forbidden_pre_confirmation_surface in (
+            "setup_id",
+            "staged_setup",
+            "project-setups",
+            "setup-drafts",
+            "create_project_from_omi",
+            "projects/from-omi",
+            "hidden project write",
+        ):
+            assert forbidden_pre_confirmation_surface not in runtime_without_comments
+
+    def test_omi_candidate_records_are_not_pre_project_staged_storage(
+        self,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+        inventory_008_source: str,
+    ) -> None:
+        for project_scoped_surface in (
+            "`GET /api/projects/{project_name}/omi`",
+            "`POST /api/projects/{project_name}/omi/ideas`",
+            "`POST /api/projects/{project_name}/omi/candidates`",
+            "project-local OMI records",
+            "after final confirmation",
+        ):
+            assert project_scoped_surface in inventory_008_source
+
+        for project_scoped_route in (
+            '@app.get("/api/projects/{project_name}/omi")',
+            '@app.post("/api/projects/{project_name}/omi/ideas")',
+            '@app.post("/api/projects/{project_name}/omi/candidates")',
+            '@app.post("/api/projects/{project_name}/omi/promotions")',
+        ):
+            assert project_scoped_route in backend_main_source
+
+        for api_helper in (
+            "export async function createOMIIdea(projectId = PROJECT_ID, payload)",
+            "export async function createOMICandidate(projectId = PROJECT_ID, payload)",
+            "export async function createOMIPromotion(projectId = PROJECT_ID, payload)",
+        ):
+            assert api_helper in api_source
+
+        assert "OMI_PROMOTION_RECORD_STATUS = \"ready_for_manual_application\"" in (
+            project_manager_source
+        )
+        assert "def create_omi_promotion_record(" in project_manager_source
+        assert "apply" not in project_manager_source.split(
+            "def create_omi_promotion_record(",
+            1,
+        )[1].split("def ", 1)[0].lower()
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+            APP_JSX,
+            API_JS,
+            OMI_PANEL_JSX,
+            PROJECT_OVERVIEW_JSX,
+        ],
+    )
+    def test_runtime_sources_exclude_t003_forbidden_staged_storage_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._without_line_comments(read_source(source_path)).lower()
+        for forbidden_term in (
+            "generated setup",
+            "ai-written setup",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply-promotion",
+            "canon mutation",
+            "memory mutation",
+            "hidden project write",
+            "jsonl",
+            "dataset",
+        ):
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T003-forbidden term {forbidden_term!r}"
+            )
+
+
 class TestSceneMetadataDisplayCompatibility:
     def test_normalizes_legacy_scene_string_ids(self, project_nav_source: str) -> None:
         assert "function normalizeSceneOption" in project_nav_source

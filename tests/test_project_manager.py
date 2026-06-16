@@ -1,4 +1,5 @@
 import json
+import inspect
 import sys
 from pathlib import Path
 
@@ -1533,3 +1534,96 @@ def test_promotion_record_creation_does_not_modify_project_truth_files(
 
     for path, content in files.items():
         assert path.read_text(encoding="utf-8") == content
+
+
+def test_phase7_impl_008_t003_defers_backend_staged_setup_helpers() -> None:
+    source = inspect.getsource(project_manager)
+
+    for absent_helper in (
+        "create_staged_setup",
+        "load_staged_setup",
+        "update_staged_setup",
+        "delete_staged_setup",
+        "finalize_staged_setup",
+        "create_project_from_omi",
+        "PROJECT_CREATION_METHOD_OMI_GUIDED",
+    ):
+        assert absent_helper not in source
+
+    for absent_storage_surface in (
+        "project-setups",
+        "setup-drafts",
+        "staged_setup",
+        "setup_id",
+    ):
+        assert absent_storage_surface not in source.lower()
+
+
+def test_phase7_impl_008_t003_final_creation_uses_existing_blank_project_path(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    metadata = project_manager.create_project("Owner Guided Project", projects_dir=tmp_path)
+
+    assert metadata["project_id"] == "owner-guided-project"
+    assert metadata["title"] == "Owner Guided Project"
+    assert metadata["creation_method"] == project_manager.PROJECT_CREATION_METHOD_BLANK
+    assert (tmp_path / "owner-guided-project" / "project.json").is_file()
+    for folder in project_manager.WORKSPACE_CORE_FOLDERS:
+        assert (tmp_path / "owner-guided-project" / folder).is_dir()
+
+    for hidden_or_deferred_path in (
+        "bible.json",
+        "storyform.json",
+        "memory",
+        "canon",
+        "omi",
+        "project-setups",
+        "setup-drafts",
+    ):
+        assert not (tmp_path / "owner-guided-project" / hidden_or_deferred_path).exists()
+        assert not (tmp_path / hidden_or_deferred_path).exists()
+
+
+def test_phase7_impl_008_t003_collision_safe_creation_remains_source_of_truth(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+
+    first = project_manager.create_project("Owner Guided Project", projects_dir=tmp_path)
+    second = project_manager.create_project("Owner Guided Project", projects_dir=tmp_path)
+
+    assert first["project_id"] == "owner-guided-project"
+    assert second["project_id"] == "owner-guided-project-2"
+    assert project_manager.derive_project_id("Owner Guided Project") == "owner-guided-project"
+    assert project_manager.validate_project_id(second["project_id"]) == second["project_id"]
+
+
+def test_phase7_impl_008_t003_omi_records_remain_project_local_and_audit_only(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project = project_manager.create_project("Owner Guided Project", projects_dir=tmp_path)
+
+    idea = project_manager.create_omi_idea(
+        project["project_id"],
+        "Owner-authored setup input after project confirmation.",
+        provenance={"source_type": "owner_input", "created_by": "owner"},
+    )
+    candidate = project_manager.create_omi_candidate(
+        project["project_id"],
+        idea["idea_id"],
+        "planning_note",
+        {"summary": "Owner-authored candidate-only setup context."},
+        "planning_notes",
+        evidence=[{"source": "owner"}],
+    )
+
+    assert idea["project_id"] == project["project_id"]
+    assert idea["status"] == "draft"
+    assert candidate["status"] == "candidate"
+    assert candidate["promotion_status"]["eligible"] is False
+    assert project_manager.load_omi_index(project["project_id"])["promotion_ids"] == []
+    assert not (tmp_path / project["project_id"] / "memory").exists()
+    assert not (tmp_path / project["project_id"] / "canon").exists()
