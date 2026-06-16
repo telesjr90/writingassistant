@@ -1,5 +1,34 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-001-T002 Context Collection Plan for Writer Assistant Core
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: docs/planning only for `PHASE8-IMPL-001-T002`.
+- Parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Active child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory.
+- Last completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core.
+- Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+- Plan summary:
+  - Created `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md` with T003 questions, target files, tool policy, report format, stop conditions, and T004 handoff criteria.
+  - Defined eight question groups (OMI runtime, project storage, frontend surfaces, candidate schema alignment, evidence/provenance, guardrails, tests, first slice candidates).
+  - Listed exact spec, runtime, and test file allowlists for T003 inspection.
+  - Recorded that T003 output goes to `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
+  - No context tools were run in T002.
+- Updated:
+  - `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md` (created)
+  - `docs/roadmap/tasks/PHASE8-IMPL-001.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Pytest: not run; docs/planning only; no runtime code or tests changed.
+- Boundary summary: no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, extraction, generated prose, backend extraction routes, frontend extraction UI, apply-promotion, memory/canon mutation, runtime code, tests, package/dependency changes, project runtime files, training data, JSONL records, dataset manifests, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-001-T001 Publish Writer Assistant Core Parent and Child-Task Plan
 
 - Date: 2026-06-16
