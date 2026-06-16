@@ -1,5 +1,37 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-001-T004 First Runtime Slice Decision
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-001-T004`.
+- Parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision.
+- Active child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests.
+- Next child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants.
+- Last completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision.
+- Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory.
+- Source evidence: `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
+- Decision created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`
+- Decision summary:
+  - Accepted Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice.
+  - T005 is tests-first and should add contract/source tests only unless explicitly re-scoped.
+  - T006 is planned as constants-only implementation to satisfy T005.
+  - Storage helpers, route contracts, frontend placeholders, and evidence/provenance helper implementation are deferred.
+- Updated:
+  - `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`
+  - `docs/roadmap/tasks/PHASE8-IMPL-001.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Pytest: not run; docs/decision only; no runtime code or tests changed.
+- Boundary summary: no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, extraction, generated prose, backend extraction routes, frontend extraction UI, apply-promotion, OMI candidate promotion, memory/canon mutation, runtime code, tests, package/dependency changes, project runtime files, training data, JSONL records, dataset manifests, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-001-T003 Targeted Context Collection and Source Inventory
 
 - Date: 2026-06-16

@@ -67,9 +67,9 @@ Include:
 1. `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan. Status: complete.
 2. `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Status: complete.
 3. `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Status: complete.
-4. `PHASE8-IMPL-001-T004` - First runtime slice decision. Status: ready.
-5. `PHASE8-IMPL-001-T005` - First slice contract/source tests. Status: planned.
-6. `PHASE8-IMPL-001-T006` - First slice implementation prompt/repair plan. Status: planned.
+4. `PHASE8-IMPL-001-T004` - First runtime slice decision. Status: complete.
+5. `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Status: ready.
+6. `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Status: planned.
 7. `PHASE8-IMPL-001-T007` - Roadmap/status closeout. Status: planned.
 
 ## Child Task Details
@@ -99,19 +99,25 @@ Include:
 
 ### `PHASE8-IMPL-001-T004` - First runtime slice decision
 
-- Choose the smallest safe first implementation slice.
-- Define whether the first slice is schema-only, storage-only, route-only, or source-level tests first.
-- No runtime implementation unless explicitly scoped by that child prompt.
+- Completed as a docs/decision-only task.
+- Produced `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`.
+- Selected Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice.
+- Defined T005 as tests-first and T006 as constants-only implementation.
+- No runtime implementation, tests, routes, UI, extraction, model calls, apply-promotion, OMI candidate promotion, or memory/canon mutation.
 
-### `PHASE8-IMPL-001-T005` - First slice contract/source tests
+### `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests
 
-- Add tests or contract coverage for the selected first slice.
-- No production runtime implementation unless explicitly authorized by task scope.
+- Add source-level/contract tests for the selected first slice.
+- Lock candidate type constants expected by Writer Assistant Core, required field names, source locator fields, evidence/provenance fields, owner decision/status/destination fields, target category mapping, and forbidden runtime boundaries.
+- Tests-first preferred scope; do not implement production constants unless explicitly authorized by the T005 prompt.
+- No extraction runtime, backend extraction routes, frontend extraction UI, model/Ollama calls, generated prose behavior, apply-promotion, OMI candidate promotion, or memory/canon mutation.
 
-### `PHASE8-IMPL-001-T006` - First slice implementation prompt/repair plan
+### `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants
 
-- Prepare or execute the first tiny implementation slice according to T004/T005.
+- Implement only enough constants/schema metadata to satisfy T005.
+- Keep the implementation constants-only unless a later task explicitly expands scope.
 - Preserve candidate-first, no-prose, no-promotion, evidence/provenance, and OMI review boundaries.
+- Do not add routes, storage writes, extraction, model calls, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation.
 
 ### `PHASE8-IMPL-001-T007` - Roadmap/status closeout
 
@@ -125,7 +131,9 @@ Include:
 - T001 is recorded as complete (docs/status/planning only).
 - T002 is recorded as complete with context collection plan at `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md`.
 - T003 is complete and produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
-- T004 is the current ready child for first runtime slice decision.
+- T004 is complete and produced the accepted first runtime slice decision at `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`.
+- T005 is the current ready child for Writer Assistant Core candidate schema contract tests.
+- The selected first runtime slice is Writer Assistant Core candidate schema constants plus source-level/contract tests.
 - OMI remains the candidate-first review and future promotion layer.
 - Candidate output, model output, NotebookLM output, extracted candidates, and planning notes remain non-canon until explicit owner review and future owner-controlled promotion.
 - No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is claimed by this parent promotion task.
@@ -139,6 +147,12 @@ For `PHASE8-IMPL-001-T002`:
 - Non-LeanCTX whitespace check on changed docs
 
 For `PHASE8-IMPL-001-T003`:
+
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- Non-LeanCTX whitespace check on changed docs
+
+For `PHASE8-IMPL-001-T004`:
 
 - `python3 scripts/check_enrichment.py`
 - `python3 scripts/validate_roadmap.py`
@@ -165,4 +179,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Last completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Last completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.

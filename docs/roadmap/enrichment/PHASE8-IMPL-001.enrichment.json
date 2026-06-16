@@ -25,7 +25,8 @@
     "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json",
     "context_pack": ".codex-context/PHASE8-IMPL-001/",
     "context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
-    "targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md"
+    "targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
+    "first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md"
   },
   "goal": "Promote Writer Assistant Core as the next roadmap frontier after the completed Phase 7 Project Workspace Foundation and prepare the first safe runtime slice through implementation readiness, context planning, schema alignment, OMI candidate-first lifecycle boundaries, and acceptance criteria.",
   "why_now": "The published Phase 7 parent sequence PHASE7-IMPL-001 through PHASE7-IMPL-010 is complete. Writer Assistant Core is the next product direction, but implementation must start with readiness and context planning before extraction, candidate creation, model calls, UI changes, apply-promotion, or memory/canon mutation.",
@@ -90,7 +91,8 @@
       "T001 publishes the parent and child plan only.",
       "T002 publishes the context collection plan at docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md.",
       "T003 produced docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md using direct file/source inspection only.",
-      "Runtime extraction, candidate creation, model calls, UI changes, apply-promotion, and memory/canon mutation are excluded from T001."
+      "T004 selected Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice.",
+      "Runtime extraction, candidate creation, model calls, UI changes, apply-promotion, and memory/canon mutation are excluded from T001 through T004."
     ]
   },
   "child_tasks": [
@@ -143,40 +145,45 @@
       "id": "PHASE8-IMPL-001-T004",
       "title": "First runtime slice decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-001-T003"
       ],
       "scope": [
-        "Choose the smallest safe first implementation slice.",
-        "Define whether it is schema-only, storage-only, route-only, or source-level tests first.",
-        "No runtime implementation unless explicitly scoped."
+        "Completed as a docs/decision-only task.",
+        "Produced docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md.",
+        "Selected Writer Assistant Core candidate schema constants plus source-level/contract tests.",
+        "Defined T005 as tests-first and T006 as constants-only implementation.",
+        "No runtime implementation."
       ]
     },
     {
       "id": "PHASE8-IMPL-001-T005",
-      "title": "First slice contract/source tests",
+      "title": "Writer Assistant Core candidate schema contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-001-T004"
       ],
       "scope": [
-        "Add tests or contract coverage for the selected first slice.",
-        "No production runtime implementation unless explicitly authorized by task scope."
+        "Add source-level/contract tests for the selected first slice.",
+        "Lock Writer Assistant Core candidate type constants, required fields, source locator, evidence/provenance, owner decision/status/destination, and target category contract.",
+        "Assert no apply-promotion, no canon/memory mutation, no model/Ollama/extraction runtime, and no generated prose behavior.",
+        "Tests-only preferred; no production runtime implementation unless explicitly authorized by task scope."
       ]
     },
     {
       "id": "PHASE8-IMPL-001-T006",
-      "title": "First slice implementation prompt/repair plan",
+      "title": "Writer Assistant Core candidate schema constants",
       "type": "runtime_microtask",
       "status": "planned",
       "depends_on": [
         "PHASE8-IMPL-001-T005"
       ],
       "scope": [
-        "Prepare or execute the first tiny implementation slice according to T004/T005.",
-        "Keep candidate-first, no-prose, no-promotion, and evidence/provenance boundaries."
+        "Implement only enough constants/schema metadata to satisfy T005.",
+        "Keep candidate-first, no-prose, no-promotion, and evidence/provenance boundaries.",
+        "Do not add routes, storage writes, extraction, model calls, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation."
       ]
     },
     {
@@ -198,7 +205,9 @@
     "PHASE8-IMPL-001-T001 is registered as complete.",
     "PHASE8-IMPL-001-T002 is registered as complete with context collection plan published.",
     "PHASE8-IMPL-001-T003 is registered as complete with targeted context report published.",
-    "PHASE8-IMPL-001-T004 is registered as the next ready child.",
+    "PHASE8-IMPL-001-T004 is registered as complete with first runtime slice decision published.",
+    "PHASE8-IMPL-001-T005 is registered as the next ready child.",
+    "The selected first runtime slice is Writer Assistant Core candidate schema constants plus source-level/contract tests.",
     "T002 plans context collection before any context tool execution.",
     "T003 may run targeted context tools only if explicitly authorized.",
     "No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is implemented by T001."
@@ -229,6 +238,7 @@
     "T001 does not run context tools.",
     "T002 publishes the context collection plan; T002 does not run context tools.",
     "T003 used direct file/source inspection only and did not run context tools.",
+    "T004 is docs/decision only and did not run context tools.",
     "Context output is evidence, not roadmap truth.",
     "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
   ]

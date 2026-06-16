@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-001",
     "current_parent_task_title": "Writer Assistant Core implementation readiness and first runtime slice plan",
-    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is the active Writer Assistant Core readiness parent; T003 is complete and PHASE8-IMPL-001-T004 is the next ready child."
+    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is the active Writer Assistant Core readiness parent; T004 selected Writer Assistant Core candidate schema constants plus source-level/contract tests, and PHASE8-IMPL-001-T005 is the next ready child."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -434,7 +434,7 @@
       "id": "PHASE8-IMPL-001-T004",
       "title": "First runtime slice decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-001",
       "depends_on": [
         "PHASE8-IMPL-001-T003"
@@ -451,9 +451,9 @@
     },
     {
       "id": "PHASE8-IMPL-001-T005",
-      "title": "First slice contract/source tests",
+      "title": "Writer Assistant Core candidate schema contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-001",
       "depends_on": [
         "PHASE8-IMPL-001-T004"
@@ -468,7 +468,7 @@
     },
     {
       "id": "PHASE8-IMPL-001-T006",
-      "title": "First slice implementation prompt/repair plan",
+      "title": "Writer Assistant Core candidate schema constants",
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-001",
