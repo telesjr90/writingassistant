@@ -1,5 +1,37 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-001-T001 Publish Writer Assistant Core Parent and Child-Task Plan
+
+- Date: 2026-06-16
+- Result: PARTIAL
+- Scope: docs/status/planning promotion for `PHASE8-IMPL-001`.
+- Parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Active child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+- Next child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core.
+- Last completed parent: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
+- Last completed child: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
+- Promotion summary:
+  - Published Writer Assistant Core as the next active roadmap frontier after the completed Phase 7 Project Workspace Foundation.
+  - Created the Phase 8 parent task record, inventory, and enrichment JSON.
+  - Registered the conservative T001-T007 child-task sequence.
+  - Recorded that T001 does not run context tools; T002 plans context collection; T003 may run targeted context tools only if explicitly authorized.
+  - Recorded that context output is evidence, not roadmap truth.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-001.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-001.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: BLOCKED by repository hook. Hook message: `Command should run via lean-ctx for compact output. Do not retry the original command. Re-run with: /home/tjrpirateking/.nvm/versions/node/v24.16.0/bin/lean-ctx -c 'git diff --check'.` The suggested LeanCTX wrapper was not run because T001 explicitly prohibits LeanCTX/context tools.
+- Pytest: not run; docs/status/planning only; no runtime code or tests changed.
+- Boundary summary: no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, Story Check auto-runs, extraction, generated prose, summaries as durable truth, backend extraction routes, frontend extraction UI, apply-promotion, OMI candidate promotion, memory/canon mutation, runtime code, tests, package/dependency changes, project runtime files, training data, JSONL records, dataset manifests, staging, commits, or pushes were run or added.
+
 ## PHASE7-IMPL-010-T007 Roadmap/Status Closeout
 
 - Date: 2026-06-16

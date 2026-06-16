@@ -85,7 +85,7 @@ This is the next product direction after owner acceptance of the Phase 6 MVP fou
 
 - Inputs: current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, MVP foundation.
 - Outputs: project creation, project selector/library, OMI-guided project creation and idea capture, chapters/scenes/notes/materials organization, owner-authored prose editor, project overview, chapters/scenes pages, notes/materials pages, OMI ideas/candidates page, approved-memory/canon page structure, and the approved-only category pages (Characters, Locations/Settings, Objects/Items, Timeline, Plot Threads, Continuity/Consistency, Approved Contradictions, Approved Scene / Event / Causality Review, Open Questions, Relationships, Organizations/Groups, Annotations/Evidence/Provenance).
-- Status: COMPLETE (published parent sequence). `PHASE7-IMPL-001` through `PHASE7-IMPL-010` are complete, covering safe project metadata creation, selector/library support, frontend project switching, chapter/scene metadata compatibility, notes/materials storage/routes/API/minimal shell, shared owner-authored scene/note/material editor behavior, the deterministic Project Overview shell, the frontend-transient OMI-guided staged creation shell, the read-only Memory / Canon shell with approved-only empty states, and workspace validation/browser smoke with automated regression pass plus PARTIAL browser/manual smoke due to environment tooling limits. `PHASE7-IMPL-010` validated the foundation without adding runtime feature scope; T005 found no product defect and no runtime repair; interactive UI browser validation remains deferred to owner/environment rerun when Playwright deps or browser MCP are available. Next parent/child frontier requires owner/roadmap confirmation because no next published parent exists in `docs/roadmap/roadmap_index.yaml`. Extractor logic, dataset files, training records, model calls, and package installs remain out of scope unless explicitly started by a later published task.
+- Status: COMPLETE (published parent sequence). `PHASE7-IMPL-001` through `PHASE7-IMPL-010` are complete, covering safe project metadata creation, selector/library support, frontend project switching, chapter/scene metadata compatibility, notes/materials storage/routes/API/minimal shell, shared owner-authored scene/note/material editor behavior, the deterministic Project Overview shell, the frontend-transient OMI-guided staged creation shell, the read-only Memory / Canon shell with approved-only empty states, and workspace validation/browser smoke with automated regression pass plus PARTIAL browser/manual smoke due to environment tooling limits. `PHASE7-IMPL-010` validated the foundation without adding runtime feature scope; T005 found no product defect and no runtime repair; interactive UI browser validation remains deferred to owner/environment rerun when Playwright deps or browser MCP are available. The next published parent is `PHASE8-IMPL-001`. Extractor logic, dataset files, training records, model calls, and package installs remain out of scope unless explicitly started by a later published task.
 - Exit: owner can create/select a project, write and save owner-authored material, organize chapters/scenes/notes/materials, and see project-specific workspace pages without any AI prose-generation path.
 
 Workspace layer order:
@@ -101,12 +101,12 @@ Workspace layer order:
 
 This follows the Project Workspace Foundation. It identifies, organizes, connects, annotates, and reviews story knowledge from owner-authored text. All outputs remain analysis-only, candidate-first, evidence/provenance-backed where practical, and owner-controlled through OMI.
 
-### Phase 8: Writer Assistant Core Candidate Schemas, OMI Expansion, and Adapter Contracts
+### Phase 8: Writer Assistant Core Candidate Schemas, OMI Expansion, Evidence/Provenance, Context Planning, Adapter Contracts, and First Slice Readiness
 
 - Inputs: usable Project Workspace Foundation, current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
-- Outputs: story knowledge candidate schemas, evidence span/provenance model, initial project memory/canon design target, minimum candidate type set, OMI typed review expansion, and replaceable extractor adapter contracts.
-- Status: DOCUMENTED LOCALLY. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage target is recorded in `docs/roadmap/project_memory_canon_storage_model.md`; CORE-005 OMI expansion behavior is recorded in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`. No runtime schema, extractor, storage, apply-promotion, or project memory implementation has been performed.
-- Exit: owner-approved schema plan for candidate story knowledge, project memory/canon, OMI typed review, and adapter integration.
+- Outputs: story knowledge candidate schema alignment, OMI typed review expansion planning, evidence/provenance boundaries, targeted context collection plan, replaceable adapter contract planning, first safe runtime slice decision, and first implementation acceptance criteria.
+- Status: ACTIVE. `PHASE8-IMPL-001` is the first published Phase 8 parent: Writer Assistant Core implementation readiness and first runtime slice plan. `PHASE8-IMPL-001-T001` publishes the parent and child-task sequence as docs/status/planning only. `PHASE8-IMPL-001-T002` is next and plans targeted context collection before any context tools run. CORE-002/CORE-003 candidate schema and evidence/provenance documentation is recorded in `docs/roadmap/writer_assistant_core_candidate_schemas.md`; CORE-004 project memory/canon storage target is recorded in `docs/roadmap/project_memory_canon_storage_model.md`; CORE-005 OMI expansion behavior is recorded in `docs/roadmap/omi_story_knowledge_candidate_expansion.md`. No runtime extraction, runtime schema, extractor, storage mutation, backend extraction route, frontend extraction UI, model/Ollama call, apply-promotion, or project memory/canon mutation has been performed.
+- Exit: owner-approved readiness plan and first runtime slice selection for Writer Assistant Core, with candidate-first OMI lifecycle, evidence/provenance, no-prose, no-silent-promotion, and no-memory-mutation boundaries preserved.
 
 ### Phase 9: Candidate Extraction From Owner-Authored Material
 
@@ -240,7 +240,7 @@ gantt
     section Project Workspace Foundation
     Phase 7 project workspace :workspace7, after p6, 1
     section Writer Assistant Core
-    Phase 8 schemas OMI adapters :core8, after workspace7, 1
+    Phase 8 core readiness active :active, core8, after workspace7, 1
     Phase 9 extraction pipeline :core9, after core8, 1
     Phase 10 review canon pages :core10, after core9, 1
     Phase 11 continuity assistance :core11, after core10, 1

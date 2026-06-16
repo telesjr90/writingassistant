@@ -2,10 +2,10 @@
   "schema_version": "1.0",
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
-    "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-010",
-    "current_parent_task_title": "Workspace Validation / Browser and Manual Smoke",
-    "frontier_note": "Published Phase 7 parent sequence complete. Next parent/child requires owner/roadmap confirmation; no next published parent exists in this registry yet."
+    "current_track": "Writer Assistant Core",
+    "current_parent_task_id": "PHASE8-IMPL-001",
+    "current_parent_task_title": "Writer Assistant Core implementation readiness and first runtime slice plan",
+    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is the active Writer Assistant Core readiness parent; current child is PHASE8-IMPL-001-T001 and next child is PHASE8-IMPL-001-T002."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -347,6 +347,158 @@
       ],
       "boundary_tags": [
         "validation",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001",
+      "title": "Writer Assistant Core implementation readiness and first runtime slice plan",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE7-IMPL-010"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-001.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-001.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-001/"
+    },
+    {
+      "id": "PHASE8-IMPL-001-T001",
+      "title": "Publish Writer Assistant Core parent and child-task plan",
+      "type": "planning_microtask",
+      "status": "active",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T002",
+      "title": "Context collection plan for Writer Assistant Core",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T003",
+      "title": "Targeted context collection and source inventory",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T004",
+      "title": "First runtime slice decision",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T005",
+      "title": "First slice contract/source tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T006",
+      "title": "First slice implementation prompt/repair plan",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-001",
+      "depends_on": [
+        "PHASE8-IMPL-001-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
         "no_runtime_feature_scope"
       ]
     },

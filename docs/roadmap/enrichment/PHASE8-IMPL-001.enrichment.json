@@ -1,0 +1,229 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-001",
+  "title": "Writer Assistant Core implementation readiness and first runtime slice plan",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-010"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "no_auto_promotion",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "metadata_only",
+    "no_runtime_feature_scope"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-001.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-001.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json",
+    "context_pack": ".codex-context/PHASE8-IMPL-001/"
+  },
+  "goal": "Promote Writer Assistant Core as the next roadmap frontier after the completed Phase 7 Project Workspace Foundation and prepare the first safe runtime slice through implementation readiness, context planning, schema alignment, OMI candidate-first lifecycle boundaries, and acceptance criteria.",
+  "why_now": "The published Phase 7 parent sequence PHASE7-IMPL-001 through PHASE7-IMPL-010 is complete. Writer Assistant Core is the next product direction, but implementation must start with readiness and context planning before extraction, candidate creation, model calls, UI changes, apply-promotion, or memory/canon mutation.",
+  "scope": {
+    "include": [
+      "Roadmap/status publication of PHASE8-IMPL-001 as the active Writer Assistant Core parent.",
+      "Conservative child-task sequence T001 through T007.",
+      "Current code, storage, and test inventory planning.",
+      "Context collection planning before context tools run.",
+      "Candidate schema alignment for characters, aliases, organizations, locations, objects, scenes, events/actions, timeline/causality notes, relationships, plot threads, open questions, continuity issues, contradictions, annotations, evidence, and provenance.",
+      "Source/evidence/provenance boundaries.",
+      "OMI candidate-first lifecycle and future owner-controlled promotion boundaries.",
+      "First runtime slice selection and acceptance criteria after context collection."
+    ],
+    "exclude": [
+      "Runtime extraction implementation in T001.",
+      "Context-tool execution in T001.",
+      "Backend extraction routes.",
+      "Frontend extraction UI.",
+      "Candidate creation runtime behavior.",
+      "Model/Ollama calls.",
+      "Generated prose, rewriting, continuation, style imitation, prose improvement, or summaries as durable truth.",
+      "Apply-promotion, OMI candidate promotion, or memory/canon mutation.",
+      "Package/dependency changes.",
+      "Training data, JSONL records, dataset manifests, model artifacts, semantic search, Story Check auto-runs, and Dramatica analysis."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md",
+      "docs/roadmap/validation/latest_roadmap_validation.md"
+    ],
+    "source_docs": [
+      "docs/roadmap/tasks/PHASE7-IMPL-010.md",
+      "docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md",
+      "docs/roadmap/writer_assistant_core_candidate_schemas.md",
+      "docs/roadmap/omi_story_knowledge_candidate_expansion.md",
+      "docs/roadmap/omi_mvp_schema_lifecycle.md",
+      "docs/roadmap/omi_storage_model.md",
+      "docs/roadmap/project_memory_canon_storage_model.md",
+      "docs/roadmap/project_memory_canon_page_structure_spec.md",
+      "docs/roadmap/approved_characters_page_spec.md",
+      "docs/roadmap/approved_locations_settings_page_spec.md",
+      "docs/roadmap/approved_timeline_page_spec.md",
+      "docs/roadmap/approved_plot_threads_page_spec.md",
+      "docs/roadmap/continuity_consistency_page_spec.md",
+      "docs/roadmap/approved_open_questions_page_spec.md",
+      "docs/roadmap/approved_relationships_page_spec.md",
+      "docs/roadmap/approved_organizations_groups_page_spec.md",
+      "docs/roadmap/approved_objects_items_page_spec.md",
+      "docs/roadmap/approved_annotations_evidence_provenance_page_spec.md",
+      "docs/roadmap/approved_contradictions_page_spec.md",
+      "docs/roadmap/approved_scene_event_causality_review_spec.md",
+      "docs/roadmap/project_memory_canon_cross_linking_health_spec.md"
+    ],
+    "quality_notes": [
+      "T001 publishes the parent and child plan only.",
+      "T002 plans context collection.",
+      "T003 is the earliest child that may collect targeted context if explicitly authorized.",
+      "Runtime extraction, candidate creation, model calls, UI changes, apply-promotion, and memory/canon mutation are excluded from T001."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-001-T001",
+      "title": "Publish Writer Assistant Core parent and child-task plan",
+      "type": "planning_microtask",
+      "status": "active",
+      "depends_on": [
+        "PHASE8-IMPL-001"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Publish parent, inventory, enrichment JSON, and roadmap/status updates.",
+        "No context tools run."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T002",
+      "title": "Context collection plan for Writer Assistant Core",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-001-T001"
+      ],
+      "scope": [
+        "Docs/planning only.",
+        "Define exact context questions and target files/tools.",
+        "No broad tool execution yet."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T003",
+      "title": "Targeted context collection and source inventory",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-001-T002"
+      ],
+      "scope": [
+        "Run only explicitly authorized context tools or direct source inspection.",
+        "Collect narrow evidence about current OMI, storage, frontend, guardrails, candidate schemas, and tests.",
+        "No runtime implementation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T004",
+      "title": "First runtime slice decision",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-001-T003"
+      ],
+      "scope": [
+        "Choose the smallest safe first implementation slice.",
+        "Define whether it is schema-only, storage-only, route-only, or source-level tests first.",
+        "No runtime implementation unless explicitly scoped."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T005",
+      "title": "First slice contract/source tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-001-T004"
+      ],
+      "scope": [
+        "Add tests or contract coverage for the selected first slice.",
+        "No production runtime implementation unless explicitly authorized by task scope."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T006",
+      "title": "First slice implementation prompt/repair plan",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-001-T005"
+      ],
+      "scope": [
+        "Prepare or execute the first tiny implementation slice according to T004/T005.",
+        "Keep candidate-first, no-prose, no-promotion, and evidence/provenance boundaries."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-001-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-001-T006"
+      ],
+      "scope": [
+        "Close readiness parent.",
+        "Move active frontier to the first actual Writer Assistant Core implementation parent or next roadmap-authorized task."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "PHASE8-IMPL-001 is registered as the active Writer Assistant Core parent.",
+    "PHASE8-IMPL-001-T001 is registered as the active child for this promotion task.",
+    "PHASE8-IMPL-001-T002 is registered as the next ready child.",
+    "T001 remains docs/status/planning only and does not run context tools.",
+    "T002 plans context collection before any context tool execution.",
+    "T003 may run targeted context tools only if explicitly authorized.",
+    "No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is implemented by T001."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "git diff --check"
+    ],
+    "notes": "Pytest is not run for T001 unless runtime code or tests were accidentally changed."
+  },
+  "safety_notes": [
+    "The app remains analysis-only.",
+    "No generated prose, rewriting, continuation, style imitation, prose improvement, or summaries as durable truth.",
+    "All extracted or inferred story knowledge remains candidate-only until explicit owner review and later owner-controlled promotion.",
+    "OMI remains the central review and future promotion layer.",
+    "Promotion records remain audit-only until future apply-promotion exists.",
+    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
+  ],
+  "deferred_work": [
+    "Actual context collection is deferred until after T002 and requires explicit authorization in T003.",
+    "Runtime extraction, candidate creation, typed OMI expansion, backend routes, frontend UI, and first slice implementation are deferred to later children.",
+    "Apply-promotion and memory/canon mutation remain future-only.",
+    "Model/Ollama integration remains future-only and requires separate authorization."
+  ],
+  "context_tools_policy": [
+    "T001 does not run context tools.",
+    "T002 plans context collection.",
+    "T003 may run targeted context tools only if explicitly authorized.",
+    "Context output is evidence, not roadmap truth.",
+    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
+  ]
+}

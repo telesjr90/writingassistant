@@ -4,8 +4,10 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 
 ## Active Frontier
 
-- Current track: Project Workspace Foundation (published Phase 7 parent sequence complete).
-- Immediate active parent task: none published; next parent/child requires owner/roadmap confirmation.
+- Current track: Writer Assistant Core.
+- Immediate active parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Active child task: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+- Next child task: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core.
 - Last completed child task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
 - Prior completed child: `PHASE7-IMPL-010-T006` - Final validation regression pass.
 - Prior completed child: `PHASE7-IMPL-010-T005` - Validation repair triage.
@@ -18,9 +20,12 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed closeout micro-task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
-- Next parent/child: requires owner/roadmap confirmation; no next published parent exists in `docs/roadmap/roadmap_index.yaml`.
+- Phase 7 published sequence is complete (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`).
+- Next parent/child: published as `PHASE8-IMPL-001` / `PHASE8-IMPL-001-T001`; next child is `PHASE8-IMPL-001-T002`.
 - Deferred validation: interactive browser flows D, E, H, I, J, K, L when Playwright deps or browser MCP are available; note/material flows F/G unless controlled fixtures are authorized later.
 - Local smoke artifact (uncommitted): `projects/smoke-blank-1781586974/`.
+
+`PHASE8-IMPL-001` is active as the first Writer Assistant Core readiness parent. It is planning/readiness first: context collection is planned in T002 before any context tools run, and the first runtime slice is selected only after targeted context and source inventory. T001 publishes roadmap/status docs only and does not add extraction, candidate creation, backend routes, frontend extraction UI, model/Ollama calls, apply-promotion, memory/canon mutation, package changes, tests, training data, JSONL records, or dataset artifacts.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -107,7 +112,7 @@ Final `PHASE7-IMPL-009` behavior adds a read-only Memory / Canon workspace shell
 
 Final `PHASE7-IMPL-010` behavior validated the completed Phase 7 workspace foundation from `PHASE7-IMPL-004` through `PHASE7-IMPL-009` using automated regression checks, a prepared browser/manual smoke checklist, partial browser/manual smoke execution with environment-limited fallback evidence, validation repair triage, and final regression confirmation. It did not add generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, frontend approved-memory API helpers, metadata editing UI, note/material create/import/upload UI, runtime features, package/dependency changes, or training/JSONL/dataset work. Interactive UI browser validation remains deferred to owner/environment rerun when browser tooling is available.
 
-The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. The next parent/child frontier requires owner/roadmap confirmation because no next published parent exists in `docs/roadmap/roadmap_index.yaml`. `docs/master_plan.md` identifies Writer Assistant Core as the next product direction after the workspace foundation is usable, but no Writer Assistant Core parent task is published in the roadmap registry yet.
+The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. `PHASE8-IMPL-001` is now the published Writer Assistant Core readiness parent in `docs/roadmap/roadmap_index.yaml`. Current child is `PHASE8-IMPL-001-T001`; next child is `PHASE8-IMPL-001-T002`.
 
 `PHASE7-IMPL-010` must remain validation-only. It must not add runtime feature scope, apply-promotion, memory/canon mutation, generated prose, model calls, extraction, or training/JSONL/dataset work unless explicitly authorized by a separate roadmap task.
 
