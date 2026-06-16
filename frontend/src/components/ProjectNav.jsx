@@ -238,6 +238,7 @@ export default function ProjectNav({
   materials = [],
   activeWorkspaceView = 'overview',
   onSelectOverview,
+  onSelectMemoryCanon,
   activeDocumentType = DEFAULT_DOCUMENT_TYPE,
   activeDocumentId = '',
   isLoadingNotes = false,
@@ -375,6 +376,14 @@ export default function ProjectNav({
         >
           <span>Overview</span>
           <small>Project status</small>
+        </button>
+        <button
+          className={`scene-item${activeWorkspaceView === 'memory-canon' ? ' is-active' : ''}`}
+          type="button"
+          onClick={() => onSelectMemoryCanon?.()}
+        >
+          <span>Memory / Canon</span>
+          <small>Approved-only</small>
         </button>
       </nav>
 

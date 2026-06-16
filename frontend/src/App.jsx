@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import ProjectNav from './components/ProjectNav.jsx';
 import ProjectOverview from './components/ProjectOverview.jsx';
+import MemoryCanonShell from './components/MemoryCanonShell.jsx';
 import OmiGuidedProjectCreation from './components/OmiGuidedProjectCreation.jsx';
 import Editor from './components/Editor.jsx';
 import AnalysisSidebar from './components/AnalysisSidebar.jsx';
@@ -57,6 +58,7 @@ const DOCUMENT_SWITCH_MESSAGES = {
 };
 const WORKSPACE_VIEWS = {
   OVERVIEW: 'overview',
+  MEMORY_CANON: 'memory-canon',
   EDITOR: 'editor',
 };
 
@@ -326,6 +328,18 @@ export default function App() {
     }
 
     setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
+  }, [activeWorkspaceView, hasUnsavedDocumentChanges]);
+
+  const handleSelectMemoryCanon = useCallback(() => {
+    if (activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON) {
+      return;
+    }
+
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
+      return;
+    }
+
+    setActiveWorkspaceView(WORKSPACE_VIEWS.MEMORY_CANON);
   }, [activeWorkspaceView, hasUnsavedDocumentChanges]);
 
   const handleOpenEditorWorkspace = useCallback(() => {
@@ -870,6 +884,7 @@ export default function App() {
         materials={materials}
         activeWorkspaceView={activeWorkspaceView}
         onSelectOverview={handleSelectOverview}
+        onSelectMemoryCanon={handleSelectMemoryCanon}
         activeDocumentType={activeDocumentType || DEFAULT_DOCUMENT_TYPE}
         activeDocumentId={activeDocument.id}
         isLoadingNotes={isLoadingNotes}
@@ -907,6 +922,11 @@ export default function App() {
             onOpenNotes={handleOpenEditorWorkspace}
             onOpenMaterials={handleOpenEditorWorkspace}
             onOpenOmi={handleOpenEditorWorkspace}
+          />
+        ) : activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON ? (
+          <MemoryCanonShell
+            projectTitle={activeProject.title}
+            approvedRecordsByCategory={{}}
           />
         ) : (
           <>

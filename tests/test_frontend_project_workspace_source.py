@@ -3188,7 +3188,8 @@ class TestApprovedMemoryCanonShellContract:
         assert "memory" not in shared_document_controller_source.lower()
         assert "canon" not in shared_document_controller_source.lower()
         assert "Memory / Canon" not in editor_source
-        assert "Memory / Canon" not in project_nav_source
+        assert "Memory / Canon" in project_nav_source
+        assert "onSelectMemoryCanon" in project_nav_source
         assert "Approved Memory / Canon" in project_overview_source
 
     def test_project_scoped_selected_project_contract_is_defined_without_global_memory(
@@ -3481,14 +3482,13 @@ class TestMemoryCanonShellComponent:
         ):
             assert re.search(rf"['\"`]({re.escape(forbidden_route)})['\"`]", memory_canon_shell_source) is None
 
-    def test_component_is_not_integrated_into_app_or_project_nav_yet(
-        self, app_source: str, project_nav_source: str
+    def test_component_is_not_embedded_in_overview_or_editor_surfaces(
+        self, project_overview_source: str, editor_source: str
     ) -> None:
-        assert "MemoryCanonShell" not in app_source
-        assert "MemoryCanonShell" not in project_nav_source
-        assert "Memory / Canon" not in project_nav_source
-        assert "WORKSPACE_VIEWS.MEMORY" not in app_source
-        assert "WORKSPACE_VIEWS.CANON" not in app_source
+        assert "MemoryCanonShell" not in project_overview_source
+        assert "MemoryCanonShell" not in editor_source
+        assert "APPROVED_MEMORY_CATEGORIES" not in project_overview_source
+        assert "APPROVED_MEMORY_CATEGORIES" not in editor_source
 
     def test_component_excludes_omi_candidates_as_approved_canon(
         self, memory_canon_shell_source: str
@@ -3567,6 +3567,267 @@ class TestMemoryCanonShellComponent:
         for forbidden_term in forbidden_terms:
             assert forbidden_term not in lower_source, (
                 f"{source_path.relative_to(REPO_ROOT)} must not contain T003-forbidden term {forbidden_term!r}"
+            )
+
+
+class TestMemoryCanonShellAppNavIntegration:
+    """PHASE7-IMPL-009-T004 source checks for workspace integration."""
+
+    @staticmethod
+    def _runtime_source_without_comments(source: str) -> str:
+        return TestOmiGuidedProjectCreationBackendStorageDecision._without_line_comments(
+            source
+        )
+
+    @staticmethod
+    def _memory_canon_app_render_block(app_source: str) -> str:
+        branch_start = ") : activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON ? ("
+        assert branch_start in app_source
+        return app_source.split(branch_start, 1)[1].split(") : (", 1)[0]
+
+    @staticmethod
+    def _memory_canon_nav_button_block(project_nav_source: str) -> str:
+        assert "Memory / Canon" in project_nav_source
+        return project_nav_source.split("<span>Memory / Canon</span>", 1)[0].rsplit(
+            "<button", 1
+        )[1].split("</button>", 1)[0]
+
+    def test_app_imports_and_renders_memory_canon_shell_as_workspace_view(
+        self, app_source: str
+    ) -> None:
+        assert "import MemoryCanonShell from './components/MemoryCanonShell.jsx';" in app_source
+        assert "MEMORY_CANON: 'memory-canon'" in app_source
+        assert "handleSelectMemoryCanon" in app_source
+        assert "onSelectMemoryCanon={handleSelectMemoryCanon}" in app_source
+        assert "<MemoryCanonShell" in app_source
+
+        render_block = self._memory_canon_app_render_block(app_source)
+        assert "projectTitle={activeProject.title}" in render_block
+        assert "approvedRecordsByCategory={{}}" in render_block
+        for forbidden_prop in (
+            "omiCandidates",
+            "candidates",
+            "promotions",
+            "omiData",
+            "onApplyPromotion",
+            "onApprove",
+            "onSave",
+            "onEdit",
+            "onDelete",
+            "onCreate",
+            "sceneContent",
+            "noteContent",
+            "materialContent",
+        ):
+            assert forbidden_prop not in render_block
+
+    def test_app_view_state_keeps_memory_canon_out_of_editor_document_types(
+        self, app_source: str, shared_document_controller_source: str
+    ) -> None:
+        assert "MEMORY_CANON: 'memory-canon'" in app_source
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.MEMORY_CANON)" in app_source
+        assert "if (activeWorkspaceView !== WORKSPACE_VIEWS.EDITOR)" in app_source
+        assert "DOCUMENT_TYPES = Object.freeze" in shared_document_controller_source
+        assert "memory-canon" not in shared_document_controller_source
+        assert "MEMORY_CANON" not in shared_document_controller_source
+
+        render_block = self._memory_canon_app_render_block(app_source)
+        for forbidden_editor_surface in (
+            "Editor",
+            "ProjectContext",
+            "OMIPanel",
+            "activeEditorDocument",
+            "DOCUMENT_TYPES",
+            "createDocumentDescriptor",
+            "handleSave",
+            "saveScene",
+            "saveNote",
+            "saveMaterial",
+        ):
+            assert forbidden_editor_surface not in render_block
+
+    def test_project_nav_memory_canon_entry_is_workspace_only(
+        self, project_nav_source: str
+    ) -> None:
+        assert "onSelectMemoryCanon" in project_nav_source
+        assert "activeWorkspaceView === 'memory-canon'" in project_nav_source
+        assert "<span>Memory / Canon</span>" in project_nav_source
+        assert "<small>Approved-only</small>" in project_nav_source
+
+        nav_button_block = self._memory_canon_nav_button_block(project_nav_source)
+        assert "onSelectMemoryCanon?.()" in nav_button_block
+        assert "onSelectScene" not in nav_button_block
+        assert "onSelectNote" not in nav_button_block
+        assert "onSelectMaterial" not in nav_button_block
+        assert "DOCUMENT_TYPES" not in nav_button_block
+        for forbidden_action in (
+            "Approve",
+            "Promote",
+            "Apply",
+            "Edit",
+            "Delete",
+            "Import",
+            "Upload",
+        ):
+            assert forbidden_action not in nav_button_block
+
+    def test_integration_uses_empty_approved_records_and_not_project_sources(
+        self, app_source: str
+    ) -> None:
+        render_block = self._memory_canon_app_render_block(app_source)
+        assert "approvedRecordsByCategory={{}}" in render_block
+        for forbidden_source in (
+            "scenes",
+            "notes",
+            "materials",
+            "omiData",
+            "ideas",
+            "candidates",
+            "promotions",
+            "ProjectOverview",
+        ):
+            assert forbidden_source not in render_block
+
+    def test_no_approved_memory_api_or_backend_dependency_added(
+        self,
+        app_source: str,
+        api_source: str,
+        project_nav_source: str,
+        memory_canon_shell_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_runtime = "\n".join(
+            [
+                app_source,
+                api_source,
+                project_nav_source,
+                memory_canon_shell_source,
+                backend_main_source,
+                project_manager_source,
+            ]
+        )
+        for forbidden_api_or_helper in (
+            "fetchApprovedMemory",
+            "fetchCanon",
+            "fetchMemory",
+            "saveApprovedMemory",
+            "saveCanon",
+            "applyPromotion",
+            "approveCandidate",
+            "promoteToCanon",
+            "promoteToMemory",
+        ):
+            assert forbidden_api_or_helper not in combined_runtime
+
+        for forbidden_route in (
+            "/memory-canon",
+            "/approved-memory",
+            "/canon",
+            "/memory",
+        ):
+            assert re.search(rf"['\"`]({re.escape(forbidden_route)})['\"`]", combined_runtime) is None
+
+    def test_memory_canon_integration_surfaces_add_no_mutation_behavior(
+        self, app_source: str, project_nav_source: str, memory_canon_shell_source: str
+    ) -> None:
+        render_block = self._memory_canon_app_render_block(app_source)
+        nav_button_block = self._memory_canon_nav_button_block(project_nav_source)
+        combined_memory_canon_surface = "\n".join(
+            [render_block, nav_button_block, memory_canon_shell_source]
+        )
+
+        for forbidden_action_surface in (
+            "handleApprove",
+            "handlePromote",
+            "handleApply",
+            "handleSaveCanon",
+            "handleSaveMemory",
+            "handleEditCanon",
+            "handleDeleteCanon",
+            "handleCreateCanon",
+            "applyPromotion",
+            "saveCanon",
+            "saveMemory",
+            "createApproved",
+            "createCanon",
+            "updateCanon",
+            "deleteCanon",
+            "editCanon",
+            "importCanon",
+            "uploadCanon",
+            "extractCharacters",
+            "generateCanon",
+            "summarizeCanon",
+        ):
+            assert forbidden_action_surface not in combined_memory_canon_surface
+
+    def test_memory_canon_integration_remains_separate_from_omi_and_overview(
+        self,
+        app_source: str,
+        project_overview_source: str,
+        memory_canon_shell_source: str,
+    ) -> None:
+        render_block = self._memory_canon_app_render_block(app_source)
+        assert "OMIPanel" not in render_block
+        assert "getOMI" not in render_block
+        assert "createOMIPromotion" not in render_block
+        assert "ProjectOverview" not in render_block
+        assert "MemoryCanonShell" not in project_overview_source
+        assert "APPROVED_MEMORY_CATEGORIES" not in project_overview_source
+        assert "OMIPanel" not in memory_canon_shell_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            APP_JSX,
+            PROJECT_NAV_JSX,
+            MEMORY_CANON_SHELL_JSX,
+            API_JS,
+            PROJECT_OVERVIEW_JSX,
+            OMI_PANEL_JSX,
+            OMI_GUIDED_PROJECT_CREATION_JSX,
+            EDITOR_JSX,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+        ],
+    )
+    def test_runtime_sources_exclude_t004_forbidden_memory_canon_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
+        lower_source = lower_source.replace("no apply-promotion in this phase", "")
+        forbidden_terms = (
+            "generated prose",
+            "ai-written",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "approved truth mutation",
+            "hidden project write",
+            "training data",
+            "jsonl",
+            "dataset",
+        )
+        for forbidden_term in forbidden_terms:
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T004-forbidden term {forbidden_term!r}"
             )
 
 
