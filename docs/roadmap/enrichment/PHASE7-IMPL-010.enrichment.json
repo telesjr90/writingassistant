@@ -174,13 +174,14 @@
       "id": "PHASE7-IMPL-010-T004",
       "title": "Browser/manual smoke execution",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE7-IMPL-010-T003"
       ],
       "scope": [
         "Run backend and frontend locally.",
         "Execute prepared checklist and record observed results.",
+        "PARTIAL: API/server-log/source fallback when browser automation unavailable.",
         "No feature expansion."
       ]
     },
@@ -188,7 +189,7 @@
       "id": "PHASE7-IMPL-010-T005",
       "title": "Validation repair triage",
       "type": "validation_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE7-IMPL-010-T004"
       ],

@@ -1,5 +1,38 @@
 # Latest Roadmap Validation
 
+## PHASE7-IMPL-010-T004 Browser / Manual Smoke Execution
+
+- Date: 2026-06-15
+- Result: PARTIAL
+- Scope: browser/manual smoke execution for completed Phase 7 workspace validation (`PHASE7-IMPL-004` through `PHASE7-IMPL-009`).
+- Parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
+- Startup:
+  - Backend: `ANALYSIS_MODE=mock .venv-unsloth-clean/bin/python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000`
+  - Frontend: `cd frontend && npm run dev`
+  - URLs: `http://localhost:8000`, `http://localhost:5173`
+  - Browser: Playwright Chromium headless failed (`libnspr4.so` missing); Cursor browser MCP unavailable. API/server-log/frontend-source fallback used.
+- Flow results: A PASS; B PASS; C PASS; D PARTIAL; E PARTIAL; F NOT RUN; G NOT RUN; H NOT RUN; I PARTIAL; J PARTIAL; K PARTIAL; L PARTIAL.
+- Stop conditions: none triggered (no fatal load, data loss, boundary violation, or unexpected model call).
+- Issues:
+  - repair candidate: complete interactive UI flows D, E, H after browser deps available
+  - deferred: F/G (no note/material fixtures), I/J/K/L partial UI observation, A UI render confirmation
+  - not-a-bug: agent environment missing Playwright system libraries
+- Smoke artifact: `projects/smoke-blank-1781586974/` (local-only; uncommitted)
+- Updated:
+  - `docs/roadmap/validation/PHASE7-IMPL-010-browser-smoke-checklist.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/tasks/PHASE7-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: PASS.
+- Pytest: not run; docs/validation only; no runtime code or tests changed.
+- Active child: `PHASE7-IMPL-010-T004` complete (PARTIAL).
+- Next child: `PHASE7-IMPL-010-T005` - Validation repair triage.
+- No Story Check, model calls, Ollama calls, apply-promotion, memory/canon mutation, staging, commits, or pushes were run.
+
 ## PHASE7-IMPL-010-T003 Browser Smoke Checklist Preparation
 
 - Date: 2026-06-15

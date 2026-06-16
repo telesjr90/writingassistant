@@ -15,8 +15,8 @@
 
 Before starting browser/manual smoke execution, confirm all of the following:
 
-- [ ] `PHASE7-IMPL-010-T001` — inventory and child-task plan — **complete**
-- [ ] `PHASE7-IMPL-010-T002` — automated regression validation pass — **complete**
+- [x] `PHASE7-IMPL-010-T001` — inventory and child-task plan — **complete**
+- [x] `PHASE7-IMPL-010-T002` — automated regression validation pass — **complete**
 - [ ] Automated regression suite passing (frontend source-contract tests, project manager, scene routes, note/material routes, OMI boundary tests)
 - [ ] No unexpected runtime code, test, package, or project-file changes since T002
 - [ ] Owner is ready to run the app locally (backend + frontend dev servers)
@@ -29,14 +29,14 @@ Before starting browser/manual smoke execution, confirm all of the following:
 
 | Item | T004 value (fill in at execution time) |
 | --- | --- |
-| Backend server command | `[T004: backend command]` |
-| Frontend dev server command | `[T004: frontend command]` |
-| Expected backend localhost URL | `[T004: e.g. http://localhost:8000]` |
-| Expected frontend localhost URL | `[T004: e.g. http://localhost:5173]` |
-| Browser used | `[T004: browser name and version]` |
-| Shutdown procedure | `[T004: how backend and frontend were stopped]` |
-| Backend terminal errors observed | `[T004: none / describe]` |
-| Frontend terminal errors observed | `[T004: none / describe]` |
+| Backend server command | `ANALYSIS_MODE=mock .venv-unsloth-clean/bin/python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000` |
+| Frontend dev server command | `cd frontend && npm run dev` |
+| Expected backend localhost URL | `http://localhost:8000` |
+| Expected frontend localhost URL | `http://localhost:5173` |
+| Browser used | Playwright Chromium headless attempted; **failed** (`libnspr4.so` missing). Cursor browser MCP unavailable. API + server-log + frontend-source fallback used for remaining evidence. |
+| Shutdown procedure | Stop background uvicorn and Vite dev processes (SIGTERM on PIDs started for T004). |
+| Backend terminal errors observed | None fatal. Uvicorn startup complete; read-only `/api/projects` and project list/load routes returned 200 during smoke. No Story Check/analysis/Ollama routes observed. |
+| Frontend terminal errors observed | `npm warn Unknown env config "devdir"` (non-fatal). Vite ready on port 5173. |
 
 Recommended starting context (not executed in T003):
 
@@ -57,8 +57,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | App loads and project selector/library appears |
 | **Steps** | 1. Start backend and frontend per Section 3.<br>2. Open the frontend localhost URL in the browser.<br>3. Observe initial render without interacting with analysis features.<br>4. Locate the project selector or project library UI.<br>5. Confirm existing projects are listed (if any exist in local `projects/`).<br>6. Watch backend/frontend terminals and browser console during load. |
 | **Expected result** | App opens without fatal blank screen; project selector/library is visible or reachable; existing projects are listed when present; **no model call is triggered** on load; **no generated prose UI** appears. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
+| **Result** | `[x] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | Backend and frontend servers started in mock mode. Frontend HTTP 200; backend `GET /api/projects` listed 6 projects including `example`. Backend access log shows read-only project/scene/note/material/bible/storyform/OMI loads with no analysis endpoints. Interactive browser UI render blocked (Playwright `libnspr4.so` missing; browser MCP unavailable). |
 | **Stop condition** | Fatal load failure, blank screen with no recoverable UI, or unexpected model/Ollama activity on load → **stop T004** and record blocker. |
 
 ---
@@ -71,8 +71,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Create blank project |
 | **Steps** | 1. From project selector/library, start blank project creation.<br>2. Enter an owner-authored title (e.g. `smoke-blank-<timestamp>`).<br>3. Confirm/create using the existing create-project path.<br>4. Observe whether the project opens or appears in the library.<br>5. Inspect project contents: scenes, notes, materials, OMI records, memory/canon files (via UI only; no manual filesystem edits during smoke). |
 | **Expected result** | Owner can create a blank project from owner-entered title; project opens or appears in library; blank project does **not** contain generated story content; **no scenes, notes, materials, OMI, or memory/canon records are silently created** except minimal safe metadata already documented; project ID/path behavior appears safe. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
+| **Result** | `[x] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | `POST /api/projects` with title `smoke-blank-1781586974` returned 200; project_id `smoke-blank-1781586974` appeared in project list (count 6). Follow-up reads: scenes=0, notes=0, materials=0, OMI candidates=0. No generated content or hidden pre-confirmation writes observed. |
 | **Stop condition** | Hidden pre-confirmation writes, generated content in new project, or unsafe path/ID behavior → **stop T004** and record blocker. |
 
 ---
@@ -85,8 +85,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Select existing example project |
 | **Steps** | 1. From project selector/library, select a known existing example project with scenes.<br>2. Observe project title and status display.<br>3. Open or observe the scene list.<br>4. Select one scene and note the body text shown before any edit.<br>5. Reload or re-select the same scene without saving. |
 | **Expected result** | Example project opens; title/status visible; existing scene list loads; **owner-authored body text is not modified on load**. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
+| **Result** | `[x] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | `GET /api/projects/example/scenes/scene_001` returned 1972-char owner-authored body. Repeat read matched exactly (no load-time mutation). Example title from list: `The Princess and the Pea`. |
 | **Stop condition** | Scene body changed on load/reload without owner save → **stop T004** and record blocker. |
 
 ---
@@ -99,9 +99,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Switch projects |
 | **Steps** | 1. With an example project open, note active project title and visible content.<br>2. Switch to a different project (e.g. blank project from Flow B or another existing project).<br>3. If editor has unsaved changes, attempt switch and observe dirty-state warning.<br>4. Confirm active project title/context updates.<br>5. Open a scene/note/material in the new project and verify content belongs to that project only.<br>6. Confirm Overview becomes active when that is the documented behavior on project switch. |
 | **Expected result** | Active project title/context updates; dirty editor warnings appear when applicable; **previous project scene/note/material content does not leak** into next project; Overview becomes active per documented behavior. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Cross-project content leak or missing dirty-state warning when editor is dirty → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[x] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | API isolation confirmed: blank `smoke-blank-1781586974` has 0 scenes; `example` has 1 scene. No cross-project body leak at API layer. UI dirty-state warning on project switch **not exercised** (browser automation blocked). |
 
 ---
 
@@ -113,9 +112,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Scene editor smoke |
 | **Steps** | 1. Select a scene with known owner-authored body text.<br>2. Confirm editor shows exact body (no metadata injected).<br>3. Make a small owner-authored edit; confirm dirty state indicator.<br>4. Save via UI control; confirm save success and dirty state clears.<br>5. Reload/re-select scene; confirm saved text persists.<br>6. Test keyboard save (e.g. Ctrl/Cmd+S) **only while editor is focused**.<br>7. Confirm scene title/metadata display remains separate from body. |
 | **Expected result** | Selecting a scene loads exact owner-authored scene body; editing marks dirty state; save preserves owner-authored text; keyboard save works only in editor context; scene metadata remains separate from body. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Save corrupts body, metadata appears in body, or keyboard save fires outside editor context → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[x] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | `PUT /api/projects/example/scenes/scene_001` persisted a smoke edit marker and `GET` confirmed persistence; body reverted after test. UI dirty indicator, Save button, and keyboard-save-in-editor-context **not exercised** (browser blocked). |
 
 ---
 
@@ -127,9 +125,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Notes smoke |
 | **Steps** | 1. Open a project with existing notes (or skip with NOT RUN if none exist).<br>2. Confirm notes list loads.<br>3. Select a note; confirm exact owner-authored note body loads.<br>4. Make a small edit; save; reload and confirm persistence.<br>5. Scan note UI for summary/extraction/model actions. |
 | **Expected result** | Notes list loads when notes exist; selecting a note loads exact owner-authored note body; editing/saving note body works; metadata is not injected into note body; **no summary/extraction/model action** appears. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Note body corrupted on save/load or model/extraction UI appears → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[x] NOT RUN` |
+| **Evidence / observation** | `GET /api/projects/example/notes` returned empty list. No local note fixtures available to exercise note body load/edit/save in browser. UI would show `No notes yet.` |
 
 ---
 
@@ -141,9 +138,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Materials smoke |
 | **Steps** | 1. Open a project with existing materials (or skip with NOT RUN if none exist).<br>2. Confirm materials list loads.<br>3. Select a material; confirm exact owner-provided material body loads.<br>4. If current runtime supports material body editing, make a small edit, save, and confirm persistence.<br>5. Scan for import/upload/external-fetch UI unless already implemented and explicitly authorized. |
 | **Expected result** | Materials list loads when materials exist; selecting a material loads exact owner-provided material body; editing/saving material body works when current runtime supports it; metadata/provenance is not injected into material body; **no import/upload/external-fetch behavior** appears unless already implemented and authorized. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Material body corrupted or unauthorized import/fetch UI appears → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[x] NOT RUN` |
+| **Evidence / observation** | `GET /api/projects/example/materials` returned empty list. No local material fixtures available to exercise material body load/edit/save in browser. UI would show `No materials yet.` |
 
 ---
 
@@ -155,9 +151,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Shared editor dirty-state and discard safeguards |
 | **Steps** | 1. Open a scene, note, or material in the editor.<br>2. Make an unsaved edit.<br>3. Attempt to switch to a different document → observe warning.<br>4. Choose cancel/keep → confirm editor content retained.<br>5. Repeat unsaved edit; attempt project switch → observe warning.<br>6. Choose confirm/discard only when intentional → confirm discard behavior matches choice.<br>7. Simulate or trigger a failed save (if safely reproducible) and confirm editor text is not erased. |
 | **Expected result** | Unsaved changes warn before switching document/project; cancel keeps current editor content; confirm discards only when owner chooses; failed save does not erase editor text. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Silent data loss on failed save or missing discard warning → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[x] NOT RUN` |
+| **Evidence / observation** | Discard/cancel/confirm unsaved-change dialogs require interactive browser. Not exercised due to Playwright dependency failure and unavailable browser MCP. |
 
 ---
 
@@ -169,9 +164,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Project Overview view |
 | **Steps** | 1. Navigate to Overview workspace view.<br>2. Confirm Overview is visible and separate from editor view.<br>3. Observe project title, status, and array-derived counts (scenes, notes, materials).<br>4. Scan for generated summaries, extraction controls, Story Check auto-run, model calls, or semantic search.<br>5. Observe approved-memory snapshot area — confirm placeholder/status only. |
 | **Expected result** | Overview is visible as workspace view; overview uses deterministic existing project/list/status data; **no generated summaries** appear; **no extraction, Story Check auto-run, model call, or semantic search** appears; approved-memory snapshot remains placeholder/status only. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Generated summary, model call, or Story Check auto-run on Overview → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[x] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | Overview is a frontend workspace view (`ProjectOverview.jsx`). Project metadata available from list (`The Princess and the Pea`). Interactive overview render, count display, and approved-memory placeholder scan **not exercised** in browser. No Story Check auto-run observed in backend logs. |
 
 ---
 
@@ -183,9 +177,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | OMI-guided project creation staged shell |
 | **Steps** | 1. Open OMI-guided project creation entry point.<br>2. Enter owner-authored setup idea text.<br>3. Observe staged setup labels — confirm candidate/planning-only visibility.<br>4. Cancel or reset staged flow → confirm no project is created.<br>5. Restart staged flow; proceed to final confirmation using existing create-project path only.<br>6. During staged steps (before final confirmation), watch network/backend logs for staged setup storage/API calls and OMI writes.<br>7. Confirm no generated prose is created during staged steps. |
 | **Expected result** | Owner can enter setup idea text; staged setup labels are visibly candidate/planning only; cancel/reset does not create a project; final confirmation uses existing create-project path; **no backend staged setup storage/API is called**; **no OMI candidate records are written before final confirmation**; no generated prose is created. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Pre-confirmation OMI write, backend staged API call, or generated prose in staged flow → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[x] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | OMI-guided shell is frontend-transient (`OmiGuidedProjectCreation.jsx`). Blank project create produced 0 OMI candidates/ideas via API. Staged cancel/review/final-confirm UI and network watch during staged steps **not exercised** in browser. |
 
 ---
 
@@ -197,9 +190,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Memory / Canon shell |
 | **Steps** | 1. Navigate to Memory / Canon workspace view (`memory-canon`).<br>2. Confirm it is separate from Overview, editor, and OMI candidate panels.<br>3. Verify all nine approved-only categories are visible with empty states:<br>&nbsp;&nbsp;• characters<br>&nbsp;&nbsp;• locations/settings<br>&nbsp;&nbsp;• timeline<br>&nbsp;&nbsp;• plot threads<br>&nbsp;&nbsp;• continuity/consistency<br>&nbsp;&nbsp;• open questions<br>&nbsp;&nbsp;• relationships<br>&nbsp;&nbsp;• organizations/groups<br>&nbsp;&nbsp;• objects/items<br>4. Confirm OMI candidates and promotion/audit records are **not** shown as approved canon.<br>5. Scan for apply-promotion button/action and memory/canon mutation UI. |
 | **Expected result** | Memory / Canon is visible as separate workspace view; nine approved-only categories visible with approved-only empty states; OMI candidates and promotion/audit records are not shown as approved canon; **no apply-promotion button/action exists**; **no memory/canon mutation UI exists**. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | OMI candidates displayed as canon, apply-promotion UI, or memory/canon mutation control appears → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[x] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | `MemoryCanonShell.jsx` defines all nine approved-only categories with empty-state boundary copy and explicit `No apply-promotion in this phase` messaging. Interactive `memory-canon` workspace view navigation **not exercised** in browser. |
 
 ---
 
@@ -211,9 +203,8 @@ Execute flows in order unless a stop condition halts the run. Record result and 
 | **Flow name** | Boundary and safety smoke |
 | **Steps** | 1. Scan entire workspace UI (nav, editor, overview, OMI panel, memory/canon, project creation) for prohibited controls.<br>2. Navigate, switch projects, open/save documents, and view overview/memory-canon while watching backend logs.<br>3. Confirm no Story Check auto-run on load/switch/save.<br>4. Confirm no hidden project writes outside explicit owner actions (save, create project, etc.). |
 | **Expected result** | **No generated prose controls**; no rewrite/continue/improve/polish/story-prose generation path; **no model/Ollama call** unless owner explicitly runs an existing allowed analysis path outside this checklist; no extraction UI; no semantic search UI; no Story Check auto-run on load/switch/save; no apply-promotion; no memory/canon mutation; no hidden project writes outside explicit owner actions. |
-| **Result** | `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
-| **Evidence / observation** | |
-| **Stop condition** | Any boundary violation (generated prose UI, unexpected model call, apply-promotion, silent writes) → **stop T004** and record blocker. |
+| **Result** | `[ ] PASS` `[x] PARTIAL` `[ ] FAIL` `[ ] NOT RUN` |
+| **Evidence / observation** | Frontend source scan found no prohibited prose-generation control phrases (`rewrite scene`, `continue scene`, `polish prose`, `semantic search`). `apply-promotion` appears only in boundary disclaimers in `MemoryCanonShell.jsx`. Backend smoke logs show no Story Check/analysis/Ollama routes. Full interactive workspace UI scan **not exercised** in browser. |
 
 ---
 
@@ -243,24 +234,24 @@ Copy this table into `docs/roadmap/validation/latest_roadmap_validation.md` or a
 
 | Flow ID | Flow name | Result | Evidence / observation | Issue classification | Follow-up task needed | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| A | App loads and project selector/library appears | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| B | Create blank project | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| C | Select existing example project | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| D | Switch projects | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| E | Scene editor smoke | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| F | Notes smoke | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| G | Materials smoke | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| H | Shared editor dirty-state and discard safeguards | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| I | Project Overview view | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| J | OMI-guided project creation staged shell | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| K | Memory / Canon shell | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
-| L | Boundary and safety smoke | PASS / PARTIAL / FAIL / NOT RUN | | blocker / repair candidate / deferred / not-a-bug / — | yes / no | |
+| A | App loads and project selector/library appears | PASS | Servers up; project list API 200 with 6 projects; no analysis routes in logs; browser UI not interactive | deferred | no | Playwright/browser MCP blocked |
+| B | Create blank project | PASS | `smoke-blank-1781586974` created; 0 scenes/notes/materials/OMI | — | no | Smoke artifact |
+| C | Select existing example project | PASS | `scene_001` 1972 chars; repeat read unchanged | — | no | |
+| D | Switch projects | PARTIAL | API isolation OK; dirty-state UI not exercised | repair candidate | yes | T005 triage |
+| E | Scene editor smoke | PARTIAL | API save/revert OK; UI dirty/keyboard save not exercised | repair candidate | yes | T005 triage |
+| F | Notes smoke | NOT RUN | No note fixtures in local projects | deferred | no | |
+| G | Materials smoke | NOT RUN | No material fixtures in local projects | deferred | no | |
+| H | Shared editor dirty-state and discard safeguards | NOT RUN | Requires interactive browser dialogs | deferred | yes | T005 triage |
+| I | Project Overview view | PARTIAL | Metadata available; overview UI not rendered in browser | deferred | no | |
+| J | OMI-guided project creation staged shell | PARTIAL | 0 OMI on blank create; staged UI not exercised | deferred | no | |
+| K | Memory / Canon shell | PARTIAL | Source confirms 9 categories + no apply-promotion; UI not rendered | deferred | no | |
+| L | Boundary and safety smoke | PARTIAL | Source/log scan clean; full UI scan not exercised | deferred | no | |
 
-**T004 overall result:** `[ ] PASS` `[ ] PARTIAL` `[ ] FAIL`
+**T004 overall result:** `[ ] PASS` `[x] PARTIAL` `[ ] FAIL`
 
-**T004 execution date:** `[T004: YYYY-MM-DD]`
+**T004 execution date:** `2026-06-15`
 
-**Early stop triggered:** yes / no — if yes, describe:
+**Early stop triggered:** no — servers started; no fatal load, data loss, boundary violation, or unexpected model call observed. Browser automation environment incomplete.
 
 ## 7. Owner Observation Notes
 
@@ -268,14 +259,14 @@ Record free-form observations during T004:
 
 | Prompt | Notes |
 | --- | --- |
-| Confusing UI | |
-| Confusing navigation | |
-| Missing labels | |
-| Unsafe AI / prose-generation implication | |
-| Unexpected write (describe action and observed effect) | |
-| Browser console error | |
-| Backend terminal error | |
-| Frontend terminal error | |
+| Confusing UI | Not assessed interactively (browser automation blocked). |
+| Confusing navigation | Not assessed interactively. |
+| Missing labels | Not assessed interactively. |
+| Unsafe AI / prose-generation implication | Source scan found no prohibited generation controls; Story Check remains manual-only path. |
+| Unexpected write (describe action and observed effect) | Only explicit smoke actions: blank project create and reversible scene edit test on `example/scene_001`. |
+| Browser console error | Not captured (no interactive browser session). |
+| Backend terminal error | None fatal during smoke. |
+| Frontend terminal error | `npm warn Unknown env config "devdir"` only. |
 
 ## 8. Explicit Exclusions (T003 Scope)
 

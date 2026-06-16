@@ -75,8 +75,8 @@ Exclude:
 1. `PHASE7-IMPL-010-T001` - Workspace Validation / Browser and Manual Smoke inventory and child-task plan. Status: complete.
 2. `PHASE7-IMPL-010-T002` - Automated regression validation pass. Status: complete.
 3. `PHASE7-IMPL-010-T003` - Browser smoke checklist preparation. Status: complete.
-4. `PHASE7-IMPL-010-T004` - Browser/manual smoke execution. Status: ready.
-5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: draft.
+4. `PHASE7-IMPL-010-T004` - Browser/manual smoke execution. Status: complete (PARTIAL).
+5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: ready.
 6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: draft.
 7. `PHASE7-IMPL-010-T007` - Roadmap/status closeout. Status: draft.
 
@@ -101,9 +101,11 @@ Exclude:
 
 ### `PHASE7-IMPL-010-T004` - Browser/manual smoke execution
 
-- Run backend and frontend locally.
-- Execute the prepared checklist and record observed results.
-- No feature expansion.
+- Started backend (`ANALYSIS_MODE=mock`) and frontend dev servers locally.
+- Executed checklist flows A–L with PARTIAL overall result.
+- Playwright/browser MCP unavailable; API/server-log/frontend-source fallback used for flows blocked by environment.
+- Created smoke project `smoke-blank-1781586974`; reverted reversible scene edit on `example/scene_001`.
+- No runtime code or test changes.
 
 ### `PHASE7-IMPL-010-T005` - Validation repair triage
 
@@ -146,6 +148,6 @@ For `PHASE7-IMPL-010-T002` and later children, use the validation commands named
 
 `PHASE7-IMPL-010` is the active Phase 7 frontier.
 
-- Active child: `PHASE7-IMPL-010-T004` — Browser/manual smoke execution.
-- Last completed child: `PHASE7-IMPL-010-T003` — Browser smoke checklist preparation.
+- Active child: `PHASE7-IMPL-010-T005` — Validation repair triage.
+- Last completed child: `PHASE7-IMPL-010-T004` — Browser/manual smoke execution (PARTIAL).
 - Last completed parent: `PHASE7-IMPL-009` — Memory / Canon shell (approved-only empty states).
