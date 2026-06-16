@@ -248,6 +248,35 @@
       "context_pack": ".codex-context/PHASE7-IMPL-010/"
     },
     {
+      "id": "PHASE7-IMPL-010-T001",
+      "title": "Workspace Validation / Browser and Manual Smoke inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-010",
+      "depends_on": [
+        "PHASE7-IMPL-010"
+      ],
+      "boundary_tags": [
+        "validation",
+        "manual_smoke",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T002",
+      "title": "Automated regression validation pass",
+      "type": "validation_microtask",
+      "status": "ready",
+      "parent": "PHASE7-IMPL-010",
+      "depends_on": [
+        "PHASE7-IMPL-010-T001"
+      ],
+      "boundary_tags": [
+        "validation",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
       "id": "PHASE7-IMPL-004-T001",
       "title": "Read-only chapter and scene metadata compatibility inventory",
       "type": "planning_microtask",

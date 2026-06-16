@@ -7,6 +7,8 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Current track: Project Workspace Foundation.
 - Immediate active parent task: `PHASE7-IMPL-010`.
 - Canonical title: Workspace Validation / Browser and Manual Smoke.
+- Active child task: `PHASE7-IMPL-010-T001` - Workspace Validation / Browser and Manual Smoke inventory and child-task plan.
+- Next child task: `PHASE7-IMPL-010-T002` - Automated regression validation pass.
 - Last completed parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
 - Next parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
@@ -90,6 +92,16 @@ Final `PHASE7-IMPL-008` behavior adds a frontend-transient OMI-guided staged pro
 Final `PHASE7-IMPL-009` behavior adds a read-only Memory / Canon workspace shell with approved-only empty states for characters, locations/settings, timeline, plot threads, continuity/consistency, open questions, relationships, organizations/groups, and objects/items. App/Nav integration exposes the shell as a separate `memory-canon` workspace view. OMI candidates, approved-but-not-applied candidates, and promotion records are not displayed as approved canon. No backend approved-memory routes, backend approved-memory helpers, frontend approved-memory API helpers, apply-promotion, memory/canon mutation, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, training/JSONL/dataset changes, metadata editing UI, note/material create/import/upload UI, or browser/manual validation were added. Browser/manual validation remains deferred to `PHASE7-IMPL-010`.
 
 `PHASE7-IMPL-010` is the active frontier according to `docs/roadmap/roadmap_index.yaml`, `docs/roadmap/task_backlog.md`, `docs/roadmap/phase_map.md`, and `docs/master_plan.md`. It is the Workspace Validation / Browser and Manual Smoke parent task.
+
+The Phase 7 child task sequence for `PHASE7-IMPL-010` is:
+
+- `PHASE7-IMPL-010-T001`: docs/status only; inventory, task record, enrichment JSON, and roadmap/status updates.
+- `PHASE7-IMPL-010-T002`: automated regression validation pass; run existing backend/source regression suites and record results.
+- `PHASE7-IMPL-010-T003`: browser smoke checklist preparation; define exact flows, expected outcomes, and stop conditions.
+- `PHASE7-IMPL-010-T004`: browser/manual smoke execution; run app locally and execute checklist.
+- `PHASE7-IMPL-010-T005`: validation repair triage; only if smoke finds issues; classify blocker/deferred/not-a-bug.
+- `PHASE7-IMPL-010-T006`: final validation regression pass; rerun validators and relevant automated tests after any repairs.
+- `PHASE7-IMPL-010-T007`: roadmap/status closeout.
 
 The Phase 7 child task sequence for `PHASE7-IMPL-009` was:
 

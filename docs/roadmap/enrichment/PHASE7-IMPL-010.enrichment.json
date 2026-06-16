@@ -1,0 +1,258 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-010",
+  "title": "Workspace Validation / Browser and Manual Smoke",
+  "type": "validation",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-004",
+    "PHASE7-IMPL-005",
+    "PHASE7-IMPL-006",
+    "PHASE7-IMPL-007",
+    "PHASE7-IMPL-008",
+    "PHASE7-IMPL-009"
+  ],
+  "boundary_tags": [
+    "validation",
+    "manual_smoke",
+    "no_runtime_feature_scope"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-010.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-010.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-010/"
+  },
+  "goal": "Validate the completed Phase 7 workspace foundation from PHASE7-IMPL-004 through PHASE7-IMPL-009 using automated regression checks, a prepared browser/manual smoke checklist, optional owner-observed UI notes, and roadmap/status closeout without adding runtime feature scope, generated prose, model calls, extraction, apply-promotion, or memory/canon mutation.",
+  "why_now": "PHASE7-IMPL-004 through PHASE7-IMPL-009 are complete and committed. Browser/manual validation was intentionally deferred until this validation parent. The workspace now needs explicit acceptance before later extraction, apply-promotion, memory/canon mutation, or Dramatica work expands.",
+  "scope": {
+    "include": [
+      "Validation of project creation, selection, switching, and blank-project compatibility.",
+      "Validation of OMI-guided staged creation shell behavior and candidate/setup label visibility.",
+      "Validation of Project Overview, shared editor save behavior, dirty-state/keyboard-save safeguards, and workspace view separation.",
+      "Validation of scene/chapter metadata compatibility and notes/materials listing/editing behavior.",
+      "Validation of Memory / Canon shell approved-only empty states and OMI candidate exclusion.",
+      "Automated regression confirmation via existing pytest and frontend source-contract tests.",
+      "Browser/manual smoke checklist preparation and later execution.",
+      "Owner-observed UI smoke notes and validation repair triage only when needed.",
+      "Roadmap/status closeout after validation completes."
+    ],
+    "exclude": [
+      "New runtime features unless a later validation repair child explicitly authorizes a tiny safe bug fix.",
+      "Generated prose, summaries, extraction, semantic search, Story Check auto-runs, model calls, or Ollama calls.",
+      "Apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, or frontend approved-memory API helpers.",
+      "Metadata editing UI, note/material create/import/upload UI, training/JSONL/dataset work, or package/dependency changes.",
+      "Browser/manual validation during PHASE7-IMPL-010-T001."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md"
+    ],
+    "specs": [
+      "docs/roadmap/mvp_completion_test_matrix.md",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md",
+      "docs/roadmap/project_workspace_foundation_spec.md",
+      "docs/roadmap/chapter_scene_data_model_spec.md",
+      "docs/roadmap/notes_materials_data_model_spec.md",
+      "docs/roadmap/user_authored_document_editor_workflow_spec.md",
+      "docs/roadmap/project_overview_page_spec.md",
+      "docs/roadmap/omi_guided_project_creation_spec.md",
+      "docs/roadmap/project_memory_canon_page_structure_spec.md"
+    ],
+    "source_files": [
+      "frontend/src/App.jsx",
+      "frontend/src/api.js",
+      "frontend/src/components/Editor.jsx",
+      "frontend/src/components/MemoryCanonShell.jsx",
+      "frontend/src/components/OmiGuidedProjectCreation.jsx",
+      "frontend/src/components/OMIPanel.jsx",
+      "frontend/src/components/ProjectNav.jsx",
+      "frontend/src/components/ProjectOverview.jsx",
+      "frontend/src/sharedDocumentController.js",
+      "backend/main.py",
+      "backend/project_manager.py",
+      "tests/test_frontend_project_workspace_source.py",
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_note_material_routes.py",
+      "tests/test_omi_boundaries.py",
+      "tests/test_omi_routes.py"
+    ],
+    "quality_notes": [
+      "T001 creates inventory, task record, enrichment JSON, and roadmap/status updates only.",
+      "Validation confirms completed workspace behavior from PHASE7-IMPL-004 through PHASE7-IMPL-009.",
+      "Browser/manual validation execution remains deferred until T003-T004."
+    ]
+  },
+  "validation_surfaces": {
+    "automated": [
+      {
+        "path": "tests/test_frontend_project_workspace_source.py",
+        "notes": "Primary frontend source-contract and regression surface for workspace views, editor, overview, staged creation, and memory/canon shell boundaries."
+      },
+      {
+        "path": "tests/test_project_manager.py",
+        "notes": "Project creation, metadata compatibility, notes/materials helpers, and OMI lifecycle safety."
+      },
+      {
+        "path": "tests/test_scene_routes.py",
+        "notes": "Scene route compatibility and metadata behavior."
+      },
+      {
+        "path": "tests/test_note_material_routes.py",
+        "notes": "Note/material route compatibility and path safety."
+      },
+      {
+        "path": "tests/test_omi_boundaries.py",
+        "notes": "OMI no-prose and candidate/audit boundaries."
+      }
+    ],
+    "manual": [
+      {
+        "id": "browser_smoke_checklist",
+        "notes": "Prepared in T003 and executed in T004; covers project creation/selection, workspace views, editor saves, overview, OMI labels, memory/canon shell, and absence of AI prose controls."
+      },
+      {
+        "id": "owner_observed_ui_notes",
+        "notes": "Recorded during browser/manual smoke without turning validation into feature expansion."
+      }
+    ],
+    "roadmap": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py"
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE7-IMPL-010-T001",
+      "title": "Workspace Validation / Browser and Manual Smoke inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE7-IMPL-010"
+      ],
+      "scope": [
+        "Created task record, inventory, enrichment JSON, and initial roadmap/status updates.",
+        "Defined conservative validation child sequence T001 through T007.",
+        "Did not run browser/manual validation, app servers, pytest, or frontend builds."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T002",
+      "title": "Automated regression validation pass",
+      "type": "validation_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE7-IMPL-010-T001"
+      ],
+      "scope": [
+        "Run existing backend and frontend source regression suites.",
+        "Record pass/fail results in validation docs.",
+        "Make no runtime changes unless a tiny validation repair is explicitly needed."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T003",
+      "title": "Browser smoke checklist preparation",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-010-T002"
+      ],
+      "scope": [
+        "Create manual/browser smoke checklist with exact flows, expected outcomes, and stop conditions.",
+        "Do not execute browser smoke unless explicitly scoped by the child prompt."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T004",
+      "title": "Browser/manual smoke execution",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-010-T003"
+      ],
+      "scope": [
+        "Run backend and frontend locally.",
+        "Execute prepared checklist and record observed results.",
+        "No feature expansion."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T005",
+      "title": "Validation repair triage",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-010-T004"
+      ],
+      "scope": [
+        "Only if smoke or regression finds issues.",
+        "Classify issues as blocker, deferred, or not-a-bug.",
+        "Perform tiny repair only if explicitly necessary and safe."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T006",
+      "title": "Final validation regression pass",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-010-T005"
+      ],
+      "scope": [
+        "Rerun roadmap validators and relevant automated tests after any repairs.",
+        "Confirm no boundary drift."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T007",
+      "title": "Roadmap/status closeout",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-010-T006"
+      ],
+      "scope": [
+        "Record completed validation children.",
+        "Mark parent complete after closeout validation passes.",
+        "Move active frontier to next roadmap-authorized task."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Validation scope for PHASE7-IMPL-004 through PHASE7-IMPL-009 is documented before execution children run.",
+    "Automated regression suites pass or failures are recorded with triage classification.",
+    "Browser/manual smoke checklist exists before execution unless explicitly deferred with recorded rationale.",
+    "Browser/manual smoke results are recorded without turning validation into feature expansion.",
+    "No generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, training/JSONL/dataset changes, or new runtime feature scope are introduced by validation work."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py"
+    ],
+    "notes": "T001 is docs/status only. Pytest, app servers, frontend builds, browser/manual validation, model calls, and Ollama calls are deferred to later children."
+  },
+  "safety_notes": [
+    "Validation confirms analysis-only boundaries; it does not weaken them.",
+    "Owner-authored prose storage and editing remain owner-controlled actions, not AI prose generation.",
+    "OMI candidates, promotion audit records, and staged setup data remain non-canon.",
+    "Approved Memory / Canon lists remain empty-state only until future apply-promotion exists.",
+    "Validation must not silently promote candidates, create memory/*.json, or mutate durable project truth except through explicit owner/test temp paths during smoke."
+  ],
+  "deferred_work": [
+    "Browser/manual smoke execution until T004.",
+    "Validation repair until T005 and only if issues are found.",
+    "Apply-promotion and durable memory/canon mutation.",
+    "Extraction, semantic search, generated summaries, and Story Check auto-runs.",
+    "Metadata editing UI and note/material create/import/upload UI.",
+    "New runtime feature scope beyond tiny authorized validation repairs."
+  ]
+}
