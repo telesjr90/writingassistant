@@ -12,9 +12,9 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
 - Completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
-- Completed closeout micro-task: `PHASE7-IMPL-006-T007` - Roadmap/status closeout.
 - Completed closeout micro-task: `PHASE7-IMPL-007-T007` - Roadmap/status closeout.
-- Next draft child task: `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan.
+- Active child task: `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan.
+- Next draft child task: `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -64,6 +64,18 @@ Final `PHASE7-IMPL-006` behavior keeps scene/note/material document selection ID
 - `PHASE7-IMPL-007-T007`: roadmap/status closeout.
 
 Final `PHASE7-IMPL-007` behavior adds Overview as a workspace view, not an owner-authored document type. It uses existing deterministic project/list/status state, passes project/scenes/notes/materials/OMI/status/approved-memory shell props, derives scene/note/material counts from arrays/lists only, omits/defer chapter count, resets project switches to Overview, switches scene/note/material selection to editor view, keeps keyboard save editor-view-only, and adds no `/overview` backend/API dependency or backend overview helper. It does not add generated summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI/memory/canon mutation, metadata editing UI, note/material create/import/upload UI, training/JSONL/dataset changes, or browser/manual validation.
+
+`PHASE7-IMPL-008` is active next. The active child task is `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan. The next draft child task is `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests.
+
+The Phase 7 child task sequence for `PHASE7-IMPL-008` is:
+
+- `PHASE7-IMPL-008-T001`: docs/status only; inventory, task record, enrichment JSON, and roadmap/status updates.
+- `PHASE7-IMPL-008-T002`: staged flow data contract and source-level tests.
+- `PHASE7-IMPL-008-T003`: backend staged setup storage helpers.
+- `PHASE7-IMPL-008-T004`: backend staged setup routes and compatibility tests.
+- `PHASE7-IMPL-008-T005`: frontend API helpers and staged creation UI shell.
+- `PHASE7-IMPL-008-T006`: staged flow regression coverage.
+- `PHASE7-IMPL-008-T007`: roadmap/status closeout.
 
 Browser/manual validation belongs under `PHASE7-IMPL-010`.
 

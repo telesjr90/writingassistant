@@ -1,0 +1,343 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-008",
+  "title": "OMI-guided project creation staged flow",
+  "type": "runtime",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-001",
+    "PHASE7-IMPL-002",
+    "PHASE7-IMPL-003"
+  ],
+  "boundary_tags": [
+    "candidate_only",
+    "no_auto_promotion",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "local_first"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-008.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-008.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-008.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-008/"
+  },
+  "goal": "Add a staged, owner-controlled OMI-guided project creation flow that lets the owner collect setup inputs and review candidate/setup planning data before final project creation, without generated prose, model calls, hidden project writes, apply-promotion, or memory/canon mutation.",
+  "why_now": "PHASE7-IMPL-007 completed the deterministic Project Overview shell. The workspace now supports safe project creation, library selection, project switching, shared owner-authored editor, chapter/scene metadata compatibility, and notes/materials storage. The next safe Phase 7 expansion is a staged OMI-guided creation flow that keeps setup data separate from durable project truth until the owner explicitly confirms.",
+  "scope": {
+    "include": [
+      "Inventory current OMI, project creation, project library, and OMI panel surfaces relevant to a staged creation flow.",
+      "Identify gaps for staged setup storage, wizard UI, candidate labels, final confirmation, blank project compatibility, no hidden writes, no model calls, no apply-promotion, and no memory/canon mutation.",
+      "Define a conservative PHASE7-IMPL-008 child sequence.",
+      "Identify PHASE7-IMPL-008-T002 as the next source-level staged setup contract/test child."
+    ],
+    "exclude": [
+      "Runtime staged setup implementation during T001.",
+      "Runtime backend changes during T001.",
+      "Runtime frontend changes during T001.",
+      "Test edits during T001.",
+      "Generated prose, AI-written setup suggestions, AI-written premise copy, AI-written genre copy, AI-written sample openings, AI-written blurbs, AI-written summaries.",
+      "Extraction, semantic search, Story Check auto-runs, model/Ollama calls, AI rewrite/continue/polish/improve controls.",
+      "Apply-promotion behavior. OMI promotion records remain audit-only.",
+      "Memory/canon mutation. `memory/*.json` files must not be created.",
+      "Hidden project writes during wizard steps.",
+      "Dramatica-specific analysis, NCP/Dramatica UI, IC/RS/CIPS/dynamics truth claims.",
+      "Training data, JSONL records, dataset artifacts, `training/data/dataset_manifest.json` updates.",
+      "Browser/manual validation.",
+      "Metadata editing UI, note/material create/import/upload UI, chapter/scene create/edit UI, applied memory/canon UI.",
+      "Permanent project delete or archive UI.",
+      "Reuse of an unguarded model path. Any future model-assisted setup candidate path would need a separate approved task with input/output guards."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/project_workspace_implementation_decision_sweep.md"
+    ],
+    "specs": [
+      "docs/roadmap/project_workspace_foundation_spec.md",
+      "docs/roadmap/project_creation_flow_spec.md",
+      "docs/roadmap/omi_guided_project_creation_spec.md",
+      "docs/roadmap/project_file_model.md",
+      "docs/roadmap/omi_mvp_schema_lifecycle.md",
+      "docs/roadmap/omi_storage_model.md",
+      "docs/roadmap/omi_ideas_candidates_page_spec.md"
+    ],
+    "source_files": [
+      "backend/project_manager.py",
+      "backend/main.py",
+      "frontend/src/App.jsx",
+      "frontend/src/api.js",
+      "frontend/src/components/OMIPanel.jsx",
+      "frontend/src/components/ProjectNav.jsx",
+      "frontend/src/components/ProjectOverview.jsx",
+      "frontend/src/components/ProjectContext.jsx",
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_note_material_routes.py",
+      "tests/test_frontend_project_workspace_source.py",
+      "tests/test_omi_boundaries.py",
+      "tests/test_omi_routes.py"
+    ],
+    "quality_notes": [
+      "Roadmap authority, project workspace decision sweep, and OMI planning specs are the primary identity and boundary sources.",
+      "Direct read-only inspection of backend helpers, routes, frontend components, and existing tests was used for surface inventory.",
+      "No CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, or broad discovery were run.",
+      "LeanCTX and raw git status/diff are intentionally disabled for this task."
+    ]
+  },
+  "implementation_surfaces": {
+    "backend": [
+      {
+        "path": "backend/project_manager.py",
+        "notes": "Provides blank project creation helpers, ID derivation/validation, collision handling, hybrid core folder creation, atomic JSON writes, and OMI idea/candidate/promotion helpers. No staged setup helpers exist yet."
+      },
+      {
+        "path": "backend/main.py",
+        "notes": "Exposes project list/create and project-scoped OMI routes only. There is no staged setup route, no pre-project inbox, and no `POST /api/projects/from-omi` route."
+      }
+    ],
+    "frontend": [
+      {
+        "path": "frontend/src/App.jsx",
+        "notes": "Owns active project state, project library and OMI summary loading, project switching, blank project creation, and the workspace view selection. There is no staged creation wizard."
+      },
+      {
+        "path": "frontend/src/api.js",
+        "notes": "Provides project list/create helpers and project-scoped OMI helpers. There are no staged setup helpers."
+      },
+      {
+        "path": "frontend/src/components/OMIPanel.jsx",
+        "notes": "Renders owner raw idea form, candidate form, decision controls, promotion readiness, candidate details, and promotion records. Project-local only and not safe to reuse as the staged setup wizard."
+      },
+      {
+        "path": "frontend/src/components/ProjectNav.jsx",
+        "notes": "Renders project library, blank project creation form, and refresh. No OMI-guided creation entry exists."
+      },
+      {
+        "path": "frontend/src/components/ProjectOverview.jsx",
+        "notes": "Standalone prop-driven overview shell using deterministic project metadata and counts. Stable and reusable after staged project creation."
+      },
+      {
+        "path": "frontend/src/components/ProjectContext.jsx",
+        "notes": "Bible/Storyform JSON editor and read-only storyform prompt context. Not relevant to staged creation beyond the no-prose/no-AI-rewrite boundary."
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/test_project_manager.py",
+        "notes": "Covers blank project creation helpers, project ID validation, collision handling, hybrid folder creation, atomic write semantics, and OMI helper lifecycle. Staged setup coverage does not exist."
+      },
+      {
+        "path": "tests/test_scene_routes.py",
+        "notes": "Covers scene route compatibility only."
+      },
+      {
+        "path": "tests/test_note_material_routes.py",
+        "notes": "Covers note/material route compatibility only."
+      },
+      {
+        "path": "tests/test_frontend_project_workspace_source.py",
+        "notes": "Primary source-level regression surface for staged setup contract work."
+      },
+      {
+        "path": "tests/test_omi_boundaries.py",
+        "notes": "Covers OMI no-prose and no-silent-promotion behavior. Staged setup candidates must respect the same boundary."
+      },
+      {
+        "path": "tests/test_omi_routes.py",
+        "notes": "Covers OMI route behavior. No staged setup routes exist yet."
+      }
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE7-IMPL-008-T001",
+      "title": "OMI-guided project creation staged flow inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "in_progress",
+      "depends_on": [
+        "PHASE7-IMPL-008"
+      ],
+      "file_allowlist": [
+        "docs/roadmap/tasks/PHASE7-IMPL-008.md",
+        "docs/roadmap/inventory/PHASE7-IMPL-008.md",
+        "docs/roadmap/enrichment/PHASE7-IMPL-008.enrichment.json",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md",
+        "docs/roadmap/roadmap_index.yaml",
+        "docs/roadmap/task_backlog.md",
+        "docs/roadmap/phase_map.md",
+        "docs/master_plan.md"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T002",
+      "title": "Staged flow data contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-008-T001"
+      ],
+      "file_allowlist": [
+        "tests/test_frontend_project_workspace_source.py",
+        "docs/roadmap/tasks/PHASE7-IMPL-008.md"
+      ],
+      "scope": [
+        "Define the staged setup state shape (raw idea, optional owner inputs, setup candidate entries with visible labels, selected initialization fields, status, final confirmation flag, timestamps, project ID preview).",
+        "Define source-level expectations for no hidden project writes, no model calls, no OMI record creation before confirmation, blank project compatibility, candidate/setup labels, and cancel/project-switch cleanup.",
+        "Avoid runtime implementation unless a tiny source-test-support change is explicitly required."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T003",
+      "title": "Backend staged setup storage helpers",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-008-T002"
+      ],
+      "file_allowlist": [
+        "backend/project_manager.py",
+        "tests/test_project_manager.py"
+      ],
+      "scope": [
+        "Add deterministic staged setup helpers only if needed for the chosen implementation (transient frontend state vs. durable backend staged setup).",
+        "Reuse `_safe_path_component`/`validate_project_id` patterns if any staged setup ID touches the filesystem.",
+        "Keep setup drafts separate from durable project truth until finalize.",
+        "No generated prose, no model calls, no apply-promotion, no memory/canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T004",
+      "title": "Backend staged setup routes and compatibility tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-008-T003"
+      ],
+      "file_allowlist": [
+        "backend/main.py",
+        "backend/project_manager.py",
+        "tests/test_project_manager.py",
+        "tests/test_frontend_project_workspace_source.py"
+      ],
+      "scope": [
+        "Add staged setup read/write/cancel/finalize routes only if needed.",
+        "Enforce path safety, owner confirmation, no hidden durable writes, blank project creation compatibility.",
+        "No apply-promotion, no memory/canon mutation, no model calls, no setup prose generation."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T005",
+      "title": "Frontend API helpers and staged creation UI shell",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-008-T004"
+      ],
+      "file_allowlist": [
+        "frontend/src/api.js",
+        "frontend/src/App.jsx",
+        "frontend/src/components/ProjectNav.jsx",
+        "frontend/src/components/ProjectOverview.jsx"
+      ],
+      "scope": [
+        "Add minimal API helpers if staged setup routes exist.",
+        "Add the OMI-guided creation wizard entry point beside the blank project form.",
+        "Add wizard steps for owner input, candidate/setup review, final confirmation.",
+        "Keep candidate/setup labels visible at all times.",
+        "No generated prose or model calls. No shared-editor entry from the wizard."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T006",
+      "title": "Staged flow regression coverage",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-008-T005"
+      ],
+      "file_allowlist": [
+        "tests/test_project_manager.py",
+        "tests/test_frontend_project_workspace_source.py",
+        "tests/test_omi_boundaries.py"
+      ],
+      "scope": [
+        "Source-level and route tests for no hidden writes before final confirmation.",
+        "Source-level and route tests for final confirmation required to create a project folder.",
+        "Source-level and route tests for candidate/setup labels visible.",
+        "Source-level and route tests for cancel/project-switch cleanup.",
+        "Source-level and route tests for blank project creation compatibility preserved.",
+        "Source-level and route tests for no model/extraction/apply-promotion/memory mutation.",
+        "Source-level and route tests for no Story Check auto-runs."
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-008-T006"
+      ],
+      "file_allowlist": [
+        "docs/roadmap/tasks/PHASE7-IMPL-008.md",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/roadmap_index.yaml",
+        "docs/roadmap/task_backlog.md",
+        "docs/roadmap/phase_map.md",
+        "docs/master_plan.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md"
+      ],
+      "scope": [
+        "Record completed child tasks.",
+        "Mark the parent complete if all child tasks pass.",
+        "Move the active frontier to `PHASE7-IMPL-009` - Project Memory / Canon shell and approved-only empty states."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "A staged, owner-controlled OMI-guided creation wizard exists, or the existing blank project creation remains the only creation path with documented rationale.",
+    "Setup inputs are owner-authored only.",
+    "Setup candidates carry visible candidate/setup labels and are never silently promoted.",
+    "Final confirmation is explicit; no project folder is written before confirmation.",
+    "Finalized projects use the existing blank project creation path with the existing hybrid core folder set.",
+    "Project-local OMI records created from setup are candidate-only and never auto-promoted.",
+    "Blank project creation keeps working unchanged.",
+    "Existing shared editor, Overview shell, scene/note/material routes, OMI routes, and project library remain stable.",
+    "No generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI promotion/apply-promotion, or memory/canon mutation are added.",
+    "No Dramatica-specific analysis, training data, JSONL records, dataset artifacts, or browser/manual validation are added.",
+    "No metadata editing UI, note/material create/import/upload UI, or applied memory/canon UI is added."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py"
+    ],
+    "notes": "Do not use LeanCTX. If raw git diff is blocked by the local hook, record the skip. No pytest commands are required because this is a documentation/inventory task and no tests were changed."
+  },
+  "safety_notes": [
+    "Setup candidates are not canon. They must remain visibly labeled as candidates.",
+    "Pending or rejected setup candidates must not initialize `project.json`, `bible.json`, `storyform.json`, scenes, chapters, notes, materials, or memory/canon.",
+    "Final confirmation must be explicit and must list the exact initialization fields and any project-local OMI records that will be written.",
+    "The finalize step must call existing blank project creation helpers and reuse the existing hybrid core folder set.",
+    "Setup data must never call a model, run Story Check, run extraction, run semantic search, mutate OMI promotion records, or mutate memory/canon.",
+    "The wizard must clear stale setup draft state on cancel, on project switch, on completion, and on app reload.",
+    "The shared owner-authored scene/note/material editor must not be reached from the wizard.",
+    "The Project Overview shell must remain read-only and must not write any setup or candidate state on display.",
+    "The OMI panel must keep its existing no-prose/no-silent-promotion boundary copy."
+  ],
+  "deferred_work": [
+    "Runtime staged setup implementation after the T002 data contract.",
+    "Durable pre-project inbox storage if resume-after-close is later required.",
+    "Model-assisted setup candidate generation (requires separate approved task with input/output guards).",
+    "Apply-promotion behavior. OMI promotion records remain audit-only.",
+    "Memory/canon mutation and `memory/*.json` runtime files. Deferred until `PHASE7-IMPL-009` and a future apply-promotion design.",
+    "Browser/manual validation. Remains under `PHASE7-IMPL-010` or another roadmap-authorized validation phase."
+  ]
+}
