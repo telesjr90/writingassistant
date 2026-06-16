@@ -5,7 +5,9 @@ export const APPROVED_MEMORY_CATEGORIES = Object.freeze([
     description: 'Approved character records for this project.',
     emptyTitle: 'No approved character records yet.',
     emptyBody:
-      'This approved-only empty state does not show candidate records as canon.',
+      'Candidate character records remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'locations_settings',
@@ -13,56 +15,79 @@ export const APPROVED_MEMORY_CATEGORIES = Object.freeze([
     description: 'Approved location and setting records for this project.',
     emptyTitle: 'No approved location or setting records yet.',
     emptyBody:
-      'Locations and settings remain outside Memory / Canon until they are approved records.',
+      'Candidate location and setting notes remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'timeline',
     label: 'Timeline',
     description: 'Approved timeline records for this project.',
     emptyTitle: 'No approved timeline records yet.',
-    emptyBody: 'Candidate timeline data remains in OMI/candidate review.',
+    emptyBody:
+      'Candidate timeline events remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'plot_threads',
     label: 'Plot Threads',
     description: 'Approved plot thread records for this project.',
     emptyTitle: 'No approved plot thread records yet.',
-    emptyBody: 'Plot thread candidates are not approved project truth here.',
+    emptyBody:
+      'Candidate plot thread records remain in OMI/candidate review and are not approved truth here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'continuity_consistency',
     label: 'Continuity / Consistency',
     description: 'Approved continuity and consistency records for this project.',
     emptyTitle: 'No approved continuity or consistency records yet.',
-    emptyBody: 'Review notes and candidate issues remain outside approved canon.',
+    emptyBody:
+      'Candidate continuity and consistency issues remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'open_questions',
     label: 'Open Questions',
     description: 'Approved open question records for this project.',
     emptyTitle: 'No approved open question records yet.',
-    emptyBody: 'Candidate questions remain planning data until a future owner-approved step.',
+    emptyBody:
+      'Candidate open questions remain in OMI/candidate review and are not approved truth here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'relationships',
     label: 'Relationships',
     description: 'Approved relationship records for this project.',
     emptyTitle: 'No approved relationship records yet.',
-    emptyBody: 'Relationship candidates remain candidate-only and are not canon here.',
+    emptyBody:
+      'Candidate relationship records remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'organizations_groups',
     label: 'Organizations / Groups',
     description: 'Approved organization and group records for this project.',
     emptyTitle: 'No approved organization or group records yet.',
-    emptyBody: 'Group candidates remain in review until they become approved records.',
+    emptyBody:
+      'Candidate organization and group records remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
   {
     id: 'objects_items',
     label: 'Objects / Items',
     description: 'Approved object and item records for this project.',
     emptyTitle: 'No approved object or item records yet.',
-    emptyBody: 'Object and item candidates are not Memory / Canon records here.',
+    emptyBody:
+      'Candidate object and item records remain in OMI/candidate review and are not canon here.',
+    boundaryBody:
+      'Promotion/audit records are not canon by themselves. This read-only shell has no apply-promotion in this phase.',
   },
 ]);
 
@@ -113,7 +138,8 @@ export default function MemoryCanonShell({
         <p>
           This shell shows approved records only. Candidate records remain in
           OMI/candidate review, and promotion/audit records are not canon by
-          themselves.
+          themselves. Candidate-only records are never displayed as approved
+          Memory / Canon records here.
         </p>
         <p>No apply-promotion in this phase. No memory/canon mutation in this phase.</p>
       </header>
@@ -145,6 +171,7 @@ export default function MemoryCanonShell({
                 <div className="memory-canon-shell__empty-state">
                   <p>{category.emptyTitle}</p>
                   <p>{category.emptyBody}</p>
+                  <p>{category.boundaryBody}</p>
                 </div>
               )}
             </section>

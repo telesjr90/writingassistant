@@ -3831,6 +3831,319 @@ class TestMemoryCanonShellAppNavIntegration:
             )
 
 
+class TestApprovedCategoryEmptyStateCoverage:
+    """PHASE7-IMPL-009-T005 per-category empty-state coverage."""
+
+    CATEGORY_CONTRACTS = (
+        (
+            "characters",
+            "Characters",
+            ("character",),
+            "No approved character records yet.",
+        ),
+        (
+            "locations_settings",
+            "Locations / Settings",
+            ("location", "setting"),
+            "No approved location or setting records yet.",
+        ),
+        (
+            "timeline",
+            "Timeline",
+            ("timeline", "event"),
+            "No approved timeline records yet.",
+        ),
+        (
+            "plot_threads",
+            "Plot Threads",
+            ("plot thread",),
+            "No approved plot thread records yet.",
+        ),
+        (
+            "continuity_consistency",
+            "Continuity / Consistency",
+            ("continuity", "consistency"),
+            "No approved continuity or consistency records yet.",
+        ),
+        (
+            "open_questions",
+            "Open Questions",
+            ("open question",),
+            "No approved open question records yet.",
+        ),
+        (
+            "relationships",
+            "Relationships",
+            ("relationship",),
+            "No approved relationship records yet.",
+        ),
+        (
+            "organizations_groups",
+            "Organizations / Groups",
+            ("organization", "group"),
+            "No approved organization or group records yet.",
+        ),
+        (
+            "objects_items",
+            "Objects / Items",
+            ("object", "item"),
+            "No approved object or item records yet.",
+        ),
+    )
+
+    @staticmethod
+    def _runtime_source_without_comments(source: str) -> str:
+        return TestOmiGuidedProjectCreationBackendStorageDecision._without_line_comments(
+            source
+        )
+
+    @staticmethod
+    def _category_block(source: str, category_id: str) -> str:
+        marker = f"id: '{category_id}'"
+        assert marker in source
+        block_start = source.rfind("{", 0, source.index(marker))
+        block_end = source.index("\n  },", source.index(marker)) + len("\n  },")
+        return source[block_start:block_end]
+
+    def test_every_approved_category_has_complete_static_metadata(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        for category_id, label, _domain_terms, empty_title in self.CATEGORY_CONTRACTS:
+            block = self._category_block(memory_canon_shell_source, category_id)
+            assert f"id: '{category_id}'" in block
+            assert f"label: '{label}'" in block
+            assert "description:" in block
+            assert "emptyTitle:" in block
+            assert "emptyBody:" in block
+            assert "boundaryBody:" in block
+            assert empty_title in block
+
+    def test_every_category_empty_state_has_approved_only_candidate_boundary(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        for category_id, _label, _domain_terms, _empty_title in self.CATEGORY_CONTRACTS:
+            block = self._category_block(memory_canon_shell_source, category_id).lower()
+            for required_boundary in (
+                "no approved",
+                "approved",
+                "candidate",
+                "omi/candidate review",
+                "not canon",
+                "promotion/audit records are not canon by themselves",
+                "read-only shell",
+                "no apply-promotion in this phase",
+            ):
+                assert required_boundary in block, (
+                    f"{category_id} empty state must include {required_boundary!r}"
+                )
+
+    def test_category_specific_empty_state_copy_mentions_each_domain(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        for category_id, _label, domain_terms, _empty_title in self.CATEGORY_CONTRACTS:
+            block = self._category_block(memory_canon_shell_source, category_id).lower()
+            for domain_term in domain_terms:
+                assert domain_term in block, (
+                    f"{category_id} empty state should mention {domain_term!r}"
+                )
+
+    def test_memory_canon_shell_does_not_treat_candidates_or_promotions_as_approved_records(
+        self, memory_canon_shell_source: str, app_source: str, project_nav_source: str
+    ) -> None:
+        render_block = TestMemoryCanonShellAppNavIntegration._memory_canon_app_render_block(
+            app_source
+        )
+        assert "approvedRecordsByCategory={{}}" in render_block
+        for forbidden_candidate_surface in (
+            "omiCandidates",
+            "setupCandidates",
+            "candidateRecords",
+            "promotions",
+            "omiData",
+            "createOMIPromotion",
+            "OMIPanel",
+        ):
+            assert forbidden_candidate_surface not in memory_canon_shell_source
+            assert forbidden_candidate_surface not in render_block
+
+        nav_button_block = TestMemoryCanonShellAppNavIntegration._memory_canon_nav_button_block(
+            project_nav_source
+        )
+        assert "onSelectMemoryCanon?.()" in nav_button_block
+        assert "candidate" not in nav_button_block.lower()
+        assert "promotion" not in nav_button_block.lower()
+
+    def test_category_empty_states_expose_no_mutation_actions(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        categories_block = memory_canon_shell_source.split(
+            "export const APPROVED_MEMORY_CATEGORIES", 1
+        )[1].split("]);", 1)[0]
+        rendering_block = memory_canon_shell_source.split(
+            '<div className="memory-canon-shell__categories">', 1
+        )[1]
+        combined_shell_surface = "\n".join([categories_block, rendering_block])
+
+        for forbidden_action_surface in (
+            "<button",
+            "onClick",
+            "handleApprove",
+            "handlePromote",
+            "handleApply",
+            "handleSave",
+            "handleEdit",
+            "handleDelete",
+            "applyPromotion",
+            "saveCanon",
+            "saveMemory",
+            "createApproved",
+            "createCanon",
+            "updateCanon",
+            "deleteCanon",
+            "editCanon",
+            "importCanon",
+            "uploadCanon",
+            "extractCharacters",
+            "generateCanon",
+            "summarizeCanon",
+            "analyzeCanon",
+        ):
+            assert forbidden_action_surface not in combined_shell_surface
+
+    def test_integrated_empty_state_behavior_remains_read_only_and_empty(
+        self, app_source: str
+    ) -> None:
+        render_block = TestMemoryCanonShellAppNavIntegration._memory_canon_app_render_block(
+            app_source
+        )
+        assert "approvedRecordsByCategory={{}}" in render_block
+        assert "projectTitle={activeProject.title}" in render_block
+        for forbidden_source in (
+            "scenes",
+            "notes",
+            "materials",
+            "omiData",
+            "ideas",
+            "candidates",
+            "promotions",
+            "ProjectOverview",
+            "setupCandidates",
+        ):
+            assert forbidden_source not in render_block
+
+    def test_no_approved_memory_backend_or_api_dependency_for_category_empty_states(
+        self,
+        memory_canon_shell_source: str,
+        app_source: str,
+        project_nav_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_runtime = "\n".join(
+            [
+                memory_canon_shell_source,
+                app_source,
+                project_nav_source,
+                api_source,
+                backend_main_source,
+                project_manager_source,
+            ]
+        )
+        for forbidden_api_or_helper in (
+            "fetchApprovedMemory",
+            "fetchCanon",
+            "fetchMemory",
+            "saveApprovedMemory",
+            "saveCanon",
+            "applyPromotion",
+            "approveCandidate",
+            "promoteToCanon",
+            "promoteToMemory",
+        ):
+            assert forbidden_api_or_helper not in combined_runtime
+
+        for forbidden_route in (
+            "/memory-canon",
+            "/approved-memory",
+            "/canon",
+            "/memory",
+        ):
+            assert re.search(rf"['\"`]({re.escape(forbidden_route)})['\"`]", combined_runtime) is None
+
+    def test_editor_and_project_overview_do_not_own_category_empty_states(
+        self,
+        memory_canon_shell_source: str,
+        app_source: str,
+        project_overview_source: str,
+        editor_source: str,
+    ) -> None:
+        render_block = TestMemoryCanonShellAppNavIntegration._memory_canon_app_render_block(
+            app_source
+        )
+        assert "MemoryCanonShell" in render_block
+        assert "Editor" not in render_block
+        assert "ProjectOverview" not in render_block
+        assert "APPROVED_MEMORY_CATEGORIES" not in project_overview_source
+        assert "MemoryCanonShell" not in project_overview_source
+        assert "MemoryCanonShell" not in editor_source
+        assert "Editor" not in memory_canon_shell_source
+        assert "sharedDocumentController" not in memory_canon_shell_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            MEMORY_CANON_SHELL_JSX,
+            APP_JSX,
+            PROJECT_NAV_JSX,
+            API_JS,
+            PROJECT_OVERVIEW_JSX,
+            OMI_PANEL_JSX,
+            OMI_GUIDED_PROJECT_CREATION_JSX,
+            EDITOR_JSX,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+        ],
+    )
+    def test_runtime_sources_exclude_t005_forbidden_memory_canon_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
+        lower_source = lower_source.replace("no apply-promotion in this phase", "")
+        forbidden_terms = (
+            "generated prose",
+            "ai-written",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "approved truth mutation",
+            "hidden project write",
+            "training data",
+            "jsonl",
+            "dataset",
+        )
+        for forbidden_term in forbidden_terms:
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T005-forbidden term {forbidden_term!r}"
+            )
+
+
 class TestSceneMetadataDisplayCompatibility:
     def test_normalizes_legacy_scene_string_ids(self, project_nav_source: str) -> None:
         assert "function normalizeSceneOption" in project_nav_source
