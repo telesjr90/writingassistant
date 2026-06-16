@@ -204,20 +204,21 @@
       "id": "PHASE7-IMPL-010-T006",
       "title": "Final validation regression pass",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-010-T005"
       ],
       "scope": [
-        "Rerun roadmap validators and relevant automated tests after any repairs.",
-        "Confirm no boundary drift."
+        "Reran roadmap validators and relevant automated tests after T005 triage; all passed on first run.",
+        "Confirmed no boundary drift; no runtime repairs needed.",
+        "Interactive UI flows remain deferred (Playwright libnspr4.so missing; browser MCP unavailable during T004)."
       ]
     },
     {
       "id": "PHASE7-IMPL-010-T007",
       "title": "Roadmap/status closeout",
       "type": "validation_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE7-IMPL-010-T006"
       ],

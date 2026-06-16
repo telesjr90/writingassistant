@@ -77,8 +77,8 @@ Exclude:
 3. `PHASE7-IMPL-010-T003` - Browser smoke checklist preparation. Status: complete.
 4. `PHASE7-IMPL-010-T004` - Browser/manual smoke execution. Status: complete (PARTIAL).
 5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: complete.
-6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: ready.
-7. `PHASE7-IMPL-010-T007` - Roadmap/status closeout. Status: draft.
+6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: complete.
+7. `PHASE7-IMPL-010-T007` - Roadmap/status closeout. Status: ready.
 
 ## Child Task Details
 
@@ -116,8 +116,9 @@ Exclude:
 
 ### `PHASE7-IMPL-010-T006` - Final validation regression pass
 
-- Rerun roadmap validators and relevant automated tests after any repairs.
-- Confirm no boundary drift.
+- Reran roadmap validators and relevant automated tests after T005 triage; all passed on first run.
+- Confirmed no boundary drift; no runtime repairs needed.
+- Interactive UI flows remain deferred (Playwright `libnspr4.so` missing; browser MCP unavailable during T004).
 
 ### `PHASE7-IMPL-010-T007` - Roadmap/status closeout
 
@@ -149,7 +150,8 @@ For `PHASE7-IMPL-010-T002` and later children, use the validation commands named
 
 `PHASE7-IMPL-010` is the active Phase 7 frontier.
 
-- Active child: `PHASE7-IMPL-010-T006` — Final validation regression pass.
-- Last completed child: `PHASE7-IMPL-010-T005` — Validation repair triage.
+- Active child: `PHASE7-IMPL-010-T007` — Roadmap/status closeout.
+- Last completed child: `PHASE7-IMPL-010-T006` — Final validation regression pass.
+- Prior completed child: `PHASE7-IMPL-010-T005` — Validation repair triage.
 - Prior completed child: `PHASE7-IMPL-010-T004` — Browser/manual smoke execution (PARTIAL).
 - Last completed parent: `PHASE7-IMPL-009` — Memory / Canon shell (approved-only empty states).

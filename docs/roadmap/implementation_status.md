@@ -7,9 +7,10 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Current track: Project Workspace Foundation.
 - Immediate active parent task: `PHASE7-IMPL-010`.
 - Canonical title: Workspace Validation / Browser and Manual Smoke.
-- Active child task: `PHASE7-IMPL-010-T006` - Final validation regression pass.
-- Next child task: `PHASE7-IMPL-010-T006` - Final validation regression pass.
-- Last completed child task: `PHASE7-IMPL-010-T005` - Validation repair triage.
+- Active child task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
+- Next child task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
+- Last completed child task: `PHASE7-IMPL-010-T006` - Final validation regression pass.
+- Prior completed child: `PHASE7-IMPL-010-T005` - Validation repair triage.
 - Prior completed child: `PHASE7-IMPL-010-T004` - Browser/manual smoke execution (PARTIAL).
 - Last completed parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
 - Next parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.

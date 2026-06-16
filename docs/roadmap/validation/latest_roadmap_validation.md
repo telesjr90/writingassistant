@@ -1,5 +1,36 @@
 # Latest Roadmap Validation
 
+## PHASE7-IMPL-010-T006 Final Validation Regression Pass
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: final automated regression validation after `PHASE7-IMPL-010-T005` triage; docs/status only.
+- Parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
+- T005 carry-forward:
+  - No product defect confirmed; no runtime repair authorized.
+  - Interactive UI flows remain deferred because Playwright Chromium failed (`libnspr4.so` missing) and Cursor browser MCP was unavailable during T004.
+  - F/G remain deferred (no note/material fixtures); fixture creation remains a separate future authorized validation helper task.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_frontend_project_workspace_source.py`: PASS, 375 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py`: PASS, 69 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_scene_routes.py`: PASS, 14 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_note_material_routes.py`: PASS, 73 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py`: PASS, 40 passed.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: PASS.
+- Repairs made: none; all suites passed on first run.
+- Updated:
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/tasks/PHASE7-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json`
+  - `docs/roadmap/task_backlog.md`
+- Active child: `PHASE7-IMPL-010-T006` complete.
+- Next child: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
+- Parent `PHASE7-IMPL-010` remains active until T007 closeout.
+- No browser/manual validation, app servers, frontend builds, model calls, Ollama calls, apply-promotion, memory/canon mutation, staging, commits, or pushes were run.
+
 ## PHASE7-IMPL-010-T005 Validation Repair Triage
 
 - Date: 2026-06-16
