@@ -1970,6 +1970,238 @@ class TestOmiGuidedProjectCreationBackendStorageDecision:
             )
 
 
+class TestOmiGuidedProjectCreationBackendRouteDecision:
+    """PHASE7-IMPL-008-T004 route compatibility guard for no-route staging."""
+
+    @staticmethod
+    def _runtime_source_without_comments(source: str) -> str:
+        return TestOmiGuidedProjectCreationBackendStorageDecision._without_line_comments(
+            source
+        )
+
+    def test_backend_staged_setup_routes_are_deferred_after_t003(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for t003_to_t004_decision in (
+            "Backend staged setup storage helpers",
+            "Add deterministic staged setup helpers only if needed",
+            "Backend staged setup routes and compatibility tests",
+            "Add staged setup read/write/cancel/finalize routes only if needed.",
+            "transient frontend state",
+        ):
+            assert t003_to_t004_decision in combined_contract
+
+        runtime_backend = "\n".join([backend_main_source, project_manager_source])
+        for deferred_route_or_helper in (
+            "/staged-setup",
+            "/setup-drafts",
+            "/project-setup",
+            "/omi-guided-setup",
+            "/draft-project",
+            "/preproject",
+            "/pre-project",
+            "staged_setup",
+            "setup_draft",
+            "project_setup",
+            "omi_guided_setup",
+            "draft_project",
+            "preproject",
+            "pre_project",
+            "finalize_setup",
+            "create_project_from_omi",
+            "projects/from-omi",
+        ):
+            assert deferred_route_or_helper not in runtime_backend.lower()
+
+    def test_existing_project_create_route_remains_final_durable_route(
+        self,
+        backend_main_source: str,
+        project_manager_source: str,
+        api_source: str,
+        app_source: str,
+    ) -> None:
+        assert '@app.post("/api/projects")' in backend_main_source
+        assert "def post_project(payload: ProjectCreate) -> dict:" in backend_main_source
+        assert "return project_manager.create_project(title=payload.title)" in backend_main_source
+        assert "class ProjectCreate(BaseModel)" in backend_main_source
+        assert "title: str" in backend_main_source
+        assert "extra = \"forbid\"" in backend_main_source
+
+        assert "def create_project(" in project_manager_source
+        assert "def derive_project_id(" in project_manager_source
+        assert "def validate_project_id(" in project_manager_source
+        assert "def resolve_project_id_with_collision(" in project_manager_source
+        assert "PROJECT_CREATION_METHOD_BLANK = \"blank\"" in project_manager_source
+
+        assert "export async function createProject(title)" in api_source
+        assert "client.post('/projects', { title })" in api_source
+        assert "createProject(trimmedTitle)" in app_source
+
+    def test_frontend_t005_must_not_depend_on_staged_backend_api_helpers(
+        self,
+        task_008_source: str,
+        app_source: str,
+        api_source: str,
+        project_nav_source: str,
+    ) -> None:
+        assert "Frontend API helpers and staged creation UI shell" in task_008_source
+        assert "Add minimal API helpers if staged setup routes exist." in task_008_source
+        assert "Create blank project" in project_nav_source
+        assert "handleCreateProject" in app_source
+        assert "createProject(title)" in api_source
+
+        for forbidden_frontend_dependency in (
+            "createStagedSetup",
+            "fetchStagedSetup",
+            "updateStagedSetup",
+            "deleteStagedSetup",
+            "finalizeStagedSetup",
+            "createOMIGuidedSetup",
+            "createDraftProject",
+            "createPreProject",
+            "createProjectFromOMISetup",
+            "staged-setup",
+            "setup-drafts",
+            "project-setup",
+            "omi-guided-setup",
+            "draft-project",
+            "preproject",
+            "pre-project",
+            "finalize-setup",
+            "/overview",
+        ):
+            assert forbidden_frontend_dependency not in app_source
+            assert forbidden_frontend_dependency not in api_source
+
+    def test_route_absence_is_the_pre_confirmation_write_guard(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for boundary in (
+            "No hidden project writes during wizard steps",
+            "Final confirmation must be explicit",
+            "Only the confirmed finalize step may call existing project creation helpers.",
+            "Pending or rejected setup candidates remain non-canon.",
+        ):
+            assert boundary in combined_contract
+
+        runtime_without_comments = self._runtime_source_without_comments(
+            "\n".join([backend_main_source, project_manager_source])
+        ).lower()
+        for hidden_write_route_or_helper in (
+            "setup_draft",
+            "staged_setup",
+            "project_setup",
+            "omi_guided_setup",
+            "draft_project",
+            "pre_project",
+            "finalize_setup",
+            "create_project_from_omi",
+            "apply_promotion",
+            "memory mutation",
+            "canon mutation",
+            "hidden project write",
+        ):
+            assert hidden_write_route_or_helper not in runtime_without_comments
+
+    def test_omi_routes_remain_project_local_and_candidate_audit_only(
+        self,
+        backend_main_source: str,
+        project_manager_source: str,
+        api_source: str,
+    ) -> None:
+        for project_local_route in (
+            '@app.get("/api/projects/{project_name}/omi")',
+            '@app.post("/api/projects/{project_name}/omi/ideas")',
+            '@app.post("/api/projects/{project_name}/omi/candidates")',
+            '@app.post("/api/projects/{project_name}/omi/promotions")',
+        ):
+            assert project_local_route in backend_main_source
+
+        for pre_project_route in (
+            "/api/omi",
+            "/api/omi/",
+            "/api/project-setups",
+            "/api/setup-drafts",
+            "/api/projects/from-omi",
+        ):
+            assert pre_project_route not in backend_main_source
+            assert pre_project_route not in api_source
+
+        assert "OMI_PROMOTION_RECORD_STATUS = \"ready_for_manual_application\"" in (
+            project_manager_source
+        )
+        promotion_function = project_manager_source.split(
+            "def create_omi_promotion_record(",
+            1,
+        )[1].split("\n\ndef ", 1)[0]
+        assert "status\": OMI_PROMOTION_RECORD_STATUS" in promotion_function
+        assert "save_bible" not in promotion_function
+        assert "save_storyform" not in promotion_function
+        assert "save_scene" not in promotion_function
+
+    def test_t006_and_t007_remain_future_regression_and_closeout_tasks(
+        self, task_008_source: str
+    ) -> None:
+        assert "PHASE7-IMPL-008-T006" in task_008_source
+        assert "Staged flow regression coverage" in task_008_source
+        assert "no hidden writes before final confirmation" in task_008_source
+        assert "final confirmation required to create a project folder" in task_008_source
+        assert "PHASE7-IMPL-008-T007" in task_008_source
+        assert "Roadmap/status closeout" in task_008_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+            API_JS,
+            APP_JSX,
+            OMI_PANEL_JSX,
+            PROJECT_OVERVIEW_JSX,
+        ],
+    )
+    def test_runtime_sources_exclude_t004_forbidden_route_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        for forbidden_term in (
+            "generated setup",
+            "ai-written setup",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply-promotion",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "hidden project write",
+            "jsonl",
+            "dataset",
+        ):
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T004-forbidden term {forbidden_term!r}"
+            )
+
+
 class TestSceneMetadataDisplayCompatibility:
     def test_normalizes_legacy_scene_string_ids(self, project_nav_source: str) -> None:
         assert "function normalizeSceneOption" in project_nav_source

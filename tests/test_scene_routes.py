@@ -1,4 +1,5 @@
 import json
+import inspect
 import sys
 import types
 from pathlib import Path
@@ -51,6 +52,82 @@ sys.modules.setdefault("fastapi.middleware.cors", fake_cors)
 sys.modules.setdefault("pydantic", fake_pydantic)
 
 from backend import main
+
+
+def test_phase7_impl_008_t004_backend_staged_setup_routes_are_deferred():
+    source = inspect.getsource(main)
+
+    assert '@app.post("/api/projects")' in source
+    assert "def post_project(payload: ProjectCreate) -> dict:" in source
+    assert "return project_manager.create_project(title=payload.title)" in source
+
+    for deferred_route in (
+        "/staged-setup",
+        "/setup-drafts",
+        "/project-setup",
+        "/omi-guided-setup",
+        "/draft-project",
+        "/preproject",
+        "/pre-project",
+        "/projects/from-omi",
+    ):
+        assert deferred_route not in source
+
+    for deferred_helper in (
+        "create_staged_setup",
+        "load_staged_setup",
+        "update_staged_setup",
+        "finalize_staged_setup",
+        "create_project_from_omi",
+        "apply_promotion",
+    ):
+        assert deferred_helper not in source
+
+
+def test_phase7_impl_008_t004_project_create_route_delegates_existing_helper(
+    monkeypatch,
+):
+    calls = []
+
+    def fake_create_project(*, title):
+        calls.append(title)
+        return {
+            "project_id": "owner-guided-project",
+            "title": title,
+            "creation_method": "blank",
+        }
+
+    monkeypatch.setattr(main.project_manager, "create_project", fake_create_project)
+
+    response = main.post_project(types.SimpleNamespace(title="Owner Guided Project"))
+
+    assert response == {
+        "project_id": "owner-guided-project",
+        "title": "Owner Guided Project",
+        "creation_method": "blank",
+    }
+    assert calls == ["Owner Guided Project"]
+
+
+def test_phase7_impl_008_t004_omi_routes_remain_project_scoped_only():
+    source = inspect.getsource(main)
+
+    for project_scoped_route in (
+        '@app.get("/api/projects/{project_name}/omi")',
+        '@app.post("/api/projects/{project_name}/omi/ideas")',
+        '@app.post("/api/projects/{project_name}/omi/candidates")',
+        '@app.post("/api/projects/{project_name}/omi/promotions")',
+    ):
+        assert project_scoped_route in source
+
+    for pre_project_route in (
+        "/api/omi",
+        "/api/omi/",
+        "/api/project-setups",
+        "/api/setup-drafts",
+        "/api/projects/from-omi",
+    ):
+        assert pre_project_route not in source
 
 
 def test_scene_route_loads_empty_scene(tmp_path, monkeypatch):
