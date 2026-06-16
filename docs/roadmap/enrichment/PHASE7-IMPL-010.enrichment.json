@@ -87,7 +87,7 @@
     "quality_notes": [
       "T001 creates inventory, task record, enrichment JSON, and roadmap/status updates only.",
       "Validation confirms completed workspace behavior from PHASE7-IMPL-004 through PHASE7-IMPL-009.",
-      "Browser/manual validation execution remains deferred until T003-T004."
+      "Browser/manual validation execution remains deferred until T004.",
     ]
   },
   "validation_surfaces": {
@@ -147,7 +147,7 @@
       "id": "PHASE7-IMPL-010-T002",
       "title": "Automated regression validation pass",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-010-T001"
       ],
@@ -161,20 +161,20 @@
       "id": "PHASE7-IMPL-010-T003",
       "title": "Browser smoke checklist preparation",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-010-T002"
       ],
       "scope": [
-        "Create manual/browser smoke checklist with exact flows, expected outcomes, and stop conditions.",
-        "Do not execute browser smoke unless explicitly scoped by the child prompt."
+        "Created docs/roadmap/validation/PHASE7-IMPL-010-browser-smoke-checklist.md with flows A-L, stop conditions, T004 reporting template, and owner observation prompts.",
+        "Did not execute browser smoke unless explicitly scoped by the child prompt."
       ]
     },
     {
       "id": "PHASE7-IMPL-010-T004",
       "title": "Browser/manual smoke execution",
       "type": "validation_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE7-IMPL-010-T003"
       ],

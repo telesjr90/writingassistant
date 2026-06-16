@@ -1,5 +1,27 @@
 # Latest Roadmap Validation
 
+## PHASE7-IMPL-010-T003 Browser Smoke Checklist Preparation
+
+- Date: 2026-06-15
+- Result: PASS
+- Scope: browser/manual smoke checklist preparation for completed Phase 7 workspace validation (`PHASE7-IMPL-004` through `PHASE7-IMPL-009`).
+- Parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
+- Created:
+  - `docs/roadmap/validation/PHASE7-IMPL-010-browser-smoke-checklist.md` — flows A–L, preconditions, T004 placeholders, stop conditions, reporting template, owner observation prompts, explicit T003 exclusions.
+- Updated:
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/tasks/PHASE7-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: PASS (or recorded skip if hook blocks raw git).
+- Pytest: not run; docs/checklist only; no runtime code or tests changed.
+- Active child: `PHASE7-IMPL-010-T003` complete.
+- Next child: `PHASE7-IMPL-010-T004` - Browser/manual smoke execution.
+- No app servers, frontend builds, model calls, Ollama calls, browser/manual validation, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, staging, commits, or pushes were run.
+
 ## PHASE7-IMPL-010-T002 Automated Regression Validation Pass
 
 - Date: 2026-06-15
