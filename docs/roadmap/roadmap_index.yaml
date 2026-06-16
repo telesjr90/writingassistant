@@ -3,8 +3,8 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-008",
-    "current_parent_task_title": "OMI-guided project creation staged flow"
+    "current_parent_task_id": "PHASE7-IMPL-009",
+    "current_parent_task_title": "Memory / Canon shell (approved-only empty states)"
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -181,7 +181,7 @@
       "id": "PHASE7-IMPL-008",
       "title": "OMI-guided project creation staged flow",
       "type": "runtime",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-001",
@@ -205,7 +205,7 @@
       "id": "PHASE7-IMPL-009",
       "title": "Memory / Canon shell (approved-only empty states)",
       "type": "runtime",
-      "status": "future",
+      "status": "active_next",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-007"
@@ -732,7 +732,7 @@
       "id": "PHASE7-IMPL-008-T001",
       "title": "OMI-guided project creation staged flow inventory and child-task plan",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE7-IMPL-008",
       "depends_on": [
         "PHASE7-IMPL-008"
@@ -744,6 +744,112 @@
         "no_generated_prose",
         "no_memory_canon_mutation",
         "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T002",
+      "title": "Staged flow data contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-008",
+      "depends_on": [
+        "PHASE7-IMPL-008-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T003",
+      "title": "Backend staged setup storage helpers",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-008",
+      "depends_on": [
+        "PHASE7-IMPL-008-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T004",
+      "title": "Backend staged setup routes and compatibility tests",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-008",
+      "depends_on": [
+        "PHASE7-IMPL-008-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T005",
+      "title": "Frontend API helpers and staged creation UI shell",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-008",
+      "depends_on": [
+        "PHASE7-IMPL-008-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "local_first"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T006",
+      "title": "Staged flow regression coverage",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-008",
+      "depends_on": [
+        "PHASE7-IMPL-008-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-008-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-008",
+      "depends_on": [
+        "PHASE7-IMPL-008-T006"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
       ]
     }
   ]

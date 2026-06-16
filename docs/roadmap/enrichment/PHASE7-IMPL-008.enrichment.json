@@ -3,7 +3,7 @@
   "task_id": "PHASE7-IMPL-008",
   "title": "OMI-guided project creation staged flow",
   "type": "runtime",
-  "status": "active_next",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE7-IMPL-001",
@@ -159,7 +159,7 @@
       "id": "PHASE7-IMPL-008-T001",
       "title": "OMI-guided project creation staged flow inventory and child-task plan",
       "type": "planning_microtask",
-      "status": "in_progress",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008"
       ],
@@ -179,7 +179,7 @@
       "id": "PHASE7-IMPL-008-T002",
       "title": "Staged flow data contract and source-level tests",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008-T001"
       ],
@@ -197,7 +197,7 @@
       "id": "PHASE7-IMPL-008-T003",
       "title": "Backend staged setup storage helpers",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008-T002"
       ],
@@ -206,17 +206,17 @@
         "tests/test_project_manager.py"
       ],
       "scope": [
-        "Add deterministic staged setup helpers only if needed for the chosen implementation (transient frontend state vs. durable backend staged setup).",
-        "Reuse `_safe_path_component`/`validate_project_id` patterns if any staged setup ID touches the filesystem.",
-        "Keep setup drafts separate from durable project truth until finalize.",
-        "No generated prose, no model calls, no apply-promotion, no memory/canon mutation."
+        "Path A selected: backend staged setup storage helpers deferred.",
+        "Existing project creation remains the durable final creation path.",
+        "Frontend-transient setup state satisfies the contract and reduces hidden-write risk.",
+        "No backend runtime source was changed."
       ]
     },
     {
       "id": "PHASE7-IMPL-008-T004",
       "title": "Backend staged setup routes and compatibility tests",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008-T003"
       ],
@@ -227,16 +227,17 @@
         "tests/test_frontend_project_workspace_source.py"
       ],
       "scope": [
-        "Add staged setup read/write/cancel/finalize routes only if needed.",
-        "Enforce path safety, owner confirmation, no hidden durable writes, blank project creation compatibility.",
-        "No apply-promotion, no memory/canon mutation, no model calls, no setup prose generation."
+        "Backend staged setup routes deferred after the T003 storage decision.",
+        "Existing project creation route/helper remains the durable creation path.",
+        "Tests lock no staged backend route/helper/API dependency and no hidden pre-confirmation writes.",
+        "No backend route/runtime source was changed."
       ]
     },
     {
       "id": "PHASE7-IMPL-008-T005",
       "title": "Frontend API helpers and staged creation UI shell",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008-T004"
       ],
@@ -244,21 +245,22 @@
         "frontend/src/api.js",
         "frontend/src/App.jsx",
         "frontend/src/components/ProjectNav.jsx",
-        "frontend/src/components/ProjectOverview.jsx"
+        "frontend/src/components/ProjectOverview.jsx",
+        "frontend/src/components/OmiGuidedProjectCreation.jsx"
       ],
       "scope": [
-        "Add minimal API helpers if staged setup routes exist.",
-        "Add the OMI-guided creation wizard entry point beside the blank project form.",
-        "Add wizard steps for owner input, candidate/setup review, final confirmation.",
-        "Keep candidate/setup labels visible at all times.",
-        "No generated prose or model calls. No shared-editor entry from the wizard."
+        "Added frontend-transient `OmiGuidedProjectCreation` shell.",
+        "Integrated the shell minimally in `App.jsx`.",
+        "Owner input, review, visible setup/candidate labels, cancel/reset, and final confirmation are handled in frontend state.",
+        "Final creation reuses the existing create-project path only after explicit confirmation.",
+        "No staged backend API helpers, backend routes, backend storage, OMI draft-step writes, generated prose, or model calls were added."
       ]
     },
     {
       "id": "PHASE7-IMPL-008-T006",
       "title": "Staged flow regression coverage",
-      "type": "validation_microtask",
-      "status": "draft",
+      "type": "runtime_microtask",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008-T005"
       ],
@@ -268,20 +270,16 @@
         "tests/test_omi_boundaries.py"
       ],
       "scope": [
-        "Source-level and route tests for no hidden writes before final confirmation.",
-        "Source-level and route tests for final confirmation required to create a project folder.",
-        "Source-level and route tests for candidate/setup labels visible.",
-        "Source-level and route tests for cancel/project-switch cleanup.",
-        "Source-level and route tests for blank project creation compatibility preserved.",
-        "Source-level and route tests for no model/extraction/apply-promotion/memory mutation.",
-        "Source-level and route tests for no Story Check auto-runs."
+        "Added regression coverage for local reset behavior.",
+        "Added regression coverage for final confirmation gating and existing create-project finalization.",
+        "Added regression coverage for blank project compatibility, no staged backend API/helper/route dependency, no OMI writes during draft steps, no hidden writes before final confirmation, visible setup/candidate labels, App integration, Project Overview/editor separation, and safety/no-prose boundaries."
       ]
     },
     {
       "id": "PHASE7-IMPL-008-T007",
       "title": "Roadmap/status closeout",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-008-T006"
       ],
@@ -295,11 +293,20 @@
         "docs/roadmap/validation/latest_roadmap_validation.md"
       ],
       "scope": [
-        "Record completed child tasks.",
-        "Mark the parent complete if all child tasks pass.",
-        "Move the active frontier to `PHASE7-IMPL-009` - Project Memory / Canon shell and approved-only empty states."
+        "Recorded completed child tasks.",
+        "Marked the parent complete after closeout validation.",
+        "Moved the active frontier to `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states)."
       ]
     }
+  ],
+  "final_outcome": [
+    "PHASE7-IMPL-008 delivered a frontend-transient OMI-guided project creation staged shell.",
+    "Backend staged setup storage helpers were deferred.",
+    "Backend staged setup routes were deferred.",
+    "The final durable creation path remains the existing create-project route/helper.",
+    "Visible setup/candidate labels and explicit final confirmation are part of the staged shell.",
+    "Blank project creation compatibility was preserved.",
+    "No staged backend API dependency, OMI writes during staged draft steps, hidden pre-confirmation project writes, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, training/JSONL/dataset work, or browser/manual validation was added."
   ],
   "acceptance_criteria": [
     "A staged, owner-controlled OMI-guided creation wizard exists, or the existing blank project creation remains the only creation path with documented rationale.",
@@ -333,8 +340,8 @@
     "The OMI panel must keep its existing no-prose/no-silent-promotion boundary copy."
   ],
   "deferred_work": [
-    "Runtime staged setup implementation after the T002 data contract.",
-    "Durable pre-project inbox storage if resume-after-close is later required.",
+    "Durable backend staged setup storage remains deferred unless resume-after-close is later required.",
+    "Backend staged setup routes remain deferred unless durable staged storage is later approved.",
     "Model-assisted setup candidate generation (requires separate approved task with input/output guards).",
     "Apply-promotion behavior. OMI promotion records remain audit-only.",
     "Memory/canon mutation and `memory/*.json` runtime files. Deferred until `PHASE7-IMPL-009` and a future apply-promotion design.",

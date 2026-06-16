@@ -5,16 +5,17 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-008`.
-- Canonical title: OMI-guided project creation staged flow.
-- Last completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
-- Next parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
+- Immediate active parent task: `PHASE7-IMPL-009`.
+- Canonical title: Memory / Canon shell (approved-only empty states).
+- Last completed parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
+- Next parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
 - Completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
-- Completed closeout micro-task: `PHASE7-IMPL-007-T007` - Roadmap/status closeout.
-- Active child task: `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan.
-- Next draft child task: `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests.
+- Completed parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
+- Completed closeout micro-task: `PHASE7-IMPL-008-T007` - Roadmap/status closeout.
+- Active child task: next `PHASE7-IMPL-009` inventory/child-task-plan micro-task to be created from roadmap authority.
+- Next draft child task: `PHASE7-IMPL-009` child sequence; not yet expanded in this status layer.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -65,17 +66,19 @@ Final `PHASE7-IMPL-006` behavior keeps scene/note/material document selection ID
 
 Final `PHASE7-IMPL-007` behavior adds Overview as a workspace view, not an owner-authored document type. It uses existing deterministic project/list/status state, passes project/scenes/notes/materials/OMI/status/approved-memory shell props, derives scene/note/material counts from arrays/lists only, omits/defer chapter count, resets project switches to Overview, switches scene/note/material selection to editor view, keeps keyboard save editor-view-only, and adds no `/overview` backend/API dependency or backend overview helper. It does not add generated summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI/memory/canon mutation, metadata editing UI, note/material create/import/upload UI, training/JSONL/dataset changes, or browser/manual validation.
 
-`PHASE7-IMPL-008` is active next. The active child task is `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan. The next draft child task is `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests.
+`PHASE7-IMPL-008` is complete as of the T007 closeout. Completed child records:
 
-The Phase 7 child task sequence for `PHASE7-IMPL-008` is:
-
-- `PHASE7-IMPL-008-T001`: docs/status only; inventory, task record, enrichment JSON, and roadmap/status updates.
+- `PHASE7-IMPL-008-T001`: OMI-guided project creation staged flow inventory and child-task plan.
 - `PHASE7-IMPL-008-T002`: staged flow data contract and source-level tests.
-- `PHASE7-IMPL-008-T003`: backend staged setup storage helpers.
-- `PHASE7-IMPL-008-T004`: backend staged setup routes and compatibility tests.
+- `PHASE7-IMPL-008-T003`: backend staged setup storage helpers; Path A selected and backend staged storage deferred.
+- `PHASE7-IMPL-008-T004`: backend staged setup routes and compatibility tests; backend staged routes deferred.
 - `PHASE7-IMPL-008-T005`: frontend API helpers and staged creation UI shell.
 - `PHASE7-IMPL-008-T006`: staged flow regression coverage.
 - `PHASE7-IMPL-008-T007`: roadmap/status closeout.
+
+Final `PHASE7-IMPL-008` behavior adds a frontend-transient OMI-guided staged project creation shell with owner-authored setup input, visible setup/candidate labels, review/cancel/reset behavior, and explicit final confirmation before the existing create-project path runs. Backend staged storage and backend staged routes are intentionally deferred. No staged backend API helpers, OMI writes during staged draft steps, hidden pre-confirmation project writes, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, training/JSONL/dataset changes, metadata editing UI, note/material create/import/upload UI, or browser/manual validation were added.
+
+`PHASE7-IMPL-009` is the active frontier according to `docs/roadmap/roadmap_index.yaml`, `docs/roadmap/task_backlog.md`, `docs/roadmap/phase_map.md`, and `docs/master_plan.md`. It is the Memory / Canon shell (approved-only empty states) parent task.
 
 Browser/manual validation belongs under `PHASE7-IMPL-010`.
 

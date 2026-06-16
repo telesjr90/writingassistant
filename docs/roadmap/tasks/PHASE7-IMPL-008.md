@@ -87,70 +87,62 @@ Exclude:
 
 ## Current Evidence Summary
 
-- `backend/project_manager.py` provides blank project creation (`create_project`), ID derivation/validation, collision handling, hybrid core folder creation, atomic JSON writes, and OMI idea/candidate/promotion helpers. No staged setup helpers exist yet.
-- `backend/main.py` exposes project list/create and project-scoped OMI routes only. There are no staged setup routes and no `POST /api/projects/from-omi` route.
-- `frontend/src/App.jsx` holds active project state, loads project library and OMI summary, renders `ProjectNav`/`ProjectOverview`/`ProjectContext`/`OMIPanel`/`Editor`/`AnalysisSidebar`, and routes to Overview after project creation. There is no staged creation wizard.
-- `frontend/src/api.js` provides project list/create helpers plus scene/note/material/OMI helpers. There are no staged setup helpers.
+- `backend/project_manager.py` provides blank project creation (`create_project`), ID derivation/validation, collision handling, hybrid core folder creation, atomic JSON writes, and OMI idea/candidate/promotion helpers. Backend staged setup storage helpers were intentionally deferred.
+- `backend/main.py` exposes project list/create and project-scoped OMI routes only. Backend staged setup routes were intentionally deferred, and there is no `POST /api/projects/from-omi` route.
+- `frontend/src/App.jsx` holds active project state, loads project library and OMI summary, renders `ProjectNav`/`ProjectOverview`/`ProjectContext`/`OMIPanel`/`Editor`/`AnalysisSidebar`, routes to Overview after project creation, and integrates the frontend-transient `OmiGuidedProjectCreation` shell.
+- `frontend/src/api.js` provides project list/create helpers plus scene/note/material/OMI helpers. No staged setup API helpers were added.
+- `frontend/src/components/OmiGuidedProjectCreation.jsx` provides the owner-authored setup input, review, visible setup/candidate labels, cancel/reset behavior, and explicit final confirmation shell. It keeps staged setup state in frontend state and calls the existing create-project path only after final confirmation.
 - `frontend/src/components/OMIPanel.jsx` renders owner raw idea form, candidate form, decision controls, promotion readiness, candidate details, and promotion records. It is project-local only.
-- `frontend/src/components/ProjectNav.jsx` renders project library and blank project creation. There is no OMI-guided creation entry yet.
+- `frontend/src/components/ProjectNav.jsx` renders project library and blank project creation. Blank project creation remains compatible and unchanged by the staged shell.
 - `frontend/src/components/ProjectOverview.jsx` is a standalone prop-driven overview shell using deterministic project metadata and counts.
-- Existing tests cover blank project creation helpers, project ID validation, collision handling, scene/note/material route compatibility, and OMI no-prose/no-silent-promotion behavior. Staged setup coverage does not exist.
+- Existing tests now cover staged setup contract, backend storage/route deferment, frontend-transient shell behavior, final confirmation gating, blank project compatibility, no staged API/routes/helpers, no OMI writes during staged steps, no hidden writes before final confirmation, visible setup/candidate labels, App/editor/overview separation, and no-prose/model/extraction safety.
 
 ## Child Task Plan
 
-1. `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan. Status: in progress (this task).
-2. `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests. Status: draft.
-3. `PHASE7-IMPL-008-T003` - Backend staged setup storage helpers. Status: draft.
-4. `PHASE7-IMPL-008-T004` - Backend staged setup routes and compatibility tests. Status: draft.
-5. `PHASE7-IMPL-008-T005` - Frontend API helpers and staged creation UI shell. Status: draft.
-6. `PHASE7-IMPL-008-T006` - Staged flow regression coverage. Status: draft.
-7. `PHASE7-IMPL-008-T007` - Roadmap/status closeout. Status: draft.
+1. `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan. Status: complete.
+2. `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests. Status: complete.
+3. `PHASE7-IMPL-008-T003` - Backend staged setup storage helpers. Status: complete; backend staged setup storage deferred by decision.
+4. `PHASE7-IMPL-008-T004` - Backend staged setup routes and compatibility tests. Status: complete; backend staged setup routes deferred by decision.
+5. `PHASE7-IMPL-008-T005` - Frontend API helpers and staged creation UI shell. Status: complete.
+6. `PHASE7-IMPL-008-T006` - Staged flow regression coverage. Status: complete.
+7. `PHASE7-IMPL-008-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
 ### `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests
 
-- Define the staged setup state shape (raw idea, optional owner inputs, setup candidate entries with visible labels, selected initialization fields, status, final confirmation flag, timestamps, project ID preview).
-- Define source-level expectations for no hidden project writes, no model calls, no OMI record creation before confirmation, blank project compatibility, candidate/setup labels, and cancel/project-switch cleanup.
-- Avoid runtime implementation unless a tiny source-test-support change is explicitly required.
+- Completed source-level contract coverage for staged setup state, owner-authored inputs, visible setup/candidate labels, final confirmation, no hidden writes, blank project compatibility, OMI compatibility, backend/helper compatibility, frontend integration surfaces, and safety/no-prose boundaries.
+- Runtime implementation was not added in this child.
 
 ### `PHASE7-IMPL-008-T003` - Backend staged setup storage helpers
 
-- Add deterministic staged setup helpers only if needed for the chosen implementation (transient frontend state vs. durable backend staged setup).
-- Reuse `_safe_path_component`/`validate_project_id` patterns if any staged setup ID touches the filesystem.
-- Keep setup drafts separate from durable project truth until finalize.
-- No generated prose, no model calls, no apply-promotion, no memory/canon mutation.
+- Path A was selected. Backend staged setup storage helpers were deferred because frontend-transient staged setup state satisfies the contract and avoids hidden pre-confirmation backend writes.
+- Existing project creation remains the final durable project creation path.
+- No backend runtime code was changed.
 
 ### `PHASE7-IMPL-008-T004` - Backend staged setup routes and compatibility tests
 
-- Add staged setup read/write/cancel/finalize routes only if needed.
-- Enforce path safety, owner confirmation, no hidden durable writes, blank project creation compatibility.
-- No apply-promotion, no memory/canon mutation, no model calls, no setup prose generation.
+- Backend staged setup routes were deferred following the T003 storage decision.
+- Compatibility tests locked route absence, existing durable project creation, blank project compatibility, no hidden pre-confirmation writes, OMI route compatibility, and frontend-transient setup compatibility.
+- No backend route/runtime code was changed.
 
 ### `PHASE7-IMPL-008-T005` - Frontend API helpers and staged creation UI shell
 
-- Add minimal API helpers if staged setup routes exist.
-- Add the OMI-guided creation wizard entry point beside the blank project form.
-- Add wizard steps for owner input, candidate/setup review, final confirmation.
-- Keep candidate/setup labels visible at all times.
-- No generated prose or model calls. No shared-editor entry from the wizard.
+- Added `frontend/src/components/OmiGuidedProjectCreation.jsx` as a frontend-transient staged creation shell.
+- Added minimal `App.jsx` integration while preserving blank project creation, Project Overview, editor behavior, backend routes, `api.js`, and OMI backend behavior.
+- The shell collects owner-authored setup input, shows visible setup/candidate labels, supports review/cancel/reset, and calls the existing create-project path only after explicit final confirmation.
+- No staged setup backend API helpers, backend storage, backend routes, OMI draft-step writes, model calls, extraction, apply-promotion, or memory/canon mutation were added.
 
 ### `PHASE7-IMPL-008-T006` - Staged flow regression coverage
 
-- Source-level and route tests for:
-  - no hidden writes before final confirmation
-  - final confirmation required to create a project folder
-  - candidate/setup labels visible
-  - cancel/project-switch cleanup
-  - blank project creation compatibility preserved
-  - no model/extraction/apply-promotion/memory mutation
-  - no Story Check auto-runs
+- Added source-level regression coverage for local reset behavior, final confirmation gating, existing final create-project path, blank project compatibility, no staged backend API/helper/route dependency, no OMI writes during staged draft steps, no hidden writes before final confirmation, visible setup/candidate labels, owner-authored input only, App integration, Project Overview/editor separation, and safety/no-prose boundaries.
+- Runtime fixes were not needed.
 
 ### `PHASE7-IMPL-008-T007` - Roadmap/status closeout
 
-- Record completed child tasks.
-- Mark the parent complete if all child tasks pass.
-- Move the active frontier to the next published Phase 7 task (`PHASE7-IMPL-009` - Project Memory / Canon shell and approved-only empty states) according to roadmap authority.
+- Recorded completed child tasks.
+- Marked the parent complete after closeout validation passed.
+- Moved the active frontier to the next published Phase 7 task (`PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states)) according to roadmap authority.
 
 ## Acceptance Criteria
 
@@ -166,6 +158,21 @@ Exclude:
 - No Dramatica-specific analysis, training data, JSONL records, dataset artifacts, or browser/manual validation are added.
 - No metadata editing UI, note/material create/import/upload UI, or applied memory/canon UI is added.
 
+## Source-Level Contract Compatibility Notes
+
+The completed closeout preserves the source-level contract phrases used by PHASE7-IMPL-008 regression tests:
+
+- `project ID preview` remains a contract concept for deterministic preview without writes.
+- `No staged setup helpers exist yet` remains true for backend runtime source; backend staged setup storage was deferred.
+- `No staged-setup routes exist today` remains true for backend runtime source; backend staged setup routes were deferred.
+- `A first implementation can keep the wizard in transient frontend state until final confirmation.` This is the delivered T005 approach.
+- `staged setup helpers only if needed` and `Add deterministic staged setup helpers only if needed` remain the T003 decision boundary; helpers were not needed in this slice.
+- `Add staged setup read/write/cancel/finalize routes only if needed.` remains the T004 decision boundary; routes were not needed in this slice.
+- `Add minimal API helpers if staged setup routes exist.` remains the T005 API boundary; staged routes did not exist, so no staged API helpers were added.
+- `staged creation wizard` remains the UI shell concept for the frontend-transient staged creation shell.
+- `Routing the owner to the Project Overview shell` remains the post-create navigation expectation.
+- `final confirmation required to create a project folder` remains the durable write boundary.
+
 ## Validation Expectations
 
 For `PHASE7-IMPL-008-T001`:
@@ -178,8 +185,20 @@ For later children, source-level frontend tests plus focused backend helper/rout
 
 ## Final Completion Summary
 
-`PHASE7-IMPL-008` is not yet complete. The active child task is `PHASE7-IMPL-008-T001` (this task).
+`PHASE7-IMPL-008` is complete as of the T007 closeout.
+
+Final outcome:
+
+- T001 created the inventory, task record, enrichment JSON, and initial status updates.
+- T002 locked the staged flow data contract with source-level tests.
+- T003 selected Path A and deferred backend staged setup storage helpers.
+- T004 deferred backend staged setup routes and locked the existing project creation route/helper as the durable creation path.
+- T005 added the frontend-transient `OmiGuidedProjectCreation` shell and minimal `App.jsx` integration.
+- T006 added staged flow regression coverage.
+- T007 closed out roadmap/status and moved the active frontier to `PHASE7-IMPL-009`.
+
+Delivered behavior remains frontend-transient until final owner confirmation. Existing project creation remains the only durable project creation path. No staged backend storage, staged backend routes, or staged backend API helpers were introduced. No OMI records are created during staged draft steps. No hidden project writes occur before final confirmation. Candidate/setup labels remain visible. Blank project creation remains compatible. Browser/manual validation remains deferred to `PHASE7-IMPL-010` or another roadmap-authorized validation phase.
 
 ## Current Status
 
-`PHASE7-IMPL-008-T001` is in progress. The task record, inventory, and enrichment JSON for `PHASE7-IMPL-008` are now created. The next child task is `PHASE7-IMPL-008-T002` - Staged flow data contract and source-level tests.
+`PHASE7-IMPL-008` is complete. The active Phase 7 frontier is `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
