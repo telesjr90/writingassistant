@@ -1,5 +1,40 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-002-T001 Parent Publication
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: docs/status/planning publication for `PHASE8-IMPL-002-T001`.
+- Parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
+- Active child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan.
+- Next child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision.
+- Last completed parent: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Last completed child: `PHASE8-IMPL-001-T007` - Roadmap/status closeout.
+- Publication summary:
+  - Published `PHASE8-IMPL-002` as the active Writer Assistant Core parent after completed `PHASE8-IMPL-001`.
+  - Created the parent task record, inventory, and enrichment JSON.
+  - Published the T001-T007 child-task sequence for contract decision, tests-first record/evidence validation, tiny pure validation helpers, path contract tests, conditional storage helper skeleton, and closeout.
+  - Recorded that `PHASE8-IMPL-001` completed schema contract/constants only.
+  - Recorded that no extraction, storage writes, backend routes, frontend extraction UI, model calls, apply-promotion, OMI candidate promotion, or memory/canon mutation exists yet.
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-002.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-002.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json`
+- Updated:
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Pytest: not run; docs/status/planning only; no runtime code or tests changed.
+- Context tools: none run. The `PHASE8-IMPL-001-T003` targeted context report remains sufficient evidence unless a later child explicitly authorizes a narrow collect task. Context output is evidence, not roadmap truth.
+- Boundary summary: docs/status/planning only; no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, runtime code changes, test changes, backend/frontend/package files, project runtime files, extraction, generated prose, candidate storage writes, apply-promotion, OMI candidate promotion, memory/canon mutation, training data, JSONL records, dataset artifacts, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-001-T007 Roadmap/Status Closeout
 
 - Date: 2026-06-16

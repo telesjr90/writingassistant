@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-002",
+  "title": "Writer Assistant Core candidate storage contract and evidence/provenance validation",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-001"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "no_auto_promotion",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "metadata_only",
+    "no_runtime_feature_scope"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-002.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-002.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json",
+    "prior_context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
+    "prior_targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
+    "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md"
+  },
+  "goal": "Define and validate Writer Assistant Core candidate storage, source locator, evidence, provenance, status, owner decision, destination, confidence, and path-safety contracts before extraction runtime, routes, UI, model calls, storage writes, apply-promotion, or memory/canon mutation exists.",
+  "why_now": "PHASE8-IMPL-001 completed the first Writer Assistant Core runtime slice with tests-first schema contract coverage and minimal constants-only candidate schema metadata. The next safe slice is storage/evidence validation contracts before runtime extraction, storage writes, routes, UI, or model behavior expand.",
+  "scope": {
+    "include": [
+      "Project-local candidate record shape.",
+      "Storage path contract, without writes at first.",
+      "Source locator contract.",
+      "Evidence span/support contract.",
+      "Provenance/origin contract.",
+      "Confidence and uncertainty fields.",
+      "Owner decision, status, and destination fields.",
+      "Target category alignment with backend/story_knowledge/candidate_schema.py.",
+      "Validation helpers before storage writes.",
+      "Tests-first implementation."
+    ],
+    "exclude": [
+      "Production runtime code in T001.",
+      "Tests in T001.",
+      "Runtime extraction and candidate extraction from owner text.",
+      "Candidate storage writes in T001.",
+      "Model/Ollama calls.",
+      "Backend extraction routes and frontend extraction UI.",
+      "Story Check auto-runs, semantic search, and Dramatica analysis.",
+      "Generated prose, rewriting, continuation, style imitation, prose improvement, or summaries as durable truth.",
+      "Apply-promotion, OMI candidate promotion, and memory/canon mutation.",
+      "Backend approved-memory routes/helpers and frontend approved-memory API helpers.",
+      "Package/dependency changes.",
+      "Training data, JSONL records, dataset manifests, model artifacts, and project runtime artifacts.",
+      "Context-tool execution in T001."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md",
+      "docs/roadmap/validation/latest_roadmap_validation.md"
+    ],
+    "source_docs": [
+      "docs/roadmap/tasks/PHASE8-IMPL-001.md",
+      "docs/roadmap/inventory/PHASE8-IMPL-001.md",
+      "docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json",
+      "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
+      "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
+      "docs/roadmap/writer_assistant_core_candidate_schemas.md",
+      "docs/roadmap/omi_story_knowledge_candidate_expansion.md",
+      "docs/roadmap/omi_mvp_schema_lifecycle.md",
+      "docs/roadmap/omi_storage_model.md",
+      "docs/roadmap/project_memory_canon_storage_model.md",
+      "docs/roadmap/project_memory_canon_page_structure_spec.md",
+      "docs/roadmap/project_memory_canon_cross_linking_health_spec.md",
+      "tests/test_writer_assistant_core_candidate_schema_contract.py",
+      "backend/story_knowledge/candidate_schema.py"
+    ],
+    "quality_notes": [
+      "T001 publishes the parent and child plan only.",
+      "PHASE8-IMPL-001 added constants-only schema metadata and did not add extraction, storage writes, routes, UI, model calls, apply-promotion, or memory/canon mutation.",
+      "PHASE8-IMPL-002 starts with contract decision and tests before validation helpers or storage helper skeletons.",
+      "Storage writes remain disallowed in T001 and conditional later."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-002-T001",
+      "title": "Publish candidate storage/evidence validation parent and child-task plan",
+      "type": "planning_microtask",
+      "status": "active",
+      "depends_on": [
+        "PHASE8-IMPL-002"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Publish parent, inventory, enrichment JSON, and roadmap/status updates.",
+        "No code, tests, storage writes, context tools, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T002",
+      "title": "Candidate storage and evidence/provenance contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-002-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide exact first contract shape.",
+        "Decide whether T003 is tests-only or test-plus-helper.",
+        "No runtime implementation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T003",
+      "title": "Candidate storage/evidence contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-002-T002"
+      ],
+      "scope": [
+        "Tests-first.",
+        "Add contract tests for record shape, source locator, evidence/provenance, status/destination, path safety, and forbidden mutation.",
+        "Expected red if helpers are not implemented yet."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T004",
+      "title": "Candidate record validation helpers",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-002-T003"
+      ],
+      "scope": [
+        "Implement tiny pure validation helpers only.",
+        "No storage writes, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T005",
+      "title": "Project-local candidate storage path contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-002-T004"
+      ],
+      "scope": [
+        "Tests-first.",
+        "Define where typed Writer Assistant Core candidates may live under project-local storage.",
+        "Verify path safety and read/list/write boundaries before adding writes."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T006",
+      "title": "Candidate storage helper skeleton",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-002-T005"
+      ],
+      "scope": [
+        "Implement minimal helper skeleton only if T005 authorizes it.",
+        "Candidate-only storage under project-local area.",
+        "No extraction, routes, UI, apply-promotion, or memory/canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-002-T006"
+      ],
+      "scope": [
+        "Close parent.",
+        "Summarize tests/helpers/storage contract.",
+        "Identify next roadmap-authorized parent or decision point."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "PHASE8-IMPL-002 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-001.",
+    "PHASE8-IMPL-002-T001 publishes the parent, inventory, enrichment JSON, and roadmap/status updates.",
+    "PHASE8-IMPL-002-T002 is identified as the next child task.",
+    "Child tasks T001-T007 are documented with tests-first sequencing.",
+    "Scope explicitly prioritizes candidate storage contracts and evidence/provenance validation before extraction/runtime expansion.",
+    "Non-scope explicitly blocks extraction, routes, UI, model calls, storage writes in T001, apply-promotion, and memory/canon mutation.",
+    "No runtime code, tests, package files, backend/frontend files, project runtime files, training data, JSONL records, or dataset artifacts are changed in T001."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs"
+    ],
+    "notes": "T001 validation is roadmap/status only. Do not run pytest unless runtime code or tests were accidentally changed."
+  },
+  "safety_notes": [
+    "The app remains analysis-only.",
+    "No generated prose, rewriting, continuation, style imitation, prose improvement, or summaries as durable truth.",
+    "Candidates are not canon.",
+    "Storage validity does not prove story truth.",
+    "Evidence/provenance validation supports review only and does not approve or promote candidates.",
+    "OMI remains the central review and future promotion layer.",
+    "Promotion records remain audit-only until future apply-promotion exists.",
+    "Memory/canon mutation is out of scope.",
+    "Path contracts must reject path traversal and absolute host filesystem assumptions."
+  ],
+  "deferred_work": [
+    "Runtime extraction.",
+    "Candidate extraction from text.",
+    "Candidate storage writes in T001.",
+    "Backend extraction routes.",
+    "Frontend extraction UI.",
+    "Model/Ollama integration.",
+    "Apply-promotion.",
+    "OMI candidate promotion.",
+    "Memory/canon mutation.",
+    "Package/dependency changes.",
+    "Training/JSONL/dataset work.",
+    "Project runtime artifacts.",
+    "Storage writes if T005/T006 keep storage helper work decision/test-only."
+  ],
+  "context_tools_policy": [
+    "T001 does not run context tools.",
+    "PHASE8-IMPL-001 T003 already produced a targeted context report.",
+    "Additional context tools are not needed for this parent unless a later child explicitly authorizes a narrow collect task.",
+    "Context output is evidence, not roadmap truth.",
+    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
+  ]
+}
