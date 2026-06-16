@@ -1,5 +1,42 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-001-T006 Writer Assistant Core Candidate Schema Constants
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: constants-only runtime slice for `PHASE8-IMPL-001-T006`.
+- Parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Completed child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants.
+- Active child: `PHASE8-IMPL-001-T007` - Roadmap/status closeout.
+- Next child: requires owner/roadmap confirmation after T007.
+- Last completed child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants.
+- Prior completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests.
+- Source evidence:
+  - `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`
+  - `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`
+  - `tests/test_writer_assistant_core_candidate_schema_contract.py`
+- Constants package/module created:
+  - `backend/story_knowledge/__init__.py`
+  - `backend/story_knowledge/candidate_schema.py`
+- Constants summary:
+  - Added static constants for Writer Assistant Core candidate types, required fields, source locator fields, evidence fields, provenance fields, status values, owner decision values, destination values, and target-category mapping.
+  - Kept exports immutable or effectively constant with `frozenset` value sets and read-only mapping metadata.
+  - Added no routes, storage writes, extraction behavior, model paths, UI, promotion application, or durable truth mutation.
+- Updated:
+  - `backend/story_knowledge/__init__.py`
+  - `backend/story_knowledge/candidate_schema.py`
+  - `docs/roadmap/tasks/PHASE8-IMPL-001.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS, 109 passed.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs/code: PASS.
+- Boundary summary: constants-only runtime slice; no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, extraction, generated prose, backend routes, frontend files, storage writes, package/dependency changes, project runtime files, training data, JSONL records, dataset manifests, apply-promotion, OMI candidate promotion, memory/approved-truth mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-001-T005 Writer Assistant Core Candidate Schema Contract Tests
 
 - Date: 2026-06-16

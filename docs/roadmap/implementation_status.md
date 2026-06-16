@@ -6,9 +6,10 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 
 - Current track: Writer Assistant Core.
 - Immediate active parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
-- Active child task: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants.
-- Next child task: `PHASE8-IMPL-001-T007` - Roadmap/status closeout.
-- Last completed child task: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests.
+- Active child task: `PHASE8-IMPL-001-T007` - Roadmap/status closeout.
+- Next child task: requires owner/roadmap confirmation after T007.
+- Last completed child task: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants.
+- Prior completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests.
 - Prior completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision.
 - Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory.
 - Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core.
@@ -25,11 +26,11 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed closeout micro-task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
 - Phase 7 published sequence is complete (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`).
-- Next parent/child: published as `PHASE8-IMPL-001` / `PHASE8-IMPL-001-T006`; next child after T006 is `PHASE8-IMPL-001-T007`.
+- Next parent/child: published as `PHASE8-IMPL-001` / `PHASE8-IMPL-001-T007`; next parent or child after T007 requires owner/roadmap confirmation.
 - Deferred validation: interactive browser flows D, E, H, I, J, K, L when Playwright deps or browser MCP are available; note/material flows F/G unless controlled fixtures are authorized later.
 - Local smoke artifact (uncommitted): `projects/smoke-blank-1781586974/`.
 
-`PHASE8-IMPL-001` is active as the first Writer Assistant Core readiness parent. T002 published the context collection plan at `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md`. T003 produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md` using direct file/source inspection only. T004 accepted `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md` and selected Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice. T005 added tests-first contract coverage in `tests/test_writer_assistant_core_candidate_schema_contract.py` and intentionally left the targeted test red because `backend.story_knowledge.candidate_schema` is deferred to T006. T006 is now ready for constants-only implementation. T005 did not run context tools and did not add extraction, candidate creation, backend routes, frontend extraction UI, model/Ollama calls, apply-promotion, memory/canon mutation, package changes, production runtime code, training data, JSONL records, or dataset artifacts.
+`PHASE8-IMPL-001` is active as the first Writer Assistant Core readiness parent. T002 published the context collection plan at `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md`. T003 produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md` using direct file/source inspection only. T004 accepted `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md` and selected Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice. T005 added tests-first contract coverage in `tests/test_writer_assistant_core_candidate_schema_contract.py`. T006 added constants-only schema metadata in `backend/story_knowledge/candidate_schema.py` and satisfied the T005 contract. T007 is now ready for roadmap/status closeout. T006 did not run context tools and did not add extraction, candidate creation, backend routes, frontend extraction UI, model/Ollama calls, apply-promotion, memory/canon mutation, package changes, storage writes, training data, JSONL records, or dataset artifacts.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -116,7 +117,7 @@ Final `PHASE7-IMPL-009` behavior adds a read-only Memory / Canon workspace shell
 
 Final `PHASE7-IMPL-010` behavior validated the completed Phase 7 workspace foundation from `PHASE7-IMPL-004` through `PHASE7-IMPL-009` using automated regression checks, a prepared browser/manual smoke checklist, partial browser/manual smoke execution with environment-limited fallback evidence, validation repair triage, and final regression confirmation. It did not add generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, frontend approved-memory API helpers, metadata editing UI, note/material create/import/upload UI, runtime features, package/dependency changes, or training/JSONL/dataset work. Interactive UI browser validation remains deferred to owner/environment rerun when browser tooling is available.
 
-The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. `PHASE8-IMPL-001` is now the published Writer Assistant Core readiness parent in `docs/roadmap/roadmap_index.yaml`. Current child is `PHASE8-IMPL-001-T006`; last completed child is `PHASE8-IMPL-001-T005`.
+The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. `PHASE8-IMPL-001` is now the published Writer Assistant Core readiness parent in `docs/roadmap/roadmap_index.yaml`. Current child is `PHASE8-IMPL-001-T007`; last completed child is `PHASE8-IMPL-001-T006`.
 
 `PHASE7-IMPL-010` must remain validation-only. It must not add runtime feature scope, apply-promotion, memory/canon mutation, generated prose, model calls, extraction, or training/JSONL/dataset work unless explicitly authorized by a separate roadmap task.
 

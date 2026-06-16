@@ -69,8 +69,8 @@ Include:
 3. `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Status: complete.
 4. `PHASE8-IMPL-001-T004` - First runtime slice decision. Status: complete.
 5. `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Status: complete.
-6. `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Status: ready.
-7. `PHASE8-IMPL-001-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Status: complete.
+7. `PHASE8-IMPL-001-T007` - Roadmap/status closeout. Status: ready.
 
 ## Child Task Details
 
@@ -116,14 +116,16 @@ Include:
 
 ### `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants
 
-- Ready after T005.
-- Implement only enough constants/schema metadata to satisfy T005.
-- Keep the implementation constants-only unless a later task explicitly expands scope.
-- Preserve candidate-first, no-prose, no-promotion, evidence/provenance, and OMI review boundaries.
-- Do not add routes, storage writes, extraction, model calls, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation.
+- Completed as a constants-only runtime slice.
+- Created `backend/story_knowledge/__init__.py`.
+- Created `backend/story_knowledge/candidate_schema.py`.
+- Implemented only enough constants/schema metadata to satisfy T005.
+- Preserved candidate-first, no-prose, no-promotion, evidence/provenance, and OMI review boundaries.
+- Did not add routes, storage writes, extraction, model calls, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation.
 
 ### `PHASE8-IMPL-001-T007` - Roadmap/status closeout
 
+- Ready after T006.
 - Close the readiness parent after child outcomes are recorded.
 - Move the active frontier to the first actual Writer Assistant Core implementation parent or next roadmap-authorized task.
 
@@ -136,7 +138,8 @@ Include:
 - T003 is complete and produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
 - T004 is complete and produced the accepted first runtime slice decision at `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`.
 - T005 is complete with tests-first Writer Assistant Core candidate schema contract coverage.
-- T006 is the current ready child for Writer Assistant Core candidate schema constants.
+- T006 is complete with constants-only Writer Assistant Core candidate schema metadata.
+- T007 is the current ready child for roadmap/status closeout.
 - The selected first runtime slice is Writer Assistant Core candidate schema constants plus source-level/contract tests.
 - OMI remains the candidate-first review and future promotion layer.
 - Candidate output, model output, NotebookLM output, extracted candidates, and planning notes remain non-canon until explicit owner review and future owner-controlled promotion.
@@ -170,6 +173,14 @@ For `PHASE8-IMPL-001-T005`:
 - `python3 scripts/validate_roadmap.py`
 - Non-LeanCTX whitespace check on changed docs/tests
 
+For `PHASE8-IMPL-001-T006`:
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- Non-LeanCTX whitespace check on changed docs/code
+
 For `PHASE8-IMPL-001-T001`:
 
 - `python3 scripts/check_enrichment.py`
@@ -191,4 +202,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Last completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Prior completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T007` - Roadmap/status closeout. Last completed child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Prior completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Prior completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.

@@ -178,21 +178,23 @@
       "id": "PHASE8-IMPL-001-T006",
       "title": "Writer Assistant Core candidate schema constants",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-001-T005"
       ],
       "scope": [
-        "Implement only enough constants/schema metadata to satisfy T005.",
+        "Created backend/story_knowledge/__init__.py.",
+        "Created backend/story_knowledge/candidate_schema.py.",
+        "Implemented only enough constants/schema metadata to satisfy T005.",
         "Keep candidate-first, no-prose, no-promotion, and evidence/provenance boundaries.",
-        "Do not add routes, storage writes, extraction, model calls, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation."
+        "Did not add routes, storage writes, extraction, model calls, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation."
       ]
     },
     {
       "id": "PHASE8-IMPL-001-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-001-T006"
       ],
@@ -209,7 +211,8 @@
     "PHASE8-IMPL-001-T003 is registered as complete with targeted context report published.",
     "PHASE8-IMPL-001-T004 is registered as complete with first runtime slice decision published.",
     "PHASE8-IMPL-001-T005 is registered as complete with contract tests added.",
-    "PHASE8-IMPL-001-T006 is registered as the next ready child.",
+    "PHASE8-IMPL-001-T006 is registered as complete with constants-only schema metadata.",
+    "PHASE8-IMPL-001-T007 is registered as the next ready child.",
     "The selected first runtime slice is Writer Assistant Core candidate schema constants plus source-level/contract tests.",
     "T002 plans context collection before any context tool execution.",
     "T003 may run targeted context tools only if explicitly authorized.",
@@ -217,12 +220,13 @@
   ],
   "validation": {
     "commands": [
-      "python3 -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q",
       "python3 scripts/check_enrichment.py",
       "python3 scripts/validate_roadmap.py",
-      "non-LeanCTX whitespace check on changed docs/tests"
+      "non-LeanCTX whitespace check on changed docs/code"
     ],
-    "notes": "The targeted pytest is expected red in T005 because backend.story_knowledge.candidate_schema is intentionally not implemented until T006."
+    "notes": "T006 satisfies the T005 schema contract with constants-only production metadata."
   },
   "safety_notes": [
     "The app remains analysis-only.",
@@ -244,6 +248,7 @@
     "T003 used direct file/source inspection only and did not run context tools.",
     "T004 is docs/decision only and did not run context tools.",
     "T005 added tests only and did not run context tools.",
+    "T006 added constants only and did not run context tools.",
     "Context output is evidence, not roadmap truth.",
     "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
   ]
