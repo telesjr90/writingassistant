@@ -91,47 +91,50 @@ Exclude:
 
 ## Child Task Plan
 
-1. `PHASE7-IMPL-009-T001` - Memory / Canon shell inventory and child-task plan. Status: in progress.
-2. `PHASE7-IMPL-009-T002` - Approved-memory shell data contract and source-level tests. Status: draft.
-3. `PHASE7-IMPL-009-T003` - Memory / Canon shell component. Status: draft.
-4. `PHASE7-IMPL-009-T004` - ProjectNav/App integration. Status: draft.
-5. `PHASE7-IMPL-009-T005` - Approved-category empty-state coverage. Status: draft.
-6. `PHASE7-IMPL-009-T006` - Memory / Canon shell regression coverage. Status: draft.
-7. `PHASE7-IMPL-009-T007` - Roadmap/status closeout. Status: draft.
+1. `PHASE7-IMPL-009-T001` - Memory / Canon shell inventory and child-task plan. Status: complete.
+2. `PHASE7-IMPL-009-T002` - Approved-memory shell data contract and source-level tests. Status: complete.
+3. `PHASE7-IMPL-009-T003` - Memory / Canon shell component. Status: complete.
+4. `PHASE7-IMPL-009-T004` - ProjectNav/App integration. Status: complete.
+5. `PHASE7-IMPL-009-T005` - Approved-category empty-state coverage. Status: complete.
+6. `PHASE7-IMPL-009-T006` - Memory / Canon shell regression coverage. Status: complete.
+7. `PHASE7-IMPL-009-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
+### `PHASE7-IMPL-009-T001` - Memory / Canon shell inventory and child-task plan
+
+- Created the task record, inventory, enrichment JSON, and initial roadmap/status updates.
+- Defined the conservative child task sequence for approved-only empty states.
+
 ### `PHASE7-IMPL-009-T002` - Approved-memory shell data contract and source-level tests
 
-- Lock category list, approved-only empty states, candidate exclusion, no apply-promotion, no memory/canon mutation, no extraction/model/summaries.
-- Tests only unless tiny source comment fixes are needed.
+- Locked the approved-memory category list, approved-only empty states, candidate exclusion, no apply-promotion, no memory/canon mutation, and no extraction/model/summary behavior in source-level tests.
 
 ### `PHASE7-IMPL-009-T003` - Memory / Canon shell component
 
-- Add a read-only shell component with category cards/tabs and approved-only empty states.
-- No backend route/API dependency unless already existing and read-only.
-- No mutation.
+- Added standalone `MemoryCanonShell.jsx` as a read-only shell with category cards/tabs and approved-only empty states.
+- No backend route/API dependency, no mutation, and no `memory/` file creation on page load.
 
 ### `PHASE7-IMPL-009-T004` - ProjectNav/App integration
 
-- Add Memory / Canon shell as a workspace view.
-- Preserve Project Overview/editor/OMI panel separation.
-- No editor save path.
-- No candidate promotion.
+- Added Memory / Canon as a separate `memory-canon` workspace view in `App.jsx` and `ProjectNav.jsx`.
+- Preserved Project Overview/editor/OMI panel separation, editor save path isolation, and no candidate promotion.
 
 ### `PHASE7-IMPL-009-T005` - Approved-category empty-state coverage
 
-- Ensure characters, locations/settings, timeline, plot threads, continuity/consistency, open questions, relationships, organizations/groups, and objects/items have visible approved-only empty states.
-- Keep copy safe and non-generative.
+- Ensured characters, locations/settings, timeline, plot threads, continuity/consistency, open questions, relationships, organizations/groups, and objects/items have visible approved-only empty states.
+- Kept copy safe and non-generative.
 
 ### `PHASE7-IMPL-009-T006` - Memory / Canon shell regression coverage
 
-- Cover no candidate-as-canon, no apply-promotion, no mutation, no generated summaries/extraction/model calls, no editor contamination, and project-switch/selection safety.
+- Added regression coverage for project-switch separation, keyboard-save/editor gating, no OMI candidate/promotion flow into `approvedRecordsByCategory`, no API/backend helper drift, no mutation actions, approved-only empty-state preservation, App/Nav integration, OMI separation, Project Overview separation, OMI-guided setup non-canon behavior, and safety/no-prose boundaries.
+- Runtime fixes were not needed.
 
 ### `PHASE7-IMPL-009-T007` - Roadmap/status closeout
 
-- Close parent if all child tasks pass.
-- Move active frontier according to roadmap authority.
+- Recorded completed child tasks.
+- Marked the parent complete after closeout validation passed.
+- Moved the active frontier to the next published Phase 7 task (`PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke) according to roadmap authority.
 
 ## Acceptance Criteria
 
@@ -144,6 +147,20 @@ Exclude:
 - No generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, Dramatica analysis, training/JSONL/dataset changes, or browser/manual validation are added.
 - Existing Project Overview, Editor, OMI panel, project switching, and staged creation behavior remain stable.
 
+## Source-Level Contract Compatibility Notes
+
+The completed closeout preserves the source-level contract phrases used by PHASE7-IMPL-009 regression tests:
+
+- `Initial empty-state shell can avoid API changes` remains true; no frontend approved-memory API helper was added.
+- `No API is required for the initial approved-only empty-state shell` remains true; the shell renders static category structure and safe empty states without approved-memory API calls.
+- `No Memory / Canon routes` remains true for backend runtime source; no backend approved-memory routes were added.
+- `No approved-memory helper exists` remains true for `frontend/src/api.js`.
+- `Approved-memory read APIs unless a later contract proves they are needed` remains the deferred boundary for future read APIs.
+- Memory / Canon is integrated as a separate `workspace view`, not a document type.
+- `not become a document type` and `must not become a document type or save path` remain the editor/shared-document-controller boundary.
+- `not the dedicated Memory / Canon shell` remains true for `ProjectOverview.jsx`; the dedicated shell is `MemoryCanonShell.jsx`.
+- `preserve project overview/editor/omi panel separation` remains the App/Nav integration boundary.
+
 ## Validation Expectations
 
 For `PHASE7-IMPL-009-T001`:
@@ -154,6 +171,22 @@ For `PHASE7-IMPL-009-T001`:
 
 For later children, use source-level frontend tests and focused regressions named by each child prompt. Browser/manual validation remains under `PHASE7-IMPL-010`.
 
+## Final Completion Summary
+
+`PHASE7-IMPL-009` is complete as of the T007 closeout.
+
+Final outcome:
+
+- T001 created the inventory, task record, enrichment JSON, and initial status updates.
+- T002 locked the approved-memory shell data contract with source-level tests.
+- T003 added standalone `MemoryCanonShell.jsx`.
+- T004 integrated Memory / Canon as a separate `memory-canon` workspace view in App/ProjectNav.
+- T005 hardened per-category approved-only empty states for all required categories.
+- T006 added Memory / Canon shell regression coverage.
+- T007 closed out roadmap/status and moved the active frontier to `PHASE7-IMPL-010`.
+
+Delivered behavior remains read-only and approved-only. OMI candidates, approved-but-not-applied candidates, and promotion records are not displayed as approved canon. No backend approved-memory routes, backend approved-memory helpers, frontend approved-memory API helpers, apply-promotion, memory/canon mutation, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, training/JSONL/dataset work, metadata editing UI, note/material create/import/upload UI, or browser/manual validation were added. Browser/manual validation remains deferred to `PHASE7-IMPL-010` or another roadmap-authorized validation phase.
+
 ## Current Status
 
-`PHASE7-IMPL-009-T001` is in progress. This task creates the task record, inventory, enrichment JSON, and status updates before runtime implementation begins. The next child is `PHASE7-IMPL-009-T002` - Approved-memory shell data contract and source-level tests.
+`PHASE7-IMPL-009` is complete. The active Phase 7 frontier is `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.

@@ -3,8 +3,8 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-009",
-    "current_parent_task_title": "Memory / Canon shell (approved-only empty states)"
+    "current_parent_task_id": "PHASE7-IMPL-010",
+    "current_parent_task_title": "Workspace Validation / Browser and Manual Smoke"
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -205,7 +205,7 @@
       "id": "PHASE7-IMPL-009",
       "title": "Memory / Canon shell (approved-only empty states)",
       "type": "runtime",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-007"
@@ -227,7 +227,7 @@
       "id": "PHASE7-IMPL-010",
       "title": "Workspace Validation / Browser and Manual Smoke",
       "type": "validation",
-      "status": "future",
+      "status": "active_next",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-004",
@@ -856,7 +856,7 @@
       "id": "PHASE7-IMPL-009-T001",
       "title": "Memory / Canon shell inventory and child-task plan",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009"
@@ -874,7 +874,7 @@
       "id": "PHASE7-IMPL-009-T002",
       "title": "Approved-memory shell data contract and source-level tests",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009-T001"
@@ -892,7 +892,7 @@
       "id": "PHASE7-IMPL-009-T003",
       "title": "Memory / Canon shell component",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009-T002"
@@ -910,7 +910,7 @@
       "id": "PHASE7-IMPL-009-T004",
       "title": "ProjectNav/App integration",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009-T003"
@@ -928,7 +928,7 @@
       "id": "PHASE7-IMPL-009-T005",
       "title": "Approved-category empty-state coverage",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009-T004"
@@ -946,7 +946,7 @@
       "id": "PHASE7-IMPL-009-T006",
       "title": "Memory / Canon shell regression coverage",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009-T005"
@@ -964,7 +964,7 @@
       "id": "PHASE7-IMPL-009-T007",
       "title": "Roadmap/status closeout",
       "type": "runtime_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE7-IMPL-009",
       "depends_on": [
         "PHASE7-IMPL-009-T006"

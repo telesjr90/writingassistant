@@ -5,17 +5,16 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-009`.
-- Canonical title: Memory / Canon shell (approved-only empty states).
-- Last completed parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
-- Next parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
+- Immediate active parent task: `PHASE7-IMPL-010`.
+- Canonical title: Workspace Validation / Browser and Manual Smoke.
+- Last completed parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
+- Next parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
 - Completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
 - Completed parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
-- Completed closeout micro-task: `PHASE7-IMPL-008-T007` - Roadmap/status closeout.
-- Active child task: `PHASE7-IMPL-009-T001` - Memory / Canon shell inventory and child-task plan.
-- Next draft child task: `PHASE7-IMPL-009-T002` - Approved-memory shell data contract and source-level tests.
+- Completed parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
+- Completed closeout micro-task: `PHASE7-IMPL-009-T007` - Roadmap/status closeout.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -78,9 +77,21 @@ Final `PHASE7-IMPL-007` behavior adds Overview as a workspace view, not an owner
 
 Final `PHASE7-IMPL-008` behavior adds a frontend-transient OMI-guided staged project creation shell with owner-authored setup input, visible setup/candidate labels, review/cancel/reset behavior, and explicit final confirmation before the existing create-project path runs. Backend staged storage and backend staged routes are intentionally deferred. No staged backend API helpers, OMI writes during staged draft steps, hidden pre-confirmation project writes, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, training/JSONL/dataset changes, metadata editing UI, note/material create/import/upload UI, or browser/manual validation were added.
 
-`PHASE7-IMPL-009` is the active frontier according to `docs/roadmap/roadmap_index.yaml`, `docs/roadmap/task_backlog.md`, `docs/roadmap/phase_map.md`, and `docs/master_plan.md`. It is the Memory / Canon shell (approved-only empty states) parent task. The active child task is `PHASE7-IMPL-009-T001` - Memory / Canon shell inventory and child-task plan.
+`PHASE7-IMPL-009` is complete as of the T007 closeout. Completed child records:
 
-The Phase 7 child task sequence for `PHASE7-IMPL-009` is:
+- `PHASE7-IMPL-009-T001`: Memory / Canon shell inventory and child-task plan.
+- `PHASE7-IMPL-009-T002`: approved-memory shell data contract and source-level tests.
+- `PHASE7-IMPL-009-T003`: standalone `MemoryCanonShell.jsx` component.
+- `PHASE7-IMPL-009-T004`: App/ProjectNav integration as separate `memory-canon` workspace view.
+- `PHASE7-IMPL-009-T005`: per-category approved-only empty-state hardening.
+- `PHASE7-IMPL-009-T006`: Memory / Canon shell regression coverage.
+- `PHASE7-IMPL-009-T007`: roadmap/status closeout.
+
+Final `PHASE7-IMPL-009` behavior adds a read-only Memory / Canon workspace shell with approved-only empty states for characters, locations/settings, timeline, plot threads, continuity/consistency, open questions, relationships, organizations/groups, and objects/items. App/Nav integration exposes the shell as a separate `memory-canon` workspace view. OMI candidates, approved-but-not-applied candidates, and promotion records are not displayed as approved canon. No backend approved-memory routes, backend approved-memory helpers, frontend approved-memory API helpers, apply-promotion, memory/canon mutation, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, training/JSONL/dataset changes, metadata editing UI, note/material create/import/upload UI, or browser/manual validation were added. Browser/manual validation remains deferred to `PHASE7-IMPL-010`.
+
+`PHASE7-IMPL-010` is the active frontier according to `docs/roadmap/roadmap_index.yaml`, `docs/roadmap/task_backlog.md`, `docs/roadmap/phase_map.md`, and `docs/master_plan.md`. It is the Workspace Validation / Browser and Manual Smoke parent task.
+
+The Phase 7 child task sequence for `PHASE7-IMPL-009` was:
 
 - `PHASE7-IMPL-009-T001`: docs/status only; inventory, task record, enrichment JSON, and roadmap/status updates.
 - `PHASE7-IMPL-009-T002`: approved-memory shell data contract and source-level tests.
@@ -90,9 +101,7 @@ The Phase 7 child task sequence for `PHASE7-IMPL-009` is:
 - `PHASE7-IMPL-009-T006`: Memory / Canon shell regression coverage.
 - `PHASE7-IMPL-009-T007`: roadmap/status closeout.
 
-`PHASE7-IMPL-009` must remain read-only and approved-only. OMI candidates, approved-but-not-applied candidates, and promotion records are not canon. The parent must not add apply-promotion, memory/canon mutation, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, training/JSONL/dataset changes, metadata editing UI, note/material create/import/upload UI, or browser/manual validation.
-
-Browser/manual validation belongs under `PHASE7-IMPL-010`.
+`PHASE7-IMPL-010` must remain validation-only. It must not add runtime feature scope, apply-promotion, memory/canon mutation, generated prose, model calls, extraction, or training/JSONL/dataset work unless explicitly authorized by a separate roadmap task.
 
 Any prior smoke-test/manual-validation use of `PHASE7-IMPL-004` is a numbering drift issue, not a reason to renumber. Correct the reference by moving validation language under `PHASE7-IMPL-010` or a child task of `PHASE7-IMPL-010`; do not change the identity of `PHASE7-IMPL-004`.
 
