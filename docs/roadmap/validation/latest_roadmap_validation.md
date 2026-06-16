@@ -1,5 +1,42 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-001-T005 Writer Assistant Core Candidate Schema Contract Tests
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: tests-first contract coverage for `PHASE8-IMPL-001-T005`.
+- Parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests.
+- Active child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants.
+- Next child: `PHASE8-IMPL-001-T007` - Roadmap/status closeout.
+- Last completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests.
+- Prior completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision.
+- Source evidence:
+  - `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`
+  - `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`
+- Test file created:
+  - `tests/test_writer_assistant_core_candidate_schema_contract.py`
+- Contract summary:
+  - Requires future `backend.story_knowledge.candidate_schema` constants for candidate types, required fields, source locator fields, evidence/provenance fields, status values, owner decision values, destination values, and candidate target-category mapping.
+  - Locks candidate-first destination and target-category boundaries without implementing production constants.
+  - Adds module source-level assertions for no runtime/model/extraction/generation/import behavior once the constants module exists.
+- Targeted pytest:
+  - `python3 -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: BLOCKED before test collection because `/usr/bin/python3` does not have `pytest` installed (`No module named pytest`).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: expected red.
+  - Expected red failure cause: `ModuleNotFoundError: No module named 'backend.story_knowledge'`.
+  - The supplemental project-venv failure is limited to the missing future constants module/symbols for T006.
+- Updated:
+  - `tests/test_writer_assistant_core_candidate_schema_contract.py`
+  - `docs/roadmap/tasks/PHASE8-IMPL-001.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs/tests: PASS.
+- Boundary summary: tests-first only; no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, extraction, generated prose, backend routes, frontend files, production runtime code, package/dependency changes, project runtime files, training data, JSONL records, dataset manifests, apply-promotion, OMI candidate promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-001-T004 First Runtime Slice Decision
 
 - Date: 2026-06-16

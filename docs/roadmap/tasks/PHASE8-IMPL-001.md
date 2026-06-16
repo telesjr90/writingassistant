@@ -68,8 +68,8 @@ Include:
 2. `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Status: complete.
 3. `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Status: complete.
 4. `PHASE8-IMPL-001-T004` - First runtime slice decision. Status: complete.
-5. `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Status: ready.
-6. `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Status: planned.
+5. `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Status: complete.
+6. `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Status: ready.
 7. `PHASE8-IMPL-001-T007` - Roadmap/status closeout. Status: planned.
 
 ## Child Task Details
@@ -107,13 +107,16 @@ Include:
 
 ### `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests
 
-- Add source-level/contract tests for the selected first slice.
-- Lock candidate type constants expected by Writer Assistant Core, required field names, source locator fields, evidence/provenance fields, owner decision/status/destination fields, target category mapping, and forbidden runtime boundaries.
-- Tests-first preferred scope; do not implement production constants unless explicitly authorized by the T005 prompt.
+- Completed as tests-first contract coverage.
+- Added `tests/test_writer_assistant_core_candidate_schema_contract.py`.
+- Locked candidate type constants expected by Writer Assistant Core, required field names, source locator fields, evidence/provenance fields, owner decision/status/destination fields, target category mapping, and forbidden runtime boundaries.
+- Targeted pytest is expected red until T006 creates `backend.story_knowledge.candidate_schema` and the required symbols.
+- No production constants, runtime modules, extraction runtime, backend extraction routes, frontend extraction UI, model/Ollama calls, generated prose behavior, apply-promotion, OMI candidate promotion, or memory/canon mutation were added.
 - No extraction runtime, backend extraction routes, frontend extraction UI, model/Ollama calls, generated prose behavior, apply-promotion, OMI candidate promotion, or memory/canon mutation.
 
 ### `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants
 
+- Ready after T005.
 - Implement only enough constants/schema metadata to satisfy T005.
 - Keep the implementation constants-only unless a later task explicitly expands scope.
 - Preserve candidate-first, no-prose, no-promotion, evidence/provenance, and OMI review boundaries.
@@ -132,7 +135,8 @@ Include:
 - T002 is recorded as complete with context collection plan at `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md`.
 - T003 is complete and produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
 - T004 is complete and produced the accepted first runtime slice decision at `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md`.
-- T005 is the current ready child for Writer Assistant Core candidate schema contract tests.
+- T005 is complete with tests-first Writer Assistant Core candidate schema contract coverage.
+- T006 is the current ready child for Writer Assistant Core candidate schema constants.
 - The selected first runtime slice is Writer Assistant Core candidate schema constants plus source-level/contract tests.
 - OMI remains the candidate-first review and future promotion layer.
 - Candidate output, model output, NotebookLM output, extracted candidates, and planning notes remain non-canon until explicit owner review and future owner-controlled promotion.
@@ -158,6 +162,14 @@ For `PHASE8-IMPL-001-T004`:
 - `python3 scripts/validate_roadmap.py`
 - Non-LeanCTX whitespace check on changed docs
 
+For `PHASE8-IMPL-001-T005`:
+
+- `python3 -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+- Expected red until T006 creates `backend.story_knowledge.candidate_schema`.
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- Non-LeanCTX whitespace check on changed docs/tests
+
 For `PHASE8-IMPL-001-T001`:
 
 - `python3 scripts/check_enrichment.py`
@@ -179,4 +191,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Last completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T006` - Writer Assistant Core candidate schema constants. Last completed child: `PHASE8-IMPL-001-T005` - Writer Assistant Core candidate schema contract tests. Prior completed child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Prior completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
