@@ -18,6 +18,7 @@ APP_JSX = FRONTEND_SRC / "App.jsx"
 SHARED_DOCUMENT_CONTROLLER_JS = FRONTEND_SRC / "sharedDocumentController.js"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
 PROJECT_OVERVIEW_JSX = FRONTEND_SRC / "components" / "ProjectOverview.jsx"
+OMI_PANEL_JSX = FRONTEND_SRC / "components" / "OMIPanel.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
 PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
 BACKEND_MAIN_PY = BACKEND_SRC / "main.py"
@@ -26,6 +27,14 @@ TASK_007_MD = ROADMAP_ROOT / "tasks" / "PHASE7-IMPL-007.md"
 INVENTORY_007_MD = ROADMAP_ROOT / "inventory" / "PHASE7-IMPL-007.md"
 ENRICHMENT_007_JSON = ROADMAP_ROOT / "enrichment" / "PHASE7-IMPL-007.enrichment.json"
 PROJECT_OVERVIEW_SPEC_MD = ROADMAP_ROOT / "project_overview_page_spec.md"
+TASK_008_MD = ROADMAP_ROOT / "tasks" / "PHASE7-IMPL-008.md"
+INVENTORY_008_MD = ROADMAP_ROOT / "inventory" / "PHASE7-IMPL-008.md"
+ENRICHMENT_008_JSON = ROADMAP_ROOT / "enrichment" / "PHASE7-IMPL-008.enrichment.json"
+PROJECT_CREATION_SPEC_MD = ROADMAP_ROOT / "project_creation_flow_spec.md"
+OMI_GUIDED_CREATION_SPEC_MD = ROADMAP_ROOT / "omi_guided_project_creation_spec.md"
+OMI_SCHEMA_LIFECYCLE_MD = ROADMAP_ROOT / "omi_mvp_schema_lifecycle.md"
+OMI_STORAGE_MODEL_MD = ROADMAP_ROOT / "omi_storage_model.md"
+OMI_IDEAS_CANDIDATES_SPEC_MD = ROADMAP_ROOT / "omi_ideas_candidates_page_spec.md"
 
 
 def read_source(path: Path) -> str:
@@ -55,6 +64,11 @@ def project_nav_source() -> str:
 @pytest.fixture(scope="module")
 def project_overview_source() -> str:
     return read_source(PROJECT_OVERVIEW_JSX)
+
+
+@pytest.fixture(scope="module")
+def omi_panel_source() -> str:
+    return read_source(OMI_PANEL_JSX)
 
 
 @pytest.fixture(scope="module")
@@ -95,6 +109,46 @@ def enrichment_007_source() -> str:
 @pytest.fixture(scope="module")
 def project_overview_spec_source() -> str:
     return read_source(PROJECT_OVERVIEW_SPEC_MD)
+
+
+@pytest.fixture(scope="module")
+def task_008_source() -> str:
+    return read_source(TASK_008_MD)
+
+
+@pytest.fixture(scope="module")
+def inventory_008_source() -> str:
+    return read_source(INVENTORY_008_MD)
+
+
+@pytest.fixture(scope="module")
+def enrichment_008_source() -> str:
+    return read_source(ENRICHMENT_008_JSON)
+
+
+@pytest.fixture(scope="module")
+def project_creation_spec_source() -> str:
+    return read_source(PROJECT_CREATION_SPEC_MD)
+
+
+@pytest.fixture(scope="module")
+def omi_guided_creation_spec_source() -> str:
+    return read_source(OMI_GUIDED_CREATION_SPEC_MD)
+
+
+@pytest.fixture(scope="module")
+def omi_schema_lifecycle_source() -> str:
+    return read_source(OMI_SCHEMA_LIFECYCLE_MD)
+
+
+@pytest.fixture(scope="module")
+def omi_storage_model_source() -> str:
+    return read_source(OMI_STORAGE_MODEL_MD)
+
+
+@pytest.fixture(scope="module")
+def omi_ideas_candidates_spec_source() -> str:
+    return read_source(OMI_IDEAS_CANDIDATES_SPEC_MD)
 
 
 class TestApiProjectHelpers:
@@ -1332,6 +1386,367 @@ class TestProjectOverviewRegressionCoverage:
             "dataset",
         ):
             assert forbidden_term not in lower_source
+
+
+class TestOmiGuidedProjectCreationStagedFlowContract:
+    """PHASE7-IMPL-008-T002 source contract before staged-flow runtime work."""
+
+    def test_staged_setup_state_shape_is_documented_before_runtime_work(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        enrichment_008_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source, enrichment_008_source])
+        for concept in (
+            "raw idea",
+            "optional owner inputs",
+            "setup candidate entries with visible labels",
+            "selected initialization fields",
+            "status",
+            "final confirmation flag",
+            "timestamps",
+            "project ID preview",
+        ):
+            assert concept in combined_contract
+
+        for separation_rule in (
+            "separate from durable project truth",
+            "before final project creation",
+            "until the owner explicitly confirms",
+        ):
+            assert separation_rule in combined_contract
+
+    def test_owner_authored_input_only_and_no_generated_setup_contract(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        omi_guided_creation_spec_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [task_008_source, inventory_008_source, omi_guided_creation_spec_source]
+        )
+        for owner_input in (
+            "owner-authored inputs only",
+            "Raw idea",
+            "Working title",
+            "Owner-authored description",
+            "Owner-authored premise note",
+            "Owner-authored prose snippets",
+        ):
+            assert owner_input in combined_contract
+
+        for prohibited_output in (
+            "Generated prose",
+            "AI-written setup suggestions",
+            "AI-written premise copy",
+            "AI-written genre copy",
+            "AI-written sample openings",
+            "AI-written blurbs",
+            "AI-written summaries",
+        ):
+            assert prohibited_output in combined_contract
+
+    def test_visible_setup_candidate_labels_remain_required(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        omi_guided_creation_spec_source: str,
+        omi_panel_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [task_008_source, inventory_008_source, omi_guided_creation_spec_source]
+        )
+        for label_contract in (
+            "Setup candidates are not canon",
+            "visibly labeled as candidates",
+            "Setup candidate: project title",
+            "Setup candidate: genre tag",
+            "Setup candidate: premise note",
+            "Setup candidate: character note",
+            "not initialize `project.json`",
+        ):
+            assert label_contract in combined_contract
+
+        for existing_visible_label in (
+            "Project bible candidate",
+            "Storyform context candidate",
+            "Scene prompt context candidate",
+            "Pending",
+            "Approved",
+            "Rejected",
+            "Needs revision",
+        ):
+            assert existing_visible_label in omi_panel_source
+
+    def test_final_confirmation_boundary_blocks_hidden_project_creation(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        omi_guided_creation_spec_source: str,
+        backend_main_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [task_008_source, inventory_008_source, omi_guided_creation_spec_source]
+        )
+        for final_confirmation_term in (
+            "final confirmation step",
+            "explicit final confirmation",
+            "before confirmation",
+            "after confirmation",
+            "final_confirmation",
+            "No hidden project writes during wizard steps",
+        ):
+            assert final_confirmation_term in combined_contract
+
+        assert "POST /api/projects/from-omi" in combined_contract
+        assert "/api/projects/from-omi" not in backend_main_source
+        assert "class ProjectCreate" in backend_main_source
+        assert '@app.post("/api/projects")' in backend_main_source
+
+    def test_no_hidden_project_writes_before_confirmation_contract(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        app_source: str,
+        api_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for forbidden_pre_confirmation_write in (
+            "`project.json`",
+            "`bible.json`",
+            "`storyform.json`",
+            "scenes, chapters, notes, materials",
+            "memory/canon",
+            "OMI promotion records",
+        ):
+            assert forbidden_pre_confirmation_write in combined_contract
+
+        for staged_helper in (
+            "createOMISetup",
+            "updateOMISetup",
+            "createProjectFromOMISetup",
+            "fetchOMISetup",
+            "from-omi",
+        ):
+            assert staged_helper not in app_source
+            assert staged_helper not in api_source
+
+    def test_blank_project_creation_compatibility_is_locked(
+        self,
+        app_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+        project_creation_spec_source: str,
+    ) -> None:
+        assert "createProject(trimmedTitle)" in app_source
+        assert "export async function createProject(title)" in api_source
+        assert "client.post('/projects', { title })" in api_source
+        assert '@app.post("/api/projects")' in backend_main_source
+        assert "return project_manager.create_project(title=payload.title)" in backend_main_source
+        assert "def create_project(" in project_manager_source
+        assert "derive_project_id" in project_manager_source
+        assert "validate_project_id" in project_manager_source
+        assert "resolve_project_id_with_collision" in project_manager_source
+        assert "Project creation must follow these principles" in project_creation_spec_source
+        assert "Blank project creation is the first implementation path." in project_creation_spec_source
+
+    def test_project_id_preview_must_reuse_safe_creation_rules_without_writes(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        project_creation_spec_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source, project_creation_spec_source])
+        for preview_contract in (
+            "project ID preview",
+            "exact `project_id`",
+            "project_id",
+            "derive_project_id",
+            "validate_project_id",
+            "collision",
+        ):
+            assert preview_contract in combined_contract or preview_contract in project_manager_source
+
+        for helper_name in (
+            "def derive_project_id(",
+            "def validate_project_id(",
+            "def resolve_project_id_with_collision(",
+        ):
+            assert helper_name in project_manager_source
+
+        assert "preview must not create a project directory" not in project_manager_source.lower()
+
+    def test_cancel_project_switch_and_completion_cleanup_contract(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        app_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for cleanup_term in (
+            "clear stale setup draft state on cancel",
+            "on project switch",
+            "on completion",
+            "on app reload",
+            "no auto-resume of abandoned staged setup",
+        ):
+            assert cleanup_term in combined_contract
+
+        assert "handleSelectProject" in app_source
+        assert "UNSAVED_PROJECT_SWITCH_MESSAGE" in app_source
+        assert "setActiveProjectId(projectId)" in app_source
+
+    def test_omi_compatibility_stays_candidate_only_until_owner_confirmation(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        omi_guided_creation_spec_source: str,
+        omi_schema_lifecycle_source: str,
+        omi_storage_model_source: str,
+        omi_ideas_candidates_spec_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [
+                task_008_source,
+                inventory_008_source,
+                omi_guided_creation_spec_source,
+                omi_schema_lifecycle_source,
+                omi_storage_model_source,
+                omi_ideas_candidates_spec_source,
+            ]
+        )
+        for omi_boundary in (
+            "candidate-only",
+            "not canon",
+            "must not be auto-promoted",
+            "Promotion records remain audit-only",
+            "apply-promotion",
+            "memory/canon mutation",
+            "project-local OMI records",
+            "after final confirmation",
+        ):
+            assert omi_boundary in combined_contract
+
+    def test_backend_staged_setup_helpers_are_optional_future_work(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for optional_contract in (
+            "if needed",
+            "transient frontend state",
+            "staged setup route",
+            "Reuse `_safe_path_component`/`validate_project_id` patterns",
+            "reuse the same ID validation",
+            "path safety",
+            "No staged setup helpers exist yet",
+        ):
+            assert optional_contract in combined_contract
+
+        for absent_backend_surface in (
+            "create_staged_setup",
+            "load_staged_setup",
+            "update_staged_setup",
+            "finalize_staged_setup",
+            "project-setups",
+            "from-omi",
+        ):
+            assert absent_backend_surface not in backend_main_source
+            assert absent_backend_surface not in project_manager_source
+
+    def test_frontend_integration_surface_is_future_and_separate_from_editor(
+        self,
+        task_008_source: str,
+        inventory_008_source: str,
+        app_source: str,
+        api_source: str,
+        project_nav_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_008_source, inventory_008_source])
+        for future_surface in (
+            "frontend/src/App.jsx",
+            "frontend/src/api.js",
+            "staged creation wizard",
+            "Routing the owner to the Project Overview shell",
+            "The shared owner-authored editor must not be reached from the staged setup wizard.",
+        ):
+            assert future_surface in combined_contract
+
+        assert "Create blank project" in project_nav_source
+        assert "handleCreateProject" in app_source
+        assert "createProject(title)" in api_source
+        assert "OMI-guided" not in app_source
+        assert "OMI-guided" not in project_nav_source
+        assert "StagedSetupWizard" not in app_source
+        assert "selectedDocumentType" in app_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            APP_JSX,
+            API_JS,
+            PROJECT_NAV_JSX,
+            PROJECT_OVERVIEW_JSX,
+            PROJECT_CONTEXT_JSX,
+            EDITOR_JSX,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+        ],
+    )
+    def test_frontend_runtime_sources_exclude_staged_flow_forbidden_terms(
+        self, source_path: Path
+    ) -> None:
+        lower_source = read_source(source_path).lower()
+        for forbidden_term in (
+            "generated setup",
+            "generated prose",
+            "ai-written setup",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "hidden project write",
+            "training data",
+            "jsonl",
+            "dataset",
+        ):
+            assert forbidden_term not in lower_source
+
+    def test_backend_runtime_has_no_staged_setup_or_hidden_write_surface(
+        self, backend_main_source: str, project_manager_source: str
+    ) -> None:
+        for source in (backend_main_source, project_manager_source):
+            for absent_surface in (
+                "project-setups",
+                "projects/from-omi",
+                "create_project_from_omi",
+                "staged_setup",
+                "setup_id",
+                "hidden project write",
+                "generated setup",
+                "ai-written setup",
+                "model call",
+                "semantic search",
+            ):
+                assert absent_surface not in source.lower()
 
 
 class TestSceneMetadataDisplayCompatibility:
