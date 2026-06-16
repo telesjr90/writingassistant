@@ -18,6 +18,7 @@ APP_JSX = FRONTEND_SRC / "App.jsx"
 SHARED_DOCUMENT_CONTROLLER_JS = FRONTEND_SRC / "sharedDocumentController.js"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
 PROJECT_OVERVIEW_JSX = FRONTEND_SRC / "components" / "ProjectOverview.jsx"
+MEMORY_CANON_SHELL_JSX = FRONTEND_SRC / "components" / "MemoryCanonShell.jsx"
 OMI_GUIDED_PROJECT_CREATION_JSX = FRONTEND_SRC / "components" / "OmiGuidedProjectCreation.jsx"
 OMI_PANEL_JSX = FRONTEND_SRC / "components" / "OMIPanel.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
@@ -86,6 +87,11 @@ def project_nav_source() -> str:
 @pytest.fixture(scope="module")
 def project_overview_source() -> str:
     return read_source(PROJECT_OVERVIEW_JSX)
+
+
+@pytest.fixture(scope="module")
+def memory_canon_shell_source() -> str:
+    return read_source(MEMORY_CANON_SHELL_JSX)
 
 
 @pytest.fixture(scope="module")
@@ -3334,6 +3340,233 @@ class TestApprovedMemoryCanonShellContract:
         for forbidden_term in forbidden_terms:
             assert forbidden_term not in lower_source, (
                 f"{source_path.relative_to(REPO_ROOT)} must not contain T002-forbidden term {forbidden_term!r}"
+            )
+
+
+class TestMemoryCanonShellComponent:
+    """PHASE7-IMPL-009-T003 source checks for standalone Memory / Canon shell."""
+
+    CATEGORY_CONTRACTS = (
+        ("characters", "Characters"),
+        ("locations_settings", "Locations / Settings"),
+        ("timeline", "Timeline"),
+        ("plot_threads", "Plot Threads"),
+        ("continuity_consistency", "Continuity / Consistency"),
+        ("open_questions", "Open Questions"),
+        ("relationships", "Relationships"),
+        ("organizations_groups", "Organizations / Groups"),
+        ("objects_items", "Objects / Items"),
+    )
+
+    @staticmethod
+    def _runtime_source_without_comments(source: str) -> str:
+        return TestOmiGuidedProjectCreationBackendStorageDecision._without_line_comments(
+            source
+        )
+
+    def test_memory_canon_shell_component_exists_and_exports_contract(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        assert MEMORY_CANON_SHELL_JSX.exists()
+        assert "export const APPROVED_MEMORY_CATEGORIES" in memory_canon_shell_source
+        assert "export default function MemoryCanonShell" in memory_canon_shell_source
+        assert "Object.freeze([" in memory_canon_shell_source
+
+    def test_approved_memory_category_definitions_are_static_and_complete(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        categories_block = memory_canon_shell_source.split(
+            "export const APPROVED_MEMORY_CATEGORIES", 1
+        )[1].split("]);", 1)[0]
+
+        for category_id, label in self.CATEGORY_CONTRACTS:
+            assert f"id: '{category_id}'" in categories_block
+            assert f"label: '{label}'" in categories_block
+
+        for required_field in ("description", "emptyTitle", "emptyBody"):
+            assert required_field in categories_block
+
+    def test_approved_only_empty_state_and_boundary_copy_is_visible(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        lower_source = memory_canon_shell_source.lower()
+        for required_copy in (
+            "memory / canon",
+            "approved-only",
+            "approved records",
+            "empty-state",
+            "no approved",
+            "candidate records remain",
+            "omi/candidate review",
+            "promotion/audit records are not canon by",
+            "read-only shell",
+            "no apply-promotion in this phase",
+            "no memory/canon mutation in this phase",
+        ):
+            assert required_copy in lower_source
+
+    def test_component_is_prop_driven_and_read_only(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        assert "projectTitle" in memory_canon_shell_source
+        assert "approvedRecordsByCategory = {}" in memory_canon_shell_source
+        assert "className = ''" in memory_canon_shell_source
+        assert "getCategoryRecords(approvedRecordsByCategory, category.id)" in (
+            memory_canon_shell_source
+        )
+        assert "Array.isArray(records)" in memory_canon_shell_source
+        assert "records.length" in memory_canon_shell_source
+
+        for forbidden_source_dependency in (
+            "fetch(",
+            "axios",
+            "../api",
+            "../api.js",
+            "from './api",
+            "from '../api",
+            "OMIPanel",
+            "Editor",
+            "sharedDocumentController",
+        ):
+            assert forbidden_source_dependency not in memory_canon_shell_source
+
+    def test_component_exposes_no_mutation_actions_or_controls(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        for forbidden_action_surface in (
+            "<button",
+            "onClick",
+            "handleApprove",
+            "handlePromote",
+            "handleApply",
+            "handleSave",
+            "handleEdit",
+            "handleDelete",
+            "applyPromotion",
+            "saveCanon",
+            "saveMemory",
+            "createApproved",
+            "createCanon",
+            "updateCanon",
+            "deleteCanon",
+            "editCanon",
+            "importCanon",
+            "uploadCanon",
+            "extractCharacters",
+            "generateCanon",
+            "summarizeCanon",
+        ):
+            assert forbidden_action_surface not in memory_canon_shell_source
+
+    def test_component_has_no_backend_or_approved_memory_api_dependency(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        for forbidden_api_surface in (
+            "fetch(",
+            "axios",
+            "fetchApprovedMemory",
+            "fetchCanon",
+            "saveApprovedMemory",
+            "saveCanon",
+            "getApprovedMemory",
+            "getCanon",
+        ):
+            assert forbidden_api_surface not in memory_canon_shell_source
+
+        for forbidden_route in (
+            "/memory-canon",
+            "/approved-memory",
+            "/canon",
+            "/memory",
+        ):
+            assert re.search(rf"['\"`]({re.escape(forbidden_route)})['\"`]", memory_canon_shell_source) is None
+
+    def test_component_is_not_integrated_into_app_or_project_nav_yet(
+        self, app_source: str, project_nav_source: str
+    ) -> None:
+        assert "MemoryCanonShell" not in app_source
+        assert "MemoryCanonShell" not in project_nav_source
+        assert "Memory / Canon" not in project_nav_source
+        assert "WORKSPACE_VIEWS.MEMORY" not in app_source
+        assert "WORKSPACE_VIEWS.CANON" not in app_source
+
+    def test_component_excludes_omi_candidates_as_approved_canon(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        assert "OMIPanel" not in memory_canon_shell_source
+        assert "omiCandidates" not in memory_canon_shell_source
+        assert "candidates =" not in memory_canon_shell_source
+        assert "candidate records remain" in memory_canon_shell_source.lower()
+        assert "not canon" in memory_canon_shell_source.lower()
+        assert "candidate-only" in memory_canon_shell_source.lower()
+
+    def test_component_remains_separate_from_editor_document_paths(
+        self, memory_canon_shell_source: str
+    ) -> None:
+        for forbidden_editor_surface in (
+            "Editor",
+            "sharedDocumentController",
+            "DOCUMENT_TYPES",
+            "selectedDocumentType",
+            "saveScene",
+            "saveNote",
+            "saveMaterial",
+            "bodyContent",
+            "setBodyContent",
+            "dirty",
+        ):
+            assert forbidden_editor_surface not in memory_canon_shell_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            MEMORY_CANON_SHELL_JSX,
+            APP_JSX,
+            API_JS,
+            PROJECT_NAV_JSX,
+            PROJECT_OVERVIEW_JSX,
+            OMI_PANEL_JSX,
+            OMI_GUIDED_PROJECT_CREATION_JSX,
+            EDITOR_JSX,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+        ],
+    )
+    def test_runtime_sources_exclude_t003_forbidden_memory_canon_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
+        lower_source = lower_source.replace("no apply-promotion in this phase", "")
+        forbidden_terms = (
+            "generated prose",
+            "ai-written",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "approved truth mutation",
+            "hidden project write",
+            "jsonl",
+            "dataset",
+        )
+        for forbidden_term in forbidden_terms:
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T003-forbidden term {forbidden_term!r}"
             )
 
 
