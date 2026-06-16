@@ -18,6 +18,7 @@ APP_JSX = FRONTEND_SRC / "App.jsx"
 SHARED_DOCUMENT_CONTROLLER_JS = FRONTEND_SRC / "sharedDocumentController.js"
 PROJECT_NAV_JSX = FRONTEND_SRC / "components" / "ProjectNav.jsx"
 PROJECT_OVERVIEW_JSX = FRONTEND_SRC / "components" / "ProjectOverview.jsx"
+OMI_GUIDED_PROJECT_CREATION_JSX = FRONTEND_SRC / "components" / "OmiGuidedProjectCreation.jsx"
 OMI_PANEL_JSX = FRONTEND_SRC / "components" / "OMIPanel.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
 PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
@@ -64,6 +65,11 @@ def project_nav_source() -> str:
 @pytest.fixture(scope="module")
 def project_overview_source() -> str:
     return read_source(PROJECT_OVERVIEW_JSX)
+
+
+@pytest.fixture(scope="module")
+def omi_guided_project_creation_source() -> str:
+    return read_source(OMI_GUIDED_PROJECT_CREATION_JSX)
 
 
 @pytest.fixture(scope="module")
@@ -2199,6 +2205,252 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
         ):
             assert forbidden_term not in lower_source, (
                 f"{source_path.relative_to(REPO_ROOT)} must not contain T004-forbidden term {forbidden_term!r}"
+            )
+
+
+class TestOmiGuidedProjectCreationFrontendShell:
+    """PHASE7-IMPL-008-T005 source contract for the transient frontend shell."""
+
+    @staticmethod
+    def _runtime_source_without_comments(source: str) -> str:
+        return TestOmiGuidedProjectCreationBackendStorageDecision._without_line_comments(
+            source
+        )
+
+    def test_component_exists_and_exports_default(
+        self, omi_guided_project_creation_source: str
+    ) -> None:
+        assert OMI_GUIDED_PROJECT_CREATION_JSX.exists()
+        assert "export default function OmiGuidedProjectCreation({" in (
+            omi_guided_project_creation_source
+        )
+
+    def test_component_uses_frontend_transient_local_state_only(
+        self, omi_guided_project_creation_source: str
+    ) -> None:
+        for local_state_token in (
+            "import { useMemo, useState } from 'react';",
+            "const [draft, setDraft] = useState(INITIAL_DRAFT)",
+            "const [step, setStep] = useState(STEPS.SETUP)",
+            "const [finalConfirmation, setFinalConfirmation] = useState(false)",
+            "function resetDraft()",
+        ):
+            assert local_state_token in omi_guided_project_creation_source
+
+        for forbidden_dependency in (
+            "../api",
+            "fetch(",
+            "client.",
+            "axios",
+            "localStorage",
+            "sessionStorage",
+            "createOMIIdea",
+            "createOMICandidate",
+            "createOMIPromotion",
+            "runStoryCheck",
+            "saveBible",
+            "saveStoryform",
+            "saveScene",
+            "saveNote",
+            "saveMaterial",
+        ):
+            assert forbidden_dependency not in omi_guided_project_creation_source
+
+    def test_owner_authored_labels_and_candidate_boundaries_are_visible(
+        self, omi_guided_project_creation_source: str
+    ) -> None:
+        for required_label in (
+            "Owner-authored setup only",
+            "Owner-authored setup idea",
+            "Owner-authored setup notes",
+            "Setup draft",
+            "Setup candidate",
+            "Candidate planning data",
+            "not approved project truth",
+            "not canon",
+            "not memory",
+        ):
+            assert required_label in omi_guided_project_creation_source
+
+    def test_review_step_and_final_confirmation_gate_creation_callback(
+        self, omi_guided_project_creation_source: str
+    ) -> None:
+        for expected_step_token in (
+            "SETUP: 'setup'",
+            "REVIEW: 'review'",
+            "setStep(STEPS.REVIEW)",
+            "aria-label=\"Review setup draft\"",
+            "checked={finalConfirmation}",
+            "const canCreate = canReview && finalConfirmation && !disabled",
+            "disabled={!canCreate}",
+        ):
+            assert expected_step_token in omi_guided_project_creation_source
+
+        final_create_body = omi_guided_project_creation_source.split(
+            "async function handleFinalCreate(event)",
+            1,
+        )[1].split("\n  return (", 1)[0]
+        assert "event.preventDefault()" in final_create_body
+        assert "if (!canCreate || typeof onCreateProject !== 'function')" in final_create_body
+        assert "await onCreateProject(trimmedDraft.projectTitle)" in final_create_body
+        assert "resetDraft()" in final_create_body
+        assert "onComplete?.()" in final_create_body
+
+    def test_cancel_and_back_paths_clear_transient_state_without_backend_cleanup(
+        self, omi_guided_project_creation_source: str
+    ) -> None:
+        cancel_body = omi_guided_project_creation_source.split(
+            "function handleCancel()",
+            1,
+        )[1].split("\n  function handleReview", 1)[0]
+        assert "resetDraft()" in cancel_body
+        assert "onCancel?.()" in cancel_body
+
+        for cleanup_forbidden in (
+            "deleteStagedSetup",
+            "clearSetupDraft",
+            "fetch(",
+            "client.",
+            "cleanup",
+            "/setup",
+        ):
+            assert cleanup_forbidden not in cancel_body
+
+        assert "setFinalConfirmation(false)" in omi_guided_project_creation_source
+        assert "Back to setup draft" in omi_guided_project_creation_source
+
+    def test_app_imports_renders_and_uses_existing_create_project_callback(
+        self, app_source: str
+    ) -> None:
+        assert "import OmiGuidedProjectCreation from './components/OmiGuidedProjectCreation.jsx';" in (
+            app_source
+        )
+        assert "<OmiGuidedProjectCreation" in app_source
+        shell_render = app_source.split("<OmiGuidedProjectCreation", 1)[1].split("/>", 1)[0]
+        assert "onCreateProject={handleCreateProject}" in shell_render
+        assert "disabled={isCreatingProject}" in shell_render
+        assert "setCreateProjectError('')" in shell_render
+        assert "setCreateProjectStatus('')" in shell_render
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)" in shell_render
+        assert "createProject(trimmedTitle)" in app_source
+        assert "await loadProjects()" in app_source
+        assert "setActiveProjectId(newProjectId)" in app_source
+
+    def test_blank_project_creation_remains_present_and_additive(
+        self, app_source: str, project_nav_source: str
+    ) -> None:
+        assert "onCreateProject={handleCreateProject}" in app_source
+        assert "aria-label=\"Create blank project\"" in project_nav_source
+        assert "Create blank project" in project_nav_source
+        assert "handleCreateProjectSubmit" in project_nav_source
+        assert "const created = await onCreateProject(trimmedProjectTitle)" in project_nav_source
+        assert "OmiGuidedProjectCreation" not in project_nav_source
+
+    def test_no_staged_backend_api_or_route_dependency_was_added(
+        self,
+        omi_guided_project_creation_source: str,
+        app_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_runtime = "\n".join(
+            [
+                omi_guided_project_creation_source,
+                app_source,
+                api_source,
+                backend_main_source,
+                project_manager_source,
+            ]
+        )
+        for forbidden_staged_dependency in (
+            "/staged-setup",
+            "/setup-drafts",
+            "/project-setup",
+            "/omi-guided-setup",
+            "createStagedSetup",
+            "saveSetupDraft",
+            "fetchSetupDraft",
+            "finalizeSetupDraft",
+            "fetchOmiGuidedSetup",
+            "createProjectFromOMISetup",
+            "create_staged_setup",
+            "finalize_staged_setup",
+            "create_project_from_omi",
+            "projects/from-omi",
+        ):
+            assert forbidden_staged_dependency not in combined_runtime
+
+        assert "export async function createProject(title)" in api_source
+        assert "client.post('/projects', { title })" in api_source
+
+    def test_editor_overview_and_omi_runtime_paths_remain_separate(
+        self, app_source: str, omi_guided_project_creation_source: str
+    ) -> None:
+        shell_render = app_source.split("<OmiGuidedProjectCreation", 1)[1].split("/>", 1)[0]
+        for forbidden_shell_prop in (
+            "onCreateIdea",
+            "onCreateCandidate",
+            "onCreatePromotion",
+            "onRunStoryCheck",
+            "onSave",
+            "selectedDocumentId",
+            "documentType",
+        ):
+            assert forbidden_shell_prop not in shell_render
+
+        for forbidden_component_token in (
+            "OMIPanel",
+            "Editor",
+            "ProjectContext",
+            "AnalysisSidebar",
+            "createOMI",
+            "Promotion",
+        ):
+            assert forbidden_component_token not in omi_guided_project_creation_source
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            OMI_GUIDED_PROJECT_CREATION_JSX,
+            APP_JSX,
+            API_JS,
+            OMI_PANEL_JSX,
+            PROJECT_OVERVIEW_JSX,
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+        ],
+    )
+    def test_runtime_sources_exclude_t005_forbidden_shell_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        for forbidden_term in (
+            "generated setup",
+            "generated prose",
+            "ai-written setup",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply-promotion",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "hidden project write",
+            "jsonl",
+            "dataset",
+        ):
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T005-forbidden term {forbidden_term!r}"
             )
 
 

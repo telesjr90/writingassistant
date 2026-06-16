@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import ProjectNav from './components/ProjectNav.jsx';
 import ProjectOverview from './components/ProjectOverview.jsx';
+import OmiGuidedProjectCreation from './components/OmiGuidedProjectCreation.jsx';
 import Editor from './components/Editor.jsx';
 import AnalysisSidebar from './components/AnalysisSidebar.jsx';
 import ProjectContext from './components/ProjectContext.jsx';
@@ -879,6 +880,17 @@ export default function App() {
         onSelectMaterial={handleSelectMaterial}
       />
       <main className="editor-column" aria-label="Project workspace">
+        <OmiGuidedProjectCreation
+          onCreateProject={handleCreateProject}
+          disabled={isCreatingProject}
+          onCancel={() => {
+            setCreateProjectError('');
+            setCreateProjectStatus('');
+          }}
+          onComplete={() => {
+            setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
+          }}
+        />
         {activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (
           <ProjectOverview
             project={activeProject}
