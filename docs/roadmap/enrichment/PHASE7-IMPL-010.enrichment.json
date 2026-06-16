@@ -3,7 +3,7 @@
   "task_id": "PHASE7-IMPL-010",
   "title": "Workspace Validation / Browser and Manual Smoke",
   "type": "validation",
-  "status": "active_next",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE7-IMPL-004",
@@ -87,7 +87,10 @@
     "quality_notes": [
       "T001 creates inventory, task record, enrichment JSON, and roadmap/status updates only.",
       "Validation confirms completed workspace behavior from PHASE7-IMPL-004 through PHASE7-IMPL-009.",
-      "Browser/manual validation execution remains deferred until T004.",
+      "T004 browser/manual smoke was PARTIAL due to Playwright libnspr4.so missing and unavailable browser MCP.",
+      "T005 triage found no product defect and no runtime repair required.",
+      "T006 final automated regression pass passed on first run.",
+      "T007 closeout marks published Phase 7 parent sequence complete; next frontier requires owner/roadmap confirmation."
     ]
   },
   "validation_surfaces": {
@@ -218,16 +221,26 @@
       "id": "PHASE7-IMPL-010-T007",
       "title": "Roadmap/status closeout",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-010-T006"
       ],
       "scope": [
-        "Record completed validation children.",
-        "Mark parent complete after closeout validation passes.",
-        "Move active frontier to next roadmap-authorized task."
+        "Recorded completed validation children T001 through T007.",
+        "Marked parent complete after closeout validation passed.",
+        "Updated roadmap/status docs with final validation outcome and deferred interactive browser notes.",
+        "Published Phase 7 parent sequence complete; next frontier requires owner/roadmap confirmation."
       ]
     }
+  ],
+  "final_outcome": [
+    "Automated regression validation passed in T002 and T006.",
+    "Browser/manual smoke was attempted in T004 with PARTIAL result due to Playwright libnspr4.so missing and unavailable browser MCP; no confirmed product blocker.",
+    "T005 triage found no runtime repair required.",
+    "Interactive UI flows D, E, H, I, J, K, and L remain deferred for owner/environment rerun when browser tooling is available.",
+    "Note/material browser flows F/G remain deferred unless controlled fixtures are authorized later.",
+    "Local smoke artifact projects/smoke-blank-1781586974/ must remain uncommitted.",
+    "No generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, frontend approved-memory API helpers, metadata editing UI, note/material create/import/upload UI, runtime features, package/dependency changes, or training/JSONL/dataset work was added."
   ],
   "acceptance_criteria": [
     "Validation scope for PHASE7-IMPL-004 through PHASE7-IMPL-009 is documented before execution children run.",
@@ -251,8 +264,9 @@
     "Validation must not silently promote candidates, create memory/*.json, or mutate durable project truth except through explicit owner/test temp paths during smoke."
   ],
   "deferred_work": [
-    "Browser/manual smoke execution until T004.",
-    "Validation repair until T005 and only if issues are found.",
+    "Interactive browser validation rerun when Playwright system deps or browser MCP are available (flows D, E, H, I, J, K, L).",
+    "Note/material browser flows F/G unless controlled fixtures are authorized later.",
+    "Next published parent/child frontier after Phase 7 closeout (requires owner/roadmap confirmation).",
     "Apply-promotion and durable memory/canon mutation.",
     "Extraction, semantic search, generated summaries, and Story Check auto-runs.",
     "Metadata editing UI and note/material create/import/upload UI.",

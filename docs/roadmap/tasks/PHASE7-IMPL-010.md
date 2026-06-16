@@ -78,7 +78,7 @@ Exclude:
 4. `PHASE7-IMPL-010-T004` - Browser/manual smoke execution. Status: complete (PARTIAL).
 5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: complete.
 6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: complete.
-7. `PHASE7-IMPL-010-T007` - Roadmap/status closeout. Status: ready.
+7. `PHASE7-IMPL-010-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -122,9 +122,10 @@ Exclude:
 
 ### `PHASE7-IMPL-010-T007` - Roadmap/status closeout
 
-- Record completed validation children.
-- Mark the parent complete after closeout validation passes.
-- Move the active frontier to the next roadmap-authorized task.
+- Recorded completed validation children T001 through T007.
+- Marked the parent complete after closeout validation passed.
+- Updated roadmap/status docs with final validation outcome, deferred interactive browser notes, and local smoke artifact guidance.
+- Published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete; next parent/child frontier requires owner/roadmap confirmation because no next published parent exists in `docs/roadmap/roadmap_index.yaml`.
 
 ## Acceptance Criteria
 
@@ -146,12 +147,39 @@ For `PHASE7-IMPL-010-T001`:
 
 For `PHASE7-IMPL-010-T002` and later children, use the validation commands named by each child prompt, including focused pytest suites and roadmap validators as applicable.
 
+## Final Completion Summary
+
+`PHASE7-IMPL-010` is complete as of the T007 closeout.
+
+Final outcome:
+
+- T001 created the inventory, task record, enrichment JSON, and initial roadmap/status updates.
+- T002 ran automated regression validation; all relevant pytest suites passed on first run.
+- T003 created the browser/manual smoke checklist (`docs/roadmap/validation/PHASE7-IMPL-010-browser-smoke-checklist.md`).
+- T004 executed browser/manual smoke with PARTIAL overall result because Playwright Chromium failed (`libnspr4.so` missing) and Cursor browser MCP was unavailable; API/server-log/frontend-source fallback used for blocked flows.
+- T005 triaged T004 results; no product defect confirmed; no runtime repair authorized.
+- T006 reran roadmap validators and relevant automated tests; all passed on first run.
+- T007 closed out roadmap/status and recorded the published Phase 7 parent sequence as complete.
+
+Validation outcome:
+
+- Automated regression validation passed (T002 and T006).
+- Browser/manual smoke was attempted (T004) with PARTIAL result due to environment/browser tooling limits, not a confirmed product blocker.
+- No runtime repair was required or performed (T005).
+- Interactive UI flows D, E, H, I, J, K, and L remain deferred for owner/environment rerun when browser tooling is available.
+- Note/material browser flows F/G remain deferred unless controlled fixtures are authorized later.
+
+Local smoke artifact (must remain uncommitted): `projects/smoke-blank-1781586974/`.
+
+`PHASE7-IMPL-010` did not add generated prose, summaries, extraction, semantic search, Story Check auto-runs, model calls, Ollama calls, apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, frontend approved-memory API helpers, metadata editing UI, note/material create/import/upload UI, runtime features, package/dependency changes, or training/JSONL/dataset work.
+
 ## Current Status
 
-`PHASE7-IMPL-010` is the active Phase 7 frontier.
+`PHASE7-IMPL-010` is complete. The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete.
 
-- Active child: `PHASE7-IMPL-010-T007` — Roadmap/status closeout.
-- Last completed child: `PHASE7-IMPL-010-T006` — Final validation regression pass.
+- Last completed child: `PHASE7-IMPL-010-T007` — Roadmap/status closeout.
+- Prior completed child: `PHASE7-IMPL-010-T006` — Final validation regression pass.
 - Prior completed child: `PHASE7-IMPL-010-T005` — Validation repair triage.
 - Prior completed child: `PHASE7-IMPL-010-T004` — Browser/manual smoke execution (PARTIAL).
-- Last completed parent: `PHASE7-IMPL-009` — Memory / Canon shell (approved-only empty states).
+- Last completed parent: `PHASE7-IMPL-010` — Workspace Validation / Browser and Manual Smoke.
+- Next parent/child: requires owner/roadmap confirmation; no next published parent exists in `docs/roadmap/roadmap_index.yaml`.

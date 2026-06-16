@@ -4,22 +4,23 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 
 ## Active Frontier
 
-- Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-010`.
-- Canonical title: Workspace Validation / Browser and Manual Smoke.
-- Active child task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
-- Next child task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
-- Last completed child task: `PHASE7-IMPL-010-T006` - Final validation regression pass.
+- Current track: Project Workspace Foundation (published Phase 7 parent sequence complete).
+- Immediate active parent task: none published; next parent/child requires owner/roadmap confirmation.
+- Last completed child task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
+- Prior completed child: `PHASE7-IMPL-010-T006` - Final validation regression pass.
 - Prior completed child: `PHASE7-IMPL-010-T005` - Validation repair triage.
 - Prior completed child: `PHASE7-IMPL-010-T004` - Browser/manual smoke execution (PARTIAL).
-- Last completed parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
-- Next parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
-- Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
-- Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
-- Completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
-- Completed parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
+- Last completed parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
+- Completed parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
 - Completed parent task: `PHASE7-IMPL-009` - Memory / Canon shell (approved-only empty states).
-- Completed closeout micro-task: `PHASE7-IMPL-009-T007` - Roadmap/status closeout.
+- Completed parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
+- Completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
+- Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
+- Completed closeout micro-task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
+- Next parent/child: requires owner/roadmap confirmation; no next published parent exists in `docs/roadmap/roadmap_index.yaml`.
+- Deferred validation: interactive browser flows D, E, H, I, J, K, L when Playwright deps or browser MCP are available; note/material flows F/G unless controlled fixtures are authorized later.
+- Local smoke artifact (uncommitted): `projects/smoke-blank-1781586974/`.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -94,27 +95,19 @@ Final `PHASE7-IMPL-008` behavior adds a frontend-transient OMI-guided staged pro
 
 Final `PHASE7-IMPL-009` behavior adds a read-only Memory / Canon workspace shell with approved-only empty states for characters, locations/settings, timeline, plot threads, continuity/consistency, open questions, relationships, organizations/groups, and objects/items. App/Nav integration exposes the shell as a separate `memory-canon` workspace view. OMI candidates, approved-but-not-applied candidates, and promotion records are not displayed as approved canon. No backend approved-memory routes, backend approved-memory helpers, frontend approved-memory API helpers, apply-promotion, memory/canon mutation, generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, training/JSONL/dataset changes, metadata editing UI, note/material create/import/upload UI, or browser/manual validation were added. Browser/manual validation remains deferred to `PHASE7-IMPL-010`.
 
-`PHASE7-IMPL-010` is the active frontier according to `docs/roadmap/roadmap_index.yaml`, `docs/roadmap/task_backlog.md`, `docs/roadmap/phase_map.md`, and `docs/master_plan.md`. It is the Workspace Validation / Browser and Manual Smoke parent task.
-
-The Phase 7 child task sequence for `PHASE7-IMPL-010` is:
+`PHASE7-IMPL-010` is complete as of the T007 closeout. Completed child records:
 
 - `PHASE7-IMPL-010-T001`: docs/status only; inventory, task record, enrichment JSON, and roadmap/status updates.
-- `PHASE7-IMPL-010-T002`: automated regression validation pass; run existing backend/source regression suites and record results.
-- `PHASE7-IMPL-010-T003`: browser smoke checklist preparation; define exact flows, expected outcomes, and stop conditions.
-- `PHASE7-IMPL-010-T004`: browser/manual smoke execution; run app locally and execute checklist.
-- `PHASE7-IMPL-010-T005`: validation repair triage; only if smoke finds issues; classify blocker/deferred/not-a-bug.
-- `PHASE7-IMPL-010-T006`: final validation regression pass; rerun validators and relevant automated tests after any repairs.
+- `PHASE7-IMPL-010-T002`: automated regression validation pass; all relevant pytest suites passed on first run.
+- `PHASE7-IMPL-010-T003`: browser smoke checklist preparation.
+- `PHASE7-IMPL-010-T004`: browser/manual smoke execution (PARTIAL; Playwright `libnspr4.so` missing; browser MCP unavailable).
+- `PHASE7-IMPL-010-T005`: validation repair triage; no product defect confirmed; no runtime repair authorized.
+- `PHASE7-IMPL-010-T006`: final validation regression pass; all suites passed on first run.
 - `PHASE7-IMPL-010-T007`: roadmap/status closeout.
 
-The Phase 7 child task sequence for `PHASE7-IMPL-009` was:
+Final `PHASE7-IMPL-010` behavior validated the completed Phase 7 workspace foundation from `PHASE7-IMPL-004` through `PHASE7-IMPL-009` using automated regression checks, a prepared browser/manual smoke checklist, partial browser/manual smoke execution with environment-limited fallback evidence, validation repair triage, and final regression confirmation. It did not add generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, frontend approved-memory API helpers, metadata editing UI, note/material create/import/upload UI, runtime features, package/dependency changes, or training/JSONL/dataset work. Interactive UI browser validation remains deferred to owner/environment rerun when browser tooling is available.
 
-- `PHASE7-IMPL-009-T001`: docs/status only; inventory, task record, enrichment JSON, and roadmap/status updates.
-- `PHASE7-IMPL-009-T002`: approved-memory shell data contract and source-level tests.
-- `PHASE7-IMPL-009-T003`: Memory / Canon shell component.
-- `PHASE7-IMPL-009-T004`: ProjectNav/App integration.
-- `PHASE7-IMPL-009-T005`: approved-category empty-state coverage.
-- `PHASE7-IMPL-009-T006`: Memory / Canon shell regression coverage.
-- `PHASE7-IMPL-009-T007`: roadmap/status closeout.
+The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. The next parent/child frontier requires owner/roadmap confirmation because no next published parent exists in `docs/roadmap/roadmap_index.yaml`. `docs/master_plan.md` identifies Writer Assistant Core as the next product direction after the workspace foundation is usable, but no Writer Assistant Core parent task is published in the roadmap registry yet.
 
 `PHASE7-IMPL-010` must remain validation-only. It must not add runtime feature scope, apply-promotion, memory/canon mutation, generated prose, model calls, extraction, or training/JSONL/dataset work unless explicitly authorized by a separate roadmap task.
 

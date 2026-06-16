@@ -4,7 +4,8 @@
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
     "current_parent_task_id": "PHASE7-IMPL-010",
-    "current_parent_task_title": "Workspace Validation / Browser and Manual Smoke"
+    "current_parent_task_title": "Workspace Validation / Browser and Manual Smoke",
+    "frontier_note": "Published Phase 7 parent sequence complete. Next parent/child requires owner/roadmap confirmation; no next published parent exists in this registry yet."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -227,7 +228,7 @@
       "id": "PHASE7-IMPL-010",
       "title": "Workspace Validation / Browser and Manual Smoke",
       "type": "validation",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-004",
@@ -339,7 +340,7 @@
       "id": "PHASE7-IMPL-010-T007",
       "title": "Roadmap/status closeout",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE7-IMPL-010",
       "depends_on": [
         "PHASE7-IMPL-010-T006"
