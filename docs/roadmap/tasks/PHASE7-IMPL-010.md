@@ -73,8 +73,8 @@ Exclude:
 ## Child Task Plan
 
 1. `PHASE7-IMPL-010-T001` - Workspace Validation / Browser and Manual Smoke inventory and child-task plan. Status: complete.
-2. `PHASE7-IMPL-010-T002` - Automated regression validation pass. Status: ready.
-3. `PHASE7-IMPL-010-T003` - Browser smoke checklist preparation. Status: draft.
+2. `PHASE7-IMPL-010-T002` - Automated regression validation pass. Status: complete.
+3. `PHASE7-IMPL-010-T003` - Browser smoke checklist preparation. Status: ready.
 4. `PHASE7-IMPL-010-T004` - Browser/manual smoke execution. Status: draft.
 5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: draft.
 6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: draft.
@@ -90,9 +90,9 @@ Exclude:
 
 ### `PHASE7-IMPL-010-T002` - Automated regression validation pass
 
-- Run existing backend and frontend source regression suites.
-- Record results in validation docs.
-- Make no runtime changes unless a tiny validation repair is explicitly needed.
+- Ran existing backend and frontend source regression suites; all passed on first run.
+- Recorded results in `docs/roadmap/validation/latest_roadmap_validation.md`.
+- No runtime changes were needed.
 
 ### `PHASE7-IMPL-010-T003` - Browser smoke checklist preparation
 
@@ -146,6 +146,6 @@ For `PHASE7-IMPL-010-T002` and later children, use the validation commands named
 
 `PHASE7-IMPL-010` is the active Phase 7 frontier.
 
-- Active child: `PHASE7-IMPL-010-T001` — complete after inventory/child-task planning.
-- Next child: `PHASE7-IMPL-010-T002` — Automated regression validation pass.
+- Active child: `PHASE7-IMPL-010-T003` — Browser smoke checklist preparation.
+- Last completed child: `PHASE7-IMPL-010-T002` — Automated regression validation pass.
 - Last completed parent: `PHASE7-IMPL-009` — Memory / Canon shell (approved-only empty states).
