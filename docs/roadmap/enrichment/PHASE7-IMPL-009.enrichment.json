@@ -1,0 +1,289 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE7-IMPL-009",
+  "title": "Memory / Canon shell (approved-only empty states)",
+  "type": "runtime",
+  "status": "active_next",
+  "parent": null,
+  "depends_on": [
+    "PHASE7-IMPL-008"
+  ],
+  "boundary_tags": [
+    "empty_states_only",
+    "read_only",
+    "no_auto_promotion",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE7-IMPL-009.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE7-IMPL-009.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE7-IMPL-009.enrichment.json",
+    "context_pack": ".codex-context/PHASE7-IMPL-009/"
+  },
+  "goal": "Add a read-only Memory / Canon shell for approved-only project knowledge categories, showing safe empty states and clear candidate/canon boundaries without adding apply-promotion, approved-memory mutation, extraction, generated summaries, model calls, semantic search, or browser/manual validation.",
+  "why_now": "PHASE7-IMPL-008 completed the frontend-transient OMI-guided staged creation shell. The workspace can now expose the next approved-memory/canon area as a read-only shell before any apply-promotion or durable memory mutation exists.",
+  "scope": {
+    "include": [
+      "Inventory existing Memory / Canon and approved-memory specs.",
+      "Inventory current frontend/backend/test surfaces for a read-only approved-memory shell.",
+      "Define a conservative child task sequence for approved-only empty states.",
+      "Keep OMI candidates, approved-but-not-applied candidates, and promotion records out of approved canon displays."
+    ],
+    "exclude": [
+      "Runtime Memory / Canon shell implementation during T001.",
+      "Runtime backend changes during T001.",
+      "Runtime frontend changes during T001.",
+      "Test edits during T001.",
+      "Apply-promotion, promotion execution, memory/canon mutation, approved-truth mutation.",
+      "Generated prose, AI-written story content, summaries, extraction, semantic search, Story Check auto-runs, Dramatica analysis, model calls, Ollama calls.",
+      "Training data, JSONL data, dataset artifacts, browser/manual validation.",
+      "Metadata editing UI, note/material create/import/upload UI, category detail editing."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md"
+    ],
+    "specs": [
+      "docs/roadmap/project_memory_canon_page_structure_spec.md",
+      "docs/roadmap/project_memory_canon_storage_model.md",
+      "docs/roadmap/approved_characters_page_spec.md",
+      "docs/roadmap/approved_locations_settings_page_spec.md",
+      "docs/roadmap/approved_timeline_page_spec.md",
+      "docs/roadmap/approved_plot_threads_page_spec.md",
+      "docs/roadmap/continuity_consistency_page_spec.md",
+      "docs/roadmap/approved_open_questions_page_spec.md",
+      "docs/roadmap/approved_relationships_page_spec.md",
+      "docs/roadmap/approved_organizations_groups_page_spec.md",
+      "docs/roadmap/approved_objects_items_page_spec.md",
+      "docs/roadmap/omi_storage_model.md",
+      "docs/roadmap/omi_story_knowledge_candidate_expansion.md",
+      "docs/roadmap/writer_assistant_core_candidate_schemas.md",
+      "docs/roadmap/project_workspace_foundation_spec.md",
+      "docs/roadmap/project_overview_page_spec.md"
+    ],
+    "source_files": [
+      "frontend/src/App.jsx",
+      "frontend/src/api.js",
+      "frontend/src/components/ProjectNav.jsx",
+      "frontend/src/components/ProjectOverview.jsx",
+      "frontend/src/components/OMIPanel.jsx",
+      "frontend/src/components/OmiGuidedProjectCreation.jsx",
+      "frontend/src/components/Editor.jsx",
+      "frontend/src/sharedDocumentController.js",
+      "backend/main.py",
+      "backend/project_manager.py",
+      "tests/test_frontend_project_workspace_source.py",
+      "tests/test_project_manager.py",
+      "tests/test_scene_routes.py",
+      "tests/test_note_material_routes.py"
+    ],
+    "quality_notes": [
+      "Direct read-only inspection of roadmap authority, specs, frontend surfaces, backend surfaces, and existing test surfaces was used.",
+      "No runtime code or tests were changed.",
+      "No CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, frontend builds, model calls, or Ollama calls were run."
+    ]
+  },
+  "implementation_surfaces": {
+    "frontend": [
+      {
+        "path": "frontend/src/App.jsx",
+        "notes": "Has Overview and editor workspace views. No Memory / Canon view exists yet."
+      },
+      {
+        "path": "frontend/src/components/ProjectNav.jsx",
+        "notes": "Has Overview workspace nav plus scene/note/material document navigation. Memory / Canon can be added as a workspace view, not a document type."
+      },
+      {
+        "path": "frontend/src/components/ProjectOverview.jsx",
+        "notes": "Shows a simple approved-memory/canon empty-state line but is not the dedicated shell."
+      },
+      {
+        "path": "frontend/src/components/OMIPanel.jsx",
+        "notes": "Candidate and promotion audit UI. Its records must not be treated as approved memory/canon."
+      },
+      {
+        "path": "frontend/src/api.js",
+        "notes": "No approved-memory helper exists; initial empty-state shell can avoid API changes."
+      }
+    ],
+    "backend": [
+      {
+        "path": "backend/project_manager.py",
+        "notes": "No approved-memory/canon helpers, no apply-promotion helper, and no memory/canon mutation helper exist."
+      },
+      {
+        "path": "backend/main.py",
+        "notes": "No Memory / Canon routes and no apply-promotion route exist."
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/test_frontend_project_workspace_source.py",
+        "notes": "Primary source-level test surface for upcoming approved-memory shell contracts."
+      },
+      {
+        "path": "tests/test_project_manager.py",
+        "notes": "Covers backend project/OMI safety; future backend memory work would need focused coverage if introduced."
+      }
+    ]
+  },
+  "approved_memory_categories": [
+    {
+      "id": "characters",
+      "label": "Characters",
+      "future_source": "memory/characters.json",
+      "empty_state": "No approved character records yet."
+    },
+    {
+      "id": "locations_settings",
+      "label": "Locations / Settings",
+      "future_source": "memory/locations.json",
+      "empty_state": "No approved location or setting records yet."
+    },
+    {
+      "id": "timeline",
+      "label": "Timeline",
+      "future_source": "memory/timeline.json",
+      "empty_state": "No approved timeline events yet."
+    },
+    {
+      "id": "plot_threads",
+      "label": "Plot Threads",
+      "future_source": "memory/plot_threads.json",
+      "empty_state": "No approved plot threads yet."
+    },
+    {
+      "id": "continuity_consistency",
+      "label": "Continuity / Consistency",
+      "future_source": "memory/continuity_warnings.json",
+      "empty_state": "No approved continuity or consistency records yet."
+    },
+    {
+      "id": "open_questions",
+      "label": "Open Questions",
+      "future_source": "memory/open_questions.json",
+      "empty_state": "No approved open questions yet."
+    },
+    {
+      "id": "relationships",
+      "label": "Relationships",
+      "future_source": "memory/relationships.json",
+      "empty_state": "No approved relationships yet."
+    },
+    {
+      "id": "organizations_groups",
+      "label": "Organizations / Groups",
+      "future_source": "memory/organizations.json",
+      "empty_state": "No approved organizations or groups yet."
+    },
+    {
+      "id": "objects_items",
+      "label": "Objects / Items",
+      "future_source": "memory/objects.json",
+      "empty_state": "No approved objects or items yet."
+    }
+  ],
+  "child_tasks": [
+    {
+      "id": "PHASE7-IMPL-009-T001",
+      "title": "Memory / Canon shell inventory and child-task plan",
+      "type": "planning_microtask",
+      "status": "in_progress",
+      "depends_on": [
+        "PHASE7-IMPL-009"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-009-T002",
+      "title": "Approved-memory shell data contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-009-T001"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-009-T003",
+      "title": "Memory / Canon shell component",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-009-T002"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-009-T004",
+      "title": "ProjectNav/App integration",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-009-T003"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-009-T005",
+      "title": "Approved-category empty-state coverage",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-009-T004"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-009-T006",
+      "title": "Memory / Canon shell regression coverage",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-009-T005"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-009-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE7-IMPL-009-T006"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Memory / Canon shell remains read-only.",
+    "Approved-only empty states exist for the required categories.",
+    "OMI candidates and promotion records are not displayed as approved canon.",
+    "No apply-promotion or memory/canon mutation is added.",
+    "No generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, training/JSONL/dataset work, or browser/manual validation is added."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py"
+    ],
+    "notes": "Docs/status only. No pytest commands are required unless runtime or tests are changed."
+  },
+  "safety_notes": [
+    "OMI candidates are not canon.",
+    "Promotion records are audit records, not applied memory.",
+    "Approved-but-not-applied candidates must not appear in approved lists.",
+    "Missing memory storage is a valid empty state.",
+    "Opening the shell must not create memory files or mutate OMI, bible, storyform, scenes, notes, materials, project metadata, training data, or datasets."
+  ],
+  "deferred_work": [
+    "Apply-promotion.",
+    "Durable approved-memory storage mutation.",
+    "Approved-memory read APIs unless a later contract proves they are needed.",
+    "Extraction and candidate creation from prose.",
+    "Semantic search, graph/canon queries, and relationship visualization.",
+    "Generated summaries.",
+    "Dramatica analysis.",
+    "Browser/manual validation under PHASE7-IMPL-010."
+  ]
+}
