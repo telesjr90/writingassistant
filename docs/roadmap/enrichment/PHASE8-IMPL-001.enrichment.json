@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-001",
   "title": "Writer Assistant Core implementation readiness and first runtime slice plan",
   "type": "runtime",
-  "status": "active",
+  "status": "done",
   "parent": null,
   "depends_on": [
     "PHASE7-IMPL-010"
@@ -92,7 +92,10 @@
       "T002 publishes the context collection plan at docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md.",
       "T003 produced docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md using direct file/source inspection only.",
       "T004 selected Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice.",
-      "Runtime extraction, candidate creation, model calls, UI changes, apply-promotion, and memory/canon mutation are excluded from T001 through T004."
+      "T005 added tests-first contract coverage in tests/test_writer_assistant_core_candidate_schema_contract.py.",
+      "T006 added constants-only schema metadata in backend/story_knowledge/candidate_schema.py.",
+      "T007 closed the parent with final validation.",
+      "Runtime extraction, candidate creation, model calls, UI changes, apply-promotion, and memory/canon mutation are excluded from PHASE8-IMPL-001."
     ]
   },
   "child_tasks": [
@@ -194,13 +197,14 @@
       "id": "PHASE8-IMPL-001-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-001-T006"
       ],
       "scope": [
-        "Close readiness parent.",
-        "Move active frontier to the first actual Writer Assistant Core implementation parent or next roadmap-authorized task."
+        "Closed the readiness parent.",
+        "Recorded final validation results.",
+        "Recorded that no next Writer Assistant Core parent is published yet and the next parent/child requires owner/roadmap confirmation."
       ]
     }
   ],
@@ -212,12 +216,27 @@
     "PHASE8-IMPL-001-T004 is registered as complete with first runtime slice decision published.",
     "PHASE8-IMPL-001-T005 is registered as complete with contract tests added.",
     "PHASE8-IMPL-001-T006 is registered as complete with constants-only schema metadata.",
-    "PHASE8-IMPL-001-T007 is registered as the next ready child.",
+    "PHASE8-IMPL-001-T007 is registered as complete with roadmap/status closeout.",
+    "PHASE8-IMPL-001 is registered as complete.",
     "The selected first runtime slice is Writer Assistant Core candidate schema constants plus source-level/contract tests.",
     "T002 plans context collection before any context tool execution.",
     "T003 may run targeted context tools only if explicitly authorized.",
-    "No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is implemented by T001."
+    "No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is implemented by PHASE8-IMPL-001."
   ],
+  "final_artifacts": {
+    "runtime": [
+      "backend/story_knowledge/__init__.py",
+      "backend/story_knowledge/candidate_schema.py"
+    ],
+    "tests": [
+      "tests/test_writer_assistant_core_candidate_schema_contract.py"
+    ],
+    "docs": [
+      "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
+      "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md"
+    ]
+  },
   "validation": {
     "commands": [
       ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q",
@@ -226,7 +245,7 @@
       "python3 scripts/validate_roadmap.py",
       "non-LeanCTX whitespace check on changed docs/code"
     ],
-    "notes": "T006 satisfies the T005 schema contract with constants-only production metadata."
+    "notes": "Final closeout validation passes. T006 satisfies the T005 schema contract with constants-only production metadata."
   },
   "safety_notes": [
     "The app remains analysis-only.",
@@ -234,13 +253,15 @@
     "All extracted or inferred story knowledge remains candidate-only until explicit owner review and later owner-controlled promotion.",
     "OMI remains the central review and future promotion layer.",
     "Promotion records remain audit-only until future apply-promotion exists.",
-    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
+    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs.",
+    "No next Writer Assistant Core parent is published yet; the next parent/child requires owner/roadmap confirmation."
   ],
   "deferred_work": [
     "T003 direct-inspection context collection is complete and recorded in docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md.",
-    "Runtime extraction, candidate creation, typed OMI expansion, backend routes, frontend UI, and first slice implementation are deferred to later children.",
+    "Runtime extraction, candidate creation, typed OMI expansion, backend routes, frontend UI, candidate storage contracts, and evidence/provenance validation helpers are deferred to later published work.",
     "Apply-promotion and memory/canon mutation remain future-only.",
-    "Model/Ollama integration remains future-only and requires separate authorization."
+    "Model/Ollama integration remains future-only and requires separate authorization.",
+    "The next Writer Assistant Core implementation parent requires owner/roadmap confirmation before work starts."
   ],
   "context_tools_policy": [
     "T001 does not run context tools.",
@@ -249,6 +270,7 @@
     "T004 is docs/decision only and did not run context tools.",
     "T005 added tests only and did not run context tools.",
     "T006 added constants only and did not run context tools.",
+    "T007 is docs/status closeout only and did not run context tools.",
     "Context output is evidence, not roadmap truth.",
     "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
   ]

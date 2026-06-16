@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-001",
     "current_parent_task_title": "Writer Assistant Core implementation readiness and first runtime slice plan",
-    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is the active Writer Assistant Core readiness parent; T006 added Writer Assistant Core candidate schema constants, and PHASE8-IMPL-001-T007 is the next ready child."
+    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is complete as the first Writer Assistant Core readiness parent; no next Writer Assistant Core parent is published yet, so the next parent/child requires owner/roadmap confirmation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -354,7 +354,7 @@
       "id": "PHASE8-IMPL-001",
       "title": "Writer Assistant Core implementation readiness and first runtime slice plan",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-010"
@@ -487,7 +487,7 @@
       "id": "PHASE8-IMPL-001-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-001",
       "depends_on": [
         "PHASE8-IMPL-001-T006"
