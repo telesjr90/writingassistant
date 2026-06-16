@@ -1,5 +1,41 @@
 # Latest Roadmap Validation
 
+## PHASE7-IMPL-010-T005 Validation Repair Triage
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: triage of `PHASE7-IMPL-010-T004` PARTIAL browser/manual smoke results; docs/status only.
+- Parent task: `PHASE7-IMPL-010` - Workspace Validation / Browser and Manual Smoke.
+- T004 input summary:
+  - Servers started cleanly in mock mode; no stop conditions; no blocker product defects observed.
+  - Playwright Chromium headless failed (`libnspr4.so` missing); Cursor browser MCP unavailable.
+  - API/server-log/frontend-source fallback used for flows blocked by environment.
+  - Smoke artifact: `projects/smoke-blank-1781586974/` (local-only; uncommitted).
+- Triage decision:
+  - No product defect confirmed.
+  - No runtime repair authorized in T005.
+  - Proceed to `PHASE7-IMPL-010-T006` - Final validation regression pass.
+  - Carry forward interactive browser rerun as deferred owner/environment validation note.
+- Classification:
+  - environment limitation: Playwright `libnspr4.so` missing; Cursor browser MCP unavailable; blocks interactive UI confirmation, not product failure.
+  - repair candidate (deferred validation, not defect): D dirty-state warning on project switch; E editor dirty indicator and keyboard save; H discard/unsaved dialogs; I Overview browser rendering; J OMI-guided staged shell browser behavior; K Memory / Canon browser navigation; L full interactive boundary/safety scan.
+  - deferred / not-a-bug: F/G not run (no note/material fixtures in local projects); fixture creation remains a separate future authorized validation helper task, not T005 scope.
+  - confirmed pass / no issue: A/B/C API validation; API project isolation and save/revert; no unexpected model/Ollama call; no generated prose path; no apply-promotion or memory/canon mutation; no API expansion.
+- Updated:
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/tasks/PHASE7-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE7-IMPL-010.enrichment.json`
+  - `docs/roadmap/task_backlog.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `git diff --check`: PASS.
+- Pytest: not run; docs/status triage only; no runtime code or tests changed.
+- Active child: `PHASE7-IMPL-010-T005` complete.
+- Next child: `PHASE7-IMPL-010-T006` - Final validation regression pass.
+- No browser/manual validation, app servers, model calls, Ollama calls, apply-promotion, memory/canon mutation, staging, commits, or pushes were run.
+
 ## PHASE7-IMPL-010-T004 Browser / Manual Smoke Execution
 
 - Date: 2026-06-15

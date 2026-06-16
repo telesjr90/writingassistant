@@ -310,7 +310,7 @@
       "id": "PHASE7-IMPL-010-T005",
       "title": "Validation repair triage",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE7-IMPL-010",
       "depends_on": [
         "PHASE7-IMPL-010-T004"
@@ -318,6 +318,34 @@
       "boundary_tags": [
         "validation",
         "manual_smoke",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T006",
+      "title": "Final validation regression pass",
+      "type": "validation_microtask",
+      "status": "ready",
+      "parent": "PHASE7-IMPL-010",
+      "depends_on": [
+        "PHASE7-IMPL-010-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T007",
+      "title": "Roadmap/status closeout",
+      "type": "validation_microtask",
+      "status": "draft",
+      "parent": "PHASE7-IMPL-010",
+      "depends_on": [
+        "PHASE7-IMPL-010-T006"
+      ],
+      "boundary_tags": [
+        "validation",
         "no_runtime_feature_scope"
       ]
     },

@@ -76,8 +76,8 @@ Exclude:
 2. `PHASE7-IMPL-010-T002` - Automated regression validation pass. Status: complete.
 3. `PHASE7-IMPL-010-T003` - Browser smoke checklist preparation. Status: complete.
 4. `PHASE7-IMPL-010-T004` - Browser/manual smoke execution. Status: complete (PARTIAL).
-5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: ready.
-6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: draft.
+5. `PHASE7-IMPL-010-T005` - Validation repair triage. Status: complete.
+6. `PHASE7-IMPL-010-T006` - Final validation regression pass. Status: ready.
 7. `PHASE7-IMPL-010-T007` - Roadmap/status closeout. Status: draft.
 
 ## Child Task Details
@@ -109,9 +109,10 @@ Exclude:
 
 ### `PHASE7-IMPL-010-T005` - Validation repair triage
 
-- Only if smoke or regression finds issues.
-- Classify issues as blocker, deferred, or not-a-bug.
-- Perform tiny repair only if explicitly necessary and safe.
+- Triaged T004 PARTIAL results; no product defect confirmed.
+- Classified gaps as environment limitation, deferred validation, repair-candidate (interactive UI only), or confirmed pass.
+- No runtime repair authorized; interactive browser rerun deferred to owner/environment when Playwright deps or browser MCP are available.
+- F/G remain deferred (no note/material fixtures); future fixture creation is a separate authorized validation helper task, not T005 scope.
 
 ### `PHASE7-IMPL-010-T006` - Final validation regression pass
 
@@ -148,6 +149,7 @@ For `PHASE7-IMPL-010-T002` and later children, use the validation commands named
 
 `PHASE7-IMPL-010` is the active Phase 7 frontier.
 
-- Active child: `PHASE7-IMPL-010-T005` — Validation repair triage.
-- Last completed child: `PHASE7-IMPL-010-T004` — Browser/manual smoke execution (PARTIAL).
+- Active child: `PHASE7-IMPL-010-T006` — Final validation regression pass.
+- Last completed child: `PHASE7-IMPL-010-T005` — Validation repair triage.
+- Prior completed child: `PHASE7-IMPL-010-T004` — Browser/manual smoke execution (PARTIAL).
 - Last completed parent: `PHASE7-IMPL-009` — Memory / Canon shell (approved-only empty states).

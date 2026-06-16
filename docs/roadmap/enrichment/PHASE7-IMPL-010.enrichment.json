@@ -189,21 +189,22 @@
       "id": "PHASE7-IMPL-010-T005",
       "title": "Validation repair triage",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE7-IMPL-010-T004"
       ],
       "scope": [
-        "Only if smoke or regression finds issues.",
-        "Classify issues as blocker, deferred, or not-a-bug.",
-        "Perform tiny repair only if explicitly necessary and safe."
+        "Triaged T004 PARTIAL browser/manual smoke results.",
+        "No product defect confirmed; no runtime repair authorized.",
+        "Classified environment limitations, deferred validation gaps, and confirmed passes.",
+        "Proceed to T006 final validation regression pass."
       ]
     },
     {
       "id": "PHASE7-IMPL-010-T006",
       "title": "Final validation regression pass",
       "type": "validation_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE7-IMPL-010-T005"
       ],
