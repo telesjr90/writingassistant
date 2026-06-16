@@ -3,8 +3,8 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Project Workspace Foundation",
-    "current_parent_task_id": "PHASE7-IMPL-007",
-    "current_parent_task_title": "Project Overview shell"
+    "current_parent_task_id": "PHASE7-IMPL-008",
+    "current_parent_task_title": "OMI-guided project creation staged flow"
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -158,7 +158,7 @@
       "id": "PHASE7-IMPL-007",
       "title": "Project Overview shell",
       "type": "runtime",
-      "status": "active_next",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-002",
@@ -181,7 +181,7 @@
       "id": "PHASE7-IMPL-008",
       "title": "OMI-guided project creation staged flow",
       "type": "runtime",
-      "status": "future",
+      "status": "active_next",
       "parent": null,
       "depends_on": [
         "PHASE7-IMPL-001",
@@ -620,6 +620,109 @@
         "read_only",
         "read_only_overview",
         "empty_states_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T002",
+      "title": "Overview data contract and source-level tests",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-007",
+      "depends_on": [
+        "PHASE7-IMPL-007-T001"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "read_only_overview",
+        "empty_states_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T003",
+      "title": "Backend/project data helper compatibility, if needed",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-007",
+      "depends_on": [
+        "PHASE7-IMPL-007-T002"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "read_only_overview",
+        "metadata_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T004",
+      "title": "Frontend overview shell component",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-007",
+      "depends_on": [
+        "PHASE7-IMPL-007-T003"
+      ],
+      "boundary_tags": [
+        "read_only_overview",
+        "empty_states_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T005",
+      "title": "ProjectNav/App overview integration",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-007",
+      "depends_on": [
+        "PHASE7-IMPL-007-T004"
+      ],
+      "boundary_tags": [
+        "read_only_overview",
+        "empty_states_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T006",
+      "title": "Overview regression coverage",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-007",
+      "depends_on": [
+        "PHASE7-IMPL-007-T005"
+      ],
+      "boundary_tags": [
+        "read_only_overview",
+        "empty_states_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-007-T007",
+      "title": "Roadmap/status closeout",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE7-IMPL-007",
+      "depends_on": [
+        "PHASE7-IMPL-007-T006"
+      ],
+      "boundary_tags": [
+        "read_only",
         "no_model_calls",
         "no_generated_prose",
         "no_memory_canon_mutation"

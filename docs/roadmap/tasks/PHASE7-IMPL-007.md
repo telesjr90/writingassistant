@@ -66,22 +66,23 @@ Exclude:
 ## Current Evidence Summary
 
 - `frontend/src/App.jsx` loads active project library metadata, scenes, notes, materials, bible, storyform, storyform context, and OMI summary on project change.
-- `frontend/src/components/ProjectNav.jsx` currently provides project and document navigation but has no Overview nav item.
+- `frontend/src/components/ProjectNav.jsx` provides project/document navigation and now includes an Overview workspace item separate from scene/note/material document selection.
+- `frontend/src/components/ProjectOverview.jsx` is a standalone prop-driven overview shell that renders deterministic project/list/status props only.
 - `frontend/src/components/Editor.jsx` is document-neutral for scene/note/material body editing and should remain separate from overview display.
 - `frontend/src/api.js` has project list/create helpers plus scene/note/material body helpers and OMI summary helpers; it has no dedicated overview API helper.
 - `backend/main.py` has project, scene, note/material, OMI, bible/storyform, and Story Check routes; it has no dedicated overview route.
-- `backend/project_manager.py` has project metadata listing plus scene/chapter/note/material helper surfaces that can support cheap counts if a later child needs a narrow overview helper.
-- `tests/test_frontend_project_workspace_source.py` has source-level guards for the shared editor and workspace safety boundaries but no overview shell contract yet.
+- `backend/project_manager.py` has project metadata listing plus scene/chapter/note/material helper surfaces; no overview helper was needed for this parent.
+- `tests/test_frontend_project_workspace_source.py` includes source-level overview data-contract, component, integration, and regression coverage.
 
 ## Child Task Plan
 
-1. `PHASE7-IMPL-007-T001` - Project Overview shell inventory and child-task plan. Status: complete after validation.
-2. `PHASE7-IMPL-007-T002` - Overview data contract and source-level tests.
-3. `PHASE7-IMPL-007-T003` - Backend/project data helper compatibility, if needed.
-4. `PHASE7-IMPL-007-T004` - Frontend overview shell component.
-5. `PHASE7-IMPL-007-T005` - ProjectNav/App overview integration.
-6. `PHASE7-IMPL-007-T006` - Overview regression coverage.
-7. `PHASE7-IMPL-007-T007` - Roadmap/status closeout.
+1. `PHASE7-IMPL-007-T001` - Project Overview shell inventory and child-task plan. Status: complete.
+2. `PHASE7-IMPL-007-T002` - Overview data contract and source-level tests. Status: complete.
+3. `PHASE7-IMPL-007-T003` - Backend/project data helper compatibility, if needed. Status: complete.
+4. `PHASE7-IMPL-007-T004` - Frontend overview shell component. Status: complete.
+5. `PHASE7-IMPL-007-T005` - ProjectNav/App overview integration. Status: complete.
+6. `PHASE7-IMPL-007-T006` - Overview regression coverage. Status: complete.
+7. `PHASE7-IMPL-007-T007` - Roadmap/status closeout. Status: complete after validation.
 
 ## Child Task Details
 
@@ -138,6 +139,42 @@ For `PHASE7-IMPL-007-T001`:
 
 For later children, use source-level frontend tests and focused backend/helper/route regressions named by each child prompt. Browser/manual validation remains under `PHASE7-IMPL-010`.
 
+## Final Completion Summary
+
+`PHASE7-IMPL-007` is complete as of the T007 closeout.
+
+Completed child results:
+
+- `PHASE7-IMPL-007-T001`: PASS; created the task record, inventory, and enrichment JSON and inventoried current overview inputs/surfaces.
+- `PHASE7-IMPL-007-T002`: PASS; locked the deterministic overview data contract with source-level tests.
+- `PHASE7-IMPL-007-T003`: PASS; verified no backend/project overview helper was needed and deferred chapter count.
+- `PHASE7-IMPL-007-T004`: PASS; added standalone prop-driven `ProjectOverview`.
+- `PHASE7-IMPL-007-T005`: PASS; integrated Overview as a workspace view in `App.jsx` and added an Overview item in `ProjectNav.jsx`.
+- `PHASE7-IMPL-007-T006`: PASS; added overview regression coverage.
+- `PHASE7-IMPL-007-T007`: PASS after validation; roadmap/status closeout.
+
+Final behavior:
+
+- Overview is a workspace view, not an owner-authored document type.
+- Overview uses existing deterministic project/list/status state.
+- Overview receives project, scenes, notes, materials, OMI/status, and approved-memory/canon shell/status props.
+- Scene, note, and material counts are derived from arrays/lists only.
+- Chapter count is omitted/deferred.
+- Project switches reset to Overview.
+- Scene/note/material selection switches to editor view.
+- Keyboard save dispatches only in editor view.
+- No `/overview` API/backend dependency exists.
+- No backend overview route/helper was added.
+- Scene/note/material editor behavior remains ID-based and body-only.
+- No generated summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI/canon/memory mutation, metadata editing UI, note/material create/import/upload UI, training/JSONL/dataset work, browser/manual validation, package changes, app servers, or runtime project fixture changes were added.
+
+Remaining acceptable gaps:
+
+- Browser/manual validation remains deferred to `PHASE7-IMPL-010` or another roadmap-authorized validation phase.
+- Chapter count remains deferred unless a cheap deterministic helper is later identified.
+- Richer approved memory/canon pages remain future work.
+- A future deterministic backend helper remains optional only if later proven necessary.
+
 ## Current Status
 
-`PHASE7-IMPL-007-T001` is the active child task. Runtime implementation has not started. The next recommended child task is `PHASE7-IMPL-007-T002` - Overview data contract and source-level tests.
+`PHASE7-IMPL-007` is complete. The active frontier should move to the next published Phase 7 parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.

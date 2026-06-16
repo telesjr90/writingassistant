@@ -5,15 +5,16 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Project Workspace Foundation.
-- Immediate active parent task: `PHASE7-IMPL-007`.
-- Canonical title: Project Overview shell.
-- Last completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
-- Next parent task: `PHASE7-IMPL-007` - Project Overview shell.
+- Immediate active parent task: `PHASE7-IMPL-008`.
+- Canonical title: OMI-guided project creation staged flow.
+- Last completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
+- Next parent task: `PHASE7-IMPL-008` - OMI-guided project creation staged flow.
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed parent task: `PHASE7-IMPL-006` - Shared owner-authored document editor.
+- Completed parent task: `PHASE7-IMPL-007` - Project Overview shell.
 - Completed closeout micro-task: `PHASE7-IMPL-006-T007` - Roadmap/status closeout.
-- Completed planning/inventory micro-task: `PHASE7-IMPL-007-T001` - Project Overview shell inventory and child-task plan.
-- Next draft child task: `PHASE7-IMPL-007-T002` - Overview data contract and source-level tests.
+- Completed closeout micro-task: `PHASE7-IMPL-007-T007` - Roadmap/status closeout.
+- Next draft child task: `PHASE7-IMPL-008-T001` - OMI-guided project creation staged flow inventory and child-task plan.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -52,7 +53,17 @@ Final `PHASE7-IMPL-005` behavior stores owner-authored notes and owner-provided 
 
 Final `PHASE7-IMPL-006` behavior keeps scene/note/material document selection ID-based; loads and saves exact owner-authored body content only; keeps metadata out of editor bodies; preserves dirty-state, keyboard-save, project-switch, and document-switch guards; and does not add metadata editing UI, note/material create/import/upload UI, generated prose, summaries, extraction, model/Ollama calls, OMI/memory/canon mutation, or training/JSONL/dataset changes. Browser/manual validation remains deferred to `PHASE7-IMPL-010`.
 
-`PHASE7-IMPL-007-T001` is complete as an inventory/artifact task. It created the PHASE7-IMPL-007 task record, inventory, and enrichment JSON; identified the current project overview inputs in `App.jsx`, `ProjectNav.jsx`, `api.js`, `backend/main.py`, and `backend/project_manager.py`; documented that no dedicated overview component or route exists yet; and recommended `PHASE7-IMPL-007-T002` as the next child limited to overview data contract and source-level tests. Runtime frontend implementation, backend implementation, tests, app servers, frontend builds, model calls, extraction, Story Check auto-runs, context generation, project fixture writes, OMI/memory/canon mutation, and training/JSONL/dataset changes were not performed.
+`PHASE7-IMPL-007` is complete as of the T007 closeout. Completed child records:
+
+- `PHASE7-IMPL-007-T001`: Project Overview shell inventory and child-task plan.
+- `PHASE7-IMPL-007-T002`: overview data contract and source-level tests.
+- `PHASE7-IMPL-007-T003`: backend/project data helper compatibility decision; no backend overview helper was needed.
+- `PHASE7-IMPL-007-T004`: standalone prop-driven `ProjectOverview` component.
+- `PHASE7-IMPL-007-T005`: ProjectNav/App overview integration.
+- `PHASE7-IMPL-007-T006`: overview regression coverage.
+- `PHASE7-IMPL-007-T007`: roadmap/status closeout.
+
+Final `PHASE7-IMPL-007` behavior adds Overview as a workspace view, not an owner-authored document type. It uses existing deterministic project/list/status state, passes project/scenes/notes/materials/OMI/status/approved-memory shell props, derives scene/note/material counts from arrays/lists only, omits/defer chapter count, resets project switches to Overview, switches scene/note/material selection to editor view, keeps keyboard save editor-view-only, and adds no `/overview` backend/API dependency or backend overview helper. It does not add generated summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, OMI/memory/canon mutation, metadata editing UI, note/material create/import/upload UI, training/JSONL/dataset changes, or browser/manual validation.
 
 Browser/manual validation belongs under `PHASE7-IMPL-010`.
 
