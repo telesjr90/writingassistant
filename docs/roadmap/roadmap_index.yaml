@@ -266,13 +266,28 @@
       "id": "PHASE7-IMPL-010-T002",
       "title": "Automated regression validation pass",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE7-IMPL-010",
       "depends_on": [
         "PHASE7-IMPL-010-T001"
       ],
       "boundary_tags": [
         "validation",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE7-IMPL-010-T003",
+      "title": "Browser smoke checklist preparation",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE7-IMPL-010",
+      "depends_on": [
+        "PHASE7-IMPL-010-T002"
+      ],
+      "boundary_tags": [
+        "validation",
+        "manual_smoke",
         "no_runtime_feature_scope"
       ]
     },
