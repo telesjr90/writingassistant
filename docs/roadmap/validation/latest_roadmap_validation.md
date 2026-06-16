@@ -1,5 +1,39 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-001-T003 Targeted Context Collection and Source Inventory
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: targeted context collection and source inventory for `PHASE8-IMPL-001-T003`.
+- Parent task: `PHASE8-IMPL-001` - Writer Assistant Core implementation readiness and first runtime slice plan.
+- Completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory.
+- Active child: `PHASE8-IMPL-001-T004` - First runtime slice decision.
+- Last completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory.
+- Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core.
+- Context collection method: direct file/source inspection only.
+- Context tools used: none.
+- Created:
+  - `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`
+- Report summary:
+  - Answered T002 question groups A-H.
+  - Inventoried current OMI routes, storage helpers, project storage, frontend workspace surfaces, guardrails, and existing tests.
+  - Confirmed runtime OMI is generic/MVP-era and does not yet implement expanded Writer Assistant Core story-knowledge candidate types.
+  - Confirmed Memory / Canon remains read-only approved-only shell behavior with no apply-promotion and no memory/canon mutation.
+  - Evaluated six first-slice candidates.
+  - Recommended T004 consider Writer Assistant Core candidate schema constants plus source-level/contract tests before extraction runtime.
+- Updated:
+  - `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`
+  - `docs/roadmap/tasks/PHASE8-IMPL-001.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Pytest: not run; docs/context/status only; no runtime code or tests changed.
+- Boundary summary: no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, extraction, generated prose, backend extraction routes, frontend extraction UI, apply-promotion, memory/canon mutation, runtime code, tests, package/dependency changes, project runtime files, training data, JSONL records, dataset manifests, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-001-T002 Context Collection Plan for Writer Assistant Core
 
 - Date: 2026-06-16

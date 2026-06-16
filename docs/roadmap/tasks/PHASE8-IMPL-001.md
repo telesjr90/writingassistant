@@ -66,8 +66,8 @@ Include:
 
 1. `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan. Status: complete.
 2. `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Status: complete.
-3. `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Status: ready.
-4. `PHASE8-IMPL-001-T004` - First runtime slice decision. Status: planned.
+3. `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Status: complete.
+4. `PHASE8-IMPL-001-T004` - First runtime slice decision. Status: ready.
 5. `PHASE8-IMPL-001-T005` - First slice contract/source tests. Status: planned.
 6. `PHASE8-IMPL-001-T006` - First slice implementation prompt/repair plan. Status: planned.
 7. `PHASE8-IMPL-001-T007` - Roadmap/status closeout. Status: planned.
@@ -91,10 +91,11 @@ Include:
 
 ### `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory
 
-- Run only explicitly authorized context tools or direct source inspection per the T002 plan.
-- Produce `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
-- Treat context output as evidence, not roadmap truth.
-- No runtime implementation.
+- Completed with direct file/source inspection only.
+- Produced `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
+- Answered T002 question groups A-H and evaluated first runtime slice candidates.
+- Recommended T004 consider Writer Assistant Core candidate schema constants plus source-level/contract tests before extraction runtime.
+- No context tools, runtime implementation, tests, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation.
 
 ### `PHASE8-IMPL-001-T004` - First runtime slice decision
 
@@ -123,7 +124,8 @@ Include:
 - The T001-T007 child sequence is published and conservative.
 - T001 is recorded as complete (docs/status/planning only).
 - T002 is recorded as complete with context collection plan at `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md`.
-- T003 is the current child and may run targeted context tools per the T002 plan.
+- T003 is complete and produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md`.
+- T004 is the current ready child for first runtime slice decision.
 - OMI remains the candidate-first review and future promotion layer.
 - Candidate output, model output, NotebookLM output, extracted candidates, and planning notes remain non-canon until explicit owner review and future owner-controlled promotion.
 - No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is claimed by this parent promotion task.
@@ -131,6 +133,12 @@ Include:
 ## Validation Expectations
 
 For `PHASE8-IMPL-001-T002`:
+
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- Non-LeanCTX whitespace check on changed docs
+
+For `PHASE8-IMPL-001-T003`:
 
 - `python3 scripts/check_enrichment.py`
 - `python3 scripts/validate_roadmap.py`
@@ -157,4 +165,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-001` is active. Current child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Last completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.
+`PHASE8-IMPL-001` is active. Current ready child: `PHASE8-IMPL-001-T004` - First runtime slice decision. Last completed child: `PHASE8-IMPL-001-T003` - Targeted context collection and source inventory. Prior completed child: `PHASE8-IMPL-001-T002` - Context collection plan for Writer Assistant Core. Prior completed child: `PHASE8-IMPL-001-T001` - Publish Writer Assistant Core parent and child-task plan.

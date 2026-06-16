@@ -24,7 +24,8 @@
     "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-001.md",
     "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-001.enrichment.json",
     "context_pack": ".codex-context/PHASE8-IMPL-001/",
-    "context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md"
+    "context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
+    "targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md"
   },
   "goal": "Promote Writer Assistant Core as the next roadmap frontier after the completed Phase 7 Project Workspace Foundation and prepare the first safe runtime slice through implementation readiness, context planning, schema alignment, OMI candidate-first lifecycle boundaries, and acceptance criteria.",
   "why_now": "The published Phase 7 parent sequence PHASE7-IMPL-001 through PHASE7-IMPL-010 is complete. Writer Assistant Core is the next product direction, but implementation must start with readiness and context planning before extraction, candidate creation, model calls, UI changes, apply-promotion, or memory/canon mutation.",
@@ -88,7 +89,7 @@
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
       "T002 publishes the context collection plan at docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md.",
-      "T003 is the earliest child that may collect targeted context if explicitly authorized.",
+      "T003 produced docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md using direct file/source inspection only.",
       "Runtime extraction, candidate creation, model calls, UI changes, apply-promotion, and memory/canon mutation are excluded from T001."
     ]
   },
@@ -126,14 +127,15 @@
       "id": "PHASE8-IMPL-001-T003",
       "title": "Targeted context collection and source inventory",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-001-T002"
       ],
       "scope": [
-        "Run only explicitly authorized context tools or direct source inspection per T002 plan.",
-        "Collect narrow evidence about current OMI, storage, frontend, guardrails, candidate schemas, and tests.",
-        "Produce docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md.",
+        "Completed by direct file/source inspection only.",
+        "Collected narrow evidence about current OMI, storage, frontend, guardrails, candidate schemas, and tests.",
+        "Produced docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md.",
+        "Recommended T004 consider Writer Assistant Core candidate schema constants plus source-level/contract tests before extraction runtime.",
         "No runtime implementation."
       ]
     },
@@ -141,7 +143,7 @@
       "id": "PHASE8-IMPL-001-T004",
       "title": "First runtime slice decision",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-001-T003"
       ],
@@ -195,7 +197,8 @@
     "PHASE8-IMPL-001 is registered as the active Writer Assistant Core parent.",
     "PHASE8-IMPL-001-T001 is registered as complete.",
     "PHASE8-IMPL-001-T002 is registered as complete with context collection plan published.",
-    "PHASE8-IMPL-001-T003 is registered as the next ready child.",
+    "PHASE8-IMPL-001-T003 is registered as complete with targeted context report published.",
+    "PHASE8-IMPL-001-T004 is registered as the next ready child.",
     "T002 plans context collection before any context tool execution.",
     "T003 may run targeted context tools only if explicitly authorized.",
     "No runtime extraction, candidate creation, backend route, frontend UI, model call, apply-promotion, memory/canon mutation, or training/dataset work is implemented by T001."
@@ -217,7 +220,7 @@
     "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
   ],
   "deferred_work": [
-    "Actual context collection is deferred to T003 per the T002 plan at docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md.",
+    "T003 direct-inspection context collection is complete and recorded in docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md.",
     "Runtime extraction, candidate creation, typed OMI expansion, backend routes, frontend UI, and first slice implementation are deferred to later children.",
     "Apply-promotion and memory/canon mutation remain future-only.",
     "Model/Ollama integration remains future-only and requires separate authorization."
@@ -225,7 +228,7 @@
   "context_tools_policy": [
     "T001 does not run context tools.",
     "T002 publishes the context collection plan; T002 does not run context tools.",
-    "T003 may run targeted context tools only if explicitly authorized per the T002 plan.",
+    "T003 used direct file/source inspection only and did not run context tools.",
     "Context output is evidence, not roadmap truth.",
     "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
   ]
