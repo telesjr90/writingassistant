@@ -36,6 +36,27 @@ OMI_GUIDED_CREATION_SPEC_MD = ROADMAP_ROOT / "omi_guided_project_creation_spec.m
 OMI_SCHEMA_LIFECYCLE_MD = ROADMAP_ROOT / "omi_mvp_schema_lifecycle.md"
 OMI_STORAGE_MODEL_MD = ROADMAP_ROOT / "omi_storage_model.md"
 OMI_IDEAS_CANDIDATES_SPEC_MD = ROADMAP_ROOT / "omi_ideas_candidates_page_spec.md"
+TASK_009_MD = ROADMAP_ROOT / "tasks" / "PHASE7-IMPL-009.md"
+INVENTORY_009_MD = ROADMAP_ROOT / "inventory" / "PHASE7-IMPL-009.md"
+ENRICHMENT_009_JSON = ROADMAP_ROOT / "enrichment" / "PHASE7-IMPL-009.enrichment.json"
+PROJECT_MEMORY_CANON_PAGE_SPEC_MD = ROADMAP_ROOT / "project_memory_canon_page_structure_spec.md"
+PROJECT_MEMORY_CANON_STORAGE_MODEL_MD = ROADMAP_ROOT / "project_memory_canon_storage_model.md"
+APPROVED_CHARACTERS_PAGE_SPEC_MD = ROADMAP_ROOT / "approved_characters_page_spec.md"
+APPROVED_LOCATIONS_SETTINGS_PAGE_SPEC_MD = (
+    ROADMAP_ROOT / "approved_locations_settings_page_spec.md"
+)
+APPROVED_TIMELINE_PAGE_SPEC_MD = ROADMAP_ROOT / "approved_timeline_page_spec.md"
+APPROVED_PLOT_THREADS_PAGE_SPEC_MD = ROADMAP_ROOT / "approved_plot_threads_page_spec.md"
+CONTINUITY_CONSISTENCY_PAGE_SPEC_MD = ROADMAP_ROOT / "continuity_consistency_page_spec.md"
+APPROVED_OPEN_QUESTIONS_PAGE_SPEC_MD = ROADMAP_ROOT / "approved_open_questions_page_spec.md"
+APPROVED_RELATIONSHIPS_PAGE_SPEC_MD = ROADMAP_ROOT / "approved_relationships_page_spec.md"
+APPROVED_ORGANIZATIONS_GROUPS_PAGE_SPEC_MD = (
+    ROADMAP_ROOT / "approved_organizations_groups_page_spec.md"
+)
+APPROVED_OBJECTS_ITEMS_PAGE_SPEC_MD = ROADMAP_ROOT / "approved_objects_items_page_spec.md"
+OMI_STORY_KNOWLEDGE_CANDIDATE_EXPANSION_MD = (
+    ROADMAP_ROOT / "omi_story_knowledge_candidate_expansion.md"
+)
 
 
 def read_source(path: Path) -> str:
@@ -155,6 +176,54 @@ def omi_storage_model_source() -> str:
 @pytest.fixture(scope="module")
 def omi_ideas_candidates_spec_source() -> str:
     return read_source(OMI_IDEAS_CANDIDATES_SPEC_MD)
+
+
+@pytest.fixture(scope="module")
+def task_009_source() -> str:
+    return read_source(TASK_009_MD)
+
+
+@pytest.fixture(scope="module")
+def inventory_009_source() -> str:
+    return read_source(INVENTORY_009_MD)
+
+
+@pytest.fixture(scope="module")
+def enrichment_009_source() -> str:
+    return read_source(ENRICHMENT_009_JSON)
+
+
+@pytest.fixture(scope="module")
+def project_memory_canon_page_spec_source() -> str:
+    return read_source(PROJECT_MEMORY_CANON_PAGE_SPEC_MD)
+
+
+@pytest.fixture(scope="module")
+def project_memory_canon_storage_model_source() -> str:
+    return read_source(PROJECT_MEMORY_CANON_STORAGE_MODEL_MD)
+
+
+@pytest.fixture(scope="module")
+def approved_category_specs_source() -> str:
+    return "\n".join(
+        read_source(path)
+        for path in [
+            APPROVED_CHARACTERS_PAGE_SPEC_MD,
+            APPROVED_LOCATIONS_SETTINGS_PAGE_SPEC_MD,
+            APPROVED_TIMELINE_PAGE_SPEC_MD,
+            APPROVED_PLOT_THREADS_PAGE_SPEC_MD,
+            CONTINUITY_CONSISTENCY_PAGE_SPEC_MD,
+            APPROVED_OPEN_QUESTIONS_PAGE_SPEC_MD,
+            APPROVED_RELATIONSHIPS_PAGE_SPEC_MD,
+            APPROVED_ORGANIZATIONS_GROUPS_PAGE_SPEC_MD,
+            APPROVED_OBJECTS_ITEMS_PAGE_SPEC_MD,
+        ]
+    )
+
+
+@pytest.fixture(scope="module")
+def omi_story_knowledge_candidate_expansion_source() -> str:
+    return read_source(OMI_STORY_KNOWLEDGE_CANDIDATE_EXPANSION_MD)
 
 
 class TestApiProjectHelpers:
@@ -2815,6 +2884,456 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
         ):
             assert forbidden_term not in lower_source, (
                 f"{source_path.relative_to(REPO_ROOT)} must not contain T006-forbidden term {forbidden_term!r}"
+            )
+
+
+class TestApprovedMemoryCanonShellContract:
+    """PHASE7-IMPL-009-T002 source contract for approved-only Memory / Canon shell."""
+
+    CATEGORY_CONTRACTS = (
+        ("characters", "Characters", "memory/characters.json"),
+        ("locations_settings", "Locations / Settings", "memory/locations.json"),
+        ("timeline", "Timeline", "memory/timeline.json"),
+        ("plot_threads", "Plot Threads", "memory/plot_threads.json"),
+        ("continuity_consistency", "Continuity / Consistency", "memory/continuity_warnings.json"),
+        ("open_questions", "Open Questions", "memory/open_questions.json"),
+        ("relationships", "Relationships", "memory/relationships.json"),
+        ("organizations_groups", "Organizations / Groups", "memory/organizations.json"),
+        ("objects_items", "Objects / Items", "memory/objects.json"),
+    )
+
+    @staticmethod
+    def _runtime_source_without_comments(source: str) -> str:
+        return TestOmiGuidedProjectCreationBackendStorageDecision._without_line_comments(
+            source
+        )
+
+    def test_approved_memory_category_list_is_defined_in_contract_sources(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        enrichment_009_source: str,
+        project_memory_canon_page_spec_source: str,
+        project_memory_canon_storage_model_source: str,
+        approved_category_specs_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [
+                task_009_source,
+                inventory_009_source,
+                enrichment_009_source,
+                project_memory_canon_page_spec_source,
+                project_memory_canon_storage_model_source,
+                approved_category_specs_source,
+            ]
+        )
+
+        for category_id, label, future_source in self.CATEGORY_CONTRACTS:
+            assert category_id in enrichment_009_source
+            assert label in combined_contract
+            assert future_source in combined_contract
+
+        for category_spec_phrase in (
+            "Approved Characters",
+            "Approved Locations / Settings",
+            "Approved Timeline",
+            "Approved Plot Threads",
+            "Continuity / Consistency",
+            "Approved Open Questions",
+            "Approved Relationships",
+            "Approved Organizations / Groups",
+            "Approved Objects / Items",
+        ):
+            assert category_spec_phrase in approved_category_specs_source
+
+    def test_approved_only_empty_state_contract_is_documented(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        enrichment_009_source: str,
+        project_memory_canon_page_spec_source: str,
+        approved_category_specs_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [
+                task_009_source,
+                inventory_009_source,
+                enrichment_009_source,
+                project_memory_canon_page_spec_source,
+                approved_category_specs_source,
+            ]
+        ).lower()
+
+        for required_concept in (
+            "approved-only",
+            "empty state",
+            "no approved",
+            "candidate backlog",
+            "not canon",
+            "future apply-promotion",
+            "read-only",
+            "missing `memory/` storage is a valid empty state",
+        ):
+            assert required_concept in combined_contract
+
+        for _, _, future_source in self.CATEGORY_CONTRACTS:
+            assert future_source in combined_contract
+
+    def test_omi_candidates_and_promotion_records_are_excluded_from_approved_canon(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        project_memory_canon_page_spec_source: str,
+        omi_storage_model_source: str,
+        omi_story_knowledge_candidate_expansion_source: str,
+        omi_panel_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [
+                task_009_source,
+                inventory_009_source,
+                project_memory_canon_page_spec_source,
+                omi_storage_model_source,
+                omi_story_knowledge_candidate_expansion_source,
+            ]
+        )
+
+        for required_boundary in (
+            "OMI candidates are not canon",
+            "Promotion records are audit records",
+            "not canon by themselves",
+            "approved-but-not-applied candidates",
+            "must not appear in approved",
+            "candidate-as-canon",
+            "no silent promotion",
+        ):
+            assert required_boundary.lower() in combined_contract.lower()
+
+        for omi_candidate_surface in (
+            "CANDIDATE_TYPES",
+            "CANDIDATE_STATUSES",
+            "PROMOTION_TARGETS",
+            "promotionReadiness",
+            "Promotion records",
+        ):
+            assert omi_candidate_surface in omi_panel_source
+
+        assert "applyPromotion" not in omi_panel_source
+        assert "promoteToCanon" not in omi_panel_source
+
+    def test_no_apply_promotion_or_promotion_execution_contract(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        app_source: str,
+        api_source: str,
+        omi_panel_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_009_source, inventory_009_source]).lower()
+        for required_contract in (
+            "no apply-promotion",
+            "promotion records are audit records only",
+            "no apply-promotion helper",
+            "no apply-promotion route",
+            "promotion records are audit records, not applied memory",
+        ):
+            assert (
+                required_contract in combined_contract
+                or required_contract.replace("promotion records are audit records, not applied memory", "promotion records are audit records only") in combined_contract
+            )
+
+        combined_runtime = "\n".join(
+            [
+                app_source,
+                api_source,
+                omi_panel_source,
+                backend_main_source,
+                project_manager_source,
+            ]
+        )
+        for forbidden_runtime_token in (
+            "applyPromotion",
+            "executePromotion",
+            "promoteToCanon",
+            "promoteToMemory",
+            "apply_omi_promotion",
+            "execute_omi_promotion",
+            "promote_to_canon",
+            "promote_to_memory",
+            "/apply-promotion",
+            "/apply_promotion",
+        ):
+            assert forbidden_runtime_token not in combined_runtime
+
+    def test_no_memory_or_canon_mutation_helpers_or_routes_exist(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_009_source, inventory_009_source]).lower()
+        for required_read_only_contract in (
+            "read-only",
+            "no memory/canon mutation",
+            "opening the shell must not create `memory/*.json`",
+            "no approved-memory/canon helpers",
+            "no memory/canon mutation helper",
+        ):
+            assert required_read_only_contract in combined_contract
+
+        combined_runtime = "\n".join([api_source, backend_main_source, project_manager_source])
+        for forbidden_mutation_token in (
+            "saveCanon",
+            "saveMemory",
+            "updateCanon",
+            "updateMemory",
+            "createApprovedMemory",
+            "createCanon",
+            "createMemory",
+            "approveCandidate",
+            "applyApprovedMemory",
+            "writeCanon",
+            "writeMemory",
+            "save_canon",
+            "save_memory",
+            "update_canon",
+            "update_memory",
+            "create_approved_memory",
+            "create_canon",
+            "create_memory",
+            "approve_candidate",
+            "write_canon",
+            "write_memory",
+        ):
+            assert forbidden_mutation_token not in combined_runtime
+
+    def test_no_backend_route_or_frontend_api_dependency_required_for_initial_shell(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        enrichment_009_source: str,
+        app_source: str,
+        api_source: str,
+        backend_main_source: str,
+        project_manager_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [task_009_source, inventory_009_source, enrichment_009_source]
+        )
+        for route_contract in (
+            "Initial empty-state shell can avoid API changes",
+            "No API is required for the initial approved-only empty-state shell",
+            "No Memory / Canon routes",
+            "No approved-memory helper exists",
+            "Approved-memory read APIs unless a later contract proves they are needed",
+        ):
+            assert route_contract in combined_contract
+
+        combined_runtime = "\n".join(
+            [app_source, api_source, backend_main_source, project_manager_source]
+        )
+        for forbidden_route_or_helper in (
+            "/memory-canon",
+            "/approved-memory",
+            "fetchApprovedMemory",
+            "fetchCanon",
+            "saveApprovedMemory",
+            "saveCanon",
+            "getApprovedMemory",
+            "getCanon",
+            "approved_memory",
+            "memory_canon",
+        ):
+            assert forbidden_route_or_helper not in combined_runtime
+
+        assert "client.get(`/projects/${projectId}/omi`)" in api_source
+        assert "export async function getOMI" in api_source
+
+    def test_frontend_integration_boundary_is_workspace_not_editor_or_overview(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        app_source: str,
+        project_nav_source: str,
+        project_overview_source: str,
+        editor_source: str,
+        shared_document_controller_source: str,
+    ) -> None:
+        combined_contract = "\n".join([task_009_source, inventory_009_source]).lower()
+        for integration_contract in (
+            "workspace view",
+            "not become a document type",
+            "not the dedicated memory / canon shell",
+            "must not become a document type or save path",
+            "preserve project overview/editor/omi panel separation",
+        ):
+            assert integration_contract in combined_contract
+
+        assert "OVERVIEW: 'overview'" in app_source
+        assert "EDITOR: 'editor'" in app_source
+        assert "DOCUMENT_TYPES = Object.freeze" in shared_document_controller_source
+        assert "SCENE: 'scene'" in shared_document_controller_source
+        assert "NOTE: 'note'" in shared_document_controller_source
+        assert "MATERIAL: 'material'" in shared_document_controller_source
+        assert "memory" not in shared_document_controller_source.lower()
+        assert "canon" not in shared_document_controller_source.lower()
+        assert "Memory / Canon" not in editor_source
+        assert "Memory / Canon" not in project_nav_source
+        assert "Approved Memory / Canon" in project_overview_source
+
+    def test_project_scoped_selected_project_contract_is_defined_without_global_memory(
+        self,
+        inventory_009_source: str,
+        project_memory_canon_page_spec_source: str,
+        app_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [inventory_009_source, project_memory_canon_page_spec_source]
+        ).lower()
+        for project_scoped_contract in (
+            "active project",
+            "project-local",
+        ):
+            assert project_scoped_contract in combined_contract
+
+        assert "const [activeProjectId, setActiveProjectId] = useState(PROJECT_ID)" in app_source
+        assert "setActiveProjectId(projectId)" in app_source
+        assert "setSelectedDocumentType('')" in app_source
+        assert "setSelectedNoteId('')" in app_source
+        assert "setSelectedMaterialId('')" in app_source
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)" in app_source
+        assert "getOMI(activeProjectId)" in app_source
+
+    def test_read_only_category_shell_contract_defers_mutation_and_detail_editing(
+        self,
+        task_009_source: str,
+        inventory_009_source: str,
+        enrichment_009_source: str,
+    ) -> None:
+        combined_contract = "\n".join(
+            [task_009_source, inventory_009_source, enrichment_009_source]
+        ).lower()
+        for allowed_shell_concept in (
+            "category cards",
+            "category cards/tabs",
+            "approved-only empty states",
+            "read-only shell",
+            "static or prop-driven category cards/tabs",
+        ):
+            assert allowed_shell_concept in combined_contract
+
+        for deferred_concept in (
+            "apply-promotion",
+            "durable approved-memory storage mutation",
+            "category detail editing",
+            "metadata editing ui",
+            "note/material create/import/upload ui",
+        ):
+            assert deferred_concept in combined_contract
+
+    def test_omi_guided_setup_and_project_creation_do_not_seed_approved_canon(
+        self,
+        inventory_009_source: str,
+        omi_guided_project_creation_source: str,
+        app_source: str,
+    ) -> None:
+        for setup_boundary in (
+            "Staged setup draft data is not approved canon",
+            "not approved canon",
+            "frontend-transient",
+            "not approved project truth",
+        ):
+            assert setup_boundary.lower() in inventory_009_source.lower() or (
+                setup_boundary in omi_guided_project_creation_source
+            )
+
+        assert "Setup candidate" in omi_guided_project_creation_source
+        assert "Candidate planning data" in omi_guided_project_creation_source
+        assert "not approved project truth" in omi_guided_project_creation_source
+        assert "not canon" in omi_guided_project_creation_source
+        assert "not memory" in omi_guided_project_creation_source
+
+        shell_render = app_source.split("<OmiGuidedProjectCreation", 1)[1].split("/>", 1)[0]
+        for forbidden_prop in (
+            "onCreateApprovedMemory",
+            "onCreateCanon",
+            "onCreateMemory",
+            "onApplyPromotion",
+        ):
+            assert forbidden_prop not in shell_render
+
+    def test_phase9_docs_define_t002_to_t007_contract_sequence(
+        self, task_009_source: str, enrichment_009_source: str
+    ) -> None:
+        combined_contract = "\n".join([task_009_source, enrichment_009_source])
+        for child_contract in (
+            "PHASE7-IMPL-009-T002",
+            "Approved-memory shell data contract and source-level tests",
+            "PHASE7-IMPL-009-T003",
+            "Memory / Canon shell component",
+            "PHASE7-IMPL-009-T004",
+            "ProjectNav/App integration",
+            "PHASE7-IMPL-009-T005",
+            "Approved-category empty-state coverage",
+            "PHASE7-IMPL-009-T006",
+            "Memory / Canon shell regression coverage",
+            "PHASE7-IMPL-009-T007",
+            "Roadmap/status closeout",
+        ):
+            assert child_contract in combined_contract
+
+    @pytest.mark.parametrize(
+        "source_path",
+        [
+            APP_JSX,
+            API_JS,
+            PROJECT_NAV_JSX,
+            PROJECT_OVERVIEW_JSX,
+            OMI_PANEL_JSX,
+            OMI_GUIDED_PROJECT_CREATION_JSX,
+            EDITOR_JSX,
+            SHARED_DOCUMENT_CONTROLLER_JS,
+            BACKEND_MAIN_PY,
+            PROJECT_MANAGER_PY,
+        ],
+    )
+    def test_runtime_sources_exclude_t002_forbidden_approved_memory_behavior(
+        self, source_path: Path
+    ) -> None:
+        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        forbidden_terms = (
+            "generated prose",
+            "ai-written",
+            "ai suggestion",
+            "summarize project",
+            "summarize idea",
+            "summarize note",
+            "summarize material",
+            "extract characters",
+            "extract locations",
+            "extract timeline",
+            "semantic search",
+            "story analysis",
+            "story check auto-run",
+            "dramatica analysis",
+            "ollama call",
+            "model call",
+            "apply promotion",
+            "canon mutation",
+            "memory mutation",
+            "approved truth mutation",
+            "promote candidate",
+            "hidden project write",
+            "jsonl",
+            "dataset",
+        )
+        for forbidden_term in forbidden_terms:
+            assert forbidden_term not in lower_source, (
+                f"{source_path.relative_to(REPO_ROOT)} must not contain T002-forbidden term {forbidden_term!r}"
             )
 
 
