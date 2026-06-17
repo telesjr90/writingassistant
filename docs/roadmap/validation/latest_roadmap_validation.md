@@ -1,5 +1,41 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-002-T005 Project-Local Candidate Storage Path Contract Tests
+
+- Date: 2026-06-16
+- Result: PASS (tests-only; expected red pytest handoff to T006)
+- Scope: tests-only storage path contract coverage for `PHASE8-IMPL-002-T005`.
+- Parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
+- Completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests.
+- Active child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton.
+- Next child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout.
+- Last completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests.
+- Prior completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers.
+- Test contract summary:
+  - Added `tests/test_writer_assistant_core_candidate_storage_contract.py` defining the expected T006 helper API on `backend.story_knowledge.candidate_storage`.
+  - Covers storage directory path, candidate index path, candidate record path, unsafe candidate ID rejection, project-local boundaries, forbidden storage locations, no filesystem side effects, source-level boundary checks, and validation-helper compatibility.
+  - Future paths: `projects/{project_id}/writer_assistant/candidates/{candidate_id}.json` and optional `projects/{project_id}/writer_assistant/index.json`.
+  - T005 authorizes T006 for pure path helper skeleton only; JSON read/write/list remains deferred.
+  - No production storage helpers or storage writes added in T005.
+- Created:
+  - `tests/test_writer_assistant_core_candidate_storage_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-002.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_storage_contract.py -q`: expected FAIL/collection error until T006 implements `backend.story_knowledge.candidate_storage` (`ImportError: cannot import name 'candidate_storage' from 'backend.story_knowledge'`).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_record_contract.py -q`: PASS.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS.
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: tests-only plus roadmap/status updates; no context tools, production runtime code, storage writes, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-002-T004 Candidate Record Validation Helpers
 
 - Date: 2026-06-16

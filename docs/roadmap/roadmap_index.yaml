@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-002",
     "current_parent_task_title": "Writer Assistant Core candidate storage contract and evidence/provenance validation",
-    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is complete as the first Writer Assistant Core readiness parent. PHASE8-IMPL-002 is active for candidate storage contracts and evidence/provenance validation. T004 completed pure validation helpers in backend/story_knowledge/candidate_record.py; T005 is active for project-local storage path contract tests; storage writes remain deferred to T005/T006."
+    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is complete as the first Writer Assistant Core readiness parent. PHASE8-IMPL-002 is active for candidate storage contracts and evidence/provenance validation. T005 completed tests-only storage path contract coverage; T006 is active for pure path helper skeleton; storage writes remain deferred."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -601,7 +601,7 @@
       "id": "PHASE8-IMPL-002-T005",
       "title": "Project-local candidate storage path contract tests",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-002",
       "depends_on": [
         "PHASE8-IMPL-002-T004"
@@ -618,7 +618,7 @@
       "id": "PHASE8-IMPL-002-T006",
       "title": "Candidate storage helper skeleton",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "parent": "PHASE8-IMPL-002",
       "depends_on": [
         "PHASE8-IMPL-002-T005"

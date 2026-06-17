@@ -162,28 +162,36 @@
       "id": "PHASE8-IMPL-002-T005",
       "title": "Project-local candidate storage path contract tests",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-002-T004"
       ],
       "scope": [
         "Tests-first.",
         "Define where typed Writer Assistant Core candidates may live under project-local storage.",
-        "Verify path safety and read/list/write boundaries before adding writes."
+        "Verify path safety and read/list/write boundaries before adding writes.",
+        "Created tests/test_writer_assistant_core_candidate_storage_contract.py.",
+        "Defines expected T006 helper API on backend.story_knowledge.candidate_storage.",
+        "Targeted pytest expected red until T006 implements pure path helpers.",
+        "T005 authorizes T006 for pure path helper skeleton only; JSON read/write/list deferred.",
+        "Tests-only; no production storage helpers or storage writes in T005."
       ]
     },
     {
       "id": "PHASE8-IMPL-002-T006",
       "title": "Candidate storage helper skeleton",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "depends_on": [
         "PHASE8-IMPL-002-T005"
       ],
       "scope": [
-        "Implement minimal helper skeleton only if T005 authorizes it.",
-        "Candidate-only storage under project-local area.",
-        "No extraction, routes, UI, apply-promotion, or memory/canon mutation."
+        "Implement minimal pure path helper skeleton authorized by T005.",
+        "Expected module backend/story_knowledge/candidate_storage.py.",
+        "Expected exports candidate_storage_dir, candidate_index_path, candidate_record_path, validate_candidate_storage_path.",
+        "Candidate-only storage under projects/{project_id}/writer_assistant/.",
+        "No extraction, routes, UI, apply-promotion, or memory/canon mutation.",
+        "JSON read/write/list helpers remain deferred unless a later task expands scope."
       ]
     },
     {
@@ -226,6 +234,11 @@
     "t004_helper_module": "backend/story_knowledge/candidate_record.py",
     "t004_pytest_result": "pass",
     "t004_scope": "tiny_pure_validation_helpers_no_io",
+    "t005_test_file": "tests/test_writer_assistant_core_candidate_storage_contract.py",
+    "t005_expected_helper_module": "backend.story_knowledge.candidate_storage",
+    "t005_pytest_result": "expected_red_until_t006",
+    "t005_scope": "tests_only_pure_path_contract_no_writes",
+    "t006_scope": "pure_path_helper_skeleton_only",
     "storage_writes_authorized": false,
     "storage_writes_earliest_child": "PHASE8-IMPL-002-T005_or_T006"
   },
