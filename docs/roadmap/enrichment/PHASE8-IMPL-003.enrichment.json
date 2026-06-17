@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-003",
   "title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
   "type": "runtime",
-  "status": "active",
+  "status": "done",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-002"
@@ -99,8 +99,9 @@
       "PHASE8-IMPL-003-T005 added tests-only list contract coverage.",
       "PHASE8-IMPL-003-T006 added list_candidate_records to backend/story_knowledge/candidate_persistence.py.",
       "Targeted list pytest passes after T006.",
-      "PHASE8-IMPL-003 starts with contract decision and tests before persistence helpers.",
-      "List behavior is in-scope after T005 tests; index read/write deferred to later parent."
+      "PHASE8-IMPL-003-T007 closed parent with final validation.",
+      "Final output is candidate-only write/read/list persistence helpers.",
+      "Index read/write remains deferred to later parent."
     ]
   },
   "child_tasks": [
@@ -216,19 +217,73 @@
       "id": "PHASE8-IMPL-003-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-003-T006"
       ],
       "scope": [
-        "Close parent.",
-        "Summarize persistence behavior and deferred work.",
-        "Identify next roadmap-authorized parent or decision point."
+        "Closed parent.",
+        "Summarized persistence behavior and deferred work.",
+        "Recorded final artifacts, validation results, and boundary confirmations.",
+        "Recorded that no next Writer Assistant Core parent is published; next parent/child requires owner/roadmap confirmation."
       ]
     }
   ],
   "future_storage_path": "projects/{project_id}/writer_assistant/candidates/{candidate_id}.json",
   "future_index_path": "projects/{project_id}/writer_assistant/index.json",
+  "persistence_decision_summary": {
+    "decision_file": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md",
+    "helper_module": "backend/story_knowledge/candidate_persistence.py",
+    "write_helper": "write_candidate_record",
+    "read_helper": "read_candidate_record",
+    "list_helper": "list_candidate_records",
+    "t003_test_file": "tests/test_writer_assistant_core_candidate_persistence_contract.py",
+    "t003_pytest_result": "pass_after_t004",
+    "t004_pytest_result": "pass",
+    "t005_test_file": "tests/test_writer_assistant_core_candidate_list_contract.py",
+    "t005_pytest_result": "pass_after_t006",
+    "t006_pytest_result": "pass",
+    "index_read_write_authorized": false,
+    "parent_complete": true,
+    "t007_closeout_result": "pass"
+  },
+  "final_artifacts": {
+    "decision": [
+      "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md"
+    ],
+    "runtime": [
+      "backend/story_knowledge/candidate_persistence.py"
+    ],
+    "tests": [
+      "tests/test_writer_assistant_core_candidate_persistence_contract.py",
+      "tests/test_writer_assistant_core_candidate_list_contract.py"
+    ]
+  },
+  "final_validation": {
+    "writer_assistant_core_contract_pytest": "pass_263_total",
+    "omi_project_manager_regression_pytest": "pass_109",
+    "check_enrichment": "pass",
+    "validate_roadmap": "pass",
+    "whitespace_check": "pass"
+  },
+  "final_behavior": {
+    "write_candidate_record": true,
+    "read_candidate_record": true,
+    "list_candidate_records": true,
+    "candidate_json_source_of_truth": "writer_assistant/candidates/*.json",
+    "validate_before_write": true,
+    "read_list_validate_loaded_records": true,
+    "read_list_side_effect_free": true,
+    "list_direct_file_only": true,
+    "list_deterministic_sort_by_candidate_id": true,
+    "index_read_write": false,
+    "extraction_runtime": false,
+    "backend_routes": false,
+    "frontend_ui": false,
+    "model_calls": false,
+    "apply_promotion": false,
+    "memory_canon_mutation": false
+  },
   "prior_runtime_artifacts": {
     "validation_helpers": "backend/story_knowledge/candidate_record.py",
     "path_helpers": "backend/story_knowledge/candidate_storage.py",
@@ -279,6 +334,11 @@
     "Index read/write helpers (deferred to PHASE8-IMPL-004 or equivalent).",
     "Project runtime artifacts beyond authorized candidate persistence."
   ],
+  "next_frontier": {
+    "published_next_parent": null,
+    "requires_owner_roadmap_confirmation": true,
+    "proposed_not_active": "PHASE8-IMPL-004 — Writer Assistant Core candidate index contract and derived index helpers"
+  },
   "context_tools_policy": [
     "T001 does not run context tools.",
     "PHASE8-IMPL-001 T003 already produced targeted context.",

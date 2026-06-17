@@ -82,7 +82,7 @@ Future storage path remains:
 4. `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Status: complete.
 5. `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Status: complete.
 6. `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Status: complete.
-7. `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Status: ready.
+7. `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -161,6 +161,9 @@ Future storage path remains:
 - Close parent.
 - Summarize persistence behavior and deferred work.
 - Identify next roadmap-authorized parent or decision point.
+- Completed: closed parent with final roadmap/status updates and validation.
+- Recorded final artifacts, runtime behavior, deferred work, and boundary confirmations.
+- Recorded that no next Writer Assistant Core parent is published; next parent/child requires owner/roadmap confirmation.
 
 ## Acceptance Criteria
 
@@ -197,4 +200,76 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Active child: `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Next child: none under this parent after T007 closeout. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. T002 accepted write/read persistence contract; list-only in T005/T006; index deferred. T003 added tests-only write/read persistence contract coverage in `tests/test_writer_assistant_core_candidate_persistence_contract.py`. T004 added minimal candidate-only JSON write/read helpers in `backend/story_knowledge/candidate_persistence.py`, and the targeted persistence contract pytest now passes. T005 added tests-only list contract coverage in `tests/test_writer_assistant_core_candidate_list_contract.py`. T006 added `list_candidate_records` to `backend/story_knowledge/candidate_persistence.py`, and the targeted list contract pytest now passes. T005/T006 are list-only despite the child labels mentioning list/index; index read/write remains deferred to a later parent. No index helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
+`PHASE8-IMPL-003` is complete. Last completed child: `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Prior completed child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Prior completed child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Prior completed child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Prior completed child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Prior completed child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Prior completed child: `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Prior completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`.
+
+## Final Result
+
+`PHASE8-IMPL-003` is complete. It accepted the candidate persistence contract decision, added tests-first write/read and list contract coverage, implemented minimal candidate-only JSON write/read/list persistence helpers, and completed final roadmap/status validation. Candidate JSON files under `writer_assistant/candidates/*.json` are source of truth. Write validates before persistence. Read/list validate loaded records and are side-effect free. List is direct-file-only, non-recursive, and deterministic by `candidate_id`. No index is read, written, or created. No extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
+
+## Final Artifacts
+
+Decision artifact:
+
+- `docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md`
+
+Implemented runtime file:
+
+- `backend/story_knowledge/candidate_persistence.py`
+
+Final test files:
+
+- `tests/test_writer_assistant_core_candidate_persistence_contract.py`
+- `tests/test_writer_assistant_core_candidate_list_contract.py`
+
+## Final Runtime Behavior
+
+- `write_candidate_record(project_dir, record) -> dict`
+- `read_candidate_record(project_dir, candidate_id) -> dict`
+- `list_candidate_records(project_dir) -> list[dict]`
+- Candidate JSON files under `writer_assistant/candidates/*.json` are source of truth.
+- Write validates before persistence.
+- Read/list validate loaded records.
+- List is direct-file-only, non-recursive, deterministic by `candidate_id`.
+- Read/list are side-effect free.
+- No index is read/written/created.
+
+## Final Validation Results
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (263 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+
+## Final Boundaries
+
+- Candidate-only JSON persistence helpers exist; candidates are not canon.
+- Persistence existence does not prove story truth.
+- No index read/write helpers.
+- No runtime extraction or candidate extraction from owner text.
+- No backend routes or frontend candidate review/backlog UI.
+- No model/Ollama calls, semantic search, or Story Check auto-runs.
+- No apply-promotion or OMI candidate promotion.
+- No memory/canon mutation or approved-memory routes/helpers.
+- No package/dependency changes.
+- No training data, JSONL records, dataset artifacts, or project runtime files.
+- No staging, commit, or push.
+
+## Deferred Work
+
+- Index read/write helpers.
+- Backend routes.
+- Frontend candidate review/backlog UI.
+- Extraction from owner text.
+- Model/Ollama calls.
+- Semantic search.
+- Story Check auto-runs.
+- Apply-promotion.
+- OMI candidate promotion.
+- Memory/canon mutation.
+- Approved-memory routes/helpers.
+- Training/JSONL/dataset work.
+
+## Next Frontier
+
+No next Writer Assistant Core parent is currently published in `docs/roadmap/roadmap_index.yaml`. The next parent/child requires owner/roadmap confirmation. A proposed future direction (not active truth) is `PHASE8-IMPL-004` — Writer Assistant Core candidate index contract and derived index helpers — but it is not authorized until published in roadmap docs.

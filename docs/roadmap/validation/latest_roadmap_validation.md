@@ -1,5 +1,62 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-003-T007 Roadmap/Status Closeout
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/status closeout for `PHASE8-IMPL-003` after completed T001-T006.
+- Parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
+- Final parent result: `PHASE8-IMPL-003` complete.
+- Completed child: `PHASE8-IMPL-003-T007` - Roadmap/status closeout.
+- Last completed child: `PHASE8-IMPL-003-T007` - Roadmap/status closeout.
+- Prior completed children:
+  - `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation.
+  - `PHASE8-IMPL-003-T005` - Candidate list/index contract tests.
+  - `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers.
+  - `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests.
+  - `PHASE8-IMPL-003-T002` - Candidate persistence contract decision.
+  - `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan.
+- Final parent outcome:
+  - Accepted candidate persistence contract decision.
+  - Added tests-first write/read and list contract coverage.
+  - Implemented candidate-only JSON write/read/list persistence helpers.
+  - No index helpers, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation.
+- Final artifacts:
+  - `docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md`
+  - `tests/test_writer_assistant_core_candidate_persistence_contract.py`
+  - `backend/story_knowledge/candidate_persistence.py`
+  - `tests/test_writer_assistant_core_candidate_list_contract.py`
+- Final runtime behavior:
+  - `write_candidate_record(project_dir, record) -> dict`
+  - `read_candidate_record(project_dir, candidate_id) -> dict`
+  - `list_candidate_records(project_dir) -> list[dict]`
+  - Candidate JSON files under `writer_assistant/candidates/*.json` are source of truth.
+  - Write validates before persistence; read/list validate loaded records.
+  - List is direct-file-only, non-recursive, deterministic by `candidate_id`.
+  - Read/list are side-effect free; no index is read/written/created.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-003.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+- Writer Assistant Core candidate contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+  - Result: PASS (263 passed).
+- Focused regression pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`
+  - Result: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Next frontier: no next Writer Assistant Core parent is published in `docs/roadmap/roadmap_index.yaml`; next parent/child requires owner/roadmap confirmation. Proposed future direction (not active): `PHASE8-IMPL-004` — Writer Assistant Core candidate index contract and derived index helpers.
+- Context tools: none run.
+- Boundary summary: docs/status closeout only; no context tools, runtime code changes, test changes, index helpers, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-003-T006 Candidate List Helper Implementation
 
 - Date: 2026-06-17

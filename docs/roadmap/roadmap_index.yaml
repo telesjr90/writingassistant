@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-003",
     "current_parent_task_title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
-    "frontier_note": "PHASE8-IMPL-003 is active through T006. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. Active child is PHASE8-IMPL-003-T007 closeout. T006 added list_candidate_records to candidate_persistence.py; targeted list pytest passes. Index read/write remains deferred."
+    "frontier_note": "PHASE8-IMPL-003 is complete through T007. PHASE8-IMPL-001, PHASE8-IMPL-002, and PHASE8-IMPL-003 are complete. No next Writer Assistant Core parent is published; owner/roadmap confirmation is required before PHASE8-IMPL-004 or equivalent. Index read/write remains deferred."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -654,7 +654,7 @@
       "id": "PHASE8-IMPL-003",
       "title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-002"
@@ -783,7 +783,7 @@
       "id": "PHASE8-IMPL-003-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-003",
       "depends_on": [
         "PHASE8-IMPL-003-T006"
