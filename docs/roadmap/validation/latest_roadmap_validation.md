@@ -1,5 +1,39 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-002-T004 Candidate Record Validation Helpers
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: pure validation helpers for `PHASE8-IMPL-002-T004`.
+- Parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
+- Completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers.
+- Active child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests.
+- Next child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton.
+- Last completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers.
+- Prior completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests.
+- Helper module summary:
+  - Created `backend/story_knowledge/candidate_record.py` with pure validation helpers only.
+  - Exports: `validate_candidate_record`, `validate_source_locator`, `validate_evidence_item`, `validate_provenance`.
+  - No file I/O, storage writes, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation.
+- Created:
+  - `backend/story_knowledge/candidate_record.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-002.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_record_contract.py -q`: PASS (160 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (7 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: pure validation helpers plus roadmap/status updates; no context tools, storage writes, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-002-T003 Candidate Record Contract Tests
 
 - Date: 2026-06-16
