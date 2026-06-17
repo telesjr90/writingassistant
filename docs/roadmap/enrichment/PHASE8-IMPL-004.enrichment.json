@@ -1,0 +1,270 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-004",
+  "title": "Writer Assistant Core candidate index contract and derived index helpers",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-003"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "no_auto_promotion",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "metadata_only",
+    "no_runtime_feature_scope"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-004.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-004.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json",
+    "prior_context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
+    "prior_targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
+    "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
+    "candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+    "candidate_persistence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md"
+  },
+  "goal": "Define and implement a derived candidate index layer for typed Writer Assistant Core candidate records with validation-before-indexing and path safety before extraction runtime, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.",
+  "why_now": "PHASE8-IMPL-003 completed candidate-only JSON write/read/list persistence helpers and intentionally deferred index read/write. The next safe slice is derived index contracts and tests before runtime extraction, routes, UI, or model behavior expand.",
+  "scope": {
+    "include": [
+      "Derived index contract.",
+      "Index file path projects/{project_id}/writer_assistant/index.json.",
+      "Index record shape decision.",
+      "Source-of-truth boundary: candidate JSON files remain authoritative.",
+      "Rebuild-from-candidates behavior.",
+      "Stale/corrupt index handling.",
+      "Validation-before-indexing.",
+      "Path safety.",
+      "Tests-first index helper implementation.",
+      "Candidate-only separation from OMI MVP, memory, canon, bible, storyform, scenes, notes, and materials."
+    ],
+    "exclude": [
+      "Production runtime code in T001.",
+      "Tests in T001.",
+      "Index read/write helpers in T001.",
+      "Derived index helpers in T001.",
+      "Backend routes and API helpers.",
+      "Frontend UI.",
+      "Extraction from owner text.",
+      "Model/Ollama calls and HTTP calls.",
+      "Generated prose, rewriting, continuation, style imitation, or prose improvement.",
+      "Semantic search and Story Check auto-runs.",
+      "Dramatica analysis.",
+      "Apply-promotion, OMI candidate promotion, and memory/canon mutation.",
+      "Approved-memory routes/helpers.",
+      "Package/dependency changes.",
+      "Training data, JSONL records, dataset artifacts, and project runtime files.",
+      "Context-tool execution in T001."
+    ]
+  },
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md",
+      "docs/roadmap/validation/latest_roadmap_validation.md"
+    ],
+    "source_docs": [
+      "docs/roadmap/tasks/PHASE8-IMPL-003.md",
+      "docs/roadmap/inventory/PHASE8-IMPL-003.md",
+      "docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json",
+      "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+      "docs/roadmap/writer_assistant_core_candidate_schemas.md",
+      "docs/roadmap/omi_story_knowledge_candidate_expansion.md",
+      "docs/roadmap/omi_mvp_schema_lifecycle.md",
+      "docs/roadmap/omi_storage_model.md",
+      "docs/roadmap/project_memory_canon_storage_model.md",
+      "backend/story_knowledge/candidate_schema.py",
+      "backend/story_knowledge/candidate_record.py",
+      "backend/story_knowledge/candidate_storage.py",
+      "backend/story_knowledge/candidate_persistence.py",
+      "tests/test_writer_assistant_core_candidate_schema_contract.py",
+      "tests/test_writer_assistant_core_candidate_record_contract.py",
+      "tests/test_writer_assistant_core_candidate_storage_contract.py",
+      "tests/test_writer_assistant_core_candidate_persistence_contract.py",
+      "tests/test_writer_assistant_core_candidate_list_contract.py"
+    ],
+    "quality_notes": [
+      "T001 publishes the parent and child plan only.",
+      "PHASE8-IMPL-003 completed candidate-only write/read/list persistence; index deferred.",
+      "Candidate JSON files under writer_assistant/candidates/*.json are source of truth.",
+      "No index read/write helper exists yet.",
+      "No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-004-T001",
+      "title": "Publish candidate index parent and child-task plan",
+      "type": "planning_microtask",
+      "status": "done",
+      "depends_on": [
+        "PHASE8-IMPL-004"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Publish parent, inventory, enrichment JSON, and roadmap/status updates.",
+        "No code, tests, index helpers, context tools, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-004-T002",
+      "title": "Candidate index contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-004-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide exact derived index shape, helper API, rebuild behavior, stale/corrupt behavior, and error behavior.",
+        "No runtime implementation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-004-T003",
+      "title": "Candidate index contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-004-T002"
+      ],
+      "scope": [
+        "Tests-first.",
+        "Define derived index read/write/rebuild behavior.",
+        "Expected red if helpers missing.",
+        "No routes/UI/extraction/model behavior."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-004-T004",
+      "title": "Minimal candidate index helpers",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-004-T003"
+      ],
+      "scope": [
+        "Implement smallest derived index helpers required by T003.",
+        "Use existing candidate persistence/list helpers as source of truth.",
+        "No routes/UI/extraction/model behavior."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-004-T005",
+      "title": "Index safety and stale/corrupt regression tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-004-T004"
+      ],
+      "scope": [
+        "Tests-first or regression-only.",
+        "Focused regression test slice.",
+        "Verify index never overrides candidate JSON.",
+        "Verify corrupt/stale index behavior follows T002 decision.",
+        "Verify no memory/canon/bible/storyform/scenes/notes/materials mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-004-T006",
+      "title": "Index safety repair or hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-004-T005"
+      ],
+      "scope": [
+        "Conditional repair only if T005 finds a gap.",
+        "Otherwise docs/status validation update only.",
+        "No route/UI/extraction/model behavior."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-004-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-004-T006"
+      ],
+      "scope": [
+        "Close parent.",
+        "Summarize derived index behavior and deferred work.",
+        "Identify next roadmap-authorized parent or decision point."
+      ]
+    }
+  ],
+  "future_index_path": "projects/{project_id}/writer_assistant/index.json",
+  "candidate_source_of_truth_path": "projects/{project_id}/writer_assistant/candidates/{candidate_id}.json",
+  "index_source_of_truth_rule": "writer_assistant/index.json is derived convenience metadata only; candidate JSON files remain authoritative.",
+  "prior_runtime_artifacts": {
+    "validation_helpers": "backend/story_knowledge/candidate_record.py",
+    "path_helpers": "backend/story_knowledge/candidate_storage.py",
+    "schema_constants": "backend/story_knowledge/candidate_schema.py",
+    "json_persistence": "backend/story_knowledge/candidate_persistence.py",
+    "write_helper": "write_candidate_record",
+    "read_helper": "read_candidate_record",
+    "list_helper": "list_candidate_records",
+    "index_read_write": false
+  },
+  "acceptance_criteria": [
+    "PHASE8-IMPL-004 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-003.",
+    "PHASE8-IMPL-004-T001 publishes the parent, inventory, enrichment JSON, and roadmap/status updates.",
+    "PHASE8-IMPL-004-T002 is identified as the next child task.",
+    "Child tasks T001-T007 are documented with tests-first sequencing.",
+    "Scope explicitly prioritizes derived candidate index contract before extraction/runtime expansion.",
+    "Non-scope explicitly blocks extraction, routes, UI, model calls, index helpers in T001, apply-promotion, and memory/canon mutation.",
+    "Candidate JSON files remain source of truth; index is derived convenience metadata only.",
+    "No runtime code, tests, package files, backend/frontend files, project runtime files, training data, JSONL records, or dataset artifacts are changed in T001."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs"
+    ],
+    "notes": "T001 validation is roadmap/status only. Do not run pytest unless runtime code or tests were accidentally changed."
+  },
+  "safety_notes": [
+    "The app remains analysis-only.",
+    "No generated prose, rewriting, continuation, style imitation, prose improvement, or summaries as durable truth.",
+    "Candidates are not canon.",
+    "Index existence does not prove story truth.",
+    "Index must not become authoritative over candidate JSON source of truth.",
+    "Candidate index supports review convenience only and does not approve or promote candidates.",
+    "OMI remains the central review and future promotion layer.",
+    "Promotion records remain audit-only until future apply-promotion exists.",
+    "Memory/canon mutation is out of scope.",
+    "Index helpers must not mutate bible, storyform, scenes, notes, materials, or approved memory/canon."
+  ],
+  "deferred_work": [
+    "Extraction from owner-authored text.",
+    "Backend extraction routes.",
+    "Frontend candidate review/backlog UI.",
+    "Model/Ollama integration.",
+    "Apply-promotion.",
+    "OMI candidate promotion.",
+    "Memory/canon mutation.",
+    "Approved-memory routes/helpers.",
+    "Package/dependency changes.",
+    "Training/JSONL/dataset work.",
+    "Route/UI/extraction/model expansion beyond index helpers."
+  ],
+  "context_tools_policy": [
+    "T001 does not run context tools.",
+    "PHASE8-IMPL-001 through PHASE8-IMPL-003 already provide sufficient local evidence for this parent.",
+    "Additional context tools are not needed unless a later child explicitly authorizes a narrow collect task.",
+    "Context output is evidence, not roadmap truth.",
+    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
+  ]
+}
