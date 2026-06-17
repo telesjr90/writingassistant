@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-002",
-    "current_parent_task_title": "Writer Assistant Core candidate storage contract and evidence/provenance validation",
-    "frontier_note": "PHASE8-IMPL-002 is complete through T007. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. No next Writer Assistant Core parent is published. Next parent/child requires owner/roadmap confirmation. Proposed future direction (not active): PHASE8-IMPL-003 candidate storage read/write contract and candidate-only persistence."
+    "current_parent_task_id": "PHASE8-IMPL-003",
+    "current_parent_task_title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
+    "frontier_note": "PHASE8-IMPL-003 is active through T001. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. Next child is PHASE8-IMPL-003-T002 candidate persistence contract decision. Candidate persistence is not yet implemented."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -639,6 +639,154 @@
       "parent": "PHASE8-IMPL-002",
       "depends_on": [
         "PHASE8-IMPL-002-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003",
+      "title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-003.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-003.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-001/"
+    },
+    {
+      "id": "PHASE8-IMPL-003-T001",
+      "title": "Publish candidate persistence parent and child-task plan",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003-T002",
+      "title": "Candidate persistence contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003-T003",
+      "title": "Candidate persistence write/read contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003-T004",
+      "title": "Minimal candidate persistence helpers",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003-T005",
+      "title": "Candidate list/index contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003-T006",
+      "title": "Candidate list/index helper implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-003-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-003",
+      "depends_on": [
+        "PHASE8-IMPL-003-T006"
       ],
       "boundary_tags": [
         "candidate_only",

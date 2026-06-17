@@ -5,9 +5,9 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 ## Active Frontier
 
 - Current track: Writer Assistant Core.
-- Immediate active parent task: none published after `PHASE8-IMPL-002`.
-- Active child task: none published after `PHASE8-IMPL-002-T007`.
-- Next child task: none published; next parent/child requires owner/roadmap confirmation.
+- Immediate active parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
+- Active child task: `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan.
+- Next child task: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision.
 - Last completed parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
 - Last completed child task: `PHASE8-IMPL-002-T007` - Roadmap/status closeout.
 - Prior completed child under last parent: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton.
@@ -36,13 +36,15 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed closeout micro-task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
 - Phase 7 published sequence is complete (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`).
-- Next parent/child: no Writer Assistant Core parent is published after `PHASE8-IMPL-002`; owner/roadmap confirmation required before the next parent starts.
+- Next parent/child: `PHASE8-IMPL-003` is the active Writer Assistant Core parent; next child is `PHASE8-IMPL-003-T002`.
 - Deferred validation: interactive browser flows D, E, H, I, J, K, L when Playwright deps or browser MCP are available; note/material flows F/G unless controlled fixtures are authorized later.
 - Local smoke artifact (uncommitted): `projects/smoke-blank-1781586974/`.
 
 `PHASE8-IMPL-001` is complete as the first Writer Assistant Core readiness parent. T001 published the parent and child-task plan. T002 published the context collection plan at `docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md`. T003 produced the targeted context report at `docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md` using direct file/source inspection only. T004 accepted `docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md` and selected Writer Assistant Core candidate schema constants plus source-level/contract tests as the first runtime slice. T005 added tests-first contract coverage in `tests/test_writer_assistant_core_candidate_schema_contract.py`. T006 added constants-only schema metadata in `backend/story_knowledge/candidate_schema.py` and satisfied the T005 contract. T007 closed the parent with final validation. PHASE8-IMPL-001 completed schema contract/constants only and did not add extraction, candidate creation runtime, backend routes, frontend extraction UI, model/Ollama calls, apply-promotion, memory/canon mutation, package changes, candidate storage writes, training data, JSONL records, or dataset artifacts.
 
 `PHASE8-IMPL-002` is complete as the second Writer Assistant Core parent. It prepared candidate storage contracts and evidence/provenance validation before extraction/runtime expansion. `PHASE8-IMPL-002-T001` published the parent, inventory, enrichment JSON, child-task plan, and roadmap/status updates. `PHASE8-IMPL-002-T002` accepted the storage record contract in `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`, selected T003 as tests-only, deferred validation helpers to T004, and deferred storage writes until T005/T006. `PHASE8-IMPL-002-T003` added tests-only contract coverage in `tests/test_writer_assistant_core_candidate_record_contract.py` for record shape, source locator, evidence/provenance, status/destination, path safety, and forbidden mutation. `PHASE8-IMPL-002-T004` added pure validation helpers in `backend/story_knowledge/candidate_record.py` and satisfied the T003 contract tests with no file I/O. `PHASE8-IMPL-002-T005` added tests-only storage path contract coverage in `tests/test_writer_assistant_core_candidate_storage_contract.py` for `writer_assistant/candidates/` and `writer_assistant/index.json` boundaries. `PHASE8-IMPL-002-T006` added pure path helpers in `backend/story_knowledge/candidate_storage.py` and satisfied the T005 storage contract tests. `PHASE8-IMPL-002-T007` closed the parent with final validation. Final behavior: candidate record validation helpers are pure; storage helpers are pure path helpers only; no directories/files are created; no JSON read/write/list behavior exists. Phase 8 still has no extraction runtime, no candidate JSON persistence, no backend extraction routes, no frontend extraction/review UI, no model/Ollama calls, no apply-promotion, and no memory/canon mutation.
+
+`PHASE8-IMPL-003` is active as the third Writer Assistant Core parent. `PHASE8-IMPL-003-T001` published the parent, inventory, enrichment JSON, child-task plan, and roadmap/status updates. The parent will define and implement candidate-only JSON persistence with validation-before-write and path safety before extraction, routes, UI, or model behavior expands. Candidate persistence is not yet implemented. No JSON read/write/list helpers, extraction, backend routes, frontend UI, model calls, apply-promotion, or memory/canon mutation exists yet.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 
@@ -129,7 +131,7 @@ Final `PHASE7-IMPL-009` behavior adds a read-only Memory / Canon workspace shell
 
 Final `PHASE7-IMPL-010` behavior validated the completed Phase 7 workspace foundation from `PHASE7-IMPL-004` through `PHASE7-IMPL-009` using automated regression checks, a prepared browser/manual smoke checklist, partial browser/manual smoke execution with environment-limited fallback evidence, validation repair triage, and final regression confirmation. It did not add generated prose, summaries, extraction, semantic search, Story Check auto-runs, model/Ollama calls, apply-promotion, memory/canon mutation, OMI candidate promotion, backend approved-memory routes/helpers, frontend approved-memory API helpers, metadata editing UI, note/material create/import/upload UI, runtime features, package/dependency changes, or training/JSONL/dataset work. Interactive UI browser validation remains deferred to owner/environment rerun when browser tooling is available.
 
-The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. `PHASE8-IMPL-001` and `PHASE8-IMPL-002` are complete as the first two published Writer Assistant Core parents in `docs/roadmap/roadmap_index.yaml`. No next Writer Assistant Core parent is published; next parent/child requires owner/roadmap confirmation.
+The published Phase 7 parent sequence (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`) is complete. `PHASE8-IMPL-001` and `PHASE8-IMPL-002` are complete as the first two published Writer Assistant Core parents in `docs/roadmap/roadmap_index.yaml`. `PHASE8-IMPL-003` is the active Writer Assistant Core parent; next child is `PHASE8-IMPL-003-T002`.
 
 `PHASE7-IMPL-010` must remain validation-only. It must not add runtime feature scope, apply-promotion, memory/canon mutation, generated prose, model calls, extraction, or training/JSONL/dataset work unless explicitly authorized by a separate roadmap task.
 
