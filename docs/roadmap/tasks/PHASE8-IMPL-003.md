@@ -80,8 +80,8 @@ Future storage path remains:
 2. `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Status: complete.
 3. `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Status: complete.
 4. `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Status: complete.
-5. `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Status: ready.
-6. `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Status: planned.
+5. `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Status: complete.
+6. `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Status: ready.
 7. `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Status: planned.
 
 ## Child Task Details
@@ -138,7 +138,11 @@ Future storage path remains:
 - Candidate-only.
 - No memory/canon mutation.
 - T005 tests `list_candidate_records` only per T002 decision.
-- Ready after T004 write/read helper completion.
+- Completed: added tests-only list contract coverage in `tests/test_writer_assistant_core_candidate_list_contract.py`.
+- Defines expected T006 helper API: `list_candidate_records(project_dir: Path) -> list[dict]`.
+- Covers missing/empty directory behavior, valid listing with deterministic sort, file filtering, invalid JSON/record fail-fast, filename/record ID mismatch, side-effect boundaries, index deferral, and source-level boundary scan.
+- Expected red status until T006 implements `list_candidate_records`.
+- T005 is list-only despite the child label mentioning list/index; index read/write remains deferred to a later parent.
 
 ### `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation
 
@@ -146,6 +150,7 @@ Future storage path remains:
 - Index read/write deferred to later parent.
 - No routes/UI/extraction/model behavior.
 - No apply-promotion or memory/canon mutation.
+- Ready after T005 list contract tests.
 
 ### `PHASE8-IMPL-003-T007` - Roadmap/status closeout
 
@@ -188,4 +193,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Active child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Next child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. T002 accepted write/read persistence contract; list-only in T005/T006; index deferred. T003 added tests-only write/read persistence contract coverage in `tests/test_writer_assistant_core_candidate_persistence_contract.py`. T004 added minimal candidate-only JSON write/read helpers in `backend/story_knowledge/candidate_persistence.py`, and the targeted persistence contract pytest now passes. List/index behavior remains deferred to T005/T006 and later parent work. No list/index helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
+`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Active child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Next child: `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. T002 accepted write/read persistence contract; list-only in T005/T006; index deferred. T003 added tests-only write/read persistence contract coverage in `tests/test_writer_assistant_core_candidate_persistence_contract.py`. T004 added minimal candidate-only JSON write/read helpers in `backend/story_knowledge/candidate_persistence.py`, and the targeted persistence contract pytest now passes. T005 added tests-only list contract coverage in `tests/test_writer_assistant_core_candidate_list_contract.py`; targeted list pytest is expected red until T006 implements `list_candidate_records`. T005 is list-only despite the child label mentioning list/index; index read/write remains deferred to a later parent. No list helper, index helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.

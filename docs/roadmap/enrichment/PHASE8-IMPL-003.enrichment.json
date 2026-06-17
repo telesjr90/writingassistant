@@ -86,7 +86,8 @@
       "tests/test_writer_assistant_core_candidate_schema_contract.py",
       "tests/test_writer_assistant_core_candidate_record_contract.py",
       "tests/test_writer_assistant_core_candidate_storage_contract.py",
-      "tests/test_writer_assistant_core_candidate_persistence_contract.py"
+      "tests/test_writer_assistant_core_candidate_persistence_contract.py",
+      "tests/test_writer_assistant_core_candidate_list_contract.py"
     ],
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
@@ -95,6 +96,8 @@
       "PHASE8-IMPL-003-T003 added tests-only write/read persistence contract coverage.",
       "T004 added minimal candidate-only write/read helpers in backend/story_knowledge/candidate_persistence.py.",
       "Targeted persistence pytest passes after T004.",
+      "PHASE8-IMPL-003-T005 added tests-only list contract coverage.",
+      "Targeted list pytest expected red until T006 implements list_candidate_records.",
       "PHASE8-IMPL-003 starts with contract decision and tests before persistence helpers.",
       "List behavior is in-scope after T005 tests; index read/write deferred to later parent."
     ]
@@ -174,7 +177,7 @@
       "id": "PHASE8-IMPL-003-T005",
       "title": "Candidate list/index contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-003-T004"
       ],
@@ -182,14 +185,19 @@
         "Tests-first.",
         "Decide and test list behavior only; index deferred.",
         "Candidate-only.",
-        "No memory/canon mutation."
+        "No memory/canon mutation.",
+        "Created tests/test_writer_assistant_core_candidate_list_contract.py.",
+        "Defines expected T006 list_candidate_records helper API.",
+        "Targeted list pytest expected red until T006 implements list helper.",
+        "No runtime list implementation; no index helper recorded.",
+        "T005 is list-only despite child label mentioning list/index."
       ]
     },
     {
       "id": "PHASE8-IMPL-003-T006",
       "title": "Candidate list/index helper implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-003-T005"
       ],
