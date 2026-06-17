@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-002",
     "current_parent_task_title": "Writer Assistant Core candidate storage contract and evidence/provenance validation",
-    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is complete as the first Writer Assistant Core readiness parent. PHASE8-IMPL-002 is active for candidate storage contracts and evidence/provenance validation before extraction/runtime expansion."
+    "frontier_note": "Published Phase 7 parent sequence is complete. PHASE8-IMPL-001 is complete as the first Writer Assistant Core readiness parent. PHASE8-IMPL-002 is active for candidate storage contracts and evidence/provenance validation. T002 accepted the storage record contract; T003 is active for tests-only contract coverage before validation helpers or storage writes."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -529,7 +529,7 @@
       "id": "PHASE8-IMPL-002-T001",
       "title": "Publish candidate storage/evidence validation parent and child-task plan",
       "type": "planning_microtask",
-      "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-002",
       "depends_on": [
         "PHASE8-IMPL-002"
@@ -548,10 +548,97 @@
       "id": "PHASE8-IMPL-002-T002",
       "title": "Candidate storage and evidence/provenance contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-002",
       "depends_on": [
         "PHASE8-IMPL-002-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "metadata_only",
+        "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T003",
+      "title": "Candidate storage/evidence contract tests",
+      "type": "runtime_microtask",
+      "status": "active",
+      "parent": "PHASE8-IMPL-002",
+      "depends_on": [
+        "PHASE8-IMPL-002-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T004",
+      "title": "Candidate record validation helpers",
+      "type": "runtime_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-002",
+      "depends_on": [
+        "PHASE8-IMPL-002-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T005",
+      "title": "Project-local candidate storage path contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-002",
+      "depends_on": [
+        "PHASE8-IMPL-002-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T006",
+      "title": "Candidate storage helper skeleton",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-002",
+      "depends_on": [
+        "PHASE8-IMPL-002-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-002-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-002",
+      "depends_on": [
+        "PHASE8-IMPL-002-T006"
       ],
       "boundary_tags": [
         "candidate_only",

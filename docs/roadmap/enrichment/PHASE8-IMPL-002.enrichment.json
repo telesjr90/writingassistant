@@ -25,7 +25,8 @@
     "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json",
     "prior_context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
     "prior_targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
-    "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md"
+    "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
+    "candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md"
   },
   "goal": "Define and validate Writer Assistant Core candidate storage, source locator, evidence, provenance, status, owner decision, destination, confidence, and path-safety contracts before extraction runtime, routes, UI, model calls, storage writes, apply-promotion, or memory/canon mutation exists.",
   "why_now": "PHASE8-IMPL-001 completed the first Writer Assistant Core runtime slice with tests-first schema contract coverage and minimal constants-only candidate schema metadata. The next safe slice is storage/evidence validation contracts before runtime extraction, storage writes, routes, UI, or model behavior expand.",
@@ -88,7 +89,7 @@
       "T001 publishes the parent and child plan only.",
       "PHASE8-IMPL-001 added constants-only schema metadata and did not add extraction, storage writes, routes, UI, model calls, apply-promotion, or memory/canon mutation.",
       "PHASE8-IMPL-002 starts with contract decision and tests before validation helpers or storage helper skeletons.",
-      "Storage writes remain disallowed in T001 and conditional later."
+      "T002 accepted the storage record contract and selected T003 as tests-only with validation helpers deferred to T004 and storage writes deferred to T005/T006.",
     ]
   },
   "child_tasks": [
@@ -96,7 +97,7 @@
       "id": "PHASE8-IMPL-002-T001",
       "title": "Publish candidate storage/evidence validation parent and child-task plan",
       "type": "planning_microtask",
-      "status": "active",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-002"
       ],
@@ -110,7 +111,7 @@
       "id": "PHASE8-IMPL-002-T002",
       "title": "Candidate storage and evidence/provenance contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-002-T001"
       ],
@@ -118,21 +119,25 @@
         "Docs/decision only.",
         "Decide exact first contract shape.",
         "Decide whether T003 is tests-only or test-plus-helper.",
-        "No runtime implementation."
+        "No runtime implementation.",
+        "Decision file: docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+        "Selected T003 tests-only; T004 validation helpers; T005 path tests; T006 conditional storage skeleton.",
+        "No storage writes before T005/T006."
       ]
     },
     {
       "id": "PHASE8-IMPL-002-T003",
       "title": "Candidate storage/evidence contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "depends_on": [
         "PHASE8-IMPL-002-T002"
       ],
       "scope": [
         "Tests-first.",
         "Add contract tests for record shape, source locator, evidence/provenance, status/destination, path safety, and forbidden mutation.",
-        "Expected red if helpers are not implemented yet."
+        "Expected red if helpers are not implemented yet.",
+        "Tests-only; no production helpers in T003."
       ]
     },
     {
@@ -191,6 +196,29 @@
       ]
     }
   ],
+  "contract_decision_summary": {
+    "decision_file": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+    "storage_record_required_fields": [
+      "candidate_id",
+      "project_id",
+      "candidate_type",
+      "status",
+      "target_category",
+      "source_locator",
+      "evidence",
+      "provenance",
+      "owner_decision",
+      "destination",
+      "confidence",
+      "created_at",
+      "updated_at"
+    ],
+    "future_storage_path": "projects/{project_id}/writer_assistant/candidates/{candidate_id}.json",
+    "t003_scope": "tests_only",
+    "t004_scope": "tiny_pure_validation_helpers_no_io",
+    "storage_writes_authorized": false,
+    "storage_writes_earliest_child": "PHASE8-IMPL-002-T005_or_T006"
+  },
   "acceptance_criteria": [
     "PHASE8-IMPL-002 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-001.",
     "PHASE8-IMPL-002-T001 publishes the parent, inventory, enrichment JSON, and roadmap/status updates.",
