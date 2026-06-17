@@ -97,7 +97,8 @@
       "T004 added minimal candidate-only write/read helpers in backend/story_knowledge/candidate_persistence.py.",
       "Targeted persistence pytest passes after T004.",
       "PHASE8-IMPL-003-T005 added tests-only list contract coverage.",
-      "Targeted list pytest expected red until T006 implements list_candidate_records.",
+      "PHASE8-IMPL-003-T006 added list_candidate_records to backend/story_knowledge/candidate_persistence.py.",
+      "Targeted list pytest passes after T006.",
       "PHASE8-IMPL-003 starts with contract decision and tests before persistence helpers.",
       "List behavior is in-scope after T005 tests; index read/write deferred to later parent."
     ]
@@ -197,7 +198,7 @@
       "id": "PHASE8-IMPL-003-T006",
       "title": "Candidate list/index helper implementation",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-003-T005"
       ],
@@ -205,14 +206,17 @@
         "Implement list_candidate_records only if T005 authorizes it.",
         "Index read/write deferred to later parent.",
         "No routes/UI/extraction/model behavior.",
-        "No apply-promotion or memory/canon mutation."
+        "No apply-promotion or memory/canon mutation.",
+        "Added list_candidate_records to backend/story_knowledge/candidate_persistence.py.",
+        "Targeted list contract pytest passes.",
+        "No index helpers or index writes added."
       ]
     },
     {
       "id": "PHASE8-IMPL-003-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-003-T006"
       ],
@@ -230,7 +234,7 @@
     "path_helpers": "backend/story_knowledge/candidate_storage.py",
     "schema_constants": "backend/story_knowledge/candidate_schema.py",
     "json_persistence": true,
-    "json_read_write_list": false,
+    "json_read_write_list": true,
     "storage_writes": true
   },
   "acceptance_criteria": [

@@ -47,4 +47,35 @@ def read_candidate_record(project_dir, candidate_id):
     return copy.deepcopy(validated)
 
 
-__all__ = ("write_candidate_record", "read_candidate_record")
+def list_candidate_records(project_dir):
+    storage_dir = candidate_storage.candidate_storage_dir(_as_path(project_dir))
+    if not storage_dir.exists():
+        return []
+
+    records = []
+    for entry in storage_dir.iterdir():
+        if not entry.is_file():
+            continue
+        if entry.suffix != ".json":
+            continue
+
+        raw_text = entry.read_text(encoding="utf-8")
+        try:
+            loaded = json.loads(raw_text)
+        except json.JSONDecodeError as exc:
+            raise ValueError("candidate record JSON is invalid") from exc
+        if not isinstance(loaded, dict):
+            raise ValueError("candidate record JSON must be an object")
+        validated = candidate_record.validate_candidate_record(loaded)
+        if entry.stem != validated["candidate_id"]:
+            raise ValueError("candidate filename does not match record candidate_id")
+        expected_path = _candidate_path(project_dir, validated["candidate_id"])
+        if expected_path != entry:
+            raise ValueError("candidate path must be inside storage directory")
+        records.append(copy.deepcopy(validated))
+
+    records.sort(key=lambda item: item["candidate_id"])
+    return records
+
+
+__all__ = ("write_candidate_record", "read_candidate_record", "list_candidate_records")

@@ -463,8 +463,8 @@ def test_write_rejects_unsafe_candidate_id_without_side_effects(
 
 
 def test_t003_does_not_require_list_or_index_helpers():
-    """T003 covers write/read only; list/index deferred to T005/T006 and later parent."""
-    assert not hasattr(candidate_persistence, "list_candidate_records")
+    """T003 covers write/read only; list added in T006; index deferred to later parent."""
+    assert hasattr(candidate_persistence, "list_candidate_records")
     assert not hasattr(candidate_persistence, "write_candidate_index")
     assert not hasattr(candidate_persistence, "read_candidate_index")
 

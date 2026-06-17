@@ -1,5 +1,51 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-003-T006 Candidate List Helper Implementation
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: minimal list-only helper for `PHASE8-IMPL-003-T006`.
+- Parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
+- Completed child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation.
+- Active child: `PHASE8-IMPL-003-T007` - Roadmap/status closeout.
+- Next child: none under this parent after T007 closeout.
+- Last completed child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation.
+- Prior completed child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests.
+- Helper summary:
+  - Added `list_candidate_records(project_dir: Path) -> list[dict]` to `backend/story_knowledge/candidate_persistence.py`.
+  - List reads direct candidate JSON files only under `writer_assistant/candidates/`.
+  - Missing directory returns `[]` without side effects.
+  - Validates each file, requires filename stem to match `candidate_id`, returns records sorted by `candidate_id`.
+  - No index helpers, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation added.
+- Updated:
+  - `backend/story_knowledge/candidate_persistence.py`
+  - `docs/roadmap/tasks/PHASE8-IMPL-003.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+- Candidate list contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_list_contract.py -q`
+  - Result: PASS (14 passed).
+- Combined Writer Assistant Core candidate contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+  - Result: PASS (263 passed).
+- Focused regression pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`
+  - Result: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Boundary summary:
+  - List helper only.
+  - No index helpers.
+  - No routes or UI.
+  - No extraction or model behavior.
+  - No apply-promotion or memory/canon mutation.
+  - T007 is next.
+
 ## PHASE8-IMPL-003-T005 Candidate List Contract Tests
 
 - Date: 2026-06-17
