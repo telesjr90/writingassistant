@@ -93,7 +93,8 @@
       "PHASE8-IMPL-002 added pure validation and path helpers only; no JSON persistence exists yet.",
       "PHASE8-IMPL-003-T002 accepted write/read persistence contract; list-only in T005/T006; index deferred.",
       "PHASE8-IMPL-003-T003 added tests-only write/read persistence contract coverage.",
-      "Targeted persistence pytest expected red until T004 implements candidate_persistence.",
+      "T004 added minimal candidate-only write/read helpers in backend/story_knowledge/candidate_persistence.py.",
+      "Targeted persistence pytest passes after T004.",
       "PHASE8-IMPL-003 starts with contract decision and tests before persistence helpers.",
       "List behavior is in-scope after T005 tests; index read/write deferred to later parent."
     ]
@@ -153,7 +154,7 @@
       "id": "PHASE8-IMPL-003-T004",
       "title": "Minimal candidate persistence helpers",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-003-T003"
       ],
@@ -162,14 +163,18 @@
         "Use existing validation and path helpers.",
         "Project-local only.",
         "No list/index unless authorized by T002/T003.",
-        "No routes/UI/extraction/model behavior."
+        "No routes/UI/extraction/model behavior.",
+        "Created backend/story_knowledge/candidate_persistence.py.",
+        "Added write_candidate_record and read_candidate_record only.",
+        "Targeted persistence contract pytest passes.",
+        "No list/index helpers or index writes added."
       ]
     },
     {
       "id": "PHASE8-IMPL-003-T005",
       "title": "Candidate list/index contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-003-T004"
       ],
@@ -216,9 +221,9 @@
     "validation_helpers": "backend/story_knowledge/candidate_record.py",
     "path_helpers": "backend/story_knowledge/candidate_storage.py",
     "schema_constants": "backend/story_knowledge/candidate_schema.py",
-    "json_persistence": false,
+    "json_persistence": true,
     "json_read_write_list": false,
-    "storage_writes": false
+    "storage_writes": true
   },
   "acceptance_criteria": [
     "PHASE8-IMPL-003 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-002.",

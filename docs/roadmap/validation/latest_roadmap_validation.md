@@ -1,5 +1,52 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-003-T004 Minimal Candidate Persistence Helpers
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: minimal candidate-only JSON write/read persistence for `PHASE8-IMPL-003-T004`.
+- Parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
+- Completed child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers.
+- Active child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests.
+- Next child: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation.
+- Last completed child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers.
+- Prior completed child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests.
+- Created:
+  - `backend/story_knowledge/candidate_persistence.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-003.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+- Helper summary:
+  - Added `write_candidate_record(project_dir: Path, record: dict) -> dict`.
+  - Added `read_candidate_record(project_dir: Path, candidate_id: str) -> dict`.
+  - Validation runs before any directory or file creation.
+  - Write scope remains one candidate JSON file only.
+  - Read remains side-effect free.
+  - No list/index helpers or index writes were added.
+- Candidate persistence contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_persistence_contract.py -q`
+  - Result: PASS (46 passed).
+- Existing contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+  - Result: PASS (203 passed).
+- Focused regression pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`
+  - Result: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Boundary summary:
+  - No list/index helpers.
+  - No routes or UI.
+  - No extraction or model behavior.
+  - No apply-promotion or memory/canon mutation.
+  - T005 is next.
+
 ## PHASE8-IMPL-003-T003 Candidate Persistence Write/Read Contract Tests
 
 - Date: 2026-06-17

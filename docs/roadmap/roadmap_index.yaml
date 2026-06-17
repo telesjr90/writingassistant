@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-003",
     "current_parent_task_title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
-    "frontier_note": "PHASE8-IMPL-003 is active through T003. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. Active child is PHASE8-IMPL-003-T004 minimal persistence helpers. Next child is PHASE8-IMPL-003-T005 list contract tests. T003 added write/read contract tests; targeted pytest expected red until T004. Candidate persistence helpers are not yet implemented."
+    "frontier_note": "PHASE8-IMPL-003 is active through T004. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. Active child is PHASE8-IMPL-003-T005 list contract tests. Next child is PHASE8-IMPL-003-T006 list helper implementation. T004 added minimal candidate-only write/read helpers and the targeted persistence pytest now passes. Index read/write remains deferred."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -732,7 +732,7 @@
       "id": "PHASE8-IMPL-003-T004",
       "title": "Minimal candidate persistence helpers",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-003",
       "depends_on": [
         "PHASE8-IMPL-003-T003"
@@ -749,7 +749,7 @@
       "id": "PHASE8-IMPL-003-T005",
       "title": "Candidate list/index contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-003",
       "depends_on": [
         "PHASE8-IMPL-003-T004"
