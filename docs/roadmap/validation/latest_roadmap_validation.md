@@ -1,5 +1,39 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-002-T003 Candidate Record Contract Tests
+
+- Date: 2026-06-16
+- Result: PASS (tests-only; expected red pytest handoff to T004)
+- Scope: tests-only contract coverage for `PHASE8-IMPL-002-T003`.
+- Parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
+- Completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests.
+- Active child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers.
+- Next child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests.
+- Last completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests.
+- Prior completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision.
+- Test contract summary:
+  - Added `tests/test_writer_assistant_core_candidate_record_contract.py` defining the expected T004 helper API on `backend.story_knowledge.candidate_record`.
+  - Covers candidate record required fields, candidate types, target category alignment, source locator, evidence, provenance, confidence/uncertainty, status, owner decision, destination, path safety, and source-level boundary checks.
+  - Storage path construction deferred to T005; no storage write helpers required in T003.
+  - No production validation helpers added in T003.
+- Created:
+  - `tests/test_writer_assistant_core_candidate_record_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-002.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_record_contract.py -q`: expected FAIL/collection error until T004 implements `backend.story_knowledge.candidate_record`.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS.
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: tests-only plus roadmap/status updates; no context tools, production runtime code, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, candidate storage writes, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-002-T002 Contract Decision
 
 - Date: 2026-06-16

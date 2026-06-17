@@ -80,8 +80,8 @@ Include:
 
 1. `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Status: complete.
 2. `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Status: complete.
-3. `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Status: active.
-4. `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Status: planned.
+3. `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Status: complete.
+4. `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Status: active.
 5. `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Status: planned.
 6. `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Status: planned, conditional on T005 authorization.
 7. `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Status: planned.
@@ -108,8 +108,10 @@ Include:
 
 - Tests-first.
 - Add contract tests for record shape, source locator, evidence/provenance, status/destination, path safety, and forbidden mutation.
-- Expected red if helpers are not implemented yet.
-- No production helpers unless explicitly authorized.
+- Completed test file: `tests/test_writer_assistant_core_candidate_record_contract.py`.
+- Defines the expected T004 helper API on `backend.story_knowledge.candidate_record`.
+- Targeted pytest is expected red until T004 implements pure validation helpers.
+- No production helpers added in T003.
 
 ### `PHASE8-IMPL-002-T004` - Candidate record validation helpers
 
@@ -171,6 +173,6 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-002` is active. Active child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Next child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Last completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Prior completed child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Last completed parent: `PHASE8-IMPL-001`. Prior completed child under prior parent: `PHASE8-IMPL-001-T007`.
+`PHASE8-IMPL-002` is active. Active child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Next child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Last completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Prior completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Prior completed child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Last completed parent: `PHASE8-IMPL-001`. Prior completed child under prior parent: `PHASE8-IMPL-001-T007`.
 
-T002 accepted the storage record contract in `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`. T003 is tests-only and may be expected red until T004 implements pure validation helpers. No storage writes, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation are authorized by T002.
+T002 accepted the storage record contract in `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`. T003 added tests-only contract coverage in `tests/test_writer_assistant_core_candidate_record_contract.py` and is expected red until T004 implements `backend.story_knowledge.candidate_record` pure validation helpers. No storage writes, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation are authorized by T002/T003.

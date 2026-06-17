@@ -129,14 +129,16 @@
       "id": "PHASE8-IMPL-002-T003",
       "title": "Candidate storage/evidence contract tests",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-002-T002"
       ],
       "scope": [
         "Tests-first.",
         "Add contract tests for record shape, source locator, evidence/provenance, status/destination, path safety, and forbidden mutation.",
-        "Expected red if helpers are not implemented yet.",
+        "Created tests/test_writer_assistant_core_candidate_record_contract.py.",
+        "Defines expected T004 helper API on backend.story_knowledge.candidate_record.",
+        "Targeted pytest expected red until T004 implements pure validation helpers.",
         "Tests-only; no production helpers in T003."
       ]
     },
@@ -144,7 +146,7 @@
       "id": "PHASE8-IMPL-002-T004",
       "title": "Candidate record validation helpers",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "depends_on": [
         "PHASE8-IMPL-002-T003"
       ],
@@ -215,6 +217,9 @@
     ],
     "future_storage_path": "projects/{project_id}/writer_assistant/candidates/{candidate_id}.json",
     "t003_scope": "tests_only",
+    "t003_test_file": "tests/test_writer_assistant_core_candidate_record_contract.py",
+    "t003_expected_helper_module": "backend.story_knowledge.candidate_record",
+    "t003_pytest_result": "expected_red_until_t004",
     "t004_scope": "tiny_pure_validation_helpers_no_io",
     "storage_writes_authorized": false,
     "storage_writes_earliest_child": "PHASE8-IMPL-002-T005_or_T006"
