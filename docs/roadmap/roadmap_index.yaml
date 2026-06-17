@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-003",
     "current_parent_task_title": "Writer Assistant Core candidate storage read/write contract and candidate-only persistence",
-    "frontier_note": "PHASE8-IMPL-003 is active through T001. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. Next child is PHASE8-IMPL-003-T002 candidate persistence contract decision. Candidate persistence is not yet implemented."
+    "frontier_note": "PHASE8-IMPL-003 is active through T002. PHASE8-IMPL-001 and PHASE8-IMPL-002 are complete. Active child is PHASE8-IMPL-003-T003 write/read contract tests. Next child is PHASE8-IMPL-003-T004 minimal persistence helpers. Candidate persistence is not yet implemented."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -696,7 +696,7 @@
       "id": "PHASE8-IMPL-003-T002",
       "title": "Candidate persistence contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-003",
       "depends_on": [
         "PHASE8-IMPL-003-T001"
@@ -715,7 +715,7 @@
       "id": "PHASE8-IMPL-003-T003",
       "title": "Candidate persistence write/read contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-003",
       "depends_on": [
         "PHASE8-IMPL-003-T002"

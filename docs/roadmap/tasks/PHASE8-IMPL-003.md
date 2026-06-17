@@ -77,8 +77,8 @@ Future storage path remains:
 ## Child-Task Plan
 
 1. `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan. Status: complete.
-2. `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Status: ready.
-3. `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Status: planned.
+2. `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Status: complete.
+3. `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Status: ready.
 4. `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Status: planned.
 5. `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Status: planned.
 6. `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Status: planned.
@@ -99,6 +99,9 @@ Future storage path remains:
 - Decide whether index is in-scope for this parent.
 - Decide whether T003 is tests-only or split tests by write/read/list.
 - No runtime implementation.
+- Completed decision: `docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md`.
+- Selected sequence: T003 tests-only write/read; T004 minimal write/read helpers; T005 tests-only list; T006 list helper only if T005 authorizes; index read/write deferred to later parent.
+- T004 must not implement list/index. T003 must not test list/index.
 
 ### `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests
 
@@ -107,6 +110,9 @@ Future storage path remains:
 - Require validate-before-write and path safety.
 - No routes/UI/extraction/model behavior.
 - Expected red if helpers are missing.
+- Likely test file: `tests/test_writer_assistant_core_candidate_persistence_contract.py`.
+- Defines expected T004 helper API on `backend.story_knowledge.candidate_persistence`.
+- Tests write/read only; no list/index tests in T003.
 
 ### `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers
 
@@ -119,14 +125,15 @@ Future storage path remains:
 ### `PHASE8-IMPL-003-T005` - Candidate list/index contract tests
 
 - Tests-first.
-- Decide and test list/index behavior if authorized.
+- Decide and test list behavior only; index read/write deferred to later parent.
 - Candidate-only.
 - No memory/canon mutation.
-- If index/list behavior is too broad, remain decision/test-only and defer list/index implementation to a later parent.
+- T005 tests `list_candidate_records` only per T002 decision.
 
 ### `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation
 
-- Implement minimal list/index helpers only if T005 authorizes it.
+- Implement `list_candidate_records` only if T005 authorizes it.
+- Index read/write deferred to later parent.
 - No routes/UI/extraction/model behavior.
 - No apply-promotion or memory/canon mutation.
 
@@ -171,4 +178,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan. Next child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. Candidate persistence is not yet implemented. No JSON read/write/list helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
+`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Active child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Next child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. T002 accepted write/read persistence contract; list-only in T005/T006; index deferred. Candidate persistence is not yet implemented. No JSON read/write/list helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.

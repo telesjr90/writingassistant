@@ -26,7 +26,8 @@
     "prior_context_collection_plan": "docs/roadmap/context/PHASE8-IMPL-001-context-collection-plan.md",
     "prior_targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
     "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
-    "candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md"
+    "candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+    "candidate_persistence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md"
   },
   "goal": "Define and implement candidate-only JSON persistence for typed Writer Assistant Core candidate records with validation-before-write and path safety before extraction runtime, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.",
   "why_now": "PHASE8-IMPL-002 completed pure candidate record validation helpers and pure storage path helpers with no file I/O. The next safe slice is candidate-only persistence contracts and tests before runtime extraction, routes, UI, or model behavior expand.",
@@ -89,8 +90,9 @@
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
       "PHASE8-IMPL-002 added pure validation and path helpers only; no JSON persistence exists yet.",
+      "PHASE8-IMPL-003-T002 accepted write/read persistence contract; list-only in T005/T006; index deferred.",
       "PHASE8-IMPL-003 starts with contract decision and tests before persistence helpers.",
-      "List/index behavior may remain decision/test-only if scope is too broad for this parent."
+      "List behavior is in-scope after T005 tests; index read/write deferred to later parent."
     ]
   },
   "child_tasks": [
@@ -112,15 +114,15 @@
       "id": "PHASE8-IMPL-003-T002",
       "title": "Candidate persistence contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-003-T001"
       ],
       "scope": [
         "Docs/decision only.",
-        "Decide exact JSON read/write/list/index contract.",
-        "Decide whether index is in-scope for this parent.",
-        "Decide whether T003 is tests-only or split tests by write/read/list.",
+        "Decided exact JSON read/write/list/index contract.",
+        "Decided list-only in T005/T006; index deferred to later parent.",
+        "Decided T003 is tests-only write/read.",
         "No runtime implementation."
       ]
     },
@@ -128,7 +130,7 @@
       "id": "PHASE8-IMPL-003-T003",
       "title": "Candidate persistence write/read contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-003-T002"
       ],
@@ -137,7 +139,8 @@
         "Define write/read behavior for candidate-only JSON records.",
         "Require validate-before-write and path safety.",
         "No routes/UI/extraction/model behavior.",
-        "Expected red if helpers are missing."
+        "Expected red if helpers are missing.",
+        "Write/read only; no list/index tests."
       ]
     },
     {
@@ -166,10 +169,9 @@
       ],
       "scope": [
         "Tests-first.",
-        "Decide and test list/index behavior if authorized.",
+        "Decide and test list behavior only; index deferred.",
         "Candidate-only.",
-        "No memory/canon mutation.",
-        "May remain decision/test-only and defer implementation to a later parent if scope is too broad."
+        "No memory/canon mutation."
       ]
     },
     {
@@ -181,7 +183,8 @@
         "PHASE8-IMPL-003-T005"
       ],
       "scope": [
-        "Implement minimal list/index helpers only if T005 authorizes it.",
+        "Implement list_candidate_records only if T005 authorizes it.",
+        "Index read/write deferred to later parent.",
         "No routes/UI/extraction/model behavior.",
         "No apply-promotion or memory/canon mutation."
       ]
@@ -250,6 +253,7 @@
     "Approved-memory routes/helpers.",
     "Package/dependency changes.",
     "Training/JSONL/dataset work.",
+    "Index read/write helpers (deferred to PHASE8-IMPL-004 or equivalent).",
     "Project runtime artifacts beyond authorized candidate persistence."
   ],
   "context_tools_policy": [

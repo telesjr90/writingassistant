@@ -1,5 +1,39 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-003-T002 Candidate Persistence Contract Decision
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-003-T002`.
+- Parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
+- Completed child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision.
+- Active child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests.
+- Next child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers.
+- Last completed child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision.
+- Prior completed child: `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan.
+- Decision summary:
+  - Accepted typed Writer Assistant Core candidate-only JSON write/read persistence contract.
+  - Selected T003 as tests-only write/read; T004 as minimal write/read helpers; T005 as tests-only list; T006 as list helper only if T005 authorizes; index read/write deferred to later parent.
+  - T004 exports: `write_candidate_record`, `read_candidate_record` in `backend/story_knowledge/candidate_persistence.py`.
+  - Validation-before-write mandatory; path safety via `candidate_storage.candidate_record_path`.
+  - No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation authorized.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-003.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Pytest: not run; docs/decision only; no runtime code or tests changed.
+- Context tools: none run. PHASE8-IMPL-001 targeted context and PHASE8-IMPL-002 contracts remain sufficient evidence unless a later child explicitly authorizes a narrow collect task.
+- Boundary summary: docs/decision only; no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, runtime code changes, test changes, backend/frontend/package files, project runtime files, extraction, generated prose, candidate storage writes, JSON persistence, apply-promotion, OMI candidate promotion, memory/canon mutation, training data, JSONL records, dataset artifacts, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-003-T001 Parent Publication
 
 - Date: 2026-06-17
