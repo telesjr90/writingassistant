@@ -85,12 +85,15 @@
       "backend/story_knowledge/candidate_storage.py",
       "tests/test_writer_assistant_core_candidate_schema_contract.py",
       "tests/test_writer_assistant_core_candidate_record_contract.py",
-      "tests/test_writer_assistant_core_candidate_storage_contract.py"
+      "tests/test_writer_assistant_core_candidate_storage_contract.py",
+      "tests/test_writer_assistant_core_candidate_persistence_contract.py"
     ],
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
       "PHASE8-IMPL-002 added pure validation and path helpers only; no JSON persistence exists yet.",
       "PHASE8-IMPL-003-T002 accepted write/read persistence contract; list-only in T005/T006; index deferred.",
+      "PHASE8-IMPL-003-T003 added tests-only write/read persistence contract coverage.",
+      "Targeted persistence pytest expected red until T004 implements candidate_persistence.",
       "PHASE8-IMPL-003 starts with contract decision and tests before persistence helpers.",
       "List behavior is in-scope after T005 tests; index read/write deferred to later parent."
     ]
@@ -130,7 +133,7 @@
       "id": "PHASE8-IMPL-003-T003",
       "title": "Candidate persistence write/read contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-003-T002"
       ],
@@ -140,14 +143,17 @@
         "Require validate-before-write and path safety.",
         "No routes/UI/extraction/model behavior.",
         "Expected red if helpers are missing.",
-        "Write/read only; no list/index tests."
+        "Write/read only; no list/index tests.",
+        "Created tests/test_writer_assistant_core_candidate_persistence_contract.py.",
+        "Targeted pytest expected red until T004 implements candidate_persistence.",
+        "No runtime implementation; no list/index/index-write scope."
       ]
     },
     {
       "id": "PHASE8-IMPL-003-T004",
       "title": "Minimal candidate persistence helpers",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-003-T003"
       ],

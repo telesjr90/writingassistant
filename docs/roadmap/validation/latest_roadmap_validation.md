@@ -1,5 +1,45 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-003-T003 Candidate Persistence Write/Read Contract Tests
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: tests-only for `PHASE8-IMPL-003-T003`.
+- Parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
+- Completed child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests.
+- Active child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers.
+- Next child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests.
+- Last completed child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests.
+- Prior completed child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision.
+- Test contract summary:
+  - Added tests-only write/read persistence contract coverage for typed Writer Assistant Core candidate JSON persistence.
+  - Defines expected T004 helper API: `write_candidate_record`, `read_candidate_record` on `backend.story_knowledge.candidate_persistence`.
+  - Covers validation-before-write, side-effect boundaries, overwrite behavior, read error cases, unsafe ID rejection, and source-level boundary scan.
+  - Does not test list/index helpers; index read/write remains deferred to T005/T006 and later parent.
+- Created:
+  - `tests/test_writer_assistant_core_candidate_persistence_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-003.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-003.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Targeted persistence pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_persistence_contract.py -q`
+  - Result: expected red (collection/import error; exit code 2).
+  - Failure cause: `ImportError: cannot import name 'candidate_persistence' from 'backend.story_knowledge'`.
+  - Confirmation: failure limited to missing future T004 helper module/symbols; no syntax errors; no skipped tests.
+- Existing contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+  - Result: PASS (203 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: tests-only plus roadmap/status updates; no production runtime code, no JSON persistence implementation, no backend routes, no frontend files, no package/project runtime/training files, no generated prose/model/extraction behavior, no apply-promotion or memory/canon mutation, no staging/commits/pushes.
+
 ## PHASE8-IMPL-003-T002 Candidate Persistence Contract Decision
 
 - Date: 2026-06-17

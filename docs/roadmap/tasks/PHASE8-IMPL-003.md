@@ -78,8 +78,8 @@ Future storage path remains:
 
 1. `PHASE8-IMPL-003-T001` - Publish candidate persistence parent and child-task plan. Status: complete.
 2. `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Status: complete.
-3. `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Status: ready.
-4. `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Status: planned.
+3. `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Status: complete.
+4. `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Status: ready.
 5. `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Status: planned.
 6. `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation. Status: planned.
 7. `PHASE8-IMPL-003-T007` - Roadmap/status closeout. Status: planned.
@@ -110,9 +110,12 @@ Future storage path remains:
 - Require validate-before-write and path safety.
 - No routes/UI/extraction/model behavior.
 - Expected red if helpers are missing.
-- Likely test file: `tests/test_writer_assistant_core_candidate_persistence_contract.py`.
+- Test file: `tests/test_writer_assistant_core_candidate_persistence_contract.py`.
 - Defines expected T004 helper API on `backend.story_knowledge.candidate_persistence`.
 - Tests write/read only; no list/index tests in T003.
+- Completed: added tests-only write/read persistence contract coverage.
+- Expected red status until T004 creates `backend/story_knowledge/candidate_persistence.py`.
+- List/index remains deferred to T005/T006; index read/write deferred to later parent per T002 decision.
 
 ### `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers
 
@@ -178,4 +181,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T002` - Candidate persistence contract decision. Active child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Next child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. T002 accepted write/read persistence contract; list-only in T005/T006; index deferred. Candidate persistence is not yet implemented. No JSON read/write/list helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
+`PHASE8-IMPL-003` is active. Last completed child: `PHASE8-IMPL-003-T003` - Candidate persistence write/read contract tests. Active child: `PHASE8-IMPL-003-T004` - Minimal candidate persistence helpers. Next child: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests. Last completed parent: `PHASE8-IMPL-002`. Prior completed child under prior parent: `PHASE8-IMPL-002-T007`. T002 accepted write/read persistence contract; list-only in T005/T006; index deferred. T003 added tests-only write/read persistence contract coverage in `tests/test_writer_assistant_core_candidate_persistence_contract.py`; targeted pytest remains expected red until T004 implements `backend/story_knowledge/candidate_persistence.py`. Candidate persistence helpers are not yet implemented. No JSON read/write/list helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
