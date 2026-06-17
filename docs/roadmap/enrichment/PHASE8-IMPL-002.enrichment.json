@@ -181,24 +181,25 @@
       "id": "PHASE8-IMPL-002-T006",
       "title": "Candidate storage helper skeleton",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-002-T005"
       ],
       "scope": [
         "Implement minimal pure path helper skeleton authorized by T005.",
-        "Expected module backend/story_knowledge/candidate_storage.py.",
-        "Expected exports candidate_storage_dir, candidate_index_path, candidate_record_path, validate_candidate_storage_path.",
+        "Created backend/story_knowledge/candidate_storage.py.",
+        "Exports candidate_storage_dir, candidate_index_path, candidate_record_path, validate_candidate_storage_path.",
         "Candidate-only storage under projects/{project_id}/writer_assistant/.",
-        "No extraction, routes, UI, apply-promotion, or memory/canon mutation.",
-        "JSON read/write/list helpers remain deferred unless a later task expands scope."
+        "Pure path helpers only; no filesystem side effects.",
+        "Storage contract pytest passes; JSON read/write/list deferred.",
+        "No extraction, routes, UI, apply-promotion, or memory/canon mutation."
       ]
     },
     {
       "id": "PHASE8-IMPL-002-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "active",
       "depends_on": [
         "PHASE8-IMPL-002-T006"
       ],
@@ -236,9 +237,14 @@
     "t004_scope": "tiny_pure_validation_helpers_no_io",
     "t005_test_file": "tests/test_writer_assistant_core_candidate_storage_contract.py",
     "t005_expected_helper_module": "backend.story_knowledge.candidate_storage",
-    "t005_pytest_result": "expected_red_until_t006",
+    "t005_pytest_result": "pass_after_t006",
     "t005_scope": "tests_only_pure_path_contract_no_writes",
-    "t006_scope": "pure_path_helper_skeleton_only",
+    "t006_helper_module": "backend/story_knowledge/candidate_storage.py",
+    "t006_pytest_result": "pass",
+    "t006_scope": "pure_path_helper_skeleton_only_no_io",
+    "t006_json_read_helpers": false,
+    "t006_json_write_helpers": false,
+    "t006_json_list_helpers": false,
     "storage_writes_authorized": false,
     "storage_writes_earliest_child": "PHASE8-IMPL-002-T005_or_T006"
   },

@@ -1,5 +1,41 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-002-T006 Candidate Storage Helper Skeleton
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: pure path helper skeleton for `PHASE8-IMPL-002-T006`.
+- Parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
+- Completed child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton.
+- Active child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout.
+- Next child: none published after T007 closeout.
+- Last completed child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton.
+- Prior completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests.
+- Helper module summary:
+  - Created `backend/story_knowledge/candidate_storage.py` with pure path helpers only.
+  - Exports: `candidate_storage_dir`, `candidate_index_path`, `candidate_record_path`, `validate_candidate_storage_path`.
+  - Paths: `projects/{project_id}/writer_assistant/candidates/{candidate_id}.json` and `projects/{project_id}/writer_assistant/index.json`.
+  - No file I/O, directory creation, JSON read/write/list helpers, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation.
+- Created:
+  - `backend/story_knowledge/candidate_storage.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-002.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_storage_contract.py -q`: PASS (36 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_record_contract.py -q`: PASS (160 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (7 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: pure path helpers plus roadmap/status updates; no context tools, storage writes, JSON read/write/list helpers, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-002-T005 Project-Local Candidate Storage Path Contract Tests
 
 - Date: 2026-06-16

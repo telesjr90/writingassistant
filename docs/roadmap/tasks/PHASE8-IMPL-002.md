@@ -83,8 +83,8 @@ Include:
 3. `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Status: complete.
 4. `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Status: complete.
 5. `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Status: complete.
-6. `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Status: active, conditional on T005 authorization.
-7. `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Status: complete.
+7. `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Status: active.
 
 ## Child Task Details
 
@@ -135,11 +135,12 @@ Include:
 ### `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton
 
 - Implement a minimal pure path helper skeleton authorized by T005.
-- Expected module: `backend/story_knowledge/candidate_storage.py`.
-- Expected exports: `candidate_storage_dir`, `candidate_index_path`, `candidate_record_path`, `validate_candidate_storage_path`.
+- Completed helper module: `backend/story_knowledge/candidate_storage.py`.
+- Exports: `candidate_storage_dir`, `candidate_index_path`, `candidate_record_path`, `validate_candidate_storage_path`.
 - Candidate-only storage under `projects/{project_id}/writer_assistant/`.
+- Pure path helpers only; no filesystem side effects.
+- Targeted storage contract pytest now passes; JSON read/write/list remains deferred.
 - No extraction, routes, UI, apply-promotion, OMI candidate promotion, or memory/canon mutation.
-- JSON read/write/list helpers remain deferred unless a later task explicitly expands scope.
 
 ### `PHASE8-IMPL-002-T007` - Roadmap/status closeout
 
@@ -182,6 +183,6 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-002` is active. Active child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Next child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Last completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Prior completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Prior completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Prior completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Prior completed child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Last completed parent: `PHASE8-IMPL-001`. Prior completed child under prior parent: `PHASE8-IMPL-001-T007`.
+`PHASE8-IMPL-002` is active. Active child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Next child: none published after T007 closeout. Last completed child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Prior completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Prior completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Prior completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Prior completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Prior completed child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Last completed parent: `PHASE8-IMPL-001`. Prior completed child under prior parent: `PHASE8-IMPL-001-T007`.
 
-T002 accepted the storage record contract in `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`. T003 added tests-only contract coverage in `tests/test_writer_assistant_core_candidate_record_contract.py`. T004 added pure validation helpers in `backend/story_knowledge/candidate_record.py` and satisfied the T003 contract tests. T005 added tests-only storage path contract coverage in `tests/test_writer_assistant_core_candidate_storage_contract.py` for `writer_assistant/candidates/` and `writer_assistant/index.json` boundaries; targeted storage pytest is expected red until T006 implements pure path helpers. T005 authorizes T006 for pure path helper skeleton only; no storage writes, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation are authorized by T002/T003/T004/T005.
+T002 accepted the storage record contract in `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`. T003 added tests-only contract coverage in `tests/test_writer_assistant_core_candidate_record_contract.py`. T004 added pure validation helpers in `backend/story_knowledge/candidate_record.py` and satisfied the T003 contract tests. T005 added tests-only storage path contract coverage in `tests/test_writer_assistant_core_candidate_storage_contract.py` for `writer_assistant/candidates/` and `writer_assistant/index.json` boundaries. T006 added pure path helpers in `backend/story_knowledge/candidate_storage.py` and satisfied the T005 storage contract tests; JSON read/write/list remains deferred. No storage writes, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation are authorized by T002/T003/T004/T005/T006.
