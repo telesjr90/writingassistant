@@ -1,5 +1,51 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-002-T007 Roadmap/Status Closeout
+
+- Date: 2026-06-16
+- Result: PASS
+- Scope: docs/status closeout for `PHASE8-IMPL-002` after completed T001-T006.
+- Parent task: `PHASE8-IMPL-002` - Writer Assistant Core candidate storage contract and evidence/provenance validation.
+- Final parent result: `PHASE8-IMPL-002` complete.
+- Completed child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout.
+- Last completed child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout.
+- Prior completed children:
+  - `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton.
+  - `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests.
+  - `PHASE8-IMPL-002-T004` - Candidate record validation helpers.
+  - `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests.
+  - `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision.
+  - `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan.
+- Final parent outcome:
+  - Accepted candidate storage/evidence/provenance contract decision.
+  - Added tests-first candidate record contract coverage and pure validation helpers.
+  - Added tests-first storage path contract coverage and pure path helper skeleton.
+  - No storage writes, JSON read/write/list helpers, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation.
+- Final artifacts:
+  - `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`
+  - `tests/test_writer_assistant_core_candidate_record_contract.py`
+  - `backend/story_knowledge/candidate_record.py`
+  - `tests/test_writer_assistant_core_candidate_storage_contract.py`
+  - `backend/story_knowledge/candidate_storage.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-002.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-002.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (36 + 160 + 7 = 203 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Next frontier: no next Writer Assistant Core parent is published in `docs/roadmap/roadmap_index.yaml`; next parent/child requires owner/roadmap confirmation. Proposed future direction (not active): `PHASE8-IMPL-003` candidate storage read/write contract and candidate-only persistence.
+- Context tools: none run.
+- Boundary summary: docs/status closeout only; no context tools, runtime code changes, test changes, storage writes, JSON read/write/list helpers, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-002-T006 Candidate Storage Helper Skeleton
 
 - Date: 2026-06-16

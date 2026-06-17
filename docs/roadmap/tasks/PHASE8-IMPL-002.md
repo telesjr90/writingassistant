@@ -84,7 +84,7 @@ Include:
 4. `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Status: complete.
 5. `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Status: complete.
 6. `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Status: complete.
-7. `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Status: active.
+7. `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -144,9 +144,10 @@ Include:
 
 ### `PHASE8-IMPL-002-T007` - Roadmap/status closeout
 
-- Close the parent.
-- Summarize tests, helpers, and storage contract decisions.
-- Identify the next roadmap-authorized parent or decision point.
+- Completed as docs/status closeout and final validation.
+- Closed `PHASE8-IMPL-002` after T001 through T006 outcomes were recorded.
+- Summarized contract decision, tests, pure validation helpers, and pure path helpers.
+- Recorded that no next Writer Assistant Core parent is published yet; next parent/child requires owner/roadmap confirmation.
 
 ## Acceptance Criteria
 
@@ -183,6 +184,64 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-002` is active. Active child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Next child: none published after T007 closeout. Last completed child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Prior completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Prior completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Prior completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Prior completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Prior completed child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Last completed parent: `PHASE8-IMPL-001`. Prior completed child under prior parent: `PHASE8-IMPL-001-T007`.
+`PHASE8-IMPL-002` is complete. Last completed child: `PHASE8-IMPL-002-T007` - Roadmap/status closeout. Prior completed child: `PHASE8-IMPL-002-T006` - Candidate storage helper skeleton. Prior completed child: `PHASE8-IMPL-002-T005` - Project-local candidate storage path contract tests. Prior completed child: `PHASE8-IMPL-002-T004` - Candidate record validation helpers. Prior completed child: `PHASE8-IMPL-002-T003` - Candidate storage/evidence contract tests. Prior completed child: `PHASE8-IMPL-002-T002` - Candidate storage and evidence/provenance contract decision. Prior completed child: `PHASE8-IMPL-002-T001` - Publish candidate storage/evidence validation parent and child-task plan. Last completed parent: `PHASE8-IMPL-002`. Prior completed parent: `PHASE8-IMPL-001`. Prior completed child under prior parent: `PHASE8-IMPL-001-T007`.
 
-T002 accepted the storage record contract in `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`. T003 added tests-only contract coverage in `tests/test_writer_assistant_core_candidate_record_contract.py`. T004 added pure validation helpers in `backend/story_knowledge/candidate_record.py` and satisfied the T003 contract tests. T005 added tests-only storage path contract coverage in `tests/test_writer_assistant_core_candidate_storage_contract.py` for `writer_assistant/candidates/` and `writer_assistant/index.json` boundaries. T006 added pure path helpers in `backend/story_knowledge/candidate_storage.py` and satisfied the T005 storage contract tests; JSON read/write/list remains deferred. No storage writes, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation are authorized by T002/T003/T004/T005/T006.
+## Final Result
+
+`PHASE8-IMPL-002` is complete. It accepted the candidate storage/evidence/provenance contract decision, added tests-first record and storage path contract coverage, implemented pure candidate record validation helpers, implemented pure storage path helpers, and completed final roadmap/status validation. Candidate record validation helpers are pure with no file I/O. Storage helpers are pure path helpers only with no directories or files created. No JSON read/write/list behavior, extraction, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.
+
+## Final Artifacts
+
+Decision artifact:
+
+- `docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md`
+
+Implemented runtime files:
+
+- `backend/story_knowledge/candidate_record.py`
+- `backend/story_knowledge/candidate_storage.py`
+
+Final test files:
+
+- `tests/test_writer_assistant_core_candidate_record_contract.py`
+- `tests/test_writer_assistant_core_candidate_storage_contract.py`
+
+## Final Validation Results
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (36 + 160 + 7).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109).
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+
+## Final Boundaries
+
+- Candidate record validation helpers are pure; no file I/O.
+- Storage helpers are pure path helpers only; no directories or files created.
+- No JSON read/write/list helpers.
+- No candidate JSON persistence.
+- No runtime extraction or candidate extraction from owner text.
+- No backend routes or frontend candidate review/backlog UI.
+- No model/Ollama calls.
+- No apply-promotion or OMI candidate promotion.
+- No memory/canon mutation or approved-memory routes/helpers.
+- No package/dependency changes.
+- No training data, JSONL records, dataset artifacts, or project runtime files.
+- No staging, commit, or push.
+
+## Deferred Work
+
+- Candidate JSON read/write/list helpers.
+- Candidate persistence under `projects/{project_id}/writer_assistant/`.
+- Extraction from owner-authored text.
+- Backend extraction routes.
+- Frontend candidate review/backlog UI.
+- Model/Ollama integration.
+- Apply-promotion.
+- Memory/canon mutation.
+- Approved-memory routes/helpers.
+- Training/JSONL/dataset work.
+
+## Next Frontier
+
+No next Writer Assistant Core parent is currently published in `docs/roadmap/roadmap_index.yaml`. The next parent/child requires owner/roadmap confirmation. A proposed future direction (not active truth) is `PHASE8-IMPL-003` — Writer Assistant Core candidate storage read/write contract and candidate-only persistence — but it is not authorized until published in roadmap docs.

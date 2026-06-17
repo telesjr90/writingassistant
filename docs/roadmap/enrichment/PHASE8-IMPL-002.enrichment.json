@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-002",
   "title": "Writer Assistant Core candidate storage contract and evidence/provenance validation",
   "type": "runtime",
-  "status": "active",
+  "status": "done",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-001"
@@ -199,14 +199,15 @@
       "id": "PHASE8-IMPL-002-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "active",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-002-T006"
       ],
       "scope": [
-        "Close parent.",
-        "Summarize tests/helpers/storage contract.",
-        "Identify next roadmap-authorized parent or decision point."
+        "Closed parent.",
+        "Summarized contract decision, tests, pure validation helpers, and pure path helpers.",
+        "Recorded final validation results.",
+        "Recorded that no next Writer Assistant Core parent is published; next parent/child requires owner/roadmap confirmation."
       ]
     }
   ],
@@ -246,7 +247,41 @@
     "t006_json_write_helpers": false,
     "t006_json_list_helpers": false,
     "storage_writes_authorized": false,
-    "storage_writes_earliest_child": "PHASE8-IMPL-002-T005_or_T006"
+    "parent_complete": true,
+    "t007_closeout_result": "pass"
+  },
+  "final_artifacts": {
+    "decision": [
+      "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md"
+    ],
+    "runtime": [
+      "backend/story_knowledge/candidate_record.py",
+      "backend/story_knowledge/candidate_storage.py"
+    ],
+    "tests": [
+      "tests/test_writer_assistant_core_candidate_record_contract.py",
+      "tests/test_writer_assistant_core_candidate_storage_contract.py"
+    ]
+  },
+  "final_validation": {
+    "writer_assistant_core_contract_pytest": "pass_203_total_storage_36_record_160_schema_7",
+    "omi_project_manager_regression_pytest": "pass_109",
+    "check_enrichment": "pass",
+    "validate_roadmap": "pass",
+    "whitespace_check": "pass"
+  },
+  "final_behavior": {
+    "candidate_record_validation": "pure_no_file_io",
+    "storage_helpers": "pure_path_helpers_only",
+    "directories_created": false,
+    "files_created": false,
+    "json_read_write_list": false,
+    "extraction_runtime": false,
+    "backend_routes": false,
+    "frontend_ui": false,
+    "model_calls": false,
+    "apply_promotion": false,
+    "memory_canon_mutation": false
   },
   "acceptance_criteria": [
     "PHASE8-IMPL-002 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-001.",
@@ -277,20 +312,25 @@
     "Path contracts must reject path traversal and absolute host filesystem assumptions."
   ],
   "deferred_work": [
-    "Runtime extraction.",
-    "Candidate extraction from text.",
-    "Candidate storage writes in T001.",
+    "Candidate JSON read/write/list helpers.",
+    "Candidate persistence under projects/{project_id}/writer_assistant/.",
+    "Runtime extraction and candidate extraction from owner text.",
     "Backend extraction routes.",
-    "Frontend extraction UI.",
+    "Frontend candidate review/backlog UI.",
     "Model/Ollama integration.",
     "Apply-promotion.",
     "OMI candidate promotion.",
     "Memory/canon mutation.",
+    "Approved-memory routes/helpers.",
     "Package/dependency changes.",
     "Training/JSONL/dataset work.",
-    "Project runtime artifacts.",
-    "Storage writes if T005/T006 keep storage helper work decision/test-only."
+    "Project runtime artifacts."
   ],
+  "next_frontier": {
+    "published_next_parent": null,
+    "requires_owner_roadmap_confirmation": true,
+    "proposed_not_active": "PHASE8-IMPL-003 — Writer Assistant Core candidate storage read/write contract and candidate-only persistence"
+  },
   "context_tools_policy": [
     "T001 does not run context tools.",
     "PHASE8-IMPL-001 T003 already produced a targeted context report.",
