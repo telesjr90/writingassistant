@@ -1,5 +1,47 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-005-T004 Dramatica-flow Analysis-Only Reference Decision
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-005-T004`.
+- Parent task: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Completed child: `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision.
+- Active child: `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision.
+- Next child: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision.
+- Last completed child under active parent: `PHASE8-IMPL-005-T004`.
+- Prior completed child under active parent: `PHASE8-IMPL-005-T003`.
+- Last completed parent: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- T004 outcome:
+  - Accepted dramatica-flow as `reference-only` for analysis-pattern/rubric inspiration.
+  - Runtime adapter status: REJECT/DEFER.
+  - Accepted seven safe reference concept groups with candidate mappings and guardrails.
+  - Rejected Writer/Reviser/Architect generation, prose/outline generation, continuation, rewrite/revise APIs, world_state writes, and automatic canon settlement.
+  - Created decision doc `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md`.
+  - No dramatica-flow install/clone/execution, source retrieval beyond T003 inventory, fixtures, runtime code, tests, training data, or memory/canon mutation.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-005.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/open_questions.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - `git diff --check`: PASS.
+- Source retrieval: none in T004; T003 inventory used as evidence basis.
+- Context tools: none run.
+- External tools: none installed, cloned, or executed.
+- Boundary summary: docs/decision only; no context tools, external tool execution, runtime code changes, test changes, backend/frontend/package/project runtime/training files, extraction implementation, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes.
+
 ## PHASE8-IMPL-005-T003 Official Source Inventory and License/Dependency Screen
 
 - Date: 2026-06-17

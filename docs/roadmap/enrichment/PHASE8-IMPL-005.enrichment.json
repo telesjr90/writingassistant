@@ -33,6 +33,7 @@
     "prior_candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
     "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
     "evaluation_scope_fixture_rubric_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
+    "dramatica_flow_analysis_only_reference_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
     "tool_source_inventory": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
     "tooling_decisions": "docs/roadmap/tooling_decisions.md",
     "optional_analysis_extractors": "docs/roadmap/optional_analysis_extractors.md"
@@ -117,7 +118,8 @@
       "T003 is the first child allowed to retrieve official source information.",
       "T002 accepted evaluation scope, fixture category plan, scoring rubric, and T003 inventory requirements.",
       "T003 completed official source inventory and license/dependency screen from official docs/repos only.",
-      "No tool evaluation execution, installs, fixtures, or runtime code in T002-T003."
+      "T004 accepted dramatica-flow as reference-only; runtime adapter REJECT/DEFER; no install/clone/execution.",
+      "No tool evaluation execution, installs, fixtures, or runtime code in T002-T004."
     ]
   },
   "child_tasks": [
@@ -170,7 +172,7 @@
       "id": "PHASE8-IMPL-005-T004",
       "title": "Dramatica-flow analysis-only reference decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-005-T003"
       ],
@@ -178,13 +180,14 @@
         "Docs/decision only.",
         "Decide whether dramatica-flow is reference-only, adapter-candidate, or rejected.",
         "Split safe analysis concepts from unsafe generation/revision/continuation behavior."
-      ]
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md"
     },
     {
       "id": "PHASE8-IMPL-005-T005",
       "title": "NCP/Subtxt structural interpretation strategy decision",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-005-T004"
       ],
@@ -278,6 +281,20 @@
       "source_retrieval_run": true,
       "source_retrieval_method": "cursor_web_access_and_urllib_readonly_fetch",
       "source_inventory_artifact": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
+      "runtime_code_changed": false,
+      "tests_changed": false
+    },
+    "t004_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "external_tools_installed": false,
+      "external_repos_cloned": false,
+      "external_tool_code_executed": false,
+      "source_retrieval_run": false,
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
       "runtime_code_changed": false,
       "tests_changed": false
     }
@@ -505,8 +522,45 @@
     "index_derived_convenience": "writer_assistant/index.json"
   },
   "next_frontier": {
-    "active_child": "PHASE8-IMPL-005-T004",
+    "active_child": "PHASE8-IMPL-005-T005",
     "first_extraction_parent": "future after T007 closeout"
+  },
+  "dramatica_flow_reference_decision": {
+    "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
+    "status": "accepted",
+    "classification": "reference-only",
+    "runtime_adapter_status": "reject_defer",
+    "accepted_reference_concepts": [
+      "causal_chain_analysis",
+      "foreshadowing_promise_mystery_conflict_lifecycle",
+      "emotional_arc_state_tracking",
+      "relationship_network_delta_tracking",
+      "timeline_thread_activity",
+      "character_knowledge_information_boundaries",
+      "audit_dimensions_without_revision_loop"
+    ],
+    "rejected_behaviors": [
+      "writer_agent",
+      "reviser_agent",
+      "architect_agent_outline_generation",
+      "generated_story_outlines_as_truth",
+      "generated_chapter_outlines_as_truth",
+      "generated_chapter_prose",
+      "story_continuation",
+      "outline_continuation_as_authored_content",
+      "rewrite_segment_apis",
+      "revise_action_apis",
+      "automatic_revision_loops",
+      "ai_writing_pipeline",
+      "summary_generation_as_truth",
+      "world_state_writes",
+      "truth_file_mutation",
+      "automatic_relationship_emotional_foreshadowing_settlement_into_canon",
+      "llm_backend_switching_for_generation",
+      "one_click_book_chapter_generation"
+    ],
+    "safe_pipeline_pattern": "owner-authored text -> app-owned analysis adapter/rubric -> normalized candidate + evidence/provenance -> OMI review -> owner decision -> future apply-promotion only",
+    "rejected_pipeline_pattern": "owner text -> dramatica-flow writer/reviser/continuation pipeline -> generated outline/prose/world_state -> canon/project truth"
   },
   "t003_source_inventory": {
     "artifact": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
@@ -535,6 +589,7 @@
         "dramatica-flow"
       ]
     },
+    "dramatica_flow_t004_accepted": true,
     "blocker_highlights": {
       "B1_dramatica_flow": "triggered — generation/revision/continuation is core product behavior",
       "B4_renard": "conditional — GPL-3.0-only requires owner/legal review before adapter adoption",

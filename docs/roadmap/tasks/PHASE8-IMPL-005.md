@@ -106,8 +106,8 @@ Explicitly out of scope unless a later owner-approved parent reintroduces them:
 1. `PHASE8-IMPL-005-T001` - Publish tool evaluation and extraction strategy parent. Status: complete.
 2. `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Status: complete.
 3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: complete.
-4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: ready.
-5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: draft.
+4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: complete.
+5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: ready.
 6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: draft.
 7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: draft.
 
@@ -202,7 +202,17 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Active child: `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Active child: `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+
+## T004 Dramatica-flow Reference Decision Record
+
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md`
+- Classification: `reference-only`
+- Runtime adapter status: REJECT/DEFER
+- Accepted reference concepts: causal chain analysis; foreshadowing/promise/mystery/conflict lifecycle; emotional arc/state tracking; relationship network/delta tracking; timeline and thread activity; character knowledge/information boundaries; audit dimensions without revision loop
+- Rejected behaviors: Writer/Reviser/Architect generation agents; generated outlines/prose; continuation; rewrite/revise APIs; automatic revision loops; world_state/truth-file writes; automatic canon settlement; LLM generation pipeline execution
+- Safe future pattern: owner-authored text → app-owned rubric/adapter → candidate + evidence/provenance → OMI review → owner decision → future apply-promotion only
+- No dramatica-flow install, clone, execution, runtime extraction, code/tests, or package changes in T004
 
 ## T003 Source Inventory Record
 
