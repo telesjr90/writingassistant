@@ -99,9 +99,9 @@
       "T001 publishes the parent and child plan only.",
       "PHASE8-IMPL-003 completed candidate-only write/read/list persistence; index deferred to this parent.",
       "PHASE8-IMPL-004-T002 accepted derived index contract; helper API and index schema decided.",
-      "PHASE8-IMPL-004-T003 added tests-only index contract coverage; targeted pytest expected red until T004.",
+      "PHASE8-IMPL-004-T003 added tests-only index contract coverage; T004 implemented derived index helpers.",
       "Candidate JSON files under writer_assistant/candidates/*.json are source of truth.",
-      "No index read/write helper exists yet.",
+      "backend/story_knowledge/candidate_index.py provides build/write/read derived index helpers.",
       "No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet."
     ]
   },
@@ -154,21 +154,23 @@
       "id": "PHASE8-IMPL-004-T004",
       "title": "Minimal candidate index helpers",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-004-T003"
       ],
       "scope": [
-        "Implement smallest derived index helpers required by T003.",
-        "Use existing candidate persistence/list helpers as source of truth.",
-        "No routes/UI/extraction/model behavior."
+        "Created backend/story_knowledge/candidate_index.py.",
+        "Implemented build_candidate_index, write_candidate_index, read_candidate_index.",
+        "Derived index from list_candidate_records; candidate JSON remains source of truth.",
+        "T003 index contract tests pass.",
+        "No routes/UI/extraction/model/apply-promotion/memory-canon behavior."
       ]
     },
     {
       "id": "PHASE8-IMPL-004-T005",
       "title": "Index safety and stale/corrupt regression tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-004-T004"
       ],
@@ -214,6 +216,7 @@
   "index_source_of_truth_rule": "writer_assistant/index.json is derived convenience metadata only; candidate JSON files remain authoritative.",
   "accepted_index_contract": {
     "decision": "docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md",
+    "module": "backend/story_knowledge/candidate_index.py",
     "future_module": "backend/story_knowledge/candidate_index.py",
     "helper_api": [
       "build_candidate_index",
@@ -245,7 +248,11 @@
     "write_helper": "write_candidate_record",
     "read_helper": "read_candidate_record",
     "list_helper": "list_candidate_records",
-    "index_read_write": false
+    "index_module": "backend/story_knowledge/candidate_index.py",
+    "build_index_helper": "build_candidate_index",
+    "write_index_helper": "write_candidate_index",
+    "read_index_helper": "read_candidate_index",
+    "index_read_write": true
   },
   "acceptance_criteria": [
     "PHASE8-IMPL-004 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-003.",
@@ -274,7 +281,7 @@
     },
     "t003_results": {
       "test_file": "tests/test_writer_assistant_core_candidate_index_contract.py",
-      "targeted_pytest": "expected_red_until_t004",
+      "targeted_pytest": "pass_29",
       "existing_candidate_contract_pytest": "pass_263",
       "check_enrichment": "pass",
       "validate_roadmap": "pass",
@@ -283,6 +290,23 @@
       "runtime_code_changed": false,
       "index_helpers_added": false,
       "routes_ui_extraction_model": false
+    },
+    "t004_results": {
+      "module": "backend/story_knowledge/candidate_index.py",
+      "helper_api": [
+        "build_candidate_index",
+        "write_candidate_index",
+        "read_candidate_index"
+      ],
+      "targeted_pytest": "pass_29",
+      "combined_candidate_contract_pytest": "pass_292",
+      "focused_regression_pytest": "pass_109",
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "routes_ui_extraction_model": false,
+      "apply_promotion_memory_canon": false
     }
   },
   "safety_notes": [

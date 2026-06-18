@@ -1,5 +1,38 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-004-T004 Minimal Candidate Index Helpers
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: runtime implementation for `PHASE8-IMPL-004-T004`.
+- Parent task: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- Completed child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers.
+- Active child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests.
+- Next child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening.
+- Last completed child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers.
+- Prior completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests.
+- Implementation summary:
+  - Created `backend/story_knowledge/candidate_index.py` with `build_candidate_index`, `write_candidate_index`, and `read_candidate_index`.
+  - Derived index helpers use `list_candidate_records` as source of truth; `writer_assistant/index.json` is derived convenience metadata only.
+  - T003 index contract tests now pass (29 tests).
+- Created:
+  - `backend/story_knowledge/candidate_index.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-004.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_contract.py -q`: PASS (29 passed).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (292 passed).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: derived index helpers only; no routes, UI, extraction, model calls, apply-promotion, memory/canon mutation, package/project runtime/training files, staging, commits, or pushes.
+
 ## PHASE8-IMPL-004-T003 Candidate Index Contract Tests
 
 - Date: 2026-06-17
