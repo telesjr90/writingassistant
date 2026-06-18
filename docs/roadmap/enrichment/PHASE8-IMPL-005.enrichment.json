@@ -33,6 +33,7 @@
     "prior_candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
     "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
     "evaluation_scope_fixture_rubric_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
+    "tool_source_inventory": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
     "tooling_decisions": "docs/roadmap/tooling_decisions.md",
     "optional_analysis_extractors": "docs/roadmap/optional_analysis_extractors.md"
   },
@@ -115,7 +116,8 @@
       "Scope narrowed to exactly nine approved tools/references.",
       "T003 is the first child allowed to retrieve official source information.",
       "T002 accepted evaluation scope, fixture category plan, scoring rubric, and T003 inventory requirements.",
-      "No tool evaluation, source retrieval, installs, fixtures, or runtime code in T002."
+      "T003 completed official source inventory and license/dependency screen from official docs/repos only.",
+      "No tool evaluation execution, installs, fixtures, or runtime code in T002-T003."
     ]
   },
   "child_tasks": [
@@ -152,7 +154,7 @@
       "id": "PHASE8-IMPL-005-T003",
       "title": "Official source inventory and license/dependency screen",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-005-T002"
       ],
@@ -161,13 +163,14 @@
         "First child allowed to retrieve official source information.",
         "Retrieve and inspect only official docs/repos/primary papers for nine scoped candidates.",
         "No cloning, package installation, or runtime execution."
-      ]
+      ],
+      "artifact": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md"
     },
     {
       "id": "PHASE8-IMPL-005-T004",
       "title": "Dramatica-flow analysis-only reference decision",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-005-T003"
       ],
@@ -262,6 +265,21 @@
       "runtime_code_changed": false,
       "tests_changed": false,
       "fixtures_created": false
+    },
+    "t003_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "external_tools_installed": false,
+      "external_repos_cloned": false,
+      "external_tool_code_executed": false,
+      "source_retrieval_run": true,
+      "source_retrieval_method": "cursor_web_access_and_urllib_readonly_fetch",
+      "source_inventory_artifact": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
+      "runtime_code_changed": false,
+      "tests_changed": false
     }
   },
   "safety_notes": [
@@ -487,8 +505,47 @@
     "index_derived_convenience": "writer_assistant/index.json"
   },
   "next_frontier": {
-    "active_child": "PHASE8-IMPL-005-T003",
+    "active_child": "PHASE8-IMPL-005-T004",
     "first_extraction_parent": "future after T007 closeout"
+  },
+  "t003_source_inventory": {
+    "artifact": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
+    "status": "complete",
+    "retrieval_methods": [
+      "Cursor web access for official docs pages",
+      "Read-only urllib.request fetch for GitHub README/LICENSE/pyproject and GitHub API metadata"
+    ],
+    "preliminary_classifications": {
+      "likely_runtime_adapter_candidate": [
+        "spaCy"
+      ],
+      "possible_runtime_adapter_candidate": [
+        "segram",
+        "BookNLP",
+        "GLiNER",
+        "LangExtract",
+        "Renard"
+      ],
+      "reference_only": [
+        "dramatica-flow",
+        "Narrative Context Protocol",
+        "Subtxt docs"
+      ],
+      "reject_defer_runtime_adapter": [
+        "dramatica-flow"
+      ]
+    },
+    "blocker_highlights": {
+      "B1_dramatica_flow": "triggered — generation/revision/continuation is core product behavior",
+      "B4_renard": "conditional — GPL-3.0-only requires owner/legal review before adapter adoption",
+      "B3_langextract": "conditional — cloud Gemini path sends text remotely; Ollama path documented"
+    },
+    "source_gaps": [
+      "dramatica-flow LICENSE file not retrieved from default paths",
+      "Subtxt docs site license/terms not retrieved",
+      "BookNLP output file span schema not verified locally",
+      "No local runtime verification performed"
+    ]
   },
   "evaluation_framework": {
     "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
@@ -567,6 +624,7 @@
       "adapter_feasibility",
       "privacy_local_first_concerns"
     ],
-    "classification_pending_t003": true
+    "classification_pending_t003": false,
+    "classification_completed_t003": true
   }
 }

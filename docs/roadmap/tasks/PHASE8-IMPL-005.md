@@ -105,8 +105,8 @@ Explicitly out of scope unless a later owner-approved parent reintroduces them:
 
 1. `PHASE8-IMPL-005-T001` - Publish tool evaluation and extraction strategy parent. Status: complete.
 2. `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Status: complete.
-3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: ready.
-4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: draft.
+3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: complete.
+4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: ready.
 5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: draft.
 6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: draft.
 7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: draft.
@@ -202,7 +202,18 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Active child: `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Active child: `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+
+## T003 Source Inventory Record
+
+- Inventory artifact: `docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md`
+- Retrieval: Cursor web access plus read-only `urllib.request` fetch of official GitHub README/LICENSE/pyproject files and GitHub API repo metadata; no clone, install, or execution.
+- Preliminary classifications:
+  - likely runtime adapter candidate: spaCy
+  - possible runtime adapter candidate: segram, BookNLP, GLiNER, LangExtract, Renard
+  - reference-only: dramatica-flow, Narrative Context Protocol, Subtxt docs
+  - reject/defer runtime adapter: dramatica-flow (B1 generation core); Renard deferred pending GPL-3.0 review
+- No runtime extraction implementation, package installs, or code/tests changed in T003.
 
 ## T002 Decision Record
 
