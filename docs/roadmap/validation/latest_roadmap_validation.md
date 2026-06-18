@@ -1,5 +1,42 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-004-T002 Candidate Index Contract Decision
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-004-T002`.
+- Parent task: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- Completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision.
+- Active child: `PHASE8-IMPL-004-T003` - Candidate index contract tests.
+- Next child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers.
+- Last completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision.
+- Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan.
+- Decision summary:
+  - Accepted derived candidate index contract for `writer_assistant/index.json`.
+  - Candidate JSON files under `writer_assistant/candidates/{candidate_id}.json` remain source of truth; index is derived convenience metadata only.
+  - Selected T003 as tests-only; T004 as minimal helpers in `backend/story_knowledge/candidate_index.py`.
+  - T004 exports: `build_candidate_index`, `write_candidate_index`, `read_candidate_index`.
+  - Accepted index schema version 1 with per-candidate summary fields derived from validated candidate records only.
+  - Simple overwrite accepted for index writes; atomic write hardening deferred unless T003/T005 demonstrate need.
+  - No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation authorized.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-004.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Pytest: not run; docs/decision only; no runtime code or tests changed.
+- Context tools: none run. PHASE8-IMPL-001 through PHASE8-IMPL-003 provide sufficient evidence unless a later child explicitly authorizes a narrow collect task.
+- Boundary summary: docs/decision only; no context tools, CCE, Graphify, Repomix, AI Context generation, MCP tools, LeanCTX, app servers, browser/manual validation, frontend build, model calls, Ollama, runtime code changes, test changes, backend/frontend/package files, project runtime files, index helpers, extraction, generated prose, apply-promotion, OMI candidate promotion, memory/canon mutation, training data, JSONL records, dataset artifacts, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-004-T001 Parent Publication
 
 - Date: 2026-06-17

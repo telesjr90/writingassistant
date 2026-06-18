@@ -83,8 +83,8 @@ Important rule:
 ## Child-Task Plan
 
 1. `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Status: complete.
-2. `PHASE8-IMPL-004-T002` - Candidate index contract decision. Status: ready.
-3. `PHASE8-IMPL-004-T003` - Candidate index contract tests. Status: planned.
+2. `PHASE8-IMPL-004-T002` - Candidate index contract decision. Status: complete.
+3. `PHASE8-IMPL-004-T003` - Candidate index contract tests. Status: ready.
 4. `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Status: planned.
 5. `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Status: planned.
 6. `PHASE8-IMPL-004-T006` - Index safety repair or hardening. Status: planned.
@@ -101,14 +101,19 @@ Important rule:
 ### `PHASE8-IMPL-004-T002` - Candidate index contract decision
 
 - Docs/decision only.
-- Decide exact derived index shape, helper API, rebuild behavior, stale/corrupt behavior, and error behavior.
-- No runtime implementation.
+- Accepted derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`.
+- Accepted helper API: `build_candidate_index`, `write_candidate_index`, `read_candidate_index` in future `backend/story_knowledge/candidate_index.py`.
+- Accepted index schema: `schema_version`, `kind`, `source`, `candidate_count`, `candidate_ids`, `candidates`, `generated_from`; per-candidate summaries derive from validated candidate records only.
+- Accepted build/write/read, stale/corrupt, validation, and error behavior for T003/T004.
+- No runtime implementation in T002.
 
 ### `PHASE8-IMPL-004-T003` - Candidate index contract tests
 
 - Tests-first.
-- Define derived index read/write/rebuild behavior.
-- Expected red if helpers missing.
+- Create `tests/test_writer_assistant_core_candidate_index_contract.py`.
+- Import future module `from backend.story_knowledge import candidate_index`.
+- Expected red until T004 because `candidate_index` module/helpers do not exist yet.
+- Test build empty index, valid index from candidate JSON, ordering, summary derivation, write path/serialization, read/validation errors, corrupt index ignored by build and overwritten by write, no candidate JSON override, and no memory/canon mutation.
 - No routes/UI/extraction/model behavior.
 
 ### `PHASE8-IMPL-004-T004` - Minimal candidate index helpers
@@ -141,7 +146,7 @@ Important rule:
 
 - `PHASE8-IMPL-004` is published as the active Writer Assistant Core parent after completed `PHASE8-IMPL-003`.
 - `PHASE8-IMPL-004-T001` publishes the parent, inventory, enrichment JSON, and roadmap/status updates.
-- `PHASE8-IMPL-004-T002` is identified as the next child task.
+- `PHASE8-IMPL-004-T002` accepts the derived index contract decision and identifies T003 as the next child task.
 - Child tasks T001-T007 are documented with tests-first sequencing.
 - Scope explicitly prioritizes derived candidate index contract before extraction/runtime expansion.
 - Non-scope explicitly blocks extraction, routes, UI, model calls, index helpers in T001, apply-promotion, and memory/canon mutation.
@@ -174,4 +179,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Next child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. No index helper exists yet. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.
+`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Next child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. T002 accepted the derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`. No index helper exists yet. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.

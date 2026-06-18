@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-004",
     "current_parent_task_title": "Writer Assistant Core candidate index contract and derived index helpers",
-    "frontier_note": "PHASE8-IMPL-004 is active through T001. PHASE8-IMPL-001, PHASE8-IMPL-002, and PHASE8-IMPL-003 are complete. Next child is PHASE8-IMPL-004-T002 candidate index contract decision. No index helper exists yet."
+    "frontier_note": "PHASE8-IMPL-004 is active through T002. PHASE8-IMPL-001, PHASE8-IMPL-002, and PHASE8-IMPL-003 are complete. T002 accepted derived index contract. Next child is PHASE8-IMPL-004-T003 candidate index contract tests. No index helper exists yet."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -844,7 +844,7 @@
       "id": "PHASE8-IMPL-004-T002",
       "title": "Candidate index contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-004",
       "depends_on": [
         "PHASE8-IMPL-004-T001"
@@ -863,7 +863,7 @@
       "id": "PHASE8-IMPL-004-T003",
       "title": "Candidate index contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-004",
       "depends_on": [
         "PHASE8-IMPL-004-T002"

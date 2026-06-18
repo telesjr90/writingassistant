@@ -6,9 +6,9 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 
 - Current track: Writer Assistant Core.
 - Immediate active parent task: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
-- Active child task: none; last completed child under active parent is `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan.
-- Next child task: `PHASE8-IMPL-004-T002` - Candidate index contract decision.
-- Last completed child task: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan.
+- Active child task: `PHASE8-IMPL-004-T003` - Candidate index contract tests.
+- Next child task: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers.
+- Last completed child task: `PHASE8-IMPL-004-T002` - Candidate index contract decision.
 - Last completed parent task: `PHASE8-IMPL-003` - Writer Assistant Core candidate storage read/write contract and candidate-only persistence.
 - Prior completed child under last parent: `PHASE8-IMPL-003-T006` - Candidate list/index helper implementation.
 - Prior completed child under last parent: `PHASE8-IMPL-003-T005` - Candidate list/index contract tests.
@@ -44,7 +44,7 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 - Completed parent task: `PHASE7-IMPL-005` - Notes / Materials Storage.
 - Completed closeout micro-task: `PHASE7-IMPL-010-T007` - Roadmap/status closeout.
 - Phase 7 published sequence is complete (`PHASE7-IMPL-001` through `PHASE7-IMPL-010`).
-- Next child: `PHASE8-IMPL-004-T002` - Candidate index contract decision under active parent `PHASE8-IMPL-004`.
+- Next child: `PHASE8-IMPL-004-T003` - Candidate index contract tests under active parent `PHASE8-IMPL-004`.
 - Deferred validation: interactive browser flows D, E, H, I, J, K, L when Playwright deps or browser MCP are available; note/material flows F/G unless controlled fixtures are authorized later.
 - Local smoke artifact (uncommitted): `projects/smoke-blank-1781586974/`.
 
@@ -54,7 +54,7 @@ Status source: this file and `docs/roadmap/roadmap_index.yaml` are the current r
 
 `PHASE8-IMPL-003` is complete as the third Writer Assistant Core parent. `PHASE8-IMPL-003-T001` published the parent, inventory, enrichment JSON, child-task plan, and roadmap/status updates. `PHASE8-IMPL-003-T002` accepted the candidate persistence contract decision at `docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md`, selected T003 as tests-only write/read, T004 as minimal write/read helpers, T005 as tests-only list, T006 as list helper only if T005 authorizes, and deferred index read/write to a later parent. `PHASE8-IMPL-003-T003` added tests-only write/read persistence contract coverage in `tests/test_writer_assistant_core_candidate_persistence_contract.py`. `PHASE8-IMPL-003-T004` created `backend/story_knowledge/candidate_persistence.py` with minimal candidate-only JSON write/read helpers and satisfied the targeted persistence contract test. `PHASE8-IMPL-003-T005` added tests-only list contract coverage in `tests/test_writer_assistant_core_candidate_list_contract.py`. `PHASE8-IMPL-003-T006` added `list_candidate_records` to `backend/story_knowledge/candidate_persistence.py` and satisfied the targeted list contract test. `PHASE8-IMPL-003-T007` closed the parent with final validation. Final behavior: `write_candidate_record`, `read_candidate_record`, and `list_candidate_records` provide candidate-only JSON persistence; candidate JSON files under `writer_assistant/candidates/*.json` are source of truth; write validates before persistence; read/list validate loaded records and are side-effect free; list is direct-file-only, non-recursive, and deterministic by `candidate_id`; no index is read/written/created. T005/T006 are list-only despite the child labels mentioning list/index; index read/write was deferred to `PHASE8-IMPL-004`.
 
-`PHASE8-IMPL-004` is active as the fourth Writer Assistant Core parent. `PHASE8-IMPL-004-T001` published the parent, inventory, enrichment JSON, child-task plan, and roadmap/status updates. Next child is `PHASE8-IMPL-004-T002` - Candidate index contract decision. Scope: derived candidate index contract and helpers for typed Writer Assistant Core candidates; candidate JSON files remain source of truth; `writer_assistant/index.json` is derived convenience metadata only. No index helper exists yet. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.
+`PHASE8-IMPL-004` is active as the fourth Writer Assistant Core parent. `PHASE8-IMPL-004-T001` published the parent, inventory, enrichment JSON, child-task plan, and roadmap/status updates. `PHASE8-IMPL-004-T002` accepted the derived index contract decision at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`, selected T003 as tests-only index contract coverage, T004 as minimal index helpers in `backend/story_knowledge/candidate_index.py`, and deferred incremental sync/update APIs, routes, UI, extraction, model calls, apply-promotion, and memory/canon mutation. Next child is `PHASE8-IMPL-004-T003` - Candidate index contract tests. Scope: derived candidate index contract and helpers for typed Writer Assistant Core candidates; candidate JSON files remain source of truth; `writer_assistant/index.json` is derived convenience metadata only. No index helper exists yet. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.
 
 `PHASE7-IMPL-004` must remain `Chapter / Scene Metadata Compatibility Layer`.
 

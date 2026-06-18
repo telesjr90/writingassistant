@@ -27,7 +27,8 @@
     "prior_targeted_context_report": "docs/roadmap/context/PHASE8-IMPL-001-targeted-context-report.md",
     "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
     "candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
-    "candidate_persistence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md"
+    "candidate_persistence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md",
+    "candidate_index_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md"
   },
   "goal": "Define and implement a derived candidate index layer for typed Writer Assistant Core candidate records with validation-before-indexing and path safety before extraction runtime, routes, UI, model calls, apply-promotion, or memory/canon mutation exists.",
   "why_now": "PHASE8-IMPL-003 completed candidate-only JSON write/read/list persistence helpers and intentionally deferred index read/write. The next safe slice is derived index contracts and tests before runtime extraction, routes, UI, or model behavior expand.",
@@ -95,7 +96,8 @@
     ],
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
-      "PHASE8-IMPL-003 completed candidate-only write/read/list persistence; index deferred.",
+      "PHASE8-IMPL-003 completed candidate-only write/read/list persistence; index deferred to this parent.",
+      "PHASE8-IMPL-004-T002 accepted derived index contract; helper API and index schema decided.",
       "Candidate JSON files under writer_assistant/candidates/*.json are source of truth.",
       "No index read/write helper exists yet.",
       "No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet."
@@ -120,13 +122,13 @@
       "id": "PHASE8-IMPL-004-T002",
       "title": "Candidate index contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-004-T001"
       ],
       "scope": [
         "Docs/decision only.",
-        "Decide exact derived index shape, helper API, rebuild behavior, stale/corrupt behavior, and error behavior.",
+        "Accepted derived index shape, helper API, rebuild behavior, stale/corrupt behavior, and error behavior.",
         "No runtime implementation."
       ]
     },
@@ -134,7 +136,7 @@
       "id": "PHASE8-IMPL-004-T003",
       "title": "Candidate index contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-004-T002"
       ],
@@ -207,6 +209,31 @@
   "future_index_path": "projects/{project_id}/writer_assistant/index.json",
   "candidate_source_of_truth_path": "projects/{project_id}/writer_assistant/candidates/{candidate_id}.json",
   "index_source_of_truth_rule": "writer_assistant/index.json is derived convenience metadata only; candidate JSON files remain authoritative.",
+  "accepted_index_contract": {
+    "decision": "docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md",
+    "future_module": "backend/story_knowledge/candidate_index.py",
+    "helper_api": [
+      "build_candidate_index",
+      "write_candidate_index",
+      "read_candidate_index"
+    ],
+    "index_schema_version": 1,
+    "index_kind": "writer_assistant_candidate_index",
+    "index_source": "writer_assistant_candidates",
+    "summary_fields": [
+      "candidate_id",
+      "candidate_type",
+      "status",
+      "destination",
+      "confidence",
+      "source_document_ids",
+      "evidence_count",
+      "provenance_kind",
+      "created_at",
+      "updated_at"
+    ],
+    "atomic_write": false
+  },
   "prior_runtime_artifacts": {
     "validation_helpers": "backend/story_knowledge/candidate_record.py",
     "path_helpers": "backend/story_knowledge/candidate_storage.py",
@@ -220,7 +247,7 @@
   "acceptance_criteria": [
     "PHASE8-IMPL-004 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-003.",
     "PHASE8-IMPL-004-T001 publishes the parent, inventory, enrichment JSON, and roadmap/status updates.",
-    "PHASE8-IMPL-004-T002 is identified as the next child task.",
+    "PHASE8-IMPL-004-T002 accepts the derived index contract decision and identifies T003 as the next child task.",
     "Child tasks T001-T007 are documented with tests-first sequencing.",
     "Scope explicitly prioritizes derived candidate index contract before extraction/runtime expansion.",
     "Non-scope explicitly blocks extraction, routes, UI, model calls, index helpers in T001, apply-promotion, and memory/canon mutation.",
@@ -233,7 +260,15 @@
       "python3 scripts/validate_roadmap.py",
       "non-LeanCTX whitespace check on changed docs"
     ],
-    "notes": "T001 validation is roadmap/status only. Do not run pytest unless runtime code or tests were accidentally changed."
+    "notes": "T002 validation is docs/decision only. Do not run pytest unless runtime code or tests were accidentally changed.",
+    "t002_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "runtime_code_changed": false,
+      "tests_changed": false
+    }
   },
   "safety_notes": [
     "The app remains analysis-only.",
@@ -261,7 +296,7 @@
     "Route/UI/extraction/model expansion beyond index helpers."
   ],
   "context_tools_policy": [
-    "T001 does not run context tools.",
+    "T001 and T002 do not run context tools.",
     "PHASE8-IMPL-001 through PHASE8-IMPL-003 already provide sufficient local evidence for this parent.",
     "Additional context tools are not needed unless a later child explicitly authorizes a narrow collect task.",
     "Context output is evidence, not roadmap truth.",
