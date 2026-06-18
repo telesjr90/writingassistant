@@ -128,7 +128,7 @@ Already-defaulted implementation decisions:
 
 These are implementation follow-ups after the Project Workspace Foundation, not blockers for the completed MVP foundation:
 
-1. What evaluation scoring rubric and fixture set should `PHASE8-IMPL-005-T002` adopt for the nine scoped tools/references?
+1. ~~What evaluation scoring rubric and fixture set should `PHASE8-IMPL-005-T002` adopt for the nine scoped tools/references?~~ **Resolved in T002:** see `docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md` — 0–5 rubric with 13 dimensions, 12 fixture categories (no fixture files yet), hard blockers, and pass/fail gates.
 2. Which of the nine scoped tools should be classified as likely runtime adapter candidate, possible runtime adapter candidate, reference-only, or reject/defer after T003 official source review?
 3. What first extraction implementation path should T006 choose: manual-first, rule-based, local NLP, model-assisted, or hybrid?
 4. How should dramatica-flow safe analysis concepts be separated from unsafe generation/revision/continuation behavior?

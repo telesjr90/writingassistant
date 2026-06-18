@@ -32,6 +32,7 @@
     "prior_candidate_persistence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md",
     "prior_candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
     "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
+    "evaluation_scope_fixture_rubric_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
     "tooling_decisions": "docs/roadmap/tooling_decisions.md",
     "optional_analysis_extractors": "docs/roadmap/optional_analysis_extractors.md"
   },
@@ -113,7 +114,8 @@
       "PHASE8-IMPL-004 completed derived candidate index contract/helpers; extraction deferred to evaluation-first parent.",
       "Scope narrowed to exactly nine approved tools/references.",
       "T003 is the first child allowed to retrieve official source information.",
-      "No tool evaluation, source retrieval, installs, or runtime code in T001."
+      "T002 accepted evaluation scope, fixture category plan, scoring rubric, and T003 inventory requirements.",
+      "No tool evaluation, source retrieval, installs, fixtures, or runtime code in T002."
     ]
   },
   "child_tasks": [
@@ -136,7 +138,7 @@
       "id": "PHASE8-IMPL-005-T002",
       "title": "Evaluation scope, fixture plan, and scoring rubric decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-005-T001"
       ],
@@ -150,7 +152,7 @@
       "id": "PHASE8-IMPL-005-T003",
       "title": "Official source inventory and license/dependency screen",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-005-T002"
       ],
@@ -249,6 +251,17 @@
       "source_retrieval_run": false,
       "runtime_code_changed": false,
       "tests_changed": false
+    },
+    "t002_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "source_retrieval_run": false,
+      "runtime_code_changed": false,
+      "tests_changed": false,
+      "fixtures_created": false
     }
   },
   "safety_notes": [
@@ -474,7 +487,86 @@
     "index_derived_convenience": "writer_assistant/index.json"
   },
   "next_frontier": {
-    "active_child": "PHASE8-IMPL-005-T002",
+    "active_child": "PHASE8-IMPL-005-T003",
     "first_extraction_parent": "future after T007 closeout"
+  },
+  "evaluation_framework": {
+    "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
+    "rubric_scale": "0-5",
+    "rubric_dimensions": [
+      "analysis_only_safety",
+      "prose_generation_risk_inverse",
+      "evidence_provenance_support",
+      "candidate_schema_fit",
+      "supported_story_knowledge_categories",
+      "local_first_privacy_fit",
+      "dependency_runtime_cost_inverse",
+      "license_adoption_risk_inverse",
+      "maintainability",
+      "output_determinism_normalizability",
+      "integration_complexity_inverse",
+      "omi_candidate_only_workflow_fit",
+      "first_extraction_path_suitability"
+    ],
+    "hard_blockers": [
+      "generates_or_rewrites_prose_as_core_behavior",
+      "cannot_preserve_evidence_provenance",
+      "unacceptable_remote_private_data_transfer",
+      "unclear_or_incompatible_license",
+      "cannot_be_constrained_to_candidate_only_output",
+      "requires_runtime_dependency_before_approved_review"
+    ],
+    "fixture_categories": [
+      "F1_character_extraction",
+      "F2_location_setting_extraction",
+      "F3_object_item_extraction",
+      "F4_organization_group_extraction",
+      "F5_scene_event_action_extraction",
+      "F6_timeline_causality_extraction",
+      "F7_relationship_extraction",
+      "F8_plot_thread_open_question_extraction",
+      "F9_continuity_contradiction_extraction",
+      "F10_evidence_provenance_attachment",
+      "F11_no_prose_generation_behavior",
+      "F12_candidate_only_output_normalization"
+    ],
+    "provisional_tool_classes": {
+      "structural_reference": [
+        "Narrative Context Protocol",
+        "Subtxt docs",
+        "dramatica-flow"
+      ],
+      "nlp_entity_extraction": [
+        "spaCy",
+        "BookNLP",
+        "GLiNER"
+      ],
+      "linguistic_graph_semantic_extraction": [
+        "segram",
+        "Renard"
+      ],
+      "llm_assisted_extraction": [
+        "LangExtract",
+        "dramatica-flow"
+      ],
+      "story_continuity_reference": [
+        "dramatica-flow",
+        "Subtxt docs"
+      ]
+    },
+    "t003_inventory_fields": [
+      "official_documentation_url_or_repository",
+      "license",
+      "dependency_footprint",
+      "runtime_requirements",
+      "local_vs_remote_execution",
+      "text_prose_generation",
+      "expected_input_output_shapes",
+      "evidence_provenance_support",
+      "maintenance_status",
+      "adapter_feasibility",
+      "privacy_local_first_concerns"
+    ],
+    "classification_pending_t003": true
   }
 }

@@ -1,5 +1,43 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-005-T002 Evaluation Scope, Fixture Plan, and Scoring Rubric Decision
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-005-T002`.
+- Parent task: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Completed child: `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision.
+- Active child: `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen.
+- Next child: `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen.
+- Last completed child under active parent: `PHASE8-IMPL-005-T002`.
+- Prior completed child under active parent: `PHASE8-IMPL-005-T001`.
+- Last completed parent: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- T002 outcome:
+  - Accepted evaluation scope, provisional tool grouping, fixture category plan, 0–5 scoring rubric, hard blockers, pass/fail gates, and T003 source inventory requirements.
+  - Created decision doc `docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md`.
+  - Nine scoped tools/references unchanged; final classification deferred to T003 official source evidence.
+  - No source retrieval, tool installs/clones/executions, fixtures, runtime code, tests, training data, or memory/canon mutation.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-005.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/open_questions.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Context tools: none run.
+- External tools: none run.
+- Source retrieval: none run.
+- Boundary summary: docs/decision only; no context tools, external tools, source retrieval, fixtures, runtime code changes, test changes, backend/frontend/package/project runtime/training files, extraction implementation, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes.
+
 ## PHASE8-IMPL-005-T001 Publish Tool Evaluation and Extraction Strategy Parent
 
 - Date: 2026-06-17

@@ -104,8 +104,8 @@ Explicitly out of scope unless a later owner-approved parent reintroduces them:
 ## Child-Task Plan
 
 1. `PHASE8-IMPL-005-T001` - Publish tool evaluation and extraction strategy parent. Status: complete.
-2. `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Status: ready.
-3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: draft.
+2. `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Status: complete.
+3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: ready.
 4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: draft.
 5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: draft.
 6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: draft.
@@ -202,7 +202,13 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T001` - Publish tool evaluation and extraction strategy parent. Active child: `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Active child: `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+
+## T002 Decision Record
+
+- Decision doc: `docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md`
+- Defines evaluation objective, scope, provisional tool grouping, fixture categories (no fixture files), 0–5 scoring rubric with hard blockers and pass/fail gates, and T003 source inventory requirements.
+- T003 remains the first child allowed to retrieve official source information.
 
 ## Official Source Retrieval Policy
 

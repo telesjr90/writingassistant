@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-005",
     "current_parent_task_title": "Writer Assistant Core tool evaluation and extraction strategy decision",
-    "frontier_note": "PHASE8-IMPL-005 is active. PHASE8-IMPL-005-T001 published the parent. PHASE8-IMPL-001 through PHASE8-IMPL-004 are complete. Next child is PHASE8-IMPL-005-T002. Scope narrowed to nine approved tools/references. No extraction implementation has started."
+    "frontier_note": "PHASE8-IMPL-005 is active. PHASE8-IMPL-005-T002 accepted evaluation scope, fixture plan, and scoring rubric decision. PHASE8-IMPL-001 through PHASE8-IMPL-004 are complete. Next child is PHASE8-IMPL-005-T003. Scope narrowed to nine approved tools/references. T003 is first allowed source retrieval child. No extraction implementation has started."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1002,7 +1002,7 @@
       "id": "PHASE8-IMPL-005-T002",
       "title": "Evaluation scope, fixture plan, and scoring rubric decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-005",
       "depends_on": [
         "PHASE8-IMPL-005-T001"
@@ -1025,7 +1025,7 @@
       "id": "PHASE8-IMPL-005-T003",
       "title": "Official source inventory and license/dependency screen",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "parent": "PHASE8-IMPL-005",
       "depends_on": [
         "PHASE8-IMPL-005-T002"
