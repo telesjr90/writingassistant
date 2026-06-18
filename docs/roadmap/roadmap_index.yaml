@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-004",
     "current_parent_task_title": "Writer Assistant Core candidate index contract and derived index helpers",
-    "frontier_note": "PHASE8-IMPL-004 is active through T004. PHASE8-IMPL-001, PHASE8-IMPL-002, and PHASE8-IMPL-003 are complete. T004 created backend/story_knowledge/candidate_index.py with derived index helpers; T003 index contract tests pass. Next child is PHASE8-IMPL-004-T005 index safety and stale/corrupt regression tests."
+    "frontier_note": "PHASE8-IMPL-004 is active through T005. PHASE8-IMPL-001, PHASE8-IMPL-002, and PHASE8-IMPL-003 are complete. T005 added index safety regression tests with no repair gap. Next child is PHASE8-IMPL-004-T006 conditional docs/status validation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -897,7 +897,7 @@
       "id": "PHASE8-IMPL-004-T005",
       "title": "Index safety and stale/corrupt regression tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-004",
       "depends_on": [
         "PHASE8-IMPL-004-T004"
@@ -914,7 +914,7 @@
       "id": "PHASE8-IMPL-004-T006",
       "title": "Index safety repair or hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-004",
       "depends_on": [
         "PHASE8-IMPL-004-T005"

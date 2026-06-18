@@ -93,13 +93,15 @@
       "tests/test_writer_assistant_core_candidate_storage_contract.py",
       "tests/test_writer_assistant_core_candidate_persistence_contract.py",
       "tests/test_writer_assistant_core_candidate_list_contract.py",
-      "tests/test_writer_assistant_core_candidate_index_contract.py"
+      "tests/test_writer_assistant_core_candidate_index_contract.py",
+      "tests/test_writer_assistant_core_candidate_index_safety_regression.py"
     ],
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
       "PHASE8-IMPL-003 completed candidate-only write/read/list persistence; index deferred to this parent.",
       "PHASE8-IMPL-004-T002 accepted derived index contract; helper API and index schema decided.",
       "PHASE8-IMPL-004-T003 added tests-only index contract coverage; T004 implemented derived index helpers.",
+      "PHASE8-IMPL-004-T005 added focused index safety regression tests; no repair gap found.",
       "Candidate JSON files under writer_assistant/candidates/*.json are source of truth.",
       "backend/story_knowledge/candidate_index.py provides build/write/read derived index helpers.",
       "No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet."
@@ -170,29 +172,31 @@
       "id": "PHASE8-IMPL-004-T005",
       "title": "Index safety and stale/corrupt regression tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-004-T004"
       ],
       "scope": [
-        "Tests-first or regression-only.",
-        "Focused regression test slice.",
+        "Tests-only regression slice.",
+        "Created tests/test_writer_assistant_core_candidate_index_safety_regression.py.",
         "Verify index never overrides candidate JSON.",
         "Verify corrupt/stale index behavior follows T002 decision.",
-        "Verify no memory/canon/bible/storyform/scenes/notes/materials mutation."
+        "Verify no memory/canon/bible/storyform/scenes/notes/materials mutation.",
+        "No runtime/index helper implementation changes.",
+        "No repair gap found."
       ]
     },
     {
       "id": "PHASE8-IMPL-004-T006",
       "title": "Index safety repair or hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-004-T005"
       ],
       "scope": [
         "Conditional repair only if T005 finds a gap.",
-        "Otherwise docs/status validation update only.",
+        "T005 found no repair gap; docs/status validation update only.",
         "No route/UI/extraction/model behavior."
       ]
     },
@@ -305,6 +309,22 @@
       "validate_roadmap": "pass",
       "whitespace_check": "pass",
       "context_tools_run": false,
+      "routes_ui_extraction_model": false,
+      "apply_promotion_memory_canon": false
+    },
+    "t005_results": {
+      "test_file": "tests/test_writer_assistant_core_candidate_index_safety_regression.py",
+      "targeted_pytest": "pass_15",
+      "index_contract_pytest": "pass_29",
+      "combined_candidate_contract_pytest": "pass_307",
+      "focused_regression_pytest": "pass_109",
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "runtime_code_changed": false,
+      "index_helpers_changed": false,
+      "repair_gap_found": false,
       "routes_ui_extraction_model": false,
       "apply_promotion_memory_canon": false
     }
