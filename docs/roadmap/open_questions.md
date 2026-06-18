@@ -128,6 +128,14 @@ Already-defaulted implementation decisions:
 
 These are implementation follow-ups after the Project Workspace Foundation, not blockers for the completed MVP foundation:
 
+1. What evaluation scoring rubric and fixture set should `PHASE8-IMPL-005-T002` adopt for the nine scoped tools/references?
+2. Which of the nine scoped tools should be classified as likely runtime adapter candidate, possible runtime adapter candidate, reference-only, or reject/defer after T003 official source review?
+3. What first extraction implementation path should T006 choose: manual-first, rule-based, local NLP, model-assisted, or hybrid?
+4. How should dramatica-flow safe analysis concepts be separated from unsafe generation/revision/continuation behavior?
+5. How should NCP and Subtxt docs guide approved structural context without becoming automatic truth or bypassing owner approval?
+
+## Writer Assistant Core Follow-Up Questions (Prior)
+
 1. Project memory/canon file structure: CORE-004 recommends folder-based `memory/*.json` plus `memory/index.json` as the first implementation target; runtime implementation details remain future work.
 2. Which subset of the CORE-002 candidate types should be implemented first: characters, aliases, locations, objects, organizations, timeline events, relationships, plot threads, open questions, continuity warnings, annotations, or a smaller subset?
 3. Should the first runtime evidence-span locator use character offsets, line ranges, paragraph indices, source hashes, or a hybrid? CORE-003 defines all as optional-capable planning fields.

@@ -40,6 +40,12 @@ GitHub Issues and GitHub Projects are not authoritative until a future sync task
 | `no_runtime_feature_scope` | Validation/documentation work must not add application features. |
 | `owner_supplied_material` | Material is provided by the owner and must retain source/provenance/license distinction. |
 | `read_only_overview` | Overview surfaces cheap metadata/status only and must not generate summaries or mutate project state. |
+| `tool_evaluation_only` | Work evaluates external tools/references for future extraction strategy only; no tool execution or adapter implementation. |
+| `no_tool_execution` | Must not install, clone, run, or demo external tools. |
+| `no_source_retrieval_in_t001` | Parent publication micro-task records source policy only; official source retrieval is deferred to a later authorized child. |
+| `no_rewrite` | Must not rewrite, revise, polish, or improve owner-authored story prose. |
+| `no_continuation` | Must not continue, extend, or bridge owner-authored story prose. |
+| `docs_only` | Work is limited to roadmap docs, status files, enrichment JSON, and validation records. |
 
 ## Drift Handling
 

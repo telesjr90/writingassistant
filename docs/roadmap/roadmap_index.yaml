@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-004",
-    "current_parent_task_title": "Writer Assistant Core candidate index contract and derived index helpers",
-    "frontier_note": "PHASE8-IMPL-004 is active through T006. PHASE8-IMPL-001, PHASE8-IMPL-002, and PHASE8-IMPL-003 are complete. T006 completed as validation-only with no repair or hardening patch required. Next child is PHASE8-IMPL-004-T007 roadmap/status closeout."
+    "current_parent_task_id": "PHASE8-IMPL-005",
+    "current_parent_task_title": "Writer Assistant Core tool evaluation and extraction strategy decision",
+    "frontier_note": "PHASE8-IMPL-005 is active. PHASE8-IMPL-005-T001 published the parent. PHASE8-IMPL-001 through PHASE8-IMPL-004 are complete. Next child is PHASE8-IMPL-005-T002. Scope narrowed to nine approved tools/references. No extraction implementation has started."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -802,7 +802,7 @@
       "id": "PHASE8-IMPL-004",
       "title": "Writer Assistant Core candidate index contract and derived index helpers",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-003"
@@ -931,7 +931,7 @@
       "id": "PHASE8-IMPL-004-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-004",
       "depends_on": [
         "PHASE8-IMPL-004-T006"
@@ -944,6 +944,182 @@
         "no_memory_canon_mutation",
         "metadata_only",
         "no_runtime_feature_scope"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005",
+      "title": "Writer Assistant Core tool evaluation and extraction strategy decision",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_tool_execution",
+        "no_source_retrieval_in_t001",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-005.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-005.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-001/"
+    },
+    {
+      "id": "PHASE8-IMPL-005-T001",
+      "title": "Publish tool evaluation and extraction strategy parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_tool_execution",
+        "no_source_retrieval_in_t001",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T002",
+      "title": "Evaluation scope, fixture plan, and scoring rubric decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T003",
+      "title": "Official source inventory and license/dependency screen",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T004",
+      "title": "Dramatica-flow analysis-only reference decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T005",
+      "title": "NCP/Subtxt structural interpretation strategy decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T006",
+      "title": "NLP/extraction adapter strategy decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-005",
+      "depends_on": [
+        "PHASE8-IMPL-005-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "tool_evaluation_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
       ]
     },
     {

@@ -1,5 +1,107 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-005-T001 Publish Tool Evaluation and Extraction Strategy Parent
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/status/planning only for `PHASE8-IMPL-005-T001`.
+- Parent task: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Completed child: `PHASE8-IMPL-005-T001` - Publish tool evaluation and extraction strategy parent.
+- Active child: `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision.
+- Next child: `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision.
+- Last completed parent: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- Last completed child under prior parent: `PHASE8-IMPL-004-T007` - Roadmap/status closeout.
+- T001 outcome:
+  - Published parent task record, inventory, enrichment JSON, and roadmap/status updates.
+  - Recorded narrowed scope to exactly nine approved tools/references: dramatica-flow, Narrative Context Protocol, Subtxt docs, spaCy, segram, BookNLP, GLiNER, LangExtract, Renard.
+  - Recorded official source retrieval policy with T003 as first allowed retrieval child.
+  - No tool evaluation, source retrieval, installs, extraction runtime, routes, UI, model calls, apply-promotion, or memory/canon mutation.
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-005.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-005.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json`
+- Updated:
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+  - `docs/roadmap/roadmap_governance.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Context tools: none run.
+- External tools: none run.
+- Source retrieval: none run.
+- Boundary summary: docs/status/planning only; no context tools, external tools, source retrieval, runtime code changes, test changes, backend/frontend/package/project runtime/training files, extraction implementation, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes.
+
+## PHASE8-IMPL-004-T007 Roadmap/Status Closeout
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/status closeout for `PHASE8-IMPL-004` after completed T001-T006.
+- Parent task: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- Final parent result: `PHASE8-IMPL-004` complete.
+- Completed child: `PHASE8-IMPL-004-T007` - Roadmap/status closeout.
+- Last completed child: `PHASE8-IMPL-004-T007` - Roadmap/status closeout.
+- Prior completed children:
+  - `PHASE8-IMPL-004-T006` - Index safety repair or hardening (validation-only).
+  - `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests.
+  - `PHASE8-IMPL-004-T004` - Minimal candidate index helpers.
+  - `PHASE8-IMPL-004-T003` - Candidate index contract tests.
+  - `PHASE8-IMPL-004-T002` - Candidate index contract decision.
+  - `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan.
+- Final parent outcome:
+  - Accepted derived candidate index contract decision.
+  - Added tests-first index contract coverage.
+  - Implemented derived index build/write/read helpers.
+  - Added focused index safety regression tests.
+  - T006 completed as validation-only because T005 found no repair gaps.
+  - No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation.
+- Final artifacts:
+  - `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`
+  - `tests/test_writer_assistant_core_candidate_index_contract.py`
+  - `backend/story_knowledge/candidate_index.py`
+  - `tests/test_writer_assistant_core_candidate_index_safety_regression.py`
+- Final runtime behavior:
+  - `build_candidate_index(project_dir: Path) -> dict`
+  - `write_candidate_index(project_dir: Path) -> dict`
+  - `read_candidate_index(project_dir: Path) -> dict`
+  - Candidate JSON files under `writer_assistant/candidates/{candidate_id}.json` remain source of truth.
+  - `writer_assistant/index.json` is derived convenience metadata only.
+  - Build derives from `list_candidate_records` and is side-effect free.
+  - Write builds and writes stable UTF-8 JSON to `candidate_index_path`.
+  - Read validates existing index only; does not rebuild, repair, or compare staleness.
+  - Stale-but-valid index can be read as-is.
+  - Corrupt index raises `ValueError` on read; ignored by build; may be overwritten by write if candidate JSON records validate.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-004.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+- Writer Assistant Core candidate contract pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_safety_regression.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`
+  - Result: PASS (307 passed).
+- Focused regression pytest:
+  - Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`
+  - Result: PASS (109 passed).
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+- Next frontier: no next Writer Assistant Core parent is published in `docs/roadmap/roadmap_index.yaml`; next parent/child requires owner/roadmap confirmation. Proposed future direction (not active): `PHASE8-IMPL-005` — Writer Assistant Core candidate review/read API contract and route planning.
+- Context tools: none run.
+- Boundary summary: docs/status closeout only; no context tools, runtime code changes, test changes, index helper changes, backend routes, frontend files, package/project runtime/training files, extraction, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes were run or added.
+
 ## PHASE8-IMPL-004-T006 Index Safety Repair or Hardening
 
 - Date: 2026-06-17

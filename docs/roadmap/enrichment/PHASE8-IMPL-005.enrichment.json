@@ -1,0 +1,480 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-005",
+  "title": "Writer Assistant Core tool evaluation and extraction strategy decision",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-004"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "tool_evaluation_only",
+    "no_tool_execution",
+    "no_source_retrieval_in_t001",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "no_runtime_feature_scope",
+    "docs_only"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-005.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-005.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json",
+    "prior_candidate_index_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md",
+    "prior_candidate_persistence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md",
+    "prior_candidate_storage_evidence_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+    "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
+    "tooling_decisions": "docs/roadmap/tooling_decisions.md",
+    "optional_analysis_extractors": "docs/roadmap/optional_analysis_extractors.md"
+  },
+  "goal": "Prepare a controlled evaluation phase for deciding how nine approved tools/references should or should not be used for future Writer Assistant Core extraction, producing an evaluation plan, scoring rubric, source inventory plan, and extraction strategy decision without runtime extraction behavior.",
+  "why_now": "PHASE8-IMPL-001 through PHASE8-IMPL-004 completed candidate schema, validation, persistence, and derived index infrastructure. Extraction implementation must not begin until tool strategy is decided for the nine approved candidates.",
+  "scope": {
+    "include": [
+      "Narrowed nine-tool/reference inventory for evaluation only.",
+      "Evaluation rubric and scoring metrics.",
+      "Extraction fixture plan.",
+      "Official source retrieval policy.",
+      "License/dependency/privacy/local-first screening.",
+      "Generation-risk screening.",
+      "Candidate-only adapter strategy.",
+      "dramatica-flow analysis-only reference review.",
+      "NCP/Subtxt structural interpretation strategy.",
+      "First extraction path decision.",
+      "Next parent handoff for first extraction architecture/implementation."
+    ],
+    "exclude": [
+      "Production runtime code in T001.",
+      "Tests in T001.",
+      "Tool evaluation in T001.",
+      "Official source retrieval in T001.",
+      "Tool installs, clones, demos, or executions in T001.",
+      "Extraction adapters and candidate extraction runtime.",
+      "Backend routes and API helpers.",
+      "Frontend UI.",
+      "Model/Ollama calls and HTTP calls.",
+      "Generated prose, rewriting, continuation, style imitation, or prose improvement.",
+      "Outline generation as project truth.",
+      "Semantic search and Story Check auto-runs.",
+      "Dramatica analysis runtime.",
+      "Apply-promotion, OMI candidate promotion, and memory/canon mutation.",
+      "Package/dependency changes.",
+      "Training data, JSONL records, dataset artifacts, and project runtime files.",
+      "Context-tool execution in T001.",
+      "CoreNLP/OpenIE/SUTime, AI-Reader-V2, narrative-blueprint, NovelClaw, NotebookLM workflow, llm_finetuning, ai-llm-project-file-structure-template unless later owner-approved parent reintroduces them."
+    ]
+  },
+  "scoped_tools": [
+    "dramatica-flow",
+    "Narrative Context Protocol",
+    "Subtxt docs",
+    "spaCy",
+    "segram",
+    "BookNLP",
+    "GLiNER",
+    "LangExtract",
+    "Renard"
+  ],
+  "evidence": {
+    "authority": [
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md",
+      "docs/roadmap/validation/latest_roadmap_validation.md"
+    ],
+    "source_docs": [
+      "docs/roadmap/tasks/PHASE8-IMPL-004.md",
+      "docs/roadmap/inventory/PHASE8-IMPL-004.md",
+      "docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json",
+      "docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-003-candidate-persistence-contract-decision.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-002-candidate-storage-evidence-contract-decision.md",
+      "docs/roadmap/writer_assistant_core_candidate_schemas.md",
+      "docs/roadmap/tooling_decisions.md",
+      "docs/roadmap/optional_analysis_extractors.md",
+      "backend/story_knowledge/candidate_schema.py",
+      "backend/story_knowledge/candidate_record.py",
+      "backend/story_knowledge/candidate_storage.py",
+      "backend/story_knowledge/candidate_persistence.py",
+      "backend/story_knowledge/candidate_index.py"
+    ],
+    "quality_notes": [
+      "T001 publishes the parent and child plan only.",
+      "PHASE8-IMPL-004 completed derived candidate index contract/helpers; extraction deferred to evaluation-first parent.",
+      "Scope narrowed to exactly nine approved tools/references.",
+      "T003 is the first child allowed to retrieve official source information.",
+      "No tool evaluation, source retrieval, installs, or runtime code in T001."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-005-T001",
+      "title": "Publish tool evaluation and extraction strategy parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "depends_on": [
+        "PHASE8-IMPL-005"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Publish parent, inventory, enrichment JSON, and roadmap/status updates.",
+        "Record narrowed nine-tool scope and official source retrieval policy.",
+        "No evaluation, source retrieval, tool runs, installs, code, or tests."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T002",
+      "title": "Evaluation scope, fixture plan, and scoring rubric decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-005-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide evaluation categories, scoring metrics, fixture requirements, source rules, safety gates, and pass/fail thresholds.",
+        "No tool runs, no installs, no runtime code."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T003",
+      "title": "Official source inventory and license/dependency screen",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-005-T002"
+      ],
+      "scope": [
+        "Docs/research inventory only.",
+        "First child allowed to retrieve official source information.",
+        "Retrieve and inspect only official docs/repos/primary papers for nine scoped candidates.",
+        "No cloning, package installation, or runtime execution."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T004",
+      "title": "Dramatica-flow analysis-only reference decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-005-T003"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide whether dramatica-flow is reference-only, adapter-candidate, or rejected.",
+        "Split safe analysis concepts from unsafe generation/revision/continuation behavior."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T005",
+      "title": "NCP/Subtxt structural interpretation strategy decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-005-T004"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide how NCP and Subtxt docs guide approved structural context, import/export, semantic rubric, and Dramatica-informed validation.",
+        "No NCP runtime implementation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T006",
+      "title": "NLP/extraction adapter strategy decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-005-T005"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Compare spaCy, segram, BookNLP, GLiNER, LangExtract, and Renard against T002 rubric.",
+        "Choose first extraction implementation path.",
+        "Define next implementation parent scope.",
+        "Require candidate-only evidence/provenance output."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-005-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-005-T006"
+      ],
+      "scope": [
+        "Close parent.",
+        "Summarize accepted tool strategy.",
+        "Identify next parent for first extraction architecture/implementation.",
+        "No runtime implementation."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "PHASE8-IMPL-005 is published as the active Writer Assistant Core parent after completed PHASE8-IMPL-004.",
+    "PHASE8-IMPL-005-T001 publishes the parent, inventory, enrichment JSON, and roadmap/status updates.",
+    "Scope is narrowed to exactly nine approved tools/references.",
+    "Official source retrieval policy records T003 as first allowed retrieval child.",
+    "Child tasks T001-T007 are documented with evaluation-first sequencing.",
+    "Non-scope blocks extraction implementation, routes, UI, model calls, tool execution in T001, apply-promotion, and memory/canon mutation.",
+    "External tools remain replaceable adapters around app-owned Writer Assistant Core.",
+    "Tool output must become candidates with evidence/provenance, never canon.",
+    "Owner approval remains mandatory.",
+    "No prose generation, rewrite, continuation, or automatic canon mutation is allowed."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs"
+    ],
+    "notes": "T001 validation is docs/status only. Do not run pytest unless runtime code or tests were accidentally changed.",
+    "t001_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "source_retrieval_run": false,
+      "runtime_code_changed": false,
+      "tests_changed": false
+    }
+  },
+  "safety_notes": [
+    "The app remains analysis-only.",
+    "No generated prose, rewriting, continuation, style imitation, prose improvement, or summaries as durable truth.",
+    "Candidates are not canon.",
+    "Tool output does not prove story truth.",
+    "External tools must become candidate records with evidence/provenance if ever implemented.",
+    "Owner approval remains mandatory before durable truth.",
+    "OMI remains the central review and future promotion layer.",
+    "Promotion records remain audit-only until future apply-promotion exists.",
+    "Memory/canon mutation is out of scope.",
+    "dramatica-flow, NCP, and Subtxt docs are evaluation/reference sources, not runtime dependencies or automatic truth."
+  ],
+  "deferred_work": [
+    "Extraction adapter implementation.",
+    "Backend extraction routes.",
+    "Frontend candidate review/backlog UI.",
+    "Model/Ollama integration for extraction.",
+    "Package/dependency installation for external tools.",
+    "Apply-promotion.",
+    "OMI candidate promotion.",
+    "Memory/canon mutation.",
+    "Training/JSONL/dataset work.",
+    "First extraction architecture/implementation parent until T007 closeout."
+  ],
+  "context_tools_policy": [
+    "T001 does not run context tools.",
+    "Context tools may only be used in a later child if the child explicitly authorizes narrow collection.",
+    "Context output is evidence, not roadmap truth.",
+    "Roadmap truth remains roadmap_index.yaml, implementation_status.md, task records, enrichment JSON, and validation docs."
+  ],
+  "external_tool_policy": [
+    "No external tool is installed or executed in T001.",
+    "No external source retrieval happens in T001.",
+    "External tools are evaluation candidates only.",
+    "External tool outputs must become candidate records with evidence/provenance if ever implemented.",
+    "External tools must never write prose, rewrite prose, continue prose, or mutate canon/memory.",
+    "Removed candidates must stay out of scope unless a later owner-approved parent reintroduces them."
+  ],
+  "official_source_retrieval_policy": {
+    "first_allowed_child": "PHASE8-IMPL-005-T003",
+    "t001_retrieval": false,
+    "allowed_methods": [
+      "Cursor web access restricted to official URLs listed for T003",
+      "Read-only terminal fetch with curl -L or urllib.request for specific official URLs",
+      "User-provided attached source snapshots if Cursor has no web access"
+    ],
+    "forbidden_methods": [
+      "git clone",
+      "package installation",
+      "running tool code",
+      "running demos",
+      "model calls",
+      "broad discovery",
+      "scraping unrelated sites",
+      "tutorials/blogs as primary sources when official docs/repos exist",
+      "treating marketing claims as validated behavior",
+      "writing runtime code based on source review",
+      "classifying tools from memory alone"
+    ],
+    "source_quality_rule": "Prefer official docs/repos and primary papers. Use third-party tutorials only as secondary context.",
+    "output_rule": "Source inventory and evaluation-readiness screen only. Each tool classified as likely runtime adapter candidate, possible runtime adapter candidate, reference-only, or reject/defer with evidence, risk, and implementation prerequisites.",
+    "blocked_internet_rule": "Stop and ask owner for official source snapshots. Do not substitute memory-based tool claims.",
+    "official_targets": {
+      "dramatica-flow": {
+        "source_type": "GitHub repository",
+        "urls": [
+          "https://github.com/ydsgangge-ux/dramatica-flow"
+        ],
+        "inspect": [
+          "README",
+          "API descriptions",
+          "agent/pipeline docs",
+          "license",
+          "dependency files",
+          "generation/revision/continuation features",
+          "analysis-only concepts"
+        ]
+      },
+      "Narrative Context Protocol": {
+        "source_type": "GitHub repository and official Dramatica/NCP page",
+        "urls": [
+          "https://github.com/narrative-first/narrative-context-protocol",
+          "https://dramatica.com/ncp"
+        ],
+        "inspect": [
+          "schema",
+          "examples",
+          "license/copyright",
+          "storyform fields",
+          "moments/ideation structure",
+          "import/export implications"
+        ]
+      },
+      "Subtxt docs": {
+        "source_type": "documentation site",
+        "urls": [
+          "https://guide.subtxt.app/",
+          "https://guide.subtxt.app/getting-started/key-concepts/"
+        ],
+        "inspect": [
+          "key concepts",
+          "source-of-conflict guidance",
+          "author-level interpretation",
+          "Dramatica/Subtxt terminology",
+          "analysis rubric implications"
+        ]
+      },
+      "spaCy": {
+        "source_type": "official docs and GitHub repository",
+        "urls": [
+          "https://spacy.io/",
+          "https://github.com/explosion/spaCy"
+        ],
+        "inspect": [
+          "pipeline components",
+          "rule matching",
+          "NER",
+          "dependency parsing",
+          "models",
+          "license",
+          "local/offline feasibility"
+        ]
+      },
+      "segram": {
+        "source_type": "GitHub repository and ReadTheDocs documentation",
+        "urls": [
+          "https://github.com/sztal/segram",
+          "https://segram.readthedocs.io/en/latest/"
+        ],
+        "inspect": [
+          "semantic grammar model",
+          "spaCy dependency",
+          "supported tasks",
+          "maturity",
+          "license",
+          "fiction/story applicability"
+        ]
+      },
+      "BookNLP": {
+        "source_type": "GitHub repository and official documentation",
+        "urls": [
+          "https://github.com/booknlp/booknlp",
+          "https://booknlp.pythonhumanities.com/"
+        ],
+        "inspect": [
+          "long-document/book pipeline",
+          "character extraction",
+          "quote attribution",
+          "event extraction",
+          "coreference/aliases",
+          "dependencies",
+          "license",
+          "maintenance",
+          "runtime requirements"
+        ]
+      },
+      "GLiNER": {
+        "source_type": "GitHub repository and official documentation/paper",
+        "urls": [
+          "https://github.com/urchade/GLiNER",
+          "https://urchade.github.io/GLiNER/",
+          "https://arxiv.org/abs/2311.08526"
+        ],
+        "inspect": [
+          "zero-shot/flexible entity extraction",
+          "relation extraction support",
+          "model requirements",
+          "CPU/local feasibility",
+          "confidence thresholds",
+          "license"
+        ]
+      },
+      "LangExtract": {
+        "source_type": "GitHub repository and Google developer announcement/docs",
+        "urls": [
+          "https://github.com/google/langextract",
+          "https://developers.googleblog.com/introducing-langextract-a-gemini-powered-information-extraction-library/",
+          "https://langextract.com/"
+        ],
+        "inspect": [
+          "source grounding",
+          "schema enforcement",
+          "model/provider requirements",
+          "local model support",
+          "visualization",
+          "privacy risks",
+          "license"
+        ]
+      },
+      "Renard": {
+        "source_type": "GitHub repository and academic paper",
+        "urls": [
+          "https://github.com/CompNet/Renard",
+          "https://arxiv.org/abs/2407.02284"
+        ],
+        "inspect": [
+          "static/dynamic character network extraction",
+          "modular pipeline design",
+          "dependencies",
+          "license",
+          "narrative-text fit",
+          "relationship-candidate feasibility"
+        ]
+      }
+    }
+  },
+  "candidate_only_policy": [
+    "All tool output must become Writer Assistant Core candidate records with evidence/provenance.",
+    "Candidates are not canon.",
+    "Owner approval remains mandatory before durable truth.",
+    "No silent promotion to memory/canon.",
+    "Promotion records remain audit-only until future apply-promotion exists."
+  ],
+  "prior_runtime_artifacts": {
+    "schema_constants": "backend/story_knowledge/candidate_schema.py",
+    "validation_helpers": "backend/story_knowledge/candidate_record.py",
+    "path_helpers": "backend/story_knowledge/candidate_storage.py",
+    "json_persistence": "backend/story_knowledge/candidate_persistence.py",
+    "index_module": "backend/story_knowledge/candidate_index.py",
+    "candidate_json_source_of_truth": "writer_assistant/candidates/{candidate_id}.json",
+    "index_derived_convenience": "writer_assistant/index.json"
+  },
+  "next_frontier": {
+    "active_child": "PHASE8-IMPL-005-T002",
+    "first_extraction_parent": "future after T007 closeout"
+  }
+}
