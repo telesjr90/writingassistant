@@ -84,8 +84,8 @@ Important rule:
 
 1. `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Status: complete.
 2. `PHASE8-IMPL-004-T002` - Candidate index contract decision. Status: complete.
-3. `PHASE8-IMPL-004-T003` - Candidate index contract tests. Status: ready.
-4. `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Status: planned.
+3. `PHASE8-IMPL-004-T003` - Candidate index contract tests. Status: complete.
+4. `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Status: ready.
 5. `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Status: planned.
 6. `PHASE8-IMPL-004-T006` - Index safety repair or hardening. Status: planned.
 7. `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Status: planned.
@@ -109,11 +109,12 @@ Important rule:
 
 ### `PHASE8-IMPL-004-T003` - Candidate index contract tests
 
-- Tests-first.
-- Create `tests/test_writer_assistant_core_candidate_index_contract.py`.
-- Import future module `from backend.story_knowledge import candidate_index`.
+- Tests-first. Status: complete.
+- Created `tests/test_writer_assistant_core_candidate_index_contract.py`.
+- Normal import: `from backend.story_knowledge import candidate_index`.
 - Expected red until T004 because `candidate_index` module/helpers do not exist yet.
-- Test build empty index, valid index from candidate JSON, ordering, summary derivation, write path/serialization, read/validation errors, corrupt index ignored by build and overwritten by write, no candidate JSON override, and no memory/canon mutation.
+- Covers build empty index, valid index from candidate JSON, ordering, summary derivation, write path/serialization, read/validation errors, corrupt index ignored by build and overwritten by write, no candidate JSON override, and no memory/canon mutation.
+- No runtime/index helper implementation in T003.
 - No routes/UI/extraction/model behavior.
 
 ### `PHASE8-IMPL-004-T004` - Minimal candidate index helpers
@@ -179,4 +180,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Next child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. T002 accepted the derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`. No index helper exists yet. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.
+`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Next child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Prior completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. T003 added tests-only index contract coverage in `tests/test_writer_assistant_core_candidate_index_contract.py`; targeted pytest is expected red until T004 because `backend.story_knowledge.candidate_index` does not exist yet. T002 accepted the derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`. No index helper exists yet. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.

@@ -1,5 +1,41 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-004-T003 Candidate Index Contract Tests
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: tests-only for `PHASE8-IMPL-004-T003`.
+- Parent task: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- Completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests.
+- Active child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers.
+- Next child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests.
+- Last completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests.
+- Prior completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision.
+- Test summary:
+  - Created `tests/test_writer_assistant_core_candidate_index_contract.py` with contract coverage for `build_candidate_index`, `write_candidate_index`, and `read_candidate_index`.
+  - Normal import `from backend.story_knowledge import candidate_index`; no `pytest.importorskip`.
+  - Targeted pytest expected red until T004 because `backend.story_knowledge.candidate_index` does not exist yet.
+  - Covers empty build, derived summaries, ordering, stale/corrupt index behavior, write/read validation, invalid index shape, source-of-truth boundaries, side effects, and source-level forbidden-term checks.
+  - Uses `created_at` and `updated_at` summary fields per current candidate record contract and T002 decision.
+- Created:
+  - `tests/test_writer_assistant_core_candidate_index_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-004.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_contract.py -q`: expected red (collection/import error until T004).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (263 passed).
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: tests-only; no production runtime code, index helpers, routes, UI, extraction, model calls, apply-promotion, memory/canon mutation, package/project runtime/training files, staging, commits, or pushes.
+
 ## PHASE8-IMPL-004-T002 Candidate Index Contract Decision
 
 - Date: 2026-06-17

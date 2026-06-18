@@ -92,12 +92,14 @@
       "tests/test_writer_assistant_core_candidate_record_contract.py",
       "tests/test_writer_assistant_core_candidate_storage_contract.py",
       "tests/test_writer_assistant_core_candidate_persistence_contract.py",
-      "tests/test_writer_assistant_core_candidate_list_contract.py"
+      "tests/test_writer_assistant_core_candidate_list_contract.py",
+      "tests/test_writer_assistant_core_candidate_index_contract.py"
     ],
     "quality_notes": [
       "T001 publishes the parent and child plan only.",
       "PHASE8-IMPL-003 completed candidate-only write/read/list persistence; index deferred to this parent.",
       "PHASE8-IMPL-004-T002 accepted derived index contract; helper API and index schema decided.",
+      "PHASE8-IMPL-004-T003 added tests-only index contract coverage; targeted pytest expected red until T004.",
       "Candidate JSON files under writer_assistant/candidates/*.json are source of truth.",
       "No index read/write helper exists yet.",
       "No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet."
@@ -136,14 +138,15 @@
       "id": "PHASE8-IMPL-004-T003",
       "title": "Candidate index contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-004-T002"
       ],
       "scope": [
         "Tests-first.",
-        "Define derived index read/write/rebuild behavior.",
-        "Expected red if helpers missing.",
+        "Created tests/test_writer_assistant_core_candidate_index_contract.py.",
+        "Expected red until T004 because candidate_index module/helpers do not exist yet.",
+        "No runtime/index helper implementation.",
         "No routes/UI/extraction/model behavior."
       ]
     },
@@ -151,7 +154,7 @@
       "id": "PHASE8-IMPL-004-T004",
       "title": "Minimal candidate index helpers",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-004-T003"
       ],
@@ -268,6 +271,18 @@
       "context_tools_run": false,
       "runtime_code_changed": false,
       "tests_changed": false
+    },
+    "t003_results": {
+      "test_file": "tests/test_writer_assistant_core_candidate_index_contract.py",
+      "targeted_pytest": "expected_red_until_t004",
+      "existing_candidate_contract_pytest": "pass_263",
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "runtime_code_changed": false,
+      "index_helpers_added": false,
+      "routes_ui_extraction_model": false
     }
   },
   "safety_notes": [
