@@ -87,8 +87,8 @@ Important rule:
 3. `PHASE8-IMPL-004-T003` - Candidate index contract tests. Status: complete.
 4. `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Status: complete.
 5. `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Status: complete.
-6. `PHASE8-IMPL-004-T006` - Index safety repair or hardening. Status: ready/active (conditional docs/status validation only; no repair gap found).
-7. `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-004-T006` - Index safety repair or hardening. Status: complete (validation-only; no repair or hardening patch required).
+7. `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Child Task Details
 
@@ -137,9 +137,12 @@ Important rule:
 
 ### `PHASE8-IMPL-004-T006` - Index safety repair or hardening
 
-- Conditional repair only if T005 finds a gap.
-- T005 found no repair gap; T006 is docs/status validation update only unless a later review finds otherwise.
-- No route/UI/extraction/model behavior.
+- Status: complete (validation-only).
+- T005 found no repair or hardening gap; targeted safety regression, index contract, combined candidate contract, and focused OMI/project manager regressions all passed.
+- No runtime repair required; no hardening patch required.
+- T004 implementation (`build_candidate_index`, `write_candidate_index`, `read_candidate_index`) already satisfies T005 safety/stale/corrupt regression coverage.
+- Preserved behavior: `writer_assistant/index.json` is derived only; candidate JSON files remain source of truth; build is side-effect free; write refreshes index from candidate JSON; read validates only and does not rebuild/repair.
+- Docs/status validation only; no runtime code, tests, index helpers, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation.
 
 ### `PHASE8-IMPL-004-T007` - Roadmap/status closeout
 
@@ -184,4 +187,4 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Next child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening (conditional docs/status validation only; no repair gap found). Prior completed child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Prior completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Prior completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. T005 added `tests/test_writer_assistant_core_candidate_index_safety_regression.py`; targeted regression pytest passes with no repair gap. T004 created `backend/story_knowledge/candidate_index.py` with derived index helpers; T003 index contract tests pass. T002 accepted the derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.
+`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening (validation-only; no repair or hardening patch required). Next child: `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Prior completed child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Prior completed child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Prior completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Prior completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. T006 completed as validation-only because T005 found no repair gaps; T004 index helpers already satisfy T005 safety/stale/corrupt regression coverage. T005 added `tests/test_writer_assistant_core_candidate_index_safety_regression.py`; targeted regression pytest passes with no repair gap. T004 created `backend/story_knowledge/candidate_index.py` with `build_candidate_index`, `write_candidate_index`, and `read_candidate_index`; candidate JSON remains source of truth and `writer_assistant/index.json` is derived only. T003 index contract tests pass. T002 accepted the derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.

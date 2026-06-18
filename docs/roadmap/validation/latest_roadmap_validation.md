@@ -1,5 +1,41 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-004-T006 Index Safety Repair or Hardening
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: validation-only for `PHASE8-IMPL-004-T006`.
+- Parent task: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- Completed child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening (validation-only).
+- Active child: `PHASE8-IMPL-004-T007` - Roadmap/status closeout.
+- Next child: none under active parent after T007 closeout.
+- Last completed child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening (validation-only).
+- Prior completed child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests.
+- Validation summary:
+  - T005 found no repair or hardening gap.
+  - No runtime repair required; no hardening patch required.
+  - T004 implementation (`build_candidate_index`, `write_candidate_index`, `read_candidate_index`) already satisfies T005 safety/stale/corrupt regression coverage.
+  - Preserved behavior: `writer_assistant/index.json` is derived only; candidate JSON files remain source of truth; build is side-effect free; write refreshes index from candidate JSON; read validates only and does not rebuild/repair.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-004.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_safety_regression.py -q`: PASS (15 passed).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_contract.py -q`: PASS (29 passed).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_safety_regression.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (307 passed).
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+- Context tools: none run.
+- Boundary summary: docs/status validation-only; no production runtime code, tests, index helper changes, routes, UI, extraction, model calls, apply-promotion, memory/canon mutation, package/project runtime/training files, staging, commits, or pushes.
+
 ## PHASE8-IMPL-004-T005 Index Safety and Stale/Corrupt Regression Tests
 
 - Date: 2026-06-17
