@@ -107,8 +107,8 @@ Explicitly out of scope unless a later owner-approved parent reintroduces them:
 2. `PHASE8-IMPL-005-T002` - Evaluation scope, fixture plan, and scoring rubric decision. Status: complete.
 3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: complete.
 4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: complete.
-5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: ready.
-6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: draft.
+5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: complete.
+6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: ready.
 7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: draft.
 
 ## Child Task Details
@@ -202,7 +202,7 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Active child: `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Active child: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
 
 ## T004 Dramatica-flow Reference Decision Record
 
@@ -213,6 +213,20 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 - Rejected behaviors: Writer/Reviser/Architect generation agents; generated outlines/prose; continuation; rewrite/revise APIs; automatic revision loops; world_state/truth-file writes; automatic canon settlement; LLM generation pipeline execution
 - Safe future pattern: owner-authored text → app-owned rubric/adapter → candidate + evidence/provenance → OMI review → owner decision → future apply-promotion only
 - No dramatica-flow install, clone, execution, runtime extraction, code/tests, or package changes in T004
+
+## T005 NCP/Subtxt Structural Interpretation Strategy Record
+
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md`
+- Narrative Context Protocol classification: `reference-only`, future `approved-context import/export candidate`
+- Subtxt docs classification: `reference-only`, future `semantic rubric candidate`
+- Runtime adapter status: REJECT/DEFER for both
+- Automatic truth status: REJECTED
+- Import/export implementation status: DEFERRED
+- Accepted NCP use: optional future approved-context import/export schema; approved storyform/moments/structural context transport only after owner review
+- Accepted Subtxt use: semantic/Dramatica interpretation rubric; source-of-conflict guidance; author-level interpretation; insufficient-evidence discipline
+- Rejected behaviors: NCP import as automatic truth; NCP export of raw candidates as final truth; automatic storyform/throughline/storypoint labeling; Subtxt/Dramatica labels without evidence; generation/rewrite/continuation/revision; memory/canon mutation; owner-review bypass
+- Safe pipeline: owner-authored text or owner-provided structure → app-owned flow → candidates with evidence/provenance → Subtxt-informed rubric checks → optional NCP-shaped context only after approval → owner review → future apply-promotion only
+- No NCP import/export implementation, Subtxt analysis runtime, tool install/clone/execution, source retrieval beyond T003 inventory, runtime code/tests, or package changes in T005
 
 ## T003 Source Inventory Record
 

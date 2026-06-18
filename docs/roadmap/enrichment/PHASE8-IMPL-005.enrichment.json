@@ -34,6 +34,7 @@
     "prior_first_runtime_slice_decision": "docs/roadmap/decisions/PHASE8-IMPL-001-first-runtime-slice-decision.md",
     "evaluation_scope_fixture_rubric_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
     "dramatica_flow_analysis_only_reference_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
+    "ncp_subtxt_structural_interpretation_strategy_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md",
     "tool_source_inventory": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
     "tooling_decisions": "docs/roadmap/tooling_decisions.md",
     "optional_analysis_extractors": "docs/roadmap/optional_analysis_extractors.md"
@@ -119,7 +120,8 @@
       "T002 accepted evaluation scope, fixture category plan, scoring rubric, and T003 inventory requirements.",
       "T003 completed official source inventory and license/dependency screen from official docs/repos only.",
       "T004 accepted dramatica-flow as reference-only; runtime adapter REJECT/DEFER; no install/clone/execution.",
-      "No tool evaluation execution, installs, fixtures, or runtime code in T002-T004."
+      "T005 accepted NCP as reference-only/future approved-context import-export candidate and Subtxt docs as reference-only/future semantic rubric candidate; runtime adapter/import/export/Subtxt analysis REJECT/DEFER.",
+      "No tool evaluation execution, installs, fixtures, or runtime code in T002-T005."
     ]
   },
   "child_tasks": [
@@ -187,7 +189,7 @@
       "id": "PHASE8-IMPL-005-T005",
       "title": "NCP/Subtxt structural interpretation strategy decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-005-T004"
       ],
@@ -195,13 +197,14 @@
         "Docs/decision only.",
         "Decide how NCP and Subtxt docs guide approved structural context, import/export, semantic rubric, and Dramatica-informed validation.",
         "No NCP runtime implementation."
-      ]
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md"
     },
     {
       "id": "PHASE8-IMPL-005-T006",
       "title": "NLP/extraction adapter strategy decision",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-005-T005"
       ],
@@ -295,6 +298,20 @@
       "external_tool_code_executed": false,
       "source_retrieval_run": false,
       "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
+      "runtime_code_changed": false,
+      "tests_changed": false
+    },
+    "t005_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "external_tools_installed": false,
+      "external_repos_cloned": false,
+      "external_tool_code_executed": false,
+      "source_retrieval_run": false,
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md",
       "runtime_code_changed": false,
       "tests_changed": false
     }
@@ -522,7 +539,7 @@
     "index_derived_convenience": "writer_assistant/index.json"
   },
   "next_frontier": {
-    "active_child": "PHASE8-IMPL-005-T005",
+    "active_child": "PHASE8-IMPL-005-T006",
     "first_extraction_parent": "future after T007 closeout"
   },
   "dramatica_flow_reference_decision": {
@@ -561,6 +578,48 @@
     ],
     "safe_pipeline_pattern": "owner-authored text -> app-owned analysis adapter/rubric -> normalized candidate + evidence/provenance -> OMI review -> owner decision -> future apply-promotion only",
     "rejected_pipeline_pattern": "owner text -> dramatica-flow writer/reviser/continuation pipeline -> generated outline/prose/world_state -> canon/project truth"
+  },
+  "ncp_subtxt_structural_interpretation_decision": {
+    "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md",
+    "status": "accepted",
+    "narrative_context_protocol": {
+      "classification": "reference-only",
+      "future_role": "approved-context import/export candidate",
+      "runtime_adapter_status": "reject_defer",
+      "automatic_truth_status": "rejected",
+      "import_export_implementation_status": "deferred"
+    },
+    "subtxt_docs": {
+      "classification": "reference-only",
+      "future_role": "semantic rubric candidate",
+      "runtime_adapter_status": "reject_defer",
+      "automatic_classification_status": "rejected"
+    },
+    "accepted_ncp_use": [
+      "future approved structural-context export",
+      "future approved structural-context import as candidates",
+      "approved storyform representation after owner review",
+      "approved OS/MC/IC/RS context transport",
+      "approved story moments and authorial-intent metadata",
+      "future NCP export validation rules"
+    ],
+    "accepted_subtxt_use": [
+      "semantic interpretation rubric",
+      "source-of-conflict reasoning",
+      "author-level interpretation guidance",
+      "insufficient-evidence discipline",
+      "diagnostic question framing"
+    ],
+    "rejected_behaviors": [
+      "ncp_import_as_automatic_truth",
+      "ncp_export_of_raw_candidates_as_final_truth",
+      "automatic_storyform_throughline_storypoint_labeling",
+      "subtxt_dramatica_labels_without_evidence",
+      "generation_rewrite_continuation_revision",
+      "memory_canon_mutation",
+      "owner_review_bypass"
+    ],
+    "safe_pipeline_pattern": "owner-authored text or owner-provided structure -> app-owned analysis/import flow -> candidate records with evidence/provenance -> Subtxt-informed rubric checks -> optional NCP-shaped context only after approval -> owner review -> future apply-promotion only"
   },
   "t003_source_inventory": {
     "artifact": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",

@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-005",
     "current_parent_task_title": "Writer Assistant Core tool evaluation and extraction strategy decision",
-    "frontier_note": "PHASE8-IMPL-005 is active. PHASE8-IMPL-005-T004 accepted dramatica-flow as reference-only; runtime adapter REJECT/DEFER. PHASE8-IMPL-001 through PHASE8-IMPL-004 are complete. Active child is PHASE8-IMPL-005-T005. Scope narrowed to nine approved tools/references. No extraction implementation has started."
+    "frontier_note": "PHASE8-IMPL-005 is active. PHASE8-IMPL-005-T005 accepted NCP as reference-only/future approved-context import-export candidate and Subtxt docs as reference-only/future semantic rubric candidate; runtime adapter/import/export/Subtxt analysis REJECT/DEFER. PHASE8-IMPL-001 through PHASE8-IMPL-004 are complete. Active child is PHASE8-IMPL-005-T006. Scope narrowed to nine approved tools/references. No extraction implementation has started."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1068,7 +1068,7 @@
       "id": "PHASE8-IMPL-005-T005",
       "title": "NCP/Subtxt structural interpretation strategy decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-005",
       "depends_on": [
         "PHASE8-IMPL-005-T004"
@@ -1081,13 +1081,14 @@
         "no_auto_promotion",
         "no_memory_canon_mutation",
         "docs_only"
-      ]
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md"
     },
     {
       "id": "PHASE8-IMPL-005-T006",
       "title": "NLP/extraction adapter strategy decision",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "parent": "PHASE8-IMPL-005",
       "depends_on": [
         "PHASE8-IMPL-005-T005"

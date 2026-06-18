@@ -1,5 +1,49 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-005-T005 NCP/Subtxt Structural Interpretation Strategy Decision
+
+- Date: 2026-06-17
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-005-T005`.
+- Parent task: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Completed child: `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision.
+- Active child: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision.
+- Next child: `PHASE8-IMPL-005-T007` - Roadmap/status closeout.
+- Last completed child under active parent: `PHASE8-IMPL-005-T005`.
+- Prior completed child under active parent: `PHASE8-IMPL-005-T004`.
+- Last completed parent: `PHASE8-IMPL-004` - Writer Assistant Core candidate index contract and derived index helpers.
+- T005 outcome:
+  - Accepted NCP as `reference-only` and future `approved-context import/export candidate`.
+  - Accepted Subtxt docs as `reference-only` and future `semantic rubric candidate`.
+  - Runtime adapter status: REJECT/DEFER for both.
+  - Automatic truth status: REJECTED.
+  - Import/export implementation status: DEFERRED.
+  - Rejected NCP import as automatic truth, NCP export of raw candidates as final truth, automatic storyform labeling, Subtxt/Dramatica labels without evidence, generation/rewrite/continuation/revision, memory/canon mutation, and owner-review bypass.
+  - Created decision doc `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md`.
+  - No NCP import/export implementation, Subtxt analysis runtime, tool install/clone/execution, source retrieval beyond T003 inventory, fixtures, runtime code, tests, training data, or memory/canon mutation.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-005.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/open_questions.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - `git diff --check`: PASS.
+- Source retrieval: none in T005; T003 inventory used as evidence basis.
+- Context tools: none run.
+- External tools: none installed, cloned, or executed.
+- Boundary summary: docs/decision only; no context tools, external tool execution, runtime code changes, test changes, backend/frontend/package/project runtime/training files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, staging, commits, or pushes.
+
 ## PHASE8-IMPL-005-T004 Dramatica-flow Analysis-Only Reference Decision
 
 - Date: 2026-06-17
