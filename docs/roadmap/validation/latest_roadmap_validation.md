@@ -1,5 +1,46 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T002 Evidence / Source-Map Contract Decision
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: docs/decision/status only for `PHASE8-IMPL-006-T002`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision.
+- Active/next child: `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests.
+- Next implementation child after tests: `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation.
+- T002 outcome:
+  - Created decision artifact `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`.
+  - Accepted app-owned source document identity, source map, source locator, offset, source hash/snapshot, Evidence Ledger, evidence record, extraction run provenance, raw output, BookNLP-ready mapping, and candidate normalization contracts.
+  - Selected exact Python string character offsets over the UTF-8 decoded source snapshot as the primary first-slice evidence locator.
+  - Kept UTF-8 byte offsets as future/raw-tool mapping support and token/line locators as optional support.
+  - Recorded that raw tool output is never canon, extracted candidates are never canon, owner review remains mandatory, and missing evidence must become insufficient-evidence output or rejected normalization rather than invented spans.
+  - Recorded T003 tests-first handoff for future source-map/evidence helper contracts.
+  - No runtime extraction, tests, runtime code, package/dependency changes, backend routes, frontend UI, model calls, BookNLP/spaCy install/run, raw output storage implementation, apply-promotion, or memory/canon mutation.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS after preserving the repo's roadmap index type convention for T003 while keeping T003 tests-first/ready.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T002 tool policy.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Source/web retrieval: none run.
+- Boundary summary: docs/decision only; no context tools, external tools, source/web retrieval, runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T001 Publish Evidence-First Extraction Foundation Parent
 
 - Date: 2026-06-18

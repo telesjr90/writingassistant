@@ -83,9 +83,9 @@ Include:
 
 ## Child-Task Plan
 
-1. `PHASE8-IMPL-006-T001` - Publish evidence-first extraction foundation parent and scope decision. Status: complete after this docs/status/planning publication.
-2. `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision. Status: ready.
-3. `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests. Status: planned.
+1. `PHASE8-IMPL-006-T001` - Publish evidence-first extraction foundation parent and scope decision. Status: complete.
+2. `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision. Status: complete; decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`.
+3. `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests. Status: ready/active.
 4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: planned.
 5. `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision. Status: planned.
 6. `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests. Status: planned.
@@ -107,7 +107,7 @@ Include:
 
 ## Validation Expectations
 
-For `PHASE8-IMPL-006-T001`:
+For `PHASE8-IMPL-006-T002`:
 
 - `python3 scripts/check_enrichment.py`
 - `python3 scripts/validate_roadmap.py`
@@ -130,6 +130,10 @@ Do not run pytest because no tests or runtime code should change. Do not run app
 
 ## Current Status
 
-`PHASE8-IMPL-006` is active/published by `PHASE8-IMPL-006-T001`. `PHASE8-IMPL-006-T001` is docs/status/planning only and creates the parent, inventory, enrichment JSON, and scope decision. No runtime extraction starts in T001. No external tools are installed or run.
+`PHASE8-IMPL-006` is active/published by `PHASE8-IMPL-006-T001`. `PHASE8-IMPL-006-T001` is docs/status/planning only and created the parent, inventory, enrichment JSON, and scope decision.
 
-Next child: `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision.
+`PHASE8-IMPL-006-T002` is complete as a docs/decision-only child. It accepted app-owned source document identity, source map, source locator, offset, source hash/snapshot, Evidence Ledger, evidence record, extraction run provenance, raw output, BookNLP-ready mapping, and candidate normalization contracts in `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`. T002 decided that first-slice evidence uses exact Python string character offsets over the UTF-8 decoded source snapshot, keeps byte offsets as future/raw-tool mapping support, treats raw tool outputs and candidates as non-canon, and requires owner review before any approved memory/canon path. T002 does not implement runtime extraction, tests, package/tool installation, backend routes, frontend UI, model calls, generated prose behavior, or memory/canon mutation.
+
+T003 handoff: add tests-first contract coverage, likely in `tests/test_writer_assistant_core_source_evidence_contract.py`, for future `backend.story_knowledge.source_map` and `backend.story_knowledge.evidence` helpers. T003 should cover required fields, allowed source document types, path-safe IDs, hash/snapshot fields, offsets, locator precision, evidence kinds, provenance run type/status values, no arbitrary/external/training paths, candidate-only boundaries, BookNLP-ready raw output references, no generated prose fields, no source-map writes in tests, and no external tool execution. T003 may be expected red until T004 creates helpers.
+
+Next child: `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests.

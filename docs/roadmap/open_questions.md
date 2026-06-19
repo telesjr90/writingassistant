@@ -143,10 +143,10 @@ These are implementation follow-ups after the Project Workspace Foundation, not 
 Deferred PHASE8-IMPL-006 follow-ups:
 
 1. Should `PHASE8-IMPL-007` be BookNLP adapter implementation or simple local baseline extraction?
-2. What exact source locator priority should be used: char offsets, byte offsets, token offsets, line numbers, or mixed?
-3. Should raw tool outputs be stored under `writer_assistant/extractions/{tool}/{run_id}/`?
-4. What run provenance fields are mandatory before any extraction result becomes a candidate?
-5. What fixture policy should be used for BookNLP-like outputs without running BookNLP?
+2. ~~What exact source locator priority should be used: char offsets, byte offsets, token offsets, line numbers, or mixed?~~ **Resolved in T002:** primary first-slice locator is Python string character offsets over the exact UTF-8 decoded source snapshot; UTF-8 byte offsets support future/raw-tool mapping; token and line locators are optional support; all offsets use half-open intervals.
+3. ~~Should raw tool outputs be stored under `writer_assistant/extractions/{tool}/{run_id}/`?~~ **Resolved in T002 as future target:** raw outputs should stay separate under `projects/{project_id}/writer_assistant/extractions/{tool_name}/{run_id}/`, with raw files and manifest kept non-canon and not created by T002.
+4. ~~What run provenance fields are mandatory before any extraction result becomes a candidate?~~ **Resolved in T002:** provenance must record run/tool/adapter identity, source documents/snapshots, input and output artifact hashes, status, warnings, parameters/environment, created candidate IDs, rejected/insufficient-evidence counts, and human review requirement.
+5. What fixture policy should be used for BookNLP-like outputs without running BookNLP? T002 records BookNLP-ready raw-output references as references only; exact fixture data remains a T003/T005 follow-up.
 6. Should object/item candidates be in the first implementation slice?
 7. When should NCP import/export be implemented?
 8. When should Subtxt-inspired rubric checks be implemented?

@@ -30,6 +30,7 @@
     "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-006.md",
     "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json",
     "scope_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md",
+    "evidence_source_map_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
     "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-005.md",
     "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json",
     "prior_evaluation_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
@@ -119,28 +120,31 @@
       "id": "PHASE8-IMPL-006-T002",
       "title": "Evidence/source-map contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-006-T001"
       ],
       "scope": [
         "Docs/decision only.",
-        "Decide source document IDs, locator forms, offset policy, source hash policy, and Evidence Ledger shape.",
+        "Accepted source document identity, source map, source locator, offset, source hash/snapshot, Evidence Ledger, evidence record, extraction provenance, raw output, BookNLP-ready mapping, and candidate normalization contracts.",
         "No runtime code/tests."
-      ]
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-006-T003",
       "title": "Evidence/source-map contract tests",
       "type": "validation_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-006-T002"
       ],
       "scope": [
         "Tests-first only.",
         "Expected red if helpers do not exist.",
-        "Test source locator shape, evidence span shape, source hash, owner-authored source type, and no-canon mutation."
+        "Likely test file: tests/test_writer_assistant_core_source_evidence_contract.py.",
+        "Test source document refs, source maps, locators, evidence records, extraction provenance, raw-output references, path safety, source hashes/snapshots, offset validation, candidate-only boundaries, no generated prose fields, and no-canon mutation."
       ]
     },
     {
@@ -205,7 +209,8 @@
     "The five answer files are referenced as evidence inputs.",
     "PHASE8-IMPL-005 remains complete.",
     "PHASE8-IMPL-006-T001 is marked complete if successful.",
-    "PHASE8-IMPL-006-T002 is marked ready/active.",
+    "PHASE8-IMPL-006-T002 is complete.",
+    "PHASE8-IMPL-006-T003 is marked ready/active.",
     "No runtime extraction is claimed.",
     "No external tools are installed, cloned, or executed.",
     "No code/tests are changed.",
@@ -219,7 +224,22 @@
       "non-LeanCTX whitespace check on changed docs",
       "narrow git diff --check if local tooling allows it without LeanCTX"
     ],
-    "notes": "T001 validation is docs/status/planning only. Do not run pytest because no tests or runtime code should change."
+    "notes": "T002 validation is docs/decision/status only. Do not run pytest because no tests or runtime code should change."
+  },
+  "t002_contract_summary": {
+    "status": "complete",
+    "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
+    "source_document_policy": "Source document identity is project-local, path-safe, snapshot/hash-backed, and distinguishes owner-authored or owner-provided material from generated/tool output.",
+    "source_map_policy": "Source maps are derived support records with reproducible snapshots, stable segments, exact snapshot hashes, and no destructive normalization or canon status.",
+    "offset_policy": "Primary first-slice locator is Python string character offsets over the exact UTF-8 decoded snapshot; byte offsets are future/raw-tool mapping support; token and line locators are optional support; all spans are half-open.",
+    "evidence_policy": "Evidence records support candidate claims only, require source-derived/owner-provided excerpts, bounded confidence, source locator/snapshot/hash data, and do not create truth.",
+    "provenance_policy": "Extraction run provenance records source snapshots, tool/adapter identity, raw output artifacts, status, warnings, rejection/insufficient-evidence counts, and human review requirement.",
+    "raw_output_policy": "Raw tool output is stored separately in future extraction folders, is never canon, is not candidate JSON until normalized and validated, and must not write memory/canon/source files.",
+    "candidate_boundary": "Raw/manual/rule output must normalize through app-owned source locators and evidence records before candidate persistence; candidate confidence cannot bypass owner review.",
+    "t003_handoff": "Add tests-first contract coverage for future source_map and evidence helpers; tests may be expected red until T004 implements helpers.",
+    "runtime_changes": "none",
+    "test_changes": "none",
+    "code_changes": "none"
   },
   "safety_notes": [
     "The app is analysis-only.",
