@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-006",
     "current_parent_task_title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
-    "frontier_note": "PHASE8-IMPL-005 is complete through PHASE8-IMPL-005-T007. PHASE8-IMPL-006 is active as an evidence-first extraction foundation and BookNLP-ready adapter strategy parent. T001 published docs/status/planning artifacts only; T002 accepted the evidence/source-map contract decision; T003 added tests-first contract coverage; T004 added pure source-map/evidence validation helpers; T005 accepted the BookNLP-ready raw output and adapter contract decision; T006 is the next tests-first mocked fixture contract child. No extraction implementation has started. BookNLP and spaCy are not installed or run."
+    "frontier_note": "PHASE8-IMPL-005 is complete through PHASE8-IMPL-005-T007. PHASE8-IMPL-006 is active as an evidence-first extraction foundation and BookNLP-ready adapter strategy parent. T001 published docs/status/planning artifacts only; T002 accepted the evidence/source-map contract decision; T003 added tests-first contract coverage; T004 added pure source-map/evidence validation helpers; T005 accepted the BookNLP-ready raw output and adapter contract decision; T006 added tests-first mocked BookNLP-ready adapter contract coverage for future backend.story_knowledge.booknlp_adapter_contract APIs. T007 is the active/ready roadmap/status closeout child. No extraction implementation has started. BookNLP and spaCy are not installed or run."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1256,7 +1256,7 @@
       "id": "PHASE8-IMPL-006-T006",
       "title": "BookNLP-ready adapter contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-006",
       "depends_on": [
         "PHASE8-IMPL-006-T005"
@@ -1268,13 +1268,15 @@
         "no_model_calls",
         "no_generated_prose",
         "no_memory_canon_mutation"
-      ]
+      ],
+      "artifact": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+      "future_module": "backend.story_knowledge.booknlp_adapter_contract"
     },
     {
       "id": "PHASE8-IMPL-006-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-006",
       "depends_on": [
         "PHASE8-IMPL-006-T006"

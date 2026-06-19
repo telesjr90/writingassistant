@@ -88,8 +88,8 @@ Include:
 3. `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests. Status: complete; test artifact: `tests/test_writer_assistant_core_source_evidence_contract.py`.
 4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: complete; helper modules: `backend/story_knowledge/source_map.py`, `backend/story_knowledge/evidence.py`.
 5. `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision. Status: complete; decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
-6. `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests. Status: ready/active.
-7. `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests. Status: complete; test artifact: `tests/test_writer_assistant_core_booknlp_adapter_contract.py`; expected-red future module: `backend.story_knowledge.booknlp_adapter_contract`.
+7. `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Acceptance Criteria
 
@@ -100,23 +100,26 @@ Include:
 - `PHASE8-IMPL-006-T001` is marked complete if successful.
 - `PHASE8-IMPL-006-T004` is complete.
 - `PHASE8-IMPL-006-T005` is complete if successful.
-- `PHASE8-IMPL-006-T006` is marked ready/active.
+- `PHASE8-IMPL-006-T006` is complete if successful.
+- `PHASE8-IMPL-006-T007` is marked ready/active.
 - No runtime extraction is claimed.
 - No external tools are installed, cloned, or executed.
-- No production code or tests are changed in T005.
+- No production adapter code is changed in T006.
 - No generated prose/rewrite/continuation behavior is added.
 - No memory/canon mutation is added.
 
 ## Validation Expectations
 
-For `PHASE8-IMPL-006-T005`:
+For `PHASE8-IMPL-006-T006`:
 
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`
 - `python3 scripts/check_enrichment.py`
 - `python3 scripts/validate_roadmap.py`
-- non-LeanCTX whitespace check on changed docs
+- non-LeanCTX whitespace check on changed T006 files
 - narrow `git diff --check` if local hooks allow it without LeanCTX
 
-Do not run pytest because T005 is docs/decision only. Do not run full pytest, app servers, frontend build, browser validation, model calls, Ollama, BookNLP, spaCy, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external repo clone, package install, demos, or tool execution.
+The targeted BookNLP adapter contract pytest is expected red until the future module exists; acceptable failure is limited to missing `backend.story_knowledge.booknlp_adapter_contract` or missing future API symbols. Do not run full pytest, app servers, frontend build, browser validation, model calls, Ollama, BookNLP, spaCy, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external repo clone, package install, demos, or tool execution.
 
 ## Safety / Product Boundaries
 
@@ -146,4 +149,6 @@ T003 handoff: add tests-first contract coverage, likely in `tests/test_writer_as
 
 T006 handoff: add tests-first BookNLP-ready adapter contract coverage using mocked BookNLP-like fixture dictionaries only. T006 should test mocked token/entity/quote/book JSON/supersense/event artifact shapes, run manifest validation, raw artifact bundle validation, source locator/evidence integration, candidate draft normalization shape, unsupported candidate handling, fail-closed behavior, and no tool execution/package import/filesystem writes/runtime invocation. T006 may be expected red until a later implementation child or parent creates `backend.story_knowledge.booknlp_adapter_contract`.
 
-Next child: `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests.
+`PHASE8-IMPL-006-T006` is complete as a tests-first contract child. It created `tests/test_writer_assistant_core_booknlp_adapter_contract.py`, which defines the expected future API for `backend.story_knowledge.booknlp_adapter_contract`: `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts`. The tests use mocked BookNLP-like in-memory dictionaries only and cover run manifests, raw artifact bundles, mocked token/entity/quote/book JSON/supersense/event artifacts, source locator/evidence integration, entity/quote/event normalization draft shape, combined candidate draft building, fail-closed behavior, runtime/tool boundary source scanning for the future module, and existing helper integration. The targeted T006 pytest is expected red until a later implementation creates the future module; the current failure is limited to `ImportError: cannot import name 'booknlp_adapter_contract' from 'backend.story_knowledge'`. T006 does not implement runtime extraction, create `backend/story_knowledge/booknlp_adapter_contract.py`, install or run BookNLP/spaCy, change package files, add routes/UI, call models, generate prose, apply promotion, mutate memory/canon, create project runtime files, or create training/JSONL/dataset artifacts.
+
+Next child: `PHASE8-IMPL-006-T007` - Roadmap/status closeout.

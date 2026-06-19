@@ -1,5 +1,50 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T006 BookNLP-Ready Adapter Contract Tests
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: tests-first contract coverage plus roadmap/status updates for `PHASE8-IMPL-006-T006`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests.
+- Active/next child: `PHASE8-IMPL-006-T007` - Roadmap/status closeout.
+- Next child after T007: none under `PHASE8-IMPL-006`.
+- T006 outcome:
+  - Created expected-red test file `tests/test_writer_assistant_core_booknlp_adapter_contract.py`.
+  - Defined the future pure adapter-contract module `backend.story_knowledge.booknlp_adapter_contract`.
+  - Defined future APIs: `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts`.
+  - Added mocked BookNLP-like fixture builders for source document refs, source segments, source maps, tokens, entities, quotes, book JSON, supersense, events, run manifests, and raw artifact bundles.
+  - Added contract coverage for raw-import run manifest policy, raw artifact bundle shape, token/entity/quote/book JSON/supersense/event artifacts, source locator/evidence integration, entity/quote/event candidate draft normalization, combined draft building, fail-closed behavior, runtime/tool boundary source scanning, and helper integration.
+  - Targeted BookNLP adapter contract pytest is expected red until a later implementation creates the future module; current failure is limited to missing `backend.story_knowledge.booknlp_adapter_contract`.
+  - Existing source/evidence and candidate contract regression tests remain green.
+  - No runtime extraction, production adapter module, package/dependency changes, backend routes, frontend UI, model calls, BookNLP/spaCy install/run, raw output storage implementation, apply-promotion, generated prose behavior, or memory/canon mutation.
+- Created:
+  - `tests/test_writer_assistant_core_booknlp_adapter_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: EXPECTED RED; collection ImportError because `backend.story_knowledge.booknlp_adapter_contract` is not implemented yet.
+  - Exact failure cause: `ImportError: cannot import name 'booknlp_adapter_contract' from 'backend.story_knowledge' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/story_knowledge/__init__.py)`.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 367 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T006 tool policy.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Source/web retrieval: none run.
+- Boundary summary: tests-first only; no context tools, external tools, source/web retrieval, production adapter code, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T005 BookNLP-Ready Raw Output / Adapter Contract Decision
 
 - Date: 2026-06-19

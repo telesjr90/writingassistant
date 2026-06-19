@@ -147,13 +147,15 @@ Deferred PHASE8-IMPL-006 follow-ups:
 3. ~~Should raw tool outputs be stored under `writer_assistant/extractions/{tool}/{run_id}/`?~~ **Resolved in T002 as future target:** raw outputs should stay separate under `projects/{project_id}/writer_assistant/extractions/{tool_name}/{run_id}/`, with raw files and manifest kept non-canon and not created by T002.
 4. ~~What run provenance fields are mandatory before any extraction result becomes a candidate?~~ **Resolved in T002:** provenance must record run/tool/adapter identity, source documents/snapshots, input and output artifact hashes, status, warnings, parameters/environment, created candidate IDs, rejected/insufficient-evidence counts, and human review requirement.
 5. ~~What fixture policy should be used for BookNLP-like outputs without running BookNLP?~~ **Resolved in T005:** use app-owned mocked BookNLP-like fixture dictionaries only, based on synthetic owner-authored sample text, with builders for token, entity, quote, book JSON, supersense, event, and run manifest shapes; see `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
-6. Should object/item candidates be in the first implementation slice?
-7. When should NCP import/export be implemented?
-8. When should Subtxt-inspired rubric checks be implemented?
-9. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
-10. spaCy package approval/install timing remains deferred; no dependency is approved by T001.
-11. BookNLP package approval/install timing remains deferred; no dependency is approved by T001.
-12. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
+6. ~~What future BookNLP-ready adapter contract test surface should T006 define?~~ **Resolved in T006:** `tests/test_writer_assistant_core_booknlp_adapter_contract.py` defines expected-red coverage for future `backend.story_knowledge.booknlp_adapter_contract` APIs, using mocked in-memory BookNLP-like dictionaries only and asserting raw-support, evidence/source locator, normalization draft, fail-closed, no-runtime-dependency, no-prose, no-apply-promotion, and no-memory/canon-mutation boundaries.
+7. Should object/item candidates be in the first implementation slice?
+8. When should NCP import/export be implemented?
+9. When should Subtxt-inspired rubric checks be implemented?
+10. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
+11. spaCy package approval/install timing remains deferred; no dependency is approved by T001.
+12. BookNLP package approval/install timing remains deferred; no dependency is approved by T001.
+13. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
+14. Should `PHASE8-IMPL-006-T007` close the parent with a recommendation for BookNLP adapter implementation, simple local baseline extraction, or another tests-first foundation parent?
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

@@ -194,7 +194,7 @@
       "id": "PHASE8-IMPL-006-T006",
       "title": "BookNLP-ready adapter contract tests",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-006-T005"
       ],
@@ -202,13 +202,17 @@
         "Tests-first only.",
         "Validate mapping contracts using fixtures/mocked sample structures only.",
         "No BookNLP runtime execution."
-      ]
+      ],
+      "artifact": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+      "future_module": "backend.story_knowledge.booknlp_adapter_contract",
+      "expected_red_result": "Targeted pytest fails during collection because backend.story_knowledge.booknlp_adapter_contract is not implemented yet.",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-006-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-006-T006"
       ],
@@ -229,7 +233,8 @@
     "PHASE8-IMPL-006-T003 is complete as tests-first contract coverage.",
     "PHASE8-IMPL-006-T004 is complete.",
     "PHASE8-IMPL-006-T005 is complete.",
-    "PHASE8-IMPL-006-T006 is marked ready/active.",
+    "PHASE8-IMPL-006-T006 is complete as tests-first BookNLP-ready adapter contract coverage.",
+    "PHASE8-IMPL-006-T007 is marked ready/active.",
     "No runtime extraction is claimed.",
     "No external tools are installed, cloned, or executed.",
     "No production code or tests are changed in T005.",
@@ -240,10 +245,12 @@
     "commands": [
       "python3 scripts/check_enrichment.py",
       "python3 scripts/validate_roadmap.py",
-      "non-LeanCTX whitespace check on changed docs",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q",
+      "non-LeanCTX whitespace check on changed T006 files",
       "narrow git diff --check if local tooling allows it without LeanCTX"
     ],
-    "notes": "T005 validation is docs/decision/status only. No pytest is run because no tests or runtime code change in T005."
+    "notes": "T006 validation includes an expected-red targeted BookNLP adapter contract pytest. The acceptable failure is limited to the missing future backend.story_knowledge.booknlp_adapter_contract module or future symbols."
   },
   "t005_booknlp_raw_output_adapter_contract_summary": {
     "status": "complete",
@@ -328,6 +335,44 @@
     "focused_project_omi_regression_result": "109 passed",
     "runtime_extraction_changes": "none",
     "package_changes": "none"
+  },
+  "t006_booknlp_adapter_contract_test_summary": {
+    "status": "complete",
+    "test_file": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+    "future_module": "backend.story_knowledge.booknlp_adapter_contract",
+    "future_api": [
+      "validate_booknlp_run_manifest(manifest: dict) -> dict",
+      "validate_booknlp_raw_artifact_bundle(bundle: dict) -> dict",
+      "normalize_booknlp_entity_mentions(bundle: dict, source_map: dict) -> list[dict]",
+      "normalize_booknlp_quotes(bundle: dict, source_map: dict) -> list[dict]",
+      "normalize_booknlp_events(bundle: dict, source_map: dict) -> list[dict]",
+      "build_booknlp_candidate_drafts(bundle: dict, source_map: dict) -> list[dict]"
+    ],
+    "coverage": [
+      "Run manifest validation contract with raw-import policy gates, source document refs, raw artifact refs, forbidden prompt/prose/mutation fields, and no caller input mutation.",
+      "Raw artifact bundle validation contract for nested manifest/source map/raw refs, collection shapes, raw-support-only boundaries, forbidden canon/candidate shortcuts, forbidden prose/mutation fields, and no caller input mutation.",
+      "Mocked token, entity, quote, book JSON, supersense, and event artifact contracts using synthetic owner-authored sample text only.",
+      "Entity, quote, and event normalization contracts for candidate draft shape, evidence/provenance/raw refs, insufficient-evidence or rejected-output behavior, no canon truth, no generated prose, and no input mutation.",
+      "Combined candidate draft builder contract for draft-only output, no promoted status, no promote owner decision, no forbidden destination values, and fail-closed unsupported raw artifacts.",
+      "Fail-closed scenarios for invalid manifest/bundle structure, missing source locators, invalid offsets, missing hashes, mutation/prose fields, unsupported candidate types, invalid confidence, and ambiguous speaker attribution.",
+      "Runtime/tool boundary source scan for the future production module only, forbidding BookNLP/spaCy imports, model/network/server/tool execution, filesystem writes, training/dataset terms, generated prose, and memory/canon/apply-promotion terms.",
+      "Existing source-map/evidence helper integration for source document refs, source maps, source locators, raw output references, and evidence records."
+    ],
+    "expected_red_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q",
+    "expected_red_result": "ERROR during collection: ImportError cannot import name 'booknlp_adapter_contract' from 'backend.story_knowledge' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/story_knowledge/__init__.py). This is limited to the missing future T006 module/symbols.",
+    "existing_regression_result": "367 passed",
+    "roadmap_validation_results": {
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "git_diff_check": "BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T006 tool policy"
+    },
+    "t007_status": "ready",
+    "runtime_changes": "none",
+    "production_adapter_code_changes": "none",
+    "package_changes": "none",
+    "external_tool_execution": "none",
+    "booknlp_spacy_install_or_run": "none"
   },
   "t002_contract_summary": {
     "status": "complete",
