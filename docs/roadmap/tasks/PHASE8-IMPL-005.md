@@ -108,8 +108,8 @@ Explicitly out of scope unless a later owner-approved parent reintroduces them:
 3. `PHASE8-IMPL-005-T003` - Official source inventory and license/dependency screen. Status: complete.
 4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: complete.
 5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: complete.
-6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: ready.
-7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: draft.
+6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: complete.
+7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Child Task Details
 
@@ -202,7 +202,22 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Active child: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Active child: `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+
+## T006 NLP/Extraction Adapter Strategy Decision Record
+
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md`
+- First extraction strategy accepted: spaCy-first local deterministic/rule-assisted candidate extraction foundation
+- First implementation style: app-owned, local, deterministic/rule-assisted, candidate-only
+- First slice focus: source segmentation/source locators; simple entity candidates; source evidence spans; candidate normalization; no-prose and no-canon-mutation contracts
+- Deferred from first implementation slice: segram, BookNLP, GLiNER, LangExtract, Renard
+- LangExtract status: later/local-only/model-assisted candidate only if privacy/local model policy is approved
+- Renard status: deferred pending GPL/license review and relationship-network scope
+- Reference-only context retained from T004/T005: dramatica-flow, Narrative Context Protocol, Subtxt docs
+- Next parent recommendation: after T007 closeout, publish a first extraction architecture/implementation parent for the spaCy-first local deterministic/rule-assisted candidate extraction foundation
+- No runtime extraction exists yet
+- No tools were installed, cloned, executed, or evaluated locally in T006
+- No runtime code, tests, backend routes, frontend UI, package/dependency files, project runtime files, model calls, memory/canon mutation, training data, JSONL records, or dataset files changed in T006
 
 ## T004 Dramatica-flow Reference Decision Record
 

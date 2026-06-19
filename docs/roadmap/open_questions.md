@@ -54,6 +54,11 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 15. Evaluate optional analysis extractors only after the Project Workspace Foundation and internal contracts are ready; external tools remain replaceable adapters whose outputs are candidate-only and routed through OMI.
 16. Books 4-5 remain conditional and should not start while the fine-tuning/book-backed track is paused.
 17. Decide whether to accept the Step 2 sandbox limitation for localhost backend/frontend server smokes or rerun those smokes in a local environment where socket binding is permitted.
+18. Defer extractor package approval/install timing to a future extraction architecture/implementation parent; no extraction dependency is approved for installation by T006.
+19. Defer the exact extraction trigger policy to a future parent; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
+20. Defer the exact evidence-locator priority format to the first extraction architecture parent; T006 only requires source segmentation/source locators and evidence spans as first-slice concerns.
+21. Defer whether `object_candidate` is included in the first runtime extraction slice; T006 accepts simple entity candidates first without widening implementation scope.
+22. Defer later tool spikes for segram, BookNLP, GLiNER, LangExtract, and Renard until after the spaCy-first foundation and required privacy/license/scope approvals.
 
 ## Project Workspace Foundation Follow-Up Questions
 
@@ -130,7 +135,7 @@ These are implementation follow-ups after the Project Workspace Foundation, not 
 
 1. ~~What evaluation scoring rubric and fixture set should `PHASE8-IMPL-005-T002` adopt for the nine scoped tools/references?~~ **Resolved in T002:** see `docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md` — 0–5 rubric with 13 dimensions, 12 fixture categories (no fixture files yet), hard blockers, and pass/fail gates.
 2. ~~Which of the nine scoped tools should be classified as likely runtime adapter candidate, possible runtime adapter candidate, reference-only, or reject/defer after T003 official source review?~~ **Preliminary in T003:** see `docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md` — spaCy likely runtime adapter candidate; segram, BookNLP, GLiNER, LangExtract, Renard possible; dramatica-flow, NCP, Subtxt docs reference-only; final decisions deferred to T004–T006.
-3. What first extraction implementation path should T006 choose: manual-first, rule-based, local NLP, model-assisted, or hybrid?
+3. ~~What first extraction implementation path should T006 choose: manual-first, rule-based, local NLP, model-assisted, or hybrid?~~ **Resolved in T006:** see `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md` — first extraction strategy is spaCy-first local deterministic/rule-assisted candidate extraction foundation; first implementation style is app-owned, local, deterministic/rule-assisted, and candidate-only; segram, BookNLP, GLiNER, LangExtract, and Renard are deferred from the first implementation slice.
 4. ~~How should dramatica-flow safe analysis concepts be separated from unsafe generation/revision/continuation behavior?~~ **Resolved in T004:** see `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md` — dramatica-flow accepted as `reference-only`; runtime adapter REJECT/DEFER; seven safe reference concept groups accepted; generation/revision/continuation/world_state behaviors rejected.
 5. ~~How should NCP and Subtxt docs guide approved structural context without becoming automatic truth or bypassing owner approval?~~ **Resolved in T005:** see `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md` — NCP accepted as `reference-only` and future `approved-context import/export candidate`; Subtxt docs accepted as `reference-only` and future `semantic rubric candidate`; runtime adapter/import/export/Subtxt analysis REJECT/DEFER; import/export and automatic labeling rejected; candidate-first pipeline with owner review required.
 

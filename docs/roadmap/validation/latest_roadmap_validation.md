@@ -1,5 +1,36 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-005-T006 Repair Roadmap/Status Update
+
+- Date: 2026-06-18
+- Result: PARTIAL
+- Scope: docs/status repair only after `PHASE8-IMPL-005-T006`.
+- Parent task: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Completed child recorded: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision.
+- Active child after repair: `PHASE8-IMPL-005-T007` - Roadmap/status closeout.
+- Next child: none under `PHASE8-IMPL-005`; next parent pending T007 closeout recommendation.
+- T006 decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md`
+- T006 accepted decision:
+  - First extraction strategy: spaCy-first local deterministic/rule-assisted candidate extraction foundation.
+  - First implementation style: app-owned, local, deterministic/rule-assisted, candidate-only.
+  - First slice focus: source segmentation/source locators, simple entity candidates, source evidence spans, candidate normalization, and no-prose/no-canon-mutation contracts.
+  - Deferred from first implementation slice: segram, BookNLP, GLiNER, LangExtract, Renard.
+  - LangExtract remains later/local-only/model-assisted candidate only if privacy/local model policy is approved.
+  - Renard remains deferred pending GPL/license review and relationship-network scope.
+  - dramatica-flow, NCP, and Subtxt remain reference-only according to T004/T005.
+- Repair completed:
+  - Roadmap/status files updated so T006 is complete and T007 is active/ready.
+  - Decision log and open questions updated for accepted strategy and deferred follow-ups.
+  - No runtime extraction implementation claimed.
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - `git diff --check`: BLOCKED by local hook requiring LeanCTX rerun; LeanCTX was not run because this repair task forbids context tools.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Boundary summary: docs/status repair only; no runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-005-T005 NCP/Subtxt Structural Interpretation Strategy Decision
 
 - Date: 2026-06-17

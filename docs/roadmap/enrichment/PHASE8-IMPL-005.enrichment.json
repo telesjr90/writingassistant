@@ -35,6 +35,7 @@
     "evaluation_scope_fixture_rubric_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
     "dramatica_flow_analysis_only_reference_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
     "ncp_subtxt_structural_interpretation_strategy_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md",
+    "nlp_extraction_adapter_strategy_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md",
     "tool_source_inventory": "docs/roadmap/inventory/PHASE8-IMPL-005-tool-source-inventory.md",
     "tooling_decisions": "docs/roadmap/tooling_decisions.md",
     "optional_analysis_extractors": "docs/roadmap/optional_analysis_extractors.md"
@@ -121,7 +122,8 @@
       "T003 completed official source inventory and license/dependency screen from official docs/repos only.",
       "T004 accepted dramatica-flow as reference-only; runtime adapter REJECT/DEFER; no install/clone/execution.",
       "T005 accepted NCP as reference-only/future approved-context import-export candidate and Subtxt docs as reference-only/future semantic rubric candidate; runtime adapter/import/export/Subtxt analysis REJECT/DEFER.",
-      "No tool evaluation execution, installs, fixtures, or runtime code in T002-T005."
+      "T006 accepted spaCy-first local deterministic/rule-assisted candidate extraction foundation as the first extraction strategy; segram, BookNLP, GLiNER, LangExtract, and Renard are deferred from the first implementation slice.",
+      "No runtime extraction implementation, tool evaluation execution, installs, fixtures, or runtime code in T002-T006."
     ]
   },
   "child_tasks": [
@@ -204,7 +206,7 @@
       "id": "PHASE8-IMPL-005-T006",
       "title": "NLP/extraction adapter strategy decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-005-T005"
       ],
@@ -214,13 +216,14 @@
         "Choose first extraction implementation path.",
         "Define next implementation parent scope.",
         "Require candidate-only evidence/provenance output."
-      ]
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md"
     },
     {
       "id": "PHASE8-IMPL-005-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-005-T006"
       ],
@@ -314,6 +317,24 @@
       "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md",
       "runtime_code_changed": false,
       "tests_changed": false
+    },
+    "t006_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "git_diff_check": "blocked_by_local_hook_requiring_leanctx",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "external_tools_installed": false,
+      "external_repos_cloned": false,
+      "external_tool_code_executed": false,
+      "source_retrieval_run": false,
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md",
+      "first_extraction_path": "spaCy-first local deterministic/rule-assisted candidate extraction foundation",
+      "runtime_extraction_exists": false,
+      "runtime_code_changed": false,
+      "tests_changed": false,
+      "package_dependency_changes": false
     }
   },
   "safety_notes": [
@@ -539,8 +560,51 @@
     "index_derived_convenience": "writer_assistant/index.json"
   },
   "next_frontier": {
-    "active_child": "PHASE8-IMPL-005-T006",
-    "first_extraction_parent": "future after T007 closeout"
+    "active_child": "PHASE8-IMPL-005-T007",
+    "last_completed_child": "PHASE8-IMPL-005-T006",
+    "first_extraction_parent": "future after T007 closeout",
+    "recommended_next_parent": "first extraction architecture/implementation parent for spaCy-first local deterministic/rule-assisted candidate extraction foundation"
+  },
+  "nlp_extraction_adapter_strategy_decision": {
+    "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md",
+    "status": "accepted",
+    "first_extraction_strategy": "spaCy-first local deterministic/rule-assisted candidate extraction foundation",
+    "first_implementation_style": "app-owned, local, deterministic/rule-assisted, candidate-only",
+    "first_slice_focus": [
+      "source_segmentation_source_locators",
+      "simple_entity_candidates",
+      "source_evidence_spans",
+      "candidate_normalization",
+      "no_prose_contract",
+      "no_canon_mutation_contract"
+    ],
+    "accepted_classifications": {
+      "spaCy": "first local deterministic/rule-assisted extraction foundation",
+      "segram": "deferred semantic/action-analysis reference after spaCy baseline",
+      "BookNLP": "deferred long-form literary extraction candidate",
+      "GLiNER": "deferred custom entity extraction candidate",
+      "LangExtract": "deferred later/local-only/model-assisted candidate if privacy/local model policy is approved",
+      "Renard": "deferred pending GPL/license review and relationship-network scope",
+      "dramatica-flow": "reference-only per T004",
+      "Narrative Context Protocol": "reference-only/future approved-context import-export candidate per T005",
+      "Subtxt docs": "reference-only/future semantic rubric candidate per T005"
+    },
+    "deferred_tools": [
+      "segram",
+      "BookNLP",
+      "GLiNER",
+      "LangExtract",
+      "Renard"
+    ],
+    "risk_notes": [
+      "LangExtract remains later/local-only/model-assisted candidate only if privacy/local model policy is approved.",
+      "Renard remains deferred pending GPL/license review and relationship-network scope.",
+      "No runtime extraction exists yet.",
+      "No tools were installed, cloned, executed, or evaluated locally."
+    ],
+    "next_parent_recommendation": "After T007 closeout, publish a first extraction architecture/implementation parent for spaCy-first local deterministic/rule-assisted candidate extraction foundation.",
+    "runtime_code_changed": false,
+    "tests_changed": false
   },
   "dramatica_flow_reference_decision": {
     "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
