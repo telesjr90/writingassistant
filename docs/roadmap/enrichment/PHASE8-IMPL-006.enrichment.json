@@ -1,0 +1,255 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-006",
+  "title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-005"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "evidence_first",
+    "booknlp_ready",
+    "no_tool_execution",
+    "no_package_changes",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "no_runtime_feature_scope",
+    "docs_only"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-006.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-006.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json",
+    "scope_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-005.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json",
+    "prior_evaluation_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
+    "prior_dramatica_flow_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md",
+    "prior_ncp_subtxt_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md",
+    "prior_nlp_strategy_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md"
+  },
+  "goal": "Prepare Writer Assistant Core for automated extraction by publishing an evidence-first foundation with stable source maps, source locators, Evidence Ledger/provenance planning, raw output policy, candidate normalization contracts, and BookNLP-ready adapter strategy before any runtime extraction work begins.",
+  "why_now": "PHASE8-IMPL-005 completed tool evaluation and recommended spaCy-first local deterministic/rule-assisted extraction. Owner follow-up analysis in local answer files revised the next parent to evidence-first and BookNLP-ready, with spaCy as a possible lightweight baseline and BookNLP as the first serious literary extractor candidate after source maps/provenance are stable.",
+  "evidence_inputs": [
+    "docs/feasibility.md",
+    "docs/booknlp.md",
+    "docs/dramaticaflow.md",
+    "docs/subtxt.md",
+    "docs/ncp.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-005.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/phase_map.md",
+    "docs/master_plan.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/open_questions.md",
+    "backend/story_knowledge/candidate_schema.py",
+    "backend/story_knowledge/candidate_record.py",
+    "backend/story_knowledge/candidate_storage.py",
+    "backend/story_knowledge/candidate_persistence.py",
+    "backend/story_knowledge/candidate_index.py"
+  ],
+  "scope": {
+    "include": [
+      "Stable source map contracts.",
+      "Source document locator contracts.",
+      "Evidence Ledger design.",
+      "Extraction run provenance model.",
+      "Raw tool output storage policy.",
+      "Candidate normalization contract.",
+      "Candidate-only persistence boundaries.",
+      "No-prose/no-model/no-canon-mutation guardrails.",
+      "BookNLP-ready adapter contract.",
+      "Optional spaCy baseline decision point.",
+      "Future dramatica-flow-inspired analysis rubric mapping.",
+      "Future Subtxt semantic guardrail mapping.",
+      "Future NCP approved-context import/export mapping."
+    ],
+    "exclude": [
+      "Runtime extraction in T001.",
+      "BookNLP install or execution.",
+      "spaCy install or execution.",
+      "External repository clone.",
+      "External tool execution.",
+      "Context tool execution.",
+      "Web/source retrieval.",
+      "Model/Ollama calls.",
+      "Runtime code.",
+      "Tests in T001.",
+      "Backend routes.",
+      "Frontend UI.",
+      "Runtime project files.",
+      "Package/dependency changes.",
+      "Training data, JSONL records, datasets, or manifests.",
+      "Generated prose, rewrite, continuation, imitation, polish, improvement, or expansion.",
+      "Automatic Storyform truth.",
+      "Apply-promotion.",
+      "Memory/canon mutation."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-006-T001",
+      "title": "Publish evidence-first extraction foundation parent and scope decision",
+      "type": "planning_microtask",
+      "status": "done",
+      "depends_on": [
+        "PHASE8-IMPL-006"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Create parent, inventory, enrichment JSON, and scope decision.",
+        "No runtime code/tests."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T002",
+      "title": "Evidence/source-map contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-006-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide source document IDs, locator forms, offset policy, source hash policy, and Evidence Ledger shape.",
+        "No runtime code/tests."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T003",
+      "title": "Evidence/source-map contract tests",
+      "type": "validation_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-006-T002"
+      ],
+      "scope": [
+        "Tests-first only.",
+        "Expected red if helpers do not exist.",
+        "Test source locator shape, evidence span shape, source hash, owner-authored source type, and no-canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T004",
+      "title": "Minimal source-map/evidence helper implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-006-T003"
+      ],
+      "scope": [
+        "Implement pure helpers only if T003 authorizes.",
+        "No external tools, BookNLP install, spaCy install, extraction runtime, routes, or UI."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T005",
+      "title": "BookNLP-ready raw output and adapter contract decision",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-006-T004"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide raw tool output storage policy, run provenance, BookNLP output mapping expectations, and candidate normalization boundaries.",
+        "No BookNLP install or execution."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T006",
+      "title": "BookNLP-ready adapter contract tests",
+      "type": "validation_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-006-T005"
+      ],
+      "scope": [
+        "Tests-first only.",
+        "Validate mapping contracts using fixtures/mocked sample structures only.",
+        "No BookNLP runtime execution."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-006-T006"
+      ],
+      "scope": [
+        "Close parent.",
+        "Summarize source/evidence foundation and BookNLP-ready contract.",
+        "Recommend next parent based on T005/T006 results."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "PHASE8-IMPL-006 is active/published in roadmap docs.",
+    "Parent scope is evidence-first + BookNLP-ready, not spaCy-only.",
+    "The five answer files are referenced as evidence inputs.",
+    "PHASE8-IMPL-005 remains complete.",
+    "PHASE8-IMPL-006-T001 is marked complete if successful.",
+    "PHASE8-IMPL-006-T002 is marked ready/active.",
+    "No runtime extraction is claimed.",
+    "No external tools are installed, cloned, or executed.",
+    "No code/tests are changed.",
+    "No generated prose/rewrite/continuation behavior is added.",
+    "No memory/canon mutation is added."
+  ],
+  "validation": {
+    "commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs",
+      "narrow git diff --check if local tooling allows it without LeanCTX"
+    ],
+    "notes": "T001 validation is docs/status/planning only. Do not run pytest because no tests or runtime code should change."
+  },
+  "safety_notes": [
+    "The app is analysis-only.",
+    "All extraction outputs remain candidates until owner approval.",
+    "BookNLP outputs, if later used, must become candidates with evidence/provenance.",
+    "spaCy remains a possible lightweight baseline, not the sole strategic center.",
+    "dramatica-flow generation/revision/continuation/world-state behavior remains blocked.",
+    "Subtxt claims must remain evidence-gated candidates.",
+    "NCP imports must become candidates unless owner-approved.",
+    "No automatic canon mutation is allowed."
+  ],
+  "deferred_work": [
+    "BookNLP package approval/install.",
+    "BookNLP runtime adapter implementation.",
+    "spaCy package approval/install.",
+    "Actual extraction runs.",
+    "Raw output storage implementation.",
+    "Frontend review UI.",
+    "Backend extraction routes.",
+    "dramatica-flow analysis rubrics.",
+    "Subtxt semantic rubric implementation.",
+    "NCP import/export implementation.",
+    "apply-promotion.",
+    "memory/canon mutation.",
+    "model-assisted extraction.",
+    "training/JSONL/dataset work."
+  ],
+  "context_tools_policy": "T001 does not run context tools. T001 uses only local files and existing roadmap docs.",
+  "external_tool_policy": "T001 does not run external tools, install packages, clone repositories, retrieve web sources, run BookNLP, run spaCy, run dramatica-flow, run model calls, or run Ollama.",
+  "candidate_only_policy": "Tool outputs and imported structural data remain candidates with evidence/provenance until explicit owner approval. No candidate can mutate memory/canon automatically.",
+  "booknlp_ready_policy": "BookNLP is a strong candidate for the first serious literary extractor after source maps/provenance exist. T001 does not install, approve for installation, or execute BookNLP.",
+  "source_evidence_policy": "Source locators, stable source maps, source hashes, evidence spans, raw output provenance, and candidate normalization must be decided before runtime extraction begins."
+}

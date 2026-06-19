@@ -138,17 +138,22 @@ These are implementation follow-ups after the Project Workspace Foundation, not 
 3. ~~What first extraction implementation path should T006 choose: manual-first, rule-based, local NLP, model-assisted, or hybrid?~~ **Resolved in T006:** see `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md` — first extraction strategy is spaCy-first local deterministic/rule-assisted candidate extraction foundation; first implementation style is app-owned, local, deterministic/rule-assisted, and candidate-only; segram, BookNLP, GLiNER, LangExtract, and Renard are deferred from the first implementation slice.
 4. ~~How should dramatica-flow safe analysis concepts be separated from unsafe generation/revision/continuation behavior?~~ **Resolved in T004:** see `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md` — dramatica-flow accepted as `reference-only`; runtime adapter REJECT/DEFER; seven safe reference concept groups accepted; generation/revision/continuation/world_state behaviors rejected.
 5. ~~How should NCP and Subtxt docs guide approved structural context without becoming automatic truth or bypassing owner approval?~~ **Resolved in T005:** see `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md` — NCP accepted as `reference-only` and future `approved-context import/export candidate`; Subtxt docs accepted as `reference-only` and future `semantic rubric candidate`; runtime adapter/import/export/Subtxt analysis REJECT/DEFER; import/export and automatic labeling rejected; candidate-first pipeline with owner review required.
-6. ~~What parent should follow PHASE8-IMPL-005?~~ **Resolved in T007:** recommended next parent is `PHASE8-IMPL-006 - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation`. This is a recommendation only until separately owner-approved and published.
+6. ~~What parent should follow PHASE8-IMPL-005?~~ **Resolved in T001 publication:** `PHASE8-IMPL-006 - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy` is active. The scope was revised from spaCy-first-only to evidence-first + BookNLP-ready using the five local owner follow-up answer files.
 
 Deferred PHASE8-IMPL-006 follow-ups:
 
-1. spaCy package approval/install timing remains deferred to the next parent; no dependency is approved by PHASE8-IMPL-005.
-2. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
-3. Evidence locator priority format remains deferred; the next parent should choose offsets, line ranges, paragraph locators, hashes, or a hybrid.
-4. `object_candidate` first-slice inclusion remains deferred unless the next parent explicitly authorizes it.
-5. Future segram, BookNLP, GLiNER, LangExtract, and Renard spikes remain deferred until after the spaCy-first baseline and required privacy/license/scope approvals.
-6. Future NCP import/export architecture remains deferred until approved-context boundaries and owner-review flows are explicitly designed.
-7. Future Subtxt rubric tests remain deferred until semantic/Dramatica rubric use is separately scoped.
+1. Should `PHASE8-IMPL-007` be BookNLP adapter implementation or simple local baseline extraction?
+2. What exact source locator priority should be used: char offsets, byte offsets, token offsets, line numbers, or mixed?
+3. Should raw tool outputs be stored under `writer_assistant/extractions/{tool}/{run_id}/`?
+4. What run provenance fields are mandatory before any extraction result becomes a candidate?
+5. What fixture policy should be used for BookNLP-like outputs without running BookNLP?
+6. Should object/item candidates be in the first implementation slice?
+7. When should NCP import/export be implemented?
+8. When should Subtxt-inspired rubric checks be implemented?
+9. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
+10. spaCy package approval/install timing remains deferred; no dependency is approved by T001.
+11. BookNLP package approval/install timing remains deferred; no dependency is approved by T001.
+12. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

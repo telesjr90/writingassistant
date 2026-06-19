@@ -1,5 +1,55 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T001 Publish Evidence-First Extraction Foundation Parent
+
+- Date: 2026-06-18
+- Result: PASS
+- Scope: docs/status/planning only for `PHASE8-IMPL-006-T001`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T001` - Publish evidence-first extraction foundation parent and scope decision.
+- Active/next child: `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision.
+- Last completed parent: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Last completed child under prior parent: `PHASE8-IMPL-005-T007` - Roadmap/status closeout.
+- T001 outcome:
+  - Published parent task record, inventory, enrichment JSON, and scope decision.
+  - Revised next-parent direction from spaCy-first-only to evidence-first + BookNLP-ready.
+  - Recorded BookNLP as a strong candidate for the first serious literary extractor after source maps/provenance exist.
+  - Recorded spaCy as a possible lightweight local baseline/support option.
+  - Recorded dramatica-flow as reference-only or future wrapped analysis-only rubric source.
+  - Recorded Subtxt docs as semantic guardrail/rubric source.
+  - Recorded NCP as future approved-context import/export target.
+  - No runtime extraction, tests, runtime code, package/dependency changes, or external tool execution.
+- Evidence inputs:
+  - `docs/feasibility.md`
+  - `docs/booknlp.md`
+  - `docs/dramaticaflow.md`
+  - `docs/subtxt.md`
+  - `docs/ncp.md`
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md`
+- Updated:
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T001 tool policy.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Source/web retrieval: none run.
+- Boundary summary: docs/status/planning only; no context tools, external tools, source/web retrieval, runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-005-T007 Roadmap/Status Closeout
 
 - Date: 2026-06-18

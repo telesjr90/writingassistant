@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-005",
-    "current_parent_task_title": "Writer Assistant Core tool evaluation and extraction strategy decision",
-    "frontier_note": "PHASE8-IMPL-005 is complete through PHASE8-IMPL-005-T007. T006 accepted spaCy-first local deterministic/rule-assisted candidate extraction foundation as the first extraction strategy; segram, BookNLP, GLiNER, LangExtract, and Renard are deferred from the first implementation slice. PHASE8-IMPL-001 through PHASE8-IMPL-005 are complete. Next recommended parent is PHASE8-IMPL-006 - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation. PHASE8-IMPL-006 is not active until separately published. No extraction implementation has started."
+    "current_parent_task_id": "PHASE8-IMPL-006",
+    "current_parent_task_title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
+    "frontier_note": "PHASE8-IMPL-005 is complete through PHASE8-IMPL-005-T007. PHASE8-IMPL-006 is active as an evidence-first extraction foundation and BookNLP-ready adapter strategy parent. T001 publishes docs/status/planning artifacts only; T002 is the next evidence/source-map contract decision. No extraction implementation has started. BookNLP and spaCy are not installed or run."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1121,6 +1121,162 @@
         "no_model_calls",
         "no_generated_prose",
         "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006",
+      "title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-006.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-006.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json",
+      "context_pack": null
+    },
+    {
+      "id": "PHASE8-IMPL-006-T001",
+      "title": "Publish evidence-first extraction foundation parent and scope decision",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "docs_only"
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md"
+    },
+    {
+      "id": "PHASE8-IMPL-006-T002",
+      "title": "Evidence/source-map contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T003",
+      "title": "Evidence/source-map contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "validation",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T004",
+      "title": "Minimal source-map/evidence helper implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T005",
+      "title": "BookNLP-ready raw output and adapter contract decision",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "docs_only"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T006",
+      "title": "BookNLP-ready adapter contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "validation",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-006-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-006",
+      "depends_on": [
+        "PHASE8-IMPL-006-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
         "no_memory_canon_mutation",
         "no_runtime_feature_scope",
         "docs_only"
