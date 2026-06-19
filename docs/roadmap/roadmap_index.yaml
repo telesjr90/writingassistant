@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-006",
     "current_parent_task_title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
-    "frontier_note": "PHASE8-IMPL-005 is complete through PHASE8-IMPL-005-T007. PHASE8-IMPL-006 is active as an evidence-first extraction foundation and BookNLP-ready adapter strategy parent. T001 published docs/status/planning artifacts only; T002 accepted the evidence/source-map contract decision; T003 is the next tests-first contract child. No extraction implementation has started. BookNLP and spaCy are not installed or run."
+    "frontier_note": "PHASE8-IMPL-005 is complete through PHASE8-IMPL-005-T007. PHASE8-IMPL-006 is active as an evidence-first extraction foundation and BookNLP-ready adapter strategy parent. T001 published docs/status/planning artifacts only; T002 accepted the evidence/source-map contract decision; T003 added expected-red tests-first contract coverage; T004 is the next helper implementation child. No extraction implementation has started. BookNLP and spaCy are not installed or run."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1198,7 +1198,7 @@
       "id": "PHASE8-IMPL-006-T003",
       "title": "Evidence/source-map contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-006",
       "depends_on": [
         "PHASE8-IMPL-006-T002"
@@ -1209,13 +1209,14 @@
         "no_model_calls",
         "no_generated_prose",
         "no_memory_canon_mutation"
-      ]
+      ],
+      "artifact": "tests/test_writer_assistant_core_source_evidence_contract.py"
     },
     {
       "id": "PHASE8-IMPL-006-T004",
       "title": "Minimal source-map/evidence helper implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-006",
       "depends_on": [
         "PHASE8-IMPL-006-T003"

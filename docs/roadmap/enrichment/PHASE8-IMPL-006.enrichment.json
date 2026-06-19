@@ -88,8 +88,8 @@
       "Context tool execution.",
       "Web/source retrieval.",
       "Model/Ollama calls.",
-      "Runtime code.",
-      "Tests in T001.",
+    "Runtime code.",
+    "Tests outside explicit tests-first children.",
       "Backend routes.",
       "Frontend UI.",
       "Runtime project files.",
@@ -136,7 +136,7 @@
       "id": "PHASE8-IMPL-006-T003",
       "title": "Evidence/source-map contract tests",
       "type": "validation_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-006-T002"
       ],
@@ -144,14 +144,22 @@
         "Tests-first only.",
         "Expected red if helpers do not exist.",
         "Likely test file: tests/test_writer_assistant_core_source_evidence_contract.py.",
-        "Test source document refs, source maps, locators, evidence records, extraction provenance, raw-output references, path safety, source hashes/snapshots, offset validation, candidate-only boundaries, no generated prose fields, and no-canon mutation."
-      ]
+        "Test source document refs, source maps, locators, evidence records, extraction provenance, raw-output references, path safety, source hashes/snapshots, offset validation, candidate-only boundaries, no generated prose fields, and no-canon mutation.",
+        "Expected red until T004 creates backend.story_knowledge.source_map and backend.story_knowledge.evidence."
+      ],
+      "artifact": "tests/test_writer_assistant_core_source_evidence_contract.py",
+      "future_helper_modules": [
+        "backend.story_knowledge.source_map",
+        "backend.story_knowledge.evidence"
+      ],
+      "expected_red_result": "Targeted pytest fails during collection because backend.story_knowledge.evidence is not implemented yet.",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-006-T004",
       "title": "Minimal source-map/evidence helper implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-006-T003"
       ],
@@ -210,10 +218,11 @@
     "PHASE8-IMPL-005 remains complete.",
     "PHASE8-IMPL-006-T001 is marked complete if successful.",
     "PHASE8-IMPL-006-T002 is complete.",
-    "PHASE8-IMPL-006-T003 is marked ready/active.",
+    "PHASE8-IMPL-006-T003 is complete as tests-first contract coverage.",
+    "PHASE8-IMPL-006-T004 is marked ready/active.",
     "No runtime extraction is claimed.",
     "No external tools are installed, cloned, or executed.",
-    "No code/tests are changed.",
+    "No production code is changed; T003 adds contract tests only.",
     "No generated prose/rewrite/continuation behavior is added.",
     "No memory/canon mutation is added."
   ],
@@ -224,7 +233,42 @@
       "non-LeanCTX whitespace check on changed docs",
       "narrow git diff --check if local tooling allows it without LeanCTX"
     ],
-    "notes": "T002 validation is docs/decision/status only. Do not run pytest because no tests or runtime code should change."
+    "notes": "T003 validation is tests-first plus docs/status only. Targeted source/evidence contract pytest is expected red until T004 creates helper modules."
+  },
+  "t003_contract_test_summary": {
+    "status": "complete",
+    "test_file": "tests/test_writer_assistant_core_source_evidence_contract.py",
+    "future_helper_modules": [
+      "backend.story_knowledge.source_map",
+      "backend.story_knowledge.evidence"
+    ],
+    "future_source_map_api": [
+      "validate_source_document_ref(source_document: dict) -> dict",
+      "validate_source_map(source_map: dict) -> dict",
+      "validate_source_segment(segment: dict) -> dict",
+      "validate_source_locator(locator: dict) -> dict"
+    ],
+    "future_evidence_api": [
+      "validate_evidence_record(evidence: dict) -> dict",
+      "validate_extraction_run_provenance(run: dict) -> dict",
+      "validate_raw_output_reference(reference: dict) -> dict"
+    ],
+    "coverage": [
+      "Source document reference required fields, allowed types, path-safe IDs, path hints, and no mutation fields.",
+      "Source segment required fields, segment types, half-open offsets, source-derived excerpts, and no generated prose fields.",
+      "Source map required fields, nested source document/segment validation, bool flags, derived-support boundaries, and no canon/mutation fields.",
+      "Source locator precision values, char-offset-first evidence rules, path safety, and no external/training/dataset paths.",
+      "Evidence record fields, evidence kinds, nested locator/document validation, confidence bounds, claim shape, and provenance boundaries.",
+      "Extraction run provenance fields, run type/status values, source documents, non-negative counts, and model/prose/mutation field rejection.",
+      "Raw output references, BookNLP-ready artifact kinds, non-canon/non-candidate flags, source snapshot hashes, and raw-reference-only behavior.",
+      "Existing candidate boundary compatibility and source-level forbidden runtime dependency terms for future modules."
+    ],
+    "expected_red_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q",
+    "expected_red_result": "ERROR during collection: ImportError cannot import name 'evidence' from 'backend.story_knowledge'. This is limited to missing future T004 modules/symbols.",
+    "existing_candidate_regression_result": "263 passed",
+    "runtime_changes": "none",
+    "production_code_changes": "none",
+    "package_changes": "none"
   },
   "t002_contract_summary": {
     "status": "complete",

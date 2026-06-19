@@ -1,5 +1,44 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T003 Evidence / Source-Map Contract Tests
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: tests-first contract coverage plus roadmap/status updates for `PHASE8-IMPL-006-T003`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests.
+- Active/next child: `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation.
+- Next child after T004: `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision.
+- T003 outcome:
+  - Created expected-red test file `tests/test_writer_assistant_core_source_evidence_contract.py`.
+  - Defined future helper APIs for `backend.story_knowledge.source_map` and `backend.story_knowledge.evidence`.
+  - Added contract coverage for source document references, source segments, source maps, source locators, evidence records, extraction run provenance, raw output references, BookNLP-ready artifact references, candidate boundary compatibility, and future source-level forbidden runtime dependency terms.
+  - Targeted source/evidence contract pytest is expected red until T004 creates helper modules; current failure is limited to missing future T004 modules/symbols.
+  - Existing candidate contract regression tests remain green.
+  - No runtime extraction, production code, package/dependency changes, backend routes, frontend UI, model calls, BookNLP/spaCy install/run, raw output storage implementation, apply-promotion, or memory/canon mutation.
+- Created:
+  - `tests/test_writer_assistant_core_source_evidence_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: EXPECTED RED; collection ImportError because `backend.story_knowledge.evidence` is not implemented yet.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 263 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T003 tool policy.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Source/web retrieval: none run.
+- Boundary summary: tests-first only; no context tools, external tools, source/web retrieval, production runtime code changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T002 Evidence / Source-Map Contract Decision
 
 - Date: 2026-06-19

@@ -85,8 +85,8 @@ Include:
 
 1. `PHASE8-IMPL-006-T001` - Publish evidence-first extraction foundation parent and scope decision. Status: complete.
 2. `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision. Status: complete; decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`.
-3. `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests. Status: ready/active.
-4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: planned.
+3. `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests. Status: complete; test artifact: `tests/test_writer_assistant_core_source_evidence_contract.py`.
+4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: ready/active.
 5. `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision. Status: planned.
 6. `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests. Status: planned.
 7. `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Status: planned.
@@ -101,20 +101,22 @@ Include:
 - `PHASE8-IMPL-006-T002` is marked ready/active.
 - No runtime extraction is claimed.
 - No external tools are installed, cloned, or executed.
-- No code/tests are changed.
+- No production code is changed; T003 adds contract tests only.
 - No generated prose/rewrite/continuation behavior is added.
 - No memory/canon mutation is added.
 
 ## Validation Expectations
 
-For `PHASE8-IMPL-006-T002`:
+For `PHASE8-IMPL-006-T003`:
 
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q` expected red until T004 creates future source/evidence helper modules
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`
 - `python3 scripts/check_enrichment.py`
 - `python3 scripts/validate_roadmap.py`
 - non-LeanCTX whitespace check on changed docs
 - narrow `git diff --check` if local hooks allow it without LeanCTX
 
-Do not run pytest because no tests or runtime code should change. Do not run app servers, frontend build, browser validation, model calls, Ollama, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external repo clone, package install, demos, or tool execution.
+Do not run full pytest because no production runtime code should change. Do not run app servers, frontend build, browser validation, model calls, Ollama, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external repo clone, package install, demos, or tool execution.
 
 ## Safety / Product Boundaries
 
@@ -136,4 +138,6 @@ Do not run pytest because no tests or runtime code should change. Do not run app
 
 T003 handoff: add tests-first contract coverage, likely in `tests/test_writer_assistant_core_source_evidence_contract.py`, for future `backend.story_knowledge.source_map` and `backend.story_knowledge.evidence` helpers. T003 should cover required fields, allowed source document types, path-safe IDs, hash/snapshot fields, offsets, locator precision, evidence kinds, provenance run type/status values, no arbitrary/external/training paths, candidate-only boundaries, BookNLP-ready raw output references, no generated prose fields, no source-map writes in tests, and no external tool execution. T003 may be expected red until T004 creates helpers.
 
-Next child: `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests.
+`PHASE8-IMPL-006-T003` is complete as a tests-first child. It created `tests/test_writer_assistant_core_source_evidence_contract.py`, which defines the future API for `backend.story_knowledge.source_map` and `backend.story_knowledge.evidence`: source document reference validation, source segment validation, source map validation, source locator validation, evidence record validation, extraction run provenance validation, and raw output reference validation. The targeted T003 pytest is expected red until T004 creates the future helper modules; the current failure is limited to the missing `backend.story_knowledge.evidence` import during collection. Existing candidate contract regressions remain green. T003 does not implement runtime extraction, production helpers, package/tool installation, backend routes, frontend UI, model calls, generated prose behavior, or memory/canon mutation.
+
+Next child: `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation.
