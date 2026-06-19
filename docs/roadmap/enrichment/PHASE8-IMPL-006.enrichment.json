@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-006",
   "title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
   "type": "runtime",
-  "status": "active",
+  "status": "done",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-005"
@@ -89,8 +89,8 @@
       "Context tool execution.",
       "Web/source retrieval.",
       "Model/Ollama calls.",
-    "Runtime code.",
-    "Tests outside explicit tests-first children.",
+      "Runtime code.",
+      "Tests outside explicit tests-first children.",
       "Backend routes.",
       "Frontend UI.",
       "Runtime project files.",
@@ -212,15 +212,18 @@
       "id": "PHASE8-IMPL-006-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-006-T006"
       ],
       "scope": [
         "Close parent.",
         "Summarize source/evidence foundation and BookNLP-ready contract.",
-        "Recommend next parent based on T005/T006 results."
-      ]
+        "Preserve expected-red future module handoff.",
+        "Recommend PHASE8-IMPL-007 as the next parent.",
+        "No runtime extraction or adapter implementation."
+      ],
+      "result": "complete"
     }
   ],
   "acceptance_criteria": [
@@ -239,18 +242,34 @@
     "No external tools are installed, cloned, or executed.",
     "No production code or tests are changed in T005.",
     "No generated prose/rewrite/continuation behavior is added.",
-    "No memory/canon mutation is added."
+    "No memory/canon mutation is added.",
+    "PHASE8-IMPL-006 is complete.",
+    "PHASE8-IMPL-006-T007 is complete.",
+    "Final parent result is recorded as COMPLETE.",
+    "Expected-red BookNLP adapter handoff is preserved for backend.story_knowledge.booknlp_adapter_contract.",
+    "PHASE8-IMPL-007 is recommended but not activated.",
+    "No runtime extraction, BookNLP/spaCy install or execution, adapter implementation, routes, UI, package changes, project runtime files, generated prose, apply-promotion, memory/canon mutation, or training/JSONL/dataset work is recorded."
   ],
   "validation": {
     "commands": [
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q",
       "python3 scripts/check_enrichment.py",
       "python3 scripts/validate_roadmap.py",
-      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q",
-      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q",
-      "non-LeanCTX whitespace check on changed T006 files",
+      "non-LeanCTX whitespace check on changed T007 files",
       "narrow git diff --check if local tooling allows it without LeanCTX"
     ],
-    "notes": "T006 validation includes an expected-red targeted BookNLP adapter contract pytest. The acceptable failure is limited to the missing future backend.story_knowledge.booknlp_adapter_contract module or future symbols."
+    "notes": "T007 validation includes source/evidence contract pytest, expected-red BookNLP adapter contract pytest, existing candidate contract regressions, roadmap validators, explicit non-LeanCTX whitespace check, and narrow git diff --check if local tooling permits it without LeanCTX.",
+    "t007_results": {
+      "source_evidence_contract_pytest": "PASS",
+      "booknlp_adapter_contract_pytest": "EXPECTED RED; collection ImportError because backend.story_knowledge.booknlp_adapter_contract is not implemented yet; acceptable failure is limited to the missing future module/symbols.",
+      "candidate_contract_regression_pytest": "PASS",
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "git_diff_check": "BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T007 tool policy"
+    }
   },
   "t005_booknlp_raw_output_adapter_contract_summary": {
     "status": "complete",
@@ -400,24 +419,105 @@
     "No automatic canon mutation is allowed."
   ],
   "deferred_work": [
-    "BookNLP package approval/install.",
-    "BookNLP runtime adapter implementation.",
-    "spaCy package approval/install.",
-    "Actual extraction runs.",
-    "Raw output storage implementation.",
-    "Frontend review UI.",
+    "Real BookNLP install.",
+    "Real BookNLP execution.",
+    "Real BookNLP output parsing.",
+    "Raw output storage helpers.",
+    "Extraction orchestrator.",
+    "Candidate creation from real raw outputs.",
     "Backend extraction routes.",
-    "dramatica-flow analysis rubrics.",
+    "Frontend extraction/review UI.",
+    "Source snapshot text matching helper.",
+    "Relationship network extraction.",
+    "Timeline causality extraction.",
     "Subtxt semantic rubric implementation.",
     "NCP import/export implementation.",
+    "dramatica-flow-inspired rubric implementation.",
+    "Model-assisted extraction.",
     "apply-promotion.",
     "memory/canon mutation.",
-    "model-assisted extraction.",
     "training/JSONL/dataset work."
   ],
-  "context_tools_policy": "T001 does not run context tools. T001 uses only local files and existing roadmap docs.",
-  "external_tool_policy": "T001 does not run external tools, install packages, clone repositories, retrieve web sources, run BookNLP, run spaCy, run dramatica-flow, run model calls, or run Ollama.",
+  "context_tools_policy": "T007 did not run context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX.",
+  "external_tool_policy": "T007 did not install packages, clone repositories, retrieve web sources, run BookNLP, run spaCy, run dramatica-flow, run model calls, run Ollama, or execute external tools.",
   "candidate_only_policy": "Tool outputs and imported structural data remain candidates with evidence/provenance until explicit owner approval. No candidate can mutate memory/canon automatically.",
-  "booknlp_ready_policy": "BookNLP is a strong candidate for the first serious literary extractor after source maps/provenance exist. T001 does not install, approve for installation, or execute BookNLP.",
-  "source_evidence_policy": "Source locators, stable source maps, source hashes, evidence spans, raw output provenance, and candidate normalization must be decided before runtime extraction begins."
+  "booknlp_ready_policy": "BookNLP-ready contract tests remain an expected-red future handoff. BookNLP is not installed or run; adapter implementation is deferred to the recommended PHASE8-IMPL-007 parent.",
+  "source_evidence_policy": "Source locators, stable source maps, source hashes, evidence spans, raw output provenance, and candidate normalization must be decided before runtime extraction begins.",
+  "final_parent_result": {
+    "status": "complete",
+    "completed_child": "PHASE8-IMPL-006-T007",
+    "summary": "PHASE8-IMPL-006 established the evidence-first extraction foundation and BookNLP-ready adapter strategy without implementing extraction runtime.",
+    "parent_outputs": [
+      "T001 published the evidence-first + BookNLP-ready parent and scope decision.",
+      "T002 accepted app-owned evidence/source-map contracts before extractor runtime.",
+      "T003 added expected-red source/evidence contract tests.",
+      "T004 implemented pure source-map/evidence validation helpers.",
+      "T005 accepted BookNLP-ready raw output and adapter contract decision.",
+      "T006 added expected-red mocked BookNLP-ready adapter contract tests.",
+      "T007 closed the parent."
+    ],
+    "helper_modules": [
+      "backend/story_knowledge/source_map.py",
+      "backend/story_knowledge/evidence.py"
+    ],
+    "test_files": [
+      "tests/test_writer_assistant_core_source_evidence_contract.py",
+      "tests/test_writer_assistant_core_booknlp_adapter_contract.py"
+    ],
+    "decision_artifacts": [
+      "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
+      "docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md"
+    ],
+    "runtime_test_behavior_now_available": [
+      "Pure source document reference validation.",
+      "Pure source segment validation.",
+      "Pure source map validation.",
+      "Pure source locator validation.",
+      "Pure evidence record validation.",
+      "Pure extraction run provenance validation.",
+      "Pure raw output reference validation.",
+      "Source/evidence contract tests passing.",
+      "Existing Writer Assistant Core candidate contract regressions passing.",
+      "BookNLP adapter contract tests added as expected-red handoff."
+    ],
+    "no_runtime_claims": [
+      "No runtime extraction exists yet.",
+      "No BookNLP/spaCy package was installed or run.",
+      "No backend.story_knowledge.booknlp_adapter_contract implementation exists.",
+      "No backend routes, frontend UI, package/dependency files, project runtime files, memory/canon mutation, apply-promotion, model calls, generated prose, rewrite, continuation, training data, JSONL records, datasets, or manifests were added."
+    ]
+  },
+  "expected_red_booknlp_adapter_handoff": {
+    "status": "intentional_expected_red",
+    "future_module": "backend.story_knowledge.booknlp_adapter_contract",
+    "future_file": "backend/story_knowledge/booknlp_adapter_contract.py",
+    "future_apis": [
+      "validate_booknlp_run_manifest",
+      "validate_booknlp_raw_artifact_bundle",
+      "normalize_booknlp_entity_mentions",
+      "normalize_booknlp_quotes",
+      "normalize_booknlp_events",
+      "build_booknlp_candidate_drafts"
+    ],
+    "repair_policy": "Do not repair in T007; implement in a future owner-approved PHASE8-IMPL-007 child."
+  },
+  "next_parent_recommendation": {
+    "id": "PHASE8-IMPL-007",
+    "title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
+    "status": "recommended_not_active",
+    "scope": [
+      "Implement backend/story_knowledge/booknlp_adapter_contract.py.",
+      "Make tests/test_writer_assistant_core_booknlp_adapter_contract.py pass.",
+      "Keep implementation pure and mocked-fixture based.",
+      "No BookNLP install or execution unless a later child explicitly authorizes it.",
+      "No spaCy install or execution unless a later child explicitly authorizes it.",
+      "Validate BookNLP-like run manifests and raw artifact bundles.",
+      "Normalize mocked entity, quote, and event outputs into candidate draft shapes.",
+      "Preserve source/evidence/provenance boundaries.",
+      "Fail closed on missing or ambiguous evidence.",
+      "Keep raw artifacts non-canon and non-candidate.",
+      "No runtime extraction, routes, UI, package changes, memory/canon mutation, or generated prose."
+    ]
+  }
 }

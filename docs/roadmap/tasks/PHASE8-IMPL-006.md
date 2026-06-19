@@ -89,11 +89,11 @@ Include:
 4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: complete; helper modules: `backend/story_knowledge/source_map.py`, `backend/story_knowledge/evidence.py`.
 5. `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision. Status: complete; decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
 6. `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests. Status: complete; test artifact: `tests/test_writer_assistant_core_booknlp_adapter_contract.py`; expected-red future module: `backend.story_knowledge.booknlp_adapter_contract`.
-7. `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Status: complete.
 
 ## Acceptance Criteria
 
-- `PHASE8-IMPL-006` is active/published in roadmap docs.
+- `PHASE8-IMPL-006` is published and complete in roadmap docs.
 - Parent scope is evidence-first + BookNLP-ready, not spaCy-only.
 - The five local answer files are referenced as evidence inputs.
 - `PHASE8-IMPL-005` remains complete through `PHASE8-IMPL-005-T007`.
@@ -101,7 +101,7 @@ Include:
 - `PHASE8-IMPL-006-T004` is complete.
 - `PHASE8-IMPL-006-T005` is complete if successful.
 - `PHASE8-IMPL-006-T006` is complete if successful.
-- `PHASE8-IMPL-006-T007` is marked ready/active.
+- `PHASE8-IMPL-006-T007` is complete.
 - No runtime extraction is claimed.
 - No external tools are installed, cloned, or executed.
 - No production adapter code is changed in T006.
@@ -135,7 +135,9 @@ The targeted BookNLP adapter contract pytest is expected red until the future mo
 
 ## Current Status
 
-`PHASE8-IMPL-006` is active/published by `PHASE8-IMPL-006-T001`. `PHASE8-IMPL-006-T001` is docs/status/planning only and created the parent, inventory, enrichment JSON, and scope decision.
+`PHASE8-IMPL-006` is complete. Last completed child: `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Last completed parent: `PHASE8-IMPL-006`. Prior completed parent: `PHASE8-IMPL-005`. Recommended next parent: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+
+`PHASE8-IMPL-006-T001` is docs/status/planning only and created the parent, inventory, enrichment JSON, and scope decision.
 
 `PHASE8-IMPL-006-T002` is complete as a docs/decision-only child. It accepted app-owned source document identity, source map, source locator, offset, source hash/snapshot, Evidence Ledger, evidence record, extraction run provenance, raw output, BookNLP-ready mapping, and candidate normalization contracts in `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`. T002 decided that first-slice evidence uses exact Python string character offsets over the UTF-8 decoded source snapshot, keeps byte offsets as future/raw-tool mapping support, treats raw tool outputs and candidates as non-canon, and requires owner review before any approved memory/canon path. T002 does not implement runtime extraction, tests, package/tool installation, backend routes, frontend UI, model calls, generated prose behavior, or memory/canon mutation.
 
@@ -151,4 +153,95 @@ T006 handoff: add tests-first BookNLP-ready adapter contract coverage using mock
 
 `PHASE8-IMPL-006-T006` is complete as a tests-first contract child. It created `tests/test_writer_assistant_core_booknlp_adapter_contract.py`, which defines the expected future API for `backend.story_knowledge.booknlp_adapter_contract`: `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts`. The tests use mocked BookNLP-like in-memory dictionaries only and cover run manifests, raw artifact bundles, mocked token/entity/quote/book JSON/supersense/event artifacts, source locator/evidence integration, entity/quote/event normalization draft shape, combined candidate draft building, fail-closed behavior, runtime/tool boundary source scanning for the future module, and existing helper integration. The targeted T006 pytest is expected red until a later implementation creates the future module; the current failure is limited to `ImportError: cannot import name 'booknlp_adapter_contract' from 'backend.story_knowledge'`. T006 does not implement runtime extraction, create `backend/story_knowledge/booknlp_adapter_contract.py`, install or run BookNLP/spaCy, change package files, add routes/UI, call models, generate prose, apply promotion, mutate memory/canon, create project runtime files, or create training/JSONL/dataset artifacts.
 
-Next child: `PHASE8-IMPL-006-T007` - Roadmap/status closeout.
+`PHASE8-IMPL-006-T007` is complete as a docs/status closeout child. It closed the parent, recorded final artifacts and behavior, preserved the expected-red BookNLP adapter handoff, and recommended `PHASE8-IMPL-007` as the next parent. T007 did not implement extraction, create `backend/story_knowledge/booknlp_adapter_contract.py`, install or run BookNLP/spaCy, change package files, add routes/UI, create project runtime files, call models, generate prose, apply promotion, mutate memory/canon, or create training/JSONL/dataset artifacts.
+
+## Final Parent Summary
+
+Final result: `COMPLETE`.
+
+`PHASE8-IMPL-006` delivered the evidence-first extraction foundation and BookNLP-ready adapter strategy without runtime extraction. The parent established source-map/evidence decisions, tests-first contract coverage, pure validation helpers, BookNLP-ready raw output and adapter contract decisions, and an expected-red adapter contract handoff for the next parent.
+
+Completed child summary:
+
+- `PHASE8-IMPL-006-T001`: published the evidence-first + BookNLP-ready parent and scope decision.
+- `PHASE8-IMPL-006-T002`: accepted app-owned evidence/source-map contracts before extractor runtime.
+- `PHASE8-IMPL-006-T003`: added expected-red source/evidence contract tests.
+- `PHASE8-IMPL-006-T004`: implemented pure validation helpers in `backend/story_knowledge/source_map.py` and `backend/story_knowledge/evidence.py`.
+- `PHASE8-IMPL-006-T005`: accepted the BookNLP-ready raw output and adapter contract decision.
+- `PHASE8-IMPL-006-T006`: added expected-red mocked BookNLP-ready adapter contract tests in `tests/test_writer_assistant_core_booknlp_adapter_contract.py`.
+- `PHASE8-IMPL-006-T007`: closed the parent.
+
+Final artifacts:
+
+- Scope decision: `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md`.
+- Evidence/source-map decision: `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`.
+- BookNLP-ready raw output/adapter decision: `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
+- Source/evidence tests: `tests/test_writer_assistant_core_source_evidence_contract.py`.
+- BookNLP adapter contract tests: `tests/test_writer_assistant_core_booknlp_adapter_contract.py`.
+- Helper modules: `backend/story_knowledge/source_map.py`, `backend/story_knowledge/evidence.py`.
+
+Final runtime/test behavior now available:
+
+- Pure source document reference validation.
+- Pure source segment validation.
+- Pure source map validation.
+- Pure source locator validation.
+- Pure evidence record validation.
+- Pure extraction run provenance validation.
+- Pure raw output reference validation.
+- Source/evidence contract tests passing.
+- Existing Writer Assistant Core candidate contract regressions passing.
+- BookNLP adapter contract tests added as expected-red handoff.
+
+Expected-red future handoff:
+
+- Future module: `backend.story_knowledge.booknlp_adapter_contract`.
+- Future APIs: `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts`.
+- The expected-red state is intentional until a future implementation creates the module and APIs.
+
+## Next Parent Recommendation
+
+Recommended next parent:
+
+`PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+
+Recommended scope:
+
+- Implement `backend/story_knowledge/booknlp_adapter_contract.py`.
+- Make `tests/test_writer_assistant_core_booknlp_adapter_contract.py` pass.
+- Keep implementation pure and mocked-fixture based.
+- Do not install or execute BookNLP or spaCy unless a later child explicitly authorizes it.
+- Validate BookNLP-like run manifests and raw artifact bundles.
+- Normalize mocked entity, quote, and event outputs into candidate draft shapes.
+- Preserve source/evidence/provenance boundaries.
+- Fail closed on missing or ambiguous evidence.
+- Keep raw artifacts non-canon and non-candidate.
+- Do not add runtime extraction, routes, UI, package changes, memory/canon mutation, or generated prose.
+
+## Deferred Beyond PHASE8-IMPL-006
+
+- Real BookNLP install.
+- Real BookNLP execution.
+- Real BookNLP output parsing.
+- Raw output storage helpers.
+- Extraction orchestrator.
+- Candidate creation from real raw outputs.
+- Backend extraction routes.
+- Frontend extraction/review UI.
+- Source snapshot text matching helper.
+- Relationship network extraction.
+- Timeline causality extraction.
+- Subtxt semantic rubric implementation.
+- NCP import/export implementation.
+- dramatica-flow-inspired rubric implementation.
+- Model-assisted extraction.
+- Apply-promotion.
+- Memory/canon mutation.
+- Training/JSONL/dataset work.
+
+## Final Boundaries
+
+- No runtime extraction exists yet.
+- No BookNLP or spaCy package was installed or run.
+- No `backend/story_knowledge/booknlp_adapter_contract.py` implementation exists.
+- No backend routes, frontend UI, package/dependency files, project runtime files, memory/canon mutation, apply-promotion, model calls, generated prose, rewrite, continuation, training data, JSONL records, datasets, or manifests were added.

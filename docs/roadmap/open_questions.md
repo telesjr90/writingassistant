@@ -138,24 +138,29 @@ These are implementation follow-ups after the Project Workspace Foundation, not 
 3. ~~What first extraction implementation path should T006 choose: manual-first, rule-based, local NLP, model-assisted, or hybrid?~~ **Resolved in T006:** see `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md` — first extraction strategy is spaCy-first local deterministic/rule-assisted candidate extraction foundation; first implementation style is app-owned, local, deterministic/rule-assisted, and candidate-only; segram, BookNLP, GLiNER, LangExtract, and Renard are deferred from the first implementation slice.
 4. ~~How should dramatica-flow safe analysis concepts be separated from unsafe generation/revision/continuation behavior?~~ **Resolved in T004:** see `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md` — dramatica-flow accepted as `reference-only`; runtime adapter REJECT/DEFER; seven safe reference concept groups accepted; generation/revision/continuation/world_state behaviors rejected.
 5. ~~How should NCP and Subtxt docs guide approved structural context without becoming automatic truth or bypassing owner approval?~~ **Resolved in T005:** see `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md` — NCP accepted as `reference-only` and future `approved-context import/export candidate`; Subtxt docs accepted as `reference-only` and future `semantic rubric candidate`; runtime adapter/import/export/Subtxt analysis REJECT/DEFER; import/export and automatic labeling rejected; candidate-first pipeline with owner review required.
-6. ~~What parent should follow PHASE8-IMPL-005?~~ **Resolved in T001 publication:** `PHASE8-IMPL-006 - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy` is active. The scope was revised from spaCy-first-only to evidence-first + BookNLP-ready using the five local owner follow-up answer files.
+6. ~~What parent should follow PHASE8-IMPL-005?~~ **Resolved in T001 publication and completed in T007:** `PHASE8-IMPL-006 - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy` was published and is now complete. The scope was revised from spaCy-first-only to evidence-first + BookNLP-ready using the five local owner follow-up answer files.
 
 Deferred PHASE8-IMPL-006 follow-ups:
 
-1. Should `PHASE8-IMPL-007` be BookNLP adapter implementation or simple local baseline extraction?
+1. ~~Should `PHASE8-IMPL-007` be BookNLP adapter implementation or simple local baseline extraction?~~ **Resolved in T007:** recommend `PHASE8-IMPL-007 - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation`, recommended only and not active until separately published.
 2. ~~What exact source locator priority should be used: char offsets, byte offsets, token offsets, line numbers, or mixed?~~ **Resolved in T002:** primary first-slice locator is Python string character offsets over the exact UTF-8 decoded source snapshot; UTF-8 byte offsets support future/raw-tool mapping; token and line locators are optional support; all offsets use half-open intervals.
 3. ~~Should raw tool outputs be stored under `writer_assistant/extractions/{tool}/{run_id}/`?~~ **Resolved in T002 as future target:** raw outputs should stay separate under `projects/{project_id}/writer_assistant/extractions/{tool_name}/{run_id}/`, with raw files and manifest kept non-canon and not created by T002.
 4. ~~What run provenance fields are mandatory before any extraction result becomes a candidate?~~ **Resolved in T002:** provenance must record run/tool/adapter identity, source documents/snapshots, input and output artifact hashes, status, warnings, parameters/environment, created candidate IDs, rejected/insufficient-evidence counts, and human review requirement.
 5. ~~What fixture policy should be used for BookNLP-like outputs without running BookNLP?~~ **Resolved in T005:** use app-owned mocked BookNLP-like fixture dictionaries only, based on synthetic owner-authored sample text, with builders for token, entity, quote, book JSON, supersense, event, and run manifest shapes; see `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
 6. ~~What future BookNLP-ready adapter contract test surface should T006 define?~~ **Resolved in T006:** `tests/test_writer_assistant_core_booknlp_adapter_contract.py` defines expected-red coverage for future `backend.story_knowledge.booknlp_adapter_contract` APIs, using mocked in-memory BookNLP-like dictionaries only and asserting raw-support, evidence/source locator, normalization draft, fail-closed, no-runtime-dependency, no-prose, no-apply-promotion, and no-memory/canon-mutation boundaries.
-7. Should object/item candidates be in the first implementation slice?
-8. When should NCP import/export be implemented?
-9. When should Subtxt-inspired rubric checks be implemented?
-10. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
-11. spaCy package approval/install timing remains deferred; no dependency is approved by T001.
-12. BookNLP package approval/install timing remains deferred; no dependency is approved by T001.
-13. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
-14. Should `PHASE8-IMPL-006-T007` close the parent with a recommendation for BookNLP adapter implementation, simple local baseline extraction, or another tests-first foundation parent?
+7. ~~Should `PHASE8-IMPL-006-T007` close the parent with a recommendation for BookNLP adapter implementation, simple local baseline extraction, or another tests-first foundation parent?~~ **Resolved in T007:** recommend a pure mocked BookNLP adapter contract implementation parent, not a runtime extraction parent.
+8. Exact `PHASE8-IMPL-007` child sequence remains deferred.
+9. When/if real BookNLP install is authorized remains deferred; no dependency is approved by T007.
+10. Real BookNLP schema parsing policy remains deferred.
+11. Raw output storage helper timing remains deferred.
+12. Source snapshot text matching helper timing remains deferred.
+13. Extraction route/UI timing remains deferred.
+14. Should object/item candidates be in the first implementation slice?
+15. When should NCP import/export be implemented?
+16. When should Subtxt-inspired rubric checks be implemented?
+17. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
+18. spaCy package approval/install timing remains deferred; no dependency is approved by T007.
+19. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

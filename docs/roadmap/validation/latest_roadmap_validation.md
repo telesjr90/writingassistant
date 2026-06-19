@@ -1,5 +1,60 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T007 Roadmap/Status Closeout
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: docs/status closeout only for `PHASE8-IMPL-006-T007`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T007` - Roadmap/status closeout.
+- Parent result: `COMPLETE`.
+- Active/next child: none published.
+- Recommended next parent: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Parent closeout summary:
+  - T001 published the evidence-first + BookNLP-ready parent and scope decision.
+  - T002 accepted app-owned evidence/source-map contracts before extractor runtime.
+  - T003 added expected-red source/evidence contract tests.
+  - T004 implemented pure validation helpers in `backend/story_knowledge/source_map.py` and `backend/story_knowledge/evidence.py`.
+  - T005 accepted BookNLP-ready raw output and adapter contract decision.
+  - T006 added expected-red mocked BookNLP-ready adapter contract tests in `tests/test_writer_assistant_core_booknlp_adapter_contract.py`.
+  - T007 closed the parent.
+- Final runtime/test behavior now available:
+  - Pure source document reference validation.
+  - Pure source segment validation.
+  - Pure source map validation.
+  - Pure source locator validation.
+  - Pure evidence record validation.
+  - Pure extraction run provenance validation.
+  - Pure raw output reference validation.
+  - Source/evidence contract tests passing.
+  - Existing Writer Assistant Core candidate contract regressions passing.
+  - BookNLP adapter contract tests added as expected-red handoff.
+- Expected-red future handoff:
+  - Future module: `backend.story_knowledge.booknlp_adapter_contract`.
+  - Future APIs: `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts`.
+  - Expected-red state is intentional and was not repaired in T007.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: EXPECTED RED; collection ImportError because `backend.story_knowledge.booknlp_adapter_contract` is not implemented yet; acceptable failure is limited to the missing future module/symbols.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed T007 files: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T007 tool policy.
+- Boundary summary: docs/status closeout only; no context tools, external tools, source/web retrieval, demos, model calls, runtime extraction, BookNLP/spaCy install or execution, adapter implementation, backend routes, frontend files, package/dependency files, project runtime files, extraction/import/export implementation, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T006 BookNLP-Ready Adapter Contract Tests
 
 - Date: 2026-06-19
