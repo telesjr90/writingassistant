@@ -31,6 +31,7 @@
     "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json",
     "scope_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md",
     "evidence_source_map_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
+    "booknlp_raw_output_adapter_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md",
     "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-005.md",
     "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json",
     "prior_evaluation_decision": "docs/roadmap/decisions/PHASE8-IMPL-005-evaluation-scope-fixture-rubric-decision.md",
@@ -177,7 +178,7 @@
       "id": "PHASE8-IMPL-006-T005",
       "title": "BookNLP-ready raw output and adapter contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-006-T004"
       ],
@@ -185,13 +186,15 @@
         "Docs/decision only.",
         "Decide raw tool output storage policy, run provenance, BookNLP output mapping expectations, and candidate normalization boundaries.",
         "No BookNLP install or execution."
-      ]
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-006-T006",
       "title": "BookNLP-ready adapter contract tests",
       "type": "validation_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-006-T005"
       ],
@@ -225,10 +228,11 @@
     "PHASE8-IMPL-006-T002 is complete.",
     "PHASE8-IMPL-006-T003 is complete as tests-first contract coverage.",
     "PHASE8-IMPL-006-T004 is complete.",
-    "PHASE8-IMPL-006-T005 is marked ready/active.",
+    "PHASE8-IMPL-006-T005 is complete.",
+    "PHASE8-IMPL-006-T006 is marked ready/active.",
     "No runtime extraction is claimed.",
     "No external tools are installed, cloned, or executed.",
-    "No production code is changed; T003 adds contract tests only.",
+    "No production code or tests are changed in T005.",
     "No generated prose/rewrite/continuation behavior is added.",
     "No memory/canon mutation is added."
   ],
@@ -239,7 +243,29 @@
       "non-LeanCTX whitespace check on changed docs",
       "narrow git diff --check if local tooling allows it without LeanCTX"
     ],
-    "notes": "T003 validation is tests-first plus docs/status only. Targeted source/evidence contract pytest is expected red until T004 creates helper modules."
+    "notes": "T005 validation is docs/decision/status only. No pytest is run because no tests or runtime code change in T005."
+  },
+  "t005_booknlp_raw_output_adapter_contract_summary": {
+    "status": "complete",
+    "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md",
+    "raw_artifact_policy": "Accepted BookNLP-like raw artifact kinds include booknlp_tokens, booknlp_entities, booknlp_quotes, booknlp_book_json, booknlp_supersense, and booknlp_events, with optional support kinds booknlp_html, booknlp_manifest, mock_fixture, and other_raw_output. Raw artifacts are non-canon, non-candidate support artifacts only.",
+    "run_manifest_policy": "Future BookNLP-like run manifests must record run/tool/adapter identity, source documents, input snapshot hashes, raw artifact references, artifact hashes, status, parameters/environment, warnings/errors, and required false canon/prose/candidate-generation policy values at the raw import stage.",
+    "adapter_normalization_boundary": "Future adapter normalization must map raw artifacts through app-owned source locators and evidence records before candidate creation, preserve provenance, attach source snapshot hashes, validate candidates before persistence, and fail closed when source/evidence mapping is missing or ambiguous.",
+    "mock_fixture_policy": "T006 should use synthetic mocked BookNLP-like fixture dictionaries only; no BookNLP install, runtime invocation, real output files, copyrighted book text, or runtime project files.",
+    "future_test_file": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+    "future_module": "backend.story_knowledge.booknlp_adapter_contract",
+    "future_api": [
+      "validate_booknlp_run_manifest(manifest: dict) -> dict",
+      "validate_booknlp_raw_artifact_bundle(bundle: dict) -> dict",
+      "normalize_booknlp_entity_mentions(bundle: dict, source_map: dict) -> list[dict]",
+      "normalize_booknlp_quotes(bundle: dict, source_map: dict) -> list[dict]",
+      "normalize_booknlp_events(bundle: dict, source_map: dict) -> list[dict]",
+      "build_booknlp_candidate_drafts(bundle: dict, source_map: dict) -> list[dict]"
+    ],
+    "runtime_changes": "none",
+    "test_changes": "none",
+    "code_changes": "none",
+    "package_changes": "none"
   },
   "t003_contract_test_summary": {
     "status": "complete",

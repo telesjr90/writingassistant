@@ -1,5 +1,43 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T005 BookNLP-Ready Raw Output / Adapter Contract Decision
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: docs/decision/status only for `PHASE8-IMPL-006-T005`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision.
+- Active/next child: `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests.
+- Next child after T006: `PHASE8-IMPL-006-T007` - Roadmap/status closeout.
+- T005 outcome:
+  - Created decision artifact `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
+  - Accepted BookNLP-like raw artifact kinds, future raw storage boundaries, run manifest shape, raw output reference policy, mocked fixture shapes, adapter normalization boundaries, candidate/evidence mapping expectations, and fail-closed behavior.
+  - Selected `tests/test_writer_assistant_core_booknlp_adapter_contract.py` as the T006 expected test file.
+  - Selected `backend.story_knowledge.booknlp_adapter_contract` as the expected future tests-first module.
+  - No runtime extraction, tests, production code, package/dependency changes, backend routes, frontend UI, model calls, BookNLP/spaCy install/run, raw output storage implementation, apply-promotion, or memory/canon mutation.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/open_questions.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T005 tool policy.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Source/web retrieval: none run.
+- Boundary summary: docs/decision only; no context tools, external tools, source/web retrieval, tests, runtime code, extraction runtime, backend routes, frontend files, package/dependency files, project runtime files, import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T004 Minimal Source-Map / Evidence Helper Implementation
 
 - Date: 2026-06-19
