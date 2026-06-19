@@ -1,35 +1,51 @@
 # Latest Roadmap Validation
 
-## PHASE8-IMPL-005-T006 Repair Roadmap/Status Update
+## PHASE8-IMPL-005-T007 Roadmap/Status Closeout
 
 - Date: 2026-06-18
-- Result: PARTIAL
-- Scope: docs/status repair only after `PHASE8-IMPL-005-T006`.
+- Result: PASS
+- Scope: docs/status closeout only after completed `PHASE8-IMPL-005-T001` through `PHASE8-IMPL-005-T006`.
 - Parent task: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
-- Completed child recorded: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision.
-- Active child after repair: `PHASE8-IMPL-005-T007` - Roadmap/status closeout.
-- Next child: none under `PHASE8-IMPL-005`; next parent pending T007 closeout recommendation.
-- T006 decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md`
-- T006 accepted decision:
-  - First extraction strategy: spaCy-first local deterministic/rule-assisted candidate extraction foundation.
-  - First implementation style: app-owned, local, deterministic/rule-assisted, candidate-only.
-  - First slice focus: source segmentation/source locators, simple entity candidates, source evidence spans, candidate normalization, and no-prose/no-canon-mutation contracts.
-  - Deferred from first implementation slice: segram, BookNLP, GLiNER, LangExtract, Renard.
-  - LangExtract remains later/local-only/model-assisted candidate only if privacy/local model policy is approved.
-  - Renard remains deferred pending GPL/license review and relationship-network scope.
-  - dramatica-flow, NCP, and Subtxt remain reference-only according to T004/T005.
-- Repair completed:
-  - Roadmap/status files updated so T006 is complete and T007 is active/ready.
-  - Decision log and open questions updated for accepted strategy and deferred follow-ups.
-  - No runtime extraction implementation claimed.
+- Final parent result: `PHASE8-IMPL-005` complete.
+- Completed child recorded: `PHASE8-IMPL-005-T007` - Roadmap/status closeout.
+- Last completed parent: `PHASE8-IMPL-005` - Writer Assistant Core tool evaluation and extraction strategy decision.
+- Next recommended parent: `PHASE8-IMPL-006` - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation.
+- Next active child: none published.
+- Parent closeout summary:
+  - T001 published the parent and nine-tool scope.
+  - T002 accepted evaluation scope, fixture plan, and scoring rubric.
+  - T003 completed official source inventory and license/dependency screen.
+  - T004 accepted dramatica-flow as reference-only for analysis-pattern/rubric inspiration; runtime adapter REJECT/DEFER.
+  - T005 accepted NCP as reference-only/future approved-context import-export candidate and Subtxt docs as reference-only/future semantic rubric candidate.
+  - T006 accepted spaCy-first local deterministic/rule-assisted candidate extraction foundation as the first extraction strategy.
+  - T007 closed the parent and recorded PHASE8-IMPL-006 as the recommended next parent.
+- Final classifications:
+  - dramatica-flow: reference-only; generation/revision/continuation/world_state/canon-settlement behavior rejected.
+  - Narrative Context Protocol: reference-only now; optional future approved-context import/export schema candidate.
+  - Subtxt docs: reference-only now; optional future semantic/Dramatica rubric guidance candidate.
+  - spaCy: selected first-path local deterministic/rule-assisted candidate extraction foundation.
+  - segram, BookNLP, GLiNER, LangExtract, Renard: deferred from the first implementation slice.
+- Files changed:
+  - `docs/roadmap/tasks/PHASE8-IMPL-005.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-005.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
 - Validator results:
   - `python3 scripts/check_enrichment.py`: PASS.
   - `python3 scripts/validate_roadmap.py`: PASS.
   - Non-LeanCTX whitespace check on changed docs: PASS.
-  - `git diff --check`: BLOCKED by local hook requiring LeanCTX rerun; LeanCTX was not run because this repair task forbids context tools.
+  - Narrow `git diff --check`: PASS.
 - Context tools: none run.
 - External tools: none installed, cloned, executed, or evaluated locally.
-- Boundary summary: docs/status repair only; no runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+- Whitespace/diff check: explicit non-LeanCTX whitespace check passed; narrow Git diff check passed.
+- Boundary summary: docs/status closeout only; no runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
 
 ## PHASE8-IMPL-005-T005 NCP/Subtxt Structural Interpretation Strategy Decision
 

@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-005",
   "title": "Writer Assistant Core tool evaluation and extraction strategy decision",
   "type": "runtime",
-  "status": "active",
+  "status": "done",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-004"
@@ -123,7 +123,8 @@
       "T004 accepted dramatica-flow as reference-only; runtime adapter REJECT/DEFER; no install/clone/execution.",
       "T005 accepted NCP as reference-only/future approved-context import-export candidate and Subtxt docs as reference-only/future semantic rubric candidate; runtime adapter/import/export/Subtxt analysis REJECT/DEFER.",
       "T006 accepted spaCy-first local deterministic/rule-assisted candidate extraction foundation as the first extraction strategy; segram, BookNLP, GLiNER, LangExtract, and Renard are deferred from the first implementation slice.",
-      "No runtime extraction implementation, tool evaluation execution, installs, fixtures, or runtime code in T002-T006."
+      "T007 closed PHASE8-IMPL-005 as complete and recommended PHASE8-IMPL-006 for analysis-only candidate extraction architecture and spaCy-first local extraction foundation.",
+      "No runtime extraction implementation, tool evaluation execution, installs, fixtures, or runtime code in T002-T007."
     ]
   },
   "child_tasks": [
@@ -223,7 +224,7 @@
       "id": "PHASE8-IMPL-005-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-005-T006"
       ],
@@ -335,6 +336,24 @@
       "runtime_code_changed": false,
       "tests_changed": false,
       "package_dependency_changes": false
+    },
+    "t007_results": {
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "git_diff_check": "pass",
+      "context_tools_run": false,
+      "external_tools_run": false,
+      "external_tools_installed": false,
+      "external_repos_cloned": false,
+      "external_tool_code_executed": false,
+      "source_retrieval_run": false,
+      "parent_result": "complete",
+      "last_completed_child": "PHASE8-IMPL-005-T007",
+      "runtime_extraction_exists": false,
+      "runtime_code_changed": false,
+      "tests_changed": false,
+      "package_dependency_changes": false
     }
   },
   "safety_notes": [
@@ -359,7 +378,7 @@
     "OMI candidate promotion.",
     "Memory/canon mutation.",
     "Training/JSONL/dataset work.",
-    "First extraction architecture/implementation parent until T007 closeout."
+    "PHASE8-IMPL-006 extraction architecture/foundation parent publication and execution."
   ],
   "context_tools_policy": [
     "T001 does not run context tools.",
@@ -560,10 +579,38 @@
     "index_derived_convenience": "writer_assistant/index.json"
   },
   "next_frontier": {
-    "active_child": "PHASE8-IMPL-005-T007",
-    "last_completed_child": "PHASE8-IMPL-005-T006",
-    "first_extraction_parent": "future after T007 closeout",
-    "recommended_next_parent": "first extraction architecture/implementation parent for spaCy-first local deterministic/rule-assisted candidate extraction foundation"
+    "active_child": null,
+    "last_completed_child": "PHASE8-IMPL-005-T007",
+    "first_extraction_parent": "PHASE8-IMPL-006 recommended, not active until separately published",
+    "recommended_next_parent": "PHASE8-IMPL-006 - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation"
+  },
+  "final_parent_result": {
+    "status": "complete",
+    "closed_by": "PHASE8-IMPL-005-T007",
+    "parent_outputs": [
+      "evaluation scope and fixture/rubric decision",
+      "official source inventory and license/dependency screen",
+      "dramatica-flow analysis-only reference boundary decision",
+      "NCP/Subtxt structural interpretation boundary decision",
+      "NLP/extraction adapter strategy decision",
+      "next-parent recommendation for spaCy-first local deterministic/rule-assisted extraction foundation"
+    ],
+    "final_classifications": {
+      "dramatica-flow": "reference-only; runtime adapter reject/defer; analysis-pattern/rubric inspiration only",
+      "Narrative Context Protocol": "reference-only now; optional future approved-context import/export schema candidate",
+      "Subtxt docs": "reference-only now; optional future semantic/Dramatica rubric guidance candidate",
+      "spaCy": "selected first-path local deterministic/rule-assisted candidate extraction foundation",
+      "segram": "deferred possible later runtime adapter/reference",
+      "BookNLP": "deferred possible later runtime adapter",
+      "GLiNER": "deferred possible later runtime adapter",
+      "LangExtract": "deferred possible later model-assisted/evidence-grounded candidate",
+      "Renard": "deferred possible later relationship/character-network adapter/reference"
+    },
+    "next_parent_recommendation": "PHASE8-IMPL-006 - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation",
+    "runtime_extraction_exists": false,
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "package_dependency_changes": false
   },
   "nlp_extraction_adapter_strategy_decision": {
     "artifact": "docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md",

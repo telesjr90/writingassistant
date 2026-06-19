@@ -109,7 +109,7 @@ Explicitly out of scope unless a later owner-approved parent reintroduces them:
 4. `PHASE8-IMPL-005-T004` - Dramatica-flow analysis-only reference decision. Status: complete.
 5. `PHASE8-IMPL-005-T005` - NCP/Subtxt structural interpretation strategy decision. Status: complete.
 6. `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Status: complete.
-7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -202,7 +202,67 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-005` is active. Last completed child: `PHASE8-IMPL-005-T006` - NLP/extraction adapter strategy decision. Active child: `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Last completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`.
+`PHASE8-IMPL-005` is complete. Last completed child: `PHASE8-IMPL-005-T007` - Roadmap/status closeout. Last completed parent: `PHASE8-IMPL-005`. Prior completed parent: `PHASE8-IMPL-004`. Prior completed child under prior parent: `PHASE8-IMPL-004-T007`. Next parent recommendation: `PHASE8-IMPL-006` - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation.
+
+## Final Parent Summary
+
+`PHASE8-IMPL-005` completed the Writer Assistant Core tool evaluation and extraction strategy decision with docs/status/decision artifacts only. T001 published the parent and nine-tool scope. T002 accepted the evaluation scope, fixture category plan, and scoring rubric. T003 completed the official source inventory and license/dependency screen. T004 accepted dramatica-flow as reference-only. T005 accepted Narrative Context Protocol and Subtxt docs as reference-only with future bounded roles. T006 accepted the first extraction strategy. T007 closed the parent and recommends the next extraction architecture/foundation parent.
+
+Final result: `COMPLETE`.
+
+Parent outputs:
+
+- Evaluation scope and fixture/rubric decision.
+- Official source inventory and license/dependency screen.
+- Dramatica-flow analysis-only reference boundary decision.
+- NCP/Subtxt structural interpretation boundary decision.
+- NLP/extraction adapter strategy decision.
+- Next-parent recommendation for a spaCy-first local deterministic/rule-assisted extraction foundation.
+
+No runtime extraction exists yet. No tools were installed, cloned, or executed. No runtime code, tests, backend routes, frontend UI, package/dependency files, project runtime files, model calls, memory/canon files, training data, JSONL records, or dataset files changed under this parent.
+
+## Final Classification Summary
+
+| Tool/reference | Final status | Runtime adapter status | Notes |
+| --- | --- | --- | --- |
+| dramatica-flow | reference-only | reject/defer | Safe use is analysis-pattern/rubric inspiration only. Generation, revision, continuation, Writer/Reviser/Architect agents, generated outlines/prose, world_state/truth writes, and automatic canon settlement are rejected. |
+| Narrative Context Protocol | reference-only now; optional future approved-context import/export schema candidate | reject/defer | Rejected as automatic truth, direct canon mutation, candidate source of truth, or owner-review bypass. |
+| Subtxt docs | reference-only now; optional future semantic/Dramatica rubric guidance candidate | reject/defer | Rejected as automatic classifier, proof of storyform truth, unsupported Dramatica label source, or generation prompt source. |
+| spaCy | selected first-path foundation | future only after package/dependency approval | Accepted strategy is local deterministic/rule-assisted candidate extraction foundation for source segmentation/source locators, simple entity candidates, evidence/provenance attachment, candidate normalization, and no-prose/no-canon-mutation tests. |
+| segram | deferred possible later runtime adapter/reference | deferred | Semantic/action-analysis interest, but deferred until the spaCy baseline exists and maturity/maintenance/story-fit are clearer. |
+| BookNLP | deferred possible later runtime adapter | deferred | Long-form/manuscript-scale character/quote/event pipeline; deferred until baseline candidate/evidence pipeline and fixtures exist. |
+| GLiNER | deferred possible later runtime adapter | deferred | Fiction-specific flexible entity extraction potential; deferred until baseline exists and model thresholds/evidence reliability can be tested. |
+| LangExtract | deferred possible later model-assisted/evidence-grounded candidate | deferred | Source grounding is useful, but default cloud/model/privacy risks require local/Ollama-only policy before adoption. |
+| Renard | deferred possible later relationship/character-network adapter/reference | deferred | Relationship-network fit, but GPL/license review and baseline entity/evidence flow must come first. |
+
+## Next Parent Recommendation
+
+Recommended next parent:
+
+`PHASE8-IMPL-006` - Writer Assistant Core analysis-only candidate extraction architecture and spaCy-first local extraction foundation.
+
+Recommended scope:
+
+- Publish extraction architecture/foundation parent.
+- Tests-first extraction orchestrator, source locator, extraction request, and candidate normalization contracts.
+- App-owned local deterministic extraction boundaries.
+- spaCy-first path only if package/dependency approval is explicitly included in the next parent.
+- Candidate-only output with source locator/evidence/provenance attachment.
+- No model calls, generated prose, memory/canon mutation, apply-promotion, backend route, or frontend UI unless separately authorized.
+
+Recommended first implementation slice:
+
+- Extraction orchestrator contract.
+- Source document locator contract.
+- Extraction request object.
+- Deterministic source segmentation helpers.
+- Candidate normalization into existing Writer Assistant Core candidate record schema.
+- Source locator/evidence/provenance attachment.
+- No-prose/no-model/no-canon-mutation tests.
+- Candidate-only write path using existing persistence helpers.
+- Derived candidate index refresh only if explicitly authorized by the next parent.
+
+Deferred from the next parent unless separately authorized: relationship networks, timeline causality, emotional arcs, open questions, contradiction detection, Dramatica throughline/storypoint labels, NCP import/export, Subtxt semantic classification, dramatica-flow runtime use, model-assisted extraction, BookNLP, GLiNER, LangExtract, Renard, segram, frontend extraction/review UI, apply-promotion, memory/canon mutation, and training/JSONL/dataset generation.
 
 ## T006 NLP/Extraction Adapter Strategy Decision Record
 
