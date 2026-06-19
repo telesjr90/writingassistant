@@ -159,20 +159,25 @@
       "id": "PHASE8-IMPL-006-T004",
       "title": "Minimal source-map/evidence helper implementation",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-006-T003"
       ],
       "scope": [
         "Implement pure helpers only if T003 authorizes.",
         "No external tools, BookNLP install, spaCy install, extraction runtime, routes, or UI."
-      ]
+      ],
+      "artifacts": [
+        "backend/story_knowledge/source_map.py",
+        "backend/story_knowledge/evidence.py"
+      ],
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-006-T005",
       "title": "BookNLP-ready raw output and adapter contract decision",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-006-T004"
       ],
@@ -219,7 +224,8 @@
     "PHASE8-IMPL-006-T001 is marked complete if successful.",
     "PHASE8-IMPL-006-T002 is complete.",
     "PHASE8-IMPL-006-T003 is complete as tests-first contract coverage.",
-    "PHASE8-IMPL-006-T004 is marked ready/active.",
+    "PHASE8-IMPL-006-T004 is complete.",
+    "PHASE8-IMPL-006-T005 is marked ready/active.",
     "No runtime extraction is claimed.",
     "No external tools are installed, cloned, or executed.",
     "No production code is changed; T003 adds contract tests only.",
@@ -268,6 +274,33 @@
     "existing_candidate_regression_result": "263 passed",
     "runtime_changes": "none",
     "production_code_changes": "none",
+    "package_changes": "none"
+  },
+  "t004_helper_implementation_summary": {
+    "status": "complete",
+    "helper_modules": [
+      "backend/story_knowledge/source_map.py",
+      "backend/story_knowledge/evidence.py"
+    ],
+    "implemented_api": [
+      "validate_source_document_ref(source_document: dict) -> dict",
+      "validate_source_segment(segment: dict) -> dict",
+      "validate_source_map(source_map: dict) -> dict",
+      "validate_source_locator(locator: dict) -> dict",
+      "validate_evidence_record(evidence: dict) -> dict",
+      "validate_extraction_run_provenance(run: dict) -> dict",
+      "validate_raw_output_reference(reference: dict) -> dict"
+    ],
+    "behavior": [
+      "Pure shape validation only.",
+      "Returns copies without mutating caller input.",
+      "Raises ValueError for invalid input.",
+      "No filesystem I/O, external tool execution, model calls, candidate creation, index building, routes, UI, package changes, or memory/canon mutation."
+    ],
+    "source_evidence_contract_result": "104 passed",
+    "existing_candidate_regression_result": "263 passed",
+    "focused_project_omi_regression_result": "109 passed",
+    "runtime_extraction_changes": "none",
     "package_changes": "none"
   },
   "t002_contract_summary": {

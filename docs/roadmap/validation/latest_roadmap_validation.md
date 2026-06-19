@@ -1,5 +1,47 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-006-T004 Minimal Source-Map / Evidence Helper Implementation
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: pure validation helper implementation plus roadmap/status updates for `PHASE8-IMPL-006-T004`.
+- Parent task: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Completed child recorded: `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation.
+- Active/next child: `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision.
+- Next child after T005: `PHASE8-IMPL-006-T006`.
+- T004 outcome:
+  - Created pure validation helper module `backend/story_knowledge/source_map.py`.
+  - Created pure validation helper module `backend/story_knowledge/evidence.py`.
+  - Implemented validation for source document refs, source segments, source maps, source locators, evidence records, extraction run provenance, and raw output references.
+  - Source/evidence contract tests now pass.
+  - Existing candidate contract regression tests remain green.
+  - Focused project/OMI regression tests remain green.
+  - No runtime extraction, package/dependency changes, backend routes, frontend UI, model calls, BookNLP/spaCy install/run, raw output storage implementation, apply-promotion, or memory/canon mutation.
+- Created:
+  - `backend/story_knowledge/source_map.py`
+  - `backend/story_knowledge/evidence.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-006.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-006.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 263 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T004 tool policy.
+- Context tools: none run.
+- External tools: none installed, cloned, executed, or evaluated locally.
+- Source/web retrieval: none run.
+- Boundary summary: pure validation helpers only; no context tools, external tools, source/web retrieval, extraction runtime, backend routes, frontend files, package/dependency files, project runtime files, import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T003 Evidence / Source-Map Contract Tests
 
 - Date: 2026-06-19

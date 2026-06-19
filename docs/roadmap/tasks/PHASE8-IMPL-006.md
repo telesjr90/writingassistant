@@ -86,8 +86,8 @@ Include:
 1. `PHASE8-IMPL-006-T001` - Publish evidence-first extraction foundation parent and scope decision. Status: complete.
 2. `PHASE8-IMPL-006-T002` - Evidence/source-map contract decision. Status: complete; decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md`.
 3. `PHASE8-IMPL-006-T003` - Evidence/source-map contract tests. Status: complete; test artifact: `tests/test_writer_assistant_core_source_evidence_contract.py`.
-4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: ready/active.
-5. `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision. Status: planned.
+4. `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation. Status: complete; helper modules: `backend/story_knowledge/source_map.py`, `backend/story_knowledge/evidence.py`.
+5. `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision. Status: ready/active.
 6. `PHASE8-IMPL-006-T006` - BookNLP-ready adapter contract tests. Status: planned.
 7. `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Status: planned.
 
@@ -98,7 +98,8 @@ Include:
 - The five local answer files are referenced as evidence inputs.
 - `PHASE8-IMPL-005` remains complete through `PHASE8-IMPL-005-T007`.
 - `PHASE8-IMPL-006-T001` is marked complete if successful.
-- `PHASE8-IMPL-006-T002` is marked ready/active.
+- `PHASE8-IMPL-006-T004` is complete if successful.
+- `PHASE8-IMPL-006-T005` is marked ready/active.
 - No runtime extraction is claimed.
 - No external tools are installed, cloned, or executed.
 - No production code is changed; T003 adds contract tests only.
@@ -107,10 +108,11 @@ Include:
 
 ## Validation Expectations
 
-For `PHASE8-IMPL-006-T003`:
+For `PHASE8-IMPL-006-T004`:
 
-- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q` expected red until T004 creates future source/evidence helper modules
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`
 - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`
 - `python3 scripts/check_enrichment.py`
 - `python3 scripts/validate_roadmap.py`
 - non-LeanCTX whitespace check on changed docs
@@ -140,4 +142,6 @@ T003 handoff: add tests-first contract coverage, likely in `tests/test_writer_as
 
 `PHASE8-IMPL-006-T003` is complete as a tests-first child. It created `tests/test_writer_assistant_core_source_evidence_contract.py`, which defines the future API for `backend.story_knowledge.source_map` and `backend.story_knowledge.evidence`: source document reference validation, source segment validation, source map validation, source locator validation, evidence record validation, extraction run provenance validation, and raw output reference validation. The targeted T003 pytest is expected red until T004 creates the future helper modules; the current failure is limited to the missing `backend.story_knowledge.evidence` import during collection. Existing candidate contract regressions remain green. T003 does not implement runtime extraction, production helpers, package/tool installation, backend routes, frontend UI, model calls, generated prose behavior, or memory/canon mutation.
 
-Next child: `PHASE8-IMPL-006-T004` - Minimal source-map/evidence helper implementation.
+`PHASE8-IMPL-006-T004` is complete as a narrow pure-helper implementation child. It created `backend/story_knowledge/source_map.py` and `backend/story_knowledge/evidence.py` with standard-library-only validation helpers for source document refs, source segments, source maps, source locators, evidence records, extraction run provenance, and raw output references. The helpers validate shape only, return copies, reject invalid input with `ValueError`, perform no filesystem I/O, create no candidates, write no project files, build no indexes, call no tools/models, and mutate no source, memory, or canon records. The targeted source/evidence contract pytest now passes, existing candidate contract regressions pass, and focused project/OMI regressions pass.
+
+Next child: `PHASE8-IMPL-006-T005` - BookNLP-ready raw output and adapter contract decision.
