@@ -1,5 +1,58 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-007-T005 Entity/Quote/Event Mocked Normalization Review and Hardening
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: validation-only review of mocked entity/quote/event normalization behavior for `PHASE8-IMPL-007-T005`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Completed child recorded: `PHASE8-IMPL-007-T005` - Entity/quote/event mocked normalization helpers.
+- Active/next child: `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening.
+- Next child after T006: `PHASE8-IMPL-007-T007` - Roadmap/status closeout.
+- Path taken: validation-only. T004 supplied the needed mocked normalization behavior early, and T005 found no runtime or test repair gap.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Runtime/test changes:
+  - Runtime code changes: none.
+  - Test changes: none.
+  - Package/tool/install/runtime changes: none.
+- Normalization review summary:
+  - Entity mentions: current implementation returns in-memory candidate draft shapes with source locator, evidence, provenance, confidence, raw output references, and normalization status; unsupported entity types and invalid confidence fail closed.
+  - Quotes: current implementation treats speaker attribution as candidate support only; missing or ambiguous speaker attribution fails closed.
+  - Events: current implementation treats events as app-owned derived support from `.tokens.event`; unusable event rows without reliable locators or valid confidence fail closed.
+- Guardrail confirmation:
+  - `booknlp_events` remains app-derived support from `.tokens.event`, not a real raw BookNLP output file.
+  - BookNLP byte offsets remain raw support only.
+  - No byte-to-character source snapshot matching or source-span guessing is implemented.
+  - `.book` `g` is not converted into identity or demographic truth.
+  - `COREF`, `char_id`, speaker mentions, and event flags remain uncertain extraction signals only.
+  - Drafts are in-memory only and are not persisted candidate records.
+  - No canon/candidate persistence, memory/canon mutation, generated prose, rewrite, continuation, or apply-promotion behavior was added.
+- Validator results:
+  - Pre-change `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Plain `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T005 policy.
+  - `/usr/bin/git diff --check -- backend/story_knowledge/booknlp_adapter_contract.py tests/test_writer_assistant_core_booknlp_adapter_contract.py docs/roadmap/tasks/PHASE8-IMPL-007.md docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json docs/roadmap/implementation_status.md docs/roadmap/roadmap_index.yaml docs/roadmap/task_backlog.md docs/roadmap/phase_map.md docs/master_plan.md docs/roadmap/validation/latest_roadmap_validation.md docs/roadmap/decision_log.md docs/roadmap/risk_register.md docs/roadmap/open_questions.md`: PASS.
+- Source-cache safety result:
+  - Plain `git status --short -- .external_sources`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T005 policy.
+  - Plain `git status --short --ignored -- .external_sources | head -50`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T005 policy.
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources`: `!! .external_sources/`.
+- Boundary summary: mocked normalization review/hardening only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools installed, external repos cloned/fetched/pulled, external repo code executed/imported/vendored, demos, model calls, runtime extraction, BookNLP/spaCy install or execution, backend routes, frontend files, package/dependency files, project runtime files, extraction/import/export implementation, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-007-T004 Manifest and Raw Artifact Bundle Validators
 
 - Date: 2026-06-20

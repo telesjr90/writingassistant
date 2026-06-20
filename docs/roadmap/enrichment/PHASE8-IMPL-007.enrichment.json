@@ -261,13 +261,13 @@
       "id": "PHASE8-IMPL-007-T005",
       "title": "Entity/quote/event mocked normalization helpers",
       "type": "runtime_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-007-T004"
       ],
       "scope": [
-        "Harden mocked normalization helpers: normalize_booknlp_entity_mentions, normalize_booknlp_quotes, normalize_booknlp_events.",
-        "T004 supplied minimal in-memory behavior required by current contract tests.",
+        "Validation-only review of mocked normalization helpers: normalize_booknlp_entity_mentions, normalize_booknlp_quotes, normalize_booknlp_events.",
+        "T004 supplied the needed in-memory behavior required by current contract tests.",
         "Produce candidate draft shapes only.",
         "No persistence writes.",
         "No candidate JSON writes.",
@@ -275,13 +275,30 @@
         "No generated prose.",
         "No real BookNLP execution."
       ],
-      "result": "ready_after_t004"
+      "validation_path": "validation_only",
+      "files_changed": [
+        "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+        "docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/roadmap_index.yaml",
+        "docs/roadmap/task_backlog.md",
+        "docs/roadmap/phase_map.md",
+        "docs/master_plan.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md"
+      ],
+      "validation_results": {
+        "booknlp_adapter_contract_pytest": "PASS: 148 passed"
+      },
+      "runtime_changes": "none",
+      "test_changes": "none",
+      "package_tool_install_runtime_changes": "none",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-007-T006",
       "title": "Candidate draft builder, fail-closed behavior, and boundary hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-007-T005"
       ],
@@ -294,7 +311,7 @@
         "No new runtime scope.",
         "No package/tool install."
       ],
-      "result": "deferred_to_t006"
+      "result": "ready_after_t005"
     },
     {
       "id": "PHASE8-IMPL-007-T007",
@@ -320,7 +337,7 @@
     "PHASE8-IMPL-007-T002 is complete with source inventory and implementation refresh decision artifacts.",
     "PHASE8-IMPL-007-T003 is complete with implementation decision artifact.",
     "PHASE8-IMPL-007-T004 is complete with pure mocked adapter-contract module and validators.",
-    "PHASE8-IMPL-007-T005 is ready/active and PHASE8-IMPL-007-T006 through PHASE8-IMPL-007-T007 are registered as planned.",
+    "PHASE8-IMPL-007-T005 is complete as validation-only and PHASE8-IMPL-007-T006 is ready/active.",
     "PHASE8-IMPL-006 remains complete through PHASE8-IMPL-006-T007.",
     "tests/test_writer_assistant_core_booknlp_adapter_contract.py is the primary implementation target test file and passes after T004.",
     "T001 confirms the four .external_sources/ clones exist locally.",
