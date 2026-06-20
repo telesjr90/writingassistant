@@ -153,16 +153,19 @@ Deferred PHASE8-IMPL-006 follow-ups:
 9. ~~What fixture correction, raw-vs-normalized naming, event derivation, byte-offset handling, and source-level forbidden-term policy should T004 use?~~ **Resolved in T003:** see `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`. Raw BookNLP-like shapes and adapter-normalized shapes stay explicit; minimal fixture corrections are authorized only if needed; `booknlp_events` is app-derived from `.tokens.event`; byte offsets are raw support; app source locators/evidence are required for candidate drafts; production source must avoid forbidden runtime/tool/prose/mutation terms.
 10. When/if real BookNLP install is authorized remains deferred; no dependency is approved by T007.
 11. Real BookNLP schema parsing policy remains deferred; T002 only inspected local official example outputs and docs read-only, and T007 keeps real parsing out of PHASE8-IMPL-007.
-12. ~~Raw output storage helper timing remains deferred.~~ **Recommended next:** `PHASE8-IMPL-008 - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract`, recommended only and not active until separately published.
-13. Source snapshot text matching helper timing remains deferred.
-14. Extraction route/UI timing remains deferred.
-15. Should object/item candidates be in the first implementation slice?
-15. When should NCP import/export be implemented?
-16. When should Subtxt-inspired rubric checks be implemented?
-17. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
-18. spaCy package approval/install timing remains deferred; no dependency is approved by T007.
-19. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
-20. PHASE8-IMPL-007 is complete; its mocked adapter contract does not authorize real BookNLP/spaCy runtime, runtime extraction, storage writes, routes, UI, package changes, generated prose, apply-promotion, or memory/canon mutation.
+12. ~~Raw output storage helper timing remains deferred.~~ **Resolved into PHASE8-IMPL-008:** the parent is active and `PHASE8-IMPL-008-T002` accepted `docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md`. T003 is tests-only; T004 may implement pure path helpers and optional manifest validators only; raw artifact write/read/list helpers remain deferred.
+13. ~~What project-local raw extraction storage root and run-folder shape should future helpers use?~~ **Resolved in PHASE8-IMPL-008-T002:** use `project_dir / "writer_assistant" / "extractions"` and `writer_assistant/extractions/{tool_name}/{run_id}/`, with first supported `tool_name` `booknlp`.
+14. ~~Should BookNLP events be stored as a raw external artifact?~~ **Resolved in PHASE8-IMPL-008-T002:** no. `booknlp_events_derived` is app-owned derived support from `.tokens` `event`, not a real external `.events` or `events.tsv` BookNLP file.
+15. Source snapshot text matching helper timing remains deferred.
+16. Extraction route/UI timing remains deferred.
+17. Should object/item candidates be in the first implementation slice?
+18. When should NCP import/export be implemented?
+19. When should Subtxt-inspired rubric checks be implemented?
+20. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
+21. spaCy package approval/install timing remains deferred; no dependency is approved by T007.
+22. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
+23. PHASE8-IMPL-007 is complete; its mocked adapter contract does not authorize real BookNLP/spaCy runtime, runtime extraction, storage writes, routes, UI, package changes, generated prose, apply-promotion, or memory/canon mutation.
+24. PHASE8-IMPL-008-T002 is complete; its storage contract does not authorize raw artifact write/read/list helpers, BookNLP fixture parser helpers, real BookNLP/spaCy runtime, runtime extraction, routes, UI, package changes, generated prose, apply-promotion, or memory/canon mutation.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

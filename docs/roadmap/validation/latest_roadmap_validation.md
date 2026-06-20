@@ -1,5 +1,60 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-008-T002 Raw Extraction Artifact Storage Contract Decision
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-008-T002`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: `PHASE8-IMPL-008` active.
+- Completed child recorded: `PHASE8-IMPL-008-T002` - Raw extraction artifact storage contract decision.
+- Active/next child: `PHASE8-IMPL-008-T003` - Extraction artifact storage path and manifest contract tests (ready/active).
+- Decision artifact:
+  - `docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md`
+- T002 outcome:
+  - Accepted future project-local raw extraction artifact storage root: `project_dir / "writer_assistant" / "extractions"`.
+  - Accepted future run-folder shape: `writer_assistant/extractions/{tool_name}/{run_id}/`.
+  - Accepted first tool-specific folder: `booknlp`.
+  - Accepted strict `tool_name` and `run_id` safety rules.
+  - Accepted manifest shape, policy flags, allowed run/status values, and display-only storage path policy.
+  - Accepted future raw artifact kinds: `booknlp_tokens`, `booknlp_entities`, `booknlp_quotes`, `booknlp_supersense`, `booknlp_book_json`, and `booknlp_book_html`.
+  - Accepted future derived artifact kind: `booknlp_events_derived`.
+  - Recorded that BookNLP event support comes from `.tokens` `event` column and must not be represented as a real external raw BookNLP file.
+  - Selected T003 as tests-only.
+  - Limited T004 to pure path helpers and optional manifest shape validators only if T003 authorizes them.
+- Files created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md`
+- Files updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Explicit non-actions:
+  - No `backend/story_knowledge/raw_extraction_storage.py` created.
+  - No `backend/story_knowledge/booknlp_fixture_parser.py` created.
+  - No backend, frontend, tests, project runtime files, package/dependency files, training data, JSONL records, datasets, or manifests changed.
+  - No raw extraction artifact files written under `projects/`.
+  - No BookNLP or spaCy install/run/import.
+  - No model calls, Ollama calls, runtime extraction, backend routes, frontend UI, apply-promotion, memory/canon mutation, generated prose, staging, commit, or push.
+  - No context tools, Graphify, Repomix, AI Context, CCE, MCP tools, LeanCTX, external repo clone/fetch/pull, source retrieval, or web research.
+- Source-cache safety:
+  - `/usr/bin/git status --short -- .external_sources`: clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `!! .external_sources/`.
+  - `.external_sources/` is ignored and not staged.
+- Validation commands:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - non-LeanCTX whitespace check on changed docs: PASS.
+  - narrow `/usr/bin/git diff --check` on tracked changed docs: PASS.
+  - T002 did not run pytest because this was docs/decision only.
+
 ## PHASE8-IMPL-008-T001 Publish Raw Extraction Artifact Storage and BookNLP Fixture Parser Contract Parent
 
 - Date: 2026-06-20

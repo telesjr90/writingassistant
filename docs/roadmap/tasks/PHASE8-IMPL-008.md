@@ -109,8 +109,8 @@ Explicitly excluded in this parent:
 ## Child-Task Plan
 
 1. `PHASE8-IMPL-008-T001` - Publish raw extraction artifact storage and BookNLP fixture parser contract parent. Status: complete on success of T001.
-2. `PHASE8-IMPL-008-T002` - Raw extraction artifact storage contract decision. Status: ready/active after T001.
-3. `PHASE8-IMPL-008-T003` - Extraction artifact storage path and manifest contract tests. Status: planned/draft.
+2. `PHASE8-IMPL-008-T002` - Raw extraction artifact storage contract decision. Status: complete on success of T002.
+3. `PHASE8-IMPL-008-T003` - Extraction artifact storage path and manifest contract tests. Status: ready/active after T002.
 4. `PHASE8-IMPL-008-T004` - Minimal extraction artifact storage helpers. Status: planned/draft.
 5. `PHASE8-IMPL-008-T005` - BookNLP fixture parser contract decision. Status: planned/draft.
 6. `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests. Status: planned/draft.
@@ -136,6 +136,8 @@ Explicitly excluded in this parent:
 ### `PHASE8-IMPL-008-T002` - Raw extraction artifact storage contract decision
 
 - Docs/decision only.
+- Status: complete as of 2026-06-20.
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md`.
 - Use the completed `PHASE8-IMPL-007` adapter contract, source/evidence contract, and source inventory as foundation.
 - Decide project-local raw extraction artifact storage root: `projects/{project_id}/writer_assistant/extractions/`.
 - Decide run-folder shape: `projects/{project_id}/writer_assistant/extractions/{tool_name}/{run_id}/`.
@@ -149,9 +151,25 @@ Explicitly excluded in this parent:
 - Confirm real BookNLP install/run remains deferred.
 - No runtime code, no tests, no implementation, no raw artifact writes, no BookNLP/spaCy install/run/import.
 
+T002 accepted:
+
+- storage root: `project_dir / "writer_assistant" / "extractions"`;
+- run-folder shape: `project_dir / "writer_assistant" / "extractions" / tool_name / run_id`;
+- first tool-specific root: `project_dir / "writer_assistant" / "extractions" / "booknlp" / run_id`;
+- strict lower-case alphanumeric plus underscore/hyphen `tool_name` and `run_id` identifiers with traversal, suffix, absolute path, and Windows drive patterns rejected;
+- future module `backend/story_knowledge/raw_extraction_storage.py`;
+- future T004 APIs for pure path helpers and optional manifest shape validation only;
+- future manifest fields, policy flags, allowed run/status values, and display-only storage path fields;
+- BookNLP raw layout under `raw/tokens.tsv`, `raw/entities.tsv`, `raw/quotes.tsv`, `raw/supersense.tsv`, `raw/book.json`, and optional raw-ref-only `raw/book.html`;
+- `derived/events.json` only as future-authorized app-owned derived support from `.tokens.event`, not as a real external BookNLP raw output file;
+- future raw artifact kinds `booknlp_tokens`, `booknlp_entities`, `booknlp_quotes`, `booknlp_supersense`, `booknlp_book_json`, and `booknlp_book_html`;
+- future derived artifact kind `booknlp_events_derived`;
+- T003 as tests-only and T004 as pure path helpers plus manifest shape validators only if authorized by T003 tests.
+
 ### `PHASE8-IMPL-008-T003` - Extraction artifact storage path and manifest contract tests
 
 - Tests-only contract coverage.
+- Status: ready/active after T002.
 - Expected-red contract tests for the future pure storage path and manifest helper APIs.
 - Tests may use `tmp_path` and in-memory dictionaries only; no real project folder writes, no real BookNLP/spaCy runtime.
 - Tests must cover safe and unsafe project identifiers, safe and unsafe tool identifiers, safe and unsafe run identifiers, path traversal rejection, manifest validation, forbidden fields, and forbidden locations.
