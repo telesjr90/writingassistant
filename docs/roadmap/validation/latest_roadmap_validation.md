@@ -1,5 +1,106 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-007-T002 Official Repo Retrieval/Source Inventory and Implementation Contract Refresh
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: docs/inventory plus docs/decision only for `PHASE8-IMPL-007-T002`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Completed child recorded: `PHASE8-IMPL-007-T002` - Official repo retrieval/source inventory and implementation contract refresh.
+- Active/next child: `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory.
+- Next child after T003: `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators.
+- Created:
+  - `docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md`
+  - `docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Local repo SHAs:
+  - BookNLP: `3d900fc2224e55960c3363826ae28539b77b4204`
+  - dramatica-flow: `890f099bfcb64adbf407fd83ab708c48e92b0766`
+  - Narrative Context Protocol: `b1222748376aae3d309176b3bb5afb884eb281ea`
+  - Subtxt docs: `ec66121364c039693314dcce4cde464e497bece4`
+- Source-cache safety result:
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources`: `!! .external_sources/`.
+  - `/usr/bin/git check-ignore -v .external_sources/booknlp`: `.git/info/exclude:10:.external_sources/    .external_sources/booknlp`.
+  - `/usr/bin/git check-ignore -v .external_sources/dramatica-flow`: `.git/info/exclude:10:.external_sources/    .external_sources/dramatica-flow`.
+  - `/usr/bin/git check-ignore -v .external_sources/narrative-context-protocol`: `.git/info/exclude:10:.external_sources/    .external_sources/narrative-context-protocol`.
+  - `/usr/bin/git check-ignore -v .external_sources/subtxt-docs`: `.git/info/exclude:10:.external_sources/    .external_sources/subtxt-docs`.
+  - Plain `git` source-cache safety commands were initially blocked by the local hook requiring LeanCTX; T002 did not run LeanCTX and used `/usr/bin/git` for allowed non-LeanCTX checks.
+- Source inventory summary:
+  - BookNLP real examples confirmed `.tokens`, `.entities`, `.quotes`, `.supersense`, `.book`, and `.book.html` outputs.
+  - No separate BookNLP `.events` file was found; `booknlp_events` is app-owned derived support from `.tokens.event`.
+  - BookNLP `.tokens` byte offsets require cautious adapter/source-map bridging to app character offsets.
+  - BookNLP coreference, quote attribution, and event flags remain candidate evidence only.
+  - dramatica-flow remains blocked/deferred for runtime because inspected files expose generation, continuation, rewrite, write/revise, LLM, and world-state/truth-like mutation surfaces.
+  - NCP remains future approved-context import/export reference only.
+  - Subtxt docs remain semantic guardrail/reference only.
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - Narrow `/usr/bin/git diff --check`: PASS.
+- Boundary summary: docs/inventory plus docs/decision only; read-only local source inspection only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools installed, external repos cloned/fetched/pulled, external repo code executed, demos, model calls, runtime extraction, BookNLP/spaCy install or execution, adapter implementation, backend routes, frontend files, package/dependency files, project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
+## PHASE8-IMPL-007-T001 Publish BookNLP Adapter Contract Implementation Parent and Source-Inventory-Aware Child-Task Plan
+
+- Date: 2026-06-19
+- Result: PASS
+- Scope: docs/status/planning only for `PHASE8-IMPL-007-T001`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Completed child recorded: `PHASE8-IMPL-007-T001` - Publish BookNLP adapter contract implementation parent and source-inventory-aware child-task plan.
+- Active/next child: `PHASE8-IMPL-007-T002` - Official repo retrieval/source inventory and implementation contract refresh.
+- Last completed parent: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy.
+- Last completed child under prior parent: `PHASE8-IMPL-006-T007` - Roadmap/status closeout.
+- T001 outcome:
+  - Published parent task record at `docs/roadmap/tasks/PHASE8-IMPL-007.md`.
+  - Published inventory at `docs/roadmap/inventory/PHASE8-IMPL-007.md`.
+  - Published enrichment JSON at `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`.
+  - Marked `PHASE8-IMPL-007` active in roadmap/status docs.
+  - Marked `PHASE8-IMPL-007-T001` complete; marked `PHASE8-IMPL-007-T002` ready/active; registered `PHASE8-IMPL-007-T003` through `PHASE8-IMPL-007-T007` as planned/draft.
+  - Acknowledged the expected-red BookNLP adapter handoff from `PHASE8-IMPL-006-T006` (`backend.story_knowledge.booknlp_adapter_contract` future module).
+  - Recorded `.external_sources/booknlp`, `.external_sources/dramatica-flow`, `.external_sources/narrative-context-protocol`, and `.external_sources/subtxt-docs` as a local read-only evidence cache for T002 only.
+  - Confirmed the four `.external_sources/` clone paths exist locally.
+  - Added `.external_sources/` to `.git/info/exclude` so the local cache is protected from accidental commit.
+  - Did not implement the BookNLP adapter, did not implement extraction, did not change runtime code or tests, did not change package/dependency files, did not call models, did not generate prose, did not apply promotion, and did not mutate memory/canon.
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+- Updated:
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - Narrow `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T001 tool policy.
+- Source-cache safety results:
+  - `git status --short -- .external_sources`: empty (`.external_sources/` is no longer reported as untracked after `.git/info/exclude` was updated).
+  - `git check-ignore -v .external_sources/booknlp`: `.git/info/exclude:10:.external_sources/    .external_sources/booknlp`.
+  - `git check-ignore -v .external_sources/dramatica-flow`: `.git/info/exclude:10:.external_sources/    .external_sources/dramatica-flow`.
+  - `git check-ignore -v .external_sources/narrative-context-protocol`: `.git/info/exclude:10:.external_sources/    .external_sources/narrative-context-protocol`.
+  - `git check-ignore -v .external_sources/subtxt-docs`: `.git/info/exclude:10:.external_sources/    .external_sources/subtxt-docs`.
+  - `git status --short --ignored -- .external_sources`: `!! .external_sources/`.
+- Context tools: none run.
+- External tools: none installed, cloned, fetched, pulled, or executed locally.
+- Source/web retrieval: none run.
+- Boundary summary: docs/status/planning only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools, source/web retrieval, runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-006-T007 Roadmap/Status Closeout
 
 - Date: 2026-06-19

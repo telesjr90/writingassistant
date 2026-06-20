@@ -149,9 +149,9 @@ Deferred PHASE8-IMPL-006 follow-ups:
 5. ~~What fixture policy should be used for BookNLP-like outputs without running BookNLP?~~ **Resolved in T005:** use app-owned mocked BookNLP-like fixture dictionaries only, based on synthetic owner-authored sample text, with builders for token, entity, quote, book JSON, supersense, event, and run manifest shapes; see `docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md`.
 6. ~~What future BookNLP-ready adapter contract test surface should T006 define?~~ **Resolved in T006:** `tests/test_writer_assistant_core_booknlp_adapter_contract.py` defines expected-red coverage for future `backend.story_knowledge.booknlp_adapter_contract` APIs, using mocked in-memory BookNLP-like dictionaries only and asserting raw-support, evidence/source locator, normalization draft, fail-closed, no-runtime-dependency, no-prose, no-apply-promotion, and no-memory/canon-mutation boundaries.
 7. ~~Should `PHASE8-IMPL-006-T007` close the parent with a recommendation for BookNLP adapter implementation, simple local baseline extraction, or another tests-first foundation parent?~~ **Resolved in T007:** recommend a pure mocked BookNLP adapter contract implementation parent, not a runtime extraction parent.
-8. Exact `PHASE8-IMPL-007` child sequence remains deferred.
-9. When/if real BookNLP install is authorized remains deferred; no dependency is approved by T007.
-10. Real BookNLP schema parsing policy remains deferred.
+8. ~~Exact `PHASE8-IMPL-007` child sequence remains deferred.~~ **Resolved in T002:** `PHASE8-IMPL-007-T003` is docs/decision-only implementation decision after source inventory; T004 validators first; T005 mocked normalizers; T006 candidate draft builder and boundary hardening; T007 closeout. T003 must decide fixture correction, raw-shape versus normalized-shape naming, event derivation from `.tokens.event`, byte-offset handling, and source-level forbidden terms.
+9. When/if real BookNLP install is authorized remains deferred; no dependency is approved by T002.
+10. Real BookNLP schema parsing policy remains deferred; T002 only inspected local official example outputs and docs read-only.
 11. Raw output storage helper timing remains deferred.
 12. Source snapshot text matching helper timing remains deferred.
 13. Extraction route/UI timing remains deferred.

@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-006",
-    "current_parent_task_title": "Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy",
-    "frontier_note": "PHASE8-IMPL-006 is complete through PHASE8-IMPL-006-T007. It delivered the evidence-first extraction foundation, source-map/evidence contract, pure source/evidence validation helpers, BookNLP-ready raw output/adapter contract decision, and expected-red mocked adapter contract tests for future backend.story_knowledge.booknlp_adapter_contract APIs. No extraction implementation has started. BookNLP and spaCy are not installed or run. Recommended next parent is PHASE8-IMPL-007 - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation; it is recommended only and not active until separately published."
+    "current_parent_task_id": "PHASE8-IMPL-007",
+    "current_parent_task_title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
+    "frontier_note": "PHASE8-IMPL-007 is active as the seventh Writer Assistant Core parent after completed PHASE8-IMPL-006. PHASE8-IMPL-007-T001 published the parent, inventory, enrichment JSON, and roadmap/status updates and confirmed that .external_sources/booknlp, .external_sources/dramatica-flow, .external_sources/narrative-context-protocol, and .external_sources/subtxt-docs exist locally and are protected from commit via .git/info/exclude. PHASE8-IMPL-007-T002 completed read-only official source inventory using the already-cloned .external_sources/ repositories, created docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md and docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md, and verified repo SHAs for BookNLP, dramatica-flow, Narrative Context Protocol, and Subtxt docs. Active child is PHASE8-IMPL-007-T003 (docs/decision only). PHASE8-IMPL-007-T004 through PHASE8-IMPL-007-T007 are registered as planned. The parent implements pure mocked backend/story_knowledge/booknlp_adapter_contract.py so tests/test_writer_assistant_core_booknlp_adapter_contract.py turns green; no BookNLP/spaCy install or execution, no real extraction, no routes, no UI, no package changes, no generated prose, no apply-promotion, no memory/canon mutation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1290,6 +1290,194 @@
         "no_runtime_feature_scope",
         "docs_only"
       ]
+    },
+    {
+      "id": "PHASE8-IMPL-007",
+      "title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "booknlp_ready",
+        "mocked_fixtures_only",
+        "source_inventory_before_implementation",
+        "pure_validation",
+        "pure_normalization",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_routes",
+        "no_frontend",
+        "no_runtime_extraction",
+        "docs_only_t001",
+        "read_only_external_sources_only"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-007.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json",
+      "context_pack": null
+    },
+    {
+      "id": "PHASE8-IMPL-007-T001",
+      "title": "Publish BookNLP adapter contract implementation parent and source-inventory-aware child-task plan",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "no_runtime_extraction",
+        "docs_only",
+        "read_only_external_sources_only"
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-007-T002",
+      "title": "Official repo retrieval/source inventory and implementation contract refresh",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "read_only_external_sources_only",
+        "docs_only"
+      ],
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md",
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-007-T003",
+      "title": "BookNLP adapter implementation decision after source inventory",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "docs_only"
+      ],
+      "result": "deferred_to_t003"
+    },
+    {
+      "id": "PHASE8-IMPL-007-T004",
+      "title": "Manifest and raw artifact bundle validators",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "pure_validation"
+      ],
+      "artifacts": [
+        "backend/story_knowledge/booknlp_adapter_contract.py"
+      ],
+      "result": "deferred_to_t004"
+    },
+    {
+      "id": "PHASE8-IMPL-007-T005",
+      "title": "Entity/quote/event mocked normalization helpers",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "pure_normalization"
+      ],
+      "result": "deferred_to_t005"
+    },
+    {
+      "id": "PHASE8-IMPL-007-T006",
+      "title": "Candidate draft builder, fail-closed behavior, and boundary hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "pure_normalization"
+      ],
+      "result": "deferred_to_t006"
+    },
+    {
+      "id": "PHASE8-IMPL-007-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-007",
+      "depends_on": [
+        "PHASE8-IMPL-007-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "no_runtime_extraction",
+        "docs_only"
+      ],
+      "result": "deferred_to_t007"
     },
     {
       "id": "PHASE7-IMPL-004-T001",
