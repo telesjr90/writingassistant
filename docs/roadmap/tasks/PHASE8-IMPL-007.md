@@ -196,8 +196,8 @@ Include:
 3. `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory. Status: complete.
 4. `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators. Status: complete.
 5. `PHASE8-IMPL-007-T005` - Entity/quote/event mocked normalization helpers. Status: complete.
-6. `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening. Status: ready/active.
-7. `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening. Status: complete.
+7. `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Child Task Details
 
@@ -302,19 +302,33 @@ Include:
 
 ### `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening
 
-- Status: ready/active after T005.
-- Implement `build_booknlp_candidate_drafts`.
-- Combine mocked entity/quote/event normalization outputs.
-- Enforce fail-closed behavior.
-- Ensure no promoted status, no promote owner decision, no forbidden destinations, no canon/memory mutation fields.
-- Run targeted contract/regression tests.
-- No new runtime scope beyond `backend/story_knowledge/booknlp_adapter_contract.py`.
+- Status: complete as of 2026-06-20.
+- Path: validation-only. T004/T005 already supplied and validated the candidate draft builder, fail-closed behavior, and source-level boundary checks required by T006.
+- Reviewed `build_booknlp_candidate_drafts` and confirmed it combines mocked entity, quote, and event normalizer outputs into in-memory draft dictionaries only.
+- Confirmed candidate drafts are not persisted, never write raw outputs, never create/update an index, never mutate memory/canon/project source files, never mark drafts promoted, and never set owner decision to promote.
+- Confirmed drafts do not use forbidden destination values and do not include canon/memory mutation or generated-prose fields.
+- Confirmed source locators, evidence records, provenance, confidence, raw output references, and normalization status remain attached where current contract tests require them.
+- Confirmed invalid manifests, invalid bundles, missing source locators, invalid offsets, missing hashes, mutation/prose fields, unsupported entity types, invalid confidence, ambiguous speaker attribution, and unusable events fail closed through `ValueError`, `insufficient_evidence`, or `rejected_output`.
+- Confirmed BookNLP byte offsets remain raw support only; no byte-to-character source snapshot matching or missing-span guessing is implemented.
+- Confirmed `.book` `g` remains raw aggregate metadata only, not identity or demographic truth.
+- Confirmed `COREF`, `char_id`, speaker mentions, and event flags remain uncertain extraction signals only.
+- Runtime changes: none.
+- Test changes: none.
+- Validation results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 263 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+- No real BookNLP/spaCy install or execution.
+- No runtime extraction.
+- No persistence/canon/memory mutation.
 - No package/tool install.
-
-If T004-T005 already make the full contract green, T006 should be validation-only and record no runtime changes unless required.
 
 ### `PHASE8-IMPL-007-T007` - Roadmap/status closeout
 
+- Status: ready/active after T006.
 - Close the parent.
 - Summarize source inventory, module, helpers, and tests.
 - Record that the adapter contract implementation is mocked only.
@@ -381,11 +395,11 @@ For later children (recorded here for context, executed in their own tasks):
 
 ## Current Status
 
-`PHASE8-IMPL-007` is active. Last completed parent: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy. Last completed child under this parent: `PHASE8-IMPL-007-T005` - Entity/quote/event mocked normalization helpers. Active child: `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening. Next child: `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Prior completed parents: `PHASE8-IMPL-001` through `PHASE8-IMPL-006`. Recommended next parent after `PHASE8-IMPL-007` closes will depend on T006 outcomes.
+`PHASE8-IMPL-007` is active. Last completed parent: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy. Last completed child under this parent: `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening. Active child: `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Next child: none under `PHASE8-IMPL-007`. Prior completed parents: `PHASE8-IMPL-001` through `PHASE8-IMPL-006`. Recommended next parent after `PHASE8-IMPL-007` closes will be selected by T007.
 
 T003 is complete as docs/decision only. It accepted the exact implementation split and handoff for T004-T006 without implementing the BookNLP adapter, changing tests, changing runtime code, changing package/dependency files, running tools, calling models, generating prose, applying promotion, or mutating memory/canon.
 
-T004 is complete. T004 created the pure standard-library-only mocked adapter-contract module, implemented manifest and raw artifact bundle validators, exposed all public APIs, and added minimal in-memory draft shaping required by the current contract tests. The targeted BookNLP adapter contract test now passes. T005 is complete as validation-only after reviewing the early mocked entity/quote/event normalization behavior and finding no repair gap. T006 is ready/active to review or harden the candidate draft builder and fail-closed boundaries.
+T004 is complete. T004 created the pure standard-library-only mocked adapter-contract module, implemented manifest and raw artifact bundle validators, exposed all public APIs, and added minimal in-memory draft shaping required by the current contract tests. The targeted BookNLP adapter contract test now passes. T005 is complete as validation-only after reviewing the early mocked entity/quote/event normalization behavior and finding no repair gap. T006 is complete as validation-only after reviewing the candidate draft builder, fail-closed behavior, and boundary hardening scope and finding no runtime or test repair gap. T007 is ready/active for roadmap/status closeout.
 
 ## Final Parent Goal (Deferred to T007)
 

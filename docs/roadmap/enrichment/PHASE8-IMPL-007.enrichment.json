@@ -298,26 +298,48 @@
       "id": "PHASE8-IMPL-007-T006",
       "title": "Candidate draft builder, fail-closed behavior, and boundary hardening",
       "type": "runtime_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-007-T005"
       ],
       "scope": [
-        "Implement build_booknlp_candidate_drafts.",
-        "Combine mocked entity/quote/event normalization outputs.",
-        "Enforce fail-closed behavior.",
-        "Ensure no promoted status, no promote owner decision, no forbidden destinations, no canon/memory mutation fields.",
-        "Run targeted contract/regression tests.",
-        "No new runtime scope.",
+        "Validation-only review of build_booknlp_candidate_drafts because T004/T005 already supplied the required mocked in-memory behavior.",
+        "Confirmed mocked entity/quote/event normalization outputs are combined into in-memory draft dictionaries only.",
+        "Confirmed fail-closed behavior for invalid, unsupported, ambiguous, or insufficiently evidenced input.",
+        "Confirmed no promoted status, no promote owner decision, no forbidden destinations, no canon/memory mutation fields, and no generated-prose fields.",
+        "Confirmed raw output refs remain non-canon and non-candidate.",
+        "Confirmed no new runtime scope.",
         "No package/tool install."
       ],
-      "result": "ready_after_t005"
+      "validation_path": "validation_only",
+      "files_changed": [
+        "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+        "docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/roadmap_index.yaml",
+        "docs/roadmap/task_backlog.md",
+        "docs/roadmap/phase_map.md",
+        "docs/master_plan.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md"
+      ],
+      "validation_results": {
+        "booknlp_adapter_contract_pytest": "PASS: 148 passed",
+        "source_evidence_contract_pytest": "PASS: 104 passed",
+        "candidate_contract_regression_pytest": "PASS: 263 passed",
+        "focused_omi_project_regression_pytest": "PASS: 109 passed",
+        "check_enrichment": "PASS",
+        "validate_roadmap": "PASS"
+      },
+      "runtime_changes": "none",
+      "test_changes": "none",
+      "package_tool_install_runtime_changes": "none",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-007-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-007-T006"
       ],
@@ -328,7 +350,7 @@
         "Recommend the next parent.",
         "No runtime expansion."
       ],
-      "result": "deferred_to_t007"
+      "result": "ready_after_t006"
     }
   ],
   "acceptance_criteria": [
@@ -337,7 +359,8 @@
     "PHASE8-IMPL-007-T002 is complete with source inventory and implementation refresh decision artifacts.",
     "PHASE8-IMPL-007-T003 is complete with implementation decision artifact.",
     "PHASE8-IMPL-007-T004 is complete with pure mocked adapter-contract module and validators.",
-    "PHASE8-IMPL-007-T005 is complete as validation-only and PHASE8-IMPL-007-T006 is ready/active.",
+    "PHASE8-IMPL-007-T005 is complete as validation-only.",
+    "PHASE8-IMPL-007-T006 is complete as validation-only and PHASE8-IMPL-007-T007 is ready/active.",
     "PHASE8-IMPL-006 remains complete through PHASE8-IMPL-006-T007.",
     "tests/test_writer_assistant_core_booknlp_adapter_contract.py is the primary implementation target test file and passes after T004.",
     "T001 confirms the four .external_sources/ clones exist locally.",

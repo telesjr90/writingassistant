@@ -1,5 +1,62 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-007-T006 Candidate Draft Builder, Fail-Closed Behavior, and Boundary Hardening
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: validation-only review of candidate draft builder behavior, fail-closed behavior, source-level boundary hardening, and no-persistence/no-canon guarantees for `PHASE8-IMPL-007-T006`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Completed child recorded: `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening.
+- Active/next child: `PHASE8-IMPL-007-T007` - Roadmap/status closeout.
+- Next child after T007: none under `PHASE8-IMPL-007`.
+- Path taken: validation-only. T004/T005 already satisfied the candidate draft builder and fail-closed contract; T006 found no runtime or test repair gap.
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Runtime/test changes:
+  - Runtime code changes: none.
+  - Test changes: none.
+  - Package/tool/install/runtime changes: none.
+- Candidate draft builder review summary:
+  - `build_booknlp_candidate_drafts` combines mocked entity, quote, and event normalizer outputs.
+  - Returned values are in-memory draft dictionaries only.
+  - Drafts carry source locator, evidence, provenance, confidence, raw output references, and normalization status where current contract tests require them.
+  - Drafts do not persist candidate JSON, write raw outputs, create/update an index, mutate memory/canon/project source files, mark drafts promoted, set owner decision to promote, or use forbidden destination values.
+- Fail-closed review summary:
+  - Manifest and bundle validation reject invalid shape, unsafe IDs, missing hashes, unsupported fields, mutation/prose fields, invalid offsets, and invalid raw output references.
+  - Normalizers and builder fail closed for unsupported entity types, invalid confidence, missing/invalid locators, ambiguous speaker attribution, and unusable event rows.
+  - Invalid or ambiguous inputs become `ValueError`, `insufficient_evidence`, or `rejected_output`, not approved truth.
+- Guardrail confirmation:
+  - `booknlp_events` remains app-derived support from `.tokens.event`, not a real raw BookNLP output file.
+  - BookNLP byte offsets remain raw support only.
+  - No byte-to-character source snapshot matching or source-span guessing is implemented.
+  - `.book` `g` is not converted into identity or demographic truth.
+  - `COREF`, `char_id`, speaker mentions, and event flags remain uncertain extraction signals only.
+  - Raw output refs remain non-canon and non-candidate.
+  - No canon/candidate persistence, memory/canon mutation, generated prose, rewrite, continuation, or apply-promotion behavior was added.
+- Validator results:
+  - Pre-change `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 263 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Plain `git diff --check`: not run; `/usr/bin/git diff --check -- ...` was used directly for the required narrow check to avoid local wrapper/hook behavior.
+  - `/usr/bin/git diff --check -- backend/story_knowledge/booknlp_adapter_contract.py tests/test_writer_assistant_core_booknlp_adapter_contract.py docs/roadmap/tasks/PHASE8-IMPL-007.md docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json docs/roadmap/implementation_status.md docs/roadmap/roadmap_index.yaml docs/roadmap/task_backlog.md docs/roadmap/phase_map.md docs/master_plan.md docs/roadmap/validation/latest_roadmap_validation.md docs/roadmap/decision_log.md docs/roadmap/risk_register.md docs/roadmap/open_questions.md`: PASS.
+- Source-cache safety result:
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources`: `!! .external_sources/`.
+- Boundary summary: candidate draft builder/fail-closed/boundary hardening only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools installed, external repos cloned/fetched/pulled, external repo code executed/imported/vendored, demos, model calls, runtime extraction, BookNLP/spaCy install or execution, backend routes, frontend files, package/dependency files, project runtime files, extraction/import/export implementation, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+- T007 next: `PHASE8-IMPL-007-T007` - Roadmap/status closeout.
+
 ## PHASE8-IMPL-007-T005 Entity/Quote/Event Mocked Normalization Review and Hardening
 
 - Date: 2026-06-20
