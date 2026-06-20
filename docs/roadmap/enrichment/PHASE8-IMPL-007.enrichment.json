@@ -222,15 +222,16 @@
       "id": "PHASE8-IMPL-007-T004",
       "title": "Manifest and raw artifact bundle validators",
       "type": "runtime_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-007-T003"
       ],
       "scope": [
-        "Implement only the first part of backend/story_knowledge/booknlp_adapter_contract.py.",
-        "Target manifest and raw artifact bundle validation tests.",
+        "Created backend/story_knowledge/booknlp_adapter_contract.py.",
+        "Implemented manifest and raw artifact bundle validation tests.",
         "Keep functions pure, deterministic, mocked-fixture based, standard-library only.",
-        "Create all six public API symbols immediately if needed for import/collection.",
+        "Created all six public API symbols.",
+        "Added minimal in-memory mocked draft shaping because the current contract tests assert draft behavior in T004.",
         "Treat booknlp_events as app-derived from .tokens.event, not as a real raw output file.",
         "Support raw-like and/or normalized mocked fixture compatibility required by tests.",
         "Keep source-level forbidden terms out of production module.",
@@ -241,18 +242,32 @@
       "artifacts": [
         "backend/story_knowledge/booknlp_adapter_contract.py"
       ],
-      "result": "deferred_to_t004"
+      "api_symbols": [
+        "validate_booknlp_run_manifest",
+        "validate_booknlp_raw_artifact_bundle",
+        "normalize_booknlp_entity_mentions",
+        "normalize_booknlp_quotes",
+        "normalize_booknlp_events",
+        "build_booknlp_candidate_drafts"
+      ],
+      "validation_results": {
+        "booknlp_adapter_contract_pytest": "PASS: 148 passed"
+      },
+      "fixture_correction": "none",
+      "runtime_tool_package_changes": "none",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-007-T005",
       "title": "Entity/quote/event mocked normalization helpers",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-007-T004"
       ],
       "scope": [
-        "Implement mocked normalization helpers: normalize_booknlp_entity_mentions, normalize_booknlp_quotes, normalize_booknlp_events.",
+        "Harden mocked normalization helpers: normalize_booknlp_entity_mentions, normalize_booknlp_quotes, normalize_booknlp_events.",
+        "T004 supplied minimal in-memory behavior required by current contract tests.",
         "Produce candidate draft shapes only.",
         "No persistence writes.",
         "No candidate JSON writes.",
@@ -260,7 +275,7 @@
         "No generated prose.",
         "No real BookNLP execution."
       ],
-      "result": "deferred_to_t005"
+      "result": "ready_after_t004"
     },
     {
       "id": "PHASE8-IMPL-007-T006",
@@ -304,10 +319,10 @@
     "PHASE8-IMPL-007-T001 is complete.",
     "PHASE8-IMPL-007-T002 is complete with source inventory and implementation refresh decision artifacts.",
     "PHASE8-IMPL-007-T003 is complete with implementation decision artifact.",
-    "PHASE8-IMPL-007-T004 is ready/active after T003.",
-    "PHASE8-IMPL-007-T005 through PHASE8-IMPL-007-T007 are registered as planned.",
+    "PHASE8-IMPL-007-T004 is complete with pure mocked adapter-contract module and validators.",
+    "PHASE8-IMPL-007-T005 is ready/active and PHASE8-IMPL-007-T006 through PHASE8-IMPL-007-T007 are registered as planned.",
     "PHASE8-IMPL-006 remains complete through PHASE8-IMPL-006-T007.",
-    "tests/test_writer_assistant_core_booknlp_adapter_contract.py is the primary future-implementation target test file and remains expected-red until later children implement backend/story_knowledge/booknlp_adapter_contract.py.",
+    "tests/test_writer_assistant_core_booknlp_adapter_contract.py is the primary implementation target test file and passes after T004.",
     "T001 confirms the four .external_sources/ clones exist locally.",
     "T001 confirms .external_sources/ is protected from accidental commit via .git/info/exclude.",
     "T001 does not stage, commit, or push anything.",

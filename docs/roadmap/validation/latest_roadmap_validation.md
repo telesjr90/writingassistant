@@ -1,5 +1,66 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-007-T004 Manifest and Raw Artifact Bundle Validators
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: first code implementation child for `PHASE8-IMPL-007`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Completed child recorded: `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators.
+- Active/next child: `PHASE8-IMPL-007-T005` - Entity/quote/event mocked normalization helpers.
+- Next child after T005: `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening.
+- Created:
+  - `backend/story_knowledge/booknlp_adapter_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Module/API summary:
+  - Created pure mocked standard-library-only `backend/story_knowledge/booknlp_adapter_contract.py`.
+  - Exposed `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts`.
+  - Implemented manifest validation and raw artifact bundle validation.
+  - Added minimal in-memory mocked draft shaping because the current contract tests assert draft behavior during T004.
+- Validator behavior:
+  - Run manifests validate required fields, allowed status values, raw import policy flags, source documents, raw output references, snapshot/artifact hashes, warnings/errors, parameters, and environment.
+  - Raw artifact bundles validate nested manifest, source map, raw output references, collection shapes, token/entity/quote/book/supersense/event records, offsets, confidence values, and source locators.
+  - Unknown fields, unsafe shortcut fields, invalid offsets, invalid confidence, missing locators, missing hashes, and mutation/prose fields fail closed with `ValueError`.
+- Raw-shape / normalized-shape handling:
+  - Validators accept current app-normalized mocked fixture fields and selected T002-confirmed raw-like aliases for tokens, entities, quotes, supersense, and token-derived events.
+  - Candidate drafts use app-owned source locator, evidence, provenance, confidence, raw output reference, and normalization status fields only.
+- Event derivation handling:
+  - `booknlp_events` remains app-owned derived support from `.tokens.event`, not a real separate BookNLP output file.
+  - Events remain candidate support only; no timeline canon or causal-chain truth is created.
+- Offset handling:
+  - Raw byte offsets are validated when present and preserved as support.
+  - Candidate drafts require app-owned source locators/evidence; full byte-to-character source snapshot matching remains deferred.
+- Guardrails:
+  - `.book` `g` remains raw aggregate metadata only and is not converted into identity claims.
+  - Coreference clusters, character IDs, and quote attribution remain extraction signals only.
+  - Ambiguous or unsupported records return rejected/insufficient in-memory drafts where the contract expects fail-closed normalization behavior.
+  - No canon/candidate persistence, no promotion, and no memory/canon mutation were added.
+- Test fixture correction: none.
+- Validator results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 263 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Plain `git diff --check`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T004 policy.
+  - `/usr/bin/git diff --check -- backend/story_knowledge/booknlp_adapter_contract.py tests/test_writer_assistant_core_booknlp_adapter_contract.py docs/roadmap/tasks/PHASE8-IMPL-007.md docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json docs/roadmap/implementation_status.md docs/roadmap/roadmap_index.yaml docs/roadmap/task_backlog.md docs/roadmap/phase_map.md docs/master_plan.md docs/roadmap/validation/latest_roadmap_validation.md docs/roadmap/decision_log.md docs/roadmap/risk_register.md docs/roadmap/open_questions.md`: PASS.
+- Source-cache safety result:
+  - Plain `git status --short -- .external_sources`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T004 policy.
+  - Plain `git status --short --ignored -- .external_sources | head -50`: BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per T004 policy.
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources`: `!! .external_sources/`.
+- Boundary summary: pure mocked adapter-contract implementation only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools installed, external repos cloned/fetched/pulled, external repo code executed/imported/vendored, demos, model calls, runtime extraction, BookNLP/spaCy install or execution, backend routes, frontend files, package/dependency files, project runtime files, extraction/import/export implementation, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-007-T003 BookNLP Adapter Implementation Decision After Source Inventory
 
 - Date: 2026-06-20

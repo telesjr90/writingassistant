@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-007",
     "current_parent_task_title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
-    "frontier_note": "PHASE8-IMPL-007 is active as the seventh Writer Assistant Core parent after completed PHASE8-IMPL-006. PHASE8-IMPL-007-T001 published the parent, inventory, enrichment JSON, and roadmap/status updates and confirmed that .external_sources/booknlp, .external_sources/dramatica-flow, .external_sources/narrative-context-protocol, and .external_sources/subtxt-docs exist locally and are protected from commit via .git/info/exclude. PHASE8-IMPL-007-T002 completed read-only official source inventory using the already-cloned .external_sources/ repositories, created docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md and docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md, and verified repo SHAs for BookNLP, dramatica-flow, Narrative Context Protocol, and Subtxt docs. PHASE8-IMPL-007-T003 completed the docs-only implementation decision at docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md. Active child is PHASE8-IMPL-007-T004, the first code implementation child for manifest and raw artifact bundle validators. PHASE8-IMPL-007-T005 through PHASE8-IMPL-007-T007 are registered as planned. The parent implements pure mocked backend/story_knowledge/booknlp_adapter_contract.py so tests/test_writer_assistant_core_booknlp_adapter_contract.py turns green; no BookNLP/spaCy install or execution, no real extraction, no routes, no UI, no package changes, no generated prose, no apply-promotion, no memory/canon mutation."
+    "frontier_note": "PHASE8-IMPL-007 is active as the seventh Writer Assistant Core parent after completed PHASE8-IMPL-006. PHASE8-IMPL-007-T001 published the parent, inventory, enrichment JSON, and roadmap/status updates and confirmed that .external_sources/booknlp, .external_sources/dramatica-flow, .external_sources/narrative-context-protocol, and .external_sources/subtxt-docs exist locally and are protected from commit via .git/info/exclude. PHASE8-IMPL-007-T002 completed read-only official source inventory using the already-cloned .external_sources/ repositories, created docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md and docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md, and verified repo SHAs for BookNLP, dramatica-flow, Narrative Context Protocol, and Subtxt docs. PHASE8-IMPL-007-T003 completed the docs-only implementation decision at docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md. PHASE8-IMPL-007-T004 created pure mocked backend/story_knowledge/booknlp_adapter_contract.py, exposed all six public APIs, implemented manifest and raw artifact bundle validators, and supplied minimal in-memory draft shaping required by current contract tests. Active child is PHASE8-IMPL-007-T005. PHASE8-IMPL-007-T006 through PHASE8-IMPL-007-T007 are registered as planned. No BookNLP/spaCy install or execution, no real extraction, no routes, no UI, no package changes, no generated prose, no apply-promotion, no memory/canon mutation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1400,7 +1400,7 @@
       "id": "PHASE8-IMPL-007-T004",
       "title": "Manifest and raw artifact bundle validators",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-007",
       "depends_on": [
         "PHASE8-IMPL-007-T003"
@@ -1417,13 +1417,13 @@
       "artifacts": [
         "backend/story_knowledge/booknlp_adapter_contract.py"
       ],
-      "result": "deferred_to_t004"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-007-T005",
       "title": "Entity/quote/event mocked normalization helpers",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-007",
       "depends_on": [
         "PHASE8-IMPL-007-T004"
