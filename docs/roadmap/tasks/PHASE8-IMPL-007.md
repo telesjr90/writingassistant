@@ -191,7 +191,7 @@ Include:
 
 ## Child-Task Plan
 
-1. `PHASE8-IMPL-007-T001` - Publish BookNLP adapter contract implementation parent and source-inventory-aware child-task plan. Status: in progress at start of T001; complete on T001 success.
+1. `PHASE8-IMPL-007-T001` - Publish BookNLP adapter contract implementation parent and source-inventory-aware child-task plan. Status: complete.
 2. `PHASE8-IMPL-007-T002` - Official repo retrieval/source inventory and implementation contract refresh. Status: complete.
 3. `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory. Status: complete.
 4. `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators. Status: complete.
@@ -328,28 +328,26 @@ Include:
 
 ### `PHASE8-IMPL-007-T007` - Roadmap/status closeout
 
-- Status: ready/active after T006.
-- Close the parent.
-- Summarize source inventory, module, helpers, and tests.
-- Record that the adapter contract implementation is mocked only.
-- Recommend the next parent:
-  - real BookNLP schema parser/spike, or
-  - raw output storage helpers, or
-  - extraction orchestrator contract, or
-  - candidate review UI,
-  depending on validation results.
+- Status: complete as of 2026-06-20.
+- Closed the parent as `PHASE8-IMPL-007 COMPLETE`.
+- Summarized source inventory, implementation decisions, helper module, tests, and final mocked runtime/test behavior.
+- Recorded that the adapter contract implementation is pure mocked in-memory dictionary behavior only.
+- Recommended next parent:
+  - `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
 - No runtime expansion.
 
 ## Acceptance Criteria
 
-- `PHASE8-IMPL-007` is published and active in roadmap docs.
+- `PHASE8-IMPL-007` is complete in roadmap docs.
 - `PHASE8-IMPL-007-T001` is complete on success.
 - `PHASE8-IMPL-007-T002` is complete with source inventory and implementation refresh decision artifacts.
 - `PHASE8-IMPL-007-T003` is complete with implementation decision artifact.
-- `PHASE8-IMPL-007-T004` is ready/active after T003.
-- `PHASE8-IMPL-007-T005` through `PHASE8-IMPL-007-T007` are registered as planned.
+- `PHASE8-IMPL-007-T004` is complete with pure mocked adapter-contract module and validators.
+- `PHASE8-IMPL-007-T005` is complete as validation-only mocked normalization review.
+- `PHASE8-IMPL-007-T006` is complete as validation-only candidate draft builder and boundary review.
+- `PHASE8-IMPL-007-T007` is complete as roadmap/status closeout.
 - `PHASE8-IMPL-006` remains complete through `PHASE8-IMPL-006-T007`.
-- `tests/test_writer_assistant_core_booknlp_adapter_contract.py` is the primary future-implementation target test file and remains expected-red until later children implement `backend/story_knowledge/booknlp_adapter_contract.py`.
+- `tests/test_writer_assistant_core_booknlp_adapter_contract.py` is the primary implementation target test file and passes.
 - T001 confirms the four `.external_sources/` clones exist locally.
 - T001 confirms `.external_sources/` is protected from accidental commit (via `.git/info/exclude`).
 - T001 does not stage, commit, or push anything.
@@ -395,28 +393,55 @@ For later children (recorded here for context, executed in their own tasks):
 
 ## Current Status
 
-`PHASE8-IMPL-007` is active. Last completed parent: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy. Last completed child under this parent: `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening. Active child: `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Next child: none under `PHASE8-IMPL-007`. Prior completed parents: `PHASE8-IMPL-001` through `PHASE8-IMPL-006`. Recommended next parent after `PHASE8-IMPL-007` closes will be selected by T007.
+`PHASE8-IMPL-007` is complete. Last completed parent: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation. Last completed child under this parent: `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Active parent/child: pending next parent publication. Next child: none under `PHASE8-IMPL-007`. Prior completed parents: `PHASE8-IMPL-001` through `PHASE8-IMPL-006`. Recommended next parent: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
 
 T003 is complete as docs/decision only. It accepted the exact implementation split and handoff for T004-T006 without implementing the BookNLP adapter, changing tests, changing runtime code, changing package/dependency files, running tools, calling models, generating prose, applying promotion, or mutating memory/canon.
 
-T004 is complete. T004 created the pure standard-library-only mocked adapter-contract module, implemented manifest and raw artifact bundle validators, exposed all public APIs, and added minimal in-memory draft shaping required by the current contract tests. The targeted BookNLP adapter contract test now passes. T005 is complete as validation-only after reviewing the early mocked entity/quote/event normalization behavior and finding no repair gap. T006 is complete as validation-only after reviewing the candidate draft builder, fail-closed behavior, and boundary hardening scope and finding no runtime or test repair gap. T007 is ready/active for roadmap/status closeout.
+T004 is complete. T004 created the pure standard-library-only mocked adapter-contract module, implemented manifest and raw artifact bundle validators, exposed all public APIs, and added minimal in-memory draft shaping required by the current contract tests. The targeted BookNLP adapter contract test now passes. T005 is complete as validation-only after reviewing the early mocked entity/quote/event normalization behavior and finding no repair gap. T006 is complete as validation-only after reviewing the candidate draft builder, fail-closed behavior, and boundary hardening scope and finding no runtime or test repair gap. T007 is complete as docs/status closeout only.
 
-## Final Parent Goal (Deferred to T007)
+## Final Parent Summary
 
-After T007 closes the parent, the final artifact is a pure mocked BookNLP adapter contract implementation that:
+`PHASE8-IMPL-007 COMPLETE`.
+
+The parent delivered a pure mocked BookNLP adapter contract implementation and normalization foundation. All runtime behavior remains bounded to standard-library-only in-memory mocked dictionaries. No real BookNLP or spaCy package was installed, imported, or run; no runtime extraction exists.
+
+Completed child summary:
+
+- T001 published the parent and source-inventory-aware plan.
+- T002 completed read-only official source inventory and implementation refresh decision using `.external_sources/`.
+- T003 accepted the BookNLP adapter implementation decision after source inventory.
+- T004 created `backend/story_knowledge/booknlp_adapter_contract.py`, exposed all six APIs, and implemented validators plus minimal draft behavior sufficient for current contract tests.
+- T005 reviewed mocked entity/quote/event normalization as validation-only.
+- T006 reviewed candidate draft builder, fail-closed behavior, and boundary hardening as validation-only.
+- T007 closes the parent.
+
+Final artifacts:
+
+- `docs/roadmap/inventory/PHASE8-IMPL-007.md`
+- `docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md`
+- `docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md`
+- `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`
+- `backend/story_knowledge/booknlp_adapter_contract.py`
+- `tests/test_writer_assistant_core_booknlp_adapter_contract.py`
+
+Final runtime/test behavior now available:
 
 - makes `tests/test_writer_assistant_core_booknlp_adapter_contract.py` pass
 - provides `validate_booknlp_run_manifest`, `validate_booknlp_raw_artifact_bundle`, `normalize_booknlp_entity_mentions`, `normalize_booknlp_quotes`, `normalize_booknlp_events`, and `build_booknlp_candidate_drafts` as pure standard-library-only functions
+- validates pure mocked BookNLP-like run manifests
+- validates pure mocked raw artifact bundles
+- normalizes mocked entity, quote, and event records into in-memory candidate draft shapes
+- builds pure mocked candidate drafts from in-memory dictionaries
 - integrates with existing pure source-map and evidence validation helpers
+- preserves source/evidence/provenance/raw-ref integration
 - fails closed on invalid manifests, invalid bundles, missing source locators, invalid offsets, missing hashes, mutation/prose fields, unsupported candidate types, invalid confidence, and ambiguous speaker attribution
+- creates no persisted candidates, raw-output writes, index writes, memory/canon mutation, generated prose, rewrite, continuation, or apply-promotion behavior
 - preserves no-prose, no-canon-mutation, no-auto-promotion, and no-runtime-extraction boundaries
 
-The final recommended next parent after `PHASE8-IMPL-007` will be one of:
+Next parent recommendation:
 
-- real BookNLP schema parser/spike (only after explicit owner approval)
-- raw output storage helpers
-- extraction orchestrator contract
-- candidate review UI
+- `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Recommended scope: decide and test project-local storage for raw extraction artifacts under `writer_assistant/extractions/`; define manifest/read/write/list helpers for mocked raw artifacts only; optionally parse mocked/in-memory BookNLP-like TSV/JSON fixture text; preserve raw artifacts as non-canon and non-candidate; keep candidate creation and real extraction deferred; no real BookNLP install/run; no routes/UI/package changes unless separately authorized.
 
 ## Deferred Beyond PHASE8-IMPL-007
 

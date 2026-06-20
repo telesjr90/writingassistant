@@ -1,5 +1,76 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-007-T007 Roadmap/Status Closeout
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: docs/status closeout only for `PHASE8-IMPL-007-T007`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Parent closeout: `PHASE8-IMPL-007 COMPLETE`.
+- Completed child recorded: `PHASE8-IMPL-007-T007` - Roadmap/status closeout.
+- Active/next child: none under `PHASE8-IMPL-007`; active parent/child is pending next parent publication.
+- Next parent recommendation: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract, recommended only and not active.
+- Files changed:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Parent closeout summary:
+  - T001 published the parent and source-inventory-aware plan.
+  - T002 completed read-only official source inventory and implementation refresh decision.
+  - T003 accepted the BookNLP adapter implementation decision after source inventory.
+  - T004 created `backend/story_knowledge/booknlp_adapter_contract.py`, exposed all six APIs, and implemented validators plus minimal in-memory draft behavior sufficient for current contract tests.
+  - T005 reviewed mocked entity/quote/event normalization as validation-only.
+  - T006 reviewed candidate draft builder, fail-closed behavior, and boundary hardening as validation-only.
+  - T007 closes the parent.
+- Final runtime/test behavior now available:
+  - `validate_booknlp_run_manifest`
+  - `validate_booknlp_raw_artifact_bundle`
+  - `normalize_booknlp_entity_mentions`
+  - `normalize_booknlp_quotes`
+  - `normalize_booknlp_events`
+  - `build_booknlp_candidate_drafts`
+  - pure mocked in-memory BookNLP-like manifest validation
+  - pure mocked raw artifact bundle validation
+  - pure mocked entity/quote/event draft normalization
+  - pure mocked candidate draft builder
+  - fail-closed behavior for invalid, unsupported, ambiguous, or insufficiently evidenced inputs
+  - source/evidence/provenance/raw-ref integration
+- Deferred work:
+  - real BookNLP install/run/import
+  - real spaCy install/run/import
+  - real BookNLP output file parsing
+  - real byte-to-character source snapshot matching
+  - raw output storage helpers
+  - extraction orchestrator
+  - backend routes
+  - frontend review UI
+  - apply-promotion
+  - memory/canon mutation
+  - NCP/Subtxt/dramatica-flow implementation
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `!! .external_sources/`.
+  - `.external_sources/` is not staged and remains ignored/protected from commit.
+- Validator results:
+  - Pre-edit `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - Pre-edit `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q`: PASS, 263 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Narrow `/usr/bin/git diff --check -- ...`: PASS.
+- Boundary summary: docs/status closeout only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools installed, external repos cloned/fetched/pulled, external repo code executed/imported/vendored, demos, model calls, runtime extraction, real BookNLP/spaCy install or execution, backend routes, frontend files, package/dependency files, project runtime files, extraction/import/export implementation, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
+
 ## PHASE8-IMPL-007-T006 Candidate Draft Builder, Fail-Closed Behavior, and Boundary Hardening
 
 - Date: 2026-06-20

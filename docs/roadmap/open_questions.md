@@ -151,9 +151,9 @@ Deferred PHASE8-IMPL-006 follow-ups:
 7. ~~Should `PHASE8-IMPL-006-T007` close the parent with a recommendation for BookNLP adapter implementation, simple local baseline extraction, or another tests-first foundation parent?~~ **Resolved in T007:** recommend a pure mocked BookNLP adapter contract implementation parent, not a runtime extraction parent.
 8. ~~Exact `PHASE8-IMPL-007` child sequence remains deferred.~~ **Resolved in T003:** `PHASE8-IMPL-007-T004` creates all public API symbols and implements manifest/raw artifact bundle validators first; T005 implements mocked normalizers; T006 implements or hardens candidate draft builder and boundary checks; T007 closes the parent.
 9. ~~What fixture correction, raw-vs-normalized naming, event derivation, byte-offset handling, and source-level forbidden-term policy should T004 use?~~ **Resolved in T003:** see `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`. Raw BookNLP-like shapes and adapter-normalized shapes stay explicit; minimal fixture corrections are authorized only if needed; `booknlp_events` is app-derived from `.tokens.event`; byte offsets are raw support; app source locators/evidence are required for candidate drafts; production source must avoid forbidden runtime/tool/prose/mutation terms.
-10. When/if real BookNLP install is authorized remains deferred; no dependency is approved by T003.
-11. Real BookNLP schema parsing policy remains deferred; T002 only inspected local official example outputs and docs read-only, and T003 keeps real parsing out of PHASE8-IMPL-007.
-12. Raw output storage helper timing remains deferred.
+10. When/if real BookNLP install is authorized remains deferred; no dependency is approved by T007.
+11. Real BookNLP schema parsing policy remains deferred; T002 only inspected local official example outputs and docs read-only, and T007 keeps real parsing out of PHASE8-IMPL-007.
+12. ~~Raw output storage helper timing remains deferred.~~ **Recommended next:** `PHASE8-IMPL-008 - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract`, recommended only and not active until separately published.
 13. Source snapshot text matching helper timing remains deferred.
 14. Extraction route/UI timing remains deferred.
 15. Should object/item candidates be in the first implementation slice?
@@ -162,6 +162,7 @@ Deferred PHASE8-IMPL-006 follow-ups:
 17. When should dramatica-flow-inspired causal/information-boundary rubrics be implemented?
 18. spaCy package approval/install timing remains deferred; no dependency is approved by T007.
 19. Extraction trigger policy remains deferred; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
+20. PHASE8-IMPL-007 is complete; its mocked adapter contract does not authorize real BookNLP/spaCy runtime, runtime extraction, storage writes, routes, UI, package changes, generated prose, apply-promotion, or memory/canon mutation.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

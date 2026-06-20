@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-007",
     "current_parent_task_title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
-    "frontier_note": "PHASE8-IMPL-007 is active as the seventh Writer Assistant Core parent after completed PHASE8-IMPL-006. PHASE8-IMPL-007-T001 published the parent, inventory, enrichment JSON, and roadmap/status updates and confirmed that .external_sources/booknlp, .external_sources/dramatica-flow, .external_sources/narrative-context-protocol, and .external_sources/subtxt-docs exist locally and are protected from commit via .git/info/exclude. PHASE8-IMPL-007-T002 completed read-only official source inventory using the already-cloned .external_sources/ repositories, created docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md and docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md, and verified repo SHAs for BookNLP, dramatica-flow, Narrative Context Protocol, and Subtxt docs. PHASE8-IMPL-007-T003 completed the docs-only implementation decision at docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md. PHASE8-IMPL-007-T004 created pure mocked backend/story_knowledge/booknlp_adapter_contract.py, exposed all six public APIs, implemented manifest and raw artifact bundle validators, and supplied minimal in-memory draft shaping required by current contract tests. PHASE8-IMPL-007-T005 completed as validation-only after reviewing mocked entity/quote/event normalization and confirming no repair gap. PHASE8-IMPL-007-T006 completed as validation-only after reviewing the candidate draft builder, fail-closed behavior, and boundary hardening scope and confirming no runtime/test repair gap. Active child is PHASE8-IMPL-007-T007 for roadmap/status closeout. No BookNLP/spaCy install or execution, no real extraction, no routes, no UI, no package changes, no generated prose, no apply-promotion, no memory/canon mutation."
+    "frontier_note": "PHASE8-IMPL-007 is complete as the seventh Writer Assistant Core parent. PHASE8-IMPL-007 delivered the read-only .external_sources/ official source inventory, implementation refresh decision, implementation decision, pure mocked standard-library-only backend/story_knowledge/booknlp_adapter_contract.py module, all six public APIs, manifest and raw artifact bundle validators, mocked entity/quote/event normalization, candidate draft builder, fail-closed behavior, and source/evidence/provenance/raw-ref integration. All runtime behavior remains bounded to in-memory mocked dictionaries. No real BookNLP/spaCy install or execution, no runtime extraction, no routes, no UI, no package changes, no generated prose, no apply-promotion, and no memory/canon mutation exists. Last completed child is PHASE8-IMPL-007-T007. Active parent/child is pending next parent publication. Recommended next parent is PHASE8-IMPL-008 - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract; it is recommended only and not active."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1295,7 +1295,7 @@
       "id": "PHASE8-IMPL-007",
       "title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-006"
@@ -1325,7 +1325,8 @@
       "task_record": "docs/roadmap/tasks/PHASE8-IMPL-007.md",
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-007.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json",
-      "context_pack": null
+      "context_pack": null,
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-007-T001",
@@ -1463,7 +1464,7 @@
       "id": "PHASE8-IMPL-007-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-007",
       "depends_on": [
         "PHASE8-IMPL-007-T006"
@@ -1478,7 +1479,7 @@
         "no_runtime_extraction",
         "docs_only"
       ],
-      "result": "deferred_to_t007"
+      "result": "complete"
     },
     {
       "id": "PHASE7-IMPL-004-T001",
