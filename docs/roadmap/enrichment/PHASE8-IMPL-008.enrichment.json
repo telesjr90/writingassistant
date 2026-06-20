@@ -1,0 +1,556 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-008",
+  "title": "Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-007"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "evidence_first",
+    "booknlp_ready",
+    "mocked_fixtures_only",
+    "pure_validation",
+    "pure_path_helpers",
+    "storage_contract_first",
+    "tests_first",
+    "fixture_parser_only",
+    "raw_artifacts_non_canon",
+    "raw_artifacts_non_candidate",
+    "no_tool_execution",
+    "no_package_changes",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "no_routes",
+    "no_frontend",
+    "no_runtime_extraction",
+    "docs_only_t001",
+    "read_only_external_sources_only"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-008.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-008.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-007.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json",
+    "prior_official_source_inventory": "docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md",
+    "prior_implementation_refresh_decision": "docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md",
+    "prior_booknlp_adapter_decision": "docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md",
+    "prior_evidence_first_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md",
+    "prior_evidence_source_map_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
+    "prior_booknlp_ready_raw_output_decision": "docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md",
+    "foundation_module": "backend/story_knowledge/booknlp_adapter_contract.py",
+    "foundation_test_file": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+    "foundation_helpers": [
+      "backend/story_knowledge/source_map.py",
+      "backend/story_knowledge/evidence.py",
+      "backend/story_knowledge/candidate_schema.py",
+      "backend/story_knowledge/candidate_record.py",
+      "backend/story_knowledge/candidate_storage.py",
+      "backend/story_knowledge/candidate_persistence.py",
+      "backend/story_knowledge/candidate_index.py"
+    ],
+    "foundation_helper_tests": [
+      "tests/test_writer_assistant_core_source_evidence_contract.py",
+      "tests/test_writer_assistant_core_booknlp_adapter_contract.py"
+    ],
+    "external_source_cache_paths": [
+      ".external_sources/booknlp",
+      ".external_sources/dramatica-flow",
+      ".external_sources/narrative-context-protocol",
+      ".external_sources/subtxt-docs"
+    ],
+    "future_storage_module": "backend/story_knowledge/raw_extraction_storage.py",
+    "future_parser_module": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "future_storage_test_file": "tests/test_writer_assistant_core_raw_extraction_storage_contract.py",
+    "future_parser_test_file": "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py"
+  },
+  "goal": "Publish the next safe Writer Assistant Core parent after the completed PHASE8-IMPL-007 mocked BookNLP adapter contract implementation. PHASE8-IMPL-008 prepares the project-local raw extraction artifact storage boundary and the mocked BookNLP-like fixture parser contract before any real extractor runtime exists. It defines and tests a storage root, run-folder shape, raw artifact kinds, and a fixture parser that turns in-memory TSV/JSON fixture text into raw artifact bundles acceptable to the existing validate_booknlp_raw_artifact_bundle API, while preserving non-canon, non-candidate, no-runtime-extraction, no-route, no-UI, no-package-change, no-canon-mutation, no-apply-promotion, and no-generated-prose boundaries. Real BookNLP install/run remains deferred.",
+  "why_now": "PHASE8-IMPL-007 delivered the pure mocked BookNLP adapter contract implementation and normalization foundation with six public APIs, validators, mocked normalizers, candidate draft builder, fail-closed behavior, and source/evidence/provenance/raw-ref integration. The mocked adapter consumes raw artifact bundles but does not own a project-local storage boundary or a fixture parser. Before any real BookNLP install, the app needs a safe raw extraction artifact storage layout and a mocked fixture parser contract that keeps BookNLP/spaCy deferred and keeps raw artifacts and parsed fixture output out of canon, memory/canon, OMI candidates, and apply-promotion. This is the right next safe parent before any real extractor runtime is built.",
+  "evidence_inputs": [
+    "docs/feasibility.md",
+    "docs/booknlp.md",
+    "docs/dramaticaflow.md",
+    "docs/subtxt.md",
+    "docs/ncp.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-first-booknlp-ready-scope-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-006-evidence-source-map-contract-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-006-booknlp-ready-raw-output-adapter-contract-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-007.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/phase_map.md",
+    "docs/master_plan.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "backend/story_knowledge/booknlp_adapter_contract.py",
+    "backend/story_knowledge/source_map.py",
+    "backend/story_knowledge/evidence.py",
+    "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+    "tests/test_writer_assistant_core_source_evidence_contract.py"
+  ],
+  "source_inventory_inputs": {
+    "policy": "Read-only inspection of already-cloned official source repositories under .external_sources/. T002/T005 decisions may reference the T002 source inventory and the T003 implementation decision but must not clone, fetch, pull, install, run, import, vendor, or execute any external repository code.",
+    "local_clone_paths": [
+      ".external_sources/booknlp",
+      ".external_sources/dramatica-flow",
+      ".external_sources/narrative-context-protocol",
+      ".external_sources/subtxt-docs"
+    ],
+    "must_not_clone_fetch_or_pull": true,
+    "must_not_install_or_run": true,
+    "must_not_import_or_vendor": true,
+    "must_not_copy_into_app_runtime": true,
+    "must_not_be_committed": true,
+    "must_not_be_staged": true,
+    "protection_mechanism": ".git/info/exclude",
+    "t001_only_confirms_paths_exist_and_ignore_status": true,
+    "detailed_review_belongs_to_t002_or_t005": true,
+    "t002_priority": [
+      "Project-local raw extraction artifact storage root and run-folder shape",
+      "Tool identifier and run identifier format",
+      "Manifest shape and raw output reference policy",
+      "Forbidden locations and side-effect boundaries"
+    ],
+    "t005_priority": [
+      "Mocked BookNLP-like fixture parser contract",
+      "In-memory TSV/JSON fixture text shapes based on T002/T003/T007 source inventory",
+      "Parser output handoff to validate_booknlp_raw_artifact_bundle",
+      "Whether parser implementation is deferred to PHASE8-IMPL-009"
+    ]
+  },
+  "scope": {
+    "include": [
+      "Documentation decision for the project-local raw extraction artifact storage root and run-folder shape (T002).",
+      "Documentation decision for the mocked BookNLP-like fixture parser contract, in-memory TSV/JSON fixture text shapes, and parser output handoff to validate_booknlp_raw_artifact_bundle (T005).",
+      "Tests-only contract coverage for the future pure storage path and manifest helper APIs, exercised under tmp_path only (T003).",
+      "Tests-only contract coverage for the future pure fixture parser API, exercised with in-memory fixture text and in-memory raw artifact bundles only (T006).",
+      "Optional pure path and manifest validation helpers (T004) only if explicitly authorized by T003 contract tests and T002 decision.",
+      "Optional pure fixture parser helpers only if T005 explicitly widens T006 into tests-first-plus-implementation; otherwise parser implementation is deferred to PHASE8-IMPL-009.",
+      "Validation of storage and parser contracts against the existing validate_booknlp_raw_artifact_bundle API.",
+      "Fail-closed contract coverage for unsafe project identifiers, unsafe tool identifiers, unsafe run identifiers, path traversal, forbidden raw paths, missing manifests, invalid manifest fields, missing artifacts, and forbidden fields.",
+      "Explicit non-canon, non-candidate guardrails so raw extraction artifacts and parsed fixture output are never approved truth, never OMI candidate records by default, and never trigger apply-promotion.",
+      "Source/evidence/provenance/raw-ref integration so parsed fixture bundles carry source-map, evidence, raw output references, and normalization status where the existing booknlp_adapter_contract API expects them.",
+      "Preservation of the existing mocked BookNLP adapter boundary and the existing source/evidence and candidate contract regressions.",
+      "Roadmap/status updates and closeout documentation (T007)."
+    ],
+    "exclude": [
+      "Real BookNLP install.",
+      "Real BookNLP execution.",
+      "Real BookNLP output file parsing from files produced by a real extractor runtime.",
+      "spaCy install or execution.",
+      "Real extraction orchestrator that reads project scenes, calls any extractor, and persists candidate records.",
+      "Raw artifact writes into real project folders outside tests.",
+      "Candidate JSON persistence from parsed fixture output.",
+      "Backend extraction routes or extraction API endpoints.",
+      "Frontend extraction, review, or parse-preview UI.",
+      "Package or dependency changes.",
+      "Model calls, Ollama calls, dramatica-flow runtime, NCP runtime, or Subtxt runtime.",
+      "Generated prose, rewriting, continuation, imitation, polish, improvement, or expansion of owner-authored story prose.",
+      "Automatic Storyform truth, automatic Dramatica/Subtxt labels, automatic CIPS/dynamics/RS/IC truth, or automatic canon mutation.",
+      "Apply-promotion.",
+      "Memory/canon mutation.",
+      "Cloning, fetching, or pulling from any external remote.",
+      "Executing, importing, or vendoring external repository code from .external_sources/ into backend/ or any app runtime file.",
+      "Training data, JSONL records, dataset artifacts, or manifest changes.",
+      "Staging, committing, or pushing in T001.",
+      ".external_sources/ content commits.",
+      "Raw extraction artifact files written into real project runtime folders."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-008-T001",
+      "title": "Publish raw extraction artifact storage and BookNLP fixture parser contract parent",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-008"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Create parent task record, inventory, and enrichment JSON.",
+        "Mark PHASE8-IMPL-008 active in roadmap/status docs.",
+        "Mark T001 complete on success.",
+        "Mark T002 ready/active.",
+        "Register T003 through T007 as planned/draft.",
+        "Confirm backend/story_knowledge/booknlp_adapter_contract.py and tests/test_writer_assistant_core_booknlp_adapter_contract.py are unchanged.",
+        "Confirm .external_sources/ is ignored/protected from commit and no .external_sources/ content is staged.",
+        "No runtime code, no tests, no implementation, no raw artifact writes, no BookNLP/spaCy install/run/import.",
+        "No context tools, no external tools, no source/web retrieval."
+      ],
+      "files_created": [
+        "docs/roadmap/tasks/PHASE8-IMPL-008.md",
+        "docs/roadmap/inventory/PHASE8-IMPL-008.md",
+        "docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json"
+      ],
+      "files_updated": [
+        "docs/roadmap/roadmap_governance.md",
+        "docs/roadmap/roadmap_index.yaml",
+        "docs/roadmap/implementation_status.md",
+        "docs/roadmap/task_backlog.md",
+        "docs/roadmap/phase_map.md",
+        "docs/master_plan.md",
+        "docs/roadmap/validation/latest_roadmap_validation.md"
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T002",
+      "title": "Raw extraction artifact storage contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-008-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Use the completed PHASE8-IMPL-007 adapter contract, source/evidence contract, and source inventory as foundation.",
+        "Decide project-local raw extraction artifact storage root: projects/{project_id}/writer_assistant/extractions/.",
+        "Decide run-folder shape: projects/{project_id}/writer_assistant/extractions/{tool_name}/{run_id}/.",
+        "Decide that the first tool-specific child folder is booknlp for BookNLP-like outputs.",
+        "Decide run identifier format, tool identifier format, and manifest.json shape for raw extraction artifacts.",
+        "Decide how the manifest and raw output references integrate with the existing source-map and evidence helpers.",
+        "Decide whether T003 is tests-only.",
+        "Decide forbidden locations (outside writer_assistant/extractions/, outside the project tree, absolute paths, path traversal).",
+        "Decide forbidden side effects (no project file mutation, no memory/canon mutation, no candidate persistence from raw artifacts).",
+        "Confirm raw extraction artifacts are non-canon and non-candidate.",
+        "Confirm real BookNLP install/run remains deferred.",
+        "No runtime code, no tests, no implementation, no raw artifact writes, no BookNLP/spaCy install/run/import."
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-storage-contract-decision.md",
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T003",
+      "title": "Extraction artifact storage path and manifest contract tests",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-008-T002"
+      ],
+      "scope": [
+        "Tests-only contract coverage.",
+        "Expected-red contract tests for the future pure storage path and manifest helper APIs.",
+        "Tests use tmp_path and in-memory dictionaries only; no real project folder writes, no real BookNLP/spaCy runtime.",
+        "Tests must cover safe and unsafe project identifiers, safe and unsafe tool identifiers, safe and unsafe run identifiers, path traversal rejection, manifest validation, forbidden fields, and forbidden locations.",
+        "Tests must confirm raw artifact storage helpers do not mutate project source files, do not write memory/canon, do not create candidate records, and do not promote anything.",
+        "No implementation; no real BookNLP/spaCy install/run; no raw artifacts in real project folders."
+      ],
+      "future_artifact": "tests/test_writer_assistant_core_raw_extraction_storage_contract.py",
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T004",
+      "title": "Minimal extraction artifact storage helpers",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-008-T003"
+      ],
+      "scope": [
+        "Implement only the pure storage path and manifest validation helpers explicitly authorized by T003 contract tests and T002 decision.",
+        "No raw file write/read/list unless T002/T003 explicitly authorize it; even then only tmp_path test directories are acceptable in this parent.",
+        "No real BookNLP runtime.",
+        "No routes, no UI, no package/dependency changes, no project runtime file creation.",
+        "No candidate JSON persistence from raw artifacts.",
+        "No memory/canon mutation.",
+        "No apply-promotion."
+      ],
+      "future_module": "backend/story_knowledge/raw_extraction_storage.py",
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T005",
+      "title": "BookNLP fixture parser contract decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-008-T004"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Use T002 verified source inventory facts about BookNLP real output fields and the existing PHASE8-IMPL-007 mocked adapter contract.",
+        "Decide the mocked BookNLP-like fixture parser API surface, in-memory TSV/JSON fixture text shapes, and how parser output feeds validate_booknlp_raw_artifact_bundle.",
+        "Confirm the parser is in-memory only; no filesystem read of real BookNLP output.",
+        "Confirm the parser never writes real project artifacts.",
+        "Confirm the parser output remains raw support data and is non-canon and non-candidate.",
+        "Confirm owner review remains mandatory before any future converter turns parsed fixture output into candidate records.",
+        "Decide whether T006 is tests-only and whether parser implementation is deferred to PHASE8-IMPL-009.",
+        "No runtime code, no tests, no implementation, no BookNLP/spaCy install/run/import."
+      ],
+      "artifact": "docs/roadmap/decisions/PHASE8-IMPL-008-booknlp-fixture-parser-contract-decision.md",
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T006",
+      "title": "BookNLP fixture parser contract tests",
+      "type": "validation_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-008-T005"
+      ],
+      "scope": [
+        "Tests-only contract coverage.",
+        "Expected-red contract tests for the future pure fixture parser API.",
+        "Tests use in-memory TSV/JSON fixture text and in-memory raw artifact bundles only.",
+        "No filesystem read of real BookNLP output; no project runtime file creation.",
+        "Tests must cover safe and unsafe fixture shapes, missing required fields, extra forbidden fields, byte-to-character offset boundary handling, and downstream compatibility with validate_booknlp_raw_artifact_bundle.",
+        "Tests must confirm parsed fixture output is in-memory and is not persisted, not promoted, and not converted into candidate records by the parser.",
+        "No implementation; no real BookNLP/spaCy install/run; no raw artifacts in real project folders."
+      ],
+      "future_artifact": "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py",
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "draft",
+      "depends_on": [
+        "PHASE8-IMPL-008-T006"
+      ],
+      "scope": [
+        "Docs/status closeout only.",
+        "Close PHASE8-IMPL-008 as complete.",
+        "Summarize T002/T005 decisions, T003/T006 tests-only contract coverage, and T004 minimal storage helpers.",
+        "Preserve no-runtime-extraction, no-real-BookNLP/spaCy, no-route, no-UI, no-package-change, no-canon-mutation, no-apply-promotion, no-generated-prose boundaries.",
+        "Recommend the next parent: PHASE8-IMPL-009 - BookNLP fixture parser helper implementation and raw artifact bundle integration.",
+        "No runtime expansion."
+      ],
+      "result": "pending"
+    }
+  ],
+  "acceptance_criteria": [
+    "PHASE8-IMPL-008 is registered as active in roadmap_index.yaml and implementation_status.md.",
+    "PHASE8-IMPL-008-T001 is complete on success of T001.",
+    "PHASE8-IMPL-008-T002 is registered as ready/active.",
+    "PHASE8-IMPL-008-T003 through PHASE8-IMPL-008-T007 are registered as planned/draft.",
+    "PHASE8-IMPL-007 remains complete through PHASE8-IMPL-007-T007 and the adapter contract module and test file are unchanged.",
+    "backend/story_knowledge/booknlp_adapter_contract.py remains the foundation; no edits in T001.",
+    "tests/test_writer_assistant_core_booknlp_adapter_contract.py remains the existing contract test file; no edits in T001.",
+    "No runtime extraction is added by T001.",
+    "No raw extraction artifact helpers, files, or paths are created by T001.",
+    "No BookNLP or spaCy install, run, or import is performed.",
+    "No backend routes, frontend UI, package/dependency files, or project runtime files are changed.",
+    "No apply-promotion, no memory/canon mutation, no generated prose behavior is added.",
+    "No training data, JSONL records, datasets, or manifests are created or changed.",
+    "No staging, commit, or push is performed.",
+    ".external_sources/ remains ignored/protected from commit; no .external_sources/ content is staged.",
+    "No context tools, no external tools, no source/web retrieval, no demos, no model calls, no Ollama calls, no BookNLP/spaCy execution are performed."
+  ],
+  "validation": {
+    "t001_commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs",
+      "narrow git diff --check on changed docs if local hooks allow without LeanCTX; otherwise record as blocked by local tooling policy",
+      "/usr/bin/git status --short -- .external_sources",
+      "/usr/bin/git status --short --ignored -- .external_sources | head -50"
+    ],
+    "t001_notes": "T001 is docs/status/planning only. T001 does not run pytest, app servers, frontend build, browser validation, model calls, Ollama, BookNLP, spaCy, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external repo clone/fetch/pull, package install, demos, or tool execution. T001 does not stage, commit, or push.",
+    "t002_commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs"
+    ],
+    "t002_notes": "T002 is docs/decision only.",
+    "t003_commands": [
+      "python3 -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q",
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed files",
+      "narrow git diff --check if local hooks allow without LeanCTX; otherwise record as blocked by local tooling policy"
+    ],
+    "t003_notes": "T003 is tests-only contract coverage. No implementation. No real BookNLP/spaCy runtime. No raw artifacts in real project folders.",
+    "t004_commands": [
+      "python3 -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q",
+      "python3 -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q",
+      "python3 -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q",
+      "python3 -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q",
+      "python3 -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q",
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed files",
+      "narrow git diff --check if local hooks allow without LeanCTX; otherwise record as blocked by local tooling policy"
+    ],
+    "t004_notes": "T004 is minimal pure storage path and manifest validation helpers. No raw file write/read/list unless T002/T003 explicitly authorize it. No real BookNLP/spaCy runtime. No project runtime file creation. No routes/UI/package changes.",
+    "t005_commands": [
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed docs"
+    ],
+    "t005_notes": "T005 is docs/decision only.",
+    "t006_commands": [
+      "python3 -m pytest tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py -q",
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed files",
+      "narrow git diff --check if local hooks allow without LeanCTX; otherwise record as blocked by local tooling policy"
+    ],
+    "t006_notes": "T006 is tests-only contract coverage. No implementation. No real BookNLP/spaCy runtime. No raw artifacts in real project folders.",
+    "t007_commands": [
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py -q",
+      ".venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q",
+      "python3 scripts/check_enrichment.py",
+      "python3 scripts/validate_roadmap.py",
+      "non-LeanCTX whitespace check on changed files",
+      "/usr/bin/git diff --check -- changed docs",
+      "/usr/bin/git status --short -- .external_sources",
+      "/usr/bin/git status --short --ignored -- .external_sources | head -50"
+    ],
+    "t007_notes": "T007 is docs/status closeout only."
+  },
+  "t001_raw_extraction_storage_parent_summary": {
+    "status": "complete",
+    "parent_published": "PHASE8-IMPL-008",
+    "foundation_handoff_acknowledged": true,
+    "foundation_module": "backend/story_knowledge/booknlp_adapter_contract.py",
+    "foundation_test_file": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+    "foundation_apis": [
+      "validate_booknlp_run_manifest",
+      "validate_booknlp_raw_artifact_bundle",
+      "normalize_booknlp_entity_mentions",
+      "normalize_booknlp_quotes",
+      "normalize_booknlp_events",
+      "build_booknlp_candidate_drafts"
+    ],
+    "storage_root_target": "projects/{project_id}/writer_assistant/extractions/",
+    "run_folder_target": "projects/{project_id}/writer_assistant/extractions/{tool_name}/{run_id}/",
+    "booknlp_run_folder_target": "projects/{project_id}/writer_assistant/extractions/booknlp/{run_id}/",
+    "recommended_artifact_kinds": [
+      "manifest.json",
+      "raw/tokens.tsv",
+      "raw/entities.tsv",
+      "raw/quotes.tsv",
+      "raw/supersense.tsv",
+      "raw/book.json",
+      "raw/book.html (optional raw ref only)"
+    ],
+    "derived_event_records_target": "derived/events.json only if explicitly authorized by a later child",
+    "parser_strategy": "in-memory TSV/JSON fixture text only; no filesystem read of real BookNLP output; no project runtime file creation",
+    "parser_handoff_target": "validate_booknlp_raw_artifact_bundle in backend/story_knowledge/booknlp_adapter_contract.py",
+    "t001_runtime_changes": "none",
+    "t001_test_changes": "none",
+    "t001_code_changes": "none",
+    "t001_package_changes": "none",
+    "t001_external_tool_changes": "none",
+    "t001_source_web_retrieval_changes": "none",
+    "t001_staging_or_commits": "none",
+    "t001_raw_artifact_helpers_or_files": "none",
+    "t001_parser_helpers_or_implementation": "none"
+  },
+  "safety_notes": [
+    "The app is analysis-only.",
+    "Raw extraction artifacts are never canon, never project truth, and never memory/canon records.",
+    "Raw extraction artifacts are never OMI candidate records and never enter the candidate pipeline by default; a future reviewed converter must explicitly create candidate records.",
+    "BookNLP-like outputs in this parent are mocked fixtures only.",
+    "Real BookNLP install/run remains deferred.",
+    "spaCy install/run remains deferred.",
+    "Parsed fixture output remains raw support data only; it is not promoted and is not memory/canon.",
+    "Owner review remains mandatory before any future converter or apply-promotion can change memory/canon.",
+    "No prose generation, rewrite, continuation, imitation, polish, improvement, or expansion.",
+    "No automatic Storyform truth, automatic Dramatica/Subtxt labels, automatic CIPS/dynamics/RS/IC truth, or automatic canon mutation.",
+    "No apply-promotion, no memory/canon mutation.",
+    ".external_sources/ is a local read-only evidence cache and must not be vendored into backend/, copied into app runtime files, committed, or run.",
+    "T001 does not run context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX.",
+    "T001 does not run external tools, install packages, clone repositories, retrieve web sources, or run BookNLP/spaCy/dramatica-flow/NCP/Subtxt code.",
+    "T001 does not write raw extraction artifact files, helpers, or paths.",
+    "T001 does not modify backend/story_knowledge/booknlp_adapter_contract.py or tests/test_writer_assistant_core_booknlp_adapter_contract.py."
+  ],
+  "deferred_work": [
+    "Real BookNLP install.",
+    "Real BookNLP execution.",
+    "Real BookNLP output file parsing from files produced by a real extractor runtime.",
+    "Real extraction orchestrator.",
+    "Raw artifact writes into real project folders outside tests.",
+    "Candidate JSON persistence from parsed fixture output.",
+    "Backend extraction routes or extraction API endpoints.",
+    "Frontend extraction, review, or parse-preview UI.",
+    "Apply-promotion.",
+    "Memory/canon mutation.",
+    "Source snapshot text matching helper.",
+    "Relationship network extraction.",
+    "Timeline causality extraction.",
+    "Subtxt semantic rubric implementation.",
+    "NCP import/export implementation.",
+    "dramatica-flow-inspired rubric implementation.",
+    "Model-assisted extraction.",
+    "Training/JSONL/dataset work.",
+    "Cloning, fetching, or pulling from any external remote into the repo.",
+    "Vendoring or executing external repository code from .external_sources/ into backend/.",
+    "Staging, committing, or pushing any .external_sources/ content."
+  ],
+  "context_tools_policy": "No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run in T001.",
+  "external_tool_policy": "T001 did not install packages, clone/fetch/pull repositories, retrieve web sources, run BookNLP, run spaCy, run dramatica-flow, run NCP tooling, run model calls, run Ollama, or execute external tools.",
+  "external_sources_policy": ".external_sources/ is a local read-only evidence cache for prior parent source inventory, not an app dependency. .external_sources/ must not be committed, must not be staged, must not be vendored into backend/, must not be copied into app runtime files, must not be executed, and must not be imported. T001 confirms the four local clone paths exist and are protected via .git/info/exclude. T002 and T005 may reference the existing source inventory and decisions but must not clone, fetch, pull, install, run, import, vendor, or execute any external repository code.",
+  "candidate_only_policy": "Raw extraction artifacts and parsed fixture output are not OMI candidate records and do not enter the candidate pipeline. A future reviewed converter must explicitly create candidate records. Tool outputs and imported structural data remain candidates with evidence/provenance until explicit owner approval. No candidate can mutate memory/canon automatically. Candidate drafts from build_booknlp_candidate_drafts are not persisted and not promoted in this parent.",
+  "raw_artifact_policy": "Raw extraction artifacts under projects/{project_id}/writer_assistant/extractions/ are non-canon and non-candidate. They are raw support data only. They must never be treated as approved truth, project truth, memory/canon records, or OMI candidate records. They must never trigger apply-promotion. They must never be written into real project folders by T001 or by T002/T003/T004/T005/T006 unless explicitly authorized and limited to tmp_path test directories. The first tool-specific child folder is booknlp; the recommended run folder is projects/{project_id}/writer_assistant/extractions/booknlp/{run_id}/.",
+  "fixture_parser_policy": "The BookNLP fixture parser is in-memory only. It consumes in-memory TSV/JSON fixture text and produces in-memory raw artifact bundles acceptable to validate_booknlp_raw_artifact_bundle. It must not read real BookNLP output from disk. It must not write real project artifacts. It must not produce candidate records. Its output is raw support data only and is non-canon, non-candidate, non-promotable. Owner review remains mandatory before any future converter can turn parsed fixture output into candidate records. The parser implementation is deferred to PHASE8-IMPL-009 unless T005 explicitly widens T006 into tests-first-plus-implementation.",
+  "source_evidence_policy": "Source locators, stable source maps, source hashes, evidence spans, raw output provenance, and candidate normalization are already established as the foundation for the mocked adapter contract. PHASE8-IMPL-008 extends that foundation to raw extraction artifact storage and to a BookNLP-like fixture parser while preserving the existing source-map and evidence validation helpers in backend/story_knowledge/source_map.py and backend/story_knowledge/evidence.py. Parsed fixture bundles must carry source-map, evidence, raw output references, and normalization status where the existing booknlp_adapter_contract API expects them. BookNLP byte offsets remain raw support only; full byte-to-character source snapshot matching remains deferred.",
+  "final_parent_result": {
+    "status": "in_progress",
+    "date": "2026-06-20",
+    "t001_result": "complete",
+    "summary": "PHASE8-IMPL-008-T001 published the parent task record, inventory, and enrichment JSON and updated the roadmap/status docs. PHASE8-IMPL-008 is active; PHASE8-IMPL-008-T002 is ready/active; PHASE8-IMPL-008-T003 through PHASE8-IMPL-008-T007 are planned/draft. No runtime extraction, no raw extraction artifact helpers or files, no BookNLP fixture parser, no real BookNLP/spaCy install/run/import, no backend routes, no frontend UI, no package/dependency changes, no model calls, no generated prose, no apply-promotion, no memory/canon mutation, no project runtime files, no training/JSONL/dataset work, no staging, no commit, no push. PHASE8-IMPL-007 artifacts remain the foundation and are unchanged.",
+    "foundation_unchanged": [
+      "backend/story_knowledge/booknlp_adapter_contract.py",
+      "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+      "backend/story_knowledge/source_map.py",
+      "backend/story_knowledge/evidence.py",
+      "backend/story_knowledge/candidate_schema.py",
+      "backend/story_knowledge/candidate_record.py",
+      "backend/story_knowledge/candidate_storage.py",
+      "backend/story_knowledge/candidate_persistence.py",
+      "backend/story_knowledge/candidate_index.py",
+      "tests/test_writer_assistant_core_source_evidence_contract.py"
+    ],
+    "not_implemented": [
+      "raw extraction artifact storage helpers",
+      "raw extraction artifact files in real project folders",
+      "BookNLP fixture parser",
+      "real BookNLP install/run/import",
+      "real spaCy install/run/import",
+      "runtime extraction",
+      "extraction orchestrator",
+      "backend routes",
+      "frontend UI",
+      "package/dependency changes",
+      "generated prose/rewrite/continuation",
+      "apply-promotion",
+      "memory/canon mutation",
+      "candidate persistence from raw artifacts",
+      "training/JSONL/dataset work"
+    ]
+  },
+  "next_parent_recommendation": {
+    "id": "PHASE8-IMPL-009",
+    "title": "BookNLP fixture parser helper implementation and raw artifact bundle integration",
+    "status": "recommended_only_not_active",
+    "scope": [
+      "implement the pure BookNLP fixture parser helpers authorized by PHASE8-IMPL-008-T006 contract tests and PHASE8-IMPL-008-T005 decision",
+      "wire parsed fixture output into validate_booknlp_raw_artifact_bundle without changing the existing mocked adapter contract",
+      "preserve non-canon, non-candidate, no-runtime-extraction, no-route, no-UI, no-package-change, no-canon-mutation, no-apply-promotion, no-generated-prose boundaries",
+      "keep real BookNLP install/run deferred unless separately authorized"
+    ]
+  }
+}

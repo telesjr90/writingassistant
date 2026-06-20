@@ -46,6 +46,24 @@ GitHub Issues and GitHub Projects are not authoritative until a future sync task
 | `no_rewrite` | Must not rewrite, revise, polish, or improve owner-authored story prose. |
 | `no_continuation` | Must not continue, extend, or bridge owner-authored story prose. |
 | `docs_only` | Work is limited to roadmap docs, status files, enrichment JSON, and validation records. |
+| `evidence_first` | Source maps, source locators, evidence records, and provenance come before any extraction runtime. |
+| `booknlp_ready` | BookNLP-like raw artifacts, manifest policy, and adapter normalization boundaries are decided before real BookNLP install or execution. |
+| `mocked_fixtures_only` | BookNLP-like outputs are mocked fixture dictionaries only; no real BookNLP run or file output parsing. |
+| `source_inventory_before_implementation` | A read-only official source inventory child must run before any adapter implementation. |
+| `pure_validation` | Work is pure shape validation only; no filesystem I/O, no tool/package import, no model call. |
+| `pure_normalization` | Work is pure mocked normalization only; no persistence writes, no candidate JSON writes, no memory/canon mutation. |
+| `no_package_changes` | Must not change `package.json`, `requirements.txt`, or other dependency files. |
+| `no_routes` | Must not add backend routes or API endpoints. |
+| `no_frontend` | Must not add frontend UI components, pages, or client behavior. |
+| `no_runtime_extraction` | Must not implement runtime extraction, extraction orchestrator, or raw output storage writes. |
+| `docs_only_t001` | The T001 publication child is docs/status/planning only; it must not implement runtime code or tests. |
+| `read_only_external_sources_only` | `.external_sources/` clones are inspected read-only; no clone, fetch, pull, install, run, import, vendor, or execute external repository code. |
+| `raw_artifacts_non_canon` | Raw extraction artifacts (run folders, raw TSV/JSON/HTML outputs) are never approved truth, canon, project truth, memory/canon records, or OMI candidate records. |
+| `raw_artifacts_non_candidate` | Raw extraction artifacts and parsed fixture output are raw support data only; they do not enter the OMI candidate pipeline and never become candidate records by default. |
+| `fixture_parser_only` | BookNLP-like parsing is limited to mocked in-memory TSV/JSON fixture text; no real BookNLP output files are parsed from disk. |
+| `storage_contract_first` | Project-local raw extraction artifact storage layout, run-folder naming, and path/manifest contracts are decided and tested before any extractor runtime exists. |
+| `tests_first` | Future helpers are specified by expected-red contract tests before implementation. |
+| `pure_path_helpers` | Helpers compute and validate safe storage paths and manifests only; they do not write, read, or list raw artifact files unless separately authorized. |
 
 ## Drift Handling
 

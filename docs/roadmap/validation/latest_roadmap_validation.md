@@ -1,5 +1,57 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-008-T001 Publish Raw Extraction Artifact Storage and BookNLP Fixture Parser Contract Parent
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: docs/status/planning only for `PHASE8-IMPL-008-T001`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: `PHASE8-IMPL-008` active.
+- Completed child recorded: `PHASE8-IMPL-008-T001` - Publish raw extraction artifact storage and BookNLP fixture parser contract parent.
+- Active/next child: `PHASE8-IMPL-008-T002` - Raw extraction artifact storage contract decision (ready/active).
+- Last completed parent: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Last completed child under prior parent: `PHASE8-IMPL-007-T007` - Roadmap/status closeout.
+- T001 outcome:
+  - Published parent task record at `docs/roadmap/tasks/PHASE8-IMPL-008.md`.
+  - Published inventory at `docs/roadmap/inventory/PHASE8-IMPL-008.md`.
+  - Published enrichment JSON at `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`.
+  - Marked `PHASE8-IMPL-008` active in `docs/roadmap/roadmap_index.yaml` and `docs/roadmap/implementation_status.md`.
+  - Marked `PHASE8-IMPL-008-T001` complete; marked `PHASE8-IMPL-008-T002` ready/active; registered `PHASE8-IMPL-008-T003` through `PHASE8-IMPL-008-T007` as planned/draft.
+  - Confirmed the four `.external_sources/` clone paths exist locally and remain ignored/protected from commit via `.git/info/exclude`.
+  - Confirmed `backend/story_knowledge/booknlp_adapter_contract.py` and `tests/test_writer_assistant_core_booknlp_adapter_contract.py` are unchanged.
+  - Added concise definitions to `docs/roadmap/roadmap_governance.md` for new boundary tags used by `roadmap_index.yaml` and the enrichment JSON: `raw_artifacts_non_canon`, `raw_artifacts_non_candidate`, `fixture_parser_only`, `storage_contract_first`, `tests_first`, `pure_path_helpers`.
+  - Did not implement extraction, raw extraction artifact helpers, raw extraction artifact files, a BookNLP fixture parser, or a real extractor runtime.
+  - Did not change runtime code, tests, package/dependency files, backend routes, frontend UI, or project runtime files.
+  - Did not install or run BookNLP/spaCy/external tools.
+  - Did not run model calls, Ollama, context tools, or source/web retrieval.
+  - Did not stage, commit, or push.
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-008.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+- Updated:
+  - `docs/roadmap/roadmap_governance.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Source-cache safety results:
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `!! .external_sources/`.
+  - `.external_sources/` is not staged and remains ignored/protected from commit.
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - Narrow `/usr/bin/git diff --check -- ...`: PASS.
+- Context tools: none run.
+- External tools: none installed, cloned, fetched, pulled, or executed locally.
+- Source/web retrieval: none run.
+- Boundary summary: docs/status/planning only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools, source/web retrieval, runtime code changes, test changes, backend/frontend/package/project runtime files, extraction/import/export implementation, raw extraction artifact helpers or files, BookNLP fixture parser, real BookNLP/spaCy install or execution, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+- T002 next: `PHASE8-IMPL-008-T002` - Raw extraction artifact storage contract decision.
+
 ## PHASE8-IMPL-007-T007 Roadmap/Status Closeout
 
 - Date: 2026-06-20

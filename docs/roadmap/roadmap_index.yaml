@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-007",
-    "current_parent_task_title": "Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation",
-    "frontier_note": "PHASE8-IMPL-007 is complete as the seventh Writer Assistant Core parent. PHASE8-IMPL-007 delivered the read-only .external_sources/ official source inventory, implementation refresh decision, implementation decision, pure mocked standard-library-only backend/story_knowledge/booknlp_adapter_contract.py module, all six public APIs, manifest and raw artifact bundle validators, mocked entity/quote/event normalization, candidate draft builder, fail-closed behavior, and source/evidence/provenance/raw-ref integration. All runtime behavior remains bounded to in-memory mocked dictionaries. No real BookNLP/spaCy install or execution, no runtime extraction, no routes, no UI, no package changes, no generated prose, no apply-promotion, and no memory/canon mutation exists. Last completed child is PHASE8-IMPL-007-T007. Active parent/child is pending next parent publication. Recommended next parent is PHASE8-IMPL-008 - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract; it is recommended only and not active."
+    "current_parent_task_id": "PHASE8-IMPL-008",
+    "current_parent_task_title": "Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract",
+    "frontier_note": "PHASE8-IMPL-008 is active as the eighth Writer Assistant Core parent. PHASE8-IMPL-007 remains complete as the seventh Writer Assistant Core parent and delivered the pure mocked BookNLP adapter contract implementation and normalization foundation (backend/story_knowledge/booknlp_adapter_contract.py with validate_booknlp_run_manifest, validate_booknlp_raw_artifact_bundle, normalize_booknlp_entity_mentions, normalize_booknlp_quotes, normalize_booknlp_events, and build_booknlp_candidate_drafts). PHASE8-IMPL-008-T001 published the parent task record, inventory, and enrichment JSON and marked the parent active. PHASE8-IMPL-008-T002 is ready/active (raw extraction artifact storage contract decision). PHASE8-IMPL-008-T003 through PHASE8-IMPL-008-T007 are planned/draft. The parent prepares a project-local raw extraction artifact storage boundary under projects/{project_id}/writer_assistant/extractions/ and a mocked BookNLP-like fixture parser contract, without real BookNLP install/run, without runtime extraction, without routes/UI/package changes, and without applying promotion or mutating memory/canon. Recommended future parent, not yet published: PHASE8-IMPL-009 - BookNLP fixture parser helper implementation and raw artifact bundle integration."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1480,6 +1480,220 @@
         "docs_only"
       ],
       "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-008",
+      "title": "Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-007"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "booknlp_ready",
+        "mocked_fixtures_only",
+        "pure_validation",
+        "pure_path_helpers",
+        "storage_contract_first",
+        "tests_first",
+        "fixture_parser_only",
+        "raw_artifacts_non_canon",
+        "raw_artifacts_non_candidate",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_routes",
+        "no_frontend",
+        "no_runtime_extraction",
+        "docs_only_t001",
+        "read_only_external_sources_only"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-008.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-008.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json",
+      "context_pack": null,
+      "result": "active"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T001",
+      "title": "Publish raw extraction artifact storage and BookNLP fixture parser contract parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "docs_only_t001",
+        "read_only_external_sources_only",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion"
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T002",
+      "title": "Raw extraction artifact storage contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "docs_only",
+        "no_runtime_extraction",
+        "raw_artifacts_non_canon",
+        "raw_artifacts_non_candidate",
+        "storage_contract_first"
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T003",
+      "title": "Extraction artifact storage path and manifest contract tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008-T002"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "pure_validation",
+        "pure_path_helpers",
+        "storage_contract_first",
+        "tests_first",
+        "raw_artifacts_non_canon",
+        "raw_artifacts_non_candidate"
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T004",
+      "title": "Minimal extraction artifact storage helpers",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "pure_validation",
+        "pure_path_helpers",
+        "storage_contract_first",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T005",
+      "title": "BookNLP fixture parser contract decision",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "docs_only",
+        "no_runtime_extraction",
+        "mocked_fixtures_only",
+        "pure_validation",
+        "fixture_parser_only",
+        "tests_first",
+        "raw_artifacts_non_candidate"
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T006",
+      "title": "BookNLP fixture parser contract tests",
+      "type": "runtime_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008-T005"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "mocked_fixtures_only",
+        "pure_validation",
+        "fixture_parser_only",
+        "tests_first",
+        "raw_artifacts_non_candidate"
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-008-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "draft",
+      "parent": "PHASE8-IMPL-008",
+      "depends_on": [
+        "PHASE8-IMPL-008-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "no_tool_execution",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "docs_only",
+        "no_runtime_extraction",
+        "no_runtime_feature_scope",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_routes",
+        "no_frontend",
+        "no_package_changes"
+      ],
+      "result": "pending"
     },
     {
       "id": "PHASE7-IMPL-004-T001",
