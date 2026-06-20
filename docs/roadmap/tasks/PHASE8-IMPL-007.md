@@ -112,6 +112,43 @@ T002 confirmed:
 
 T002 did not implement the adapter, did not change tests, did not run BookNLP/spaCy/dramatica-flow/NCP/Subtxt tooling, did not install dependencies, did not execute or vendor external repo code, did not add runtime extraction, did not add backend routes/frontend UI/package changes/project runtime files, did not generate prose, did not mutate memory/canon, and did not stage/commit/push.
 
+## Implementation Decision Result (T003)
+
+`PHASE8-IMPL-007-T003` is complete as of 2026-06-20.
+
+Decision artifact:
+
+- `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`
+
+T003 accepted a staged implementation split:
+
+- T004 creates `backend/story_knowledge/booknlp_adapter_contract.py`, creates all six public API symbols for import/collection, and implements manifest plus raw artifact bundle validators first.
+- T005 implements mocked entity, quote, and event normalization helpers.
+- T006 implements or hardens the candidate draft builder, fail-closed behavior, and source/boundary checks.
+- T007 closes the parent.
+
+T003 raw-vs-normalized decision:
+
+- Raw BookNLP-like fixture inputs should reflect T002-verified source names where practical.
+- Adapter-normalized internal records and candidate drafts may use app-owned fields such as `source_locator`, `confidence`, `raw_output_refs`, `normalization_status`, `candidate_type`, `target_category`, `evidence`, and `provenance`.
+- Current T006 tests mostly use app-normalized mocked dictionaries; T004 should preserve them where they are testing normalized adapter behavior.
+
+T003 fixture correction policy:
+
+- T004 may make minimal contract-test fixture corrections only if needed to align tests with T002 verified source inventory.
+- The main authorized correction is clarifying that `booknlp_events` is app-derived from `.tokens.event`, not a real raw BookNLP output file.
+- T004 must not delete safety tests, weaken boundaries, change public API names, add real dependencies, or widen into a real parser.
+
+T003 event, offset, and guardrail decisions:
+
+- `booknlp_events` is app-owned derived support from `.tokens.event`.
+- BookNLP byte offsets are raw support only; app-owned `source_locator`/evidence remains required for candidate drafts.
+- Full byte-to-character source snapshot matching is deferred.
+- `.book` `g` is raw aggregate metadata only, not gender identity.
+- Coreference clusters, quote attribution, and event flags remain candidate evidence only and must fail closed when ambiguous.
+
+T003 did not implement the adapter, did not modify tests, did not change backend/frontend/package/project runtime files, did not run BookNLP or spaCy, did not install packages, did not execute or vendor external repo code, did not run context tools, did not generate prose, did not mutate memory/canon, and did not stage/commit/push.
+
 ## Scope
 
 Include:
@@ -156,8 +193,8 @@ Include:
 
 1. `PHASE8-IMPL-007-T001` - Publish BookNLP adapter contract implementation parent and source-inventory-aware child-task plan. Status: in progress at start of T001; complete on T001 success.
 2. `PHASE8-IMPL-007-T002` - Official repo retrieval/source inventory and implementation contract refresh. Status: complete.
-3. `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory. Status: ready/active.
-4. `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators. Status: planned.
+3. `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory. Status: complete.
+4. `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators. Status: ready/active.
 5. `PHASE8-IMPL-007-T005` - Entity/quote/event mocked normalization helpers. Status: planned.
 6. `PHASE8-IMPL-007-T006` - Candidate draft builder, fail-closed behavior, and boundary hardening. Status: planned.
 7. `PHASE8-IMPL-007-T007` - Roadmap/status closeout. Status: planned.
@@ -194,7 +231,8 @@ Include:
 ### `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory
 
 - Docs/decision only.
-- Status: ready/active after T002.
+- Status: complete as of 2026-06-20.
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`.
 - Use the T002 source inventory.
 - Decide exact implementation boundaries for `backend/story_knowledge/booknlp_adapter_contract.py`.
 - Decide whether implementation should be one child or split into validators/normalizers.
@@ -207,13 +245,21 @@ Include:
 - Confirm exact source-level forbidden terms to avoid.
 - Confirm real BookNLP remains deferred.
 - No runtime code or tests.
+- Result: accepted staged implementation with T004 validators/API symbols first, T005 mocked normalizers, T006 builder/hardening, raw-shape versus normalized-shape separation, minimal fixture correction authorization, event derivation from `.tokens.event`, byte-offset guardrails, `g` identity guardrail, and coreference/quote attribution uncertainty guardrails.
 
 ### `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators
 
+- Status: ready/active after T003.
 - Implement only the first part of `backend/story_knowledge/booknlp_adapter_contract.py`.
+- Create all six public API symbols immediately if needed for import/collection.
 - Target manifest and raw artifact bundle validation tests.
 - Keep all functions pure, deterministic, mocked-fixture based, standard-library only.
-- Create stubs for all public APIs only if needed for test collection.
+- Validate raw-like and app-normalized mocked fixture shapes as needed by the contract.
+- Treat `booknlp_events` as app-derived from `.tokens.event`, not as a real raw output file.
+- Preserve BookNLP byte offsets as raw support but require app-owned source locators/evidence for successful candidate drafts.
+- Keep `g` as raw aggregate metadata only, not identity.
+- Treat coreference, quote attribution, and events as candidate evidence only.
+- Avoid forbidden substrings in production source if source-level tests scan raw module text.
 - No real BookNLP/spaCy install or execution.
 - No filesystem I/O, no project file creation, no candidate JSON writes.
 - No routes, UI, or package changes.
@@ -260,8 +306,10 @@ If T004-T005 already make the full contract green, T006 should be validation-onl
 
 - `PHASE8-IMPL-007` is published and active in roadmap docs.
 - `PHASE8-IMPL-007-T001` is complete on success.
-- `PHASE8-IMPL-007-T002` is ready/active after T001.
-- `PHASE8-IMPL-007-T003` through `PHASE8-IMPL-007-T007` are registered as planned/draft.
+- `PHASE8-IMPL-007-T002` is complete with source inventory and implementation refresh decision artifacts.
+- `PHASE8-IMPL-007-T003` is complete with implementation decision artifact.
+- `PHASE8-IMPL-007-T004` is ready/active after T003.
+- `PHASE8-IMPL-007-T005` through `PHASE8-IMPL-007-T007` are registered as planned.
 - `PHASE8-IMPL-006` remains complete through `PHASE8-IMPL-006-T007`.
 - `tests/test_writer_assistant_core_booknlp_adapter_contract.py` is the primary future-implementation target test file and remains expected-red until later children implement `backend/story_knowledge/booknlp_adapter_contract.py`.
 - T001 confirms the four `.external_sources/` clones exist locally.
@@ -269,8 +317,9 @@ If T004-T005 already make the full contract green, T006 should be validation-onl
 - T001 does not stage, commit, or push anything.
 - T001 records the expected-red BookNLP adapter handoff from `PHASE8-IMPL-006-T006`.
 - T001 records `.external_sources/` as a local read-only evidence cache for T002.
-- T001 does not implement the BookNLP adapter.
-- T001 does not implement extraction, candidate creation, candidate persistence, routes, UI, package changes, generated prose, apply-promotion, memory/canon mutation, or training/JSONL/dataset work.
+- T003 does not implement the BookNLP adapter.
+- T003 does not modify tests.
+- T003 does not implement extraction, candidate creation, candidate persistence, routes, UI, package changes, generated prose, apply-promotion, memory/canon mutation, or training/JSONL/dataset work.
 
 ## Validation Expectations
 
@@ -308,11 +357,11 @@ For later children (recorded here for context, executed in their own tasks):
 
 ## Current Status
 
-`PHASE8-IMPL-007` is active at the start of T001. Last completed parent: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy. Last completed child: `PHASE8-IMPL-006-T007` - Roadmap/status closeout. Prior completed parents: `PHASE8-IMPL-001` through `PHASE8-IMPL-005`. Recommended next parent after `PHASE8-IMPL-007` closes will depend on T002-T006 outcomes.
+`PHASE8-IMPL-007` is active. Last completed parent: `PHASE8-IMPL-006` - Writer Assistant Core evidence-first extraction foundation and BookNLP-ready adapter strategy. Last completed child under this parent: `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory. Active child: `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators. Prior completed parents: `PHASE8-IMPL-001` through `PHASE8-IMPL-006`. Recommended next parent after `PHASE8-IMPL-007` closes will depend on T004-T006 outcomes.
 
-T001 is docs/status/planning only. T001 publishes the parent, inventory, and enrichment JSON; marks `PHASE8-IMPL-007` active; marks T001 complete on success; marks T002 ready/active; and confirms the four `.external_sources/` clones exist and are ignored. T001 does not implement the BookNLP adapter, does not implement extraction, does not change runtime code or tests, does not change package/dependency files, does not call models, does not generate prose, does not apply promotion, and does not mutate memory/canon.
+T003 is complete as docs/decision only. It accepted the exact implementation split and handoff for T004-T006 without implementing the BookNLP adapter, changing tests, changing runtime code, changing package/dependency files, running tools, calling models, generating prose, applying promotion, or mutating memory/canon.
 
-T002 is read-only official source inventory using the already-cloned `.external_sources/` repositories. T002 must not clone, fetch, pull, install, run, import, vendor, or execute any external repository code.
+T004 is ready/active. T004 is the first code implementation child and should implement manifest and raw artifact bundle validators plus public API symbols only as authorized by `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`.
 
 ## Final Parent Goal (Deferred to T007)
 

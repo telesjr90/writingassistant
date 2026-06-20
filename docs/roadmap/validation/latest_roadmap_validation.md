@@ -1,5 +1,46 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-007-T003 BookNLP Adapter Implementation Decision After Source Inventory
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: docs/decision only for `PHASE8-IMPL-007-T003`.
+- Parent task: `PHASE8-IMPL-007` - Writer Assistant Core BookNLP adapter contract implementation and mocked normalization foundation.
+- Completed child recorded: `PHASE8-IMPL-007-T003` - BookNLP adapter implementation decision after source inventory.
+- Active/next child: `PHASE8-IMPL-007-T004` - Manifest and raw artifact bundle validators.
+- Next child after T004: `PHASE8-IMPL-007-T005` - Entity/quote/event mocked normalization helpers.
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-007.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-007.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+- Decision summary:
+  - Accepted T004 validators/API symbols first, T005 mocked entity/quote/event normalizers, and T006 candidate draft builder/fail-closed/boundary hardening.
+  - Accepted explicit raw-shape versus adapter-normalized shape separation.
+  - Authorized minimal future fixture corrections only if needed to align contract tests with T002 official source inventory.
+  - Clarified `booknlp_events` as app-derived from `.tokens.event`, not a real raw BookNLP output file.
+  - Recorded BookNLP byte offsets as raw support and app source locators/evidence as required for candidate drafts.
+  - Recorded `.book` `g` as raw aggregate metadata only, not identity.
+  - Kept coreference, quote attribution, and event outputs as candidate evidence only.
+- Source-cache safety result:
+  - `/usr/bin/git status --short -- .external_sources`: empty/clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources`: `!! .external_sources/`.
+- Validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check on changed docs: PASS.
+  - Narrow `/usr/bin/git diff --check`: PASS.
+- Boundary summary: docs/decision only; no context tools, CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX, external tools installed, external repos cloned/fetched/pulled, external repo code executed, demos, model calls, runtime extraction, BookNLP/spaCy install or execution, adapter implementation, backend/frontend/package/project runtime files, tests, extraction/import/export implementation, generated prose, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commits, or pushes.
+
 ## PHASE8-IMPL-007-T002 Official Repo Retrieval/Source Inventory and Implementation Contract Refresh
 
 - Date: 2026-06-20

@@ -194,7 +194,7 @@
       "id": "PHASE8-IMPL-007-T003",
       "title": "BookNLP adapter implementation decision after source inventory",
       "type": "planning_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-007-T002"
       ],
@@ -213,13 +213,16 @@
         "Confirm real BookNLP remains deferred.",
         "No runtime code/tests."
       ],
-      "result": "deferred_to_t003"
+      "artifacts": [
+        "docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md"
+      ],
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-007-T004",
       "title": "Manifest and raw artifact bundle validators",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-007-T003"
       ],
@@ -227,7 +230,10 @@
         "Implement only the first part of backend/story_knowledge/booknlp_adapter_contract.py.",
         "Target manifest and raw artifact bundle validation tests.",
         "Keep functions pure, deterministic, mocked-fixture based, standard-library only.",
-        "Create stubs for all public APIs only if needed for test collection.",
+        "Create all six public API symbols immediately if needed for import/collection.",
+        "Treat booknlp_events as app-derived from .tokens.event, not as a real raw output file.",
+        "Support raw-like and/or normalized mocked fixture compatibility required by tests.",
+        "Keep source-level forbidden terms out of production module.",
         "No real BookNLP/spaCy install or execution.",
         "No filesystem I/O.",
         "No routes/UI/package changes."
@@ -297,8 +303,9 @@
     "PHASE8-IMPL-007 is published and active in roadmap docs.",
     "PHASE8-IMPL-007-T001 is complete.",
     "PHASE8-IMPL-007-T002 is complete with source inventory and implementation refresh decision artifacts.",
-    "PHASE8-IMPL-007-T003 is ready/active after T002.",
-    "PHASE8-IMPL-007-T004 through PHASE8-IMPL-007-T007 are registered as planned.",
+    "PHASE8-IMPL-007-T003 is complete with implementation decision artifact.",
+    "PHASE8-IMPL-007-T004 is ready/active after T003.",
+    "PHASE8-IMPL-007-T005 through PHASE8-IMPL-007-T007 are registered as planned.",
     "PHASE8-IMPL-006 remains complete through PHASE8-IMPL-006-T007.",
     "tests/test_writer_assistant_core_booknlp_adapter_contract.py is the primary future-implementation target test file and remains expected-red until later children implement backend/story_knowledge/booknlp_adapter_contract.py.",
     "T001 confirms the four .external_sources/ clones exist locally.",
@@ -306,9 +313,39 @@
     "T001 does not stage, commit, or push anything.",
     "T001 records the expected-red BookNLP adapter handoff from PHASE8-IMPL-006-T006.",
     "T001 records .external_sources/ as a local read-only evidence cache for T002.",
-    "T001 does not implement the BookNLP adapter.",
-    "T001 does not implement extraction, candidate creation, candidate persistence, routes, UI, package changes, generated prose, apply-promotion, memory/canon mutation, or training/JSONL/dataset work."
+    "T003 does not implement the BookNLP adapter.",
+    "T003 does not modify tests.",
+    "T003 does not implement extraction, candidate creation, candidate persistence, routes, UI, package changes, generated prose, apply-promotion, memory/canon mutation, or training/JSONL/dataset work."
   ],
+  "t003_booknlp_adapter_implementation_decision_summary": {
+    "status": "complete",
+    "date": "2026-06-20",
+    "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md",
+    "implementation_split": {
+      "t004": "Manifest and raw artifact bundle validators plus all public API symbols for import/collection.",
+      "t005": "Mocked entity, quote, and event normalization helpers.",
+      "t006": "Candidate draft builder, fail-closed behavior, and boundary hardening."
+    },
+    "raw_vs_normalized_decision": "Raw BookNLP-like fixture shapes should use T002-confirmed source names where practical; adapter-normalized records and candidate drafts may use app-owned source_locator, confidence, raw_output_refs, normalization_status, candidate_type, target_category, evidence, and provenance fields.",
+    "fixture_correction_policy": "T004 may make minimal contract-test fixture corrections only if needed to align tests with T002 verified source inventory, especially to clarify booknlp_events as app-derived from .tokens.event. T004 must not delete safety tests, weaken boundaries, change public API names, or add real BookNLP dependencies.",
+    "event_derivation_policy": "booknlp_events is app-owned derived support from .tokens.event, not a raw BookNLP output file.",
+    "offset_policy": "BookNLP byte offsets are raw support only; app-owned source locators/evidence are required for successful candidate drafts. Full byte-to-character mapping against real source snapshots is deferred.",
+    "identity_guardrail": ".book g is raw aggregate metadata only and must not be treated as gender identity.",
+    "coreference_quote_guardrail": "Coreference clusters, quote attribution, and event flags remain candidate evidence only and must fail closed when ambiguous.",
+    "t004_status_after_t003": "ready_active",
+    "validation_results": {
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "narrow_git_diff_check": "PASS",
+      "source_cache_safety": "PASS"
+    },
+    "runtime_test_code_package_changes": "none",
+    "external_repo_code_execution": "none",
+    "external_repo_install_clone_fetch_pull": "none",
+    "booknlp_spacy_execution": "none",
+    "context_tools": "none"
+  },
   "t002_official_source_inventory_summary": {
     "status": "complete",
     "date": "2026-06-20",
