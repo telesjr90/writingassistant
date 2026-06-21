@@ -1,5 +1,177 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-008-T005 BookNLP Fixture Parser Contract Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only for `PHASE8-IMPL-008-T005`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: `PHASE8-IMPL-008` active.
+- Completed child recorded: `PHASE8-IMPL-008-T005` - BookNLP fixture parser contract decision.
+- Active child after T005: `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests (tests-first expected-red).
+- Next planned child after T006: `PHASE8-IMPL-008-T007` - Roadmap/status closeout.
+
+### Files Changed
+
+- Created/repaired decision artifact:
+  - `docs/roadmap/decisions/PHASE8-IMPL-008-booknlp-fixture-parser-contract-decision.md`
+- Updated roadmap/status docs:
+  - `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+
+### Decision Summary
+
+- Accepted an in-memory only BookNLP fixture parser contract before parser tests or implementation.
+- Accepted future module `backend/story_knowledge/booknlp_fixture_parser.py`; the module does not exist yet.
+- Accepted future APIs `parse_booknlp_tokens_tsv`, `parse_booknlp_entities_tsv`, `parse_booknlp_quotes_tsv`, `parse_booknlp_supersense_tsv`, `parse_booknlp_book_json`, `build_booknlp_raw_artifact_bundle_from_fixture_texts`, and optional `derive_booknlp_events_from_tokens`.
+- Accepted exact TSV header validation, fail-closed numeric coercion, `.book` JSON parsing with `g` as raw aggregate metadata only, event derivation from `.tokens.event`, no `.events` raw input, and raw bundle compatibility with `validate_booknlp_raw_artifact_bundle`.
+- T006 is tests-first only and expected-red; parser implementation is recommended for `PHASE8-IMPL-009`.
+
+### Boundary Summary
+
+- No runtime code changed.
+- No runtime tests were created or modified in T005.
+- No package/dependency files changed.
+- No project runtime files or raw extraction artifacts were created.
+- No raw artifact write/read/list helpers were implemented.
+- No BookNLP fixture parser implementation was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No external repository clone, fetch, pull, execution, import, or vendoring occurred.
+- No model calls, Ollama calls, demos, app servers, or frontend builds were run.
+- No generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training/JSONL/dataset work, staging, commit, or push occurred.
+
+### Validation Results
+
+- JSON parse: PASS for `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` on changed docs: PASS.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### T006 Handoff
+
+- Next step: `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests.
+- T006 should create expected-red tests for the future parser module only.
+- T006 should not implement `backend/story_knowledge/booknlp_fixture_parser.py`.
+
+## PHASE8-IMPL-008-T004 Minimal Extraction Artifact Storage Helpers
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: minimal pure storage path and manifest validation helpers for `PHASE8-IMPL-008-T004`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: `PHASE8-IMPL-008` active.
+- Completed child recorded: `PHASE8-IMPL-008-T004` - Minimal extraction artifact storage helpers.
+- Active/next child: `PHASE8-IMPL-008-T005` - BookNLP fixture parser contract decision (ready/active).
+- Next planned child after T005: `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests.
+- Files created:
+  - `backend/story_knowledge/raw_extraction_storage.py`
+- Files updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- T004 outcome:
+  - Added `backend.story_knowledge.raw_extraction_storage`.
+  - Implemented pure path helpers for `writer_assistant/extractions/{tool_name}/{run_id}/`, manifest path, raw artifact path, derived artifact directory, ID/path validation, and manifest validation.
+  - Implemented APIs: `validate_extraction_storage_id`, `extraction_storage_dir`, `tool_extraction_dir`, `extraction_run_dir`, `extraction_manifest_path`, `raw_artifact_dir`, `raw_artifact_path`, `derived_artifact_dir`, `validate_extraction_storage_path`, and `validate_extraction_run_manifest`.
+  - Accepted BookNLP raw artifact names/kinds and app-derived `booknlp_events_derived` only as a derived artifact.
+  - Kept helpers side-effect free: no directories created, no files written, no raw files read, and no raw artifact list helper added.
+- Validation results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q`: PASS, 185 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_index_safety_regression.py -q`: PASS, 307 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+  - Non-LeanCTX whitespace check: PASS.
+  - Narrow `/usr/bin/git diff --check -- ...`: PASS.
+  - `/usr/bin/git status --short -- .external_sources`: clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `!! .external_sources/`.
+  - `.external_sources/` is ignored and not staged.
+  - Runtime extraction precondition check: no `writer_assistant/extractions` under the existing local smoke project.
+- Explicit non-actions:
+  - No `backend/story_knowledge/booknlp_fixture_parser.py` created.
+  - No raw extraction artifact files written under real `projects/`.
+  - No raw artifact write/read/list helpers added.
+  - No runtime extraction, backend routes, frontend UI, package/dependency changes, model calls, Ollama calls, BookNLP/spaCy install/run/import, external repo clone/fetch/pull, external code execution/import/vendoring, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training data, JSONL records, datasets, or manifests added.
+  - No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+  - No staging, commit, or push.
+
+## PHASE8-IMPL-008-T003 Extraction Artifact Storage Path and Manifest Contract Tests
+
+- Date: 2026-06-20
+- Result: PASS
+- Scope: tests-first contract coverage for `PHASE8-IMPL-008-T003`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: `PHASE8-IMPL-008` active.
+- Completed child recorded: `PHASE8-IMPL-008-T003` - Extraction artifact storage path and manifest contract tests.
+- Active/next child: `PHASE8-IMPL-008-T004` - Minimal extraction artifact storage helpers (ready/active).
+- Next planned child after T004: `PHASE8-IMPL-008-T005` - BookNLP fixture parser contract decision.
+- Files created:
+  - `tests/test_writer_assistant_core_raw_extraction_storage_contract.py`
+- Files updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+- T003 outcome:
+  - Added expected-red storage path and manifest contract tests for future module `backend.story_knowledge.raw_extraction_storage`.
+  - Recorded future APIs: `validate_extraction_storage_id`, `extraction_storage_dir`, `tool_extraction_dir`, `extraction_run_dir`, `extraction_manifest_path`, `raw_artifact_dir`, `raw_artifact_path`, `derived_artifact_dir`, `validate_extraction_storage_path`, and `validate_extraction_run_manifest`.
+  - Covered storage root helpers, safe ID validation, path traversal/containment, forbidden locations, no filesystem side effects, raw/derived artifact filename and kind boundaries, manifest shape/policy validation, raw output reference boundaries through existing evidence helpers where compatible, and future production source-level boundary scanning.
+  - Marked `PHASE8-IMPL-008-T004` ready/active.
+- Expected-red pytest result:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q`: expected red, collection error.
+  - Exact failure cause: `ImportError: cannot import name 'raw_extraction_storage' from 'backend.story_knowledge'`.
+  - Failure is limited to the missing future module/symbol.
+  - No skips or xfails were added.
+- Existing regression test results:
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_index_safety_regression.py -q`: PASS, 307 passed.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+- Roadmap validator results:
+  - `python3 scripts/check_enrichment.py`: PASS.
+  - `python3 scripts/validate_roadmap.py`: PASS.
+- Whitespace/source-cache results:
+  - Non-LeanCTX whitespace check on changed files: PASS.
+  - Narrow `/usr/bin/git diff --check -- ...`: PASS.
+  - `/usr/bin/git status --short -- .external_sources`: clean.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `!! .external_sources/`.
+  - `.external_sources/` is ignored and not staged.
+- Explicit non-actions:
+  - No `backend/story_knowledge/raw_extraction_storage.py` created.
+  - No `backend/story_knowledge/booknlp_fixture_parser.py` created.
+  - No raw extraction artifact files written under real `projects/`.
+  - No raw artifact write/read/list helpers added.
+  - No runtime extraction, backend routes, frontend UI, package/dependency changes, model calls, Ollama calls, BookNLP/spaCy install/run/import, external repo clone/fetch/pull, external code execution/import/vendoring, generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, training data, JSONL records, datasets, or manifests added.
+  - No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+  - No staging, commit, or push.
+
 ## PHASE8-IMPL-008-T002 Raw Extraction Artifact Storage Contract Decision
 
 - Date: 2026-06-20
