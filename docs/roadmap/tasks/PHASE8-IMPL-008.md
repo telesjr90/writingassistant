@@ -10,7 +10,7 @@ Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser
 
 ## Status
 
-active (`PHASE8-IMPL-008-T006` ready/active after T005 fixture parser contract decision).
+complete (`PHASE8-IMPL-008-T001` through `PHASE8-IMPL-008-T007` complete).
 
 ## Goal
 
@@ -113,8 +113,8 @@ Explicitly excluded in this parent:
 3. `PHASE8-IMPL-008-T003` - Extraction artifact storage path and manifest contract tests. Status: complete as of 2026-06-20.
 4. `PHASE8-IMPL-008-T004` - Minimal extraction artifact storage helpers. Status: complete as of 2026-06-20.
 5. `PHASE8-IMPL-008-T005` - BookNLP fixture parser contract decision. Status: complete as of 2026-06-21.
-6. `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests. Status: ready/active after T005.
-7. `PHASE8-IMPL-008-T007` - Roadmap/status closeout. Status: planned/draft.
+6. `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests. Status: complete as of 2026-06-21.
+7. `PHASE8-IMPL-008-T007` - Roadmap/status closeout. Status: complete as of 2026-06-21.
 
 ## Child Task Details
 
@@ -224,17 +224,25 @@ T002 accepted:
 ### `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests
 
 - Tests-only contract coverage.
+- Status: complete as of 2026-06-21.
+- Test file: `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py`.
 - Expected-red contract tests for the future pure fixture parser API.
+- Expected-red result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py -q` fails during collection with `ImportError: cannot import name 'booknlp_fixture_parser' from 'backend.story_knowledge'`.
+- Expected-red failure is limited to the missing future module/symbol.
+- Future module remains `backend/story_knowledge/booknlp_fixture_parser.py`.
+- Future APIs recorded: `parse_booknlp_tokens_tsv`, `parse_booknlp_entities_tsv`, `parse_booknlp_quotes_tsv`, `parse_booknlp_supersense_tsv`, `parse_booknlp_book_json`, `build_booknlp_raw_artifact_bundle_from_fixture_texts`, and optional `derive_booknlp_events_from_tokens`.
 - Tests use in-memory TSV/JSON fixture text and in-memory raw artifact bundles only.
 - No filesystem read of real BookNLP output; no project runtime file creation.
-- Tests must cover safe and unsafe fixture shapes, missing required fields, extra forbidden fields, byte-to-character offset boundary handling, and downstream compatibility with `validate_booknlp_raw_artifact_bundle`.
-- Tests must confirm parsed fixture output is in-memory and is not persisted, not promoted, and not converted into candidate records by the parser.
-- No implementation; no real BookNLP/spaCy install/run; no raw artifacts in real project folders.
+- Tests cover safe and unsafe fixture shapes, missing required fields, extra forbidden fields, numeric coercion, byte offset ordering, `.book` JSON boundaries, event derivation from `.tokens.event`, raw bundle builder compatibility with `validate_booknlp_raw_artifact_bundle`, storage/source/evidence helper integration, raw output reference boundaries, and future production source-level forbidden terms.
+- Tests confirm parsed fixture output is in-memory and is not persisted, not promoted, and not converted into candidate records by the parser.
+- Parser implementation is deferred to `PHASE8-IMPL-009`.
+- No implementation; no raw artifact write/read/list helpers; no runtime extraction; no real BookNLP/spaCy install/run/import; no raw artifacts in real project folders.
 
 ### `PHASE8-IMPL-008-T007` - Roadmap/status closeout
 
 - Docs/status closeout only.
-- Close `PHASE8-IMPL-008` as complete.
+- Status: complete as of 2026-06-21.
+- Closed `PHASE8-IMPL-008` as complete.
 - Summarize T002/T005 decisions, T003/T006 tests-only contract coverage, and T004 minimal storage helpers.
 - Preserve no-runtime-extraction, no-real-BookNLP/spaCy, no-route, no-UI, no-package-change, no-canon-mutation, no-apply-promotion, no-generated-prose boundaries.
 - Recommend the next parent: `PHASE8-IMPL-009` - BookNLP fixture parser helper implementation and raw artifact bundle integration (parser implementation deferred from T006 per T005 decision).
@@ -321,26 +329,70 @@ For later children (recorded here for context, executed in their own tasks):
 
 ## Current Status
 
-`PHASE8-IMPL-008` is active after T005. `PHASE8-IMPL-008-T001`, `PHASE8-IMPL-008-T002`, `PHASE8-IMPL-008-T003`, `PHASE8-IMPL-008-T004`, and `PHASE8-IMPL-008-T005` are complete. The active child is `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests (tests-first expected-red). `PHASE8-IMPL-008-T007` is planned/draft. Prior completed parents are `PHASE8-IMPL-001` through `PHASE8-IMPL-007`. Recommended future parent (after `PHASE8-IMPL-008` closes) is `PHASE8-IMPL-009` - BookNLP fixture parser helper implementation and raw artifact bundle integration, not yet published.
+`PHASE8-IMPL-008` is complete as of `PHASE8-IMPL-008-T007`. `PHASE8-IMPL-008-T001` through `PHASE8-IMPL-008-T007` are complete. Prior completed parents are `PHASE8-IMPL-001` through `PHASE8-IMPL-007`. No child remains under `PHASE8-IMPL-008`. Recommended future parent is `PHASE8-IMPL-009` - BookNLP fixture parser helper implementation and raw artifact bundle integration, recommended only and not yet published or active.
 
-T005 is docs/decision only. It accepts the future in-memory BookNLP fixture parser contract and records the future parser module/API names, exact TSV header validation, numeric coercion, `.book` JSON handling, event derivation from `.tokens.event`, raw bundle builder compatibility, T006 tests-first handoff, and parser implementation deferral to `PHASE8-IMPL-009`. T005 does not implement extraction, does not create raw artifact helpers, does not create raw artifact files, does not implement a BookNLP fixture parser, does not create parser tests, does not run BookNLP or spaCy, does not install any package, does not stage/commit/push, and does not run context tools, external tools, or source/web retrieval.
+T007 is docs/status closeout only. It records that the parent delivered the raw extraction artifact storage contract, expected-red storage contract tests, pure storage path and manifest helpers, the in-memory BookNLP fixture parser contract, and expected-red parser contract tests. T007 does not implement extraction, does not create raw artifact helpers beyond the existing pure path/manifest helpers, does not create raw artifact files, does not implement a BookNLP fixture parser, does not run BookNLP or spaCy, does not install any package, does not stage/commit/push, and does not run context tools, external tools, or source/web retrieval.
+
+## Final Parent Summary
+
+`PHASE8-IMPL-008` delivered the safe raw extraction artifact storage foundation and parser-contract handoff. The parent published the task/inventory/enrichment records, accepted the raw extraction artifact storage contract, added expected-red raw storage contract tests, implemented `backend/story_knowledge/raw_extraction_storage.py` with pure path derivation and manifest validation helpers, accepted the in-memory BookNLP fixture parser contract, added expected-red BookNLP fixture parser contract tests, and closed with a clear `PHASE8-IMPL-009` recommendation for parser implementation.
+
+Final artifacts:
+
+- `docs/roadmap/inventory/PHASE8-IMPL-008.md`
+- `docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md`
+- `docs/roadmap/decisions/PHASE8-IMPL-008-booknlp-fixture-parser-contract-decision.md`
+- `backend/story_knowledge/raw_extraction_storage.py`
+- `tests/test_writer_assistant_core_raw_extraction_storage_contract.py`
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py`
+
+Final runtime/test behavior now available:
+
+- raw extraction storage path helpers: `validate_extraction_storage_id`, `extraction_storage_dir`, `tool_extraction_dir`, `extraction_run_dir`, `extraction_manifest_path`, `raw_artifact_dir`, `raw_artifact_path`, `derived_artifact_dir`, `validate_extraction_storage_path`, and `validate_extraction_run_manifest`
+- path derivation under `writer_assistant/extractions/{tool_name}/{run_id}/`
+- strict tool/run/artifact path safety
+- side-effect-free path helpers
+- manifest validation with raw-support policy flags
+- raw/derived artifact kind separation
+- parser contract tests expected-red for future `backend/story_knowledge/booknlp_fixture_parser.py`
+- no raw artifact write/read/list helpers
+- no parser implementation
+- no real BookNLP/spaCy import/run/install
+- no runtime extraction
+- no candidate/canon/memory mutation
+
+Completed child summary:
+
+- `PHASE8-IMPL-008-T001` published the raw extraction artifact storage and BookNLP fixture parser contract parent.
+- `PHASE8-IMPL-008-T002` accepted the raw extraction artifact storage contract.
+- `PHASE8-IMPL-008-T003` added expected-red raw extraction storage path and manifest contract tests.
+- `PHASE8-IMPL-008-T004` implemented `backend/story_knowledge/raw_extraction_storage.py` with pure path derivation and manifest validation helpers.
+- `PHASE8-IMPL-008-T005` accepted the in-memory BookNLP fixture parser contract.
+- `PHASE8-IMPL-008-T006` added expected-red BookNLP fixture parser contract tests.
+- `PHASE8-IMPL-008-T007` closed the parent.
+
+Next parent recommendation:
+
+`PHASE8-IMPL-009` - BookNLP fixture parser helper implementation and raw artifact bundle integration. Recommended scope: implement `backend/story_knowledge/booknlp_fixture_parser.py`, make `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` pass, parse in-memory synthetic TSV/JSON fixture strings only, build raw artifact bundles compatible with `booknlp_adapter_contract.validate_booknlp_raw_artifact_bundle`, and preserve no filesystem I/O, no real BookNLP/spaCy runtime, no parser reading from disk, no candidate persistence, and no memory/canon mutation.
 
 ## Deferred Beyond PHASE8-IMPL-008
 
-- Real BookNLP install.
-- Real BookNLP execution.
-- Real BookNLP output file parsing from files produced by a real extractor runtime.
-- Real extraction orchestrator.
-- Raw artifact writes into real project folders outside tests.
-- Candidate JSON persistence from parsed fixture output.
+- BookNLP fixture parser implementation.
+- `backend/story_knowledge/booknlp_fixture_parser.py`.
+- Making `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` pass.
+- Real BookNLP install/run/import.
+- Real BookNLP output file parsing from disk.
+- Real spaCy install/run/import.
+- Raw artifact write/read/list helpers.
+- Raw artifact persistence from real project runs.
+- Byte-to-character source matching.
+- Extraction orchestrator.
+- Backend extraction routes.
+- Frontend parser/review UI.
+- Candidate JSON persistence from parser outputs.
 - Apply-promotion.
 - Memory/canon mutation.
-- Source snapshot text matching helper.
-- Relationship network extraction.
-- Timeline causality extraction.
-- Subtxt semantic rubric implementation.
-- NCP import/export implementation.
-- dramatica-flow-inspired rubric implementation.
+- NCP/Subtxt/dramatica-flow implementation.
 - Model-assisted extraction.
 - Training/JSONL/dataset work.
 - Cloning, fetching, or pulling from any external remote into the repo.

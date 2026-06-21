@@ -1,5 +1,162 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-008-T007 Roadmap/Status Closeout
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status closeout only for `PHASE8-IMPL-008-T007`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: COMPLETE.
+- Completed child recorded: `PHASE8-IMPL-008-T007` - Roadmap/status closeout.
+- Active child after T007: none under `PHASE8-IMPL-008`; next parent publication is pending owner approval.
+- Recommended next parent: `PHASE8-IMPL-009` - BookNLP fixture parser helper implementation and raw artifact bundle integration, recommended only and not active.
+
+### Files Changed
+
+- `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+- `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+- `docs/roadmap/implementation_status.md`
+- `docs/roadmap/roadmap_index.yaml`
+- `docs/roadmap/task_backlog.md`
+- `docs/roadmap/phase_map.md`
+- `docs/master_plan.md`
+- `docs/roadmap/validation/latest_roadmap_validation.md`
+- `docs/roadmap/decision_log.md`
+- `docs/roadmap/risk_register.md`
+- `docs/roadmap/open_questions.md`
+
+### Parent Closeout Summary
+
+`PHASE8-IMPL-008` delivered parent publication and child-task plan, raw extraction artifact storage contract decision, expected-red raw storage contract tests, pure raw extraction storage path/manifest helper module, BookNLP fixture parser contract decision, expected-red BookNLP fixture parser contract tests, and a clear `PHASE8-IMPL-009` recommendation for parser implementation.
+
+Final behavior now available: pure path derivation under `writer_assistant/extractions/{tool_name}/{run_id}/`, strict tool/run/artifact path safety, side-effect-free path helpers, manifest validation with raw-support policy flags, raw/derived artifact kind separation, and expected-red parser contract tests for future `backend.story_knowledge.booknlp_fixture_parser`.
+
+### Validation Results
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py -q`: expected red, collection error limited to `ImportError: cannot import name 'booknlp_fixture_parser' from 'backend.story_knowledge'`.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q`: PASS, 185 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_index_safety_regression.py -q`: PASS, 307 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+- Pre-edit runtime extraction check: PASS, no `projects/*/writer_assistant/extractions` directories found.
+- Pre-edit storage helper scope check: PASS, no raw artifact write/read/list helper definitions found.
+- Source-cache safety precheck: PASS, `.external_sources/` exists and parser module remains absent.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed/optional docs: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` on changed/optional docs: PASS.
+- `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+- `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Docs/status closeout only.
+- No `backend/story_knowledge/booknlp_fixture_parser.py` implementation added.
+- No parser helpers added.
+- No backend runtime code changed.
+- No tests changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files or raw extraction artifacts created.
+- No raw artifact write/read/list helpers added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No external repository clone, fetch, pull, execution, import, or vendoring occurred.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- A local hook blocked `rg`/`tail` and suggested LeanCTX; the suggestion was not followed.
+- No model calls, Ollama calls, demos, app servers, or frontend builds were run.
+- No generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, extraction/import/export implementation, training/JSONL/dataset work, staging, commit, or push occurred.
+
+### T007 Handoff
+
+- Next step: owner review, then commit T007 docs if accepted.
+- Then publish/start `PHASE8-IMPL-009` in a separate owner-approved task.
+
+## PHASE8-IMPL-008-T006 BookNLP Fixture Parser Contract Tests
+
+### Result
+
+- Result: PASS.
+- Scope: tests-first contract coverage for `PHASE8-IMPL-008-T006`.
+- Parent task: `PHASE8-IMPL-008` - Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract.
+- Parent status: `PHASE8-IMPL-008` active.
+- Completed child recorded: `PHASE8-IMPL-008-T006` - BookNLP fixture parser contract tests.
+- Active child after T006: `PHASE8-IMPL-008-T007` - Roadmap/status closeout.
+- Next child after T007: none under `PHASE8-IMPL-008`.
+
+### Files Changed
+
+- Created expected-red parser contract test:
+  - `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py`
+- Updated roadmap/status docs:
+  - `docs/roadmap/tasks/PHASE8-IMPL-008.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Test Contract Summary
+
+- Added expected-red top-level import coverage for future module `backend.story_knowledge.booknlp_fixture_parser`.
+- Recorded future APIs: `parse_booknlp_tokens_tsv`, `parse_booknlp_entities_tsv`, `parse_booknlp_quotes_tsv`, `parse_booknlp_supersense_tsv`, `parse_booknlp_book_json`, `build_booknlp_raw_artifact_bundle_from_fixture_texts`, and optional `derive_booknlp_events_from_tokens`.
+- Added in-memory TSV parser contracts for tokens, entities, quotes, and supersense with exact header validation, fail-closed unknown/missing columns, malformed row rejection, empty required cell rejection, non-negative integer coercion, bool-like/negative/non-integer rejection, and span/offset ordering checks.
+- Added `.book` JSON parser contracts requiring object root and `characters` list, preserving character aggregate fields and treating `g` as raw aggregate metadata only.
+- Added event derivation contracts requiring events to derive from `.tokens.event` only, rejecting `.events` raw input and keeping derived events app-owned support only.
+- Added raw artifact bundle builder contracts requiring in-memory strings only, path rejection, unsupported key rejection, caller-input immutability, storage manifest validation, source map validation, raw output reference validation, compatibility with `validate_booknlp_raw_artifact_bundle`, and no calls to candidate/normalizer helpers or filesystem I/O.
+- Added storage/helper/adapter boundary contracts confirming raw refs remain non-canon/non-candidate and parser stays separate from raw artifact write/read/list helpers.
+- Added a future production source-level boundary scan for forbidden runtime/tool/prose/mutation/filesystem terms, reading `backend/story_knowledge/booknlp_fixture_parser.py` only if it exists.
+
+### Expected-Red Result
+
+- Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py -q`
+- Result: expected red collection failure, 1 collection error.
+- Exact failure cause: `ImportError: cannot import name 'booknlp_fixture_parser' from 'backend.story_knowledge' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/story_knowledge/__init__.py)`.
+- Failure is limited to the missing future parser module/symbol.
+- No syntax errors, unrelated import errors, skips, or xfails.
+
+### Existing Regression Test Results
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q`: PASS, 185 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q`: PASS, 148 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q`: PASS, 104 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_schema_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_index_safety_regression.py -q`: PASS, 307 passed.
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py tests/test_omi_boundaries.py tests/test_omi_routes.py -q`: PASS, 109 passed.
+
+### Roadmap And Whitespace Validation
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed/optional files: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` on changed/optional files: PASS.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Tests-first only.
+- No `backend/story_knowledge/booknlp_fixture_parser.py` implementation added.
+- No parser helpers added.
+- No backend runtime code changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files or raw extraction artifacts created.
+- No raw artifact write/read/list helpers added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No external repository clone, fetch, pull, execution, import, or vendoring occurred.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No model calls, Ollama calls, demos, app servers, or frontend builds were run.
+- No generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, extraction/import/export implementation, training/JSONL/dataset work, staging, commit, or push occurred.
+
+### T007 Handoff
+
+- Next step: `PHASE8-IMPL-008-T007` - Roadmap/status closeout.
+- Parser implementation remains recommended for `PHASE8-IMPL-009`, not active until separately published.
+
 ## PHASE8-IMPL-008-T005 BookNLP Fixture Parser Contract Decision
 
 ### Result

@@ -167,10 +167,10 @@ Deferred PHASE8-IMPL-006 follow-ups:
 23. PHASE8-IMPL-007 is complete; its mocked adapter contract does not authorize real BookNLP/spaCy runtime, runtime extraction, storage writes, routes, UI, package changes, generated prose, apply-promotion, or memory/canon mutation.
 24. PHASE8-IMPL-008-T002 is complete; its storage contract does not authorize raw artifact write/read/list helpers, BookNLP fixture parser helpers, real BookNLP/spaCy runtime, runtime extraction, routes, UI, package changes, generated prose, apply-promotion, or memory/canon mutation.
 25. ~~What BookNLP fixture parser contract should T006 test?~~ **Resolved in PHASE8-IMPL-008-T005:** future `backend/story_knowledge/booknlp_fixture_parser.py` consumes in-memory TSV/JSON fixture text only, validates exact `.tokens`, `.entities`, `.quotes`, and `.supersense` headers, coerces known numeric fields fail-closed, parses `.book` JSON with `g` as raw aggregate metadata only, derives event support from `.tokens.event`, rejects `.events` raw input, and builds raw artifact bundles compatible with `validate_booknlp_raw_artifact_bundle`.
-26. Parser implementation timing remains deferred to recommended future parent `PHASE8-IMPL-009` unless T006 closeout changes the recommendation.
-27. T006 should decide the exact strict-extra-column behavior and unsupported event marker policy in tests while preserving the T005 fail-closed recommendation.
+26. ~~Parser implementation timing remains deferred to recommended future parent `PHASE8-IMPL-009` unless T006 closeout changes the recommendation.~~ **Resolved in PHASE8-IMPL-008-T007:** parser implementation remains deferred to recommended future parent `PHASE8-IMPL-009`, not active until separately published.
+27. ~~T006 should decide the exact strict-extra-column behavior and unsupported event marker policy in tests while preserving the T005 fail-closed recommendation.~~ **Resolved in PHASE8-IMPL-008-T006/T007:** expected-red parser contract tests now record strict parser behavior; implementation remains deferred.
 28. Byte-to-character source matching remains deferred beyond T005/T006 and should stay separate from the in-memory fixture parser contract.
-29. `PHASE8-IMPL-009` scope should be limited to pure parser implementation and raw artifact bundle integration unless a later owner-approved task explicitly expands it.
+29. `PHASE8-IMPL-009` scope should be limited to pure parser implementation and raw artifact bundle integration unless a later owner-approved task explicitly expands it; it must not add filesystem I/O, real BookNLP/spaCy runtime, candidate persistence, routes/UI, apply-promotion, memory/canon mutation, or raw artifact write/read/list helpers.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

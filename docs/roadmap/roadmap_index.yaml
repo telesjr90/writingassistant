@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-008",
     "current_parent_task_title": "Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract",
-    "frontier_note": "PHASE8-IMPL-008 is active as the eighth Writer Assistant Core parent. PHASE8-IMPL-007 remains complete as the seventh Writer Assistant Core parent and delivered the pure mocked BookNLP adapter contract implementation and normalization foundation (backend/story_knowledge/booknlp_adapter_contract.py with validate_booknlp_run_manifest, validate_booknlp_raw_artifact_bundle, normalize_booknlp_entity_mentions, normalize_booknlp_quotes, normalize_booknlp_events, and build_booknlp_candidate_drafts). PHASE8-IMPL-008-T001 published the parent task record, inventory, and enrichment JSON and marked the parent active. PHASE8-IMPL-008-T002 completed the raw extraction artifact storage contract decision at docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md, accepting writer_assistant/extractions/{tool_name}/{run_id}/ as the future storage boundary, booknlp as the first tool folder, strict tool/run ID safety, manifest shape and policy flags, raw/derived artifact kinds, and T003 tests-only handoff. PHASE8-IMPL-008-T003 added expected-red tests-only contract coverage at tests/test_writer_assistant_core_raw_extraction_storage_contract.py for future backend.story_knowledge.raw_extraction_storage path and manifest helpers. PHASE8-IMPL-008-T004 created backend/story_knowledge/raw_extraction_storage.py with pure path and manifest validation helpers; the storage contract passes. PHASE8-IMPL-008-T005 completed the BookNLP fixture parser contract decision at docs/roadmap/decisions/PHASE8-IMPL-008-booknlp-fixture-parser-contract-decision.md; future module backend.story_knowledge.booknlp_fixture_parser and its public APIs are recorded; T006 is tests-first expected-red and parser implementation is deferred to PHASE8-IMPL-009. PHASE8-IMPL-008-T006 is ready/active; PHASE8-IMPL-008-T007 is planned/draft. The parent prepares a project-local raw extraction artifact storage boundary under projects/{project_id}/writer_assistant/extractions/ and a mocked BookNLP-like fixture parser contract, without real BookNLP install/run, without runtime extraction, without routes/UI/package changes, and without applying promotion or mutating memory/canon. Recommended future parent, not yet published: PHASE8-IMPL-009 - BookNLP fixture parser helper implementation and raw artifact bundle integration."
+    "frontier_note": "PHASE8-IMPL-008 is complete as the eighth Writer Assistant Core parent. PHASE8-IMPL-008-T001 through PHASE8-IMPL-008-T007 are complete. The parent delivered the raw extraction artifact storage contract decision, expected-red raw storage contract tests, backend/story_knowledge/raw_extraction_storage.py pure storage path and manifest validation helpers, the in-memory BookNLP fixture parser contract decision, and expected-red parser contract tests for future backend.story_knowledge.booknlp_fixture_parser. No parser implementation exists yet, no raw artifact write/read/list helpers exist, no runtime extraction exists, and no real BookNLP/spaCy install/run/import occurred. No routes, UI, package/dependency changes, model calls, generated prose, apply-promotion, memory/canon mutation, project runtime files, external code execution/vendoring, or training/JSONL/dataset work was added. Next parent publication is pending owner approval. Recommended future parent, not active: PHASE8-IMPL-009 - BookNLP fixture parser helper implementation and raw artifact bundle integration."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1485,7 +1485,7 @@
       "id": "PHASE8-IMPL-008",
       "title": "Writer Assistant Core raw extraction artifact storage and BookNLP fixture parser contract",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-007"
@@ -1520,7 +1520,7 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-008.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json",
       "context_pack": null,
-      "result": "active"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-008-T001",
@@ -1662,7 +1662,7 @@
       "id": "PHASE8-IMPL-008-T006",
       "title": "BookNLP fixture parser contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-008",
       "depends_on": [
         "PHASE8-IMPL-008-T005"
@@ -1689,13 +1689,13 @@
         "failure_cause": "ImportError: cannot import name 'booknlp_fixture_parser' from 'backend.story_knowledge'",
         "limited_to_missing_future_module": true
       },
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-008-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "draft",
+      "status": "done",
       "parent": "PHASE8-IMPL-008",
       "depends_on": [
         "PHASE8-IMPL-008-T006"
@@ -1716,7 +1716,7 @@
         "no_frontend",
         "no_package_changes"
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE7-IMPL-004-T001",
