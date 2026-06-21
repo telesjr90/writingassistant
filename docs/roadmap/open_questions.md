@@ -171,6 +171,10 @@ Deferred PHASE8-IMPL-006 follow-ups:
 27. ~~T006 should decide the exact strict-extra-column behavior and unsupported event marker policy in tests while preserving the T005 fail-closed recommendation.~~ **Resolved in PHASE8-IMPL-008-T006/T007:** expected-red parser contract tests now record strict parser behavior; implementation remains deferred.
 28. Byte-to-character source matching remains deferred beyond T005/T006 and should stay separate from the in-memory fixture parser contract.
 29. `PHASE8-IMPL-009` scope should be limited to pure parser implementation and raw artifact bundle integration unless a later owner-approved task explicitly expands it; it must not add filesystem I/O, real BookNLP/spaCy runtime, candidate persistence, routes/UI, apply-promotion, memory/canon mutation, or raw artifact write/read/list helpers.
+30. ~~What exact implementation split should `PHASE8-IMPL-009-T003` through `PHASE8-IMPL-009-T006` use?~~ **Resolved in PHASE8-IMPL-009-T002:** T003 creates `backend/story_knowledge/booknlp_fixture_parser.py` and implements minimal TSV parsers; T004 implements `.book` JSON parsing and `.tokens.event` event derivation; T005 implements the in-memory raw artifact bundle builder with storage/source/evidence/adapter validation; T006 runs full parser contract validation and hardening.
+31. Byte-to-character source matching remains deferred beyond the fixture parser helper implementation.
+32. Real BookNLP runtime installation/import/execution remains deferred and is not authorized by `PHASE8-IMPL-009-T002`.
+33. Raw artifact persistence, write/read/list helpers, and extraction UI/routes remain deferred beyond the parser helper implementation parent.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

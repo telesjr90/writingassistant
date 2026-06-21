@@ -1,5 +1,165 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-009-T002 Parser Implementation Contract Reconciliation Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only for `PHASE8-IMPL-009-T002`.
+- Parent task: `PHASE8-IMPL-009` - Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-009-T002` - Parser implementation contract reconciliation decision.
+- Active child after T002: `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation.
+- Next child after T003: `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation.
+
+### Files Changed
+
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-009.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+
+### Decision Artifact Summary
+
+T002 accepted the `PHASE8-IMPL-009` implementation split:
+
+- T003: minimal in-memory TSV parser implementation.
+- T004: `.book` JSON parsing and token-event derivation.
+- T005: raw artifact bundle builder integration with storage/source/evidence/adapter validators.
+- T006: full parser contract validation and boundary hardening.
+
+Accepted public APIs are `parse_booknlp_tokens_tsv`, `parse_booknlp_entities_tsv`, `parse_booknlp_quotes_tsv`, `parse_booknlp_supersense_tsv`, `parse_booknlp_book_json`, `derive_booknlp_events_from_tokens`, and `build_booknlp_raw_artifact_bundle_from_fixture_texts`.
+
+### Expected-Red Contract Status
+
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` remains expected-red because `backend.story_knowledge.booknlp_fixture_parser` is still missing.
+- T002 did not run pytest and did not make the parser contract pass.
+- T002 did not modify tests.
+- T003 is the first child authorized to create the parser module and satisfy import/public symbol collection.
+
+### Validation Results
+
+- `python3` enrichment JSON parse: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` on changed docs: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Docs/decision only.
+- No parser implementation added.
+- No `backend/story_knowledge/booknlp_fixture_parser.py` created.
+- No tests changed.
+- No backend runtime code changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files or raw extraction artifacts created.
+- No raw artifact write/read/list helpers added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No external repository clone, fetch, pull, execution, import, or vendoring occurred.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- A local hook blocked an `rg` exact-symbol check and suggested LeanCTX; the suggestion was not followed.
+- No model calls, Ollama calls, demos, app servers, or frontend builds were run.
+- No generated prose, rewrite, continuation, apply-promotion, memory/canon mutation, extraction/import/export implementation, training/JSONL/dataset work, staging, commit, or push occurred.
+
+### T003 Handoff
+
+- Next step: `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation.
+
+## PHASE8-IMPL-009-T001 Parent Publication
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/planning only for `PHASE8-IMPL-009-T001`.
+- Parent task: `PHASE8-IMPL-009` - Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-009-T001` - Publish BookNLP fixture parser implementation parent.
+- Active child after T001: `PHASE8-IMPL-009-T002` - Parser implementation contract reconciliation decision.
+- Prior parent: `PHASE8-IMPL-008` complete through `PHASE8-IMPL-008-T007`.
+
+### Files Changed
+
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-009.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-009.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json`
+- Updated:
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Parent Publication Summary
+
+`PHASE8-IMPL-009` is now the active Writer Assistant Core parent. It exists to implement the pure in-memory BookNLP fixture parser helper module in later children so `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` can pass without real BookNLP/spaCy runtime, filesystem I/O, raw artifact persistence, routes, UI, package changes, model calls, generated prose, apply-promotion, or memory/canon mutation.
+
+T001 did not implement parser helpers and did not create `backend/story_knowledge/booknlp_fixture_parser.py`.
+
+### Child Sequence Published
+
+1. `PHASE8-IMPL-009-T001` - Publish BookNLP fixture parser implementation parent. Status: complete.
+2. `PHASE8-IMPL-009-T002` - Parser implementation contract reconciliation decision. Status: ready/active.
+3. `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation. Status: planned.
+4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: planned.
+5. `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts. Status: planned.
+6. `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening. Status: planned.
+7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: planned.
+
+### Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` on changed docs: PASS.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Docs/status/planning only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, or frontend builds were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No parser implementation was added.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No extraction/import/export implementation was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T002 Handoff
+
+- Next step: `PHASE8-IMPL-009-T002` - Parser implementation contract reconciliation decision.
+
 ## PHASE8-IMPL-008-T007 Roadmap/Status Closeout
 
 ### Result

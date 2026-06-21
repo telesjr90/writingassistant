@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-009",
+  "title": "Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-008"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "candidate_only",
+    "evidence_first",
+    "booknlp_ready",
+    "mocked_fixtures_only",
+    "pure_validation",
+    "fixture_parser_only",
+    "raw_artifacts_non_canon",
+    "raw_artifacts_non_candidate",
+    "no_tool_execution",
+    "no_package_changes",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "no_routes",
+    "no_frontend",
+    "no_runtime_extraction",
+    "docs_only_t001",
+    "read_only_external_sources_only"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-009.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-009.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-008.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-008.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-008.enrichment.json",
+    "storage_decision": "docs/roadmap/decisions/PHASE8-IMPL-008-raw-extraction-artifact-storage-contract-decision.md",
+    "parser_decision": "docs/roadmap/decisions/PHASE8-IMPL-008-booknlp-fixture-parser-contract-decision.md",
+    "official_source_inventory": "docs/roadmap/inventory/PHASE8-IMPL-007-official-source-inventory.md",
+    "source_refresh_decision": "docs/roadmap/decisions/PHASE8-IMPL-007-implementation-source-refresh-decision.md",
+    "adapter_implementation_decision": "docs/roadmap/decisions/PHASE8-IMPL-007-booknlp-adapter-implementation-decision.md",
+    "storage_module": "backend/story_knowledge/raw_extraction_storage.py",
+    "storage_test_file": "tests/test_writer_assistant_core_raw_extraction_storage_contract.py",
+    "adapter_module": "backend/story_knowledge/booknlp_adapter_contract.py",
+    "adapter_test_file": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
+    "parser_test_file": "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py",
+    "future_parser_module": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "source_map_module": "backend/story_knowledge/source_map.py",
+    "evidence_module": "backend/story_knowledge/evidence.py",
+    "t002_decision": "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md"
+  },
+  "goal": "Implement the pure in-memory BookNLP fixture parser helper layer that satisfies tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py and builds raw artifact bundles compatible with validate_booknlp_raw_artifact_bundle, without real BookNLP/spaCy runtime, filesystem I/O, raw artifact persistence, candidate creation, generated prose, apply-promotion, or memory/canon mutation.",
+  "why_now": "PHASE8-IMPL-008 completed the storage contract, pure storage path/manifest helpers, parser contract decision, and expected-red parser contract tests. The next narrow implementation gap is the missing backend.story_knowledge.booknlp_fixture_parser module.",
+  "scope": {
+    "include": [
+      "Docs/status parent publication in T001.",
+      "Docs/decision reconciliation in T002 before implementation.",
+      "Pure standard-library parser module in later implementation children.",
+      "In-memory TSV parser helpers for tokens, entities, quotes, and supersense fixture text.",
+      "In-memory book JSON parser with g preserved as raw aggregate metadata only.",
+      "App-owned event derivation from tokens event markers only.",
+      "Raw artifact bundle builder integration with existing adapter, storage, source-map, and evidence contracts.",
+      "Targeted parser contract validation and boundary hardening."
+    ],
+    "exclude": [
+      "Parser implementation in T001.",
+      "Real BookNLP install, import, run, execution, or disk-output parsing.",
+      "Real spaCy install, import, run, or execution.",
+      "Filesystem reads or writes in the parser module.",
+      "Raw artifact write/read/list helpers.",
+      "Runtime extraction orchestration.",
+      "Backend routes or frontend UI.",
+      "Package or dependency changes.",
+      "External repo clone, fetch, pull, execution, import, copy, or vendoring.",
+      "Model calls, Ollama calls, Story Check calls, demos, or app server runs.",
+      "Candidate JSON persistence from parsed output.",
+      "Generated prose, rewriting, continuation, imitation, polish, improvement, or expansion.",
+      "Apply-promotion.",
+      "Memory/canon mutation.",
+      "Training data, JSONL records, dataset manifests, or model artifacts."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-009-T001",
+      "title": "Publish BookNLP fixture parser implementation parent",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-009"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Create parent task record, inventory, and enrichment JSON.",
+        "Mark PHASE8-IMPL-009 active.",
+        "Mark T001 complete and T002 ready/active.",
+        "Do not implement parser helpers."
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-009-T002",
+      "title": "Parser implementation contract reconciliation decision",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-009-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Reconcile parser tests, T005 decision, storage helpers, adapter bundle validation, and source/evidence boundaries.",
+        "Decide the exact implementation split for T003 through T006."
+      ],
+      "result": "complete",
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md"
+    },
+    {
+      "id": "PHASE8-IMPL-009-T003",
+      "title": "Minimal BookNLP TSV fixture parser implementation",
+      "type": "runtime_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-009-T002"
+      ],
+      "scope": [
+        "Create backend/story_knowledge/booknlp_fixture_parser.py if authorized.",
+        "Implement public symbols and in-memory TSV parsing helpers.",
+        "No filesystem I/O or runtime extraction."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-009-T004",
+      "title": "Book JSON parsing and token-event derivation implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-009-T003"
+      ],
+      "scope": [
+        "Implement book JSON parsing and token-event derivation if authorized.",
+        "Keep events app-owned derived support from tokens only.",
+        "Do not accept .events raw input."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-009-T005",
+      "title": "Raw artifact bundle builder integration with adapter/storage/source/evidence contracts",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-009-T004"
+      ],
+      "scope": [
+        "Implement in-memory raw artifact bundle builder if authorized.",
+        "Validate compatibility with existing adapter/storage/source/evidence helpers.",
+        "No raw artifact persistence."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-009-T006",
+      "title": "Targeted parser contract validation and boundary hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-009-T005"
+      ],
+      "scope": [
+        "Run targeted parser contract tests and focused regressions.",
+        "Repair only parser-helper gaps if authorized.",
+        "Preserve source-level forbidden-term boundaries."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-009-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-009-T006"
+      ],
+      "scope": [
+        "Docs/status closeout only.",
+        "Mark parent complete only after implementation children validate.",
+        "Recommend next parent without activating it unless separately authorized."
+      ],
+      "result": "pending"
+    }
+  ],
+  "t001_preconditions": {
+    "phase8_impl_008_complete": true,
+    "phase8_impl_008_t007_complete": true,
+    "phase8_impl_009_previously_recommended_not_active": true,
+    "no_active_child_after_phase8_impl_008_t007": true,
+    "raw_extraction_storage_exists": true,
+    "parser_contract_test_exists": true,
+    "parser_module_absent": true,
+    "parser_contract_expected_red_due_to_missing_module": true,
+    "raw_artifact_write_read_list_helpers_absent": true,
+    "external_sources_ignored": true
+  },
+  "t001_result": {
+    "result": "PASS",
+    "files_created": [
+      "docs/roadmap/tasks/PHASE8-IMPL-009.md",
+      "docs/roadmap/inventory/PHASE8-IMPL-009.md",
+      "docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json"
+    ],
+    "files_updated": [
+      "docs/roadmap/implementation_status.md",
+      "docs/roadmap/roadmap_index.yaml",
+      "docs/roadmap/task_backlog.md",
+      "docs/roadmap/phase_map.md",
+      "docs/master_plan.md",
+      "docs/roadmap/validation/latest_roadmap_validation.md"
+    ]
+  },
+  "t002_preconditions": {
+    "phase8_impl_009_active": true,
+    "phase8_impl_009_t001_complete": true,
+    "phase8_impl_009_t002_ready_active_before_edit": true,
+    "phase8_impl_009_t003_planned_next_before_edit": true,
+    "phase8_impl_008_complete_through_t007": true,
+    "raw_extraction_storage_exists": true,
+    "parser_contract_test_exists": true,
+    "parser_module_absent": true,
+    "parser_contract_expected_red_due_to_missing_module": true,
+    "runtime_extraction_absent": true,
+    "raw_artifact_write_read_list_helpers_absent": true,
+    "parser_implementation_absent": true,
+    "booknlp_spacy_not_installed_or_run_by_t002": true,
+    "external_sources_ignored": true
+  },
+  "t002_decision": {
+    "result": "PASS",
+    "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md",
+    "accepted_public_apis": [
+      "parse_booknlp_tokens_tsv",
+      "parse_booknlp_entities_tsv",
+      "parse_booknlp_quotes_tsv",
+      "parse_booknlp_supersense_tsv",
+      "parse_booknlp_book_json",
+      "derive_booknlp_events_from_tokens",
+      "build_booknlp_raw_artifact_bundle_from_fixture_texts"
+    ],
+    "implementation_split": {
+      "PHASE8-IMPL-009-T003": "Minimal in-memory TSV parser implementation.",
+      "PHASE8-IMPL-009-T004": "Book JSON parser and token-event derivation implementation.",
+      "PHASE8-IMPL-009-T005": "Raw artifact bundle builder integration with storage/source/evidence/adapter validators.",
+      "PHASE8-IMPL-009-T006": "Full parser contract validation and boundary hardening."
+    },
+    "next_child": "PHASE8-IMPL-009-T003",
+    "validation_results": {
+      "enrichment_json_parse": "PASS",
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "git_diff_check": "PASS",
+      "source_cache_safety_checks": "PASS"
+    },
+    "no_runtime_test_code_package_changes": true,
+    "no_booknlp_spacy_runtime": true,
+    "no_raw_artifact_persistence": true,
+    "no_generated_prose_apply_promotion_or_memory_canon_mutation": true
+  }
+}
