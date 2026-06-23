@@ -163,7 +163,7 @@
       "id": "PHASE8-IMPL-009-T004",
       "title": "Book JSON parsing and token-event derivation implementation",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-009-T003"
       ],
@@ -172,13 +172,26 @@
         "Keep events app-owned derived support from tokens only.",
         "Do not accept .events raw input."
       ],
-      "result": "pending"
+      "result": "complete",
+      "module_file": "backend/story_knowledge/booknlp_fixture_parser.py",
+      "implemented_apis": [
+        "parse_booknlp_book_json",
+        "derive_booknlp_events_from_tokens"
+      ],
+      "deferred_apis": [
+        "build_booknlp_raw_artifact_bundle_from_fixture_texts"
+      ],
+      "parser_contract_results": {
+        "collect_only": "PASS, 64 tests collected",
+        "full_contract": "PARTIAL, 61 passed and 3 failed on deferred T005 bundle-builder acceptance behavior",
+        "targeted_t004_subset": "PARTIAL, 61 passed and 3 failed because the broad keyword expression selects deferred bundle-builder acceptance tests"
+      }
     },
     {
       "id": "PHASE8-IMPL-009-T005",
       "title": "Raw artifact bundle builder integration with adapter/storage/source/evidence contracts",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-009-T004"
       ],
@@ -330,6 +343,54 @@
       "full_contract": "PARTIAL, 41 passed and 23 failed on deferred T004/T005 APIs"
     },
     "next_child": "PHASE8-IMPL-009-T004",
+    "no_runtime_package_tool_filesystem_changes_beyond_parser_module": true,
+    "no_booknlp_spacy_runtime": true,
+    "no_raw_artifact_persistence": true,
+    "no_generated_prose_apply_promotion_or_memory_canon_mutation": true
+  },
+  "t004_preconditions": {
+    "phase8_impl_009_active": true,
+    "phase8_impl_009_t001_complete": true,
+    "phase8_impl_009_t002_complete": true,
+    "phase8_impl_009_t003_complete": true,
+    "phase8_impl_009_t004_ready_active_before_edit": true,
+    "phase8_impl_009_t005_planned_next_before_edit": true,
+    "parser_module_exists": true,
+    "tsv_parser_apis_exist": true,
+    "book_json_parser_placeholder_existed_before_edit": true,
+    "event_derivation_placeholder_existed_before_edit": true,
+    "bundle_builder_deferred_placeholder_preserved": true,
+    "runtime_extraction_absent": true,
+    "raw_artifact_write_read_list_helpers_absent": true,
+    "booknlp_spacy_not_installed_or_run_by_t004": true,
+    "external_sources_ignored": true
+  },
+  "t004_result": {
+    "result": "PASS",
+    "module_file": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "implemented_book_json_api": "parse_booknlp_book_json",
+    "implemented_event_derivation_api": "derive_booknlp_events_from_tokens",
+    "deferred_builder_api": "build_booknlp_raw_artifact_bundle_from_fixture_texts",
+    "parser_contract_results": {
+      "collect_only": "PASS, 64 tests collected",
+      "full_contract": "PARTIAL, 61 passed and 3 failed on deferred T005 bundle-builder acceptance behavior",
+      "targeted_t004_subset": "PARTIAL, 61 passed and 3 failed because the broad keyword expression selects deferred bundle-builder acceptance tests"
+    },
+    "regression_results": {
+      "raw_extraction_storage_contract": "PASS, 185 passed",
+      "booknlp_adapter_contract": "PASS, 148 passed",
+      "source_evidence_contract": "PASS, 104 passed",
+      "candidate_regressions": "PASS, 307 passed",
+      "focused_omi_project_regressions": "PASS, 109 passed"
+    },
+    "validation_results": {
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "narrow_git_diff_check": "PASS",
+      "source_cache_safety_checks": "PASS"
+    },
+    "next_child": "PHASE8-IMPL-009-T005",
     "no_runtime_package_tool_filesystem_changes_beyond_parser_module": true,
     "no_booknlp_spacy_runtime": true,
     "no_raw_artifact_persistence": true,

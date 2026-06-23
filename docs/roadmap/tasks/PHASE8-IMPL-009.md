@@ -10,7 +10,7 @@ Writer Assistant Core BookNLP fixture parser helper implementation and raw artif
 
 ## Status
 
-active after `PHASE8-IMPL-009-T003` implementation. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, and `PHASE8-IMPL-009-T003` are complete; `PHASE8-IMPL-009-T004` is ready/active.
+active after `PHASE8-IMPL-009-T004` implementation. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, `PHASE8-IMPL-009-T003`, and `PHASE8-IMPL-009-T004` are complete; `PHASE8-IMPL-009-T005` is ready/active.
 
 ## Goal
 
@@ -87,8 +87,8 @@ Explicitly excluded:
 1. `PHASE8-IMPL-009-T001` - Publish BookNLP fixture parser implementation parent. Status: complete on successful publication.
 2. `PHASE8-IMPL-009-T002` - Parser implementation contract reconciliation decision. Status: complete as of 2026-06-21.
 3. `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation. Status: complete as of 2026-06-21.
-4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: ready/active.
-5. `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts. Status: planned/draft.
+4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: complete as of 2026-06-23.
+5. `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts. Status: ready/active.
 6. `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening. Status: planned/draft.
 7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: planned/draft.
 
@@ -169,6 +169,15 @@ T002 accepted:
 - Derive app-owned event support from token `event` markers only.
 - Reject `.events` raw input and do not claim real external BookNLP event files exist.
 - No raw artifact persistence, no candidate creation, no canon/memory mutation, no runtime extraction.
+- Status: complete as of 2026-06-23.
+- Updated parser module: `backend/story_knowledge/booknlp_fixture_parser.py`.
+- Implemented `.book` JSON API:
+  - `parse_booknlp_book_json`
+- Implemented token-event derivation API:
+  - `derive_booknlp_events_from_tokens`
+- Preserved `build_booknlp_raw_artifact_bundle_from_fixture_texts` as a fail-closed `ValueError` placeholder for T005.
+- Parser contract status: collection passes; `.book` JSON and token-event derivation portions pass; full parser contract remains partially red only on deferred T005 bundle-builder acceptance behavior.
+- No parser filesystem I/O, no real BookNLP/spaCy install or execution, no runtime extraction, no raw artifact persistence, and no candidate/canon/memory mutation were added.
 
 ### `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts
 
@@ -207,5 +216,17 @@ T002 accepted:
 Implemented TSV behavior includes exact header validation, duplicate/unknown/missing header rejection, malformed row rejection, empty required cell rejection except token `event`, non-negative integer coercion for known numeric fields, bool-like/negative/non-integer numeric rejection, and byte/span ordering checks. The output remains raw support dictionaries only.
 
 Deferred APIs remain fail-closed placeholders for `PHASE8-IMPL-009-T004` and `PHASE8-IMPL-009-T005`: `.book` JSON parsing, token-event derivation, and raw artifact bundle building. The parser contract collection now passes. The full parser contract remains partially red only for these deferred APIs, while the TSV parser portions pass.
+
+No filesystem I/O, real BookNLP/spaCy install or execution, runtime extraction, raw artifact persistence, raw write/read/list helpers, candidate/canon/memory mutation, generated prose behavior, package changes, routes, UI, project runtime files, training, JSONL, dataset work, staging, commit, or push were added.
+
+## T004 Implementation Result
+
+`PHASE8-IMPL-009-T004` implemented pure in-memory `.book` JSON parsing and token-event derivation in `backend/story_knowledge/booknlp_fixture_parser.py`.
+
+Implemented `.book` JSON behavior includes string-only input, malformed JSON rejection, dict root validation, required `characters` list validation, strict character field validation, non-negative integer validation for `id` and `count`, mention bucket/list validation, mention entry validation, deep-copy output, and preservation of `g` only as raw aggregate metadata.
+
+Implemented event derivation behavior derives app-owned support rows only from token rows whose `event` marker is `EVENT`. It copies supported token identifiers, text, byte offsets, source locator when present, and confidence when present, with a default `0.0` confidence for compatibility with the adapter contract. The derived rows do not claim timeline canon, causal truth, plot truth, approved truth, candidate persistence, memory writes, or canon writes.
+
+`build_booknlp_raw_artifact_bundle_from_fixture_texts` remains a fail-closed `ValueError` placeholder deferred to `PHASE8-IMPL-009-T005`. Parser contract collection passes. The full parser contract is partial only for the three deferred T005 bundle-builder acceptance tests; T004 `.book` JSON and event derivation behavior passes.
 
 No filesystem I/O, real BookNLP/spaCy install or execution, runtime extraction, raw artifact persistence, raw write/read/list helpers, candidate/canon/memory mutation, generated prose behavior, package changes, routes, UI, project runtime files, training, JSONL, dataset work, staging, commit, or push were added.
