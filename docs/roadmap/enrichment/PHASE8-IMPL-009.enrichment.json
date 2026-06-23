@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-009",
   "title": "Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-008"
@@ -51,6 +51,7 @@
     "adapter_test_file": "tests/test_writer_assistant_core_booknlp_adapter_contract.py",
     "parser_test_file": "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py",
     "future_parser_module": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "parser_module": "backend/story_knowledge/booknlp_fixture_parser.py",
     "source_map_module": "backend/story_knowledge/source_map.py",
     "evidence_module": "backend/story_knowledge/evidence.py",
     "t002_decision": "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md"
@@ -234,7 +235,7 @@
       "id": "PHASE8-IMPL-009-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-009-T006"
       ],
@@ -243,7 +244,7 @@
         "Mark parent complete only after implementation children validate.",
         "Recommend next parent without activating it unless separately authorized."
       ],
-      "result": "pending"
+      "result": "complete"
     }
   ],
   "t001_preconditions": {
@@ -493,6 +494,90 @@
     "no_booknlp_spacy_runtime": true,
     "no_raw_artifact_persistence": true,
     "no_raw_write_read_list_helpers": true,
+    "no_generated_prose_apply_promotion_or_memory_canon_mutation": true
+  },
+  "t007_result": {
+    "result": "PASS",
+    "parent_result": "PHASE8-IMPL-009 COMPLETE",
+    "status": "complete",
+    "completed_child_tasks": [
+      "PHASE8-IMPL-009-T001",
+      "PHASE8-IMPL-009-T002",
+      "PHASE8-IMPL-009-T003",
+      "PHASE8-IMPL-009-T004",
+      "PHASE8-IMPL-009-T005",
+      "PHASE8-IMPL-009-T006",
+      "PHASE8-IMPL-009-T007"
+    ],
+    "final_artifacts": [
+      "docs/roadmap/tasks/PHASE8-IMPL-009.md",
+      "docs/roadmap/inventory/PHASE8-IMPL-009.md",
+      "docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json",
+      "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md",
+      "backend/story_knowledge/booknlp_fixture_parser.py",
+      "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py"
+    ],
+    "final_parser_apis": [
+      "parse_booknlp_tokens_tsv",
+      "parse_booknlp_entities_tsv",
+      "parse_booknlp_quotes_tsv",
+      "parse_booknlp_supersense_tsv",
+      "parse_booknlp_book_json",
+      "derive_booknlp_events_from_tokens",
+      "build_booknlp_raw_artifact_bundle_from_fixture_texts"
+    ],
+    "final_behavior": [
+      "pure in-memory TSV fixture parsing",
+      "pure in-memory book JSON parsing",
+      "event derivation from token event column",
+      "raw artifact bundle construction from in-memory fixture strings",
+      "validation through storage/source/evidence/adapter helpers",
+      "fail-closed malformed input behavior"
+    ],
+    "tracked_artifact_confirmation": {
+      "backend/story_knowledge/booknlp_fixture_parser.py": true,
+      "backend/story_knowledge/raw_extraction_storage.py": true,
+      "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py": true,
+      "tests/test_writer_assistant_core_raw_extraction_storage_contract.py": true,
+      "tests/test_writer_assistant_core_booknlp_adapter_contract.py": true,
+      ".external_sources_ignored_or_protected": true
+    },
+    "validation_results": {
+      "parser_contract": "PASS",
+      "raw_extraction_storage_contract": "PASS",
+      "booknlp_adapter_contract": "PASS",
+      "source_evidence_contract": "PASS",
+      "candidate_regressions": "PASS",
+      "focused_omi_project_regressions": "PASS",
+      "booknlp_spacy_availability_guard": "PASS via importlib.util.find_spec only",
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "narrow_git_diff_check": "PASS",
+      "source_cache_safety_checks": "PASS"
+    },
+    "deferred_work": [
+      "real BookNLP install/run/import",
+      "real BookNLP output file parsing from disk",
+      "raw artifact write/read/list helpers",
+      "raw artifact persistence from real project runs",
+      "byte-to-character source matching",
+      "extraction orchestrator",
+      "backend extraction routes",
+      "frontend parser/review UI",
+      "candidate JSON persistence from parser outputs",
+      "apply-promotion",
+      "memory/canon mutation",
+      "NCP/Subtxt/dramatica-flow implementation",
+      "model-assisted extraction",
+      "training/JSONL/dataset work"
+    ],
+    "next_parent_recommendation": "PHASE8-IMPL-010 - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
+    "no_extraction_runtime_package_tool_execution": true,
+    "no_booknlp_spacy_runtime": true,
+    "no_parser_filesystem_io": true,
+    "no_raw_artifact_persistence": true,
+    "no_candidate_creation": true,
     "no_generated_prose_apply_promotion_or_memory_canon_mutation": true
   }
 }

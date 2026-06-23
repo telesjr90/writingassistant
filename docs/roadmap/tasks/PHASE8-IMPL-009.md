@@ -10,7 +10,7 @@ Writer Assistant Core BookNLP fixture parser helper implementation and raw artif
 
 ## Status
 
-active after `PHASE8-IMPL-009-T006` validation. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, `PHASE8-IMPL-009-T003`, `PHASE8-IMPL-009-T004`, `PHASE8-IMPL-009-T005`, and `PHASE8-IMPL-009-T006` are complete; `PHASE8-IMPL-009-T007` is ready/active.
+complete after `PHASE8-IMPL-009-T007` roadmap/status closeout. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, `PHASE8-IMPL-009-T003`, `PHASE8-IMPL-009-T004`, `PHASE8-IMPL-009-T005`, `PHASE8-IMPL-009-T006`, and `PHASE8-IMPL-009-T007` are complete. No active child remains under `PHASE8-IMPL-009`.
 
 ## Goal
 
@@ -90,7 +90,7 @@ Explicitly excluded:
 4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: complete as of 2026-06-23.
 5. `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts. Status: complete as of 2026-06-23.
 6. `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening. Status: complete as of 2026-06-23.
-7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: complete as of 2026-06-23.
 
 ## Child Task Details
 
@@ -221,7 +221,7 @@ T002 accepted:
 - Mark `PHASE8-IMPL-009` complete only if the parser contract is satisfied and all boundaries remain intact.
 - Recommend the next parent without activating it unless separately authorized.
 - No runtime feature expansion.
-- Status: ready/active after T006 validation.
+- Status: complete as of 2026-06-23.
 
 ## T001 Publication Result
 
@@ -273,4 +273,90 @@ No parser-helper gap was found, so `backend/story_knowledge/booknlp_fixture_pars
 
 No filesystem I/O, real BookNLP/spaCy install or execution, runtime extraction, raw artifact persistence, raw write/read/list helpers, candidate/canon/memory mutation, generated prose behavior, package changes, routes, UI, project runtime files, training, JSONL, dataset work, staging, commit, or push were added.
 
-`PHASE8-IMPL-009-T007` is now ready/active for roadmap/status closeout.
+`PHASE8-IMPL-009-T007` completed roadmap/status closeout.
+
+## T007 Closeout Result
+
+`PHASE8-IMPL-009` is COMPLETE.
+
+Completed child summary:
+
+- `PHASE8-IMPL-009-T001` published the parser implementation parent.
+- `PHASE8-IMPL-009-T002` accepted the implementation split and public parser API.
+- `PHASE8-IMPL-009-T003` created `backend/story_knowledge/booknlp_fixture_parser.py` and implemented TSV fixture parsers.
+- `PHASE8-IMPL-009-T004` implemented `.book` JSON parsing and token-event derivation.
+- `PHASE8-IMPL-009-T005` implemented raw artifact bundle builder integration.
+- `PHASE8-IMPL-009-T006` validated and hardened fail-closed and boundary behavior; validation found no parser gap and required no parser code changes.
+- `PHASE8-IMPL-009-T007` closed the parent.
+
+Final artifacts:
+
+- `docs/roadmap/tasks/PHASE8-IMPL-009.md`
+- `docs/roadmap/inventory/PHASE8-IMPL-009.md`
+- `docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json`
+- `docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md`
+- `backend/story_knowledge/booknlp_fixture_parser.py`
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py`
+
+Final parser APIs now available:
+
+- `parse_booknlp_tokens_tsv`
+- `parse_booknlp_entities_tsv`
+- `parse_booknlp_quotes_tsv`
+- `parse_booknlp_supersense_tsv`
+- `parse_booknlp_book_json`
+- `derive_booknlp_events_from_tokens`
+- `build_booknlp_raw_artifact_bundle_from_fixture_texts`
+
+Final behavior now available:
+
+- pure in-memory TSV fixture parsing;
+- pure in-memory `.book` JSON parsing;
+- event derivation from the token `event` column;
+- raw artifact bundle construction from in-memory fixture strings;
+- validation through storage, source-map, evidence, and adapter helpers;
+- fail-closed malformed input behavior;
+- no filesystem parser I/O;
+- no raw artifact persistence;
+- no candidate creation;
+- no memory/canon mutation;
+- no generated prose, rewrite, or continuation behavior;
+- no real BookNLP/spaCy install, import, or execution.
+
+Repo hygiene and tracked-artifact confirmation:
+
+- `backend/story_knowledge/booknlp_fixture_parser.py` is tracked.
+- `backend/story_knowledge/raw_extraction_storage.py` is tracked.
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` is tracked.
+- `tests/test_writer_assistant_core_raw_extraction_storage_contract.py` is tracked.
+- `tests/test_writer_assistant_core_booknlp_adapter_contract.py` is tracked.
+- `.external_sources/` remains ignored/protected and was not staged or exposed as an untracked source-cache directory.
+
+Explicit deferred work:
+
+- real BookNLP install/run/import;
+- real BookNLP output file parsing from disk;
+- raw artifact write/read/list helpers;
+- raw artifact persistence from real project runs;
+- byte-to-character source matching;
+- extraction orchestrator;
+- backend extraction routes;
+- frontend parser/review UI;
+- candidate JSON persistence from parser outputs;
+- apply-promotion;
+- memory/canon mutation;
+- NCP/Subtxt/dramatica-flow implementation;
+- model-assisted extraction;
+- training/JSONL/dataset work.
+
+Recommended next parent:
+
+`PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+
+Recommended scope for `PHASE8-IMPL-010`:
+
+- decide how source-map, evidence, raw storage, parser, and adapter pieces will be orchestrated without real tool runtime;
+- define a review-safe extraction pipeline contract;
+- decide whether first orchestration uses only synthetic fixtures;
+- keep real BookNLP/spaCy runtime, routes/UI, persistence writes, and apply-promotion deferred unless separately authorized;
+- maintain no-prose and no-canon-mutation boundaries.

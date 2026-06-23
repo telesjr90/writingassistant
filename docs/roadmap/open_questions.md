@@ -172,9 +172,11 @@ Deferred PHASE8-IMPL-006 follow-ups:
 28. Byte-to-character source matching remains deferred beyond T005/T006 and should stay separate from the in-memory fixture parser contract.
 29. `PHASE8-IMPL-009` scope should be limited to pure parser implementation and raw artifact bundle integration unless a later owner-approved task explicitly expands it; it must not add filesystem I/O, real BookNLP/spaCy runtime, candidate persistence, routes/UI, apply-promotion, memory/canon mutation, or raw artifact write/read/list helpers.
 30. ~~What exact implementation split should `PHASE8-IMPL-009-T003` through `PHASE8-IMPL-009-T006` use?~~ **Resolved in PHASE8-IMPL-009-T002:** T003 creates `backend/story_knowledge/booknlp_fixture_parser.py` and implements minimal TSV parsers; T004 implements `.book` JSON parsing and `.tokens.event` event derivation; T005 implements the in-memory raw artifact bundle builder with storage/source/evidence/adapter validation; T006 runs full parser contract validation and hardening.
-31. Byte-to-character source matching remains deferred beyond the fixture parser helper implementation.
-32. Real BookNLP runtime installation/import/execution remains deferred and is not authorized by `PHASE8-IMPL-009-T002`.
-33. Raw artifact persistence, write/read/list helpers, and extraction UI/routes remain deferred beyond the parser helper implementation parent.
+31. ~~Does `PHASE8-IMPL-009` deliver the fixture parser helper implementation and raw artifact bundle builder?~~ **Resolved in PHASE8-IMPL-009-T007:** yes. The parent is complete; `backend/story_knowledge/booknlp_fixture_parser.py` is tracked; all seven public parser APIs exist; the full parser contract passes; and raw artifact bundle construction remains pure, standard-library, in-memory, and raw-support-only.
+32. Byte-to-character source matching remains deferred beyond the fixture parser helper implementation.
+33. Real BookNLP runtime installation/import/execution remains deferred and is not authorized by `PHASE8-IMPL-009`.
+34. Raw artifact persistence, write/read/list helpers, extraction orchestration, extraction UI/routes, candidate persistence from parser outputs, apply-promotion, and memory/canon mutation remain deferred beyond the parser helper implementation parent.
+35. The recommended next parent is `PHASE8-IMPL-010 - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary`, recommended only and not active until separately published.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 
