@@ -124,7 +124,7 @@
       "id": "PHASE8-IMPL-009-T003",
       "title": "Minimal BookNLP TSV fixture parser implementation",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-009-T002"
       ],
@@ -133,13 +133,37 @@
         "Implement public symbols and in-memory TSV parsing helpers.",
         "No filesystem I/O or runtime extraction."
       ],
-      "result": "pending"
+      "result": "complete",
+      "module_file": "backend/story_knowledge/booknlp_fixture_parser.py",
+      "implemented_tsv_apis": [
+        "parse_booknlp_tokens_tsv",
+        "parse_booknlp_entities_tsv",
+        "parse_booknlp_quotes_tsv",
+        "parse_booknlp_supersense_tsv"
+      ],
+      "deferred_apis": [
+        "parse_booknlp_book_json",
+        "derive_booknlp_events_from_tokens",
+        "build_booknlp_raw_artifact_bundle_from_fixture_texts"
+      ],
+      "parser_contract_results": {
+        "collect_only": "PASS, 64 tests collected",
+        "full_contract": "PARTIAL, 41 passed and 23 failed on deferred T004/T005 APIs"
+      },
+      "boundaries": {
+        "pure_in_memory_tsv_only": true,
+        "no_parser_filesystem_io": true,
+        "no_runtime_extraction": true,
+        "no_raw_artifact_persistence": true,
+        "no_package_or_tool_runtime_changes": true,
+        "no_candidate_canon_memory_mutation": true
+      }
     },
     {
       "id": "PHASE8-IMPL-009-T004",
       "title": "Book JSON parsing and token-event derivation implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-009-T003"
       ],
@@ -268,6 +292,45 @@
       "source_cache_safety_checks": "PASS"
     },
     "no_runtime_test_code_package_changes": true,
+    "no_booknlp_spacy_runtime": true,
+    "no_raw_artifact_persistence": true,
+    "no_generated_prose_apply_promotion_or_memory_canon_mutation": true
+  },
+  "t003_preconditions": {
+    "phase8_impl_009_active": true,
+    "phase8_impl_009_t001_complete": true,
+    "phase8_impl_009_t002_complete": true,
+    "phase8_impl_009_t003_ready_active_before_edit": true,
+    "phase8_impl_009_t004_planned_next_before_edit": true,
+    "phase8_impl_008_complete_through_t007": true,
+    "raw_extraction_storage_exists": true,
+    "parser_contract_test_exists": true,
+    "parser_module_absent_before_edit": true,
+    "parser_contract_expected_red_due_to_missing_module": true,
+    "raw_artifact_write_read_list_helpers_absent": true,
+    "booknlp_spacy_not_installed_or_run_by_t003": true,
+    "external_sources_ignored": true
+  },
+  "t003_result": {
+    "result": "PASS",
+    "module_file": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "implemented_tsv_apis": [
+      "parse_booknlp_tokens_tsv",
+      "parse_booknlp_entities_tsv",
+      "parse_booknlp_quotes_tsv",
+      "parse_booknlp_supersense_tsv"
+    ],
+    "deferred_apis": [
+      "parse_booknlp_book_json",
+      "derive_booknlp_events_from_tokens",
+      "build_booknlp_raw_artifact_bundle_from_fixture_texts"
+    ],
+    "parser_contract_results": {
+      "collect_only": "PASS, 64 tests collected",
+      "full_contract": "PARTIAL, 41 passed and 23 failed on deferred T004/T005 APIs"
+    },
+    "next_child": "PHASE8-IMPL-009-T004",
+    "no_runtime_package_tool_filesystem_changes_beyond_parser_module": true,
     "no_booknlp_spacy_runtime": true,
     "no_raw_artifact_persistence": true,
     "no_generated_prose_apply_promotion_or_memory_canon_mutation": true

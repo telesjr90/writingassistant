@@ -10,7 +10,7 @@ Writer Assistant Core BookNLP fixture parser helper implementation and raw artif
 
 ## Status
 
-active after `PHASE8-IMPL-009-T002` decision. `PHASE8-IMPL-009-T001` and `PHASE8-IMPL-009-T002` are complete; `PHASE8-IMPL-009-T003` is ready/active.
+active after `PHASE8-IMPL-009-T003` implementation. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, and `PHASE8-IMPL-009-T003` are complete; `PHASE8-IMPL-009-T004` is ready/active.
 
 ## Goal
 
@@ -86,8 +86,8 @@ Explicitly excluded:
 
 1. `PHASE8-IMPL-009-T001` - Publish BookNLP fixture parser implementation parent. Status: complete on successful publication.
 2. `PHASE8-IMPL-009-T002` - Parser implementation contract reconciliation decision. Status: complete as of 2026-06-21.
-3. `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation. Status: ready/active.
-4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: planned/draft.
+3. `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation. Status: complete as of 2026-06-21.
+4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: ready/active.
 5. `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts. Status: planned/draft.
 6. `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening. Status: planned/draft.
 7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: planned/draft.
@@ -148,6 +148,19 @@ T002 accepted:
 - Implement in-memory parsing for `.tokens`, `.entities`, `.quotes`, and `.supersense` TSV fixture strings as authorized by T002.
 - Keep implementation pure, standard-library-only, and side-effect free.
 - Do not implement filesystem I/O, raw artifact persistence, candidate persistence, runtime extraction, external tool imports, package changes, routes, UI, model calls, generated prose, apply-promotion, or memory/canon mutation.
+- Status: complete as of 2026-06-21.
+- Created parser module: `backend/story_knowledge/booknlp_fixture_parser.py`.
+- Implemented TSV APIs:
+  - `parse_booknlp_tokens_tsv`
+  - `parse_booknlp_entities_tsv`
+  - `parse_booknlp_quotes_tsv`
+  - `parse_booknlp_supersense_tsv`
+- Added fail-closed deferred public symbols for:
+  - `parse_booknlp_book_json`
+  - `derive_booknlp_events_from_tokens`
+  - `build_booknlp_raw_artifact_bundle_from_fixture_texts`
+- Parser contract status: collection passes; full contract remains partially red only on deferred `.book` JSON, token-event derivation, and raw artifact bundle builder behavior; TSV parser portions passed in the full run.
+- No parser filesystem I/O, no real BookNLP/spaCy install or execution, no runtime extraction, no raw artifact persistence, and no candidate/canon/memory mutation were added.
 
 ### `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation
 
@@ -186,3 +199,13 @@ T002 accepted:
 ## T002 Decision Result
 
 `PHASE8-IMPL-009-T002` accepts the parser implementation split and public API contract for T003 through T006. It creates only the decision artifact and roadmap/status updates. It does not implement parser helpers, does not create `backend/story_knowledge/booknlp_fixture_parser.py`, does not modify tests, does not add raw artifact write/read/list helpers, does not create runtime project files, and does not install/import/run BookNLP or spaCy.
+
+## T003 Implementation Result
+
+`PHASE8-IMPL-009-T003` created `backend/story_knowledge/booknlp_fixture_parser.py` and implemented the minimal pure in-memory TSV parser helpers for tokens, entities, quotes, and supersense fixture text.
+
+Implemented TSV behavior includes exact header validation, duplicate/unknown/missing header rejection, malformed row rejection, empty required cell rejection except token `event`, non-negative integer coercion for known numeric fields, bool-like/negative/non-integer numeric rejection, and byte/span ordering checks. The output remains raw support dictionaries only.
+
+Deferred APIs remain fail-closed placeholders for `PHASE8-IMPL-009-T004` and `PHASE8-IMPL-009-T005`: `.book` JSON parsing, token-event derivation, and raw artifact bundle building. The parser contract collection now passes. The full parser contract remains partially red only for these deferred APIs, while the TSV parser portions pass.
+
+No filesystem I/O, real BookNLP/spaCy install or execution, runtime extraction, raw artifact persistence, raw write/read/list helpers, candidate/canon/memory mutation, generated prose behavior, package changes, routes, UI, project runtime files, training, JSONL, dataset work, staging, commit, or push were added.

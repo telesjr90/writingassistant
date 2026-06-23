@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-009",
     "current_parent_task_title": "Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration",
-    "frontier_note": "PHASE8-IMPL-009 is active as the ninth Writer Assistant Core parent after completed PHASE8-IMPL-008. PHASE8-IMPL-009-T001 is complete as docs/status/planning publication. PHASE8-IMPL-009-T002 is complete as the parser implementation contract reconciliation decision and created docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md. PHASE8-IMPL-009-T003 is active/ready as the first runtime parser implementation child. The parent will implement the pure in-memory BookNLP fixture parser helper module for the expected-red tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py contract in later children. T002 accepted the public parser APIs and the T003-T006 split; it did not create backend/story_knowledge/booknlp_fixture_parser.py, did not modify backend/tests, did not add raw artifact write/read/list helpers, did not create runtime extraction artifacts, and did not run or install BookNLP/spaCy. Scope remains fixture-only, in-memory-only, raw-support-only, non-canon, non-candidate, no runtime extraction, no routes, no UI, no package/dependency changes, no model calls, no generated prose, no apply-promotion, and no memory/canon mutation."
+    "frontier_note": "PHASE8-IMPL-009 is active as the ninth Writer Assistant Core parent after completed PHASE8-IMPL-008. PHASE8-IMPL-009-T001 is complete as docs/status/planning publication. PHASE8-IMPL-009-T002 is complete as the parser implementation contract reconciliation decision and created docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md. PHASE8-IMPL-009-T003 is complete as the first runtime parser implementation child: it created backend/story_knowledge/booknlp_fixture_parser.py and implemented pure in-memory TSV parsers for tokens, entities, quotes, and supersense only. PHASE8-IMPL-009-T004 is active/ready for .book JSON parsing and token-event derivation. The parser contract now collects and TSV parser portions pass; the full contract remains partially red only for deferred T004/T005 APIs. Scope remains fixture-only, in-memory-only, raw-support-only, non-canon, non-candidate, no parser filesystem I/O, no runtime extraction, no routes, no UI, no package/dependency changes, no model calls, no generated prose, no apply-promotion, and no memory/canon mutation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1787,7 +1787,7 @@
       "id": "PHASE8-IMPL-009-T002",
       "title": "Parser implementation contract reconciliation decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-009",
       "depends_on": [
         "PHASE8-IMPL-009-T001"
@@ -1810,13 +1810,13 @@
         "no_routes",
         "no_frontend"
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-009-T003",
       "title": "Minimal BookNLP TSV fixture parser implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-009",
       "depends_on": [
         "PHASE8-IMPL-009-T002"
@@ -1836,13 +1836,13 @@
         "no_routes",
         "no_frontend"
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-009-T004",
       "title": "Book JSON parsing and token-event derivation implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-009",
       "depends_on": [
         "PHASE8-IMPL-009-T003"

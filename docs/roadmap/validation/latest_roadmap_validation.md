@@ -1,5 +1,105 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-009-T003 Minimal BookNLP TSV Fixture Parser Implementation
+
+### Result
+
+- Result: PASS.
+- Scope: runtime implementation micro-task for TSV parser helpers only.
+- Parent task: `PHASE8-IMPL-009` - Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation.
+- Active child after T003: `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation.
+- Next child after T004: `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts.
+
+### Files Changed
+
+- Created:
+  - `backend/story_knowledge/booknlp_fixture_parser.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-009.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Parser Module Summary
+
+`backend/story_knowledge/booknlp_fixture_parser.py` now exposes all public symbols needed for parser contract collection. T003 implemented only the four TSV parser APIs:
+
+- `parse_booknlp_tokens_tsv`
+- `parse_booknlp_entities_tsv`
+- `parse_booknlp_quotes_tsv`
+- `parse_booknlp_supersense_tsv`
+
+The TSV parsers are pure, standard-library-only, in-memory-only helpers. They require exact headers, reject duplicated/missing/unknown headers, reject malformed rows, reject empty required cells except token `event`, coerce known numeric fields to non-negative integers, reject bool-like/negative/non-integer numeric values, and validate byte/span ordering.
+
+Deferred APIs remain fail-closed placeholders:
+
+- `parse_booknlp_book_json`
+- `derive_booknlp_events_from_tokens`
+- `build_booknlp_raw_artifact_bundle_from_fixture_texts`
+
+### Parser Contract Status
+
+- Pre-edit collect-only: expected red, collection failed with `ImportError: cannot import name 'booknlp_fixture_parser' from 'backend.story_knowledge'`.
+- Post-edit collect-only: PASS, 64 tests collected.
+- Post-edit full parser contract: PARTIAL, 41 passed and 23 failed.
+- Remaining failures are limited to deferred T004/T005 APIs: `.book` JSON parsing, token-event derivation, and raw artifact bundle builder behavior.
+- Source-level boundary test in the parser contract passed.
+
+### Validation Results
+
+- Parser contract collect-only: PASS, 64 tests collected.
+- Parser contract full run: PARTIAL, 41 passed / 23 failed on deferred APIs.
+- Targeted TSV subset: PARTIAL, 38 passed / 2 failed / 24 deselected. The 2 failures are deferred token-event derivation tests selected by the broad keyword expression.
+- Raw extraction storage contract: PASS, 185 passed.
+- BookNLP adapter contract: PASS, 148 passed.
+- Source/evidence contract: PASS, 104 passed.
+- Candidate regressions: PASS, 307 passed. The candidate index safety regression file exists.
+- Focused OMI/project regressions: PASS, 109 passed. All requested files exist.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Runtime extraction folder check: PASS, no `projects/**/writer_assistant/extractions` folders found by non-LeanCTX shell glob.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Pure in-memory TSV parser implementation only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- A local hook blocked one `rg` status search and one `find` runtime-extraction check with a LeanCTX suggestion; those suggestions were not followed.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, or frontend builds were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No parser filesystem I/O was added.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No extraction/import/export implementation was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T004 Handoff
+
+- Next step: `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation.
+
 ## PHASE8-IMPL-009-T002 Parser Implementation Contract Reconciliation Decision
 
 ### Result
