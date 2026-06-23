@@ -1,5 +1,91 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T002 Review-Safe Extraction Pipeline Contract Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only for `PHASE8-IMPL-010-T002`.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision.
+- Active/ready child after T002: `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests.
+- Next child under `PHASE8-IMPL-010`: `PHASE8-IMPL-010-T003`.
+
+### Files Changed
+
+- Created:
+  - `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+
+### Decision Artifact Summary
+
+T002 accepted the review-safe extraction pipeline contract with the following selections:
+
+- Review-safe pipeline shape: source map to fixture/raw bundle to adapter validation/normalization to candidate draft support to owner review.
+- First orchestration mode: synthetic fixture orchestration only.
+- Future orchestrator module name: `backend/story_knowledge/extraction_orchestrator.py`.
+- Future orchestrator public APIs: `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`.
+- Request dict fields: `project_id`, `source_document`, `source_map`, `run_manifest`, `raw_output_references`, `fixture_texts`, `requested_outputs`, plus policy flags `human_review_required`, `persist_candidates`, `persist_raw_artifacts`, `allow_runtime_tools`, `allow_model_calls`, `allow_canon_write`, `allow_prose_generation`.
+- Required safe policy flag values: `human_review_required = true`, `persist_candidates = false`, `persist_raw_artifacts = false`, `allow_runtime_tools = false`, `allow_model_calls = false`, `allow_canon_write = false`, `allow_prose_generation = false`.
+- Output dict fields: `pipeline_id`, `project_id`, `source_document`, `source_map`, `run_manifest`, `raw_artifact_bundle`, `raw_output_references`, `candidate_drafts`, `evidence_records`, `provenance`, `warnings`, `errors`, plus policy outputs `human_review_required`, `persisted_candidates`, `persisted_raw_artifacts`, `canon_write_performed`, `prose_generated`.
+- Required safe policy output values: `human_review_required = true`, `persisted_candidates = false`, `persisted_raw_artifacts = false`, `canon_write_performed = false`, `prose_generated = false`.
+- Candidate drafts remain in-memory only and are not persisted in PHASE8-IMPL-010.
+- Raw artifacts remain non-canon and non-candidate; raw write/read/list helpers remain deferred.
+- Evidence and source locators remain required; no source locator guessing from byte offsets; byte-to-character matching remains deferred.
+- Owner review is mandatory before any approved truth update; apply-promotion remains deferred.
+- T003 is tests-first and expected-red if no orchestrator module exists; T004 may implement minimal pure helpers only if T002/T003 authorize.
+
+### Validation Results
+
+- `python3 - <<'PY'` enrichment JSON parse: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` on changed docs: PASS.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Docs/decision only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research or source retrieval was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No orchestrator implementation was added.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No extraction/import/export implementation was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T003 Handoff
+
+- Next step: `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests.
+
 ## PHASE8-IMPL-010-T001 Publish Extraction Orchestration Planning Parent
 
 ### Result

@@ -2017,7 +2017,7 @@
       "id": "PHASE8-IMPL-010-T002",
       "title": "Review-safe extraction pipeline contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-010",
       "depends_on": [
         "PHASE8-IMPL-010-T001"
@@ -2044,7 +2044,7 @@
         "no_routes",
         "no_frontend"
       ],
-      "result": "ready"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-010-T003",

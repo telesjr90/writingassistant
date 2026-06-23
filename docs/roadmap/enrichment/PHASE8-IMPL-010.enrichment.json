@@ -120,7 +120,7 @@
       "id": "PHASE8-IMPL-010-T002",
       "title": "Review-safe extraction pipeline contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-010-T001"
       ],
@@ -129,7 +129,16 @@
         "Decide source map to fixture/raw bundle to adapter validation/normalization to candidate draft support to owner-review flow.",
         "Decide what remains candidate-only and forbidden.",
         "Decide whether the first orchestrator should use synthetic fixture inputs only."
-      ]
+      ],
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md",
+      "accepted_pipeline_shape": "source map to fixture/raw bundle to adapter validation/normalization to candidate draft support to owner review",
+      "future_orchestrator_module": "backend/story_knowledge/extraction_orchestrator.py",
+      "future_orchestrator_apis": [
+        "validate_extraction_pipeline_request",
+        "build_fixture_extraction_pipeline_plan",
+        "run_fixture_extraction_pipeline"
+      ],
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-010-T003",

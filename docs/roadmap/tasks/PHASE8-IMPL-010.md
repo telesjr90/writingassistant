@@ -10,7 +10,7 @@ Writer Assistant Core extraction orchestration planning and review-safe pipeline
 
 ## Status
 
-Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is the next ready/active child.
+Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is the next ready/active child.
 
 ## Goal
 
@@ -124,6 +124,19 @@ Explicitly excluded:
 - Decide whether the first orchestrator contract should use synthetic fixture inputs only.
 - No runtime code or tests.
 
+### `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision
+
+- Docs/decision only.
+- Status: complete as of 2026-06-23.
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`.
+- Accept the review-safe extraction pipeline contract shape: source map to fixture/raw bundle to adapter validation/normalization to candidate draft support to owner review.
+- Accept the first orchestration mode as synthetic fixture orchestration only.
+- Accept the future pure orchestrator module name `backend/story_knowledge/extraction_orchestrator.py` and the public API set `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`.
+- Accept the request dict fields and required safe policy flags (`human_review_required = true`, `persist_candidates = false`, `persist_raw_artifacts = false`, `allow_runtime_tools = false`, `allow_model_calls = false`, `allow_canon_write = false`, `allow_prose_generation = false`).
+- Accept the output dict fields and required safe policy output values.
+- Keep candidate drafts in-memory only; reject automatic candidate persistence, raw artifact writes, canon/memory mutation, model calls, generated prose, rewrite, and continuation.
+- T003 is tests-first and expected-red if no orchestration module exists.
+
 ### `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests
 
 - Tests-first if authorized by T002.
@@ -167,7 +180,8 @@ Explicitly excluded:
 - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json` exists.
 - `PHASE8-IMPL-010` is active in roadmap/status docs.
 - `PHASE8-IMPL-010-T001` is complete.
-- `PHASE8-IMPL-010-T002` is ready/active.
+- `PHASE8-IMPL-010-T002` is complete.
+- `PHASE8-IMPL-010-T003` is ready/active.
 - T001 records `PHASE8-IMPL-009` complete through T007.
 - T001 records `PHASE8-IMPL-006` through `PHASE8-IMPL-009` artifacts as the foundation.
 - T001 creates no backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets.
@@ -196,8 +210,8 @@ Do not run pytest for T001 because no runtime code or tests should change.
 
 ## Current Status
 
-`PHASE8-IMPL-010` is active after T001 publication. `PHASE8-IMPL-010-T001` is complete if validation passes.
+`PHASE8-IMPL-010` is active after T001 publication. `PHASE8-IMPL-010-T001` is complete. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision. `PHASE8-IMPL-010-T003` is ready/active.
 
 ## Next Child
 
-`PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision.
+`PHASE8-IMPL-010-T003` - Extraction orchestration contract tests.

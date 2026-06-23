@@ -177,6 +177,11 @@ Deferred PHASE8-IMPL-006 follow-ups:
 33. Real BookNLP runtime installation/import/execution remains deferred and is not authorized by `PHASE8-IMPL-009`.
 34. Raw artifact persistence, write/read/list helpers, extraction orchestration, extraction UI/routes, candidate persistence from parser outputs, apply-promotion, and memory/canon mutation remain deferred beyond the parser helper implementation parent.
 35. The recommended next parent is `PHASE8-IMPL-010 - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary`, recommended only and not active until separately published.
+36. ~~What review-safe extraction pipeline contract should PHASE8-IMPL-010-T002 accept before orchestration tests?~~ **Resolved in PHASE8-IMPL-010-T002:** see `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. T002 accepts the review-safe pipeline shape (source map to fixture/raw bundle to adapter validation/normalization to candidate draft support to owner review), synthetic-fixture-only first orchestration mode, future pure orchestrator module name `backend/story_knowledge/extraction_orchestrator.py`, public APIs `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`, request dict fields, output dict fields, strict safe policy flags (`human_review_required = true`, `persist_candidates = false`, `persist_raw_artifacts = false`, `allow_runtime_tools = false`, `allow_model_calls = false`, `allow_canon_write = false`, `allow_prose_generation = false`), in-memory candidate drafts only, no persistence in PHASE8-IMPL-010, owner-review-first handoff, and fail-closed/quarantine behavior.
+37. Real BookNLP/spaCy runtime extraction remains deferred beyond the accepted review-safe pipeline contract.
+38. Extraction orchestrator implementation, raw artifact write/read/list helpers, candidate persistence, candidate review UI/API, and apply-promotion remain deferred to later owner-approved parents/children.
+39. Byte-to-character source matching remains deferred beyond the review-safe pipeline contract.
+40. PHASE8-IMPL-010-T003 is tests-first and expected-red if no orchestrator module exists.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 
