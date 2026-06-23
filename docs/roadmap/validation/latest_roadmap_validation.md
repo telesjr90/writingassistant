@@ -1,5 +1,91 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-009-T006 Parser Fail-Closed and Boundary Hardening
+
+### Result
+
+- Result: PASS.
+- Continuation note: resumed after the interrupted Claude Code run and reconfirmed the T006 validation set without parser changes.
+- Scope: validation and targeted parser hardening pass for the pure in-memory BookNLP fixture parser contract.
+- Parent task: `PHASE8-IMPL-009` - Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening.
+- Active child after T006: `PHASE8-IMPL-009-T007` - Roadmap/status closeout.
+- Next child under PHASE8-IMPL-009: none.
+
+### Files Changed
+
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-009.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Hardening Summary
+
+- Parser hardening patch needed: no.
+- `backend/story_knowledge/booknlp_fixture_parser.py` was left unchanged.
+- The full parser contract and source-level boundary scan passed.
+- The parser remains pure in-memory fixture parsing and raw-support bundle construction only.
+
+### Parser Contract Status
+
+- Parser contract full run: PASS, 64 passed.
+- Source-level boundary test in the parser contract passed.
+- Fail-closed behavior confirmed for non-string fixture text, unsupported keys, malformed TSV/JSON, invalid numeric values/spans, invalid manifest/source map/raw refs, `.events` raw input, path-like inputs, and caller mutation coverage already present in the contract.
+
+### Validation Results
+
+- Parser contract full run: PASS, 64 passed.
+- Raw extraction storage contract: PASS, 185 passed.
+- BookNLP adapter contract: PASS, 148 passed.
+- Source/evidence contract: PASS, 104 passed.
+- Candidate regressions: PASS, 307 passed. All listed candidate regression files exist.
+- Focused OMI/project regressions: PASS, 109 passed. All requested files exist.
+- BookNLP/spaCy availability check: PASS, `booknlp: False` and `spacy: False` via `importlib.util.find_spec` without importing either package.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no staged or untracked `.external_sources/` output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+- Runtime extraction check: PASS, no `writer_assistant/extractions` directories found under `projects/` using a non-LeanCTX Python path check.
+
+### Boundary Summary
+
+- Validation and docs/status update only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- A local hook blocked one runtime extraction `find` check and suggested LeanCTX; the suggestion was not followed.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, or frontend builds were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No parser filesystem I/O was added.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No extraction/import/export implementation was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T007 Handoff
+
+- Next step: `PHASE8-IMPL-009-T007` - Roadmap/status closeout.
+
 ## PHASE8-IMPL-009-T005 Raw Artifact Bundle Builder Integration
 
 ### Result

@@ -10,7 +10,7 @@ Writer Assistant Core BookNLP fixture parser helper implementation and raw artif
 
 ## Status
 
-active after `PHASE8-IMPL-009-T005` implementation. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, `PHASE8-IMPL-009-T003`, `PHASE8-IMPL-009-T004`, and `PHASE8-IMPL-009-T005` are complete; `PHASE8-IMPL-009-T006` is ready/active.
+active after `PHASE8-IMPL-009-T006` validation. `PHASE8-IMPL-009-T001`, `PHASE8-IMPL-009-T002`, `PHASE8-IMPL-009-T003`, `PHASE8-IMPL-009-T004`, `PHASE8-IMPL-009-T005`, and `PHASE8-IMPL-009-T006` are complete; `PHASE8-IMPL-009-T007` is ready/active.
 
 ## Goal
 
@@ -89,8 +89,8 @@ Explicitly excluded:
 3. `PHASE8-IMPL-009-T003` - Minimal BookNLP TSV fixture parser implementation. Status: complete as of 2026-06-21.
 4. `PHASE8-IMPL-009-T004` - Book JSON parsing and token-event derivation implementation. Status: complete as of 2026-06-23.
 5. `PHASE8-IMPL-009-T005` - Raw artifact bundle builder integration with adapter/storage/source/evidence contracts. Status: complete as of 2026-06-23.
-6. `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening. Status: ready/active.
-7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: planned/draft.
+6. `PHASE8-IMPL-009-T006` - Targeted parser contract validation and boundary hardening. Status: complete as of 2026-06-23.
+7. `PHASE8-IMPL-009-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Child Task Details
 
@@ -210,6 +210,10 @@ T002 accepted:
 - Repair only parser-helper contract gaps in `backend/story_knowledge/booknlp_fixture_parser.py` if authorized.
 - Preserve source-level forbidden-term boundaries.
 - Do not widen into raw artifact persistence, runtime extraction, routes, UI, package/dependency changes, model calls, generated prose, apply-promotion, or memory/canon mutation.
+- Status: complete as of 2026-06-23.
+- Parser contract full pass recorded: PASS, 64 passed.
+- Hardening summary: validation found no parser-helper gap; no parser code changes were needed.
+- Confirmed no filesystem I/O, no real BookNLP/spaCy install/run/import, no runtime extraction, no raw artifact persistence, no candidate/canon/memory mutation, no generated prose behavior, and no package/dependency changes.
 
 ### `PHASE8-IMPL-009-T007` - Roadmap/status closeout
 
@@ -217,6 +221,7 @@ T002 accepted:
 - Mark `PHASE8-IMPL-009` complete only if the parser contract is satisfied and all boundaries remain intact.
 - Recommend the next parent without activating it unless separately authorized.
 - No runtime feature expansion.
+- Status: ready/active after T006 validation.
 
 ## T001 Publication Result
 
@@ -257,3 +262,15 @@ The builder validates supported fixture keys, rejects unsupported raw `.events` 
 Parser contract collection passes. The full parser contract passes. T006 is now ready/active for targeted validation and boundary hardening only.
 
 No filesystem I/O, real BookNLP/spaCy install or execution, runtime extraction, raw artifact persistence, raw write/read/list helpers, candidate/canon/memory mutation, generated prose behavior, package changes, routes, UI, project runtime files, training, JSONL, dataset work, staging, commit, or push were added.
+
+## T006 Validation and Hardening Result
+
+`PHASE8-IMPL-009-T006` completed the parser fail-closed and boundary hardening pass as validation-only.
+
+The full parser contract passed with 64 tests. Existing raw extraction storage, BookNLP adapter, source/evidence, candidate, and focused OMI/project regressions also passed. The parser source-level boundary scan passed. BookNLP and spaCy availability metadata checks reported both unavailable, and neither package was imported or executed.
+
+No parser-helper gap was found, so `backend/story_knowledge/booknlp_fixture_parser.py` did not require a hardening patch. The existing parser remains in-memory only, rejects path-like and non-string fixture inputs, rejects unsupported fixture keys including raw `.events` input, validates manifest/source-map/raw-reference data through existing helpers, derives events only from token rows, and returns raw-support bundle data only.
+
+No filesystem I/O, real BookNLP/spaCy install or execution, runtime extraction, raw artifact persistence, raw write/read/list helpers, candidate/canon/memory mutation, generated prose behavior, package changes, routes, UI, project runtime files, training, JSONL, dataset work, staging, commit, or push were added.
+
+`PHASE8-IMPL-009-T007` is now ready/active for roadmap/status closeout.
