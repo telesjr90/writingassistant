@@ -64,8 +64,12 @@ GitHub Issues and GitHub Projects are not authoritative until a future sync task
 | `storage_contract_first` | Project-local raw extraction artifact storage layout, run-folder naming, and path/manifest contracts are decided and tested before any extractor runtime exists. |
 | `tests_first` | Future helpers are specified by expected-red contract tests before implementation. |
 | `pure_path_helpers` | Helpers compute and validate safe storage paths and manifests only; they do not write, read, or list raw artifact files unless separately authorized. |
+| `orchestration_contract` | Extraction sequencing, inputs, outputs, failure behavior, and handoff boundaries are decided by contract before runtime orchestration exists. |
+| `review_safe_pipeline` | Extraction output must remain review-safe and owner-gated before any candidate persistence or approved truth handoff. |
+| `in_memory_only` | Authorized helper behavior is limited to in-memory data structures and must not depend on project runtime files. |
+| `standard_library_only` | Authorized implementation, if any, must use Python standard-library behavior only and must not add package dependencies. |
+| `no_filesystem_io` | Authorized helper behavior must not read, write, list, or mutate filesystem content. |
 
 ## Drift Handling
 
 If a task ID has been reused incorrectly, treat that as numbering drift. Preserve the canonical task identity in `roadmap_index.yaml`, move the mistaken scope to the correct parent or child task, and record the correction in `implementation_status.md` or the relevant task record.
-

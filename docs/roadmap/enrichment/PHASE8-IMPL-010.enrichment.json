@@ -1,0 +1,255 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-010",
+  "title": "Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-009"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "docs_only_t001",
+    "tests_first",
+    "orchestration_contract",
+    "review_safe_pipeline",
+    "fixture_parser_only",
+    "in_memory_only",
+    "standard_library_only",
+    "no_filesystem_io",
+    "no_tool_execution",
+    "no_package_changes",
+    "no_runtime_extraction",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "raw_artifacts_non_canon",
+    "raw_artifacts_non_candidate",
+    "candidate_only",
+    "evidence_first",
+    "booknlp_ready",
+    "no_routes",
+    "no_frontend"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-010.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-010.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-009.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-009.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json",
+    "parser_reconciliation_decision": "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md",
+    "source_map_module": "backend/story_knowledge/source_map.py",
+    "evidence_module": "backend/story_knowledge/evidence.py",
+    "raw_storage_module": "backend/story_knowledge/raw_extraction_storage.py",
+    "fixture_parser_module": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "adapter_contract_module": "backend/story_knowledge/booknlp_adapter_contract.py",
+    "candidate_persistence_module": "backend/story_knowledge/candidate_persistence.py",
+    "candidate_index_module": "backend/story_knowledge/candidate_index.py"
+  },
+  "goal": "Publish the planning and contract parent for sequencing existing source-map, evidence, raw storage, fixture parser, adapter normalization, candidate draft support, and owner-review pieces into a review-safe extraction pipeline boundary without implementing runtime extraction in T001.",
+  "why_now": "PHASE8-IMPL-006 through PHASE8-IMPL-009 completed the foundation for evidence/source maps, raw artifact storage boundaries, mocked adapter normalization, pure in-memory BookNLP fixture parsing, and raw artifact bundle validation. The next gap is the orchestration contract that decides sequencing, failure behavior, and owner-review handoff before real runtime extraction, routes, UI, or persistence workflows.",
+  "evidence_inputs": [
+    "docs/roadmap/tasks/PHASE8-IMPL-006.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-008.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-009.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-009.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json",
+    "backend/story_knowledge/source_map.py",
+    "backend/story_knowledge/evidence.py",
+    "backend/story_knowledge/raw_extraction_storage.py",
+    "backend/story_knowledge/booknlp_fixture_parser.py",
+    "backend/story_knowledge/booknlp_adapter_contract.py",
+    "backend/story_knowledge/candidate_persistence.py",
+    "backend/story_knowledge/candidate_index.py"
+  ],
+  "scope": {
+    "include": [
+      "Docs/status parent publication in T001.",
+      "Review-safe extraction pipeline contract decision.",
+      "Tests-first orchestration contract if authorized by T002.",
+      "Optional minimal pure orchestration helper only if later children authorize it.",
+      "Candidate review handoff and persistence boundary decision.",
+      "Safety regression or conditional hardening.",
+      "Closeout."
+    ],
+    "exclude": [
+      "Runtime extraction implementation in T001.",
+      "Extraction orchestrator module creation in T001.",
+      "Real BookNLP install, import, run, or execution.",
+      "Real spaCy install, import, run, or execution.",
+      "Real BookNLP output file parsing from disk.",
+      "Raw artifact write/read/list helpers into real projects.",
+      "Raw artifact files under real projects.",
+      "Backend routes or frontend UI.",
+      "Package or dependency changes.",
+      "Automatic candidate JSON persistence from raw/parser output.",
+      "Apply-promotion.",
+      "Memory/canon mutation.",
+      "Generated prose, rewriting, continuation, imitation, polish, improvement, or expansion.",
+      "Model calls, Ollama calls, Story Check calls, demos, or app server runs.",
+      "Training data, JSONL records, dataset manifests, or model artifacts."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-010-T001",
+      "title": "Publish extraction orchestration planning parent",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-010"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Create parent task record, inventory, and enrichment JSON.",
+        "Mark PHASE8-IMPL-010 active.",
+        "Mark T001 complete and T002 ready/active.",
+        "No runtime code or tests."
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T002",
+      "title": "Review-safe extraction pipeline contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-010-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide source map to fixture/raw bundle to adapter validation/normalization to candidate draft support to owner-review flow.",
+        "Decide what remains candidate-only and forbidden.",
+        "Decide whether the first orchestrator should use synthetic fixture inputs only."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-010-T003",
+      "title": "Extraction orchestration contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-010-T002"
+      ],
+      "scope": [
+        "Tests-first if authorized by T002.",
+        "Expected-red if no orchestrator module exists.",
+        "tmp_path/in-memory only.",
+        "No real BookNLP/spaCy, routes, UI, or real project runtime writes."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-010-T004",
+      "title": "Minimal review-safe orchestration helper",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-010-T003"
+      ],
+      "scope": [
+        "Optional implementation only if T002/T003 authorize.",
+        "Pure standard-library/helper-only orchestration over existing in-memory helpers.",
+        "No real tool runtime.",
+        "No filesystem writes outside tmp_path tests."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-010-T005",
+      "title": "Candidate review handoff and persistence boundary decision",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-010-T004"
+      ],
+      "scope": [
+        "Docs/decision only unless prior tasks authorize tests.",
+        "Decide when candidate draft support can become candidate records.",
+        "Decide what remains manual and owner-reviewed.",
+        "No apply-promotion or memory/canon mutation."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-010-T006",
+      "title": "Orchestration safety regression or conditional hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-010-T005"
+      ],
+      "scope": [
+        "Validate no runtime extraction, filesystem leakage, canon/memory mutation, generated prose, routes, UI, or package changes.",
+        "Conditional repair only if authorized."
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-010-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-010-T006"
+      ],
+      "scope": [
+        "Close parent.",
+        "Summarize decisions/tests/helpers if any.",
+        "Recommend next parent only.",
+        "No runtime expansion."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Task record, inventory, and enrichment JSON are created.",
+    "PHASE8-IMPL-010 is active in roadmap/status docs.",
+    "PHASE8-IMPL-010-T001 is complete.",
+    "PHASE8-IMPL-010-T002 is ready/active.",
+    "T001 records PHASE8-IMPL-009 complete through T007.",
+    "T001 records PHASE8-IMPL-006 through PHASE8-IMPL-009 artifacts as the foundation.",
+    "No backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets are created.",
+    "No BookNLP/spaCy install/run/import occurs.",
+    "No extraction implementation is added.",
+    "No-prose and no-canon-mutation boundaries are preserved."
+  ],
+  "validation_plan": [
+    "python3 scripts/check_enrichment.py",
+    "python3 scripts/validate_roadmap.py",
+    "non-LeanCTX whitespace check",
+    "narrow /usr/bin/git diff --check",
+    "source-cache safety checks"
+  ],
+  "safety_notes": [
+    "Owner review remains mandatory before anything can become approved truth.",
+    "Raw artifacts are non-canon and non-candidate.",
+    "Parser and adapter outputs remain support/draft material only unless a later owner-approved child defines a review-safe handoff.",
+    "T001 is docs/status/planning only."
+  ],
+  "deferred_work": [
+    "review-safe extraction pipeline contract decision",
+    "orchestration contract tests",
+    "optional pure orchestration helper",
+    "candidate review handoff decision",
+    "runtime extraction",
+    "backend routes",
+    "frontend review UI",
+    "raw artifact persistence",
+    "real BookNLP/spaCy runtime",
+    "apply-promotion",
+    "memory/canon mutation"
+  ],
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX are authorized for T001.",
+  "external_tool_policy": "No external tools are installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001.",
+  "orchestration_policy": "The parent may define an orchestration contract and later tests, but T001 does not create an orchestrator module or runtime extraction behavior.",
+  "fixture_input_policy": "Any first orchestration contract should prefer synthetic fixture inputs and existing in-memory parser helpers unless a later decision explicitly narrows otherwise.",
+  "raw_artifact_policy": "Raw artifacts and raw artifact bundles are evidence support only; T001 adds no write/read/list helpers and no real project raw artifact files.",
+  "source_evidence_policy": "Source maps, source locators, evidence records, and raw output references remain required boundaries for any future extraction handoff.",
+  "candidate_review_policy": "Owner review is mandatory before parser/adapter/orchestration output can become candidate records or approved truth.",
+  "candidate_only_policy": "Candidate draft support is not candidate truth, canon, memory, promotion, or approved story truth.",
+  "no_runtime_extraction_policy": "No real BookNLP/spaCy runtime, extraction tool execution, backend extraction route, frontend extraction UI, or package/dependency change is authorized by T001."
+}

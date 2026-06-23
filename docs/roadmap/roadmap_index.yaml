@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-009",
-    "current_parent_task_title": "Writer Assistant Core BookNLP fixture parser helper implementation and raw artifact bundle integration",
-    "frontier_note": "PHASE8-IMPL-009 is complete as the ninth Writer Assistant Core parent after completed PHASE8-IMPL-008. PHASE8-IMPL-009-T001 published the parser implementation parent. PHASE8-IMPL-009-T002 completed the parser implementation contract reconciliation decision and created docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md. PHASE8-IMPL-009-T003 created backend/story_knowledge/booknlp_fixture_parser.py and implemented pure in-memory TSV parsers for tokens, entities, quotes, and supersense. PHASE8-IMPL-009-T004 implemented pure in-memory .book JSON parsing and token-event derivation from token event markers. PHASE8-IMPL-009-T005 implemented pure in-memory raw artifact bundle construction with storage/source/evidence validation and adapter bundle compatibility. PHASE8-IMPL-009-T006 completed parser contract validation and boundary hardening with no parser code changes needed. PHASE8-IMPL-009-T007 completed roadmap/status closeout. No active child remains under PHASE8-IMPL-009. The next parent is pending separate owner-approved publication; recommended next parent is PHASE8-IMPL-010 - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary. Scope remains fixture-only, in-memory-only, raw-support-only, non-canon, non-candidate, no parser filesystem I/O, no runtime extraction, no routes, no UI, no package/dependency changes, no model calls, no generated prose, no apply-promotion, and no memory/canon mutation."
+    "current_parent_task_id": "PHASE8-IMPL-010",
+    "current_parent_task_title": "Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
+    "frontier_note": "PHASE8-IMPL-010 is active as the tenth Writer Assistant Core parent after completed PHASE8-IMPL-009. PHASE8-IMPL-010-T001 published the extraction orchestration planning parent, inventory, enrichment JSON, and roadmap/status updates. PHASE8-IMPL-010-T002 is ready/active as the review-safe extraction pipeline contract decision. This parent is planning/contract-first and exists to decide how source maps, evidence records, raw extraction storage helpers, the in-memory BookNLP fixture parser, mocked/raw artifact bundle validation, BookNLP adapter normalization and draft support, candidate persistence/index helpers, and owner-review boundaries fit together. T001 authorizes no runtime extraction, no orchestrator implementation, no raw artifact write/read/list helpers, no real BookNLP/spaCy install/import/run, no routes, no UI, no package/dependency changes, no candidate JSON persistence from parser output, no model calls, no generated prose, no apply-promotion, and no memory/canon mutation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -1943,6 +1943,245 @@
         "no_frontend"
       ],
       "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-010",
+      "title": "Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-009"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "tests_first",
+        "orchestration_contract",
+        "review_safe_pipeline",
+        "fixture_parser_only",
+        "in_memory_only",
+        "standard_library_only",
+        "no_filesystem_io",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "raw_artifacts_non_canon",
+        "raw_artifacts_non_candidate",
+        "candidate_only",
+        "evidence_first",
+        "booknlp_ready",
+        "no_routes",
+        "no_frontend"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-010.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-010.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json",
+      "context_pack": null,
+      "result": "active"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T001",
+      "title": "Publish extraction orchestration planning parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "candidate_only",
+        "evidence_first",
+        "booknlp_ready",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T002",
+      "title": "Review-safe extraction pipeline contract decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "orchestration_contract",
+        "review_safe_pipeline",
+        "candidate_only",
+        "evidence_first",
+        "booknlp_ready",
+        "fixture_parser_only",
+        "raw_artifacts_non_canon",
+        "raw_artifacts_non_candidate",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "ready"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T003",
+      "title": "Extraction orchestration contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010-T002"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "orchestration_contract",
+        "review_safe_pipeline",
+        "candidate_only",
+        "evidence_first",
+        "fixture_parser_only",
+        "in_memory_only",
+        "no_filesystem_io",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T004",
+      "title": "Minimal review-safe orchestration helper",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010-T003"
+      ],
+      "boundary_tags": [
+        "orchestration_contract",
+        "review_safe_pipeline",
+        "candidate_only",
+        "evidence_first",
+        "fixture_parser_only",
+        "in_memory_only",
+        "standard_library_only",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T005",
+      "title": "Candidate review handoff and persistence boundary decision",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010-T004"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "review_safe_pipeline",
+        "candidate_only",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T006",
+      "title": "Orchestration safety regression or conditional hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "orchestration_contract",
+        "review_safe_pipeline",
+        "candidate_only",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_memory_canon_mutation",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-010-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-010",
+      "depends_on": [
+        "PHASE8-IMPL-010-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "no_tool_execution",
+        "no_package_changes",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_runtime_feature_scope",
+        "no_runtime_extraction",
+        "no_routes",
+        "no_frontend"
+      ],
+      "result": "planned"
     },
     {
       "id": "PHASE7-IMPL-004-T001",

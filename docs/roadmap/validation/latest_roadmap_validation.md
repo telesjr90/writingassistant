@@ -1,5 +1,78 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T001 Publish Extraction Orchestration Planning Parent
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/planning only.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-010-T001` - Publish extraction orchestration planning parent.
+- Active/ready child after T001: `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision.
+
+### Files Changed
+
+- Created:
+  - `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+  - `docs/roadmap/inventory/PHASE8-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+- Updated:
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/roadmap_governance.md`
+
+### Publication Summary
+
+- `PHASE8-IMPL-010` is published as the next active Writer Assistant Core parent after completed `PHASE8-IMPL-009`.
+- `PHASE8-IMPL-009` and `PHASE8-IMPL-009-T007` are recorded complete.
+- `PHASE8-IMPL-006` through `PHASE8-IMPL-009` are recorded as the foundation for source maps, evidence, raw storage, fixture parsing, adapter normalization/draft support, and candidate persistence/index boundaries.
+- T001 remains docs/status/planning only.
+- T002 is the next review-safe extraction pipeline contract decision.
+
+### Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS after changing `PHASE8-IMPL-010-T006` from `validation_microtask` to the local Phase 8-compatible `runtime_microtask` type while preserving its safety-regression scope.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+- Initial local hook note: one broad `rg` precondition search was blocked and suggested LeanCTX; LeanCTX was not run.
+
+### Boundary Summary
+
+- Docs/status/planning only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research or source retrieval was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No orchestration implementation was added.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No extraction/import/export implementation was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T002 Handoff
+
+- Next step: `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision.
+
 ## PHASE8-IMPL-009-T006 Parser Fail-Closed and Boundary Hardening
 
 ### Result
