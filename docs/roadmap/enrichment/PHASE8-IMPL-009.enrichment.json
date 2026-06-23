@@ -191,7 +191,7 @@
       "id": "PHASE8-IMPL-009-T005",
       "title": "Raw artifact bundle builder integration with adapter/storage/source/evidence contracts",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-009-T004"
       ],
@@ -200,13 +200,21 @@
         "Validate compatibility with existing adapter/storage/source/evidence helpers.",
         "No raw artifact persistence."
       ],
-      "result": "pending"
+      "result": "complete",
+      "module_file": "backend/story_knowledge/booknlp_fixture_parser.py",
+      "implemented_apis": [
+        "build_booknlp_raw_artifact_bundle_from_fixture_texts"
+      ],
+      "parser_contract_results": {
+        "collect_only": "PASS, 64 tests collected",
+        "full_contract": "PASS, 64 passed"
+      }
     },
     {
       "id": "PHASE8-IMPL-009-T006",
       "title": "Targeted parser contract validation and boundary hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-009-T005"
       ],
@@ -391,6 +399,61 @@
       "source_cache_safety_checks": "PASS"
     },
     "next_child": "PHASE8-IMPL-009-T005",
+    "no_runtime_package_tool_filesystem_changes_beyond_parser_module": true,
+    "no_booknlp_spacy_runtime": true,
+    "no_raw_artifact_persistence": true,
+    "no_generated_prose_apply_promotion_or_memory_canon_mutation": true
+  },
+  "t005_preconditions": {
+    "phase8_impl_009_active": true,
+    "phase8_impl_009_t001_complete": true,
+    "phase8_impl_009_t002_complete": true,
+    "phase8_impl_009_t003_complete": true,
+    "phase8_impl_009_t004_complete": true,
+    "phase8_impl_009_t005_ready_active_before_edit": true,
+    "phase8_impl_009_t006_planned_next_before_edit": true,
+    "parser_module_exists": true,
+    "tsv_parser_apis_exist": true,
+    "book_json_parser_exists": true,
+    "event_derivation_exists": true,
+    "bundle_builder_placeholder_existed_before_edit": true,
+    "runtime_extraction_absent": true,
+    "raw_artifact_write_read_list_helpers_absent": true,
+    "booknlp_spacy_not_installed_or_run_by_t005": true,
+    "external_sources_ignored": true
+  },
+  "t005_result": {
+    "result": "PASS",
+    "module_file": "backend/story_knowledge/booknlp_fixture_parser.py",
+    "implemented_bundle_builder_api": "build_booknlp_raw_artifact_bundle_from_fixture_texts",
+    "implemented_behavior": [
+      "validates supported fixture keys and required fixture strings",
+      "rejects unsupported fixture keys and raw events input",
+      "rejects path-like and non-string fixture values",
+      "parses fixture strings with existing parser helpers",
+      "derives events from parsed tokens only",
+      "validates storage manifest, source map, and raw output references",
+      "builds and validates an adapter-compatible raw artifact bundle"
+    ],
+    "parser_contract_results": {
+      "collect_only": "PASS, 64 tests collected",
+      "full_contract": "PASS, 64 passed"
+    },
+    "regression_results": {
+      "raw_extraction_storage_contract": "PASS, 185 passed",
+      "booknlp_adapter_contract": "PASS, 148 passed",
+      "source_evidence_contract": "PASS, 104 passed",
+      "candidate_regressions": "PASS, 307 passed",
+      "focused_omi_project_regressions": "PASS, 109 passed"
+    },
+    "validation_results": {
+      "check_enrichment": "PASS",
+      "validate_roadmap": "PASS",
+      "non_leanctx_whitespace_check": "PASS",
+      "narrow_git_diff_check": "PASS",
+      "source_cache_safety_checks": "PASS"
+    },
+    "next_child": "PHASE8-IMPL-009-T006",
     "no_runtime_package_tool_filesystem_changes_beyond_parser_module": true,
     "no_booknlp_spacy_runtime": true,
     "no_raw_artifact_persistence": true,
