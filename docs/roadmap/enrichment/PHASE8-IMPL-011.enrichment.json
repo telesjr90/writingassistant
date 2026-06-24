@@ -158,7 +158,7 @@
       "id": "PHASE8-IMPL-011-T004",
       "title": "Candidate persistence gate contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-011-T003"
       ],
@@ -170,13 +170,22 @@
         "Test draft-to-record conversion boundary, review queue entry shape if in scope, fail-closed unsupported/unsafe drafts, no owner-decision prefill, no approved/canon/promoted status, no apply-promotion, no memory/canon mutation, no UI/API/routes, and no generated prose.",
         "tmp_path only if a filesystem is needed for isolated tests."
       ],
-      "result": "pending"
+      "result": "complete",
+      "test_file": "tests/test_writer_assistant_core_candidate_review_gate_contract.py",
+      "future_module": "backend/story_knowledge/candidate_review_gate.py",
+      "future_api": [
+        "validate_candidate_draft_for_persistence",
+        "build_candidate_record_from_draft",
+        "build_review_queue_entry",
+        "persist_candidate_record_for_review"
+      ],
+      "expected_red_result": "PASS expected-red: pytest collection ImportError 'cannot import name candidate_review_gate from backend.story_knowledge', limited to the missing future module/symbol; no skips, no xfails."
     },
     {
       "id": "PHASE8-IMPL-011-T005",
       "title": "Minimal candidate persistence gate helper, if authorized",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-011-T004"
       ],
@@ -305,7 +314,7 @@
     "runtime_project_files_changed": false
   },
   "result": "active",
-  "next_child": "PHASE8-IMPL-011-T004",
+  "next_child": "PHASE8-IMPL-011-T005",
   "t003_status": "complete",
   "t003_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
   "t003_decision_summary": "Review queue entries are candidate-linked workflow support only with required source/evidence/provenance/uncertainty fields, allowed review workflow lifecycle states and statuses, explicit insufficiency/rejected-output handling, and grouping/sorting/filtering limited to workflow convenience. Queue entries must not imply approval, canon, memory, apply-promotion, owner decision, runtime execution, UI/API action, or generated prose.",
@@ -326,5 +335,41 @@
     "review_queue_implemented": false,
     "review_ui_api_changed": false,
     "candidate_persistence_added": false
+  },
+  "t004_status": "complete",
+  "t004_test_file": "tests/test_writer_assistant_core_candidate_review_gate_contract.py",
+  "t004_future_module": "backend/story_knowledge/candidate_review_gate.py",
+  "t004_future_api": [
+    "validate_candidate_draft_for_persistence",
+    "build_candidate_record_from_draft",
+    "build_review_queue_entry",
+    "persist_candidate_record_for_review"
+  ],
+  "t004_expected_red_result": "PASS expected-red: '.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_review_gate_contract.py -q' fails during collection with ImportError 'cannot import name candidate_review_gate from backend.story_knowledge', limited to the missing future module/symbol; no syntax errors, no unrelated import failures, no skips, no xfails.",
+  "t004_validation_results": {
+    "target_expected_red": "PASS expected-red collection ImportError",
+    "candidate_regressions": "PASS (307 tests)",
+    "orchestrator_and_source_evidence_contracts": "PASS (171 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t004_changes": {
+    "test_file_created": "tests/test_writer_assistant_core_candidate_review_gate_contract.py",
+    "runtime_code_changed": false,
+    "candidate_review_gate_module_created": false,
+    "candidate_persistence_added": false,
+    "review_queue_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
   }
 }
