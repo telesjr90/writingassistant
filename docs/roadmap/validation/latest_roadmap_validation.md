@@ -1,5 +1,100 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T003 Extraction Orchestration Contract Tests
+
+### Result
+
+- Result: PASS.
+- Scope: tests-first contract coverage for future `backend.story_knowledge.extraction_orchestrator`.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests.
+- Active/ready child after T003: `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper.
+- Next child after T004: `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision.
+
+### Files Changed
+
+- Created:
+  - `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+
+### Contract Summary
+
+T003 adds expected-red tests for the future pure orchestrator:
+
+- Future module: `backend/story_knowledge/extraction_orchestrator.py`.
+- Future import path: `backend.story_knowledge.extraction_orchestrator`.
+- Future public APIs: `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`.
+- Test coverage: request validation, safe policy flags, fixture-only plan shape, in-memory run output shape, synthetic fixture integration with source/evidence/raw/parser/adapter helpers, fail-closed/quarantine behavior, no side effects, no persistence/canon/prose behavior, and a future source-level boundary scan.
+- No production orchestrator module or helper is created in T003.
+
+### Expected-Red Result
+
+- Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_extraction_orchestrator_contract.py -q`.
+- Result: EXPECTED RED.
+- Failure cause: `ImportError: cannot import name 'extraction_orchestrator' from 'backend.story_knowledge'`.
+- Confirmation: failure is limited to the missing future module/symbol; no syntax errors, unrelated import failures, skips, or xfails were introduced.
+
+### Existing Regression Results
+
+- Parser contract: PASS, 64 passed.
+- Raw extraction storage contract: PASS, 185 passed.
+- BookNLP adapter contract: PASS, 148 passed.
+- Source/evidence contract: PASS, 104 passed.
+- Candidate regressions: PASS, 307 passed. All listed files exist.
+- Focused OMI/project regressions: PASS, 109 passed. All listed files exist.
+- BookNLP/spaCy availability check: PASS, `booknlp: False`, `spacy: False` via `importlib.util.find_spec` without importing either package.
+
+### Roadmap Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Tests-first only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No orchestrator implementation was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No extraction/import/export implementation was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T004 Handoff
+
+- Next step: `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper.
+
 ## PHASE8-IMPL-010-T002 Review-Safe Extraction Pipeline Contract Decision
 
 ### Result

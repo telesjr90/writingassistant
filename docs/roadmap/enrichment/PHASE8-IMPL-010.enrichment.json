@@ -51,6 +51,8 @@
     "adapter_contract_module": "backend/story_knowledge/booknlp_adapter_contract.py",
     "candidate_persistence_module": "backend/story_knowledge/candidate_persistence.py",
     "candidate_index_module": "backend/story_knowledge/candidate_index.py"
+    ,
+    "orchestrator_module": "backend/story_knowledge/extraction_orchestrator.py"
   },
   "goal": "Publish the planning and contract parent for sequencing existing source-map, evidence, raw storage, fixture parser, adapter normalization, candidate draft support, and owner-review pieces into a review-safe extraction pipeline boundary without implementing runtime extraction in T001.",
   "why_now": "PHASE8-IMPL-006 through PHASE8-IMPL-009 completed the foundation for evidence/source maps, raw artifact storage boundaries, mocked adapter normalization, pure in-memory BookNLP fixture parsing, and raw artifact bundle validation. The next gap is the orchestration contract that decides sequencing, failure behavior, and owner-review handoff before real runtime extraction, routes, UI, or persistence workflows.",
@@ -144,7 +146,7 @@
       "id": "PHASE8-IMPL-010-T003",
       "title": "Extraction orchestration contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-010-T002"
       ],
@@ -153,13 +155,33 @@
         "Expected-red if no orchestrator module exists.",
         "tmp_path/in-memory only.",
         "No real BookNLP/spaCy, routes, UI, or real project runtime writes."
-      ]
+      ],
+      "test_file": "tests/test_writer_assistant_core_extraction_orchestrator_contract.py",
+      "future_orchestrator_module": "backend/story_knowledge/extraction_orchestrator.py",
+      "future_orchestrator_import": "backend.story_knowledge.extraction_orchestrator",
+      "future_orchestrator_apis": [
+        "validate_extraction_pipeline_request",
+        "build_fixture_extraction_pipeline_plan",
+        "run_fixture_extraction_pipeline"
+      ],
+      "expected_red_result": {
+        "command": ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_extraction_orchestrator_contract.py -q",
+        "result": "expected_red",
+        "failure_cause": "ImportError: cannot import name 'extraction_orchestrator' from 'backend.story_knowledge'",
+        "limited_to_missing_future_module": true
+      },
+      "validation_results": {
+        "target_orchestrator_contract": "expected_red_missing_future_module",
+        "existing_regressions": "pending final T003 validation",
+        "roadmap_validators": "pending final T003 validation"
+      },
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-010-T004",
       "title": "Minimal review-safe orchestration helper",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-010-T003"
       ],
@@ -167,14 +189,28 @@
         "Optional implementation only if T002/T003 authorize.",
         "Pure standard-library/helper-only orchestration over existing in-memory helpers.",
         "No real tool runtime.",
-        "No filesystem writes outside tmp_path tests."
-      ]
+        "No filesystem writes.",
+        "No runtime extraction, package/tool/runtime changes, routes, UI, raw artifact persistence, automatic candidate persistence, or memory/canon mutation."
+      ],
+      "activation_note": "Completed after T003 expected-red contract tests authorized the pure helper.",
+      "implemented_module": "backend/story_knowledge/extraction_orchestrator.py",
+      "implemented_apis": [
+        "validate_extraction_pipeline_request",
+        "build_fixture_extraction_pipeline_plan",
+        "run_fixture_extraction_pipeline"
+      ],
+      "contract_result": {
+        "command": ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_extraction_orchestrator_contract.py -q",
+        "result": "pass",
+        "tests": "67 passed"
+      },
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-010-T005",
       "title": "Candidate review handoff and persistence boundary decision",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-010-T004"
       ],
@@ -183,7 +219,8 @@
         "Decide when candidate draft support can become candidate records.",
         "Decide what remains manual and owner-reviewed.",
         "No apply-promotion or memory/canon mutation."
-      ]
+      ],
+      "activation_note": "Ready/active after T004 passed the pure in-memory orchestrator contract."
     },
     {
       "id": "PHASE8-IMPL-010-T006",
@@ -218,12 +255,16 @@
     "Task record, inventory, and enrichment JSON are created.",
     "PHASE8-IMPL-010 is active in roadmap/status docs.",
     "PHASE8-IMPL-010-T001 is complete.",
-    "PHASE8-IMPL-010-T002 is ready/active.",
+    "PHASE8-IMPL-010-T002 is complete.",
+    "PHASE8-IMPL-010-T003 is complete with expected-red contract tests.",
+    "PHASE8-IMPL-010-T004 is complete with a pure in-memory orchestration helper.",
+    "PHASE8-IMPL-010-T005 is ready/active.",
     "T001 records PHASE8-IMPL-009 complete through T007.",
     "T001 records PHASE8-IMPL-006 through PHASE8-IMPL-009 artifacts as the foundation.",
     "No backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets are created.",
     "No BookNLP/spaCy install/run/import occurs.",
     "No extraction implementation is added.",
+    "No orchestrator implementation is added in T003.",
     "No-prose and no-canon-mutation boundaries are preserved."
   ],
   "validation_plan": [
@@ -237,7 +278,8 @@
     "Owner review remains mandatory before anything can become approved truth.",
     "Raw artifacts are non-canon and non-candidate.",
     "Parser and adapter outputs remain support/draft material only unless a later owner-approved child defines a review-safe handoff.",
-    "T001 is docs/status/planning only."
+    "T001 is docs/status/planning only.",
+    "T003 is tests-first only and keeps the future orchestrator expected-red until T004."
   ],
   "deferred_work": [
     "review-safe extraction pipeline contract decision",

@@ -181,7 +181,7 @@ Deferred PHASE8-IMPL-006 follow-ups:
 37. Real BookNLP/spaCy runtime extraction remains deferred beyond the accepted review-safe pipeline contract.
 38. Extraction orchestrator implementation, raw artifact write/read/list helpers, candidate persistence, candidate review UI/API, and apply-promotion remain deferred to later owner-approved parents/children.
 39. Byte-to-character source matching remains deferred beyond the review-safe pipeline contract.
-40. PHASE8-IMPL-010-T003 is tests-first and expected-red if no orchestrator module exists.
+40. ~~PHASE8-IMPL-010-T003 is tests-first and expected-red if no orchestrator module exists.~~ **Resolved in PHASE8-IMPL-010-T003:** `tests/test_writer_assistant_core_extraction_orchestrator_contract.py` imports `backend.story_knowledge.extraction_orchestrator` normally and the target pytest fails during collection only because the future module is missing.
 
 ## Writer Assistant Core Follow-Up Questions (Prior)
 

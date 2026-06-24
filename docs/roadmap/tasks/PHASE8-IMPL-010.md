@@ -10,7 +10,7 @@ Writer Assistant Core extraction orchestration planning and review-safe pipeline
 
 ## Status
 
-Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is the next ready/active child.
+Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red orchestration contract tests at `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with the minimal review-safe orchestration helper at `backend/story_knowledge/extraction_orchestrator.py`. `PHASE8-IMPL-010-T005` is the next ready/active child.
 
 ## Goal
 
@@ -97,11 +97,11 @@ Explicitly excluded:
 
 ## Child-Task Plan
 
-1. `PHASE8-IMPL-010-T001` - Publish extraction orchestration planning parent. Status: complete on successful publication.
-2. `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision. Status: ready/active after T001.
-3. `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests. Status: planned.
-4. `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper. Status: planned and optional unless T002/T003 authorize implementation.
-5. `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision. Status: planned.
+1. `PHASE8-IMPL-010-T001` - Publish extraction orchestration planning parent. Status: complete.
+2. `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision. Status: complete.
+3. `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests. Status: complete with expected-red target coverage.
+4. `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper. Status: complete.
+5. `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision. Status: ready/active.
 6. `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening. Status: planned.
 7. `PHASE8-IMPL-010-T007` - Roadmap/status closeout. Status: planned.
 
@@ -140,22 +140,34 @@ Explicitly excluded:
 ### `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests
 
 - Tests-first if authorized by T002.
-- Expected-red if no orchestration module exists.
+- Status: complete as of 2026-06-24.
+- Expected-red contract file: `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`.
+- Expected-red target result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_extraction_orchestrator_contract.py -q` fails during collection with `ImportError: cannot import name 'extraction_orchestrator' from 'backend.story_knowledge'`.
+- Failure is limited to the missing future module/symbol; no syntax errors, unrelated import failures, skips, or xfails are introduced.
+- Future module remains `backend/story_knowledge/extraction_orchestrator.py`.
+- Future public APIs remain `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`.
+- Tests cover request validation, strict safe policy flags, fixture-only plan shape, in-memory run output shape, integration with source/evidence/raw/parser/adapter helpers, fail-closed/quarantine behavior, no side effects, no persistence/canon/prose behavior, and a future source-level boundary scan.
 - Define a future pure orchestration module/API if authorized by T002.
 - tmp_path/in-memory only.
 - No real BookNLP/spaCy, routes, UI, or real project runtime writes.
+- T003 does not implement the orchestrator module, helper functions, raw artifact write/read/list helpers, runtime extraction, routes, UI, package changes, candidate persistence, canon/memory mutation, or generated prose behavior.
 
 ### `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper
 
 - Optional implementation only if T002/T003 authorize.
+- Status: complete as of 2026-06-24.
+- Module: `backend/story_knowledge/extraction_orchestrator.py`.
+- Implemented APIs: `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`.
+- Orchestrator contract result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_extraction_orchestrator_contract.py -q` passed with 67 tests.
 - Pure standard-library helper over existing in-memory parser/storage/source/evidence/adapter helpers.
 - No real tool runtime.
-- No filesystem writes outside tmp_path tests.
-- No automatic candidate persistence unless explicitly kept in-memory only.
+- No filesystem writes.
+- No runtime extraction, real BookNLP/spaCy install/run/import, route/UI/package changes, raw artifact persistence, automatic candidate persistence, candidate/canon/memory mutation, or generated prose behavior.
 
 ### `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision
 
 - Docs/decision only unless prior tasks authorize tests.
+- Status: ready/active after T004.
 - Decide when candidate draft support can become candidate records.
 - Decide what remains manual and owner-reviewed.
 - Decide future UI/API handoff boundaries.
@@ -181,7 +193,9 @@ Explicitly excluded:
 - `PHASE8-IMPL-010` is active in roadmap/status docs.
 - `PHASE8-IMPL-010-T001` is complete.
 - `PHASE8-IMPL-010-T002` is complete.
-- `PHASE8-IMPL-010-T003` is ready/active.
+- `PHASE8-IMPL-010-T003` is complete with expected-red contract tests.
+- `PHASE8-IMPL-010-T004` is complete with a pure in-memory orchestration helper.
+- `PHASE8-IMPL-010-T005` is ready/active.
 - T001 records `PHASE8-IMPL-009` complete through T007.
 - T001 records `PHASE8-IMPL-006` through `PHASE8-IMPL-009` artifacts as the foundation.
 - T001 creates no backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets.
@@ -210,8 +224,8 @@ Do not run pytest for T001 because no runtime code or tests should change.
 
 ## Current Status
 
-`PHASE8-IMPL-010` is active after T001 publication. `PHASE8-IMPL-010-T001` is complete. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision. `PHASE8-IMPL-010-T003` is ready/active.
+`PHASE8-IMPL-010` is active after T001 publication. `PHASE8-IMPL-010-T001` is complete. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red extraction orchestration contract tests. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with `backend/story_knowledge/extraction_orchestrator.py`, implementing `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`. The orchestrator contract passes with 67 tests. The helper is pure, standard-library, in-memory, fixture-only orchestration over existing source/evidence/raw/parser/adapter helpers and does not add runtime extraction, raw artifact persistence, automatic candidate persistence, routes, UI, package changes, generated prose behavior, or memory/canon mutation.
 
 ## Next Child
 
-`PHASE8-IMPL-010-T003` - Extraction orchestration contract tests.
+`PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision.
