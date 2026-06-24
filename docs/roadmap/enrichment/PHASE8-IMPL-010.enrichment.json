@@ -50,8 +50,7 @@
     "fixture_parser_module": "backend/story_knowledge/booknlp_fixture_parser.py",
     "adapter_contract_module": "backend/story_knowledge/booknlp_adapter_contract.py",
     "candidate_persistence_module": "backend/story_knowledge/candidate_persistence.py",
-    "candidate_index_module": "backend/story_knowledge/candidate_index.py"
-    ,
+    "candidate_index_module": "backend/story_knowledge/candidate_index.py",
     "orchestrator_module": "backend/story_knowledge/extraction_orchestrator.py"
   },
   "goal": "Publish the planning and contract parent for sequencing existing source-map, evidence, raw storage, fixture parser, adapter normalization, candidate draft support, and owner-review pieces into a review-safe extraction pipeline boundary without implementing runtime extraction in T001.",

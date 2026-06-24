@@ -1,5 +1,93 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T004 Minimal Review-Safe Orchestration Helper
+
+### Result
+
+- Result: PASS.
+- Scope: pure in-memory helper implementation for `backend.story_knowledge.extraction_orchestrator`.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper.
+- Active/ready child after T004: `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision.
+- Next child after T005: `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening.
+
+### Files Changed
+
+- Created:
+  - `backend/story_knowledge/extraction_orchestrator.py`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Orchestrator Summary
+
+T004 created `backend/story_knowledge/extraction_orchestrator.py` with the public APIs selected by T002 and tested by T003:
+
+- `validate_extraction_pipeline_request`
+- `build_fixture_extraction_pipeline_plan`
+- `run_fixture_extraction_pipeline`
+
+The helper validates strict safe request policy, builds a fixture-only in-memory plan, sequences existing source/evidence/raw/parser/adapter helpers, returns in-memory candidate draft and review handoff support, and fails closed on unsafe policy, unsupported inputs, invalid helper output, or blocked persistence/runtime/canon/prose requests.
+
+### Contract and Regression Results
+
+- Orchestrator contract: PASS, 67 passed.
+- Parser contract: PASS, 64 passed.
+- Raw extraction storage contract: PASS, 185 passed.
+- BookNLP adapter contract: PASS, 148 passed.
+- Source/evidence contract: PASS, 104 passed.
+- Candidate regressions: PASS, 307 passed. All listed files exist.
+- Focused OMI/project regressions: PASS, 109 passed. All listed files exist.
+- BookNLP/spaCy availability guard: PASS, `booknlp: False`, `spacy: False` via `importlib.util.find_spec` without importing either package.
+
+### Roadmap Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+- Local hook note: one targeted `rg` over roadmap status files was blocked and suggested LeanCTX; LeanCTX was not run.
+
+### Boundary Summary
+
+- Pure in-memory orchestration helper only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No parser/orchestrator filesystem I/O was added.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No automatic candidate persistence was added.
+- No extraction/import/export implementation was added beyond pure in-memory fixture orchestration.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T005 Handoff
+
+- Next step: `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision.
+
 ## PHASE8-IMPL-010-T003 Extraction Orchestration Contract Tests
 
 ### Result
