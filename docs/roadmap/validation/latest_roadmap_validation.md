@@ -1,5 +1,101 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T007 Roadmap/Status Closeout
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status closeout only.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent result: `PHASE8-IMPL-010` COMPLETE.
+- Completed child recorded: `PHASE8-IMPL-010-T007` - Roadmap/status closeout.
+- Active child after T007: none.
+- Recommended next parent: `PHASE8-IMPL-011` - Writer Assistant Core candidate review queue and persistence gate planning. Recommendation only; not published or active.
+
+### Files Changed
+
+- `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+- `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+- `docs/roadmap/implementation_status.md`
+- `docs/roadmap/roadmap_index.yaml`
+- `docs/roadmap/task_backlog.md`
+- `docs/roadmap/phase_map.md`
+- `docs/master_plan.md`
+- `docs/roadmap/validation/latest_roadmap_validation.md`
+- `docs/roadmap/decision_log.md`
+- `docs/roadmap/risk_register.md`
+- `docs/roadmap/open_questions.md`
+
+### Parent Closeout Summary
+
+`PHASE8-IMPL-010` delivered the review-safe extraction pipeline contract, expected-red orchestration contract tests, the minimal pure in-memory fixture orchestrator, candidate review handoff and persistence boundary decision, validation-only safety regression, and this closeout. The final orchestrator APIs are `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`.
+
+The final runtime/test behavior is pure in-memory fixture orchestration with strict safe policy flags, fixture-only plan generation, raw bundle construction through fixture parser helpers, adapter bundle validation, and in-memory candidate draft support. The parent does not add runtime extraction, real BookNLP/spaCy runtime, automatic candidate persistence, raw artifact persistence, memory/canon mutation, generated prose/rewrite/continuation behavior, backend routes, or frontend UI.
+
+### Tracked-Artifact Confirmation
+
+- `backend/story_knowledge/extraction_orchestrator.py`: tracked.
+- `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`: tracked.
+- `backend/story_knowledge/booknlp_fixture_parser.py`: tracked.
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py`: tracked.
+- `backend/story_knowledge/raw_extraction_storage.py`: tracked.
+- `tests/test_writer_assistant_core_raw_extraction_storage_contract.py`: tracked.
+- `.external_sources/`: ignored/protected from commit.
+
+### Regression Results
+
+- Orchestrator contract: PASS, 67 passed.
+- Parser contract: PASS, 64 passed.
+- Raw extraction storage contract: PASS, 185 passed.
+- BookNLP adapter contract: PASS, 148 passed.
+- Source/evidence contract: PASS, 104 passed.
+- Candidate regressions: PASS, 307 passed. All listed candidate regression files existed.
+- Focused OMI/project regressions: PASS, 109 passed. All listed OMI/project files existed.
+- BookNLP/spaCy availability guard: PASS, `booknlp: False`, `spacy: False`.
+
+### Roadmap Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+
+### Boundary Summary
+
+- Docs/status closeout only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No orchestrator implementation changed.
+- No tests changed.
+- No candidate persistence was added.
+- No review UI/API was added.
+- No raw artifact persistence was added.
+- No raw write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### Next Recommendation
+
+- Commit T007 docs after owner review.
+- Then publish/start `PHASE8-IMPL-011` in a separate owner-approved task.
+
 ## PHASE8-IMPL-010-T006 Orchestration Safety Regression or Conditional Hardening
 
 ### Result

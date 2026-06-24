@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-010",
   "title": "Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-009"
@@ -273,7 +273,7 @@
       "id": "PHASE8-IMPL-010-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-010-T006"
       ],
@@ -283,12 +283,22 @@
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "activation_note": "Ready/active after T006 validation-only safety regression pass."
+      "activation_note": "Ready/active after T006 validation-only safety regression pass.",
+      "result": "complete",
+      "validation_results": {
+        "result": "pass",
+        "scope": "docs/status closeout only",
+        "roadmap_validators": "pending final validation run",
+        "tracked_artifacts": "confirmed",
+        "runtime_code_changes": "none",
+        "tests_changed": "none",
+        "next_parent": "PHASE8-IMPL-011 recommended only, not active"
+      }
     }
   ],
   "acceptance_criteria": [
     "Task record, inventory, and enrichment JSON are created.",
-    "PHASE8-IMPL-010 is active in roadmap/status docs.",
+    "PHASE8-IMPL-010 is complete in roadmap/status docs.",
     "PHASE8-IMPL-010-T001 is complete.",
     "PHASE8-IMPL-010-T002 is complete.",
     "PHASE8-IMPL-010-T003 is complete with expected-red contract tests.",
@@ -302,7 +312,7 @@
     "No extraction implementation is added.",
     "No orchestrator implementation is added in T003.",
     "No-prose and no-canon-mutation boundaries are preserved.",
-    "PHASE8-IMPL-010-T007 is ready/active."
+    "PHASE8-IMPL-010-T007 is complete with roadmap/status closeout."
   ],
   "validation_plan": [
     "python3 scripts/check_enrichment.py",
@@ -319,20 +329,26 @@
     "T006 completed as safety regression validation-only; no hardening patch was needed."
   ],
   "deferred_work": [
-    "candidate persistence",
-    "candidate review UI/API",
-    "owner decision mechanism",
+    "real BookNLP install/run/import",
+    "real spaCy install/run/import",
+    "real runtime extraction",
+    "raw artifact write/read/list helpers",
+    "raw artifact persistence into project folders",
+    "candidate persistence from orchestrator outputs",
+    "review UI/API",
+    "owner decisions",
     "apply-promotion",
-    "raw artifact persistence",
-    "runtime extraction",
-    "backend routes",
-    "frontend review UI",
-    "real BookNLP/spaCy runtime",
-    "memory/canon mutation"
+    "memory/canon mutation",
+    "backend extraction routes",
+    "frontend extraction/review UI",
+    "byte-to-character source matching",
+    "NCP/Subtxt/dramatica-flow implementation",
+    "model-assisted extraction",
+    "training/JSONL/dataset work"
   ],
-  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX are authorized for T006.",
-  "external_tool_policy": "No external tools are installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T006.",
-  "orchestration_policy": "The T004 helper remains pure, fixture-only, and in-memory; T006 validation did not widen it into persistence, routes, UI, runtime extraction, package changes, or project writes.",
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were authorized or run for T007.",
+  "external_tool_policy": "No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T007.",
+  "orchestration_policy": "The T004 helper remains pure, fixture-only, and in-memory; T007 did not change runtime behavior.",
   "fixture_input_policy": "Any first orchestration contract should prefer synthetic fixture inputs and existing in-memory parser helpers unless a later decision explicitly narrows otherwise.",
   "raw_artifact_policy": "Raw artifacts and raw artifact bundles are evidence support only; T005 adds no write/read/list helpers and no real project raw artifact files.",
   "source_evidence_policy": "Source maps, source locators, evidence records, and raw output references remain required boundaries for any future extraction handoff.",
@@ -345,5 +361,68 @@
     "runtime_or_filesystem_changes": "none",
     "persistence_review_canon_prose_behavior": "none added",
     "next_child": "PHASE8-IMPL-010-T007"
+  },
+  "result": "complete",
+  "final_parent_result": "PHASE8-IMPL-010 COMPLETE",
+  "final_closeout_child": "PHASE8-IMPL-010-T007",
+  "final_artifacts": [
+    "docs/roadmap/tasks/PHASE8-IMPL-010.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-010.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json",
+    "docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md",
+    "tests/test_writer_assistant_core_extraction_orchestrator_contract.py",
+    "backend/story_knowledge/extraction_orchestrator.py"
+  ],
+  "final_orchestrator_apis": [
+    "validate_extraction_pipeline_request",
+    "build_fixture_extraction_pipeline_plan",
+    "run_fixture_extraction_pipeline"
+  ],
+  "final_runtime_test_behavior": [
+    "pure in-memory fixture orchestration",
+    "strict safe policy flag validation",
+    "fixture-only extraction plan generation",
+    "raw bundle construction through fixture parser helpers",
+    "adapter bundle validation",
+    "in-memory candidate draft support",
+    "no automatic candidate persistence",
+    "no raw artifact persistence",
+    "no memory/canon mutation",
+    "no generated prose/rewrite/continuation behavior",
+    "no real BookNLP/spaCy runtime",
+    "no backend routes or frontend UI"
+  ],
+  "tracked_artifact_confirmation": {
+    "backend/story_knowledge/extraction_orchestrator.py": "tracked",
+    "tests/test_writer_assistant_core_extraction_orchestrator_contract.py": "tracked",
+    "backend/story_knowledge/booknlp_fixture_parser.py": "tracked",
+    "tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py": "tracked",
+    "backend/story_knowledge/raw_extraction_storage.py": "tracked",
+    "tests/test_writer_assistant_core_raw_extraction_storage_contract.py": "tracked",
+    ".external_sources/": "ignored/protected from commit"
+  },
+  "final_validation_results": {
+    "orchestrator_contract": "pass: 67 passed",
+    "parser_contract": "pass: 64 passed",
+    "raw_extraction_storage": "pass: 185 passed",
+    "booknlp_adapter": "pass: 148 passed",
+    "source_evidence": "pass: 104 passed",
+    "candidate_regressions": "pass: 307 passed; all listed files existed",
+    "focused_omi_project": "pass: 109 passed; all listed files existed",
+    "availability_guard": "pass: booknlp false; spacy false"
+  },
+  "next_parent_recommendation": {
+    "id": "PHASE8-IMPL-011",
+    "title": "Writer Assistant Core candidate review queue and persistence gate planning",
+    "status": "recommended_only_not_published_or_active",
+    "scope": [
+      "decide how in-memory candidate drafts become candidate records safely",
+      "define candidate persistence gate tests",
+      "define review queue data shape",
+      "define owner-review UI/API boundary without implementing UI",
+      "keep apply-promotion and memory/canon mutation deferred",
+      "keep real runtime extraction deferred"
+    ]
   }
 }

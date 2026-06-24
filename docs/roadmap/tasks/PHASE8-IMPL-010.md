@@ -10,7 +10,7 @@ Writer Assistant Core extraction orchestration planning and review-safe pipeline
 
 ## Status
 
-Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red orchestration contract tests at `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with the minimal review-safe orchestration helper at `backend/story_knowledge/extraction_orchestrator.py`. `PHASE8-IMPL-010-T005` is complete as of 2026-06-24 with the candidate review handoff and persistence boundary decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`. `PHASE8-IMPL-010-T006` is complete as of 2026-06-24 as a validation-only safety regression pass with no runtime hardening patch needed. `PHASE8-IMPL-010-T007` is the next ready/active child.
+Complete after `PHASE8-IMPL-010-T007` roadmap/status closeout. `PHASE8-IMPL-010-T001`, `PHASE8-IMPL-010-T002`, `PHASE8-IMPL-010-T003`, `PHASE8-IMPL-010-T004`, `PHASE8-IMPL-010-T005`, `PHASE8-IMPL-010-T006`, and `PHASE8-IMPL-010-T007` are complete. No active child remains under `PHASE8-IMPL-010`.
 
 ## Goal
 
@@ -103,7 +103,7 @@ Explicitly excluded:
 4. `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper. Status: complete.
 5. `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision. Status: complete.
 6. `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening. Status: complete.
-7. `PHASE8-IMPL-010-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-010-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -196,10 +196,11 @@ Explicitly excluded:
 
 ### `PHASE8-IMPL-010-T007` - Roadmap/status closeout
 
-- Status: ready/active after T006.
+- Status: complete as of 2026-06-24.
+- Result: PASS, docs/status closeout only.
 - Close parent after authorized decisions/tests/helpers are complete.
 - Summarize final decisions and any helper behavior.
-- Recommend next parent only.
+- Recommend next parent only: `PHASE8-IMPL-011` - Writer Assistant Core candidate review queue and persistence gate planning.
 - No runtime expansion.
 
 ## Acceptance Criteria
@@ -207,14 +208,14 @@ Explicitly excluded:
 - `docs/roadmap/tasks/PHASE8-IMPL-010.md` exists.
 - `docs/roadmap/inventory/PHASE8-IMPL-010.md` exists.
 - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json` exists.
-- `PHASE8-IMPL-010` is active in roadmap/status docs.
+- `PHASE8-IMPL-010` is complete in roadmap/status docs.
 - `PHASE8-IMPL-010-T001` is complete.
 - `PHASE8-IMPL-010-T002` is complete.
 - `PHASE8-IMPL-010-T003` is complete with expected-red contract tests.
 - `PHASE8-IMPL-010-T004` is complete with a pure in-memory orchestration helper.
 - `PHASE8-IMPL-010-T005` is complete with a candidate review handoff and persistence boundary decision.
 - `PHASE8-IMPL-010-T006` is complete with validation-only orchestration safety regression results.
-- `PHASE8-IMPL-010-T007` is ready/active.
+- `PHASE8-IMPL-010-T007` is complete with roadmap/status closeout.
 - T001 records `PHASE8-IMPL-009` complete through T007.
 - T001 records `PHASE8-IMPL-006` through `PHASE8-IMPL-009` artifacts as the foundation.
 - T001 creates no backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets.
@@ -249,6 +250,95 @@ Run focused safety regressions for T006. Do not run broad pytest unless focused 
 
 `PHASE8-IMPL-010-T006` is complete as of 2026-06-24 as a validation-only orchestration safety regression pass. The orchestrator, parser, raw storage, BookNLP adapter, source/evidence, candidate, and focused OMI/project regressions passed. No runtime hardening patch was needed. The review-safe fixture orchestrator remains pure, in-memory, fixture-only, candidate-draft-only, non-persistent, non-canon, non-prose, and non-runtime-extraction. No raw artifact writes, candidate JSON persistence, review UI/API, apply-promotion, memory/canon mutation, route/UI/package changes, project/training diffs, real BookNLP/spaCy install/run/import, model calls, or generated prose behavior were added.
 
-## Next Child
+`PHASE8-IMPL-010-T007` is complete as of 2026-06-24 as docs/status closeout only. T007 records the final parent result, final artifacts, final APIs, final runtime/test behavior, deferred work, tracked-artifact confirmation, validation results, and the next-parent recommendation. T007 did not change backend code, frontend code, tests, project files, training files, package/dependency files, runtime extraction behavior, candidate persistence, raw persistence, routes, UI, apply-promotion, memory/canon state, or generated prose behavior.
 
-`PHASE8-IMPL-010-T007` - Roadmap/status closeout.
+## Final Parent Summary
+
+`PHASE8-IMPL-010` is complete. The parent delivered the review-safe extraction orchestration planning and fixture-only pipeline boundary after the completed Writer Assistant Core source/evidence/raw/parser/adapter foundation.
+
+Completed child summary:
+
+- `PHASE8-IMPL-010-T001` published the extraction orchestration planning parent.
+- `PHASE8-IMPL-010-T002` accepted the review-safe extraction pipeline contract.
+- `PHASE8-IMPL-010-T003` added expected-red orchestration contract tests.
+- `PHASE8-IMPL-010-T004` implemented the minimal pure in-memory fixture orchestrator.
+- `PHASE8-IMPL-010-T005` accepted candidate review handoff and persistence boundaries.
+- `PHASE8-IMPL-010-T006` validated orchestration safety and required no runtime hardening patch.
+- `PHASE8-IMPL-010-T007` closes the parent.
+
+Final artifacts created or updated by this parent:
+
+- `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+- `docs/roadmap/inventory/PHASE8-IMPL-010.md`
+- `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+- `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`
+- `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`
+- `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`
+- `backend/story_knowledge/extraction_orchestrator.py`
+
+Final orchestrator APIs now available:
+
+- `validate_extraction_pipeline_request`
+- `build_fixture_extraction_pipeline_plan`
+- `run_fixture_extraction_pipeline`
+
+Final runtime/test behavior now available:
+
+- pure in-memory fixture orchestration;
+- strict safe policy flag validation;
+- fixture-only extraction plan generation;
+- raw bundle construction through fixture parser helpers;
+- adapter bundle validation;
+- in-memory candidate draft support;
+- no automatic candidate persistence;
+- no raw artifact persistence;
+- no memory/canon mutation;
+- no generated prose, rewrite, or continuation behavior;
+- no real BookNLP/spaCy runtime;
+- no backend routes or frontend UI.
+
+Tracked-artifact confirmation:
+
+- `backend/story_knowledge/extraction_orchestrator.py` is tracked.
+- `tests/test_writer_assistant_core_extraction_orchestrator_contract.py` is tracked.
+- `backend/story_knowledge/booknlp_fixture_parser.py` is tracked.
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` is tracked.
+- `backend/story_knowledge/raw_extraction_storage.py` is tracked.
+- `tests/test_writer_assistant_core_raw_extraction_storage_contract.py` is tracked.
+- `.external_sources/` remains ignored/protected from commit.
+
+Explicit deferred work:
+
+- real BookNLP install/run/import;
+- real spaCy install/run/import;
+- real runtime extraction;
+- raw artifact write/read/list helpers;
+- raw artifact persistence into project folders;
+- candidate persistence from orchestrator outputs;
+- review UI/API;
+- owner decisions;
+- apply-promotion;
+- memory/canon mutation;
+- backend extraction routes;
+- frontend extraction/review UI;
+- byte-to-character source matching;
+- NCP/Subtxt/dramatica-flow implementation;
+- model-assisted extraction;
+- training/JSONL/dataset work.
+
+No runtime extraction, real BookNLP/spaCy install/run, raw artifact persistence, automatic candidate persistence, review UI/API, apply-promotion, candidate/canon/memory mutation, backend route, frontend UI, package/dependency, project runtime, training, JSONL, dataset, model call, or generated prose behavior is claimed by this parent.
+
+## Next Parent Recommendation
+
+Recommended only; not published or active in this closeout:
+
+`PHASE8-IMPL-011` - Writer Assistant Core candidate review queue and persistence gate planning.
+
+Recommended scope:
+
+- decide how in-memory candidate drafts become candidate records safely;
+- define candidate persistence gate tests;
+- define review queue data shape;
+- define owner-review UI/API boundary without implementing UI;
+- keep apply-promotion and memory/canon mutation deferred;
+- keep real runtime extraction deferred.
