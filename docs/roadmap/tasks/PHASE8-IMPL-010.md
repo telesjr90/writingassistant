@@ -10,7 +10,7 @@ Writer Assistant Core extraction orchestration planning and review-safe pipeline
 
 ## Status
 
-Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red orchestration contract tests at `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with the minimal review-safe orchestration helper at `backend/story_knowledge/extraction_orchestrator.py`. `PHASE8-IMPL-010-T005` is complete as of 2026-06-24 with the candidate review handoff and persistence boundary decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`. `PHASE8-IMPL-010-T006` is the next ready/active child.
+Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red orchestration contract tests at `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with the minimal review-safe orchestration helper at `backend/story_knowledge/extraction_orchestrator.py`. `PHASE8-IMPL-010-T005` is complete as of 2026-06-24 with the candidate review handoff and persistence boundary decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`. `PHASE8-IMPL-010-T006` is complete as of 2026-06-24 as a validation-only safety regression pass with no runtime hardening patch needed. `PHASE8-IMPL-010-T007` is the next ready/active child.
 
 ## Goal
 
@@ -102,8 +102,8 @@ Explicitly excluded:
 3. `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests. Status: complete with expected-red target coverage.
 4. `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper. Status: complete.
 5. `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision. Status: complete.
-6. `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening. Status: ready/active.
-7. `PHASE8-IMPL-010-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening. Status: complete.
+7. `PHASE8-IMPL-010-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Child Task Details
 
@@ -179,12 +179,24 @@ Explicitly excluded:
 
 ### `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening
 
-- Status: ready/active after T005.
-- Validate no runtime extraction, no filesystem leakage, no canon/memory mutation, no generated prose, and no route/UI/package changes.
-- Conditional repair only if tests reveal gaps and the task explicitly authorizes repair.
+- Status: complete as of 2026-06-24.
+- Result: PASS, validation-only.
+- Runtime hardening patch needed: no.
+- Validated no runtime extraction, no filesystem leakage, no canon/memory mutation, no generated prose, no route/UI/package changes, no package/dependency changes, no project/training diff, and no raw artifact or candidate persistence side effects.
+- Orchestrator contract result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_extraction_orchestrator_contract.py -q` passed with 67 tests.
+- Parser contract result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py -q` passed with 64 tests.
+- Raw extraction storage result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_raw_extraction_storage_contract.py -q` passed with 185 tests.
+- BookNLP adapter result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_booknlp_adapter_contract.py -q` passed with 148 tests.
+- Source/evidence result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_source_evidence_contract.py -q` passed with 104 tests.
+- Candidate regressions result: all listed candidate regression files existed and passed with 307 tests.
+- Focused OMI/project regressions result: all listed OMI/project files existed and passed with 109 tests.
+- Availability guard result: `booknlp: False`, `spacy: False`; neither package was imported or executed.
+- Source-cache safety result: `.external_sources/` was not staged or untracked and appeared only as ignored.
+- Boundary confirmation: no candidate persistence claimed, no review UI/API claimed, no apply-promotion claimed, no raw persistence claimed, no runtime extraction claimed, no real BookNLP/spaCy install/run claimed, no route/UI/package changes claimed, and no candidate/canon/memory mutation claimed.
 
 ### `PHASE8-IMPL-010-T007` - Roadmap/status closeout
 
+- Status: ready/active after T006.
 - Close parent after authorized decisions/tests/helpers are complete.
 - Summarize final decisions and any helper behavior.
 - Recommend next parent only.
@@ -201,7 +213,8 @@ Explicitly excluded:
 - `PHASE8-IMPL-010-T003` is complete with expected-red contract tests.
 - `PHASE8-IMPL-010-T004` is complete with a pure in-memory orchestration helper.
 - `PHASE8-IMPL-010-T005` is complete with a candidate review handoff and persistence boundary decision.
-- `PHASE8-IMPL-010-T006` is ready/active.
+- `PHASE8-IMPL-010-T006` is complete with validation-only orchestration safety regression results.
+- `PHASE8-IMPL-010-T007` is ready/active.
 - T001 records `PHASE8-IMPL-009` complete through T007.
 - T001 records `PHASE8-IMPL-006` through `PHASE8-IMPL-009` artifacts as the foundation.
 - T001 creates no backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets.
@@ -217,7 +230,7 @@ Explicitly excluded:
 - narrow `/usr/bin/git diff --check -- ...`
 - `.external_sources/` source-cache safety checks
 
-Do not run pytest for T005 because no runtime code or tests should change.
+Run focused safety regressions for T006. Do not run broad pytest unless focused regressions fail for unclear reasons.
 
 ## Safety/Product Boundaries
 
@@ -234,6 +247,8 @@ Do not run pytest for T005 because no runtime code or tests should change.
 
 `PHASE8-IMPL-010-T005` is complete as of 2026-06-24 with `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`. T005 accepts candidate drafts as in-memory review support only and records that candidate persistence, review UI/API, owner decisions, apply-promotion, raw artifact persistence, and real runtime extraction remain deferred to future owner-approved tasks. Candidate drafts are not candidate records, canon, memory, owner decisions, or promotion. Any future persisted candidate must require source document refs, source locators, evidence records, provenance metadata, bounded confidence, human review, candidate-only status, and no canon/memory destination fields. T005 did not implement persistence, routes, UI, tests, runtime extraction, raw writes, apply-promotion, or memory/canon mutation.
 
+`PHASE8-IMPL-010-T006` is complete as of 2026-06-24 as a validation-only orchestration safety regression pass. The orchestrator, parser, raw storage, BookNLP adapter, source/evidence, candidate, and focused OMI/project regressions passed. No runtime hardening patch was needed. The review-safe fixture orchestrator remains pure, in-memory, fixture-only, candidate-draft-only, non-persistent, non-canon, non-prose, and non-runtime-extraction. No raw artifact writes, candidate JSON persistence, review UI/API, apply-promotion, memory/canon mutation, route/UI/package changes, project/training diffs, real BookNLP/spaCy install/run/import, model calls, or generated prose behavior were added.
+
 ## Next Child
 
-`PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening.
+`PHASE8-IMPL-010-T007` - Roadmap/status closeout.

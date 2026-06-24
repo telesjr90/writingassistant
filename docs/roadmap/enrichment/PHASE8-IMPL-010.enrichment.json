@@ -242,20 +242,38 @@
       "id": "PHASE8-IMPL-010-T006",
       "title": "Orchestration safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-010-T005"
       ],
       "scope": [
         "Validate no runtime extraction, filesystem leakage, canon/memory mutation, generated prose, routes, UI, or package changes.",
         "Conditional repair only if authorized."
-      ]
+      ],
+      "result": "complete",
+      "validation_results": {
+        "result": "pass",
+        "hardening_patch_needed": false,
+        "orchestrator_contract": "pass: 67 passed",
+        "parser_contract": "pass: 64 passed",
+        "raw_extraction_storage": "pass: 185 passed",
+        "booknlp_adapter": "pass: 148 passed",
+        "source_evidence": "pass: 104 passed",
+        "candidate_regressions": "pass: 307 passed; all listed files existed",
+        "focused_omi_project": "pass: 109 passed; all listed files existed",
+        "availability_guard": "pass: booknlp false; spacy false",
+        "source_cache_safety": "pass: .external_sources ignored only, not staged or untracked",
+        "backend_frontend_package_project_training_diff": "pass: no scoped diff"
+      },
+      "hardening_summary": "Validation-only; no runtime hardening patch was needed for backend/story_knowledge/extraction_orchestrator.py.",
+      "boundary_result": "Pure in-memory fixture orchestrator remains fixture-only, candidate-draft-only, non-persistent, non-canon, non-prose, and non-runtime-extraction.",
+      "code_runtime_test_package_changes": "none"
     },
     {
       "id": "PHASE8-IMPL-010-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-010-T006"
       ],
@@ -264,7 +282,8 @@
         "Summarize decisions/tests/helpers if any.",
         "Recommend next parent only.",
         "No runtime expansion."
-      ]
+      ],
+      "activation_note": "Ready/active after T006 validation-only safety regression pass."
     }
   ],
   "acceptance_criteria": [
@@ -275,14 +294,15 @@
     "PHASE8-IMPL-010-T003 is complete with expected-red contract tests.",
     "PHASE8-IMPL-010-T004 is complete with a pure in-memory orchestration helper.",
     "PHASE8-IMPL-010-T005 is complete with the candidate review handoff and persistence boundary decision.",
-    "PHASE8-IMPL-010-T006 is ready/active.",
+    "PHASE8-IMPL-010-T006 is complete with validation-only safety regression results.",
     "T001 records PHASE8-IMPL-009 complete through T007.",
     "T001 records PHASE8-IMPL-006 through PHASE8-IMPL-009 artifacts as the foundation.",
     "No backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets are created.",
     "No BookNLP/spaCy install/run/import occurs.",
     "No extraction implementation is added.",
     "No orchestrator implementation is added in T003.",
-    "No-prose and no-canon-mutation boundaries are preserved."
+    "No-prose and no-canon-mutation boundaries are preserved.",
+    "PHASE8-IMPL-010-T007 is ready/active."
   ],
   "validation_plan": [
     "python3 scripts/check_enrichment.py",
@@ -296,7 +316,7 @@
     "Raw artifacts are non-canon and non-candidate.",
     "Parser and adapter outputs remain support/draft material only unless a later owner-approved child defines a review-safe handoff.",
     "T005 is docs/decision only and adds no code, tests, routes, UI, package changes, runtime extraction, raw writes, candidate persistence, apply-promotion, or memory/canon mutation.",
-    "T006 is safety regression or conditional hardening only."
+    "T006 completed as safety regression validation-only; no hardening patch was needed."
   ],
   "deferred_work": [
     "candidate persistence",
@@ -310,13 +330,20 @@
     "real BookNLP/spaCy runtime",
     "memory/canon mutation"
   ],
-  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX are authorized for T005.",
-  "external_tool_policy": "No external tools are installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T005.",
-  "orchestration_policy": "The T004 helper remains pure, fixture-only, and in-memory; T005 does not widen it into persistence, routes, UI, runtime extraction, or project writes.",
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX are authorized for T006.",
+  "external_tool_policy": "No external tools are installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T006.",
+  "orchestration_policy": "The T004 helper remains pure, fixture-only, and in-memory; T006 validation did not widen it into persistence, routes, UI, runtime extraction, package changes, or project writes.",
   "fixture_input_policy": "Any first orchestration contract should prefer synthetic fixture inputs and existing in-memory parser helpers unless a later decision explicitly narrows otherwise.",
   "raw_artifact_policy": "Raw artifacts and raw artifact bundles are evidence support only; T005 adds no write/read/list helpers and no real project raw artifact files.",
   "source_evidence_policy": "Source maps, source locators, evidence records, and raw output references remain required boundaries for any future extraction handoff.",
   "candidate_review_policy": "Owner review is mandatory before parser/adapter/orchestration output can become candidate records or approved truth, and review UI/API remains deferred.",
   "candidate_only_policy": "Candidate draft support is not candidate truth, canon, memory, promotion, or approved story truth.",
-  "no_runtime_extraction_policy": "No real BookNLP/spaCy runtime, extraction tool execution, backend extraction route, frontend extraction UI, or package/dependency change is authorized by T005."
+  "no_runtime_extraction_policy": "No real BookNLP/spaCy runtime, extraction tool execution, backend extraction route, frontend extraction UI, or package/dependency change is authorized by T005.",
+  "t006_validation_summary": {
+    "result": "pass",
+    "hardening_patch_needed": false,
+    "runtime_or_filesystem_changes": "none",
+    "persistence_review_canon_prose_behavior": "none added",
+    "next_child": "PHASE8-IMPL-010-T007"
+  }
 }

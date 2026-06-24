@@ -1,5 +1,97 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T006 Orchestration Safety Regression or Conditional Hardening
+
+### Result
+
+- Result: PASS.
+- Scope: validation-only orchestration safety regression and conditional hardening assessment.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening.
+- Active/ready child after T006: `PHASE8-IMPL-010-T007` - Roadmap/status closeout.
+- Next child after T007: none under `PHASE8-IMPL-010`.
+
+### Files Changed
+
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+- Runtime hardening patch needed: no.
+- Runtime files changed: none.
+
+### Validation and Hardening Summary
+
+T006 validated that the review-safe fixture orchestrator remains pure, in-memory, fixture-only, candidate-draft-only, non-persistent, non-canon, non-prose, and non-runtime-extraction. All targeted regressions passed, so `backend/story_knowledge/extraction_orchestrator.py` was not modified.
+
+### Regression Results
+
+- Orchestrator contract: PASS, 67 passed.
+- Parser contract: PASS, 64 passed.
+- Raw extraction storage contract: PASS, 185 passed.
+- BookNLP adapter contract: PASS, 148 passed.
+- Source/evidence contract: PASS, 104 passed.
+- Candidate regressions: PASS, 307 passed. All listed candidate regression files existed.
+- Focused OMI/project regressions: PASS, 109 passed. All listed OMI/project files existed.
+
+### Boundary Checks
+
+- Candidate draft/no-persistence boundary: PASS; no automatic candidate persistence from orchestrator output was added or claimed.
+- Raw artifact/no-write boundary: PASS; no raw artifact writes, raw persistence, or raw write/read/list helpers were added.
+- Review UI/API and apply-promotion boundary: PASS; no review UI/API, owner decision writes, apply-promotion, or memory/canon mutation was added.
+- Runtime extraction and dependency boundary: PASS; no runtime extraction, BookNLP/spaCy install/run/import, model calls, or package changes were added.
+- Source-level boundary: PASS; the orchestrator source-level contract scan passed, and direct inspection found only blocked-key guard strings for persistence/memory terms.
+- Scoped backend/frontend/package/project/training diff: PASS, no output.
+- Availability guard: PASS, `booknlp: False`, `spacy: False`.
+- Project/training artifact inspection: `projects: exists`, `training: exists`; scoped git diff showed no project/training changes from T006.
+- Source-cache safety:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+- Local hook note: one targeted `rg` boundary scan was blocked and suggested LeanCTX; LeanCTX was not run. Direct Python file inspection was used instead.
+
+### Roadmap Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+
+### Boundary Summary
+
+- Safety regression/conditional hardening only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No orchestrator/runtime hardening patch was needed.
+- No tests changed.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No candidate persistence was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T007 Handoff
+
+- Next step: `PHASE8-IMPL-010-T007` - Roadmap/status closeout.
+
 ## PHASE8-IMPL-010-T005 Candidate Review Handoff and Persistence Boundary Decision
 
 ### Result
