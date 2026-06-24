@@ -48,7 +48,9 @@
     "candidate_index_module": "backend/story_knowledge/candidate_index.py",
     "source_map_module": "backend/story_knowledge/source_map.py",
     "evidence_module": "backend/story_knowledge/evidence.py",
-    "review_queue_data_shape_lifecycle_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md"
+    "review_queue_data_shape_lifecycle_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
+    "candidate_review_gate_module": "backend/story_knowledge/candidate_review_gate.py",
+    "candidate_review_gate_contract_test": "tests/test_writer_assistant_core_candidate_review_gate_contract.py"
   },
   "goal": "Publish the planning and contract parent that decides how in-memory candidate drafts from the completed PHASE8-IMPL-010 fixture orchestrator may later become project-local candidate records and review-queue entries without bypassing owner review, OMI boundaries, candidate-only status, evidence/provenance, or no-silent-promotion rules, without implementing persistence, a review queue, or review UI/API in T001 through T003.",
   "why_now": "PHASE8-IMPL-010 is complete through T007 and delivered a pure in-memory fixture orchestrator with candidate_drafts as review support only, no automatic candidate persistence, no review UI/API, no raw artifact persistence, no runtime extraction, no memory/canon mutation, and no apply-promotion. The orchestrator can return candidate drafts, but there is no explicit gate deciding how those drafts may safely become candidate records or review-queue entries. The next risk is accidental persistence or review/UI expansion without an owner-gated boundary.",
@@ -185,26 +187,34 @@
       "id": "PHASE8-IMPL-011-T005",
       "title": "Minimal candidate persistence gate helper, if authorized",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-011-T004"
       ],
       "scope": [
-        "Optional pure helper implementation only if T002-T004 authorize.",
+        "Pure helper implementation authorized by T002-T004.",
         "Candidate-only records through existing validators.",
-        "Project-local candidate storage only in tmp_path tests or as existing candidate persistence helpers allow.",
+        "Project-local candidate storage only through existing candidate persistence helpers (tmp_path in tests).",
         "No orchestrator auto-persistence.",
         "No review UI/API.",
         "No apply-promotion.",
         "No memory/canon mutation."
       ],
-      "result": "pending"
+      "result": "complete",
+      "module": "backend/story_knowledge/candidate_review_gate.py",
+      "implemented_api": [
+        "validate_candidate_draft_for_persistence",
+        "build_candidate_record_from_draft",
+        "build_review_queue_entry",
+        "persist_candidate_record_for_review"
+      ],
+      "target_contract_result": "PASS (154 tests) for tests/test_writer_assistant_core_candidate_review_gate_contract.py"
     },
     {
       "id": "PHASE8-IMPL-011-T006",
       "title": "Candidate review gate safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-011-T005"
       ],
@@ -314,7 +324,7 @@
     "runtime_project_files_changed": false
   },
   "result": "active",
-  "next_child": "PHASE8-IMPL-011-T005",
+  "next_child": "PHASE8-IMPL-011-T006",
   "t003_status": "complete",
   "t003_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
   "t003_decision_summary": "Review queue entries are candidate-linked workflow support only with required source/evidence/provenance/uncertainty fields, allowed review workflow lifecycle states and statuses, explicit insufficiency/rejected-output handling, and grouping/sorting/filtering limited to workflow convenience. Queue entries must not imply approval, canon, memory, apply-promotion, owner decision, runtime execution, UI/API action, or generated prose.",
@@ -368,6 +378,45 @@
     "frontend_changed": false,
     "package_files_changed": false,
     "runtime_project_files_changed": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t005_status": "complete",
+  "t005_module": "backend/story_knowledge/candidate_review_gate.py",
+  "t005_implemented_api": [
+    "validate_candidate_draft_for_persistence",
+    "build_candidate_record_from_draft",
+    "build_review_queue_entry",
+    "persist_candidate_record_for_review"
+  ],
+  "t005_module_summary": "Pure, standard-library-only, deterministic, candidate-only/review-pending persistence gate over existing candidate schema/record/persistence helpers. Validates candidate drafts, builds schema-valid candidate-only records, builds T003 review queue entries in memory, and persists candidate-only records through the existing project-local candidate persistence helper. No orchestrator auto-persistence, no review queue storage/listing, no review UI/API, no raw artifact persistence, no apply-promotion, and no memory/canon mutation.",
+  "t005_target_contract_result": "PASS (154 tests) for tests/test_writer_assistant_core_candidate_review_gate_contract.py",
+  "t005_validation_results": {
+    "target_contract": "PASS (154 tests)",
+    "candidate_regressions": "PASS (307 tests)",
+    "orchestrator_and_source_evidence_contracts": "PASS (171 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "source_level_boundary_scan": "PASS: no forbidden runtime/tool/prose/mutation terms in production source",
+    "booknlp_spacy_availability_guard": "booknlp: False, spacy: False (no import/run)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t005_changes": {
+    "module_created": "backend/story_knowledge/candidate_review_gate.py",
+    "runtime_code_changed": true,
+    "tests_changed": false,
+    "orchestrator_auto_persistence_added": false,
+    "review_queue_storage_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
     "memory_canon_mutation": false,
     "apply_promotion_added": false,
     "training_jsonl_dataset_changed": false
