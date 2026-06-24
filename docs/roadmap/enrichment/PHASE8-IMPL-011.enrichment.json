@@ -214,7 +214,7 @@
       "id": "PHASE8-IMPL-011-T006",
       "title": "Candidate review gate safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-011-T005"
       ],
@@ -222,13 +222,16 @@
         "Validate no owner-decision prefill, no approval/canon/memory mutation, no apply-promotion, no generated prose, and no route/UI/package/runtime expansion.",
         "Conditional repair only if tests reveal gaps."
       ],
-      "result": "pending"
+      "result": "complete",
+      "hardening_required": false,
+      "hardening_summary": "Validation-only. All target gate, candidate, orchestrator, source/evidence, parser/storage/adapter, and focused OMI/project regressions passed against the existing candidate_review_gate.py helper. No safety gap was found, so no runtime hardening patch was needed and the module was left unchanged.",
+      "target_contract_result": "PASS (154 tests) for tests/test_writer_assistant_core_candidate_review_gate_contract.py"
     },
     {
       "id": "PHASE8-IMPL-011-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-011-T006"
       ],
@@ -324,7 +327,7 @@
     "runtime_project_files_changed": false
   },
   "result": "active",
-  "next_child": "PHASE8-IMPL-011-T006",
+  "next_child": "PHASE8-IMPL-011-T007",
   "t003_status": "complete",
   "t003_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
   "t003_decision_summary": "Review queue entries are candidate-linked workflow support only with required source/evidence/provenance/uncertainty fields, allowed review workflow lifecycle states and statuses, explicit insufficiency/rejected-output handling, and grouping/sorting/filtering limited to workflow convenience. Queue entries must not imply approval, canon, memory, apply-promotion, owner decision, runtime execution, UI/API action, or generated prose.",
@@ -408,6 +411,39 @@
   "t005_changes": {
     "module_created": "backend/story_knowledge/candidate_review_gate.py",
     "runtime_code_changed": true,
+    "tests_changed": false,
+    "orchestrator_auto_persistence_added": false,
+    "review_queue_storage_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t006_status": "complete",
+  "t006_hardening_required": false,
+  "t006_hardening_summary": "Validation-only candidate review gate safety regression. The existing backend/story_knowledge/candidate_review_gate.py helper passed every contract and regression check, so no safety gap was found and no runtime hardening patch was applied; the module was left unchanged.",
+  "t006_validation_results": {
+    "candidate_review_gate_contract": "PASS (154 tests)",
+    "candidate_regressions": "PASS (307 tests)",
+    "orchestrator_and_source_evidence_contracts": "PASS (171 tests)",
+    "parser_storage_adapter_regressions": "PASS (397 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "source_level_boundary_scan": "PASS: no forbidden runtime/tool/prose/mutation terms in production source",
+    "booknlp_spacy_availability_guard": "booknlp: False, spacy: False (no import/run by candidate_review_gate.py)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t006_changes": {
+    "runtime_code_changed": false,
+    "candidate_review_gate_hardening_patch": false,
     "tests_changed": false,
     "orchestrator_auto_persistence_added": false,
     "review_queue_storage_implemented": false,

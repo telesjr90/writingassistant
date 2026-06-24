@@ -1,5 +1,80 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-011-T006 Candidate Review Gate Safety Regression
+
+### Result
+
+- Result: PASS.
+- Scope: validation-only candidate review gate safety regression and conditional hardening pass over `backend/story_knowledge/candidate_review_gate.py` plus roadmap/status updates.
+- Hardening patch needed: No. All validations passed against the existing helper, so no runtime code was modified.
+- Parent task: `PHASE8-IMPL-011` - Writer Assistant Core candidate review queue and persistence gate planning.
+- Completed child recorded: `PHASE8-IMPL-011-T006` - Candidate review gate safety regression or conditional hardening.
+- Active/ready child after T006: `PHASE8-IMPL-011-T007` - Roadmap/status closeout.
+- Next child after T007: none under `PHASE8-IMPL-011`.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-011.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Not changed: `backend/story_knowledge/candidate_review_gate.py` (no safety gap found; no hardening patch needed).
+
+### Candidate Review Gate Safety Result
+
+- The existing `candidate_review_gate.py` helper stays inside the approved boundaries: candidate-only, review-pending, project-local candidate persistence only, no orchestrator auto-persistence, no review queue storage/listing, no review UI/API, no owner-decision prefill, no approved/canon/promoted state, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no generated prose/rewrite/continuation, and no package or external tool expansion.
+- Candidate-only / no-owner-decision boundary: PASS. `build_candidate_record_from_draft` emits `status = "candidate"`, `owner_decision = "undecided"`, `destination = "omi_candidate_only"`; drafts with prefilled `owner_decision`/`status`/`promoted`/`canon`/`apply_promotion` fail closed.
+- Review queue / no-UI/API boundary: PASS. `build_review_queue_entry` returns an in-memory entry with `review_status = "pending"` and `lifecycle_state = "draft_ready_for_review"` only; no queue storage/listing, routes, or UI exist.
+- No apply-promotion / no-memory-canon boundary: PASS. No promotion or memory/canon destinations are produced; records with `write_to_canon`/promoted state fail closed before any write.
+- Raw / runtime / dependency boundary: PASS. No raw artifact write/read/list helpers, no runtime extraction, no BookNLP/spaCy import or execution, and no package/dependency changes.
+- Source-level boundary: PASS. Production source scan finds no forbidden runtime/tool/prose/mutation/UI/route terms.
+
+### Regression Test Results
+
+- Candidate review gate contract (`tests/test_writer_assistant_core_candidate_review_gate_contract.py`): PASS (154 tests).
+- Candidate regressions (schema, record, storage, persistence, list, index, index-safety): PASS (307 tests).
+- Orchestrator contract and source/evidence contract: PASS (171 tests).
+- Parser/storage/adapter regressions (booknlp fixture parser, raw extraction storage, booknlp adapter contract): PASS (397 tests).
+- Focused OMI/project regressions (`test_project_manager.py`, `test_omi_boundaries.py`, `test_omi_routes.py`): PASS (109 tests).
+
+### Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS.
+- Source-cache safety checks: PASS. `.external_sources/` is not staged and appears only as ignored.
+- BookNLP/spaCy availability guard: `booknlp: False`, `spacy: False`; `candidate_review_gate.py` imports neither at import time (no flagged runtime imports).
+
+### Boundary Confirmation
+
+- Safety regression / conditional hardening only; runtime code unchanged.
+- No context tools run; no web research.
+- No external tools installed; no external repos cloned/fetched/pulled; no external tool code executed/imported/vendored.
+- No demos run; no model calls; no runtime extraction added.
+- No real BookNLP/spaCy install or execution.
+- No orchestrator auto-persistence, review UI/API, backend routes, or frontend changes.
+- No package/dependency files changed.
+- No project runtime files changed outside isolated tmp_path tests.
+- No raw artifact persistence or raw write/read/list helpers added.
+- No generated prose/rewrite/continuation behavior added.
+- No apply-promotion or memory/canon mutation added.
+- No training/JSONL/dataset work.
+- No staging, commit, or push.
+
+### Notes
+
+- The working tree carried pre-existing uncommitted changes from a prior WORKSPACE task (`docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`, `docs/roadmap/tasks/PHASE8-IMPL-004.md`, `docs/roadmap/roadmap_governance.md`) plus untracked PHASE8-IMPL-011 context/decision/inventory files and other untracked `docs/*.md` references. None overlap with the files changed by T006; they were left untouched.
+- Git commands were run via `/usr/bin/git` directly in the WSL shell.
+
+### Next Step
+
+`PHASE8-IMPL-011-T007` - Roadmap/status closeout.
+
 ## PHASE8-IMPL-011-T005 Minimal Candidate Persistence Gate Helper
 
 ### Result
