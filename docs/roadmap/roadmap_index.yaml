@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-010",
     "current_parent_task_title": "Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
-    "frontier_note": "PHASE8-IMPL-010 is active as the tenth Writer Assistant Core parent after completed PHASE8-IMPL-009. PHASE8-IMPL-010-T001 published the extraction orchestration planning parent, inventory, enrichment JSON, and roadmap/status updates. PHASE8-IMPL-010-T002 completed the review-safe extraction pipeline contract decision. PHASE8-IMPL-010-T003 completed expected-red extraction orchestration contract tests in tests/test_writer_assistant_core_extraction_orchestrator_contract.py. PHASE8-IMPL-010-T004 completed the minimal review-safe orchestration helper in backend/story_knowledge/extraction_orchestrator.py with validate_extraction_pipeline_request, build_fixture_extraction_pipeline_plan, and run_fixture_extraction_pipeline; the orchestrator contract passes with 67 tests. PHASE8-IMPL-010-T005 is ready/active as the candidate review handoff and persistence boundary decision, and PHASE8-IMPL-010-T006 is next. This parent is planning/contract-first and exists to decide how source maps, evidence records, raw extraction storage helpers, the in-memory BookNLP fixture parser, mocked/raw artifact bundle validation, BookNLP adapter normalization and draft support, candidate persistence/index helpers, and owner-review boundaries fit together. T004 authorizes no runtime extraction, no raw artifact write/read/list helpers, no real BookNLP/spaCy install/import/run, no routes, no UI, no package/dependency changes, no candidate JSON persistence from parser output, no model calls, no generated prose, no apply-promotion, and no memory/canon mutation."
+    "frontier_note": "PHASE8-IMPL-010 is active as the tenth Writer Assistant Core parent after completed PHASE8-IMPL-009. PHASE8-IMPL-010-T001 published the extraction orchestration planning parent, inventory, enrichment JSON, and roadmap/status updates. PHASE8-IMPL-010-T002 completed the review-safe extraction pipeline contract decision. PHASE8-IMPL-010-T003 completed expected-red extraction orchestration contract tests in tests/test_writer_assistant_core_extraction_orchestrator_contract.py. PHASE8-IMPL-010-T004 completed the minimal review-safe orchestration helper in backend/story_knowledge/extraction_orchestrator.py with validate_extraction_pipeline_request, build_fixture_extraction_pipeline_plan, and run_fixture_extraction_pipeline; the orchestrator contract passes with 67 tests. PHASE8-IMPL-010-T005 completed the candidate review handoff and persistence boundary decision at docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md. PHASE8-IMPL-010-T006 is ready/active, and PHASE8-IMPL-010-T007 is next. This parent is planning/contract-first and exists to decide how source maps, evidence records, raw extraction storage helpers, the in-memory BookNLP fixture parser, mocked/raw artifact bundle validation, BookNLP adapter normalization and draft support, candidate persistence/index helpers, and owner-review boundaries fit together. T005 authorizes no runtime extraction, no raw artifact write/read/list helpers, no real BookNLP/spaCy install/import/run, no routes, no UI, no package/dependency changes, no candidate JSON persistence from parser output, no model calls, no generated prose, no apply-promotion, and no memory/canon mutation."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -2108,7 +2108,7 @@
       "id": "PHASE8-IMPL-010-T005",
       "title": "Candidate review handoff and persistence boundary decision",
       "type": "planning_microtask",
-      "status": "ready_active",
+      "status": "done",
       "parent": "PHASE8-IMPL-010",
       "depends_on": [
         "PHASE8-IMPL-010-T004"
@@ -2129,13 +2129,13 @@
         "no_routes",
         "no_frontend"
       ],
-      "result": "ready_active"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-010-T006",
       "title": "Orchestration safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "parent": "PHASE8-IMPL-010",
       "depends_on": [
         "PHASE8-IMPL-010-T005"
@@ -2154,7 +2154,7 @@
         "no_routes",
         "no_frontend"
       ],
-      "result": "planned"
+      "result": "ready_active"
     },
     {
       "id": "PHASE8-IMPL-010-T007",

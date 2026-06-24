@@ -1,5 +1,83 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-010-T005 Candidate Review Handoff and Persistence Boundary Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only for candidate review handoff and persistence boundary.
+- Continuation note: resumed after Claude credit interruption and inspected the interrupted working tree before repair.
+- Parent task: `PHASE8-IMPL-010` - Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary.
+- Parent status: ACTIVE.
+- Completed child recorded: `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision.
+- Active/ready child after T005: `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening.
+- Next child after T006: `PHASE8-IMPL-010-T007` - Roadmap/status closeout.
+
+### Files Changed
+
+- Created or preserved/repaired:
+  - `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`
+- Updated:
+  - `docs/roadmap/tasks/PHASE8-IMPL-010.md`
+  - `docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json`
+  - `docs/roadmap/implementation_status.md`
+  - `docs/roadmap/roadmap_index.yaml`
+  - `docs/roadmap/task_backlog.md`
+  - `docs/roadmap/phase_map.md`
+  - `docs/master_plan.md`
+  - `docs/roadmap/validation/latest_roadmap_validation.md`
+  - `docs/roadmap/decision_log.md`
+  - `docs/roadmap/risk_register.md`
+  - `docs/roadmap/open_questions.md`
+
+### Decision Artifact Summary
+
+T005 accepts the boundary that `candidate_drafts` are in-memory review support only. Candidate drafts are not candidate records, owner decisions, canon, memory, approved truth, or promotion. Candidate persistence, review UI/API, owner decisions, apply-promotion, raw artifact persistence, and real runtime extraction remain deferred to future owner-approved scope.
+
+Future candidate persistence must use existing candidate schema/record validators, source document refs, source locators, evidence records, provenance metadata, candidate-only status, project-local candidate storage, existing candidate index helpers, bounded confidence, and human review. It must not prefill owner decisions, write memory/canon, imply approved/canon status, or bypass review.
+
+### Validation Results
+
+- Enrichment JSON parse: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS, no output.
+- Source-cache safety checks:
+  - `/usr/bin/git status --short -- .external_sources`: PASS, no output.
+  - `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, shows `!! .external_sources/`.
+- Local hook note: one targeted `rg` boundary scan was blocked and suggested LeanCTX; LeanCTX was not run. Direct `grep` was used instead.
+
+### Boundary Summary
+
+- Docs/decision only.
+- No context tools, CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were run.
+- No web research was performed.
+- No external tools were installed.
+- No external repos were cloned, fetched, or pulled.
+- No external tool code was executed, imported, copied, or vendored.
+- No demos, app servers, frontend builds, or browser validation were run.
+- No model calls or Ollama calls were run.
+- No runtime extraction was added.
+- No real BookNLP/spaCy install, import, run, or execution occurred.
+- No orchestrator implementation changed.
+- No tests changed.
+- No raw artifact write/read/list helpers were added.
+- No backend routes changed.
+- No frontend files changed.
+- No package/dependency files changed.
+- No project runtime files changed.
+- No raw artifact writes occurred.
+- No candidate persistence was added.
+- No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion behavior was added.
+- No apply-promotion or memory/canon mutation was added.
+- No training/JSONL/dataset work was performed.
+- No staging, commit, or push was performed.
+
+### T006 Handoff
+
+- Next step: `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening.
+
 ## PHASE8-IMPL-010-T004 Minimal Review-Safe Orchestration Helper
 
 ### Result

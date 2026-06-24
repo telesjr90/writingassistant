@@ -44,6 +44,8 @@
     "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-009.md",
     "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-009.enrichment.json",
     "parser_reconciliation_decision": "docs/roadmap/decisions/PHASE8-IMPL-009-parser-implementation-contract-reconciliation-decision.md",
+    "review_safe_pipeline_decision": "docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md",
+    "candidate_review_handoff_persistence_boundary_decision": "docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md",
     "source_map_module": "backend/story_knowledge/source_map.py",
     "evidence_module": "backend/story_knowledge/evidence.py",
     "raw_storage_module": "backend/story_knowledge/raw_extraction_storage.py",
@@ -209,23 +211,38 @@
       "id": "PHASE8-IMPL-010-T005",
       "title": "Candidate review handoff and persistence boundary decision",
       "type": "planning_microtask",
-      "status": "ready_active",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-010-T004"
       ],
       "scope": [
-        "Docs/decision only unless prior tasks authorize tests.",
+        "Docs/decision only.",
         "Decide when candidate draft support can become candidate records.",
         "Decide what remains manual and owner-reviewed.",
-        "No apply-promotion or memory/canon mutation."
+        "Define future candidate persistence, review UI/API, owner decision, apply-promotion, raw artifact persistence, runtime extraction, and evidence/provenance gates.",
+        "No code, tests, routes, UI, package changes, runtime extraction, candidate persistence, raw writes, apply-promotion, or memory/canon mutation."
       ],
-      "activation_note": "Ready/active after T004 passed the pure in-memory orchestrator contract."
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md",
+      "accepted_boundary": "Candidate drafts are in-memory review support only; candidate records require a future owner-approved persistence task.",
+      "candidate_persistence_gate": "Future persistence must use existing candidate schema/record validators, source locators, evidence, provenance, candidate-only status, project-local candidate storage, existing candidate index helpers, and no owner decision, apply-promotion, memory/canon writes, or approved/canon status.",
+      "review_ui_api_gate": "Review UI/API remains deferred to a later parent and must present drafts/records as suggestions with evidence/provenance and explicit owner action.",
+      "t006_handoff": "T006 is safety regression or conditional hardening and may harden extraction_orchestrator.py only if validation finds a gap.",
+      "validation_results": {
+        "enrichment_json_parse": "pass",
+        "check_enrichment": "pass",
+        "validate_roadmap": "pass",
+        "non_leanctx_whitespace": "pass",
+        "narrow_git_diff_check": "pass",
+        "source_cache_safety": "pass"
+      },
+      "code_runtime_test_package_changes": "none",
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-010-T006",
       "title": "Orchestration safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready_active",
       "depends_on": [
         "PHASE8-IMPL-010-T005"
       ],
@@ -257,7 +274,8 @@
     "PHASE8-IMPL-010-T002 is complete.",
     "PHASE8-IMPL-010-T003 is complete with expected-red contract tests.",
     "PHASE8-IMPL-010-T004 is complete with a pure in-memory orchestration helper.",
-    "PHASE8-IMPL-010-T005 is ready/active.",
+    "PHASE8-IMPL-010-T005 is complete with the candidate review handoff and persistence boundary decision.",
+    "PHASE8-IMPL-010-T006 is ready/active.",
     "T001 records PHASE8-IMPL-009 complete through T007.",
     "T001 records PHASE8-IMPL-006 through PHASE8-IMPL-009 artifacts as the foundation.",
     "No backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets are created.",
@@ -277,29 +295,28 @@
     "Owner review remains mandatory before anything can become approved truth.",
     "Raw artifacts are non-canon and non-candidate.",
     "Parser and adapter outputs remain support/draft material only unless a later owner-approved child defines a review-safe handoff.",
-    "T001 is docs/status/planning only.",
-    "T003 is tests-first only and keeps the future orchestrator expected-red until T004."
+    "T005 is docs/decision only and adds no code, tests, routes, UI, package changes, runtime extraction, raw writes, candidate persistence, apply-promotion, or memory/canon mutation.",
+    "T006 is safety regression or conditional hardening only."
   ],
   "deferred_work": [
-    "review-safe extraction pipeline contract decision",
-    "orchestration contract tests",
-    "optional pure orchestration helper",
-    "candidate review handoff decision",
+    "candidate persistence",
+    "candidate review UI/API",
+    "owner decision mechanism",
+    "apply-promotion",
+    "raw artifact persistence",
     "runtime extraction",
     "backend routes",
     "frontend review UI",
-    "raw artifact persistence",
     "real BookNLP/spaCy runtime",
-    "apply-promotion",
     "memory/canon mutation"
   ],
-  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX are authorized for T001.",
-  "external_tool_policy": "No external tools are installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001.",
-  "orchestration_policy": "The parent may define an orchestration contract and later tests, but T001 does not create an orchestrator module or runtime extraction behavior.",
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX are authorized for T005.",
+  "external_tool_policy": "No external tools are installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T005.",
+  "orchestration_policy": "The T004 helper remains pure, fixture-only, and in-memory; T005 does not widen it into persistence, routes, UI, runtime extraction, or project writes.",
   "fixture_input_policy": "Any first orchestration contract should prefer synthetic fixture inputs and existing in-memory parser helpers unless a later decision explicitly narrows otherwise.",
-  "raw_artifact_policy": "Raw artifacts and raw artifact bundles are evidence support only; T001 adds no write/read/list helpers and no real project raw artifact files.",
+  "raw_artifact_policy": "Raw artifacts and raw artifact bundles are evidence support only; T005 adds no write/read/list helpers and no real project raw artifact files.",
   "source_evidence_policy": "Source maps, source locators, evidence records, and raw output references remain required boundaries for any future extraction handoff.",
-  "candidate_review_policy": "Owner review is mandatory before parser/adapter/orchestration output can become candidate records or approved truth.",
+  "candidate_review_policy": "Owner review is mandatory before parser/adapter/orchestration output can become candidate records or approved truth, and review UI/API remains deferred.",
   "candidate_only_policy": "Candidate draft support is not candidate truth, canon, memory, promotion, or approved story truth.",
-  "no_runtime_extraction_policy": "No real BookNLP/spaCy runtime, extraction tool execution, backend extraction route, frontend extraction UI, or package/dependency change is authorized by T001."
+  "no_runtime_extraction_policy": "No real BookNLP/spaCy runtime, extraction tool execution, backend extraction route, frontend extraction UI, or package/dependency change is authorized by T005."
 }

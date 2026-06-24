@@ -10,7 +10,7 @@ Writer Assistant Core extraction orchestration planning and review-safe pipeline
 
 ## Status
 
-Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red orchestration contract tests at `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with the minimal review-safe orchestration helper at `backend/story_knowledge/extraction_orchestrator.py`. `PHASE8-IMPL-010-T005` is the next ready/active child.
+Active after `PHASE8-IMPL-010-T001` publication. `PHASE8-IMPL-010-T001` is complete on successful publication. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md`. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red orchestration contract tests at `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with the minimal review-safe orchestration helper at `backend/story_knowledge/extraction_orchestrator.py`. `PHASE8-IMPL-010-T005` is complete as of 2026-06-24 with the candidate review handoff and persistence boundary decision artifact at `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`. `PHASE8-IMPL-010-T006` is the next ready/active child.
 
 ## Goal
 
@@ -101,8 +101,8 @@ Explicitly excluded:
 2. `PHASE8-IMPL-010-T002` - Review-safe extraction pipeline contract decision. Status: complete.
 3. `PHASE8-IMPL-010-T003` - Extraction orchestration contract tests. Status: complete with expected-red target coverage.
 4. `PHASE8-IMPL-010-T004` - Minimal review-safe orchestration helper. Status: complete.
-5. `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision. Status: ready/active.
-6. `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening. Status: planned.
+5. `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision. Status: complete.
+6. `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening. Status: ready/active.
 7. `PHASE8-IMPL-010-T007` - Roadmap/status closeout. Status: planned.
 
 ## Child Task Details
@@ -167,14 +167,19 @@ Explicitly excluded:
 ### `PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision
 
 - Docs/decision only unless prior tasks authorize tests.
-- Status: ready/active after T004.
-- Decide when candidate draft support can become candidate records.
-- Decide what remains manual and owner-reviewed.
-- Decide future UI/API handoff boundaries.
-- No apply-promotion or memory/canon mutation.
+- Status: complete as of 2026-06-24.
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`.
+- Accepted candidate drafts as in-memory review support only.
+- Recorded that candidate draft support is not candidate persistence.
+- Deferred candidate persistence to a future owner-approved task using existing candidate schema/record validators, source locators, evidence, provenance, candidate-only status, project-local candidate storage, and existing candidate index helpers.
+- Deferred candidate review UI/API to a future parent.
+- Deferred owner decisions, apply-promotion, raw artifact persistence, and real runtime extraction.
+- Preserved no candidate/canon/memory mutation, no raw writes, no routes/UI/package changes, no tests, and no implementation claims.
+- T006 handoff: run safety regressions and conditionally harden `backend/story_knowledge/extraction_orchestrator.py` only if a validation gap exists.
 
 ### `PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening
 
+- Status: ready/active after T005.
 - Validate no runtime extraction, no filesystem leakage, no canon/memory mutation, no generated prose, and no route/UI/package changes.
 - Conditional repair only if tests reveal gaps and the task explicitly authorizes repair.
 
@@ -195,7 +200,8 @@ Explicitly excluded:
 - `PHASE8-IMPL-010-T002` is complete.
 - `PHASE8-IMPL-010-T003` is complete with expected-red contract tests.
 - `PHASE8-IMPL-010-T004` is complete with a pure in-memory orchestration helper.
-- `PHASE8-IMPL-010-T005` is ready/active.
+- `PHASE8-IMPL-010-T005` is complete with a candidate review handoff and persistence boundary decision.
+- `PHASE8-IMPL-010-T006` is ready/active.
 - T001 records `PHASE8-IMPL-009` complete through T007.
 - T001 records `PHASE8-IMPL-006` through `PHASE8-IMPL-009` artifacts as the foundation.
 - T001 creates no backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets.
@@ -211,7 +217,7 @@ Explicitly excluded:
 - narrow `/usr/bin/git diff --check -- ...`
 - `.external_sources/` source-cache safety checks
 
-Do not run pytest for T001 because no runtime code or tests should change.
+Do not run pytest for T005 because no runtime code or tests should change.
 
 ## Safety/Product Boundaries
 
@@ -226,6 +232,8 @@ Do not run pytest for T001 because no runtime code or tests should change.
 
 `PHASE8-IMPL-010` is active after T001 publication. `PHASE8-IMPL-010-T001` is complete. `PHASE8-IMPL-010-T002` is complete as of 2026-06-23 with the review-safe extraction pipeline contract decision. `PHASE8-IMPL-010-T003` is complete as of 2026-06-24 with expected-red extraction orchestration contract tests. `PHASE8-IMPL-010-T004` is complete as of 2026-06-24 with `backend/story_knowledge/extraction_orchestrator.py`, implementing `validate_extraction_pipeline_request`, `build_fixture_extraction_pipeline_plan`, and `run_fixture_extraction_pipeline`. The orchestrator contract passes with 67 tests. The helper is pure, standard-library, in-memory, fixture-only orchestration over existing source/evidence/raw/parser/adapter helpers and does not add runtime extraction, raw artifact persistence, automatic candidate persistence, routes, UI, package changes, generated prose behavior, or memory/canon mutation.
 
+`PHASE8-IMPL-010-T005` is complete as of 2026-06-24 with `docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md`. T005 accepts candidate drafts as in-memory review support only and records that candidate persistence, review UI/API, owner decisions, apply-promotion, raw artifact persistence, and real runtime extraction remain deferred to future owner-approved tasks. Candidate drafts are not candidate records, canon, memory, owner decisions, or promotion. Any future persisted candidate must require source document refs, source locators, evidence records, provenance metadata, bounded confidence, human review, candidate-only status, and no canon/memory destination fields. T005 did not implement persistence, routes, UI, tests, runtime extraction, raw writes, apply-promotion, or memory/canon mutation.
+
 ## Next Child
 
-`PHASE8-IMPL-010-T005` - Candidate review handoff and persistence boundary decision.
+`PHASE8-IMPL-010-T006` - Orchestration safety regression or conditional hardening.
