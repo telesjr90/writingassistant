@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-010",
-    "current_parent_task_title": "Writer Assistant Core extraction orchestration planning and review-safe pipeline boundary",
-    "frontier_note": "PHASE8-IMPL-010 is complete as the tenth Writer Assistant Core parent after completed PHASE8-IMPL-009. PHASE8-IMPL-010-T001 published the extraction orchestration planning parent, inventory, enrichment JSON, and roadmap/status updates. PHASE8-IMPL-010-T002 completed the review-safe extraction pipeline contract decision. PHASE8-IMPL-010-T003 completed expected-red extraction orchestration contract tests in tests/test_writer_assistant_core_extraction_orchestrator_contract.py. PHASE8-IMPL-010-T004 completed the minimal review-safe orchestration helper in backend/story_knowledge/extraction_orchestrator.py with validate_extraction_pipeline_request, build_fixture_extraction_pipeline_plan, and run_fixture_extraction_pipeline; the orchestrator contract passes with 67 tests. PHASE8-IMPL-010-T005 completed the candidate review handoff and persistence boundary decision at docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md. PHASE8-IMPL-010-T006 completed a validation-only orchestration safety regression pass with orchestrator, parser, raw storage, adapter, source/evidence, candidate, and focused OMI/project regressions passing; no runtime hardening patch was needed. PHASE8-IMPL-010-T007 completed roadmap/status closeout. No active child remains under PHASE8-IMPL-010. The parent delivered a review-safe, pure in-memory, fixture-only orchestrator boundary and decision artifacts without real runtime extraction, raw artifact persistence, automatic candidate persistence, review UI/API, backend routes, frontend UI, package/dependency changes, model calls, generated prose, apply-promotion, or memory/canon mutation. Recommended next parent is PHASE8-IMPL-011 - Writer Assistant Core candidate review queue and persistence gate planning, recommendation-only and not active until separately published."
+    "current_parent_task_id": "PHASE8-IMPL-011",
+    "current_parent_task_title": "Writer Assistant Core candidate review queue and persistence gate planning",
+    "frontier_note": "PHASE8-IMPL-011 is active as the eleventh Writer Assistant Core parent after completed PHASE8-IMPL-010 (complete through PHASE8-IMPL-010-T007). PHASE8-IMPL-011-T001 published the candidate review queue and persistence gate planning parent. PHASE8-IMPL-011-T002 is complete and accepted the candidate draft to candidate record persistence gate decision at docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md. PHASE8-IMPL-011-T003 is complete and accepted the review queue data shape and lifecycle decision at docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md. Future queue entries are workflow support only, queue presence is non-approval, lifecycle states are review workflow states only, evidence/provenance/source locator display is mandatory, insufficient-evidence and rejected-output handling must be explicit, grouping/sorting/filtering are workflow convenience only, and owner action labels are future planning terms only. PHASE8-IMPL-011-T004 (candidate persistence gate contract tests) is ready/active; PHASE8-IMPL-011-T005 through PHASE8-IMPL-011-T007 are planned. T001/T002/T003 added no candidate persistence, no candidate review queue implementation, no candidate review UI/API, no backend routes, no frontend UI, no apply-promotion, no memory/canon mutation, no runtime extraction, no real BookNLP/spaCy install or run, no package/dependency changes, no generated prose, and no training/JSONL/dataset work. Candidate drafts remain in-memory review support only and owner review remains mandatory before anything can become approved truth."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -2185,6 +2185,233 @@
       ],
       "result": "complete",
       "validation_summary": "PASS docs/status closeout; PHASE8-IMPL-010 complete."
+    },
+    {
+      "id": "PHASE8-IMPL-011",
+      "title": "Writer Assistant Core candidate review queue and persistence gate planning",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-010"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_tool_execution",
+        "review_queue_planning",
+        "persistence_gate_planning",
+        "candidate_draft_support",
+        "no_automatic_persistence"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-011.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-011.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json",
+      "context_pack": null,
+      "result": "active",
+      "final_summary": "Active after PHASE8-IMPL-011-T002 decision; planning/contract parent for candidate review queue and persistence gate boundaries with a documented future persistence gate and no persistence, review queue implementation, review UI/API, apply-promotion, memory/canon mutation, or runtime extraction in T002.",
+      "notes": "Active after T003. T001/T002/T003 are complete; T004 is ready/active; T005-T007 are planned. T003 accepted review queue data shape and lifecycle boundaries as docs/decision only, with no implementation, no UI/API, no apply-promotion, and no memory/canon mutation.",
+      "review_queue_data_shape_lifecycle_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T001",
+      "title": "Publish candidate review queue and persistence gate planning parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_tool_execution",
+        "review_queue_planning",
+        "persistence_gate_planning",
+        "candidate_draft_support",
+        "no_automatic_persistence"
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T002",
+      "title": "Candidate draft to candidate record persistence gate decision",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "persistence_gate_planning",
+        "candidate_draft_support",
+        "no_automatic_persistence",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ],
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md",
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T003",
+      "title": "Review queue data shape and lifecycle decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011-T002"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "review_queue_planning",
+        "candidate_draft_support",
+        "no_automatic_persistence",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-011-T004",
+      "title": "Candidate persistence gate contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011-T003"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "persistence_gate_planning",
+        "no_automatic_persistence",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-011-T005",
+      "title": "Minimal candidate persistence gate helper, if authorized",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "persistence_gate_planning",
+        "no_automatic_persistence",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-011-T006",
+      "title": "Candidate review gate safety regression or conditional hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_automatic_persistence",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ]
+    },
+    {
+      "id": "PHASE8-IMPL-011-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-011",
+      "depends_on": [
+        "PHASE8-IMPL-011-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "owner_review_required",
+        "no_automatic_persistence",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_feature_scope",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend"
+      ]
     },
     {
       "id": "PHASE7-IMPL-004-T001",

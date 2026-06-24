@@ -1,0 +1,330 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-011",
+  "title": "Writer Assistant Core candidate review queue and persistence gate planning",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-010"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "docs_only_t001",
+    "candidate_only",
+    "evidence_first",
+    "owner_review_required",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_runtime_extraction",
+    "no_model_calls",
+    "no_package_changes",
+    "no_routes",
+    "no_frontend",
+    "no_tool_execution",
+    "review_queue_planning",
+    "persistence_gate_planning",
+    "candidate_draft_support",
+    "no_automatic_persistence"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-011.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-011.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-010.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-010.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json",
+    "review_safe_pipeline_decision": "docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md",
+    "candidate_review_handoff_persistence_boundary_decision": "docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md",
+    "candidate_draft_to_record_persistence_gate_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md",
+    "orchestrator_module": "backend/story_knowledge/extraction_orchestrator.py",
+    "candidate_schema_module": "backend/story_knowledge/candidate_schema.py",
+    "candidate_record_module": "backend/story_knowledge/candidate_record.py",
+    "candidate_persistence_module": "backend/story_knowledge/candidate_persistence.py",
+    "candidate_index_module": "backend/story_knowledge/candidate_index.py",
+    "source_map_module": "backend/story_knowledge/source_map.py",
+    "evidence_module": "backend/story_knowledge/evidence.py",
+    "review_queue_data_shape_lifecycle_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md"
+  },
+  "goal": "Publish the planning and contract parent that decides how in-memory candidate drafts from the completed PHASE8-IMPL-010 fixture orchestrator may later become project-local candidate records and review-queue entries without bypassing owner review, OMI boundaries, candidate-only status, evidence/provenance, or no-silent-promotion rules, without implementing persistence, a review queue, or review UI/API in T001 through T003.",
+  "why_now": "PHASE8-IMPL-010 is complete through T007 and delivered a pure in-memory fixture orchestrator with candidate_drafts as review support only, no automatic candidate persistence, no review UI/API, no raw artifact persistence, no runtime extraction, no memory/canon mutation, and no apply-promotion. The orchestrator can return candidate drafts, but there is no explicit gate deciding how those drafts may safely become candidate records or review-queue entries. The next risk is accidental persistence or review/UI expansion without an owner-gated boundary.",
+  "evidence_inputs": [
+    "docs/roadmap/tasks/PHASE8-IMPL-010.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-010.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-010.enrichment.json",
+    "docs/roadmap/decisions/PHASE8-IMPL-010-review-safe-extraction-pipeline-contract-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-010-candidate-review-handoff-persistence-boundary-decision.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-006.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-007.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-008.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-009.md",
+    "backend/story_knowledge/extraction_orchestrator.py",
+    "backend/story_knowledge/candidate_schema.py",
+    "backend/story_knowledge/candidate_record.py",
+    "backend/story_knowledge/candidate_persistence.py",
+    "backend/story_knowledge/candidate_index.py",
+    "backend/story_knowledge/source_map.py",
+    "backend/story_knowledge/evidence.py"
+  ],
+  "scope": {
+    "include": [
+      "Docs/status parent publication in T001.",
+      "Candidate draft to candidate record persistence gate decision.",
+      "Review queue data shape and lifecycle decision.",
+      "Tests-first persistence gate contract if authorized by T002/T003.",
+      "Optional minimal pure persistence gate helper only if later children authorize it.",
+      "Candidate review UI/API boundary decision without implementing UI.",
+      "Safety regression or conditional hardening.",
+      "Closeout."
+    ],
+    "exclude": [
+      "Implementation in T001.",
+      "Automatic candidate persistence from orchestrator output.",
+      "Candidate review queue implementation.",
+      "Backend review routes or API endpoints.",
+      "Frontend review UI.",
+      "Apply-promotion.",
+      "Memory/canon mutation.",
+      "Raw artifact persistence.",
+      "Real runtime extraction.",
+      "Real BookNLP/spaCy install, run, or import.",
+      "Package or dependency changes.",
+      "Generated prose, rewriting, continuation, imitation, polish, improvement, or expansion.",
+      "Model calls, Ollama calls, Story Check calls, demos, or app server runs.",
+      "Training data, JSONL records, dataset manifests, or model artifacts."
+    ]
+  },
+  "child_tasks": [
+    {
+      "id": "PHASE8-IMPL-011-T001",
+      "title": "Publish candidate review queue and persistence gate planning parent",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-011"
+      ],
+      "scope": [
+        "Docs/status/planning only.",
+        "Create parent task record, inventory, and enrichment JSON.",
+        "Mark PHASE8-IMPL-011 active.",
+        "Mark T001 complete and T002 ready/active.",
+        "No runtime code or tests."
+      ],
+      "result": "complete"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T002",
+      "title": "Candidate draft to candidate record persistence gate decision",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-011-T001"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Decide when candidate_drafts may become candidate records.",
+        "Require existing candidate validators, source locators, evidence, provenance, candidate-only status, no owner-decision prefill, no apply-promotion, and no memory/canon mutation.",
+        "No runtime code or tests."
+      ],
+      "result": "complete",
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md",
+      "decision_summary": "Accepted candidate_drafts as validated input support only; accepted a future explicit persistence gate before records may be written; required existing candidate schema/record/persistence/index helpers, source locators, evidence, provenance, candidate-only and review-pending status, fail-closed validation, no owner-decision prefill, no apply-promotion, and no memory/canon mutation.",
+      "validation_result": "PASS"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T003",
+      "title": "Review queue data shape and lifecycle decision",
+      "type": "planning_microtask",
+      "status": "complete",
+      "depends_on": [
+        "PHASE8-IMPL-011-T002"
+      ],
+      "scope": [
+        "Docs/decision only.",
+        "Define review queue entry shape, candidate grouping, queue state, review status, insufficiency/rejected support, evidence display requirements, and owner-action boundaries.",
+        "Treat the review queue as a review surface, not an approval/canon queue.",
+        "No runtime code or tests."
+      ],
+      "result": "complete",
+      "decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
+      "decision_summary": "Accepted review queue entries as workflow support only; queue presence is non-approval; lifecycle states are review workflow states only; evidence/provenance/source locator display is mandatory; insufficient-evidence and rejected-output handling must be explicit; grouping/sorting/filtering are workflow convenience only; owner action labels are future planning terms only; review queue implementation, UI/API, owner-decision prefill, apply-promotion, memory/canon mutation, runtime extraction, and generated prose remain rejected/deferred.",
+      "validation_result": "PASS"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T004",
+      "title": "Candidate persistence gate contract tests",
+      "type": "runtime_microtask",
+      "status": "ready",
+      "depends_on": [
+        "PHASE8-IMPL-011-T003"
+      ],
+      "scope": [
+        "Tests-first if authorized by T002/T003.",
+        "Expected-red if the future gate helper does not exist.",
+        "Define a future pure helper/API only after T002/T003 decisions.",
+        "Encode T002 persistence gate rules and T003 review queue data shape/lifecycle boundaries.",
+        "Test draft-to-record conversion boundary, review queue entry shape if in scope, fail-closed unsupported/unsafe drafts, no owner-decision prefill, no approved/canon/promoted status, no apply-promotion, no memory/canon mutation, no UI/API/routes, and no generated prose.",
+        "tmp_path only if a filesystem is needed for isolated tests."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T005",
+      "title": "Minimal candidate persistence gate helper, if authorized",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-011-T004"
+      ],
+      "scope": [
+        "Optional pure helper implementation only if T002-T004 authorize.",
+        "Candidate-only records through existing validators.",
+        "Project-local candidate storage only in tmp_path tests or as existing candidate persistence helpers allow.",
+        "No orchestrator auto-persistence.",
+        "No review UI/API.",
+        "No apply-promotion.",
+        "No memory/canon mutation."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T006",
+      "title": "Candidate review gate safety regression or conditional hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-011-T005"
+      ],
+      "scope": [
+        "Validate no owner-decision prefill, no approval/canon/memory mutation, no apply-promotion, no generated prose, and no route/UI/package/runtime expansion.",
+        "Conditional repair only if tests reveal gaps."
+      ],
+      "result": "pending"
+    },
+    {
+      "id": "PHASE8-IMPL-011-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "depends_on": [
+        "PHASE8-IMPL-011-T006"
+      ],
+      "scope": [
+        "Close parent.",
+        "Summarize decisions/tests/helpers if any.",
+        "Recommend next parent only.",
+        "No runtime expansion."
+      ],
+      "result": "pending"
+    }
+  ],
+  "acceptance_criteria": [
+    "Task record, inventory, and enrichment JSON are created.",
+    "PHASE8-IMPL-011 is active in roadmap/status docs.",
+    "PHASE8-IMPL-011-T001 is complete.",
+    "PHASE8-IMPL-011-T002 is complete.",
+    "T001 records PHASE8-IMPL-010 complete through T007.",
+    "T001 records candidate draft support as in-memory only.",
+    "No backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets are created.",
+    "No candidate records are persisted in T001.",
+    "No candidate review queue is implemented in T001.",
+    "No apply-promotion is implemented.",
+    "No memory/canon mutation occurs.",
+    "No-prose and no-canon-mutation boundaries are preserved.",
+    "PHASE8-IMPL-011-T003 is complete.",
+    "PHASE8-IMPL-011-T004 is ready/active.",
+    "T003 decision artifact is recorded.",
+    "Review queue purpose, entry shape, lifecycle states, review status labels, evidence/provenance display requirements, and T004/T005/T006 handoffs are recorded.",
+    "No review queue implementation is claimed by T003.",
+    "No tests are claimed by T003."
+  ],
+  "validation_plan": [
+    "python3 scripts/check_enrichment.py",
+    "python3 scripts/validate_roadmap.py",
+    "non-LeanCTX whitespace check",
+    "narrow /usr/bin/git diff --check",
+    "source-cache safety checks"
+  ],
+  "safety_notes": [
+    "Owner review remains mandatory before anything can become approved truth.",
+    "Candidate drafts are in-memory review support only and are not candidate records, canon, memory, owner decisions, or promotion.",
+    "Candidate persistence from orchestrator output is not authorized unless a later owner-approved child defines a review-safe gate.",
+    "T002 accepts a future explicit persistence gate between in-memory candidate_drafts and persisted candidate records.",
+    "A future gate must validate draft fields, source document refs, source locators, evidence, provenance, confidence, normalization status, candidate-only status, and human review before project-local persistence.",
+    "A review queue is a review surface, not an approval or canon queue.",
+    "T001 is docs/status/planning only and adds no code, tests, routes, UI, package changes, candidate persistence, review queue implementation, apply-promotion, or memory/canon mutation.",
+    "T003 accepts the review queue data shape and lifecycle boundary as docs/decision only.",
+    "Review queue entries are workflow support only and queue presence, sorting, grouping, priority, confidence, or source count does not imply approval or canon truth.",
+    "Review queue entries may reference candidate records only after the T002 persistence gate and must not create, write, approve, promote, or mutate candidate records, memory, or canon.",
+    "T004 is ready/active and should encode persistence gate and review queue boundary contract tests first."
+  ],
+  "deferred_work": [
+    "candidate draft to candidate record persistence gate decision",
+    "candidate persistence gate contract tests",
+    "minimal candidate persistence gate helper if authorized",
+    "candidate review UI/API boundary decision",
+    "candidate review queue implementation",
+    "backend review routes",
+    "frontend review UI",
+    "apply-promotion",
+    "memory/canon mutation",
+    "raw artifact persistence",
+    "real runtime extraction",
+    "real BookNLP/spaCy install/run/import",
+    "model-assisted extraction",
+    "training/JSONL/dataset work"
+  ],
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were authorized or run for T001 through T003.",
+  "external_tool_policy": "No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001 through T003.",
+  "candidate_draft_policy": "Candidate drafts from the orchestrator are in-memory review support only and never become candidate records, canon, memory, owner decisions, or promotion by default.",
+  "candidate_persistence_gate_policy": "T002 accepts a future explicit persistence gate before in-memory candidate_drafts may become persisted candidate records. Any future persistence gate must use existing candidate schema/record validators, source locators, evidence, provenance, candidate-only and review-pending status, project-local candidate storage, and existing candidate index helpers, with fail-closed validation, no owner-decision prefill, apply-promotion, memory/canon writes, approved/canon/promoted status, raw artifact persistence, runtime extraction, route/UI side effects, or generated prose. T002 does not implement the gate.",
+  "review_queue_policy": "T003 accepts a future review queue data shape and lifecycle boundary. Queue entries are workflow support only, not approval, canon, memory, storyform truth, owner decisions, generated prose, or apply-promotion. T003 does not implement queue storage, UI/API, routes, owner actions, or persistence.",
+  "owner_review_policy": "Owner review is mandatory before parser/adapter/orchestration output or candidate records can become approved truth.",
+  "apply_promotion_policy": "Apply-promotion remains unimplemented and is not authorized by this parent.",
+  "memory_canon_policy": "No memory/canon mutation is authorized by this parent.",
+  "no_runtime_extraction_policy": "No real BookNLP/spaCy runtime, extraction tool execution, backend extraction route, frontend extraction UI, or package/dependency change is authorized by T001.",
+  "no_generated_prose_policy": "No generated prose, rewrite, continuation, imitation, polish, improvement, or expansion is authorized by this parent.",
+  "t002_status": "complete",
+  "t002_validation_results": {
+    "enrichment_json_parse": "PASS",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t002_changes": {
+    "decision_artifact_created": "docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md",
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false
+  },
+  "result": "active",
+  "next_child": "PHASE8-IMPL-011-T004",
+  "t003_status": "complete",
+  "t003_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
+  "t003_decision_summary": "Review queue entries are candidate-linked workflow support only with required source/evidence/provenance/uncertainty fields, allowed review workflow lifecycle states and statuses, explicit insufficiency/rejected-output handling, and grouping/sorting/filtering limited to workflow convenience. Queue entries must not imply approval, canon, memory, apply-promotion, owner decision, runtime execution, UI/API action, or generated prose.",
+  "t003_validation_results": {
+    "enrichment_json_parse": "PASS",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t003_changes": {
+    "decision_artifact_created": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "review_queue_implemented": false,
+    "review_ui_api_changed": false,
+    "candidate_persistence_added": false
+  }
+}
