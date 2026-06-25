@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-013",
   "title": "Writer Assistant Core review UI/API planning and owner-action workflow contract",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-012"
@@ -214,7 +214,7 @@
       "id": "PHASE8-IMPL-013-T006",
       "title": "Review API/UI safety regression or conditional hardening decision",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-013-T005"
       ],
@@ -223,13 +223,13 @@
         "No implementation unless explicitly authorized by prior tests and owner scope.",
         "Validate no review UI/API, routes, owner action execution, apply-promotion, memory/canon mutation, or generated prose."
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-013-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-013-T006"
       ],
@@ -239,7 +239,7 @@
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "result": "pending"
+      "result": "complete"
     }
   ],
   "acceptance_criteria": [
@@ -277,20 +277,22 @@
     "T001 is docs/status/planning only and adds no code, tests, routes, UI, package changes, review UI/API, owner action execution, apply-promotion, or memory/canon mutation."
   ],
   "deferred_work": [
-    "owner-action command API contract decision",
-    "review UI planning boundary decision",
-    "review API/UI contract tests if authorized",
-    "actual read-only review queue API",
-    "actual owner action command API",
-    "review UI planning and implementation",
-    "backend review routes",
+    "backend.review_api implementation",
+    "backend read-only review queue routes",
+    "owner action command API routes",
+    "frontend API helpers",
     "frontend review UI",
-    "owner action execution",
+    "frontend UI contract test harness",
+    "owner action execution workflow",
+    "owner action storage/write/read/list beyond validation only",
     "apply-promotion",
     "memory/canon mutation",
+    "orchestrator auto-persistence",
     "raw artifact persistence",
-    "real runtime extraction",
-    "real BookNLP/spaCy install/run/import",
+    "real BookNLP/spaCy runtime",
+    "runtime extraction",
+    "byte-to-character source matching",
+    "NCP/Subtxt/dramatica-flow implementation",
     "model-assisted extraction",
     "training/JSONL/dataset work"
   ],
@@ -654,8 +656,8 @@
     "source_cache_safety": "PASS: .external_sources/ not staged and ignored",
     "plain_rg_precondition_scan": "BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per task boundary; targeted /usr/bin/git grep used instead"
   },
-  "result": "active",
-  "next_child": "PHASE8-IMPL-013-T007 - Roadmap/status closeout (ready/active)",
+  "result": "complete",
+  "next_child": "none (PHASE8-IMPL-013 complete; recommended next parent PHASE8-IMPL-014, not active until separately published)",
   "t005_status": "complete",
   "t005_result": "PASS tests-first expected-red contract coverage only",
   "t005_test_files": [
@@ -780,5 +782,109 @@
     "runtime_project_files_changed": false,
     "training_jsonl_dataset_changed": false
   },
-  "t007_status": "ready/active"
+  "t007_status": "complete",
+  "t007_result": "PASS docs/status closeout only",
+  "t007_parent_result": "PHASE8-IMPL-013 COMPLETE",
+  "t007_test_file": "tests/test_writer_assistant_review_api_contract.py",
+  "t007_decision_artifacts": [
+    "docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-013-owner-action-command-api-contract-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-013-review-ui-planning-boundary-decision.md"
+  ],
+  "t007_expected_future_backend_module": "backend.review_api",
+  "t007_expected_future_backend_symbols": [
+    "list_review_queue_entries_readonly",
+    "get_review_queue_entry_readonly",
+    "get_review_queue_index_readonly",
+    "get_review_queue_summary_readonly",
+    "validate_review_queue_read_request",
+    "validate_owner_action_command_request",
+    "build_owner_action_command_response"
+  ],
+  "t007_frontend_ui_contract_test": {
+    "status": "deferred",
+    "reason": "No local frontend/component test harness exists and no package/dependency changes are authorized."
+  },
+  "t007_final_runtime_test_behavior": [
+    "read-only review queue API contract tests are expected-red",
+    "route/API implementation remains absent",
+    "frontend UI implementation remains absent",
+    "frontend UI tests remain deferred",
+    "owner action command API implementation remains absent",
+    "owner action execution remains absent",
+    "read-only API and command API are contractually separated",
+    "review UI is planned but unimplemented",
+    "apply-promotion remains deferred",
+    "memory/canon mutation remains deferred",
+    "raw artifact persistence remains deferred",
+    "runtime extraction remains deferred",
+    "generated prose/rewrite/continuation remains forbidden"
+  ],
+  "t007_tracked_artifact_confirmation": {
+    "review_api_contract_test": "tracked",
+    "review_queue_storage_module": "tracked",
+    "review_queue_storage_contract_test": "tracked",
+    "candidate_review_gate_module": "tracked",
+    "candidate_review_gate_contract_test": "tracked",
+    "external_sources": "ignored and not staged"
+  },
+  "t007_deferred_work": [
+    "backend.review_api implementation",
+    "backend read-only review queue routes",
+    "owner action command API routes",
+    "frontend API helpers",
+    "frontend review UI",
+    "frontend UI contract test harness",
+    "owner action execution workflow",
+    "owner action storage/write/read/list beyond validation only",
+    "apply-promotion",
+    "memory/canon mutation",
+    "orchestrator auto-persistence",
+    "raw artifact persistence",
+    "real BookNLP/spaCy runtime",
+    "runtime extraction",
+    "byte-to-character source matching",
+    "NCP/Subtxt/dramatica-flow implementation",
+    "model-assisted extraction",
+    "training/JSONL/dataset work"
+  ],
+  "t007_next_parent_recommendation": "PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary (recommendation-only, not active until separately published): implement backend.review_api only after expected-red tests authorize it; keep read-only endpoints read-only; keep owner action command validation separate from execution; no frontend UI yet unless separately authorized; no apply-promotion; no memory/canon mutation; no runtime extraction; no generated prose/rewrite/continuation.",
+  "t007_validation_results": {
+    "review_api_contract_expected_red": "PASS expected-red: missing backend.review_api only",
+    "review_queue_storage_contract": "PASS: 359 passed in 3.91s batch",
+    "candidate_review_gate_contract": "PASS: 154 passed in 3.91s batch",
+    "candidate_regressions": "PASS: 307 passed in 3.91s batch",
+    "orchestrator_contract": "PASS: 67 passed in 3.91s batch",
+    "source_evidence_contract": "PASS: 104 passed in 3.91s batch",
+    "booknlp_fixture_parser_contract": "PASS: 64 passed in 3.91s batch",
+    "raw_extraction_storage_contract": "PASS: 185 passed in 3.91s batch",
+    "booknlp_adapter_contract": "PASS: 148 passed in 3.91s batch",
+    "focused_omi_project_regressions": "PASS: 109 passed in 3.91s batch",
+    "combined_regressions_total": "PASS: 1497 passed in 3.91s",
+    "booknlp_spacy_availability_guard": "PASS: booknlp False; spacy False",
+    "route_ui_api_absence_checks": "PASS: backend.review_api.py absent; backend/routes/review_queue.py absent; frontend ReviewQueuePanel absent",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t007_changes": {
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "backend_review_api_module_created": false,
+    "route_implementation": false,
+    "ui_implementation": false,
+    "frontend_api_helper_implementation": false,
+    "owner_action_command_api_implementation": false,
+    "owner_action_execution": false,
+    "apply_promotion": false,
+    "memory_canon_mutation": false,
+    "runtime_extraction": false,
+    "raw_artifact_persistence": false,
+    "generated_prose": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "training_jsonl_dataset_changed": false
+  }
 }
