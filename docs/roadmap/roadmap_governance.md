@@ -69,6 +69,13 @@ GitHub Issues and GitHub Projects are not authoritative until a future sync task
 | `in_memory_only` | Authorized helper behavior is limited to in-memory data structures and must not depend on project runtime files. |
 | `standard_library_only` | Authorized implementation, if any, must use Python standard-library behavior only and must not add package dependencies. |
 | `no_filesystem_io` | Authorized helper behavior must not read, write, list, or mutate filesystem content. |
+| `owner_review_required` | Parser, adapter, orchestration, or candidate output requires explicit owner review before it can become approved truth. |
+| `persistence_gate_planning` | The boundary for turning in-memory candidate drafts into persisted candidate records is decided and tested before any persistence helper exists. |
+| `review_queue_planning` | The candidate review queue entry shape, lifecycle, and owner-action boundaries are decided before any review queue, route, or UI exists; the queue is a review surface, not an approval/canon queue. |
+| `candidate_draft_support` | In-memory candidate drafts from the orchestrator are review support only and are not candidate records, canon, memory, owner decisions, or promotion. |
+| `no_automatic_persistence` | Orchestrator or extraction output must not be automatically persisted as candidate records without an explicit owner-gated persistence boundary. |
+| `queue_storage_planning` | Whether and how review queue entries are stored, listed, loaded, and prepared for future owner review is decided and tested before any queue storage helper, route, or UI exists; stored queue state is review workflow support only, never approval or canon truth. |
+| `owner_action_workflow_planning` | Owner review action workflow states and commands are defined as planning terms only; owner actions are not apply-promotion, owner action storage is not memory/canon mutation, and review UI/API remains deferred. |
 
 ## Drift Handling
 
