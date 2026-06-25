@@ -246,8 +246,9 @@
     "Task record, inventory, and enrichment JSON are created.",
     "PHASE8-IMPL-013 is active in roadmap/status docs.",
     "PHASE8-IMPL-013-T001 is complete.",
-    "PHASE8-IMPL-013-T002 is ready/active.",
-    "PHASE8-IMPL-013-T003 through PHASE8-IMPL-013-T007 are planned.",
+    "PHASE8-IMPL-013-T002 is complete.",
+    "PHASE8-IMPL-013-T003 through PHASE8-IMPL-013-T006 are complete.",
+    "PHASE8-IMPL-013-T007 is ready/active.",
     "T001 records PHASE8-IMPL-012 complete through T007.",
     "T001 records the review queue as workflow support only and owner actions as non-promotion.",
     "No backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets are created.",
@@ -654,7 +655,7 @@
     "plain_rg_precondition_scan": "BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per task boundary; targeted /usr/bin/git grep used instead"
   },
   "result": "active",
-  "next_child": "PHASE8-IMPL-013-T006 - Review API/UI safety regression or conditional hardening decision (ready/active)",
+  "next_child": "PHASE8-IMPL-013-T007 - Roadmap/status closeout (ready/active)",
   "t005_status": "complete",
   "t005_result": "PASS tests-first expected-red contract coverage only",
   "t005_test_files": [
@@ -728,6 +729,56 @@
     "package_files_changed": false,
     "training_jsonl_dataset_changed": false
   },
-  "t006_status": "ready/active",
-  "t006_result": "pending"
+  "t006_status": "complete",
+  "t006_result": "PASS validation-only; no hardening patch needed",
+  "t006_expected_red_result": {
+    "command": ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_review_api_contract.py -q",
+    "result": "EXPECTED RED",
+    "exit_code": 2,
+    "failure_cause": "ImportError: cannot import name 'review_api' from 'backend' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/__init__.py)",
+    "limited_to_missing_future_module_or_symbol": true,
+    "syntax_errors": false,
+    "unrelated_import_failures": false,
+    "skips": false,
+    "xfails": false
+  },
+  "t006_frontend_ui_contract_test": {
+    "status": "deferred",
+    "reason": "No local frontend/component test harness exists and no package/dependency changes are authorized."
+  },
+  "t006_validation_results": {
+    "review_api_contract_expected_red": "PASS expected-red: missing backend.review_api only",
+    "review_queue_storage_contract": "PASS: 359 passed in 0.39s",
+    "candidate_review_gate_contract": "PASS: 154 passed in 0.17s",
+    "candidate_regressions": "PASS: 307 passed in 0.62s",
+    "orchestrator_contract": "PASS: 67 passed in 0.15s",
+    "source_evidence_contract": "PASS: 104 passed in 0.15s",
+    "booknlp_fixture_parser_contract": "PASS: 64 passed in 0.11s",
+    "raw_extraction_storage_contract": "PASS: 185 passed in 0.28s",
+    "booknlp_adapter_contract": "PASS: 148 passed in 0.27s",
+    "focused_omi_project_regressions": "PASS: 109 passed in 0.79s",
+    "booknlp_spacy_availability_guard": "PASS: booknlp False; spacy False",
+    "route_ui_api_absence_checks": "PASS: backend.review_api.py absent; backend/routes/review_queue.py absent; backend/app.py absent; no review literals in backend/main.py, frontend/src/api.js, frontend/src/App.jsx, frontend/src/components/Editor.jsx, or frontend/src/components/ProjectNav.jsx",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t006_changes": {
+    "backend_code_changed": false,
+    "frontend_code_changed": false,
+    "tests_changed": false,
+    "backend_review_api_module_created": false,
+    "route_implementation": false,
+    "ui_implementation": false,
+    "frontend_api_helper_implementation": false,
+    "owner_action_command_api_implementation": false,
+    "owner_action_execution": false,
+    "apply_promotion": false,
+    "memory_canon_mutation": false,
+    "runtime_extraction": false,
+    "raw_artifact_persistence": false,
+    "generated_prose": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t007_status": "ready/active"
 }

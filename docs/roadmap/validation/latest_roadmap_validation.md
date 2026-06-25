@@ -1,5 +1,84 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-013-T006 Review API/UI Safety Regression
+
+### Result
+
+- Result: PASS.
+- Scope: validation-only. Confirmed the T005 expected-red review API contract remains a safe handoff and no hardening patch was needed.
+- Parent task: `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract. Parent result: ACTIVE after T006.
+- Completed child recorded: `PHASE8-IMPL-013-T006` - Review API/UI safety regression or conditional hardening decision.
+- Next child: `PHASE8-IMPL-013-T007` - Roadmap/status closeout (ready/active).
+- Precondition confirmed: `PHASE8-IMPL-013` active; T001, T002, T003, T004, and T005 complete; T006 was ready/active; T007 was planned/next; `PHASE8-IMPL-012` complete through T007; `tests/test_writer_assistant_review_api_contract.py` exists and is tracked; `backend.review_api` does not exist; backend review routes and FastAPI review endpoints do not exist; frontend review UI and frontend review API helpers do not exist; owner action command API and owner action execution do not exist beyond owner action record validation; no apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run, or generated prose/rewrite/continuation exists.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-013.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Expected-Red Review API Contract
+
+- Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_review_api_contract.py -q`
+- Result: EXPECTED RED.
+- Exact failure cause: collection `ImportError: cannot import name 'review_api' from 'backend' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/__init__.py)`.
+- Failure scope: limited to missing future module/symbol. No syntax errors, no unrelated import failures, no skips, and no xfails.
+
+### Frontend UI Contract Test Status
+
+- Status: deferred.
+- Reason: no local frontend/component test harness exists and no package/dependency changes are authorized.
+
+### Regression Results
+
+- Review API contract expected-red: PASS (missing `backend.review_api` only).
+- Review queue storage contract: PASS (`359 passed in 0.39s`).
+- Candidate review gate contract: PASS (`154 passed in 0.17s`).
+- Candidate regressions: PASS (`307 passed in 0.62s`).
+- Orchestrator contract: PASS (`67 passed in 0.15s`).
+- Source/evidence contract: PASS (`104 passed in 0.15s`).
+- BookNLP fixture parser contract: PASS (`64 passed in 0.11s`).
+- Raw extraction storage contract: PASS (`185 passed in 0.28s`).
+- BookNLP adapter contract: PASS (`148 passed in 0.27s`).
+- Focused OMI/project regressions: PASS (`109 passed in 0.79s`).
+
+### Route/UI/API Absence Checks
+
+- `backend/review_api.py`: absent.
+- `backend/routes/review_queue.py`: absent.
+- `backend/app.py`: absent in this checkout; active route file remains `backend/main.py`.
+- Literal review checks in `backend/main.py`, `frontend/src/api.js`, `frontend/src/App.jsx`, `frontend/src/components/Editor.jsx`, and `frontend/src/components/ProjectNav.jsx`: no matches.
+- Exact `frontend/src/Editor.jsx` and `frontend/src/ProjectNav.jsx` paths are absent; active components are under `frontend/src/components/`.
+- `/usr/bin/git diff --name-only -- backend frontend tests package.json package-lock.json pyproject.toml requirements.txt training projects 2>/dev/null || true`: no backend/frontend/test/package/project/training changes.
+
+### Source-Cache Safety
+
+- `/usr/bin/git status --short -- .external_sources`: nothing staged or untracked.
+- `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `.external_sources/` appears ignored only.
+
+### Availability Guard
+
+- `booknlp: False`
+- `spacy: False`
+
+### Boundary Confirmation
+
+- Validation-only. No backend route, FastAPI endpoint, backend review API module, frontend review UI, frontend API helper, owner action command API implementation, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency change, generated prose/rewrite/continuation, runtime project file, raw artifact write, training data, JSONL, dataset manifest, staging, commit, or push was performed.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) were run.
+- No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored.
+- No model calls, Ollama calls, app servers, frontend build, browser validation, demos, or web research were run.
+
+### Next Child
+
+- `PHASE8-IMPL-013-T007` - Roadmap/status closeout.
+
 ## PHASE8-IMPL-013-T005 Review API/UI Contract Tests
 
 ### Result
