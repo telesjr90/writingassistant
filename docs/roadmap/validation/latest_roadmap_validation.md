@@ -1,5 +1,79 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-012-T005 Minimal Review Queue Storage Helper
+
+### Result
+
+- Result: PASS.
+- Scope: runtime implementation limited to one pure, standard-library-only, project-local, candidate-linked, candidate-only, review-workflow-only queue storage helper plus roadmap/status updates.
+- Parent task: `PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning. Parent result: ACTIVE after T005.
+- Completed child recorded: `PHASE8-IMPL-012-T005` - Minimal review queue storage helper, if authorized.
+- Active/ready child after T005: `PHASE8-IMPL-012-T006` - Review queue safety regression or conditional hardening.
+- Next child: `PHASE8-IMPL-012-T007` - Roadmap/status closeout (planned).
+- Precondition confirmed: `PHASE8-IMPL-012` active; `PHASE8-IMPL-012-T001`/`T002`/`T003`/`T004` complete; `PHASE8-IMPL-011` complete through `PHASE8-IMPL-011-T007`; `tests/test_writer_assistant_core_review_queue_storage_contract.py` tracked; `backend/story_knowledge/review_queue_storage.py` did not exist before this task; `backend/story_knowledge/candidate_review_gate.py` (with `build_review_queue_entry` as an in-memory builder only) and candidate schema/record/storage/persistence/list/index modules and tests tracked; and no review UI/API, backend review routes, frontend review UI, orchestrator auto-persistence, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists.
+
+### Module / API Implemented
+
+- Module: `backend/story_knowledge/review_queue_storage.py` (pure, standard-library-only, deterministic, project-local, candidate-linked, candidate-only, review-workflow-only).
+- APIs: `validate_review_queue_entry`, `build_review_queue_entry_from_candidate_record`, `review_queue_storage_dir`, `review_queue_entry_path`, `review_queue_index_path`, `write_review_queue_entry`, `read_review_queue_entry`, `list_review_queue_entries`, `build_review_queue_index`, `validate_owner_action_record`.
+- `validate_review_queue_entry` accepts only dict input, deep-copies, rejects missing/unknown/forbidden fields, enforces allowed `review_status`/`lifecycle_state` values, validates confidence and path-safe IDs, and fails closed with generic `ValueError`.
+- `build_review_queue_entry_from_candidate_record` delegates to `candidate_review_gate.build_review_queue_entry`, sets `review_status = "pending"`/`lifecycle_state = "draft_ready_for_review"`, preserves support shapes, and fails closed for invalid/approved/promoted candidate records.
+- Path helpers derive project-local `writer_assistant/review_queue/` paths only, create no directories, and reject unsafe IDs.
+- `write_review_queue_entry` validates before writing, writes only under `writer_assistant/review_queue/entries/`, fails closed with no partial write, and returns candidate-linked review-workflow-only metadata.
+- `read_review_queue_entry`/`list_review_queue_entries` validate loaded entries and fail closed on missing/malformed data.
+- `build_review_queue_index` returns a derived/rebuildable index and writes no files.
+- `validate_owner_action_record` validates owner action record shape only (allowed commands/states, `no_promotion_performed`/`no_memory_canon_mutation` true, forbidden command/state/field rejection); it executes no owner actions.
+
+### Target Contract Result
+
+- Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_review_queue_storage_contract.py -q`.
+- Result: PASS (359 tests). No import errors, no source-level boundary failures, no side-effect failures.
+
+### Existing Regression Results
+
+- Candidate review gate contract, candidate regressions (schema, record, storage, persistence, list, index, index-safety), orchestrator contract, and source/evidence contract: PASS (632 tests combined).
+- Focused OMI/project regressions (`tests/test_project_manager.py`, `tests/test_omi_boundaries.py`, `tests/test_omi_routes.py`): PASS (109 tests).
+
+### Files Changed
+
+- Created: `backend/story_knowledge/review_queue_storage.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-012.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Validation Results
+
+- Target review queue storage contract pytest: PASS (359 tests).
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed files: PASS.
+- Narrow `/usr/bin/git diff --check` over changed files: PASS (no whitespace errors).
+- BookNLP/spaCy availability guard: `booknlp: False`, `spacy: False`; no import or run.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) run.
+- No external tools installed, cloned, fetched, pulled, executed, imported, or vendored.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: clean; nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Source-Level Boundary
+
+- Production source scan PASS: no forbidden runtime/tool/prose/mutation/UI/route terms present in `backend/story_knowledge/review_queue_storage.py`.
+
+### Boundary Confirmation
+
+- Minimal review queue storage helper only. No review UI/API, backend routes, frontend changes, owner action workflow execution, owner action storage, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, raw write/read/list helpers, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, runtime project files outside isolated tmp_path tests, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
+### Next Child
+
+- `PHASE8-IMPL-012-T006` - Review queue safety regression or conditional hardening.
+
 ## PHASE8-IMPL-012-T004 Review Queue Storage Contract Tests
 
 ### Result

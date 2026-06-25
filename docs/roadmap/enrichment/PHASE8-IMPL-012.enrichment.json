@@ -176,7 +176,7 @@
       "id": "PHASE8-IMPL-012-T005",
       "title": "Minimal review queue storage helper, if authorized",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-012-T004"
       ],
@@ -189,13 +189,13 @@
         "No apply-promotion.",
         "No memory/canon mutation."
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-012-T006",
       "title": "Review queue safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-012-T005"
       ],
@@ -514,6 +514,59 @@
     "apply_promotion_added": false,
     "training_jsonl_dataset_changed": false
   },
+  "t005_status": "complete",
+  "t005_result": "PASS runtime implementation (minimal review queue storage helper)",
+  "t005_module": "backend/story_knowledge/review_queue_storage.py",
+  "t005_implemented_api": [
+    "validate_review_queue_entry",
+    "build_review_queue_entry_from_candidate_record",
+    "review_queue_storage_dir",
+    "review_queue_entry_path",
+    "review_queue_index_path",
+    "write_review_queue_entry",
+    "read_review_queue_entry",
+    "list_review_queue_entries",
+    "build_review_queue_index",
+    "validate_owner_action_record"
+  ],
+  "t005_module_summary": "Pure, standard-library-only, deterministic, project-local, candidate-linked, candidate-only, review-workflow-only queue storage helper over existing candidate validation (candidate_record/candidate_schema) and candidate review gate (candidate_review_gate.build_review_queue_entry) helpers. Side-effect free except write_review_queue_entry, which validates before writing and persists only under writer_assistant/review_queue/entries/ in test-controlled project dirs. No memory/canon mutation, apply-promotion, review UI/API, backend routes, frontend interaction, runtime extraction, BookNLP/spaCy imports, model calls, generated prose behavior, or raw artifact persistence.",
+  "t005_validation_results": {
+    "target_review_queue_storage_contract": "PASS (359 tests)",
+    "candidate_review_gate_contract": "PASS",
+    "candidate_regressions": "PASS",
+    "orchestrator_contract": "PASS",
+    "source_evidence_contract": "PASS",
+    "combined_candidate_gate_orchestrator_source_tests": "PASS (632 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "booknlp_spacy_availability_guard": "booknlp: False, spacy: False (no import/run)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t005_changes": {
+    "module_created": "backend/story_knowledge/review_queue_storage.py",
+    "runtime_code_changed": true,
+    "tests_changed": false,
+    "review_queue_storage_implemented": true,
+    "queue_listing_loading_implemented": true,
+    "owner_action_workflow_execution_implemented": false,
+    "owner_action_record_validation_only": true,
+    "owner_action_storage_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "candidate_canon_memory_mutation": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "runtime_extraction_added": false,
+    "real_booknlp_spacy_install_or_run": false,
+    "training_jsonl_dataset_changed": false
+  },
   "result": "active",
-  "next_child": "PHASE8-IMPL-012-T005"
+  "next_child": "PHASE8-IMPL-012-T006"
 }
