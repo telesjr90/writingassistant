@@ -1,5 +1,87 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-012-T007 Roadmap/Status Closeout
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status closeout only for `PHASE8-IMPL-012` after `PHASE8-IMPL-012-T001` through `PHASE8-IMPL-012-T006`.
+- Parent task: `PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning. Parent result: COMPLETE.
+- Completed child recorded: `PHASE8-IMPL-012-T007` - Roadmap/status closeout.
+- Active/ready child after T007: none under `PHASE8-IMPL-012`.
+- Next parent recommendation: `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract (recommendation-only, not active until separately published).
+- Precondition confirmed: `PHASE8-IMPL-012` active before closeout; `PHASE8-IMPL-012-T001` through `PHASE8-IMPL-012-T006` complete; `backend/story_knowledge/review_queue_storage.py` and `tests/test_writer_assistant_core_review_queue_storage_contract.py` tracked; candidate review gate/candidate/orchestrator/source-evidence/parser-storage-adapter modules and tests tracked; and no review UI/API, backend review routes, frontend review UI, owner action workflow execution, orchestrator auto-persistence, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists.
+
+### Parent Closeout Summary
+
+- `PHASE8-IMPL-012` is COMPLETE. The parent delivered review queue storage validation, a project-local queue storage helper, a derived/rebuildable index, and owner action record validation only, through the pure `backend/story_knowledge/review_queue_storage.py` helper, plus the review queue storage contract decision and the owner action workflow boundary decision.
+- Completed child summary: T001 published the planning parent; T002 accepted the review queue storage contract decision; T003 accepted the owner action workflow boundary decision; T004 added expected-red review queue storage contract tests; T005 implemented the minimal review queue storage helper; T006 validated review queue safety and required no runtime hardening patch; T007 closes the parent.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-012.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Tracked-Artifact Confirmation
+
+- Tracked: `backend/story_knowledge/review_queue_storage.py`
+- Tracked: `tests/test_writer_assistant_core_review_queue_storage_contract.py`
+- Tracked: `backend/story_knowledge/candidate_review_gate.py`
+- Tracked: `tests/test_writer_assistant_core_candidate_review_gate_contract.py`
+- Tracked: `backend/story_knowledge/extraction_orchestrator.py`
+- Tracked: `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`
+- Tracked: `backend/story_knowledge/booknlp_fixture_parser.py`
+- Tracked: `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py`
+- Tracked: `backend/story_knowledge/raw_extraction_storage.py`
+- Tracked: `tests/test_writer_assistant_core_raw_extraction_storage_contract.py`
+- `.external_sources/` remains ignored and not staged.
+
+### Final Review Queue Storage APIs Now Available
+
+- `validate_review_queue_entry`, `build_review_queue_entry_from_candidate_record`, `review_queue_storage_dir`, `review_queue_entry_path`, `review_queue_index_path`, `write_review_queue_entry`, `read_review_queue_entry`, `list_review_queue_entries`, `build_review_queue_index`, `validate_owner_action_record`.
+
+### Validation Results
+
+- Review queue storage contract (`tests/test_writer_assistant_core_review_queue_storage_contract.py`): PASS (359 tests).
+- Candidate review gate contract (`tests/test_writer_assistant_core_candidate_review_gate_contract.py`): PASS (154 tests).
+- Candidate regressions (schema, record, storage, persistence, list, index, index-safety): PASS (307 tests).
+- Orchestrator contract (`tests/test_writer_assistant_core_extraction_orchestrator_contract.py`): PASS (67 tests).
+- Source/evidence contract (`tests/test_writer_assistant_core_source_evidence_contract.py`): PASS (104 tests).
+- Parser/storage/adapter regressions (fixture parser, raw extraction storage, BookNLP adapter): PASS (64 + 185 + 148 tests).
+- Focused OMI/project regressions (`tests/test_project_manager.py`, `tests/test_omi_boundaries.py`, `tests/test_omi_routes.py`): PASS (109 tests).
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed docs: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` over changed docs: PASS (no whitespace errors).
+- BookNLP/spaCy availability guard: `booknlp: False`, `spacy: False`; no import or execution.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: clean; nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Boundary Confirmation
+
+- Docs/status closeout only. No runtime extraction, package/tool install or execution, real BookNLP/spaCy install or execution, review UI/API, backend routes, frontend changes, owner action workflow execution, orchestrator auto-persistence, review queue storage implementation change, raw artifact persistence, raw write/read/list helpers, apply-promotion, memory/canon mutation, generated prose/rewrite/continuation, test change, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
+### Notes
+
+- The working tree carried pre-existing uncommitted changes from prior WORKSPACE tasks (`docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`, `docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json`, `docs/roadmap/tasks/PHASE8-IMPL-004.md`, `docs/roadmap/tasks/PHASE8-IMPL-011.md`) plus untracked `docs/*.md`, decision, and inventory files. None overlap with the files changed by T007; they were left untouched.
+- The sandbox could not initialize because `.git/hooks` does not exist on disk, so Git/pytest commands were run directly in the WSL shell outside the sandbox.
+
+### Next Parent Recommendation
+
+- `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract (recommendation-only, not active until separately published): decide whether backend review routes are needed before UI, define a read-only review queue API contract, define an owner-action command API contract without apply-promotion, define a frontend review UI planning boundary without implementation, and keep apply-promotion, memory/canon mutation, and real runtime extraction deferred and generated prose/rewrite/continuation forbidden.
+
 ## PHASE8-IMPL-012-T006 Review Queue Safety Regression
 
 ### Result
