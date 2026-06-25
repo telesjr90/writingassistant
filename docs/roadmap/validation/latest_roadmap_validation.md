@@ -1,5 +1,69 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-013-T003 Owner Action Command API Contract Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only. Accepted the owner action command API contract for a future review-workflow-only command boundary.
+- Parent task: `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract. Parent result: ACTIVE after T003.
+- Completed child recorded: `PHASE8-IMPL-013-T003` - Owner action command API contract decision.
+- Next child: `PHASE8-IMPL-013-T004` - Review UI planning boundary decision (ready/active).
+- Planned children: `PHASE8-IMPL-013-T005` through `PHASE8-IMPL-013-T007`.
+- Precondition confirmed: `PHASE8-IMPL-013` active; `PHASE8-IMPL-013-T001` and T002 complete; T003 was ready/active; T004 was planned/next; `PHASE8-IMPL-012` complete through T007; tracked review queue and candidate review gate modules/tests exist; owner action execution exists only as record shape validation; no owner action command API, review UI/API implementation, backend review route, frontend review UI, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists. `backend/app.py` is not present/tracked in this checkout; existing route code is recorded elsewhere as `backend/main.py`.
+
+### Decision Summary
+
+- Accepted `docs/roadmap/decisions/PHASE8-IMPL-013-owner-action-command-api-contract-decision.md`.
+- Route timing: define the future command contract before review UI planning, but implement no routes in T003.
+- Accepted command set: `request_more_evidence`, `mark_needs_info`, `defer_review`, `reject_candidate`, `mark_duplicate`, `mark_superseded`, `archive_without_promotion`, `add_reviewer_note`, `clear_reviewer_note`, `edit_queue_metadata`, `prepare_for_promotion_review`, and `mark_ready_for_separate_promotion_flow`.
+- Rejected command set includes approval, promotion, apply-promotion, memory/canon writes, generated prose/rewrite/continuation, runtime extraction, BookNLP/spaCy execution, raw artifact persistence, training/JSONL export, and unknown commands.
+- Request/response contracts require project/queue/candidate IDs, actor/audit fields, evidence/provenance/source references, `human_review_required`, and explicit no-promotion/no-memory-canon affirmations.
+- Queue/candidate relationship: future command handling may reference queue entries and candidate records but cannot create approval/canon/promoted state, mutate candidate content, delete evidence/provenance, hide uncertainty, or write raw artifacts.
+- Validation fails closed and error/quarantine responses must not partially write unsafe commands, repair by writing memory/canon, or silently coerce rejected commands.
+- Apply-promotion, memory/canon mutation, runtime extraction, raw artifact persistence, generated prose/rewrite/continuation, frontend review UI, backend routes, tests, and implementation remain deferred.
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-013-owner-action-command-api-contract-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-013.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Validation Results
+
+- Enrichment JSON parse (`docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`): PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed docs: PASS.
+- Narrow `/usr/bin/git diff --check` over changed docs: PASS.
+- No pytest run: no tests or runtime code changed in T003.
+- Plain `rg` precondition checks were blocked by a local hook requiring LeanCTX; because T003 forbids LeanCTX, equivalent targeted `/usr/bin/git grep` checks were used instead.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) run.
+- No external tools installed, cloned, fetched, pulled, executed, imported, or vendored.
+- No source/web retrieval run.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Boundary Confirmation
+
+- Docs/decision only. No backend code, frontend code, tests, routes, FastAPI endpoints, frontend API helpers, frontend review UI, owner action execution, queue mutation implementation, candidate mutation implementation, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, runtime project files, OMI runtime records, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
+### Next Child
+
+- `PHASE8-IMPL-013-T004` - Review UI planning boundary decision.
+
 ## PHASE8-IMPL-013-T002 Read-Only Review Queue API Contract Decision
 
 ### Result
