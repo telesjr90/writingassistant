@@ -10,7 +10,9 @@ Writer Assistant Core review UI/API planning and owner-action workflow contract
 
 ## Status
 
-Active after `PHASE8-IMPL-013-T001`. `PHASE8-IMPL-013-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-013-T002` is ready/active. `PHASE8-IMPL-013-T003` through `PHASE8-IMPL-013-T007` are planned. `PHASE8-IMPL-013` started after completed `PHASE8-IMPL-012` (complete through `PHASE8-IMPL-012-T007`).
+Active after `PHASE8-IMPL-013-T002`. `PHASE8-IMPL-013-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-013-T002` is complete as docs/decision only and accepted the read-only review queue API contract decision at `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`. `PHASE8-IMPL-013-T003` is ready/active. `PHASE8-IMPL-013-T004` through `PHASE8-IMPL-013-T007` are planned. `PHASE8-IMPL-013` started after completed `PHASE8-IMPL-012` (complete through `PHASE8-IMPL-012-T007`).
+
+`PHASE8-IMPL-013-T002` accepted the read-only review queue API contract: define the read-only review queue API contract before any frontend review UI but implement no routes in T002; future review queue API operations are read-only (GET/read-model only) and review-workflow-only and never mutate queue entries, candidate records, memory, canon, project source files, raw artifacts, or indexes. The decision records the future read-only operation set (planning terms only), safe request/query parameters, the read-only response shape, queue/candidate exposure rules (queue presence is not approval, high confidence is not truth, response validity is not owner approval), mandatory evidence/provenance/uncertainty display, filtering/sorting/pagination as workflow convenience only, a fail-closed error/quarantine policy that never repairs by writing, owner action API separation (deferred to T003), apply-promotion/memory-canon/runtime-extraction/raw-artifact boundaries, the review UI relationship (deferred to T004), and security/path-safety rules. T002 implemented no routes, FastAPI endpoints, frontend API helpers, frontend review UI, owner action command API, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, package changes, model calls, tests, or training/JSONL/dataset work.
 
 ## Goal
 
@@ -127,8 +129,8 @@ Explicitly excluded:
 ## Child-Task Plan
 
 1. `PHASE8-IMPL-013-T001` - Publish review UI/API planning and owner-action workflow contract parent. Status: complete.
-2. `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision. Status: ready/active.
-3. `PHASE8-IMPL-013-T003` - Owner action command API contract decision. Status: planned.
+2. `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision. Status: complete.
+3. `PHASE8-IMPL-013-T003` - Owner action command API contract decision. Status: ready/active.
 4. `PHASE8-IMPL-013-T004` - Review UI planning boundary decision. Status: planned.
 5. `PHASE8-IMPL-013-T005` - Review API/UI contract tests, if authorized. Status: planned.
 6. `PHASE8-IMPL-013-T006` - Review API/UI safety regression or conditional hardening decision. Status: planned.
@@ -148,17 +150,20 @@ Explicitly excluded:
 
 ### `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision
 
-- Docs/decision only.
-- Decide whether backend review routes are needed before frontend UI.
-- Decide a read-only review queue API contract shape (queue list/read read models, evidence/provenance/uncertainty exposure, non-approval status) without implementing routes.
-- Keep the queue API read-only and review-workflow-only; queue presence stays non-approval.
+- Docs/decision only. Complete.
+- Decided to define the read-only review queue API contract before frontend UI and to implement no routes in T002.
+- Decided a read-only review queue API contract shape (queue list/read read models, index/summary metadata, evidence/provenance/uncertainty exposure, non-approval status) without implementing routes.
+- Kept the queue API read-only and review-workflow-only; queue presence stays non-approval and a valid response is not owner approval.
+- Recorded safe request/query parameters, the read-only response shape, queue/candidate exposure rules, evidence/provenance display requirements, filtering/sorting/pagination boundary, fail-closed error/quarantine policy, owner action API separation, apply-promotion/memory-canon/runtime/raw boundaries, review UI relationship, and security/path safety.
+- Decision artifact: `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`.
 - No runtime code or tests.
 
 ### `PHASE8-IMPL-013-T003` - Owner action command API contract decision
 
-- Docs/decision only.
+- Docs/decision only. Ready/active.
 - Decide an owner-action command API contract: accepted commands/states aligned with `PHASE8-IMPL-012-T003`, rejected commands/states, fail-closed behavior, and required audit affirmations (`no_promotion_performed`, `no_memory_canon_mutation`).
 - Clarify owner action commands are not apply-promotion and owner action execution stays deferred.
+- The owner action command API is the separate write/command surface complementing the T002 read-only API.
 - No runtime code, tests, owner action execution, or apply-promotion.
 
 ### `PHASE8-IMPL-013-T004` - Review UI planning boundary decision
@@ -258,8 +263,8 @@ Do not run pytest in T001 because no tests or runtime code change.
 
 ## Current Status
 
-`PHASE8-IMPL-013` is active after T001. `PHASE8-IMPL-013-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-012` is recorded as complete through `PHASE8-IMPL-012-T007`. The review queue remains workflow support only; the `backend/story_knowledge/review_queue_storage.py` helper stores queue entries under project-local `writer_assistant/review_queue/` (exercised in tmp_path tests), validates owner action record shape only, and performs no owner action execution. Queue presence is non-approval, and owner review remains mandatory before anything can become approved truth. The child sequence is T001 parent publication (complete), T002 read-only review queue API contract decision (ready/active), T003 owner action command API contract decision (planned), T004 review UI planning boundary decision (planned), T005 review API/UI contract tests if authorized (planned), T006 review API/UI safety regression or conditional hardening decision (planned), and T007 roadmap/status closeout (planned). No review UI/API, backend routes, frontend UI, owner action execution, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, or training/JSONL/dataset work is authorized or was added in T001.
+`PHASE8-IMPL-013` is active after T002. `PHASE8-IMPL-013-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-013-T002` is complete as docs/decision only and accepted the read-only review queue API contract decision at `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`: define the read-only review queue API contract before frontend UI but implement no routes in T002; future review queue API operations are read-only (GET/read-model only) and review-workflow-only and never mutate queue entries, candidate records, memory, canon, project source files, raw artifacts, or indexes; safe request/query parameters, the read-only response shape, evidence/provenance/uncertainty display, filtering/sorting/pagination as workflow convenience only, fail-closed error/quarantine that never repairs by writing, owner action API separation (T003), apply-promotion/memory-canon/runtime/raw boundaries, the review UI relationship (T004), and security/path-safety are recorded. `PHASE8-IMPL-012` is recorded as complete through `PHASE8-IMPL-012-T007`. The review queue remains workflow support only; the `backend/story_knowledge/review_queue_storage.py` helper stores queue entries under project-local `writer_assistant/review_queue/` (exercised in tmp_path tests), validates owner action record shape only, and performs no owner action execution. Queue presence is non-approval, and owner review remains mandatory before anything can become approved truth. The child sequence is T001 parent publication (complete), T002 read-only review queue API contract decision (complete), T003 owner action command API contract decision (ready/active), T004 review UI planning boundary decision (planned), T005 review API/UI contract tests if authorized (planned), T006 review API/UI safety regression or conditional hardening decision (planned), and T007 roadmap/status closeout (planned). No review UI/API, backend routes, frontend UI, owner action execution, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, or training/JSONL/dataset work is authorized or was added in T001 or T002.
 
 ## Next Child
 
-`PHASE8-IMPL-013-T002` - Read-only review queue API contract decision.
+`PHASE8-IMPL-013-T003` - Owner action command API contract decision.

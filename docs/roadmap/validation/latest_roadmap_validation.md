@@ -1,5 +1,64 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-013-T002 Read-Only Review Queue API Contract Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only. Accepted the read-only review queue API contract for the future exposure of the `PHASE8-IMPL-012` review queue storage and owner action record validation.
+- Parent task: `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract. Parent result: ACTIVE after T002.
+- Completed child recorded: `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision.
+- Next child: `PHASE8-IMPL-013-T003` - Owner action command API contract decision (ready/active).
+- Planned children: `PHASE8-IMPL-013-T004` through `PHASE8-IMPL-013-T007`.
+- Precondition confirmed: `PHASE8-IMPL-013` active; `PHASE8-IMPL-013-T001` complete; `PHASE8-IMPL-013-T002` was ready/active; `PHASE8-IMPL-013-T003` planned/next; `PHASE8-IMPL-012` complete through `PHASE8-IMPL-012-T007`; `backend/story_knowledge/review_queue_storage.py`, `tests/test_writer_assistant_core_review_queue_storage_contract.py`, `backend/story_knowledge/candidate_review_gate.py`, and `tests/test_writer_assistant_core_candidate_review_gate_contract.py` are tracked; no review UI/API implementation, backend review routes, frontend review UI, owner action command API, owner action execution beyond record validation, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists; and `.external_sources/` remains ignored and not staged.
+
+### Decision Summary
+
+- Accepted `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`.
+- Backend route timing: define the read-only review queue API contract before any frontend review UI, but implement no routes in T002; future route implementation stays deferred until tests authorize it.
+- Read-only operation set (planning terms only): `list_review_queue_entries_readonly`, `get_review_queue_entry_readonly`, `get_review_queue_index_readonly`, `get_review_queue_filters_readonly`, and `get_review_queue_summary_readonly`; any HTTP examples are future-only GET/read-model routes.
+- Request/query contract allows only safe read parameters (path `project_id`/`queue_entry_id`, review/lifecycle/type/category/normalization filters, `has_raw_refs`, `confidence_min`/`confidence_max` uncertainty filters, `sort_by`/`sort_direction` allowlists, planning-only pagination) and rejects all mutation, owner-decision, approval/promotion, apply-promotion, memory/canon, raw write/read, runtime/model/tool, prose, path, and unknown fields.
+- Response shape exposes review-workflow support fields plus evidence/provenance/uncertainty, and never exposes approved/canon/promoted state, memory writes, apply-promotion triggers, owner action results, generated prose, route/model/runtime/raw triggers, or unsafe paths.
+- Queue/candidate relationship: queue entries are workflow support only, queue presence is not approval, high confidence is not truth, response validity is not owner approval, and the read-only API cannot mutate any store.
+- Error/quarantine policy is fail-closed and never repairs by writing.
+- Owner action API, apply-promotion, memory/canon mutation, runtime extraction, raw artifact persistence, and review UI implementation remain deferred (owner action API to T003, review UI to T004).
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-013.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Validation Results
+
+- Enrichment JSON parse (`docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`): PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed docs: PASS.
+- Narrow `/usr/bin/git diff --check` over changed docs: PASS (no whitespace errors).
+- No pytest run: no tests or runtime code changed in T002.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) run.
+- No external tools installed, cloned, fetched, pulled, executed, imported, or vendored.
+- No source/web retrieval run.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Boundary Confirmation
+
+- Docs/decision only. No review UI/API, backend routes, frontend UI, owner action command API, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, runtime project files, OMI runtime records, tests, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
 ## PHASE8-IMPL-013-T001 Publish Review UI/API Planning and Owner-Action Workflow Contract Parent
 
 ### Result
