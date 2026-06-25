@@ -40,6 +40,8 @@
     "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json",
     "candidate_draft_to_record_persistence_gate_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md",
     "review_queue_data_shape_lifecycle_decision": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
+    "review_queue_storage_contract_decision": "docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md",
+    "owner_action_workflow_boundary_decision": "docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md",
     "candidate_review_gate_module": "backend/story_knowledge/candidate_review_gate.py",
     "candidate_review_gate_contract_test": "tests/test_writer_assistant_core_candidate_review_gate_contract.py",
     "candidate_schema_module": "backend/story_knowledge/candidate_schema.py",
@@ -121,7 +123,7 @@
       "id": "PHASE8-IMPL-012-T002",
       "title": "Review queue storage contract decision",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-012-T001"
       ],
@@ -131,13 +133,13 @@
         "Decide storage root, identity rules, allowed fields, lifecycle/status rules, evidence/provenance requirements, and forbidden destinations.",
         "No runtime code or tests."
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-012-T003",
       "title": "Owner action workflow boundary decision",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-012-T002"
       ],
@@ -149,13 +151,13 @@
         "Clarify review UI/API remains deferred.",
         "No runtime code or tests."
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-012-T004",
       "title": "Review queue storage contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-012-T003"
       ],
@@ -312,6 +314,146 @@
     "apply_promotion_added": false,
     "training_jsonl_dataset_changed": false
   },
+  "t002_status": "complete",
+  "t002_result": "PASS docs/decision only",
+  "t002_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md",
+  "t002_storage_strategy": "Project-local stored queue entry read model linked to candidate records by candidate_record_id. Candidate records remain the source of candidate content and candidate-only status. Queue entries duplicate only minimal display/read-model fields, must be rebuildable/repairable from candidate records, and never write memory/canon or apply promotion.",
+  "t002_storage_root_path_boundary": "Future root projects/{project_id}/writer_assistant/review_queue/ with optional entries/{queue_entry_id}.json and index.json. project_id, queue_entry_id, and candidate_record_id must be path-safe and validated; no absolute paths, traversal, backslashes, Windows drive prefixes, nested arbitrary segments, or hidden dot-path IDs; source_path_hint stays debug/display metadata only. Forbidden locations include memory/, bible.json, storyform.json, project.json, scenes/, chapters/, notes/, materials/, omi/promotions/, training/, dataset_manifest.json, JSONL files, raw extraction artifact folders, .external_sources/, frontend/, backend route files, and package/dependency files.",
+  "t002_queue_entry_shape": "Required fields: queue_entry_id, project_id, candidate_record_id, candidate_type, target_category, review_status, lifecycle_state, source_document, source_locator, evidence_summary, evidence_refs, provenance_summary, provenance_refs, confidence, uncertainty_flags, normalization_status, raw_output_refs, human_review_required, created_at, updated_at. Optional fields: group_key, sort_key, priority_reason, reviewer_notes, owner_visible_label, related_candidate_ids, conflict_candidate_ids, duplicate_candidate_ids, insufficient_evidence_reason, rejected_output_reason, storage_version, entry_hash, candidate_snapshot_hash. Forbidden fields: owner_decision_approved, promoted, approved, canon, memory_destination, apply_promotion, storyform_truth, generated_prose, rewrite, continuation, route_trigger, ui_action_trigger, runtime_tool_trigger, model_call, raw_artifact_write_intent, training_destination, jsonl_destination.",
+  "t002_review_status_values": [
+    "pending",
+    "needs_info",
+    "rejected",
+    "deferred",
+    "duplicate",
+    "superseded",
+    "archived"
+  ],
+  "t002_lifecycle_state_values": [
+    "draft_ready_for_review",
+    "needs_more_evidence",
+    "blocked_invalid_support",
+    "owner_review_pending",
+    "owner_reviewed_rejected",
+    "owner_reviewed_deferred",
+    "duplicate_candidate",
+    "superseded_candidate",
+    "archived_without_promotion"
+  ],
+  "t002_candidate_linkage_rules": "Exactly one candidate record per entry; validated candidate_record_id and project_id; preserved candidate_type/target_category alignment; no automatic candidate creation, mutation, or approval; duplicate/conflict/related candidate IDs are references only; missing or invalid candidate records fail closed or are quarantined as invalid support.",
+  "t002_evidence_provenance_requirements": "Every stored entry preserves or references source identity, source locator, evidence summary/refs, provenance summary/refs, raw output refs where applicable, confidence-as-uncertainty, normalization status, human_review_required, and insufficient-evidence/rejected-output reasons; queue storage must not strip evidence/provenance.",
+  "t002_index_contract": "Future review_queue/index.json is derived/rebuildable workflow support only with schema_version, project_id, timestamps, minimal entry summaries, and counts by review_status/lifecycle_state/candidate_type; no canon/memory/approval/apply-promotion fields; index corruption must not affect candidate records.",
+  "t002_owner_action_relationship": "T002 defines storage only; T003 defines owner action workflow boundaries; queue storage may store workflow status/reviewer notes only if T003 authorizes; owner action storage is not apply-promotion or memory/canon mutation; review UI/API remains deferred.",
+  "t002_failure_quarantine_policy": "Fail closed or quarantine on invalid IDs, unsupported status/lifecycle, missing evidence/provenance/source locator, invalid linkage, approved/canon/promoted candidates, forbidden destinations/fields, apply-promotion/memory/canon/prose/raw/runtime/training intents, unknown fields, and unsafe paths; no partial write remains after failure unless future tests define a safe candidate-only invalid-support quarantine folder.",
+  "t002_validation_results": {
+    "enrichment_json_parse": "PASS",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t002_changes": {
+    "decision_artifact_created": "docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md",
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "review_queue_storage_implemented": false,
+    "queue_listing_loading_implemented": false,
+    "owner_action_workflow_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t003_status": "complete",
+  "t003_result": "PASS docs/decision only",
+  "t003_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md",
+  "t003_owner_action_purpose": "Owner actions are explicit review workflow commands on candidate-linked queue entries that capture owner review intent and mark candidate support as needs-info, rejected, deferred, duplicate, superseded, or archived, with reviewer notes or evidence requests. Owner actions are not a promotion path, memory/canon mutation, automatic approval, storyform truth, generated prose workflow, runtime extraction, or raw artifact persistence.",
+  "t003_allowed_owner_action_commands": [
+    "request_more_evidence",
+    "mark_needs_info",
+    "defer_review",
+    "reject_candidate",
+    "mark_duplicate",
+    "mark_superseded",
+    "archive_without_promotion",
+    "add_reviewer_note",
+    "clear_reviewer_note",
+    "edit_queue_metadata"
+  ],
+  "t003_optional_future_owner_action_commands": [
+    "prepare_for_promotion_review",
+    "mark_ready_for_separate_promotion_flow"
+  ],
+  "t003_forbidden_owner_action_commands": [
+    "approve_candidate",
+    "promote_candidate",
+    "write_to_memory",
+    "write_to_canon",
+    "apply_promotion",
+    "generate_prose",
+    "rewrite_source",
+    "continue_scene",
+    "run_extractor"
+  ],
+  "t003_allowed_owner_action_states": [
+    "pending",
+    "needs_info",
+    "deferred",
+    "rejected",
+    "duplicate",
+    "superseded",
+    "archived_without_promotion",
+    "blocked_invalid_support",
+    "ready_for_separate_promotion_review"
+  ],
+  "t003_forbidden_owner_action_states": [
+    "approved",
+    "promoted",
+    "canon",
+    "memory"
+  ],
+  "t003_owner_action_record_shape": "Required fields: action_id, project_id, queue_entry_id, candidate_record_id, action_command, resulting_review_status, resulting_lifecycle_state, actor_id or actor_ref, acted_at, reason_code, reviewer_note, source_document, source_locator, evidence_refs, provenance_refs, human_review_required, no_promotion_performed, no_memory_canon_mutation. Optional fields: previous_review_status, previous_lifecycle_state, related_candidate_ids, duplicate_candidate_ids, superseded_by_candidate_id, requested_evidence_note, action_batch_id, storage_version, action_hash. Forbidden fields: approved, promoted, canon, memory_destination, apply_promotion, storyform_truth, bible_destination, generated_prose, rewrite, continuation, route_trigger, ui_action_trigger, runtime_tool_trigger, model_call, raw_artifact_write_intent, training_destination, jsonl_destination.",
+  "t003_queue_entry_mutation_boundary": "Owner actions may update only workflow fields (review_status, lifecycle_state, reviewer_notes, insufficient_evidence_reason, rejected_output_reason, duplicate_candidate_ids, conflict_candidate_ids, related_candidate_ids, updated_at) if future tests authorize. Forbidden mutations: approved/promoted/canon status, memory/canon destination, apply-promotion flag, candidate content rewrite, source/evidence/provenance deletion, raw artifact write/list/load, route/UI trigger, and model/tool invocation. Queue mutation is workflow support only, not candidate truth mutation, project truth mutation, or promotion.",
+  "t003_candidate_record_relationship": "Owner actions may reference candidate records but must not directly modify them unless a later tests-first helper authorizes safe candidate-only metadata synchronization. Owner actions must not set candidate record status to approved/canon/promoted, prefill owner decision as approved, write memory/canon, or change candidate-only status. Candidate records remain the source of candidate content and candidate-only status and remain separate from queue entries and action records.",
+  "t003_apply_promotion_boundary": "Owner action workflow is not apply-promotion. Apply-promotion remains unimplemented and out of scope. Marking ready_for_separate_promotion_review is only a pointer to future review, not promotion. Rejecting, deferring, or archiving a queue entry is not memory/canon mutation. Any future apply-promotion path must be a separate owner-approved, audited, explicit, separately tested parent/task and must not be hidden inside queue storage or owner action helpers.",
+  "t003_memory_canon_boundary": "Owner action workflow must never write memory/*.json, memory/index.json, bible.json, storyform.json, project.json, scenes/, chapters/, notes/, materials/, or owner-authored source files. Owner actions are workflow metadata only, and queue storage and action records are not approved truth.",
+  "t003_evidence_provenance_requirements": "Every future owner action record or queue update must preserve or reference source document identity, source locator, evidence references, provenance references, candidate_record_id, queue_entry_id, action command, actor reference, timestamp, reason or reviewer note where applicable, human_review_required, no_promotion_performed, and no_memory_canon_mutation; owner actions must not strip evidence/provenance, and entries that cannot preserve support fail closed or are quarantined as invalid support.",
+  "t003_owner_action_storage_boundary": "T003 defines action storage shape only if later authorized and does not implement it. Potential future storage root projects/{project_id}/writer_assistant/review_queue/actions/{action_id}.json sits inside the T002 review queue boundary and shares its path-safety and forbidden-location rules. Future action storage must be project-local, validate before writing, fail closed, and must not write memory/canon, raw artifacts, or training/JSONL/dataset files, or trigger UI/API routes.",
+  "t003_review_ui_api_boundary": "T003 does not implement review UI/API, backend routes, or frontend screens; UI/API planning remains deferred unless local roadmap requires a later decision parent. Any future review UI/API must display evidence/provenance, uncertainty, non-approval status, and no-promotion warnings, must not hide that queue state is not canon truth, and must not perform apply-promotion unless a separate approved workflow exists.",
+  "t003_failure_quarantine_policy": "Fail closed or quarantine on unsupported owner action command/state, approved/promoted/canon state requests, apply-promotion/memory-canon/prose/raw/runtime/tool/model/training intents, missing queue_entry_id/candidate_record_id/source/evidence/provenance references, invalid actor reference, unsafe IDs or path traversal, unknown fields, and any attempt to mutate candidate content or approved truth. No partial write remains after failure unless future tests define a safe invalid-support quarantine path that is candidate-only, non-canon, and not approval.",
+  "t003_validation_results": {
+    "enrichment_json_parse": "PASS",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t003_changes": {
+    "decision_artifact_created": "docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md",
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "owner_action_workflow_implemented": false,
+    "owner_action_storage_implemented": false,
+    "review_queue_storage_implemented": false,
+    "queue_listing_loading_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "candidate_canon_memory_mutation": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
+  },
   "result": "active",
-  "next_child": "PHASE8-IMPL-012-T002"
+  "next_child": "PHASE8-IMPL-012-T004"
 }

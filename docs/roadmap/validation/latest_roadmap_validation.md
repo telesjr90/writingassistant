@@ -1,5 +1,124 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-012-T003 Owner Action Workflow Boundary Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only. Accepted the owner action workflow boundary decision for `PHASE8-IMPL-012`.
+- Parent task: `PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning. Parent result: ACTIVE after T003.
+- Completed child recorded: `PHASE8-IMPL-012-T003` - Owner action workflow boundary decision.
+- Active/ready child after T003: `PHASE8-IMPL-012-T004` - Review queue storage contract tests.
+- Next child: `PHASE8-IMPL-012-T005` - Minimal review queue storage helper, if authorized (planned).
+- Precondition confirmed: `PHASE8-IMPL-012` active, `PHASE8-IMPL-012-T001` and `PHASE8-IMPL-012-T002` complete, `PHASE8-IMPL-011` complete through `PHASE8-IMPL-011-T007`, `backend/story_knowledge/candidate_review_gate.py` (with `build_review_queue_entry` as an in-memory builder only) and candidate schema/record/storage/persistence/list/index modules and tests tracked, and no review queue storage/listing/loading, owner action workflow, owner action storage, review UI/API, backend routes, frontend UI, orchestrator auto-persistence, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists.
+
+### Decision Summary
+
+- Accepted `docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md`.
+- Owner actions are review workflow commands and states only; not apply-promotion, not memory/canon mutation, not approval/canon truth, not generated prose, and not review UI/API implementation.
+- Allowed owner action commands (planning terms): `request_more_evidence`, `mark_needs_info`, `defer_review`, `reject_candidate`, `mark_duplicate`, `mark_superseded`, `archive_without_promotion`, `add_reviewer_note`, `clear_reviewer_note`, `edit_queue_metadata`; optional future-only `prepare_for_promotion_review`, `mark_ready_for_separate_promotion_flow`; `approve_candidate`/`promote_candidate`/`write_to_memory`/`write_to_canon`/`apply_promotion`/`generate_prose`/`rewrite_source`/`continue_scene`/`run_extractor` are not allowed.
+- Allowed owner action states: `pending`, `needs_info`, `deferred`, `rejected`, `duplicate`, `superseded`, `archived_without_promotion`, `blocked_invalid_support`, `ready_for_separate_promotion_review`; `approved`/`promoted`/`canon`/`memory` are not allowed; `ready_for_separate_promotion_review` is only a pointer to a future separate promotion workflow.
+- The decision records a future owner action record shape, queue entry mutation boundary, candidate record relationship, apply-promotion boundary, memory/canon boundary, evidence/provenance requirements, owner action storage boundary, deferred review UI/API boundary, fail-closed/quarantine policy, and T004/T005/T006 handoffs.
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-012.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Validation Results
+
+- Enrichment JSON parse (`docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`): PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed docs: PASS.
+- Narrow `/usr/bin/git diff --check` over changed docs: PASS (no whitespace errors).
+- No pytest run: no tests or runtime code changed in T003.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) run.
+- No external tools installed, cloned, fetched, pulled, executed, imported, or vendored.
+- No source/web retrieval run.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: clean; nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Boundary Confirmation
+
+- Docs/decision only. No review queue storage, queue listing/loading, owner action workflow, owner action storage, review UI/API, backend routes, frontend UI, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, runtime project files, OMI runtime records, tests, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
+### Next Child
+
+- `PHASE8-IMPL-012-T004` - Review queue storage contract tests.
+
+## PHASE8-IMPL-012-T002 Review Queue Storage Contract Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only. Accepted the review queue storage contract decision for `PHASE8-IMPL-012`.
+- Parent task: `PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning. Parent result: ACTIVE after T002.
+- Completed child recorded: `PHASE8-IMPL-012-T002` - Review queue storage contract decision.
+- Active/ready child after T002: `PHASE8-IMPL-012-T003` - Owner action workflow boundary decision.
+- Next child: `PHASE8-IMPL-012-T004` - Review queue storage contract tests (planned).
+- Precondition confirmed: `PHASE8-IMPL-012` active, `PHASE8-IMPL-012-T001` complete, `PHASE8-IMPL-011` complete through `PHASE8-IMPL-011-T007`, `backend/story_knowledge/candidate_review_gate.py` and candidate schema/record/storage/persistence/list/index modules and tests tracked, `build_review_queue_entry` is an in-memory builder only, and no review queue storage/listing/loading, owner action workflow, review UI/API, backend routes, frontend UI, orchestrator auto-persistence, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists.
+
+### Decision Summary
+
+- Accepted `docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md`.
+- Storage strategy: project-local stored queue entry read model linked to candidate records by `candidate_record_id`; candidate records remain the source of candidate content and candidate-only status; queue entries duplicate only minimal display/read-model fields, must be rebuildable/repairable from candidate records, and never write memory/canon or apply promotion.
+- Storage root/path boundary: future root `projects/{project_id}/writer_assistant/review_queue/` with optional `entries/{queue_entry_id}.json` and `index.json`; path-safe validated IDs; no absolute paths, traversal, backslashes, Windows drive prefixes, nested arbitrary segments, or hidden dot-path IDs; `source_path_hint` stays debug/display metadata only; forbidden locations include `memory/`, `bible.json`, `storyform.json`, `project.json`, `scenes/`, `chapters/`, `notes/`, `materials/`, `omi/promotions/`, `training/`, `dataset_manifest.json`, JSONL files, raw extraction artifact folders, `.external_sources/`, `frontend/`, backend route files, and package/dependency files.
+- Queue entry stored shape, allowed `review_status`/`lifecycle_state` values, candidate linkage/integrity rules, evidence/provenance requirements, index contract, storage operation boundary, owner action relationship, and failure/quarantine policy recorded in the decision artifact, aligned with the `PHASE8-IMPL-011-T003` queue shape.
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-012.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Validation Results
+
+- Enrichment JSON parse (`docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`): PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed docs: PASS.
+- Narrow `/usr/bin/git diff --check` over changed docs: PASS (no whitespace errors).
+- No pytest run: no tests or runtime code changed in T002.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) run.
+- No external tools installed, cloned, fetched, pulled, executed, imported, or vendored.
+- No source/web retrieval run.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: clean; nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Boundary Confirmation
+
+- Docs/decision only. No review queue storage, queue listing/loading, owner action workflow, review UI/API, backend routes, frontend UI, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, runtime project files, OMI runtime records, tests, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
+### Next Child
+
+- `PHASE8-IMPL-012-T003` - Owner action workflow boundary decision.
+
 ## PHASE8-IMPL-012-T001 Publish Review Queue Storage and Owner-Review Workflow Planning Parent
 
 ### Result
