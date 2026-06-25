@@ -195,7 +195,7 @@
       "id": "PHASE8-IMPL-012-T006",
       "title": "Review queue safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-012-T005"
       ],
@@ -206,13 +206,13 @@
         "Validate no generated prose.",
         "Conditional repair only if tests reveal gaps."
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-012-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-012-T006"
       ],
@@ -567,6 +567,54 @@
     "real_booknlp_spacy_install_or_run": false,
     "training_jsonl_dataset_changed": false
   },
+  "t006_status": "complete",
+  "t006_result": "PASS validation-only review queue safety regression",
+  "t006_hardening_patch_needed": false,
+  "t006_hardening_summary": "All validations passed against the existing backend/story_knowledge/review_queue_storage.py. No safety gap was found within PHASE8-IMPL-012 scope, so no runtime code was modified and no hardening patch was applied. T006 is validation-only.",
+  "t006_review_queue_storage_safety_result": "PASS. The helper stays project-local under writer_assistant/review_queue/ only, candidate-linked, candidate-only, review-workflow-only, with no approval/canon/promoted state, no apply-promotion, no memory/canon mutation, no review UI/API, no backend routes, no frontend UI, no owner action workflow execution beyond record validation, no raw artifact persistence, no runtime extraction, no generated prose/rewrite/continuation, and no package or external tool expansion.",
+  "t006_no_approval_canon_memory_result": "PASS. Allowed review_status/lifecycle_state values exclude approved/promoted/canon; entries and owner action records carrying approval/canon/memory fields fail closed; validate_owner_action_record requires no_promotion_performed and no_memory_canon_mutation true.",
+  "t006_owner_action_no_execution_result": "PASS. validate_owner_action_record validates record shape only against allowed commands/states and executes no owner actions; approve_candidate/promote_candidate/apply_promotion/run_extractor commands fail closed.",
+  "t006_review_ui_api_route_result": "PASS. No review UI/API, backend routes, or frontend UI exist or were added.",
+  "t006_apply_promotion_memory_canon_result": "PASS. No promotion or apply_promotion field is produced or accepted; no memory/canon destinations are produced; records with approval/promotion/memory intents fail closed.",
+  "t006_raw_runtime_dependency_result": "PASS. No raw artifact write/read/list helpers, no runtime extraction, no BookNLP/spaCy import or execution, and no package/dependency changes.",
+  "t006_source_level_boundary_result": "PASS. Production source scan finds no forbidden runtime/tool/prose/mutation/UI/route terms in backend/story_knowledge/review_queue_storage.py.",
+  "t006_validation_results": {
+    "target_review_queue_storage_contract": "PASS (359 tests)",
+    "candidate_review_gate_contract": "PASS (154 tests)",
+    "candidate_regressions": "PASS (307 tests)",
+    "orchestrator_contract": "PASS (67 tests)",
+    "source_evidence_contract": "PASS (104 tests)",
+    "booknlp_fixture_parser_contract": "PASS (64 tests)",
+    "raw_extraction_storage_contract": "PASS (185 tests)",
+    "booknlp_adapter_contract": "PASS (148 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "booknlp_spacy_availability_guard": "booknlp: False, spacy: False (no import/run)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t006_changes": {
+    "runtime_code_changed": false,
+    "review_queue_storage_module_changed": false,
+    "tests_changed": false,
+    "review_queue_storage_implemented": true,
+    "owner_action_workflow_execution_implemented": false,
+    "owner_action_storage_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "candidate_canon_memory_mutation": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "runtime_extraction_added": false,
+    "real_booknlp_spacy_install_or_run": false,
+    "training_jsonl_dataset_changed": false
+  },
   "result": "active",
-  "next_child": "PHASE8-IMPL-012-T006"
+  "next_child": "PHASE8-IMPL-012-T007"
 }

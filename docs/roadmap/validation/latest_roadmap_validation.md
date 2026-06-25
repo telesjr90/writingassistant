@@ -1,5 +1,84 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-012-T006 Review Queue Safety Regression
+
+### Result
+
+- Result: PASS.
+- Scope: validation-only review queue safety regression and conditional hardening pass over `backend/story_knowledge/review_queue_storage.py` plus roadmap/status updates.
+- Hardening patch needed: No. All validations passed against the existing helper, so no runtime code was modified.
+- Parent task: `PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning. Parent result: ACTIVE after T006.
+- Completed child recorded: `PHASE8-IMPL-012-T006` - Review queue safety regression or conditional hardening.
+- Active/ready child after T006: `PHASE8-IMPL-012-T007` - Roadmap/status closeout.
+- Next child after T007: none under `PHASE8-IMPL-012`.
+- Precondition confirmed: `PHASE8-IMPL-012` active; `PHASE8-IMPL-012-T001`/`T002`/`T003`/`T004`/`T005` complete; `PHASE8-IMPL-012-T007` planned; `backend/story_knowledge/review_queue_storage.py` and `tests/test_writer_assistant_core_review_queue_storage_contract.py` tracked; `backend/story_knowledge/candidate_review_gate.py` (with `build_review_queue_entry` as an in-memory builder only) and candidate schema/record/storage/persistence/list/index helpers and tests tracked; and no review UI/API, backend review routes, frontend review UI, orchestrator auto-persistence, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-012.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-012.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Not changed: `backend/story_knowledge/review_queue_storage.py` (no safety gap found; no hardening patch needed).
+
+### Review Queue Storage Safety Result
+
+- The existing `review_queue_storage.py` helper stays inside the approved boundaries: project-local review queue storage only (`writer_assistant/review_queue/`, exercised in tmp_path tests), candidate-linked, candidate-only, review-workflow-only, with no approval/canon/promoted state, no apply-promotion, no memory/canon mutation, no review UI/API, no backend routes, no frontend UI, no owner action workflow execution beyond record validation, no raw artifact persistence, no runtime extraction, no generated prose/rewrite/continuation, and no package or external tool expansion.
+- Review-workflow / no-approval boundary: PASS. Allowed `review_status`/`lifecycle_state` values exclude `approved`/`promoted`/`canon`; entries carrying approval/canon/memory fields fail closed.
+- Owner action / no-execution boundary: PASS. `validate_owner_action_record` validates record shape only against the T003 allowed commands/states, requires `no_promotion_performed`/`no_memory_canon_mutation` true, rejects forbidden commands/states/fields, and executes no owner actions.
+- Review UI/API and route boundary: PASS. No review UI/API, backend routes, or frontend UI exist or were added.
+- No apply-promotion / no-memory-canon boundary: PASS. No promotion or `apply_promotion` field is produced/accepted; no memory/canon destinations are produced; records with approval/promotion/memory intents fail closed.
+- Raw / runtime / dependency boundary: PASS. No raw artifact write/read/list helpers, no runtime extraction, no BookNLP/spaCy import or execution, and no package/dependency changes.
+- Source-level boundary: PASS. Production source scan finds no forbidden runtime/tool/prose/mutation/UI/route terms.
+
+### Regression Test Results
+
+- Review queue storage contract (`tests/test_writer_assistant_core_review_queue_storage_contract.py`): PASS (359 tests).
+- Candidate review gate contract (`tests/test_writer_assistant_core_candidate_review_gate_contract.py`): PASS (154 tests).
+- Candidate regressions (schema, record, storage, persistence, list, index, index-safety): PASS (307 tests).
+- Orchestrator contract (`tests/test_writer_assistant_core_extraction_orchestrator_contract.py`): PASS (67 tests).
+- Source/evidence contract (`tests/test_writer_assistant_core_source_evidence_contract.py`): PASS (104 tests).
+- Parser/storage/adapter regressions (fixture parser, raw extraction storage, BookNLP adapter): PASS (64 + 185 + 148 tests).
+- Focused OMI/project regressions (`tests/test_project_manager.py`, `tests/test_omi_boundaries.py`, `tests/test_omi_routes.py`): PASS (109 tests).
+
+### Validation Results
+
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed files: PASS.
+- Narrow `/usr/bin/git diff --check -- ...` over changed files: PASS (no whitespace errors).
+- Source-cache safety checks: PASS. `.external_sources/` is not staged and appears only as ignored.
+- BookNLP/spaCy availability guard: `booknlp: False`, `spacy: False`; `review_queue_storage.py` imports neither.
+
+### Boundary Confirmation
+
+- Safety regression / conditional hardening only; runtime code unchanged.
+- No context tools run; no web research.
+- No external tools installed; no external repos cloned/fetched/pulled; no external tool code executed/imported/vendored.
+- No demos run; no model calls; no runtime extraction added.
+- No real BookNLP/spaCy install or execution.
+- No review UI/API added; no backend routes changed; no frontend files changed.
+- No owner action workflow execution added; no apply-promotion or memory/canon mutation added.
+- No raw artifact persistence or raw write/read/list helpers added.
+- No package/dependency files changed.
+- No project runtime files changed outside isolated tmp_path tests.
+- No generated prose/rewrite/continuation behavior added.
+- No training/JSONL/dataset work.
+- No staging, commit, or push.
+
+### Notes
+
+- The working tree carried pre-existing uncommitted changes from prior WORKSPACE tasks (`docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`, `docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json`, `docs/roadmap/tasks/PHASE8-IMPL-004.md`, `docs/roadmap/tasks/PHASE8-IMPL-011.md`) plus untracked `docs/*.md`, decision, and inventory files. None overlap with the files changed by T006; they were left untouched.
+- The sandbox could not initialize because `.git/hooks` does not exist on disk, so Git/pytest commands were run directly in the WSL shell outside the sandbox.
+
+### Next Child
+
+- `PHASE8-IMPL-012-T007` - Roadmap/status closeout.
+
 ## PHASE8-IMPL-012-T005 Minimal Review Queue Storage Helper
 
 ### Result
