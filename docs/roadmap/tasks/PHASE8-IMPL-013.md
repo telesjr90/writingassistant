@@ -10,13 +10,15 @@ Writer Assistant Core review UI/API planning and owner-action workflow contract
 
 ## Status
 
-Active after `PHASE8-IMPL-013-T004`. `PHASE8-IMPL-013-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-013-T002` is complete as docs/decision only and accepted the read-only review queue API contract decision at `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`. `PHASE8-IMPL-013-T003` is complete as docs/decision only and accepted the owner action command API contract decision at `docs/roadmap/decisions/PHASE8-IMPL-013-owner-action-command-api-contract-decision.md`. `PHASE8-IMPL-013-T004` is complete as docs/decision only and accepted the review UI planning boundary decision at `docs/roadmap/decisions/PHASE8-IMPL-013-review-ui-planning-boundary-decision.md`. `PHASE8-IMPL-013-T005` is ready/active. `PHASE8-IMPL-013-T006` through `PHASE8-IMPL-013-T007` are planned. `PHASE8-IMPL-013` started after completed `PHASE8-IMPL-012` (complete through `PHASE8-IMPL-012-T007`).
+Active after `PHASE8-IMPL-013-T005`. `PHASE8-IMPL-013-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-013-T002` is complete as docs/decision only and accepted the read-only review queue API contract decision at `docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md`. `PHASE8-IMPL-013-T003` is complete as docs/decision only and accepted the owner action command API contract decision at `docs/roadmap/decisions/PHASE8-IMPL-013-owner-action-command-api-contract-decision.md`. `PHASE8-IMPL-013-T004` is complete as docs/decision only and accepted the review UI planning boundary decision at `docs/roadmap/decisions/PHASE8-IMPL-013-review-ui-planning-boundary-decision.md`. `PHASE8-IMPL-013-T005` is complete as tests-first expected-red review API contract coverage at `tests/test_writer_assistant_review_api_contract.py`. `PHASE8-IMPL-013-T006` is ready/active. `PHASE8-IMPL-013-T007` is planned. `PHASE8-IMPL-013` started after completed `PHASE8-IMPL-012` (complete through `PHASE8-IMPL-012-T007`).
 
 `PHASE8-IMPL-013-T002` accepted the read-only review queue API contract: define the read-only review queue API contract before any frontend review UI but implement no routes in T002; future review queue API operations are read-only (GET/read-model only) and review-workflow-only and never mutate queue entries, candidate records, memory, canon, project source files, raw artifacts, or indexes. The decision records the future read-only operation set (planning terms only), safe request/query parameters, the read-only response shape, queue/candidate exposure rules (queue presence is not approval, high confidence is not truth, response validity is not owner approval), mandatory evidence/provenance/uncertainty display, filtering/sorting/pagination as workflow convenience only, a fail-closed error/quarantine policy that never repairs by writing, owner action API separation (deferred to T003), apply-promotion/memory-canon/runtime-extraction/raw-artifact boundaries, the review UI relationship (deferred to T004), and security/path-safety rules. T002 implemented no routes, FastAPI endpoints, frontend API helpers, frontend review UI, owner action command API, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, package changes, model calls, tests, or training/JSONL/dataset work.
 
 `PHASE8-IMPL-013-T003` accepted the owner action command API contract: define the future command contract before review UI planning but implement no routes in T003. The future command API is a review-workflow-only command boundary for metadata on candidate-linked queue entries. Accepted commands are `request_more_evidence`, `mark_needs_info`, `defer_review`, `reject_candidate`, `mark_duplicate`, `mark_superseded`, `archive_without_promotion`, `add_reviewer_note`, `clear_reviewer_note`, `edit_queue_metadata`, `prepare_for_promotion_review`, and `mark_ready_for_separate_promotion_flow`; the last two are pointers to a future separate promotion workflow only, not approval or promotion. Rejected commands include approval, promotion, apply-promotion, memory/canon writes, generated prose/rewrite/continuation, runtime extraction, BookNLP/spaCy runs, raw artifact persistence, training/JSONL export, and unknown commands. The decision records safe request/response shapes, actor/audit requirements, queue/candidate relationship boundaries, evidence/provenance preservation, fail-closed validation, error/quarantine policy, apply-promotion and memory/canon boundaries, runtime/raw/dependency boundaries, generated prose boundaries, and T004/T005/T006 handoffs. T003 implemented no backend routes, FastAPI endpoints, frontend helpers, frontend UI, owner action execution, queue mutation, candidate mutation, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, package changes, model calls, tests, or training/JSONL/dataset work.
 
 `PHASE8-IMPL-013-T004` accepted the review UI planning boundary before any review UI implementation exists. The future review UI is an owner-facing review surface for candidate-linked queue entries that must display workflow state, evidence, provenance, source locators, uncertainty/support strength, insufficient-evidence and rejected-output states, and owner-action controls as planning terms only. The decision records future list/detail view display contracts, evidence/provenance/source locator display requirements, uncertainty/confidence language, insufficient-evidence/rejected-output requirements, read-only versus command interaction separation, accessibility/usability expectations, empty/error/quarantine state requirements, and mobile/desktop planning boundaries. It keeps frontend implementation, backend routes, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, runtime extraction, raw artifact persistence, generated prose/rewrite/continuation, tests, and package changes deferred. T005 is tests-first only if authorized.
+
+`PHASE8-IMPL-013-T005` added tests-first expected-red API contract coverage only. The future backend/API module name recorded for implementation handoff is `backend.review_api`, with expected symbols `list_review_queue_entries_readonly`, `get_review_queue_entry_readonly`, `get_review_queue_index_readonly`, `get_review_queue_summary_readonly`, `validate_review_queue_read_request`, `validate_owner_action_command_request`, and `build_owner_action_command_response`. The target command `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_review_api_contract.py -q` is expected-red with collection `ImportError: cannot import name 'review_api' from 'backend'`, limited to the missing future module. Frontend UI contract tests are deferred because no local frontend/component test harness exists and `frontend/package.json` has no usable test command or test dependencies; no package changes were authorized. T005 implemented no backend routes, FastAPI endpoints, frontend review UI, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, runtime extraction, raw artifact persistence, generated prose/rewrite/continuation, package changes, or training/JSONL/dataset work.
 
 ## Goal
 
@@ -136,8 +138,8 @@ Explicitly excluded:
 2. `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision. Status: complete.
 3. `PHASE8-IMPL-013-T003` - Owner action command API contract decision. Status: complete.
 4. `PHASE8-IMPL-013-T004` - Review UI planning boundary decision. Status: complete.
-5. `PHASE8-IMPL-013-T005` - Review API/UI contract tests, if authorized. Status: ready/active.
-6. `PHASE8-IMPL-013-T006` - Review API/UI safety regression or conditional hardening decision. Status: planned.
+5. `PHASE8-IMPL-013-T005` - Review API/UI contract tests, if authorized. Status: complete.
+6. `PHASE8-IMPL-013-T006` - Review API/UI safety regression or conditional hardening decision. Status: ready/active.
 7. `PHASE8-IMPL-013-T007` - Roadmap/status closeout. Status: planned.
 
 ## Child Task Details
@@ -187,15 +189,22 @@ Explicitly excluded:
 
 ### `PHASE8-IMPL-013-T005` - Review API/UI contract tests, if authorized
 
-- Tests-first only, expected-red, if authorized by T002/T003/T004. Ready/active after T004.
-- Define a future API/UI-boundary contract only after prior children authorize it.
-- `tmp_path` only for any filesystem assertions.
+- Tests-first only, expected-red, authorized by T002/T003/T004. Complete.
+- Added `tests/test_writer_assistant_review_api_contract.py`.
+- Future backend/API module recorded: `backend.review_api`.
+- Future symbols recorded: `list_review_queue_entries_readonly`, `get_review_queue_entry_readonly`, `get_review_queue_index_readonly`, `get_review_queue_summary_readonly`, `validate_review_queue_read_request`, `validate_owner_action_command_request`, and `build_owner_action_command_response`.
+- Encoded read-only request validation, read-only response shape, owner action command request validation, owner action command response shape, no-side-effect/forbidden-path checks, and source-level boundary checks for the future module.
+- Expected-red target result: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_review_api_contract.py -q` fails during collection with `ImportError: cannot import name 'review_api' from 'backend'`, limited to the missing future module.
+- Frontend UI contract test deferred: no local frontend/component test harness exists and `frontend/package.json` has no usable test runner or test dependencies; package changes were not authorized.
+- `tmp_path` only for filesystem assertions.
 - No route/UI implementation.
 - No apply-promotion.
 - No memory/canon mutation.
+- No backend code, frontend code, frontend API helper, owner action execution, raw artifact persistence, runtime extraction, generated prose, package, training, JSONL, or dataset change.
 
 ### `PHASE8-IMPL-013-T006` - Review API/UI safety regression or conditional hardening decision
 
+- Ready/active after T005.
 - Validate boundaries or prepare handoff.
 - No implementation unless explicitly authorized by prior tests and owner scope.
 - Validate no review UI/API, no backend routes, no owner action execution, no apply-promotion, no memory/canon mutation, and no generated prose.
@@ -238,8 +247,9 @@ From `PHASE8-IMPL-011` and `PHASE8-IMPL-012`:
 - `PHASE8-IMPL-013-T002` is complete.
 - `PHASE8-IMPL-013-T003` is complete.
 - `PHASE8-IMPL-013-T004` is complete if successful.
-- `PHASE8-IMPL-013-T005` is ready/active.
-- `PHASE8-IMPL-013-T006` through `PHASE8-IMPL-013-T007` are planned.
+- `PHASE8-IMPL-013-T005` is complete if successful.
+- `PHASE8-IMPL-013-T006` is ready/active.
+- `PHASE8-IMPL-013-T007` is planned.
 - T001 records `PHASE8-IMPL-012` as complete through T007.
 - T001 records the review queue as workflow support only and owner actions as non-promotion.
 - T001 creates no backend code, tests, routes, UI, packages, project runtime files, training data, JSONL records, or datasets.

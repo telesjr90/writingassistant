@@ -1,5 +1,66 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-013-T005 Review API/UI Contract Tests
+
+### Result
+
+- Result: PASS.
+- Scope: tests-first expected-red only. Added backend/API contract tests for the future review API boundary.
+- Parent task: `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract. Parent result: ACTIVE after T005.
+- Completed child recorded: `PHASE8-IMPL-013-T005` - Review API/UI contract tests, if authorized.
+- Next child: `PHASE8-IMPL-013-T006` - Review API/UI safety regression or conditional hardening decision (ready/active).
+- Planned child: `PHASE8-IMPL-013-T007` - Roadmap/status closeout.
+- Precondition confirmed: `PHASE8-IMPL-013` active; T001, T002, T003, and T004 complete; T005 was ready/active; T006 was planned/next; `PHASE8-IMPL-012` complete through T007; tracked review queue and candidate review gate modules/tests exist; no review API route implementation, owner action command API implementation, owner action execution beyond owner action record validation, review UI implementation, backend review routes, frontend review UI, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, or real BookNLP/spaCy install/run exists. `backend/app.py`, `frontend/src/Editor.jsx`, and `frontend/src/ProjectNav.jsx` are not present at those exact paths in this checkout; active paths are `backend/main.py`, `frontend/src/components/Editor.jsx`, and `frontend/src/components/ProjectNav.jsx`.
+
+### Files Changed
+
+- Created: `tests/test_writer_assistant_review_api_contract.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-013.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+
+### Contract Summary
+
+- Future backend/API module recorded: `backend.review_api`.
+- Future symbols recorded: `list_review_queue_entries_readonly`, `get_review_queue_entry_readonly`, `get_review_queue_index_readonly`, `get_review_queue_summary_readonly`, `validate_review_queue_read_request`, `validate_owner_action_command_request`, and `build_owner_action_command_response`.
+- Contract coverage added: future module/symbols, read-only request validation, read-only response shape, owner action command request validation, owner action command response shape, no-side-effect/forbidden path checks using `tmp_path`, and source-level boundary checks if the future module exists.
+- Frontend UI contract test status: deferred. Reason: no local frontend/component test harness exists and `frontend/package.json` has no usable test script or test dependencies; package/dependency changes were not authorized.
+
+### Expected-Red Target
+
+- Command: `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_review_api_contract.py -q`
+- Result: EXPECTED RED.
+- Exact failure cause: collection `ImportError: cannot import name 'review_api' from 'backend' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/__init__.py)`.
+- Failure scope: limited to missing future module/symbol. No syntax errors, no unrelated import failures, no skips, and no xfails.
+
+### Existing Regression Results
+
+- Review queue storage contract: PASS (`359 passed in 0.47s`).
+- Candidate review gate contract: PASS (`154 passed in 0.23s`).
+- Candidate regressions: PASS (`307 passed in 0.73s`).
+- Orchestrator contract: PASS (`67 passed in 0.16s`).
+- Source/evidence contract: PASS (`104 passed in 0.16s`).
+- BookNLP fixture parser contract: PASS (`64 passed in 0.12s`).
+- Raw extraction storage contract: PASS (`185 passed in 0.32s`).
+- BookNLP adapter contract: PASS (`148 passed in 0.31s`).
+- Focused OMI/project regressions: PASS (`109 passed in 0.66s`).
+- Availability guard: PASS (`booknlp: False`, `spacy: False`).
+
+### Source-Cache Safety
+
+- `/usr/bin/git status --short -- .external_sources`: nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources | head -50`: `.external_sources/` appears ignored only.
+
+### Boundary Confirmation
+
+- Tests-first only. No backend route, FastAPI endpoint, backend implementation module, frontend review UI, frontend application code, frontend API helper, owner action command API implementation, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency change, generated prose/rewrite/continuation, runtime project file, training data, JSONL, dataset manifest, staging, commit, or push was performed.
+
 ## PHASE8-IMPL-013-T004 Review UI Planning Boundary Decision
 
 ### Result

@@ -55,7 +55,9 @@
     "candidate_persistence_module": "backend/story_knowledge/candidate_persistence.py",
     "candidate_index_module": "backend/story_knowledge/candidate_index.py",
     "source_map_module": "backend/story_knowledge/source_map.py",
-    "evidence_module": "backend/story_knowledge/evidence.py"
+    "evidence_module": "backend/story_knowledge/evidence.py",
+    "review_api_contract_test": "tests/test_writer_assistant_review_api_contract.py",
+    "review_ui_contract_test": "deferred: no local frontend/component test harness or usable frontend test script without package changes"
   },
   "goal": "Publish the planning and contract parent that decides whether and how the project-local review queue storage and owner action record validation produced by the completed PHASE8-IMPL-012 review queue storage helper should be exposed through a read-only review queue API, an owner-action command API, and a frontend review UI, without implementing any backend routes, frontend screens, owner action execution, apply-promotion, or memory/canon mutation, and without implementing review UI/API, routes, or owner action execution in T001.",
   "why_now": "PHASE8-IMPL-012 is complete through T007 and delivered backend/story_knowledge/review_queue_storage.py (a pure project-local candidate-linked review-workflow-only queue storage helper), review queue storage contract tests, project-local queue write/read/list, a derived/rebuildable index, and owner action record shape validation only, with no review UI/API, no backend routes, no frontend UI, no owner action execution, no apply-promotion, no memory/canon mutation, and no runtime extraction. The review queue is now storable, listable, and indexable, but nothing exposes it to an owner yet. The next risk is accidental backend review routes, owner action execution, review UI scope creep, or apply-promotion without an explicit contract.",
@@ -190,7 +192,7 @@
       "id": "PHASE8-IMPL-013-T005",
       "title": "Review API/UI contract tests, if authorized",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-013-T004"
       ],
@@ -202,13 +204,17 @@
         "No apply-promotion.",
         "No memory/canon mutation."
       ],
-      "result": "pending"
+      "result": "complete",
+      "test_file": "tests/test_writer_assistant_review_api_contract.py",
+      "expected_future_module": "backend.review_api",
+      "expected_red_result": "collection ImportError: cannot import name review_api from backend",
+      "frontend_ui_contract_test": "deferred: no local frontend/component test harness or usable frontend test script without package changes"
     },
     {
       "id": "PHASE8-IMPL-013-T006",
       "title": "Review API/UI safety regression or conditional hardening decision",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-013-T005"
       ],
@@ -287,8 +293,8 @@
     "model-assisted extraction",
     "training/JSONL/dataset work"
   ],
-  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were authorized or run for T001, T002, or T003.",
-  "external_tool_policy": "No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001, T002, or T003.",
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were authorized or run for T001 through T005.",
+  "external_tool_policy": "No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001 through T005.",
   "candidate_record_policy": "Candidate records remain candidate-only and review-pending and never become canon, memory, owner decisions, or promotion by default. This parent does not modify candidate schema/record/storage/persistence/list/index modules.",
   "review_queue_policy": "Review queue entries are workflow support only, not approval, canon, memory, storyform truth, owner decisions, generated prose, or apply-promotion. T001 does not implement review UI/API, routes, owner action execution, or persistence beyond the inherited PHASE8-IMPL-012 helper.",
   "review_api_policy": "Whether and how the review queue is exposed through a read-only review queue API and whether backend routes are needed before UI is decided in later children before any route exists. Any future review queue API must be read-only, review-workflow-only, evidence/provenance-backed, and must not expose approval/canon/promotion or perform apply-promotion. T001 does not implement a review API.",
@@ -648,5 +654,80 @@
     "plain_rg_precondition_scan": "BLOCKED by local hook requiring LeanCTX; not rerun through LeanCTX per task boundary; targeted /usr/bin/git grep used instead"
   },
   "result": "active",
-  "next_child": "PHASE8-IMPL-013-T005 - Review API/UI contract tests, if authorized (ready/active)"
+  "next_child": "PHASE8-IMPL-013-T006 - Review API/UI safety regression or conditional hardening decision (ready/active)",
+  "t005_status": "complete",
+  "t005_result": "PASS tests-first expected-red contract coverage only",
+  "t005_test_files": [
+    "tests/test_writer_assistant_review_api_contract.py"
+  ],
+  "t005_frontend_ui_contract_test": {
+    "status": "deferred",
+    "reason": "No local frontend/component test harness exists and frontend/package.json has test script \"echo Error: no test specified && exit 1\" with no test dependencies; no package/dependency changes authorized."
+  },
+  "t005_expected_future_backend_module": "backend.review_api",
+  "t005_expected_future_backend_symbols": [
+    "list_review_queue_entries_readonly",
+    "get_review_queue_entry_readonly",
+    "get_review_queue_index_readonly",
+    "get_review_queue_summary_readonly",
+    "validate_review_queue_read_request",
+    "validate_owner_action_command_request",
+    "build_owner_action_command_response"
+  ],
+  "t005_contract_coverage": {
+    "future_module_api_symbols": true,
+    "read_only_request_validation": true,
+    "read_only_response_shape": true,
+    "owner_action_command_request_validation": true,
+    "owner_action_command_response_shape": true,
+    "no_side_effect_tmp_path_only": true,
+    "forbidden_project_paths": true,
+    "source_level_boundary_if_module_exists": true,
+    "generated_prose_forbidden": true,
+    "runtime_extraction_forbidden": true,
+    "raw_artifact_persistence_forbidden": true,
+    "apply_promotion_forbidden": true,
+    "memory_canon_mutation_forbidden": true
+  },
+  "t005_expected_red_result": {
+    "command": ".venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_review_api_contract.py -q",
+    "result": "EXPECTED RED",
+    "exit_code": 2,
+    "failure_cause": "ImportError: cannot import name 'review_api' from 'backend' (/home/tjrpirateking/projects/WritingAssistantApplication/backend/__init__.py)",
+    "limited_to_missing_future_module_or_symbol": true,
+    "syntax_errors": false,
+    "unrelated_import_failures": false,
+    "skips": false,
+    "xfails": false
+  },
+  "t005_validation_results": {
+    "review_queue_storage_contract": "PASS: 359 passed in 0.47s",
+    "candidate_review_gate_contract": "PASS: 154 passed in 0.23s",
+    "candidate_regressions": "PASS: 307 passed in 0.73s",
+    "orchestrator_contract": "PASS: 67 passed in 0.16s",
+    "source_evidence_contract": "PASS: 104 passed in 0.16s",
+    "booknlp_fixture_parser_contract": "PASS: 64 passed in 0.12s",
+    "raw_extraction_storage_contract": "PASS: 185 passed in 0.32s",
+    "booknlp_adapter_contract": "PASS: 148 passed in 0.31s",
+    "focused_omi_project_regressions": "PASS: 109 passed in 0.66s",
+    "booknlp_spacy_availability_guard": "PASS: booknlp False; spacy False",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t005_changes": {
+    "backend_code_changed": false,
+    "frontend_code_changed": false,
+    "route_implementation": false,
+    "ui_implementation": false,
+    "frontend_api_helper_implementation": false,
+    "owner_action_execution": false,
+    "apply_promotion": false,
+    "memory_canon_mutation": false,
+    "runtime_extraction": false,
+    "raw_artifact_persistence": false,
+    "generated_prose": false,
+    "package_files_changed": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t006_status": "ready/active",
+  "t006_result": "pending"
 }
