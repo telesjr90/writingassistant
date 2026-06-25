@@ -1,5 +1,68 @@
 # Latest Roadmap Validation
 
+## PHASE8-IMPL-013-T001 Publish Review UI/API Planning and Owner-Action Workflow Contract Parent
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/planning only. Published the next Writer Assistant Core parent `PHASE8-IMPL-013` after completed `PHASE8-IMPL-012`.
+- Parent task: `PHASE8-IMPL-013` - Writer Assistant Core review UI/API planning and owner-action workflow contract. Parent result: ACTIVE after T001.
+- Completed child recorded: `PHASE8-IMPL-013-T001` - Publish review UI/API planning and owner-action workflow contract parent.
+- Next child: `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision (ready/active).
+- Planned children: `PHASE8-IMPL-013-T003` through `PHASE8-IMPL-013-T007`.
+- Precondition confirmed: `PHASE8-IMPL-012` complete through `PHASE8-IMPL-012-T007`; `PHASE8-IMPL-012-T007` complete; no active child remained under `PHASE8-IMPL-012`; `PHASE8-IMPL-013` was recommendation-only/unpublished and not already active; `backend/story_knowledge/review_queue_storage.py`, `tests/test_writer_assistant_core_review_queue_storage_contract.py`, `backend/story_knowledge/candidate_review_gate.py`, `tests/test_writer_assistant_core_candidate_review_gate_contract.py`, `backend/story_knowledge/extraction_orchestrator.py`, `tests/test_writer_assistant_core_extraction_orchestrator_contract.py`, and the candidate schema/record/storage/persistence/list/index helpers and tests are tracked; no review UI/API, backend review routes, frontend review UI, owner action workflow execution beyond record validation, apply-promotion, memory/canon mutation, raw artifact persistence, or runtime extraction exists; and `.external_sources/` remains ignored and not staged.
+
+### Parent Publication Summary
+
+- `PHASE8-IMPL-013` is a planning/contract parent that decides whether and how the project-local review queue storage and owner action record validation delivered by the completed `PHASE8-IMPL-012` review queue storage helper should be exposed through a read-only review queue API, an owner-action command API, and a frontend review UI, without implementing any backend routes, frontend screens, owner action execution, apply-promotion, or memory/canon mutation.
+- T001 created the parent task record, inventory, and enrichment JSON and updated roadmap/status truth files. The recommended child sequence is T001 parent publication (complete), T002 read-only review queue API contract decision (ready/active), T003 owner action command API contract decision, T004 review UI planning boundary decision, T005 review API/UI contract tests if authorized, T006 review API/UI safety regression or conditional hardening decision, and T007 roadmap/status closeout.
+- The review queue is workflow support only and queue presence is non-approval; owner action is not promotion; a candidate record is not canon and queue state is not approval; evidence/provenance must be displayed in any future review surface and confidence is uncertainty, not truth; owner review remains mandatory before anything can become approved truth.
+
+### Files Changed
+
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-013.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-013.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/roadmap_governance.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Validation Results
+
+- Enrichment JSON parse (`docs/roadmap/enrichment/PHASE8-IMPL-013.enrichment.json`): PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check over changed docs: PASS.
+- Narrow `/usr/bin/git diff --check` over changed docs: PASS (no whitespace errors).
+- No pytest run: no tests or runtime code changed in T001.
+- No context tools (CCE, Graphify, Repomix, AI Context, MCP tools, LeanCTX) run.
+- No external tools installed, cloned, fetched, pulled, executed, imported, or vendored.
+- No source/web retrieval run.
+
+### Source-Cache Safety Checks
+
+- `/usr/bin/git status --short -- .external_sources`: clean; nothing staged.
+- `/usr/bin/git status --short --ignored -- .external_sources`: `.external_sources/` remains ignored and protected from commit.
+
+### Boundary Confirmation
+
+- Docs/status/planning only. No review UI/API, backend routes, frontend UI, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, runtime project files, OMI runtime records, tests, or training/JSONL/dataset work was performed. No staging, commit, or push.
+
+### Notes
+
+- The working tree carried pre-existing uncommitted changes from prior WORKSPACE tasks (`docs/roadmap/enrichment/PHASE8-IMPL-004.enrichment.json`, `docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json`, `docs/roadmap/tasks/PHASE8-IMPL-004.md`, `docs/roadmap/tasks/PHASE8-IMPL-011.md`) plus untracked `docs/*.md`, decision, and inventory files. None overlap with the files changed by T001; they were left untouched.
+- The sandbox could not initialize because `.git/hooks` does not exist on disk, so Git commands were run directly in the WSL shell outside the sandbox.
+
+### Next Child
+
+- `PHASE8-IMPL-013-T002` - Read-only review queue API contract decision.
+
 ## PHASE8-IMPL-012-T007 Roadmap/Status Closeout
 
 ### Result

@@ -76,6 +76,10 @@ GitHub Issues and GitHub Projects are not authoritative until a future sync task
 | `no_automatic_persistence` | Orchestrator or extraction output must not be automatically persisted as candidate records without an explicit owner-gated persistence boundary. |
 | `queue_storage_planning` | Whether and how review queue entries are stored, listed, loaded, and prepared for future owner review is decided and tested before any queue storage helper, route, or UI exists; stored queue state is review workflow support only, never approval or canon truth. |
 | `owner_action_workflow_planning` | Owner review action workflow states and commands are defined as planning terms only; owner actions are not apply-promotion, owner action storage is not memory/canon mutation, and review UI/API remains deferred. |
+| `review_api_planning` | Whether and how the review queue is exposed through a read-only review queue API, and whether backend routes are needed before UI, is decided before any review route exists; a future review queue API stays read-only, review-workflow-only, and evidence/provenance-backed and never exposes approval/canon/promotion. |
+| `owner_action_api_planning` | The owner-action command API contract (accepted/rejected commands and states, fail-closed behavior, audit affirmations) is decided before any owner action route or execution exists; owner actions are not apply-promotion and owner action execution remains deferred. |
+| `review_ui_planning` | The frontend review UI display/interaction boundary is decided before any review screen exists; a future review UI must display evidence/provenance/uncertainty and non-approval status, show no-promotion warnings, and must not imply canon. |
+| `no_apply_promotion` | Must not implement or trigger apply-promotion; apply-promotion remains a separate future owner-approved, audited, explicit, separately tested gate. |
 
 ## Drift Handling
 
