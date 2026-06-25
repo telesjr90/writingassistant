@@ -157,7 +157,7 @@
       "id": "PHASE8-IMPL-012-T004",
       "title": "Review queue storage contract tests",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-012-T003"
       ],
@@ -170,13 +170,13 @@
         "No apply-promotion.",
         "No memory/canon mutation."
       ],
-      "result": "pending"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-012-T005",
       "title": "Minimal review queue storage helper, if authorized",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-012-T004"
       ],
@@ -454,6 +454,66 @@
     "apply_promotion_added": false,
     "training_jsonl_dataset_changed": false
   },
+  "t004_status": "complete",
+  "t004_result": "PASS tests-first only (expected-red target)",
+  "t004_test_file": "tests/test_writer_assistant_core_review_queue_storage_contract.py",
+  "t004_future_module": "backend.story_knowledge.review_queue_storage",
+  "t004_future_api": [
+    "validate_review_queue_entry",
+    "build_review_queue_entry_from_candidate_record",
+    "review_queue_storage_dir",
+    "review_queue_entry_path",
+    "review_queue_index_path",
+    "write_review_queue_entry",
+    "read_review_queue_entry",
+    "list_review_queue_entries",
+    "build_review_queue_index",
+    "validate_owner_action_record"
+  ],
+  "t004_expected_red_result": "Collection ImportError: cannot import name 'review_queue_storage' from 'backend.story_knowledge'; failure limited to the missing future module; no syntax errors, no unrelated import failures, no skips, no xfails.",
+  "t004_test_categories": [
+    "future module/API expectations",
+    "queue entry validation",
+    "queue entry build from candidate record",
+    "storage path helpers (project-local only)",
+    "write/read/list/index helpers (tmp_path only)",
+    "owner action record validation",
+    "fail-closed matrices for entries and owner actions",
+    "no-side-effect guarantees (tmp_path only)",
+    "future production source-level boundary scan"
+  ],
+  "t004_validation_results": {
+    "target_review_queue_storage_contract_expected_red": "PASS (expected-red collection ImportError limited to missing backend.story_knowledge.review_queue_storage)",
+    "candidate_review_gate_contract": "PASS",
+    "candidate_regressions": "PASS",
+    "orchestrator_contract": "PASS",
+    "source_evidence_contract": "PASS",
+    "combined_candidate_gate_orchestrator_source_tests": "PASS (632 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t004_changes": {
+    "test_file_created": "tests/test_writer_assistant_core_review_queue_storage_contract.py",
+    "runtime_code_changed": false,
+    "review_queue_storage_implemented": false,
+    "queue_listing_loading_implemented": false,
+    "owner_action_workflow_implemented": false,
+    "owner_action_storage_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "candidate_canon_memory_mutation": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
+  },
   "result": "active",
-  "next_child": "PHASE8-IMPL-012-T004"
+  "next_child": "PHASE8-IMPL-012-T005"
 }

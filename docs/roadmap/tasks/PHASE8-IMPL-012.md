@@ -10,7 +10,7 @@ Writer Assistant Core review queue storage and owner-review workflow planning
 
 ## Status
 
-Active after `PHASE8-IMPL-012-T003`. `PHASE8-IMPL-012-T001` is complete as docs/status/planning only. `PHASE8-IMPL-012-T002` is complete as docs/decision only and accepted the review queue storage contract decision. `PHASE8-IMPL-012-T003` is complete as docs/decision only and accepted the owner action workflow boundary decision. `PHASE8-IMPL-012-T004` is ready/active. `PHASE8-IMPL-012-T005` through `PHASE8-IMPL-012-T007` are planned. `PHASE8-IMPL-012` starts after completed `PHASE8-IMPL-011` (complete through `PHASE8-IMPL-011-T007`).
+Active after `PHASE8-IMPL-012-T004`. `PHASE8-IMPL-012-T001` is complete as docs/status/planning only. `PHASE8-IMPL-012-T002` is complete as docs/decision only and accepted the review queue storage contract decision. `PHASE8-IMPL-012-T003` is complete as docs/decision only and accepted the owner action workflow boundary decision. `PHASE8-IMPL-012-T004` is complete as tests-first only and added expected-red review queue storage contract tests. `PHASE8-IMPL-012-T005` is ready/active. `PHASE8-IMPL-012-T006` and `PHASE8-IMPL-012-T007` are planned. `PHASE8-IMPL-012` starts after completed `PHASE8-IMPL-011` (complete through `PHASE8-IMPL-011-T007`).
 
 ## Goal
 
@@ -120,8 +120,8 @@ Explicitly excluded:
 1. `PHASE8-IMPL-012-T001` - Publish review queue storage and owner-review workflow planning parent. Status: complete.
 2. `PHASE8-IMPL-012-T002` - Review queue storage contract decision. Status: complete.
 3. `PHASE8-IMPL-012-T003` - Owner action workflow boundary decision. Status: complete.
-4. `PHASE8-IMPL-012-T004` - Review queue storage contract tests. Status: ready/active.
-5. `PHASE8-IMPL-012-T005` - Minimal review queue storage helper, if authorized. Status: planned.
+4. `PHASE8-IMPL-012-T004` - Review queue storage contract tests. Status: complete.
+5. `PHASE8-IMPL-012-T005` - Minimal review queue storage helper, if authorized. Status: ready/active.
 6. `PHASE8-IMPL-012-T006` - Review queue safety regression or conditional hardening. Status: planned.
 7. `PHASE8-IMPL-012-T007` - Roadmap/status closeout. Status: planned.
 
@@ -176,18 +176,21 @@ Explicitly excluded:
 
 ### `PHASE8-IMPL-012-T004` - Review queue storage contract tests
 
-- Tests-first only. Status: ready/active.
-- Expected-red if a future queue storage helper does not exist.
-- Define a future helper/API only after T002/T003 authorize it.
-- Encode the T002 storage contract and the T003 owner action boundary.
-- `tmp_path` only for any filesystem assertions.
-- Test queue entry validation, storage paths, write/read/list/index if authorized, owner action command/state validation and record shape if in scope, and fail-closed unsafe entries/actions.
+- Tests-first only. Status: complete.
+- Added `tests/test_writer_assistant_core_review_queue_storage_contract.py`, which imports the future `backend.story_knowledge.review_queue_storage` module normally and is expected-red until `PHASE8-IMPL-012-T005` creates the module, if authorized.
+- Encoded future public APIs: `validate_review_queue_entry`, `build_review_queue_entry_from_candidate_record`, `review_queue_storage_dir`, `review_queue_entry_path`, `review_queue_index_path`, `write_review_queue_entry`, `read_review_queue_entry`, `list_review_queue_entries`, `build_review_queue_index`, and `validate_owner_action_record`.
+- Encoded the T002 storage contract (queue entry shape, allowed `review_status`/`lifecycle_state` values, forbidden fields, project-local storage paths, derived/rebuildable index contract) and the T003 owner action boundary (allowed/forbidden commands and states, owner action record shape, `no_promotion_performed`/`no_memory_canon_mutation` affirmations).
+- `tmp_path` only for all filesystem assertions; synthetic in-test fixtures only, reusing existing candidate record validators and `candidate_review_gate.build_review_queue_entry` for faithful queue entry fixtures.
+- Expected-red target result: collection `ImportError: cannot import name 'review_queue_storage' from 'backend.story_knowledge'`, limited to the missing future module; no syntax errors, no unrelated import failures, no skips, no xfails.
+- Candidate review gate contract, candidate regressions (schema/record/storage/persistence/list/index/index-safety), orchestrator contract, source/evidence contract (632 combined), and focused OMI/project regressions (109) pass.
+- No queue storage implementation, queue listing/loading, owner action workflow, review UI/API, backend routes, frontend UI, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run, or package changes were added.
 - No UI/routes.
 - No apply-promotion.
 - No memory/canon mutation.
 
 ### `PHASE8-IMPL-012-T005` - Minimal review queue storage helper, if authorized
 
+- Status: ready/active.
 - Optional pure helper implementation only if T002-T004 authorize it.
 - Project-local queue storage only.
 - Candidate-linked, candidate-only, review-workflow-only.
@@ -254,8 +257,8 @@ Do not run pytest in T001 because no tests or runtime code change.
 
 ## Current Status
 
-`PHASE8-IMPL-012` is active after T003. `PHASE8-IMPL-012-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-012-T002` is complete as docs/decision only and accepted `docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md`, which records a project-local, candidate-linked, candidate-only, review-workflow-only, evidence/provenance-backed, fail-closed review queue storage contract with allowed `review_status`/`lifecycle_state` values, a stored queue entry shape, a derived/rebuildable index contract, a storage operation boundary, candidate linkage/integrity rules, and forbidden destinations. `PHASE8-IMPL-012-T003` is complete as docs/decision only and accepted `docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md`, which records owner actions as review workflow commands and states only (not apply-promotion, not memory/canon mutation, not approval/canon truth), the allowed owner action commands and states, a future owner action record shape, the queue entry mutation boundary, the candidate record relationship, apply-promotion and memory/canon boundaries, evidence/provenance requirements, an owner action storage boundary, a deferred review UI/API boundary, and a fail-closed/quarantine policy. `PHASE8-IMPL-011` is recorded as complete through `PHASE8-IMPL-011-T007`. Review queue entries remain workflow support only and are built in memory only by the completed `PHASE8-IMPL-011` candidate review gate; they are not stored, listed, or loaded yet. `PHASE8-IMPL-012-T004` is ready/active as the review queue storage contract tests. No review queue storage, queue listing/loading, owner action workflow, owner action storage, review UI/API, backend review routes, frontend review UI, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose, model calls, or training/JSONL/dataset work is authorized or was added in T003.
+`PHASE8-IMPL-012` is active after T004. `PHASE8-IMPL-012-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-012-T002` is complete as docs/decision only and accepted `docs/roadmap/decisions/PHASE8-IMPL-012-review-queue-storage-contract-decision.md`, which records a project-local, candidate-linked, candidate-only, review-workflow-only, evidence/provenance-backed, fail-closed review queue storage contract with allowed `review_status`/`lifecycle_state` values, a stored queue entry shape, a derived/rebuildable index contract, a storage operation boundary, candidate linkage/integrity rules, and forbidden destinations. `PHASE8-IMPL-012-T003` is complete as docs/decision only and accepted `docs/roadmap/decisions/PHASE8-IMPL-012-owner-action-workflow-boundary-decision.md`, which records owner actions as review workflow commands and states only (not apply-promotion, not memory/canon mutation, not approval/canon truth), the allowed owner action commands and states, a future owner action record shape, the queue entry mutation boundary, the candidate record relationship, apply-promotion and memory/canon boundaries, evidence/provenance requirements, an owner action storage boundary, a deferred review UI/API boundary, and a fail-closed/quarantine policy. `PHASE8-IMPL-012-T004` is complete as tests-first only and added `tests/test_writer_assistant_core_review_queue_storage_contract.py`, an expected-red contract test that imports the future `backend.story_knowledge.review_queue_storage` module and encodes the T002 storage contract and T003 owner action boundary across queue entry validation, queue entry build-from-candidate, storage path helpers, write/read/list/index helpers, owner action record validation, fail-closed matrices, no-side-effect guarantees, and a future production source-level boundary scan. The target pytest is expected-red with a collection `ImportError` limited to the missing future module, and the candidate review gate/candidate/orchestrator/source-evidence regressions (632) and focused OMI/project regressions (109) pass. `PHASE8-IMPL-011` is recorded as complete through `PHASE8-IMPL-011-T007`. Review queue entries remain workflow support only and are built in memory only by the completed `PHASE8-IMPL-011` candidate review gate; they are not stored, listed, or loaded yet. `PHASE8-IMPL-012-T005` is ready/active as the minimal review queue storage helper if authorized. No review queue storage, queue listing/loading, owner action workflow, owner action storage, review UI/API, backend review routes, frontend review UI, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose, model calls, or training/JSONL/dataset work is authorized or was added in T004; T004 added only the expected-red contract test file.
 
 ## Next Child
 
-`PHASE8-IMPL-012-T004` - Review queue storage contract tests.
+`PHASE8-IMPL-012-T005` - Minimal review queue storage helper, if authorized.
