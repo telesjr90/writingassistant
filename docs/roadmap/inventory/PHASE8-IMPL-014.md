@@ -6,10 +6,10 @@
 - Title: Writer Assistant Core review API implementation and tests-first route boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active
+- Status: complete
 - Depends on: completed `PHASE8-IMPL-013` (complete through `PHASE8-IMPL-013-T007`)
-- Current child: `PHASE8-IMPL-014-T006` - Review API safety regression or conditional hardening (complete; validation-only)
-- Next child: `PHASE8-IMPL-014-T007` - Roadmap/status closeout (ready/active; docs/status only)
+- Current child: none; parent closed after `PHASE8-IMPL-014-T007`
+- Recommended next parent: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface (MVP-required; recommendation-only until separately published)
 
 ## 2. Why This Parent Exists
 
@@ -83,7 +83,11 @@ From `PHASE8-IMPL-011`, `PHASE8-IMPL-012`, and `PHASE8-IMPL-013`:
 
 ## 5. Missing/Deferred Layers
 
-- `backend.review_api` implementation (target of T003-T005);
+Implemented in this parent:
+
+- `backend/review_api.py` with all seven public APIs (`list_review_queue_entries_readonly`, `get_review_queue_entry_readonly`, `get_review_queue_index_readonly`, `get_review_queue_summary_readonly`, `validate_review_queue_read_request`, `validate_owner_action_command_request`, `build_owner_action_command_response`).
+
+Still missing/deferred after this parent:
 - FastAPI route registration in `backend/app.py`;
 - frontend review UI;
 - frontend API helpers;
@@ -102,8 +106,8 @@ From `PHASE8-IMPL-011`, `PHASE8-IMPL-012`, and `PHASE8-IMPL-013`:
 
 ## 6. Implementation Target
 
-- `backend/review_api.py` only if T002/T003-T005 authorize it.
-- No route registration yet.
+- `backend/review_api.py` implemented as a pure helper module only.
+- No route registration.
 - No UI yet.
 - Pure request validators only (`validate_review_queue_read_request`, `validate_owner_action_command_request`).
 - Pure response builders only (`build_owner_action_command_response`).
@@ -205,4 +209,4 @@ Explicitly excluded for the entire parent:
 4. `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration. Status: complete.
 5. `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration. Status: complete.
 6. `PHASE8-IMPL-014-T006` - Review API safety regression or conditional hardening. Status: complete.
-7. `PHASE8-IMPL-014-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-014-T007` - Roadmap/status closeout. Status: complete.

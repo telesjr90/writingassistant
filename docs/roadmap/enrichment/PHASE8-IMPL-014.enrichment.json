@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-014",
   "title": "Writer Assistant Core review API implementation and tests-first route boundary",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-013"
@@ -260,7 +260,7 @@
       "id": "PHASE8-IMPL-014-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-014-T006"
       ],
@@ -272,7 +272,7 @@
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "result": "ready"
+      "result": "complete"
     }
   ],
   "acceptance_criteria": [
@@ -519,9 +519,10 @@
   },
   "t006_status": "complete",
   "t006_result": "complete; validation-only safety regression passed with no backend.review_api code change needed",
-  "t007_status": "ready",
-  "t007_result": "ready/active roadmap/status closeout",
-  "next_child": "PHASE8-IMPL-014-T007 - Roadmap/status closeout (ready/active; docs/status only)",
+  "t007_status": "complete",
+  "t007_result": "PASS docs/status closeout only",
+  "recommended_next_parent": "PHASE8-IMPL-015 - Review API route implementation and read-only frontend review queue surface (MVP-required; recommendation-only until separately published)",
+  "next_child": null,
   "t006_validation_results": {
     "review_api_contract": "PASS (161 tests)",
     "review_queue_storage_regression": "PASS as part of combined storage/gate run",
