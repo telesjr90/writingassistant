@@ -241,7 +241,7 @@
       "id": "PHASE8-IMPL-014-T006",
       "title": "Review API safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-014-T005"
       ],
@@ -254,13 +254,13 @@
         "Confirm BookNLP/spaCy availability guard reports both false.",
         "Conditional hardening inside backend.review_api.py only."
       ],
-      "result": "ready"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-014-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-014-T006"
       ],
@@ -272,7 +272,7 @@
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "result": "planned"
+      "result": "ready"
     }
   ],
   "acceptance_criteria": [
@@ -517,9 +517,24 @@
     "real_booknlp_spacy_install_or_run": false,
     "training_jsonl_dataset_changed": false
   },
-  "t006_status": "ready",
-  "t006_result": "ready/active review API safety regression or conditional hardening",
-  "t007_status": "planned",
-  "t007_result": "planned roadmap/status closeout",
-  "next_child": "PHASE8-IMPL-014-T006 - Review API safety regression or conditional hardening (ready/active; validation-only)"
+  "t006_status": "complete",
+  "t006_result": "complete; validation-only safety regression passed with no backend.review_api code change needed",
+  "t007_status": "ready",
+  "t007_result": "ready/active roadmap/status closeout",
+  "next_child": "PHASE8-IMPL-014-T007 - Roadmap/status closeout (ready/active; docs/status only)",
+  "t006_validation_results": {
+    "review_api_contract": "PASS (161 tests)",
+    "review_queue_storage_regression": "PASS as part of combined storage/gate run",
+    "candidate_review_gate_regression": "PASS as part of combined storage/gate run",
+    "combined_review_queue_storage_and_candidate_gate": "PASS (513 tests)",
+    "review_api_source_safety": "PASS",
+    "review_api_no_write_terms": "PASS",
+    "review_api_workflow_boundary": "PASS",
+    "review_api_public_surface": "PASS",
+    "review_api_import_boundary": "PASS"
+  },
+  "t006_changes": [
+    "No backend/review_api.py code change was needed.",
+    "Roadmap/status docs updated to record T006 complete and T007 ready/active."
+  ]
 }
