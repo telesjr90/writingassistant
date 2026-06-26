@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-011",
   "title": "Writer Assistant Core candidate review queue and persistence gate planning",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-010"
@@ -231,7 +231,7 @@
       "id": "PHASE8-IMPL-011-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-011-T006"
       ],
@@ -241,7 +241,7 @@
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "result": "pending"
+      "result": "complete"
     }
   ],
   "acceptance_criteria": [
@@ -326,8 +326,8 @@
     "package_files_changed": false,
     "runtime_project_files_changed": false
   },
-  "result": "active",
-  "next_child": "PHASE8-IMPL-011-T007",
+  "result": "complete",
+  "next_child": null,
   "t003_status": "complete",
   "t003_decision_artifact": "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md",
   "t003_decision_summary": "Review queue entries are candidate-linked workflow support only with required source/evidence/provenance/uncertainty fields, allowed review workflow lifecycle states and statuses, explicit insufficiency/rejected-output handling, and grouping/sorting/filtering limited to workflow convenience. Queue entries must not imply approval, canon, memory, apply-promotion, owner decision, runtime execution, UI/API action, or generated prose.",
@@ -456,5 +456,110 @@
     "memory_canon_mutation": false,
     "apply_promotion_added": false,
     "training_jsonl_dataset_changed": false
+  },
+  "t007_status": "complete",
+  "t007_result": "PASS docs/status closeout only",
+  "parent_result": "PHASE8-IMPL-011 COMPLETE",
+  "candidate_review_gate_module": "backend/story_knowledge/candidate_review_gate.py",
+  "candidate_review_gate_contract_test": "tests/test_writer_assistant_core_candidate_review_gate_contract.py",
+  "decision_artifacts": [
+    "docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md"
+  ],
+  "final_candidate_review_gate_apis": [
+    "validate_candidate_draft_for_persistence",
+    "build_candidate_record_from_draft",
+    "build_review_queue_entry",
+    "persist_candidate_record_for_review"
+  ],
+  "final_runtime_test_behavior": [
+    "pure candidate draft validation for persistence",
+    "candidate-only record construction from validated drafts",
+    "in-memory review queue entry construction",
+    "project-local candidate-only persistence through existing candidate persistence helpers",
+    "review-pending metadata only",
+    "no owner-decision prefill beyond undecided",
+    "no approved/canon/promoted state",
+    "no apply-promotion",
+    "no memory/canon mutation",
+    "no review UI/API",
+    "no backend routes or frontend UI",
+    "no raw artifact persistence",
+    "no runtime extraction",
+    "no real BookNLP/spaCy runtime",
+    "no generated prose/rewrite/continuation behavior"
+  ],
+  "tracked_artifact_confirmation": {
+    "candidate_review_gate_module_tracked": true,
+    "candidate_review_gate_contract_test_tracked": true,
+    "extraction_orchestrator_module_tracked": true,
+    "extraction_orchestrator_contract_test_tracked": true,
+    "booknlp_fixture_parser_module_tracked": true,
+    "booknlp_fixture_parser_contract_test_tracked": true,
+    "raw_extraction_storage_module_tracked": true,
+    "raw_extraction_storage_contract_test_tracked": true,
+    "external_sources_ignored": true
+  },
+  "t007_validation_results": {
+    "candidate_review_gate_contract": "PASS (154 tests)",
+    "candidate_regressions": "PASS (307 tests)",
+    "orchestrator_contract": "PASS (67 tests)",
+    "source_evidence_contract": "PASS (104 tests)",
+    "parser_storage_adapter_regressions": "PASS (397 tests)",
+    "focused_omi_project_regressions": "PASS (109 tests)",
+    "booknlp_spacy_availability_guard": "booknlp: False, spacy: False (no import/run)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored"
+  },
+  "t007_changes": {
+    "runtime_code_changed": false,
+    "tests_changed": false,
+    "candidate_review_gate_changed": false,
+    "orchestrator_auto_persistence_added": false,
+    "review_queue_storage_implemented": false,
+    "review_ui_api_changed": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "final_deferred_work": [
+    "actual review queue storage/listing",
+    "review queue UI/API",
+    "owner action workflow",
+    "owner decisions beyond undecided/pending",
+    "apply-promotion",
+    "memory/canon mutation",
+    "backend review routes",
+    "frontend review UI",
+    "orchestrator auto-persistence",
+    "raw artifact persistence",
+    "real BookNLP/spaCy runtime",
+    "runtime extraction",
+    "byte-to-character source matching",
+    "NCP/Subtxt/dramatica-flow implementation",
+    "model-assisted extraction",
+    "training/JSONL/dataset work"
+  ],
+  "next_parent_recommendation": {
+    "id": "PHASE8-IMPL-012",
+    "title": "Writer Assistant Core review queue storage and owner-review workflow planning",
+    "status": "recommended_only_not_active",
+    "scope": [
+      "Decide whether review queue storage is needed before UI/API.",
+      "Define the queue storage contract.",
+      "Define the owner action workflow boundary.",
+      "Define the review UI/API planning boundary without implementation.",
+      "Keep apply-promotion and memory/canon mutation deferred.",
+      "Keep real runtime extraction deferred.",
+      "Keep generated prose/rewrite/continuation forbidden."
+    ]
   }
 }

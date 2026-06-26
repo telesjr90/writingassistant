@@ -10,7 +10,7 @@ Writer Assistant Core candidate review queue and persistence gate planning
 
 ## Status
 
-Active after `PHASE8-IMPL-011-T006` candidate review gate safety regression. `PHASE8-IMPL-011-T001`, `PHASE8-IMPL-011-T002`, `PHASE8-IMPL-011-T003`, `PHASE8-IMPL-011-T004`, `PHASE8-IMPL-011-T005`, and `PHASE8-IMPL-011-T006` are complete. `PHASE8-IMPL-011-T007` is ready/active.
+Complete after `PHASE8-IMPL-011-T007` roadmap/status closeout. `PHASE8-IMPL-011-T001`, `PHASE8-IMPL-011-T002`, `PHASE8-IMPL-011-T003`, `PHASE8-IMPL-011-T004`, `PHASE8-IMPL-011-T005`, `PHASE8-IMPL-011-T006`, and `PHASE8-IMPL-011-T007` are complete. No active child remains under `PHASE8-IMPL-011`.
 
 ## Goal
 
@@ -108,7 +108,7 @@ Explicitly excluded:
 4. `PHASE8-IMPL-011-T004` - Candidate persistence gate contract tests. Status: complete.
 5. `PHASE8-IMPL-011-T005` - Minimal candidate persistence gate helper, if authorized. Status: complete.
 6. `PHASE8-IMPL-011-T006` - Candidate review gate safety regression or conditional hardening. Status: complete.
-7. `PHASE8-IMPL-011-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-011-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -208,9 +208,11 @@ Explicitly excluded:
 
 ### `PHASE8-IMPL-011-T007` - Roadmap/status closeout
 
-- Close parent.
-- Summarize decisions/tests/helpers if any.
-- Recommend next parent only.
+- Status: complete as of 2026-06-24.
+- Result: PASS, docs/status closeout only.
+- Close parent after authorized decisions/tests/helpers are complete.
+- Summarize final decisions and helper behavior.
+- Recommend next parent only: `PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning.
 - No runtime expansion.
 
 ## Acceptance Criteria
@@ -256,8 +258,106 @@ Do not run pytest in T001 because no tests or runtime code change.
 
 ## Current Status
 
-`PHASE8-IMPL-011` is active after T003. `PHASE8-IMPL-011-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-011-T002` is complete as docs/decision only and created `docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md`. T002 accepted a future explicit candidate draft to candidate record persistence gate, recorded candidate draft input and candidate record output boundaries, required existing candidate schema/record/persistence/index helpers, source locators, evidence, provenance, candidate-only/review-pending status, no owner-decision prefill, no apply-promotion, no memory/canon mutation, and fail-closed rejection rules. `PHASE8-IMPL-011-T003` is complete as docs/decision only and created `docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md`. T003 accepted review queue entries as workflow support only, queue presence as non-approval, lifecycle states as review workflow states only, evidence/provenance/source locator display as mandatory, insufficiency/rejected-output handling as explicit states or quarantine paths, grouping/sorting/filtering as workflow convenience only, and owner action labels as future planning terms only. `PHASE8-IMPL-011-T004` is complete as tests-first only and added expected-red contract coverage in `tests/test_writer_assistant_core_candidate_review_gate_contract.py` for the future `backend.story_knowledge.candidate_review_gate` module and its `validate_candidate_draft_for_persistence`, `build_candidate_record_from_draft`, `build_review_queue_entry`, and `persist_candidate_record_for_review` APIs. The target pytest is expected-red with a collection `ImportError` limited to the missing future module; candidate, orchestrator, source/evidence, and focused OMI/project regressions pass. `PHASE8-IMPL-011-T005` is complete and created `backend/story_knowledge/candidate_review_gate.py`, a pure, standard-library-only, deterministic, candidate-only/review-pending persistence gate that implements `validate_candidate_draft_for_persistence`, `build_candidate_record_from_draft`, `build_review_queue_entry`, and `persist_candidate_record_for_review` over existing candidate validation/persistence helpers; the target contract passes (154 tests) and candidate/orchestrator/source-evidence/OMI/project regressions pass. `PHASE8-IMPL-011-T006` is complete as a validation-only candidate review gate safety regression: the target gate contract passes (154 tests), candidate regressions pass (307 tests), orchestrator/source-evidence contracts pass (171 tests), parser/storage/adapter regressions pass (397 tests), and focused OMI/project regressions pass (109 tests); the BookNLP/spaCy availability guard reports both false with no gate import; no safety gap was found, so no runtime hardening patch was needed and `candidate_review_gate.py` was left unchanged. `PHASE8-IMPL-011-T007` is ready/active. No candidate review queue storage/listing, candidate review UI/API, orchestrator auto-persistence, apply-promotion, memory/canon mutation, runtime extraction, backend routes, frontend UI, package/dependency changes, raw artifact persistence, generated prose, or training/JSONL/dataset work was added by T001-T006; T005 added only the narrowly tested candidate-only persistence through existing helpers, and T006 changed no runtime code.
+`PHASE8-IMPL-011` is complete after T007. `PHASE8-IMPL-011-T001` is complete as docs/status/planning only and created the parent task record, inventory, and enrichment JSON, and updated roadmap/status docs. `PHASE8-IMPL-011-T002` is complete as docs/decision only and created `docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md`. T002 accepted a future explicit candidate draft to candidate record persistence gate, recorded candidate draft input and candidate record output boundaries, required existing candidate schema/record/persistence/index helpers, source locators, evidence, provenance, candidate-only/review-pending status, no owner-decision prefill, no apply-promotion, no memory/canon mutation, and fail-closed rejection rules. `PHASE8-IMPL-011-T003` is complete as docs/decision only and created `docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md`. T003 accepted review queue entries as workflow support only, queue presence as non-approval, lifecycle states as review workflow states only, evidence/provenance/source locator display as mandatory, insufficiency/rejected-output handling as explicit states or quarantine paths, grouping/sorting/filtering as workflow convenience only, and owner action labels as future planning terms only. `PHASE8-IMPL-011-T004` is complete as tests-first only and added expected-red contract coverage in `tests/test_writer_assistant_core_candidate_review_gate_contract.py` for the future `backend.story_knowledge.candidate_review_gate` module and its `validate_candidate_draft_for_persistence`, `build_candidate_record_from_draft`, `build_review_queue_entry`, and `persist_candidate_record_for_review` APIs. The target pytest is expected-red with a collection `ImportError` limited to the missing future module; candidate, orchestrator, source/evidence, and focused OMI/project regressions pass. `PHASE8-IMPL-011-T005` is complete and created `backend/story_knowledge/candidate_review_gate.py`, a pure, standard-library-only, deterministic, candidate-only/review-pending persistence gate that implements `validate_candidate_draft_for_persistence`, `build_candidate_record_from_draft`, `build_review_queue_entry`, and `persist_candidate_record_for_review` over existing candidate validation/persistence helpers; the target contract passes (154 tests) and candidate/orchestrator/source-evidence/OMI/project regressions pass. `PHASE8-IMPL-011-T006` is complete as a validation-only candidate review gate safety regression: the target gate contract passes (154 tests), candidate regressions pass (307 tests), orchestrator/source-evidence contracts pass (171 tests), parser/storage/adapter regressions pass (397 tests), and focused OMI/project regressions pass (109 tests); the BookNLP/spaCy availability guard reports both false with no gate import; no safety gap was found, so no runtime hardening patch was needed and `candidate_review_gate.py` was left unchanged. `PHASE8-IMPL-011-T007` is complete as docs/status closeout only and records the final parent result, final artifacts, final APIs, final runtime/test behavior, deferred work, tracked-artifact confirmation, validation results, and the next-parent recommendation; T007 changed no backend code, frontend code, tests, project files, training files, package/dependency files, runtime extraction behavior, candidate persistence, raw persistence, routes, UI, apply-promotion, memory/canon state, or generated prose behavior. No candidate review queue storage/listing, candidate review UI/API, orchestrator auto-persistence, apply-promotion, memory/canon mutation, runtime extraction, backend routes, frontend UI, package/dependency changes, raw artifact persistence, generated prose, or training/JSONL/dataset work was added by T001-T007; T005 added only the narrowly tested candidate-only persistence through existing helpers, and T006/T007 changed no runtime code.
+
+## Final Parent Summary
+
+`PHASE8-IMPL-011` is complete. The parent delivered the candidate review queue and persistence gate planning, decisions, contract tests, and a minimal candidate-only persistence gate helper after the completed `PHASE8-IMPL-010` review-safe fixture orchestrator.
+
+Completed child summary:
+
+- `PHASE8-IMPL-011-T001` published the candidate review queue and persistence gate planning parent.
+- `PHASE8-IMPL-011-T002` accepted the candidate draft to candidate record persistence gate decision.
+- `PHASE8-IMPL-011-T003` accepted the review queue data shape and lifecycle decision.
+- `PHASE8-IMPL-011-T004` added expected-red candidate review gate contract tests.
+- `PHASE8-IMPL-011-T005` implemented the minimal candidate persistence gate helper.
+- `PHASE8-IMPL-011-T006` validated candidate review gate safety and required no runtime hardening patch.
+- `PHASE8-IMPL-011-T007` closes the parent.
+
+Final artifacts created or updated by this parent:
+
+- `docs/roadmap/tasks/PHASE8-IMPL-011.md`
+- `docs/roadmap/inventory/PHASE8-IMPL-011.md`
+- `docs/roadmap/enrichment/PHASE8-IMPL-011.enrichment.json`
+- `docs/roadmap/decisions/PHASE8-IMPL-011-candidate-draft-to-record-persistence-gate-decision.md`
+- `docs/roadmap/decisions/PHASE8-IMPL-011-review-queue-data-shape-lifecycle-decision.md`
+- `tests/test_writer_assistant_core_candidate_review_gate_contract.py`
+- `backend/story_knowledge/candidate_review_gate.py`
+
+Final candidate review gate APIs now available:
+
+- `validate_candidate_draft_for_persistence`
+- `build_candidate_record_from_draft`
+- `build_review_queue_entry`
+- `persist_candidate_record_for_review`
+
+Final runtime/test behavior now available:
+
+- pure candidate draft validation for persistence;
+- candidate-only record construction from validated drafts;
+- in-memory review queue entry construction;
+- project-local candidate-only persistence through existing candidate persistence helpers;
+- review-pending metadata only;
+- no owner-decision prefill beyond undecided;
+- no approved/canon/promoted state;
+- no apply-promotion;
+- no memory/canon mutation;
+- no review UI/API;
+- no backend routes or frontend UI;
+- no raw artifact persistence;
+- no runtime extraction;
+- no real BookNLP/spaCy runtime;
+- no generated prose, rewrite, or continuation behavior.
+
+Tracked-artifact confirmation:
+
+- `backend/story_knowledge/candidate_review_gate.py` is tracked.
+- `tests/test_writer_assistant_core_candidate_review_gate_contract.py` is tracked.
+- `backend/story_knowledge/extraction_orchestrator.py` is tracked.
+- `tests/test_writer_assistant_core_extraction_orchestrator_contract.py` is tracked.
+- `backend/story_knowledge/booknlp_fixture_parser.py` is tracked.
+- `tests/test_writer_assistant_core_booknlp_fixture_parser_contract.py` is tracked.
+- `backend/story_knowledge/raw_extraction_storage.py` is tracked.
+- `tests/test_writer_assistant_core_raw_extraction_storage_contract.py` is tracked.
+- `.external_sources/` remains ignored/protected from commit.
+
+Explicit deferred work:
+
+- actual review queue storage/listing;
+- review queue UI/API;
+- owner action workflow;
+- owner decisions beyond undecided/pending;
+- apply-promotion;
+- memory/canon mutation;
+- backend review routes;
+- frontend review UI;
+- orchestrator auto-persistence;
+- raw artifact persistence;
+- real BookNLP/spaCy runtime;
+- runtime extraction;
+- byte-to-character source matching;
+- NCP/Subtxt/dramatica-flow implementation;
+- model-assisted extraction;
+- training/JSONL/dataset work.
+
+No runtime extraction, real BookNLP/spaCy install/run, raw artifact persistence, orchestrator auto-persistence, review queue storage/listing, review UI/API, backend route, frontend UI, apply-promotion, candidate/canon/memory mutation, package/dependency, project runtime, training, JSONL, dataset, model call, or generated prose/rewrite/continuation behavior is claimed by this parent.
+
+## Next Parent Recommendation
+
+Recommended only; not published or active in this closeout:
+
+`PHASE8-IMPL-012` - Writer Assistant Core review queue storage and owner-review workflow planning.
+
+Recommended scope:
+
+- decide whether review queue storage is needed before UI/API;
+- define the queue storage contract;
+- define the owner action workflow boundary;
+- define the review UI/API planning boundary without implementation;
+- keep apply-promotion and memory/canon mutation deferred;
+- keep real runtime extraction deferred;
+- keep generated prose/rewrite/continuation forbidden.
 
 ## Next Child
 
-`PHASE8-IMPL-011-T007` - Roadmap/status closeout.
+None under `PHASE8-IMPL-011`; `PHASE8-IMPL-011-T007` is the final child.

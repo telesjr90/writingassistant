@@ -88,7 +88,7 @@ Important rule:
 4. `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Status: complete.
 5. `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Status: complete.
 6. `PHASE8-IMPL-004-T006` - Index safety repair or hardening. Status: complete (validation-only; no repair or hardening patch required).
-7. `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Status: complete.
 
 ## Child Task Details
 
@@ -149,6 +149,9 @@ Important rule:
 - Close parent.
 - Summarize derived index behavior and deferred work.
 - Identify next roadmap-authorized parent or decision point.
+- Completed: closed parent with final roadmap/status updates and validation.
+- Recorded final artifacts, runtime behavior, deferred work, and boundary confirmations.
+- Recorded that no next Writer Assistant Core parent is published; next parent/child requires owner/roadmap confirmation.
 
 ## Acceptance Criteria
 
@@ -187,4 +190,84 @@ Do not run pytest unless runtime code or tests were accidentally changed. Do not
 
 ## Current Status
 
-`PHASE8-IMPL-004` is active. Last completed child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening (validation-only; no repair or hardening patch required). Next child: `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Prior completed child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Prior completed child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Prior completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Prior completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-003`. Last completed child under prior parent: `PHASE8-IMPL-003-T007`. T006 completed as validation-only because T005 found no repair gaps; T004 index helpers already satisfy T005 safety/stale/corrupt regression coverage. T005 added `tests/test_writer_assistant_core_candidate_index_safety_regression.py`; targeted regression pytest passes with no repair gap. T004 created `backend/story_knowledge/candidate_index.py` with `build_candidate_index`, `write_candidate_index`, and `read_candidate_index`; candidate JSON remains source of truth and `writer_assistant/index.json` is derived only. T003 index contract tests pass. T002 accepted the derived index contract at `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exist yet.
+`PHASE8-IMPL-004` is complete. Last completed child: `PHASE8-IMPL-004-T007` - Roadmap/status closeout. Prior completed child: `PHASE8-IMPL-004-T006` - Index safety repair or hardening (validation-only; no repair or hardening patch required). Prior completed child: `PHASE8-IMPL-004-T005` - Index safety and stale/corrupt regression tests. Prior completed child: `PHASE8-IMPL-004-T004` - Minimal candidate index helpers. Prior completed child: `PHASE8-IMPL-004-T003` - Candidate index contract tests. Prior completed child: `PHASE8-IMPL-004-T002` - Candidate index contract decision. Prior completed child: `PHASE8-IMPL-004-T001` - Publish candidate index parent and child-task plan. Last completed parent: `PHASE8-IMPL-004`. Prior completed parent: `PHASE8-IMPL-003`. Prior completed child under prior parent: `PHASE8-IMPL-003-T007`.
+
+## Final Result
+
+`PHASE8-IMPL-004` is complete. It accepted the derived candidate index contract decision, added tests-first index contract coverage, implemented minimal derived index build/write/read helpers, added focused index safety regression tests, completed validation-only T006 because T005 found no repair gaps, and completed final roadmap/status validation. Candidate JSON files under `writer_assistant/candidates/{candidate_id}.json` remain source of truth. `writer_assistant/index.json` is derived convenience metadata only. `build_candidate_index` derives from `list_candidate_records` and is side-effect free. `write_candidate_index` builds and writes stable UTF-8 JSON to `candidate_index_path`. `read_candidate_index` validates existing index shape only and does not rebuild, repair, or compare staleness. Stale-but-valid index can be read as-is. Corrupt index raises `ValueError` on read. Corrupt index is ignored by build. Corrupt index may be overwritten by write if candidate JSON records validate. No routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation exists.
+
+## Final Artifacts
+
+Decision artifact:
+
+- `docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md`
+
+Implemented runtime file:
+
+- `backend/story_knowledge/candidate_index.py`
+
+Final test files:
+
+- `tests/test_writer_assistant_core_candidate_index_contract.py`
+- `tests/test_writer_assistant_core_candidate_index_safety_regression.py`
+
+## Final Runtime Behavior
+
+- `build_candidate_index(project_dir: Path) -> dict`
+- `write_candidate_index(project_dir: Path) -> dict`
+- `read_candidate_index(project_dir: Path) -> dict`
+- Candidate JSON files under `writer_assistant/candidates/{candidate_id}.json` remain source of truth.
+- `writer_assistant/index.json` is derived convenience metadata only.
+- Build derives from candidate JSON through `list_candidate_records`.
+- Build is side-effect free.
+- Write builds and writes stable UTF-8 JSON to `candidate_index_path`.
+- Read validates existing index only.
+- Read does not rebuild, repair, or compare staleness.
+- Stale-but-valid index can be read as-is.
+- Corrupt index raises `ValueError` on read.
+- Corrupt index is ignored by build.
+- Corrupt index may be overwritten by write if candidate JSON records validate.
+
+## Final Validation Results
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_writer_assistant_core_candidate_index_safety_regression.py tests/test_writer_assistant_core_candidate_index_contract.py tests/test_writer_assistant_core_candidate_list_contract.py tests/test_writer_assistant_core_candidate_persistence_contract.py tests/test_writer_assistant_core_candidate_storage_contract.py tests/test_writer_assistant_core_candidate_record_contract.py tests/test_writer_assistant_core_candidate_schema_contract.py -q`: PASS (307 passed).
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py tests/test_omi_routes.py tests/test_project_manager.py -q`: PASS (109 passed).
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check on changed docs: PASS.
+
+## Final Boundaries
+
+- Derived candidate index helpers exist; candidates are not canon.
+- Index existence does not prove story truth.
+- Index is derived convenience metadata only; candidate JSON remains authoritative.
+- No runtime extraction or candidate extraction from owner text.
+- No backend routes or frontend candidate review/backlog UI.
+- No model/Ollama calls, semantic search, or Story Check auto-runs.
+- No apply-promotion or OMI candidate promotion.
+- No memory/canon mutation or approved-memory routes/helpers.
+- No automatic, watcher, route, UI, or extraction-triggered index refresh.
+- No graph/vector/search index behavior.
+- No package/dependency changes.
+- No training data, JSONL records, dataset artifacts, or project runtime files.
+- No staging, commit, or push.
+
+## Deferred Work
+
+- Backend routes.
+- Frontend candidate review/backlog UI.
+- Extraction from owner text.
+- Model/Ollama calls.
+- Semantic search.
+- Story Check auto-runs.
+- Apply-promotion.
+- OMI candidate promotion.
+- Memory/canon mutation.
+- Approved-memory routes/helpers.
+- Automatic/watcher/extraction-triggered index refresh.
+- Graph/vector/search indexes.
+- Training/JSONL/dataset work.
+
+## Next Frontier
+
+No next Writer Assistant Core parent is currently published in `docs/roadmap/roadmap_index.yaml`. The next parent/child requires owner/roadmap confirmation. A proposed future direction (not active truth) is `PHASE8-IMPL-005` — Writer Assistant Core candidate review/read API contract and route planning — but it is not authorized until published in roadmap docs. An alternative proposed frontier (not active) is `PHASE8-IMPL-005` — Writer Assistant Core candidate review UI planning and API boundary decision.

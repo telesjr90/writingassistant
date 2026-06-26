@@ -34,6 +34,7 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 | Book evidence approval format | Use a consolidated owner-review worksheet with candidate answer, excerpt IDs, evidence, weak/contradicting evidence, confidence, owner decision, and final training status. |
 | Book 1-3 owner-answer inventory | Owner supplied final row decisions for Books 1-3. These have been implemented as local prep reports and a mapping queue only; positive, insufficient-evidence, needs-revision, and context-only rows remain separated. |
 | Fine-tuning prep pause | Fine-tuning/book-backed prep is paused after the Book 1-3 review JSONL mapping dry-run. No JSONL records were created, no records were promoted, the manifest was not updated, and no training ran. |
+| MVP runtime scope | Resolved by owner decision in `PHASE8-MVP-SCOPE-REVISION-001`: runtime extraction, raw artifact persistence, real BookNLP/spaCy install/run/import, analysis-only NCP/Subtxt/dramatica-flow runtime integration, model-assisted evidence-backed extraction, frontend owner-action execution, apply-promotion, and approved memory/canon mutation are MVP-required before usability/testing. Fine-tuning remains deferred after MVP. Generated prose/rewrite/continuation and prose-production paths are permanently forbidden. |
 
 ## Remaining Verification / Setup Tasks
 
@@ -51,14 +52,23 @@ Owner decisions have answered the original roadmap questions. Remaining items be
 12. Fine-tuning is paused pending P0 evidence extraction/verification before any Book 1-3 JSONL drafting.
 13. Define the safe derived book metadata/review artifact set that may be committed while keeping raw source text outside Git.
 14. Re-run the repo safety portion of the MVP completion test matrix after the dirty fixture files are resolved before declaring MVP exit; this is the next active project task.
-15. Evaluate optional analysis extractors only after the Project Workspace Foundation and internal contracts are ready; external tools remain replaceable adapters whose outputs are candidate-only and routed through OMI.
+15. Implement the MVP-required extraction and analysis runtime sequence through `PHASE8-IMPL-015` through `PHASE8-IMPL-022`; external tools remain replaceable adapters whose outputs are candidate-only and routed through owner review.
 16. Books 4-5 remain conditional and should not start while the fine-tuning/book-backed track is paused.
 17. Decide whether to accept the Step 2 sandbox limitation for localhost backend/frontend server smokes or rerun those smokes in a local environment where socket binding is permitted.
-18. Defer extractor package approval/install timing to a future extraction architecture/implementation parent; no extraction dependency is approved for installation by T006.
-19. Defer the exact extraction trigger policy to a future parent; no automatic, save-triggered, route-triggered, watcher-triggered, or batch extraction exists yet.
-20. Defer the exact evidence-locator priority format to the first extraction architecture parent; T006 only requires source segmentation/source locators and evidence spans as first-slice concerns.
-21. Defer whether `object_candidate` is included in the first runtime extraction slice; T006 accepts simple entity candidates first without widening implementation scope.
-22. Defer later tool spikes for segram, BookNLP, GLiNER, LangExtract, and Renard until after the spaCy-first foundation and required privacy/license/scope approvals.
+18. Decide the exact BookNLP/spaCy install/import/run test matrix, environment guard behavior, and failure messages in `PHASE8-IMPL-019`.
+19. Decide the exact owner-triggered extraction policy in `PHASE8-IMPL-019`; extraction must run only on owner-authored or owner-provided project text and must not be automatic canon.
+20. Decide the exact evidence-locator priority format before runtime extraction writes candidates; source maps, evidence, provenance, raw refs, and candidate-only status are mandatory.
+21. Decide the first runtime candidate subset for BookNLP/spaCy extraction, including whether `object_candidate` is included in the first runtime slice.
+22. Decide model-assisted extraction prompts, output schema, refusal/no-prose checks, evidence requirements, and diagnostic-question fallback in `PHASE8-IMPL-020`.
+23. Decide the NCP import/export trust levels, Subtxt rubric output schema, and dramatica-flow allowlist/denylist in `PHASE8-IMPL-021`.
+24. Decide apply-promotion audit storage, rollback/fail-closed behavior, and approved memory/canon write boundaries in `PHASE8-IMPL-017`.
+25. Decide frontend owner-action confirmation flows and command/action separation in `PHASE8-IMPL-016`.
+
+## MVP Requirement Ambiguity Resolution
+
+The earlier open-question entries that describe runtime extraction, raw artifact persistence, real BookNLP/spaCy runtime, apply-promotion, memory/canon mutation, model-assisted extraction, and NCP/Subtxt/dramatica-flow runtime as deferred now mean "not implemented in the earlier parent that recorded them." They no longer mean "not required for MVP." Those capabilities are required before MVP usability/testing and must be delivered through later Phase 8 parents.
+
+Fine-tuning is still deferred after MVP and remains separate from runtime usability. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, export-as-prose, and prose-production paths are permanently forbidden and should not appear as future questions.
 
 ## Project Workspace Foundation Follow-Up Questions
 

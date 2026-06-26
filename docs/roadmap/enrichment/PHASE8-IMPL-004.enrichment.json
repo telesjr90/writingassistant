@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-004",
   "title": "Writer Assistant Core candidate index contract and derived index helpers",
   "type": "runtime",
-  "status": "active",
+  "status": "done",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-003"
@@ -207,14 +207,16 @@
       "id": "PHASE8-IMPL-004-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "depends_on": [
         "PHASE8-IMPL-004-T006"
       ],
       "scope": [
-        "Close parent.",
-        "Summarize derived index behavior and deferred work.",
-        "Identify next roadmap-authorized parent or decision point."
+        "Closed parent.",
+        "Summarized derived index behavior and deferred work.",
+        "Recorded final artifacts, validation results, and boundary confirmations.",
+        "Recorded that no next Writer Assistant Core parent is published; next parent/child requires owner/roadmap confirmation.",
+        "No runtime code, tests, index helpers, routes, UI, extraction, model calls, apply-promotion, or memory/canon mutation in T007."
       ]
     }
   ],
@@ -245,7 +247,54 @@
       "created_at",
       "updated_at"
     ],
-    "atomic_write": false
+    "atomic_write": false,
+    "parent_complete": true,
+    "t007_closeout_result": "pass"
+  },
+  "final_artifacts": {
+    "decision": [
+      "docs/roadmap/decisions/PHASE8-IMPL-004-candidate-index-contract-decision.md"
+    ],
+    "runtime": [
+      "backend/story_knowledge/candidate_index.py"
+    ],
+    "tests": [
+      "tests/test_writer_assistant_core_candidate_index_contract.py",
+      "tests/test_writer_assistant_core_candidate_index_safety_regression.py"
+    ]
+  },
+  "final_validation": {
+    "writer_assistant_core_contract_pytest": "pass_307_total",
+    "omi_project_manager_regression_pytest": "pass_109",
+    "check_enrichment": "pass",
+    "validate_roadmap": "pass",
+    "whitespace_check": "pass"
+  },
+  "final_behavior": {
+    "build_candidate_index": true,
+    "write_candidate_index": true,
+    "read_candidate_index": true,
+    "candidate_json_source_of_truth": "writer_assistant/candidates/{candidate_id}.json",
+    "index_derived_convenience_only": "writer_assistant/index.json",
+    "build_derives_from_list_candidate_records": true,
+    "build_side_effect_free": true,
+    "write_stable_utf8_json": true,
+    "read_validates_shape_only": true,
+    "read_no_rebuild_repair_staleness_compare": true,
+    "stale_but_valid_index_readable": true,
+    "corrupt_index_raises_on_read": true,
+    "corrupt_index_ignored_by_build": true,
+    "corrupt_index_overwritable_by_write": true,
+    "t006_validation_only_no_repair_gap": true,
+    "extraction_runtime": false,
+    "backend_routes": false,
+    "frontend_ui": false,
+    "model_calls": false,
+    "semantic_search": false,
+    "story_check_auto_runs": false,
+    "apply_promotion": false,
+    "memory_canon_mutation": false,
+    "automatic_index_refresh": false
   },
   "prior_runtime_artifacts": {
     "validation_helpers": "backend/story_knowledge/candidate_record.py",
@@ -349,6 +398,21 @@
       "index_helpers_changed": false,
       "routes_ui_extraction_model": false,
       "apply_promotion_memory_canon": false
+    },
+    "t007_results": {
+      "completion_mode": "docs_status_closeout",
+      "runtime_code_changed": false,
+      "tests_changed": false,
+      "index_helpers_changed": false,
+      "combined_candidate_contract_pytest": "pass_307",
+      "focused_regression_pytest": "pass_109",
+      "check_enrichment": "pass",
+      "validate_roadmap": "pass",
+      "whitespace_check": "pass",
+      "context_tools_run": false,
+      "routes_ui_extraction_model": false,
+      "apply_promotion_memory_canon": false,
+      "parent_marked_complete": true
     }
   },
   "safety_notes": [
@@ -368,14 +432,23 @@
     "Backend extraction routes.",
     "Frontend candidate review/backlog UI.",
     "Model/Ollama integration.",
+    "Semantic search.",
+    "Story Check auto-runs.",
     "Apply-promotion.",
     "OMI candidate promotion.",
     "Memory/canon mutation.",
     "Approved-memory routes/helpers.",
+    "Automatic/watcher/extraction-triggered index refresh.",
+    "Graph/vector/search index behavior.",
     "Package/dependency changes.",
     "Training/JSONL/dataset work.",
     "Route/UI/extraction/model expansion beyond index helpers."
   ],
+  "next_frontier": {
+    "published_next_parent": null,
+    "requires_owner_roadmap_confirmation": true,
+    "proposed_not_active": "PHASE8-IMPL-005 — Writer Assistant Core candidate review/read API contract and route planning"
+  },
   "context_tools_policy": [
     "T001 and T002 do not run context tools.",
     "PHASE8-IMPL-001 through PHASE8-IMPL-003 already provide sufficient local evidence for this parent.",

@@ -101,19 +101,19 @@ Workspace layer order:
 
 This follows the Project Workspace Foundation. It identifies, organizes, connects, annotates, and reviews story knowledge from owner-authored text. All outputs remain analysis-only, candidate-first, evidence/provenance-backed where practical, and owner-controlled through OMI.
 
-### Phase 8: Writer Assistant Core Candidate Schemas, OMI Expansion, Evidence/Provenance, Context Planning, Adapter Contracts, and First Slice Readiness
+### Phase 8: Writer Assistant Core MVP Runtime, Review, Promotion, Memory/Canon, and Analysis Integration
 
 - Inputs: usable Project Workspace Foundation, current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
-- Outputs: story knowledge candidate schema alignment, OMI typed review expansion planning, evidence/provenance boundaries, targeted context collection plan, replaceable adapter contract planning, first safe runtime slice decision, and first implementation acceptance criteria.
-- Status: THIRTEENTH PARENT COMPLETE (PLANNING/CONTRACT). `PHASE8-IMPL-001` through `PHASE8-IMPL-013` are complete. `PHASE8-IMPL-013` is complete through `PHASE8-IMPL-013-T007` and delivered the read-only review queue API contract decision, the owner action command API contract decision, the review UI planning boundary decision, and expected-red review API contract tests at `tests/test_writer_assistant_review_api_contract.py` for future `backend.review_api` without implementing routes, frontend UI, owner action execution, apply-promotion, or memory/canon mutation. `PHASE8-IMPL-012` is complete through `PHASE8-IMPL-012-T007` and delivered review queue storage validation, a project-local queue storage helper `backend/story_knowledge/review_queue_storage.py`, a derived/rebuildable index, and owner action record validation only. No parent is currently active. Recommended next parent: `PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary` (recommendation-only, not active until separately published). Review queue entries remain workflow support only and queue presence is non-approval; owner review remains mandatory before anything can become approved truth. No `backend.review_api` implementation, candidate review UI/API implementation, owner action workflow execution, owner action storage, automatic orchestrator persistence, backend routes, frontend UI, frontend API helpers, apply-promotion, memory/canon mutation, candidate/canon/memory mutation, raw artifact write/read/list helpers, real BookNLP/spaCy install or execution, runtime extraction, package/model/prose/promotion/memory/canon work, raw artifact writes, or training/JSONL/dataset work is authorized or exists.
-- Exit: owner-approved readiness plan and first runtime slice selection for Writer Assistant Core, with candidate-first OMI lifecycle, evidence/provenance, no-prose, no-silent-promotion, and no-memory-mutation boundaries preserved.
+- Outputs: story knowledge candidate schema alignment, evidence/provenance boundaries, raw artifact lifecycle, review queue and API surfaces, frontend owner-action execution, explicit apply-promotion, approved memory/canon mutation, real BookNLP/spaCy runtime extraction, model-assisted extraction, and analysis-only NCP/Subtxt/dramatica-flow runtime integration.
+- Status: THIRTEENTH PARENT COMPLETE (PLANNING/CONTRACT); FOURTEENTH PARENT ACTIVE (TESTS-FIRST-AUTHORIZED IMPLEMENTATION). `PHASE8-IMPL-001` through `PHASE8-IMPL-013` are complete. `PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary` is active after `PHASE8-IMPL-014-T001`; T002 is ready/active as docs/decision only. `PHASE8-IMPL-014` is not the final MVP gate. It is a bounded helper parent for `backend.review_api` validators, response builders, and read-only review queue helpers only. The following are out of scope for `PHASE8-IMPL-014` but required before MVP usability/testing: frontend owner-action execution, apply-promotion, approved memory/canon mutation, raw artifact persistence implementation, real BookNLP/spaCy install/run/import and runtime extraction, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, and end-to-end MVP validation. Fine-tuning remains outside the MVP critical path.
+- Exit: usable/testable MVP with owner-authored prose storage/editing, runtime extraction over owner-authored or owner-provided text, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon mutation, model-assisted evidence-backed extraction, and analysis-only NCP/Subtxt/dramatica-flow integration. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, and prose-production paths remain permanently forbidden.
 
-### Phase 9: Candidate Extraction From Owner-Authored Material
+### Phase 9: Post-MVP Visualization and Query Assistance
 
-- Inputs: OMI expanded candidate flow, evidence span model, extraction orchestrator contract, adapter spike decision.
-- Outputs: candidate-only extraction pipeline for characters, locations/settings, objects, organizations, actions/events, timeline notes, relationships, plot threads, unresolved questions, navigation summaries, continuity issues, and possible contradictions.
-- Status: PLANNED/FUTURE. No extractor dependency is installed; no extractor route or runtime has been implemented.
-- Exit: extractor output is normalized into CORE candidate schemas, evidence/provenance is attached, and OMI candidate records are created for owner review. Nothing is canon by default.
+- Inputs: approved memory/canon records, reliable review UI, stable evidence/provenance, and the completed Phase 8 MVP-required runtime.
+- Outputs: optional graph, timeline, map, relationship, and project-memory query views.
+- Status: PLANNED/FUTURE after MVP.
+- Exit: visuals help navigation and review without implying pending candidates are approved truth.
 
 Future internal flow:
 
@@ -131,34 +131,6 @@ owner-authored scene/chapter/note text
   -> memory/*.json canon records
 ```
 
-### Phase 10: Owner Approval, Evidence, Review UI, and Project Memory/Canon Pages
-
-- Inputs: candidate schemas, evidence/provenance records, OMI review flow.
-- Outputs: annotation sidebar/review UI, evidence span display, approve/reject/revise/archive/merge/split/mark-uncertain controls, candidate status labels, project overview, approved characters, approved locations/settings, timeline, plot threads, continuity/consistency, OMI ideas/candidates, and approved memory/canon pages.
-- Status: PLANNED/FUTURE.
-- Exit: owner can review story knowledge candidates and evidence without losing track of candidate vs approved status; pending and rejected candidates are not shown as canon.
-
-### Phase 11: Continuity, Relationship, Timeline, and Plot Assistance
-
-- Inputs: approved memory/canon records, candidate extraction, annotation UI, owner-reviewed continuity flags.
-- Outputs: continuity checks, contradiction warnings, relationship/timeline/plot-thread assistance, search/query assistant.
-- Status: PLANNED/FUTURE.
-- Exit: assistant helps the writer inspect project knowledge and continuity without generating or rewriting prose.
-
-### Phase 12: Future Visualization and Query Assistance
-
-- Inputs: approved memory/canon records, reliable review UI, stable evidence/provenance.
-- Outputs: optional graph, timeline, map, relationship, and project-memory query views.
-- Status: PLANNED/FUTURE. Visualization references remain documentation-only until a dedicated spike.
-- Exit: visuals help navigation and review without implying pending candidates are approved truth.
-
-### Later Phase: Advanced Dramatica Analysis
-
-- Inputs: stable Writer Assistant Core, owner-approved project memory/canon, deferred Dramatica/NCP structural context.
-- Outputs: advanced storyform/throughline/CIPS/dynamics/IC/RS analysis as a separate layer.
-- Status: DEFERRED. Dramatica-specific truth claims remain owner-gated and evidence-backed.
-- Exit: advanced structural analysis is useful without becoming the main writer-assistant backbone.
-
 ### Later Phase: Fine-Tuning / Dramatica Analyst Model
 
 - Inputs: resumed evidence extraction, validated review JSONL, promoted records, ready manifest, GPU/cloud plan.
@@ -166,11 +138,11 @@ owner-authored scene/chapter/note text
 - Status: BLOCKED/PAUSED. Dataset gate remains blocked and fine-tuning prep is paused.
 - Exit: non-smoke model passes evaluation before any app default swap.
 
-### Future Writer Assistant Core: Extractor Research
+### Phase 8 MVP-Required Extraction Runtime Notes
 
 - Inputs: owner scene/project context, OMI candidate workflow, no-prose guardrails, extractor license review.
-- Outputs: optional candidate entity/action/relationship/timeline extraction pipeline, if later approved.
-- Status note: `docs/roadmap/optional_analysis_extractors.md` and `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md` record external tools as replaceable future adapters around the app-owned pipeline. spaCy-first local deterministic/rule-assisted candidate extraction is the accepted first strategy path; segram, BookNLP, GLiNER, LangExtract, Renard, CoreNLP/OpenIE/SUTime, AI-Reader-V2, narrative-blueprint, and NovelClaw remain later references/spikes only; generation-heavy tools remain blocked or documentation-only.
+- Outputs: candidate entity/action/relationship/timeline extraction pipeline with real BookNLP/spaCy runtime, raw refs, evidence/provenance, owner review, and candidate-only persistence.
+- Status note: `docs/roadmap/optional_analysis_extractors.md` and `docs/roadmap/decisions/PHASE8-IMPL-005-nlp-extraction-adapter-strategy-decision.md` predate this MVP scope revision where they describe extractors as optional or later. The current roadmap reclassifies real BookNLP/spaCy install/run/import and runtime extraction as MVP-required through `PHASE8-IMPL-019`. Other extraction references remain replaceable adapters around the app-owned pipeline. Generation-heavy tools remain blocked or documentation-only.
 - Exit: any extractor output remains candidate-only, routes through OMI, preserves provenance, and cannot directly mutate durable project truth, OMI promotions, training data, or `dataset_manifest.json`.
 
 ## Dataset and Training Tracks

@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-013",
-    "current_parent_task_title": "Writer Assistant Core review UI/API planning and owner-action workflow contract",
-    "frontier_note": "PHASE8-IMPL-013 is complete as the thirteenth Writer Assistant Core parent after PHASE8-IMPL-013-T007 (docs/status closeout only). No parent is currently active; the next parent is pending separate owner-approved publication. PHASE8-IMPL-013 delivered the read-only review queue API contract decision, the owner action command API contract decision, the review UI planning boundary decision, and expected-red review API contract tests at tests/test_writer_assistant_review_api_contract.py for future backend.review_api. T001 published the parent task record, inventory, and enrichment JSON as docs/status/planning only. T002 accepted docs/roadmap/decisions/PHASE8-IMPL-013-read-only-review-queue-api-contract-decision.md. T003 accepted docs/roadmap/decisions/PHASE8-IMPL-013-owner-action-command-api-contract-decision.md. T004 accepted docs/roadmap/decisions/PHASE8-IMPL-013-review-ui-planning-boundary-decision.md. T005 added expected-red tests/test_writer_assistant_review_api_contract.py for backend.review_api and no implementation; frontend UI contract tests remain deferred because no local frontend/component test harness exists without package changes. T006 validated the expected-red handoff remains safe: the review API contract fails only because backend.review_api is missing, existing regressions pass, route/UI/API absence checks pass, source-cache safety passes, and no hardening patch was needed. T007 closed the parent, confirmed tracked artifacts, re-validated expected-red and regression suites (1497 tests), and recommended PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary as the next parent (recommendation-only, not active until separately published). No backend.review_api implementation, review routes, frontend UI, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, or training/JSONL/dataset work is authorized or was added in T001-T007. PHASE8-IMPL-012 is complete through PHASE8-IMPL-012-T007 and delivered backend/story_knowledge/review_queue_storage.py plus owner action record validation only."
+    "current_parent_task_id": "PHASE8-IMPL-014",
+    "current_parent_task_title": "Writer Assistant Core review API implementation and tests-first route boundary",
+    "frontier_note": "PHASE8-IMPL-014 is active after PHASE8-IMPL-014-T002 (docs/decision only). PHASE8-IMPL-014 is the tests-first-authorized implementation parent for satisfying the expected-red review API contract tests added by PHASE8-IMPL-013-T005 (tests/test_writer_assistant_review_api_contract.py for future backend.review_api), while preserving the boundaries from PHASE8-IMPL-013-T002 (read-only review queue API contract), PHASE8-IMPL-013-T003 (owner action command API contract), and PHASE8-IMPL-013-T004 (review UI planning boundary). T001 published the parent task record, inventory, and enrichment JSON as docs/status/planning only; T002 created docs/roadmap/decisions/PHASE8-IMPL-014-review-api-implementation-reconciliation-decision.md and marked T003 ready/active. T003-T006 remain implementation/validation micro-tasks bounded to a pure backend.review_api helper; T007 remains docs/status closeout. PHASE8-IMPL-014 is not the final MVP gate. Runtime extraction, raw artifact persistence, real BookNLP/spaCy install/run/import, model-assisted extraction, frontend owner-action execution, apply-promotion, approved memory/canon mutation, and analysis-only NCP/Subtxt/dramatica-flow runtime integration are excluded from PHASE8-IMPL-014 but MVP-required in later Phase 8 parents. Fine-tuning remains deferred after MVP. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, and prose-production paths are permanently forbidden."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -2895,6 +2895,411 @@
       ],
       "result": "complete",
       "notes": "Docs/status closeout only. Closed PHASE8-IMPL-013 as complete after T001-T006. Confirmed tracked artifacts (tests/test_writer_assistant_review_api_contract.py, review_queue_storage.py, candidate_review_gate.py and contract tests) and that .external_sources/ remains ignored and not staged. Re-validated: review API contract expected-red (missing backend.review_api only); review queue storage contract PASS (359 tests); candidate review gate contract PASS (154 tests); candidate regressions PASS (307 tests); orchestrator contract PASS (67 tests); source/evidence contract PASS (104 tests); parser/storage/adapter regressions PASS (64 + 185 + 148 tests); focused OMI/project regressions PASS (109 tests); combined regressions PASS (1497 tests); BookNLP/spaCy availability guard both false; route/UI/API absence checks PASS; check_enrichment PASS; validate_roadmap PASS. Recommended PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary (recommendation-only, not active until separately published). No runtime extraction, real BookNLP/spaCy install/run, raw artifact persistence, review UI/API implementation, backend routes, frontend UI, owner action execution, apply-promotion, memory/canon mutation, generated prose/rewrite/continuation, test change, or training/JSONL/dataset work was added."
+    },
+    {
+      "id": "PHASE8-IMPL-014",
+      "title": "Writer Assistant Core review API implementation and tests-first route boundary",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-013"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "tests_first",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_tool_execution",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence",
+        "no_booknlp_install",
+        "no_spacy_install"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-014.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-014.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-014.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-014/",
+      "result": "active",
+      "final_summary": "Active after PHASE8-IMPL-014-T001 (docs/status/planning only). Tests-first-authorized implementation parent that authorizes a minimal pure backend.review_api helper module to satisfy the expected-red review API contract tests added by PHASE8-IMPL-013-T005, while preserving the boundaries from PHASE8-IMPL-013-T002 (read-only review queue API contract), PHASE8-IMPL-013-T003 (owner action command API contract), and PHASE8-IMPL-013-T004 (review UI planning boundary). T001 published the parent task record, inventory, and enrichment JSON as docs/status/planning only; marked PHASE8-IMPL-014 active; marked T001 complete and T002 ready/active; kept T003-T007 planned. T001 records PHASE8-IMPL-013 as complete through PHASE8-IMPL-013-T007, treats the expected-red review API contract tests at tests/test_writer_assistant_review_api_contract.py as the implementation handoff, and does not implement backend.review_api, register FastAPI routes in backend/app.py, implement frontend review UI or frontend API helpers, implement owner action execution, implement apply-promotion, mutate memory/canon, persist raw artifacts, implement runtime extraction, install BookNLP/spaCy, or run BookNLP/spaCy. No backend.review_api implementation, review routes, frontend UI, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, or training/JSONL/dataset work is authorized or was added in PHASE8-IMPL-014-T001.",
+      "notes": "Active after T001. T001 published parent task record, inventory, enrichment JSON, and roadmap/status updates; T002 is ready/active as docs/decision only; T003-T007 are planned. T001 does not implement backend.review_api, does not register FastAPI routes, does not modify backend/app.py or backend/main.py, does not implement frontend review UI or frontend API helpers, does not implement owner action execution, does not implement apply-promotion, does not mutate memory/canon, does not persist raw artifacts, does not implement runtime extraction, does not install or run BookNLP/spaCy, and does not change package/dependency files, tests, training/JSONL/dataset files, or project runtime files. T002-T007 are bounded: T002 decides backend.review_api scope, module split, and route boundary; T003 introduces pure request validators and response builders only; T004 adds read-only review queue helpers over review_queue_storage only; T005 refines the owner action command request validator and response builder only; T006 is validation-only with conditional hardening inside backend.review_api only; T007 is docs/status closeout only. No review UI/API implementation, backend routes, frontend UI, frontend API helpers, owner action execution, queue mutation through the read-only surface or through the command validator, candidate mutation through the read-only surface or through the command validator, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, package/dependency changes, generated prose/rewrite/continuation, model calls, or training/JSONL/dataset work is authorized in T001."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T001",
+      "title": "Publish review API implementation and tests-first route boundary parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "tests_first",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_tool_execution",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence",
+        "no_booknlp_install",
+        "no_spacy_install"
+      ],
+      "result": "complete",
+      "notes": "Docs/status/planning only. Created docs/roadmap/tasks/PHASE8-IMPL-014.md, docs/roadmap/inventory/PHASE8-IMPL-014.md, and docs/roadmap/enrichment/PHASE8-IMPL-014.enrichment.json; updated docs/roadmap/roadmap_index.yaml, docs/roadmap/implementation_status.md, docs/roadmap/task_backlog.md, docs/roadmap/phase_map.md, docs/master_plan.md, and docs/roadmap/validation/latest_roadmap_validation.md. Marked PHASE8-IMPL-014 active, T001 complete, T002 ready/active, T003-T007 planned. Did not implement backend.review_api, did not register FastAPI routes, did not modify backend/app.py or backend/main.py, did not implement frontend review UI or frontend API helpers, did not implement owner action execution, did not implement apply-promotion, did not mutate memory/canon, did not persist raw artifacts, did not implement runtime extraction, did not install or run BookNLP/spaCy, and did not change package/dependency files, tests, training/JSONL/dataset files, or project runtime files. Preconditions confirmed: PHASE8-IMPL-013 complete through T007, PHASE8-IMPL-014 not active before T001, tests/test_writer_assistant_review_api_contract.py tracked, backend.review_api absent, backend/routes/review_queue.py absent, frontend review UI absent, owner action command API absent, owner action execution absent beyond owner action record validation, apply-promotion absent, memory/canon mutation absent, raw artifact persistence absent, runtime extraction absent, real BookNLP/spaCy install/run/import absent, .external_sources/ ignored and not staged."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T002",
+      "title": "Review API implementation reconciliation decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "tests_first",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "ready",
+      "notes": "Docs/decision only. Decides backend.review_api scope, module split, and order of T003-T005 public APIs; whether FastAPI routes remain deferred to a later owner-approved parent; how the future module satisfies expected-red tests at tests/test_writer_assistant_review_api_contract.py without scope creep; read-only helper behavior over review_queue_storage only with no mutation; owner action command validator behavior with no execution and no apply-promotion; and any new boundary tag definitions in docs/roadmap/roadmap_governance.md only if validators require them. No runtime code, no tests, no route implementation, no UI, no owner action execution, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no generated prose, no package/dependency changes."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T003",
+      "title": "Minimal backend.review_api validators and response builders",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014-T002"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Pure helper module only. Creates backend/review_api.py (top-level backend.review_api, importable as from backend import review_api). Implements pure request validators only (validate_review_queue_read_request, validate_owner_action_command_request) and pure response builders only (build_owner_action_command_response). No read operations, no FastAPI routes, no app.py or main.py changes, no UI, no owner action execution, no apply-promotion, no memory/canon mutation, no raw persistence, no runtime extraction, no generated prose, no package or dependency changes, no test changes."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T004",
+      "title": "Read-only review queue API helper integration",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014-T003"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Pure read-only helper integration only. Adds the four read-only helpers in backend/review_api.py (list_review_queue_entries_readonly, get_review_queue_entry_readonly, get_review_queue_index_readonly, get_review_queue_summary_readonly). Reads through review_queue_storage only (list_review_queue_entries, read_review_queue_entry, build_review_queue_index). Produces the T002 read-only response shape with allowed-field set and no mutation. Fails closed for unsafe IDs, malformed entries, missing candidate linkage, unknown query fields. No FastAPI route registration; no app.py/main.py change; no UI; no owner action execution; no apply-promotion; no memory/canon mutation; no raw persistence; no runtime extraction."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T005",
+      "title": "Owner action command request/response validation integration",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014-T004"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "owner_action_api_planning",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Pure validator/builder integration only. Refines validate_owner_action_command_request to enforce the T003 allowed command set and required/optional fields. Refines build_owner_action_command_response to emit the T003 response required fields with no_promotion_performed=True and no_memory_canon_mutation=True by default. No execution; no queue mutation; no candidate mutation; no apply-promotion; no memory/canon writes; no project file writes; no raw artifact writes; no model calls; no tool execution; no generated prose. No FastAPI route registration; no app.py/main.py change; no UI; no package or dependency changes."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T006",
+      "title": "Review API safety regression or conditional hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Validation-only. Confirms tests/test_writer_assistant_review_api_contract.py is now green and existing regressions remain green (review queue storage contract, candidate review gate contract, candidate regressions, orchestrator contract, source/evidence contract, parser/storage/adapter regressions, focused OMI/project regressions). Confirms backend.review_api source contains no route/runtime/prose/raw/mutation implementation terms. Confirms no route registration appears in backend/app.py, backend/main.py, or any backend router file. Confirms no frontend files changed and no review UI exists. Confirms BookNLP/spaCy availability guard reports both false. Conditional hardening inside backend.review_api.py only."
+    },
+    {
+      "id": "PHASE8-IMPL-014-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-014",
+      "depends_on": [
+        "PHASE8-IMPL-014-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "owner_review_required",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_routes",
+        "no_frontend",
+        "no_owner_action_execution",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Docs/status closeout only. Closes PHASE8-IMPL-014 as complete after T001-T006. Confirms tracked artifacts (tests/test_writer_assistant_review_api_contract.py, backend/review_api.py, backend/story_knowledge/review_queue_storage.py, tests/test_writer_assistant_core_review_queue_storage_contract.py, backend/story_knowledge/candidate_review_gate.py, tests/test_writer_assistant_core_candidate_review_gate_contract.py). Re-validates review API contract (now green) and existing regressions. Recommends next parent only. No runtime expansion."
+    },
+    {
+      "id": "PHASE8-IMPL-015",
+      "title": "Review API route implementation and read-only frontend review queue surface",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-014"
+      ],
+      "boundary_tags": [
+        "mvp_required_frontend_owner_action_execution",
+        "owner_review_required",
+        "candidate_only",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-016",
+      "title": "Frontend owner-action execution workflow and review command boundary",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-015"
+      ],
+      "boundary_tags": [
+        "mvp_required_frontend_owner_action_execution",
+        "owner_review_required",
+        "candidate_only",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-017",
+      "title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-016"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "mvp_required_memory_canon_mutation",
+        "owner_review_required",
+        "no_auto_promotion",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-018",
+      "title": "Raw artifact persistence implementation and project-local extraction artifact lifecycle",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-017"
+      ],
+      "boundary_tags": [
+        "mvp_required_raw_persistence",
+        "raw_artifacts_non_canon",
+        "raw_artifacts_non_candidate",
+        "owner_review_required",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-019",
+      "title": "Real BookNLP/spaCy install/run/import and runtime extraction pipeline",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-018"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-020",
+      "title": "Model-assisted evidence-backed extraction and diagnostic workflow",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-019"
+      ],
+      "boundary_tags": [
+        "mvp_required_model_assisted_extraction",
+        "owner_review_required",
+        "candidate_only",
+        "no_auto_promotion",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-021",
+      "title": "NCP/Subtxt/dramatica-flow analysis-only runtime integration",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-020"
+      ],
+      "boundary_tags": [
+        "mvp_required_analysis_runtime",
+        "owner_review_required",
+        "candidate_only",
+        "no_auto_promotion",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-022",
+      "title": "End-to-end MVP usability validation",
+      "type": "runtime",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-021"
+      ],
+      "boundary_tags": [
+        "validation",
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "mvp_required_apply_promotion",
+        "mvp_required_memory_canon_mutation",
+        "mvp_required_model_assisted_extraction",
+        "mvp_required_analysis_runtime",
+        "fine_tuning_deferred",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
     },
     {
       "id": "PHASE7-IMPL-004-T001",

@@ -1,5 +1,116 @@
 # Latest Roadmap Validation
 
+## PHASE8-MVP-SCOPE-REVISION-001 Roadmap MVP Scope Revision
+
+### Result
+
+- Result: PASS.
+- Scope: documentation/roadmap only.
+- Active parent preserved: `PHASE8-IMPL-014`.
+- Next child preserved: `PHASE8-IMPL-014-T002` (ready/active; docs/decision only).
+- Owner decision applied: MVP requires runtime extraction, raw artifact persistence, real BookNLP/spaCy install/run/import, analysis-only NCP/Subtxt/dramatica-flow runtime integration, model-assisted evidence-backed extraction, frontend owner-action execution, apply-promotion, and approved memory/canon mutation through explicit owner-approved workflow.
+- Fine-tuning remains deferred after MVP.
+- Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, export-as-prose, and prose-production paths remain permanently forbidden.
+
+### Files Changed
+
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-014.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-014.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+- Updated: `docs/roadmap/roadmap_governance.md`
+
+### Boundary Confirmations
+
+- Documentation only.
+- No backend, frontend, tests, project runtime files, package/dependency files, training files, JSONL files, dataset files, model artifacts, or `.external_sources/` files changed.
+- No staging, commit, or push.
+- `.external_sources/` must remain ignored and not staged.
+
+### Validation Results
+
+- Enrichment JSON parse: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Non-LeanCTX whitespace check: PASS.
+- Narrow `/usr/bin/git diff --check -- ...`: PASS.
+- Source-cache safety: PASS (`.external_sources/` not staged; ignored output `!! .external_sources/`).
+
+## PHASE8-IMPL-014-T001 Publish Review API Implementation and Tests-First Route Boundary Parent
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/planning only. Published `PHASE8-IMPL-014` as the next active Writer Assistant Core parent after the completed `PHASE8-IMPL-013` parent.
+- Parent task: `PHASE8-IMPL-014` - Writer Assistant Core review API implementation and tests-first route boundary. Parent result: ACTIVE after T001.
+- Completed child recorded: `PHASE8-IMPL-014-T001` - Publish review API implementation and tests-first route boundary parent.
+- Next child: `PHASE8-IMPL-014-T002` - Review API implementation reconciliation decision (ready/active; docs/decision only).
+- Precondition confirmed: `PHASE8-IMPL-013` complete through `PHASE8-IMPL-013-T007`; `PHASE8-IMPL-014` not active before T001; `tests/test_writer_assistant_review_api_contract.py` exists and is tracked; `backend.review_api` absent; `backend/routes/review_queue.py` absent; frontend review UI absent; owner action command API absent; owner action execution absent beyond owner action record validation; apply-promotion absent; memory/canon mutation absent; raw artifact persistence absent; runtime extraction absent; real BookNLP/spaCy install/run/import absent; `.external_sources/` ignored and not staged.
+
+### Files Changed
+
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-014.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-014.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-014.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+
+### Tracked-Artifact Confirmation
+
+- `tests/test_writer_assistant_review_api_contract.py`: tracked (PHASE8-IMPL-013-T005).
+- `backend/story_knowledge/review_queue_storage.py`: tracked (PHASE8-IMPL-012-T005).
+- `tests/test_writer_assistant_core_review_queue_storage_contract.py`: tracked.
+- `backend/story_knowledge/candidate_review_gate.py`: tracked (PHASE8-IMPL-011-T005).
+- `tests/test_writer_assistant_core_candidate_review_gate_contract.py`: tracked.
+- `backend.review_api`: absent (no `backend/review_api.py`; no `backend/routes/review_queue.py`; no FastAPI review routes in `backend/app.py` or `backend/main.py`).
+- `.external_sources/`: ignored and not staged.
+
+### T001 Validation Results
+
+- `enrichment_json_parse`: PASS (Python `json.loads` succeeds on `docs/roadmap/enrichment/PHASE8-IMPL-014.enrichment.json`).
+- `check_enrichment`: PASS (`python3 scripts/check_enrichment.py`).
+- `validate_roadmap`: PASS (`python3 scripts/validate_roadmap.py`).
+- `non_leanctx_whitespace_check`: PASS (no trailing whitespace in changed docs).
+- `narrow_git_diff_check`: PASS (`/usr/bin/git diff --check -- ...` reports no whitespace errors).
+- `source_cache_safety`: PASS (`.external_sources/` not staged and ignored; `/usr/bin/git status --short -- .external_sources` returns empty).
+
+### T001 Safety/Boundary Confirmations
+
+- No backend code changed.
+- No frontend code changed.
+- No tests changed.
+- No `backend.review_api` module created.
+- No FastAPI routes registered in `backend/app.py` or `backend/main.py`.
+- No frontend review UI implemented.
+- No frontend API helper implemented.
+- No owner action execution implemented.
+- No apply-promotion implemented.
+- No memory/canon mutation occurred.
+- No raw artifact persistence added.
+- No runtime extraction added.
+- No real BookNLP/spaCy install or execution.
+- No package/dependency files changed.
+- No project runtime files created.
+- No raw artifact writes.
+- No generated prose/rewrite/continuation behavior added.
+- No training/JSONL/dataset work.
+- No staging/commit/push.
+
+### T001 Next Step Recommendation
+
+- `PHASE8-IMPL-014-T002` - Review API implementation reconciliation decision (docs/decision only).
+
 ## PHASE8-IMPL-013-T007 Roadmap/Status Closeout
 
 ### Result
