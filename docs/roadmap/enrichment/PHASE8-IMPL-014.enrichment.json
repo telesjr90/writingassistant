@@ -225,7 +225,7 @@
       "id": "PHASE8-IMPL-014-T005",
       "title": "Owner action command request/response validation integration",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-014-T004"
       ],
@@ -235,13 +235,13 @@
         "No execution; no queue mutation; no candidate mutation; no apply-promotion; no memory/canon writes; no project file writes; no raw artifact writes; no model calls; no tool execution; no generated prose.",
         "No FastAPI route registration; no app.py/main.py change; no UI; no package or dependency changes."
       ],
-      "result": "ready"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-014-T006",
       "title": "Review API safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-014-T005"
       ],
@@ -254,7 +254,7 @@
         "Confirm BookNLP/spaCy availability guard reports both false.",
         "Conditional hardening inside backend.review_api.py only."
       ],
-      "result": "planned"
+      "result": "ready"
     },
     {
       "id": "PHASE8-IMPL-014-T007",
@@ -472,11 +472,54 @@
     "real_booknlp_spacy_install_or_run": false,
     "training_jsonl_dataset_changed": false
   },
-  "t005_status": "ready",
-  "t005_result": "ready/active owner action command request/response validation integration",
-  "t006_status": "planned",
-  "t006_result": "planned review API safety regression or conditional hardening",
+  "t005_status": "complete",
+  "t005_result": "PASS runtime implementation (hardened owner action command request validation and build_owner_action_command_response integration)",
+  "t005_module": "backend/review_api.py",
+  "t005_owner_action_validation": "complete; validate_owner_action_command_request now uses copied normalized output, stricter safe-id checks, required actor reference/id, required safety affirmations, command metadata type checks, and safer reason/status/client id handling",
+  "t005_response_builder": "complete; build_owner_action_command_response validates copied owner action record and queue entry inputs, requires matching project/entry/candidate identifiers, preserves support references from the queue entry, and returns workflow-only response fields",
+  "t005_validation_results": {
+    "target_review_api_contract": "PASS (161 tests)",
+    "review_queue_storage_contract": "PASS",
+    "candidate_review_gate_contract": "PASS",
+    "combined_review_queue_and_gate_regressions": "PASS (513 tests)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored",
+    "context_tools": "none run"
+  },
+  "t005_changes": {
+    "module_updated": "backend/review_api.py",
+    "runtime_code_changed": true,
+    "tests_changed": false,
+    "backend_review_api_implemented": true,
+    "all_seven_public_apis_present": true,
+    "review_queue_storage_integration": true,
+    "t004_read_only_helpers_intact": true,
+    "write_helpers_called": false,
+    "read_only_helpers_side_effect_free": true,
+    "owner_action_command_validation_hardened": true,
+    "owner_action_response_builder_hardened": true,
+    "command_execution_implemented": false,
+    "review_ui_api_implemented": false,
+    "review_queue_api_routes_implemented": false,
+    "owner_action_api_implemented": false,
+    "owner_action_execution_implemented": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "runtime_extraction_added": false,
+    "real_booknlp_spacy_install_or_run": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t006_status": "ready",
+  "t006_result": "ready/active review API safety regression or conditional hardening",
   "t007_status": "planned",
   "t007_result": "planned roadmap/status closeout",
-  "next_child": "PHASE8-IMPL-014-T005 - Owner action command request/response validation integration (ready/active; validation only, no execution)"
+  "next_child": "PHASE8-IMPL-014-T006 - Review API safety regression or conditional hardening (ready/active; validation-only)"
 }

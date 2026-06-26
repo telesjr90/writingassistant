@@ -8,8 +8,8 @@
 - Phase: Phase 8
 - Status: active
 - Depends on: completed `PHASE8-IMPL-013` (complete through `PHASE8-IMPL-013-T007`)
-- Current child: `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration (complete; runtime implementation)
-- Next child: `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration (ready/active; validation only, no execution)
+- Current child: `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration (complete; runtime implementation)
+- Next child: `PHASE8-IMPL-014-T006` - Review API safety regression or conditional hardening (ready/active; validation-only)
 
 ## 2. Why This Parent Exists
 
@@ -203,6 +203,6 @@ Explicitly excluded for the entire parent:
 2. `PHASE8-IMPL-014-T002` - Review API implementation reconciliation decision. Status: complete.
 3. `PHASE8-IMPL-014-T003` - Minimal `backend.review_api` validators and response builders. Status: complete.
 4. `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration. Status: complete.
-5. `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration. Status: ready/active.
-6. `PHASE8-IMPL-014-T006` - Review API safety regression or conditional hardening.
+5. `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration. Status: complete.
+6. `PHASE8-IMPL-014-T006` - Review API safety regression or conditional hardening. Status: ready/active.
 7. `PHASE8-IMPL-014-T007` - Roadmap/status closeout.

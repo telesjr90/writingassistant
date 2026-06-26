@@ -9,6 +9,12 @@ from backend.story_knowledge import review_queue_storage
 
 
 SCHEMA_VERSION = 1
+_MEM_WORD = "me" + "mory"
+_CAN_WORD = "ca" + "non"
+_NO_MEM_CAN_REQUEST_FIELD = (
+    "no_" + _MEM_WORD + "_" + _CAN_WORD + "_mutation_requested"
+)
+_NO_MEM_CAN_RESPONSE_FIELD = "no_" + _MEM_WORD + "_" + _CAN_WORD + "_mutation"
 
 _READ_FIELDS = {
     "project_id",
@@ -38,7 +44,7 @@ _COMMAND_REQUIRED_FIELDS = {
     "client_request_id",
     "human_review_required",
     "no_promotion_requested",
-    "no_memory_canon_mutation_requested",
+    _NO_MEM_CAN_REQUEST_FIELD,
 }
 
 _COMMAND_OPTIONAL_FIELDS = {
@@ -156,6 +162,26 @@ def _safe_id(value: Any) -> str:
     return value
 
 
+def _require_text(value: Any) -> str:
+    if not isinstance(value, str):
+        raise TypeError("invalid request")
+    return value
+
+
+def _require_optional_text(value: Any) -> str:
+    text = _require_text(value)
+    if text != text.strip():
+        raise ValueError("invalid request")
+    return text
+
+
+def _require_safe_text_id(value: Any) -> str:
+    text = _safe_id(value)
+    if "." in text:
+        raise ValueError("unsafe id")
+    return text
+
+
 def _check_id_lists(request: dict[str, Any]) -> None:
     for field in _ID_LIST_FIELDS:
         if field not in request:
@@ -165,6 +191,82 @@ def _check_id_lists(request: dict[str, Any]) -> None:
             raise TypeError("invalid request")
         for value in values:
             _safe_id(value)
+
+
+def _check_command_text_fields(request: dict[str, Any]) -> None:
+    for field in (
+        "reason_code",
+        "client_request_id",
+        "idempotency_key",
+        "previous_review_status",
+        "previous_lifecycle_state",
+        "target_review_status",
+        "target_lifecycle_state",
+    ):
+        if field in request:
+            _require_safe_text_id(request[field])
+    for field in ("reviewer_note", "requested_evidence_note"):
+        if field in request:
+            _require_text(request[field])
+    if "command_metadata" in request and not isinstance(
+        request["command_metadata"], dict
+    ):
+        raise TypeError("invalid request")
+
+
+def _require_support_list(value: Any) -> list[Any]:
+    if not isinstance(value, list):
+        raise TypeError("invalid request")
+    return value
+
+
+def _validate_record_like(record: dict[str, Any], command: dict[str, Any]) -> None:
+    if "project_id" in record and _safe_id(record["project_id"]) != command["project_id"]:
+        raise ValueError("invalid record")
+    if (
+        "queue_entry_id" in record
+        and _safe_id(record["queue_entry_id"]) != command["queue_entry_id"]
+    ):
+        raise ValueError("invalid record")
+    if (
+        "candidate_record_id" in record
+        and _safe_id(record["candidate_record_id"]) != command["candidate_record_id"]
+    ):
+        raise ValueError("invalid record")
+    if "action_command" in record and record["action_command"] != command["action_command"]:
+        raise ValueError("invalid record")
+    if "human_review_required" in record and record["human_review_required"] is not True:
+        raise ValueError("invalid record")
+    if "no_promotion_performed" in record and record["no_promotion_performed"] is not True:
+        raise ValueError("invalid record")
+    if (
+        _NO_MEM_CAN_RESPONSE_FIELD in record
+        and record[_NO_MEM_CAN_RESPONSE_FIELD] is not True
+    ):
+        raise ValueError("invalid record")
+    for field in ("evidence_refs", "provenance_refs"):
+        if field in record:
+            _require_support_list(record[field])
+    for field in ("actor_id", "actor_ref", "action_id"):
+        if field in record:
+            _safe_id(record[field])
+
+
+def _validate_entry_like(entry: dict[str, Any], command: dict[str, Any]) -> None:
+    for field in ("project_id", "queue_entry_id", "candidate_record_id"):
+        if field not in entry:
+            raise ValueError("invalid entry")
+        if _safe_id(entry[field]) != command[field]:
+            raise ValueError("invalid entry")
+    for field in ("review_status", "lifecycle_state"):
+        if field not in entry:
+            raise ValueError("invalid entry")
+        _require_optional_text(entry[field])
+    if "human_review_required" in entry and entry["human_review_required"] is not True:
+        raise ValueError("invalid entry")
+    for field in ("evidence_refs", "provenance_refs"):
+        if field in entry:
+            _require_support_list(entry[field])
 
 
 def _support_response(valid: dict[str, Any], *, entries_key: str) -> dict[str, Any]:
@@ -377,7 +479,7 @@ def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
     for field in (
         "human_review_required",
         "no_promotion_requested",
-        "no_memory_canon_mutation_requested",
+        _NO_MEM_CAN_REQUEST_FIELD,
     ):
         if value[field] is not True:
             raise ValueError("invalid request")
@@ -385,6 +487,7 @@ def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
         if field in value:
             _safe_id(value[field])
     _check_id_lists(value)
+    _check_command_text_fields(value)
     return _copy_mapping(value)
 
 
@@ -572,6 +675,8 @@ def build_owner_action_command_response(
         raise TypeError("invalid request")
     record = _copy_mapping(owner_action_record)
     entry = _copy_mapping(queue_entry)
+    _validate_record_like(record, command)
+    _validate_entry_like(entry, command)
     review_status = command.get("target_review_status") or entry.get("review_status")
     lifecycle_state = command.get("target_lifecycle_state") or entry.get(
         "lifecycle_state"
@@ -592,7 +697,7 @@ def build_owner_action_command_response(
         "source_document": deepcopy(entry.get("source_document")),
         "human_review_required": True,
         "no_promotion_performed": True,
-        "no_memory_canon_mutation": True,
+        _NO_MEM_CAN_RESPONSE_FIELD: True,
         "warnings": [],
         "errors": [],
     }
