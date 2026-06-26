@@ -8,8 +8,8 @@
 - Phase: Phase 8
 - Status: active
 - Depends on: completed `PHASE8-IMPL-013` (complete through `PHASE8-IMPL-013-T007`)
-- Current child: `PHASE8-IMPL-014-T003` - Minimal `backend.review_api` validators and response builders (complete; runtime implementation)
-- Next child: `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration (ready/active; storage integration over `review_queue_storage.py` only)
+- Current child: `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration (complete; runtime implementation)
+- Next child: `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration (ready/active; validation only, no execution)
 
 ## 2. Why This Parent Exists
 
@@ -186,7 +186,7 @@ Explicitly excluded for the entire parent:
 - `tests/test_writer_assistant_core_review_queue_storage_contract.py` exists and is tracked.
 - `backend/story_knowledge/candidate_review_gate.py` exists and is tracked.
 - `tests/test_writer_assistant_core_candidate_review_gate_contract.py` exists and is tracked.
-- `backend.review_api` exists as `backend/review_api.py` with all seven public APIs present; read-only helper storage integration over `review_queue_storage.py` remains deferred to T004.
+- `backend.review_api` exists as `backend/review_api.py` with all seven public APIs present; read-only list/get/index/summary helpers accept optional keyword-only `project_dir` and use `review_queue_storage` read/list/build helpers when `project_dir` is supplied; write helpers are not called; owner action execution remains absent.
 - No frontend review UI exists (no review literals in `frontend/src/api.js`, `frontend/src/App.jsx`, `frontend/src/components/Editor.jsx`, or `frontend/src/components/ProjectNav.jsx`).
 - No owner action command API implementation exists beyond `validate_owner_action_record` shape validation.
 - No owner action execution exists.
@@ -202,7 +202,7 @@ Explicitly excluded for the entire parent:
 1. `PHASE8-IMPL-014-T001` - Publish review API implementation and tests-first route boundary parent. Status: complete.
 2. `PHASE8-IMPL-014-T002` - Review API implementation reconciliation decision. Status: complete.
 3. `PHASE8-IMPL-014-T003` - Minimal `backend.review_api` validators and response builders. Status: complete.
-4. `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration. Status: ready/active.
-5. `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration.
+4. `PHASE8-IMPL-014-T004` - Read-only review queue API helper integration. Status: complete.
+5. `PHASE8-IMPL-014-T005` - Owner action command request/response validation integration. Status: ready/active.
 6. `PHASE8-IMPL-014-T006` - Review API safety regression or conditional hardening.
 7. `PHASE8-IMPL-014-T007` - Roadmap/status closeout.

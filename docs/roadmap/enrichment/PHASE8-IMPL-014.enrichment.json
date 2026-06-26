@@ -208,7 +208,7 @@
       "id": "PHASE8-IMPL-014-T004",
       "title": "Read-only review queue API helper integration",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-014-T003"
       ],
@@ -219,13 +219,13 @@
         "Fail closed for unsafe IDs, malformed entries, missing candidate linkage, unknown query fields.",
         "No FastAPI route registration; no app.py/main.py change; no UI; no owner action execution; no apply-promotion; no memory/canon mutation; no raw persistence; no runtime extraction."
       ],
-      "result": "ready"
+      "result": "complete"
     },
     {
       "id": "PHASE8-IMPL-014-T005",
       "title": "Owner action command request/response validation integration",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-014-T004"
       ],
@@ -235,7 +235,7 @@
         "No execution; no queue mutation; no candidate mutation; no apply-promotion; no memory/canon writes; no project file writes; no raw artifact writes; no model calls; no tool execution; no generated prose.",
         "No FastAPI route registration; no app.py/main.py change; no UI; no package or dependency changes."
       ],
-      "result": "planned"
+      "result": "ready"
     },
     {
       "id": "PHASE8-IMPL-014-T006",
@@ -432,13 +432,51 @@
     "real_booknlp_spacy_install_or_run": false,
     "training_jsonl_dataset_changed": false
   },
-  "t004_status": "ready",
-  "t004_result": "ready/active read-only review queue API helper integration over review_queue_storage only",
-  "t005_status": "planned",
-  "t005_result": "planned owner action command request/response validation integration",
+  "t004_status": "complete",
+  "t004_result": "PASS runtime implementation (read-only review queue API helper integration over review_queue_storage via optional keyword-only project_dir)",
+  "t004_module": "backend/review_api.py",
+  "t004_storage_integration": "complete; read-only list/get/index/summary helpers accept optional keyword-only project_dir and use review_queue_storage read/list/build helpers when project_dir is supplied; write helpers are not called; list/get/index/summary helpers remain read-only and side-effect-free; owner action execution remains absent; all seven public APIs remain green",
+  "t004_validation_results": {
+    "target_review_api_contract": "PASS (161 tests)",
+    "review_queue_storage_contract": "PASS",
+    "candidate_review_gate_contract": "PASS",
+    "combined_review_queue_and_gate_regressions": "PASS (513 tests)",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "non_leanctx_whitespace_check": "PASS",
+    "narrow_git_diff_check": "PASS",
+    "source_cache_safety": "PASS: .external_sources/ not staged and ignored",
+    "context_tools": "none run"
+  },
+  "t004_changes": {
+    "module_updated": "backend/review_api.py",
+    "runtime_code_changed": true,
+    "tests_changed": false,
+    "backend_review_api_implemented": true,
+    "all_seven_public_apis_present": true,
+    "review_queue_storage_integration": true,
+    "write_helpers_called": false,
+    "read_only_helpers_side_effect_free": true,
+    "review_ui_api_implemented": false,
+    "review_queue_api_routes_implemented": false,
+    "owner_action_api_implemented": false,
+    "owner_action_execution_implemented": false,
+    "routes_changed": false,
+    "frontend_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "raw_artifact_persistence_added": false,
+    "memory_canon_mutation": false,
+    "apply_promotion_added": false,
+    "runtime_extraction_added": false,
+    "real_booknlp_spacy_install_or_run": false,
+    "training_jsonl_dataset_changed": false
+  },
+  "t005_status": "ready",
+  "t005_result": "ready/active owner action command request/response validation integration",
   "t006_status": "planned",
   "t006_result": "planned review API safety regression or conditional hardening",
   "t007_status": "planned",
   "t007_result": "planned roadmap/status closeout",
-  "next_child": "PHASE8-IMPL-014-T004 - Read-only review queue API helper integration (ready/active; storage integration over review_queue_storage.py only)"
+  "next_child": "PHASE8-IMPL-014-T005 - Owner action command request/response validation integration (ready/active; validation only, no execution)"
 }
