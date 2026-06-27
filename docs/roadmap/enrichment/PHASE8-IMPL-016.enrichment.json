@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-016",
+  "title": "Frontend owner-action execution workflow and review command boundary",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-015"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "docs_only_t001",
+    "owner_review_required",
+    "candidate_only",
+    "mvp_required_frontend_owner_action_execution",
+    "no_apply_promotion",
+    "no_auto_promotion",
+    "no_memory_canon_mutation",
+    "no_raw_artifact_persistence",
+    "no_runtime_extraction",
+    "no_model_calls",
+    "no_generated_prose",
+    "generated_prose_permanently_forbidden",
+    "frontend_workflow_boundary"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-016.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-016.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-016.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-015.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-015.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json",
+    "future_parent_sequence": [
+      "PHASE8-IMPL-017",
+      "PHASE8-IMPL-018",
+      "PHASE8-IMPL-019",
+      "PHASE8-IMPL-020",
+      "PHASE8-IMPL-021",
+      "PHASE8-IMPL-022"
+    ],
+    "child_sequence": [
+      "PHASE8-IMPL-016-T001",
+      "PHASE8-IMPL-016-T002",
+      "PHASE8-IMPL-016-T003",
+      "PHASE8-IMPL-016-T004",
+      "PHASE8-IMPL-016-T005",
+      "PHASE8-IMPL-016-T006",
+      "PHASE8-IMPL-016-T007"
+    ]
+  }
+}
