@@ -6,9 +6,9 @@
 - Title: Review API route implementation and read-only frontend review queue surface
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active after `PHASE8-IMPL-015-T002`
+- Status: active after `PHASE8-IMPL-015-T003`
 - Depends on: completed `PHASE8-IMPL-014` (complete through `PHASE8-IMPL-014-T007`)
-- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` ready/active; `PHASE8-IMPL-015-T004` through `PHASE8-IMPL-015-T007` planned
+- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` complete/PASS expected-red; `PHASE8-IMPL-015-T004` ready/active; `PHASE8-IMPL-015-T005` through `PHASE8-IMPL-015-T007` planned
 - Recommended next parent: `PHASE8-IMPL-016` - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published after `PHASE8-IMPL-015-T007`)
 
 ## 2. Why This Parent Exists
@@ -197,6 +197,18 @@ Explicitly excluded for the entire parent:
 - mutating frontend files outside the approved frontend surface file (frontend scope creep).
 
 ## 11. T001 Precondition Findings
+
+## 11. T003 Contract Test Handoff
+
+- `PHASE8-IMPL-015-T003` added `tests/test_writer_assistant_review_api_routes_contract.py` as tests-first expected-red backend route contract coverage.
+- The pinned route surface is exactly four GET-only paths: `GET /api/projects/{project_id}/review-queue`, `GET /api/projects/{project_id}/review-queue/{queue_entry_id}`, `GET /api/projects/{project_id}/review-queue/index`, and `GET /api/projects/{project_id}/review-queue/summary`.
+- The contract covers safe and unsafe `project_id` handling, safe and unsafe `queue_entry_id` handling, GET-only behavior, unknown filters/sorts/query fields, forbidden GET request bodies, missing queue/index responses, malformed queue entry fail-closed behavior, response shape preservation, and route source safety checks once `backend/routes/review_queue.py` exists.
+- Response-shape coverage preserves `schema_version`, `project_id`, `queue_entry_id`, `entries`/`entry`/index-compatible `entries`/`summary`, candidate linkage, evidence, provenance, source document, source locator, raw refs as support-only metadata, confidence as uncertainty/support strength, normalization status, `human_review_required`, and no-promotion/no-memory-canon boundary metadata.
+- The tests assert no write/mutation behavior, no owner action execution, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, and no generated prose.
+- The focused contract run is expected-red only because the read-only routes are absent until T004; collection passes and existing review API/review queue/candidate gate regressions pass.
+- T003 did not create `backend/routes/review_queue.py`, did not edit `backend/main.py`, did not edit `backend/app.py`, did not edit `backend/review_api.py`, did not edit frontend/package/runtime/training/model/source-cache files, and did not stage, commit, or push.
+
+## 12. T001 Precondition Findings
 
 - Local roadmap files show `PHASE8-IMPL-014` complete through `PHASE8-IMPL-014-T007`.
 - Local roadmap files show `PHASE8-IMPL-014-T001`, T002, T003, T004, T005, T006, and T007 complete.

@@ -1,3 +1,54 @@
+# PHASE8-IMPL-015-T003 Backend Route Contract Tests
+
+### Result
+
+- Result: FAIL.
+- Scope: tests-first expected-red contract file plus PHASE8-IMPL-015 roadmap/status updates.
+- Parent task: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface.
+- Target test file: `tests/test_writer_assistant_review_api_routes_contract.py`.
+- Failure reason: required pytest validation commands failed before collection because this local `python3` environment does not have `pytest` installed (`/usr/bin/python3: No module named pytest`). No dependency install was performed.
+- Hook boundary: the PreToolUse hook attempted to force LeanCTX for blocked search/read commands. The LeanCTX suggestions were not followed. No LeanCTX, CCE, Graphify, Repomix, AI Context, MCP, scaffold, collect-plan, context health scripts, or baseline refresh commands were run inside T003.
+
+### Files Changed
+
+- Created: `tests/test_writer_assistant_review_api_routes_contract.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md` (this entry)
+- Updated: `docs/roadmap/decision_log.md`
+
+### Contract Summary
+
+- Pinned route paths: `GET /api/projects/{project_id}/review-queue`, `GET /api/projects/{project_id}/review-queue/{queue_entry_id}`, `GET /api/projects/{project_id}/review-queue/index`, and `GET /api/projects/{project_id}/review-queue/summary`.
+- Covered GET-only behavior, safe and unsafe project IDs, safe and unsafe queue entry IDs, missing queue/index behavior, malformed queue entry fail-closed behavior, unknown filters/sorts/query fields, forbidden request bodies, response shape preservation, and future route-source safety scanning once `backend/routes/review_queue.py` exists.
+- Response shape coverage preserves candidate linkage, evidence, provenance, source document, source locator, raw refs as support-only metadata, confidence as uncertainty/support strength, normalization status, `human_review_required`, and no-promotion/no-memory-canon boundary metadata.
+- No route implementation, router registration, backend helper mutation, frontend/package/runtime/training/model/source-cache change, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model call, or generated prose was added.
+
+### Validation Results
+
+- `python3 -m pytest tests/test_writer_assistant_review_api_routes_contract.py -q`: FAIL, blocked before tests by missing `pytest`.
+- `python3 -m pytest tests/test_writer_assistant_review_api_routes_contract.py --collect-only -q`: FAIL, blocked before collection by missing `pytest`.
+- `python3 -m pytest tests/test_writer_assistant_review_api_contract.py -q`: FAIL, blocked before tests by missing `pytest`.
+- `python3 -m pytest tests/test_writer_assistant_core_review_queue_storage_contract.py tests/test_writer_assistant_core_candidate_review_gate_contract.py -q`: FAIL, blocked before tests by missing `pytest`.
+- `python3 -m py_compile tests/test_writer_assistant_review_api_routes_contract.py`: PASS.
+- `enrichment_json_parse`: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- `route_contract_content_check`: PASS.
+- `whitespace_check`: PASS.
+- `/usr/bin/git diff --check -- ...`: PASS.
+- `/usr/bin/git status --short -- .external_sources`: PASS, no tracked source-cache changes.
+- `/usr/bin/git status --short --ignored -- .external_sources | head -50`: PASS, `.external_sources/` remains ignored.
+
+### Boundary Confirmation
+
+- No staging, commit, or push was performed.
+
 # PHASE8-IMPL-015-T002 Route/Read-Only Frontend Implementation Reconciliation Decision
 
 ### Result

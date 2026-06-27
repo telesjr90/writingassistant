@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-015",
     "current_parent_task_title": "Review API route implementation and read-only frontend review queue surface",
-    "frontier_note": "PHASE8-IMPL-015 is active after PHASE8-IMPL-015-T002 (docs/decision only). PHASE8-IMPL-015-T001 published the parent task record at docs/roadmap/tasks/PHASE8-IMPL-015.md, inventory at docs/roadmap/inventory/PHASE8-IMPL-015.md, enrichment JSON at docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json, and context_pack pointer .codex-context/PHASE8-IMPL-015/. PHASE8-IMPL-015-T002 created docs/roadmap/decisions/PHASE8-IMPL-015-route-read-only-frontend-implementation-reconciliation-decision.md. Last completed parent: PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary (complete through PHASE8-IMPL-014-T007). Last completed child: PHASE8-IMPL-015-T002 - Route/read-only frontend implementation reconciliation decision (complete; docs/decision only). Next child: PHASE8-IMPL-015-T003 - Backend route contract tests for read-only review queue endpoints (ready/active; tests-first or expected-red only). PHASE8-IMPL-015 is read-only route/frontend surface work only unless a future child decision narrows the boundary further. Owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, and NCP/Subtxt/dramatica-flow runtime integration remain out of scope for PHASE8-IMPL-015 and MVP-required in later Phase 8 parents PHASE8-IMPL-016 through PHASE8-IMPL-022. Fine-tuning remains deferred after MVP. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, and prose-production paths are permanently forbidden."
+    "frontier_note": "PHASE8-IMPL-015 is active after PHASE8-IMPL-015-T003 (backend route contract tests; complete/PASS expected-red). PHASE8-IMPL-015-T001 published the parent task record at docs/roadmap/tasks/PHASE8-IMPL-015.md, inventory at docs/roadmap/inventory/PHASE8-IMPL-015.md, enrichment JSON at docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json, and context_pack pointer .codex-context/PHASE8-IMPL-015/. PHASE8-IMPL-015-T002 created docs/roadmap/decisions/PHASE8-IMPL-015-route-read-only-frontend-implementation-reconciliation-decision.md. PHASE8-IMPL-015-T003 added tests/test_writer_assistant_review_api_routes_contract.py as FastAPI TestClient contract coverage for the four GET-only read-only review queue routes; collection passes and the focused run is expected-red only because the routes are absent until T004. Last completed parent: PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary (complete through PHASE8-IMPL-014-T007). Last completed child: PHASE8-IMPL-015-T003 - Backend route contract tests for read-only review queue endpoints (complete/PASS expected-red). Next child: PHASE8-IMPL-015-T004 - Minimal backend route implementation over backend.review_api for read-only review queue endpoints (ready/active). PHASE8-IMPL-015 is read-only route/frontend surface work only unless a future child decision narrows the boundary further. Owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, and NCP/Subtxt/dramatica-flow runtime integration remain out of scope for PHASE8-IMPL-015 and MVP-required in later Phase 8 parents PHASE8-IMPL-016 through PHASE8-IMPL-022. Fine-tuning remains deferred after MVP. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, and prose-production paths are permanently forbidden."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3261,7 +3261,7 @@
       "id": "PHASE8-IMPL-015-T003",
       "title": "Backend route contract tests for read-only review queue endpoints",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-015",
       "depends_on": [
         "PHASE8-IMPL-015-T002"
@@ -3283,14 +3283,14 @@
         "owner_action_api_planning",
         "no_raw_artifact_persistence"
       ],
-      "result": "planned",
+      "result": "PASS expected-red; added tests/test_writer_assistant_review_api_routes_contract.py, collection passes, focused route contract run is expected-red only because read-only routes are absent until T004",
       "notes": "Tests-first or expected-red only. Add backend route contract tests for the future read-only review queue routes wrapping the existing backend.review_api helper module at the FastAPI test client level. Pin the future read-only route surface (paths, methods, request/query parameter shapes, response shapes projected from backend.review_api, fail-closed behavior, evidence/provenance/uncertainty preservation, no-state-mutation guarantees, no-apply-promotion guarantees, no-memory/canon-mutation guarantees, no-raw-persistence guarantees, no-runtime-extraction guarantees, no-model-call guarantees, no-generated-prose guarantees). Do not register routes in backend/main.py or any new route file. Do not modify backend.review_api.py beyond narrow test-authorized read-only safety fixes. No FastAPI route that writes, mutates, or persists queue state, candidate state, owner action state, memory/canon state, raw artifact state, or generated prose state. No owner action command routes, no apply-promotion, no memory/canon mutation, no raw persistence, no runtime extraction, no model calls, no generated prose, no package/dependency changes, no test changes outside the approved contract test file."
     },
     {
       "id": "PHASE8-IMPL-015-T004",
       "title": "Minimal backend route implementation over backend.review_api for read-only review queue endpoints",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-015",
       "depends_on": [
         "PHASE8-IMPL-015-T003"
@@ -3312,7 +3312,7 @@
         "owner_action_api_planning",
         "no_raw_artifact_persistence"
       ],
-      "result": "planned",
+      "result": "ready/active",
       "notes": "Minimal route registration only. Register read-only review queue routes in backend/main.py (or in backend/routes/review_queue.py if T002 authorizes adding the file) wrapping backend.review_api helpers only. Routes must call backend.review_api helpers only. Routes must produce the T002 read-only response shape and preserve evidence, provenance, source document, source locator, raw output refs, uncertainty, normalization status, and human_review_required. Routes must fail closed for unsafe IDs, malformed queue entries, missing candidate linkage, unknown query fields, malformed JSON, invalid HTTP methods, and forbidden fields. No FastAPI route that writes, mutates, or persists queue state, candidate state, owner action state, memory/canon state, raw artifact state, or generated prose state. No FastAPI route that runs runtime extraction, calls a model, installs or imports BookNLP/spaCy, or imports NCP/Subtxt/dramatica-flow runtime code. No FastAPI route that performs apply-promotion, executes owner actions, or auto-promotes candidates. No frontend changes; no package/dependency changes; no mutating backend.review_api.py beyond narrow T006 read-only safety fixes; no mutating backend/story_knowledge/review_queue_storage.py, candidate_review_gate.py, extraction_orchestrator.py, booknlp_fixture_parser.py, raw_extraction_storage.py, booknlp_adapter_contract.py, source_map.py, or evidence.py beyond narrow T006 read-only safety fixes."
     },
     {

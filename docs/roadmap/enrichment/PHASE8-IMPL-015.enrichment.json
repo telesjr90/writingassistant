@@ -79,7 +79,7 @@
     "What is the exact read-only review queue route split (list/get/index/summary) and how does each route project the existing backend.review_api helper response shape?",
     "Should owner action command HTTP routes remain deferred to PHASE8-IMPL-016 and remain out of scope for this parent?",
     "How should the read-only routes layer on top of backend.review_api without mutating storage, calling write helpers, calling apply-promotion, writing memory/canon, persisting raw artifacts, running runtime extraction, calling a model, or generating prose?",
-    "How should the future read-only route contract tests be structured at the FastAPI test client level without registering routes in T003?",
+    "How did the T003 read-only route contract tests pin the FastAPI test client route surface without registering routes?",
     "How should the read-only routes fail closed for unsafe project_id, unsafe queue_entry_id, malformed queue entries, missing linked candidate records, invalid candidate linkage, unknown query fields, malformed JSON, invalid HTTP methods, and forbidden request/response fields?",
     "How should the read-only routes preserve evidence/provenance/source document/source locator/raw output refs/uncertainty/normalization status/human_review_required across the response surface?",
     "How should T005 choose between frontend API helper + read-only review queue surface contract tests vs a frontend implementation plan, given the existing frontend test harness constraints?",
@@ -206,7 +206,7 @@
       "id": "PHASE8-IMPL-015-T003",
       "title": "Backend route contract tests for read-only review queue endpoints",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-015-T002"
       ],
@@ -220,13 +220,13 @@
         "Do not implement owner action command HTTP routes, frontend review UI, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model integration, or generated prose.",
         "No package or dependency changes."
       ],
-      "result": "planned"
+      "result": "PASS expected-red; added tests/test_writer_assistant_review_api_routes_contract.py, collection passes, focused route contract run is expected-red only because read-only routes are absent until T004"
     },
     {
       "id": "PHASE8-IMPL-015-T004",
       "title": "Minimal backend route implementation over backend.review_api for read-only review queue endpoints",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-015-T003"
       ],
@@ -242,7 +242,7 @@
         "No FastAPI route that performs apply-promotion, executes owner actions, or auto-promotes candidates.",
         "No frontend changes; no package or dependency changes."
       ],
-      "result": "planned"
+      "result": "ready/active"
     },
     {
       "id": "PHASE8-IMPL-015-T005",
@@ -308,7 +308,8 @@
     "PHASE8-IMPL-015 is active in roadmap/status docs.",
     "PHASE8-IMPL-015-T001 is complete.",
     "PHASE8-IMPL-015-T002 is complete.",
-    "PHASE8-IMPL-015-T003 is ready/active.",
+    "PHASE8-IMPL-015-T003 is complete/PASS expected-red.",
+    "PHASE8-IMPL-015-T004 is ready/active.",
     "T001 records PHASE8-IMPL-014 complete through T007.",
     "T001 records the backend.review_api helper module boundary from PHASE8-IMPL-014 as preserved.",
     "T001 records the review queue as workflow support only and queue presence as non-approval.",
@@ -371,8 +372,8 @@
     "Training/JSONL/dataset work; fine-tuning remains deferred after MVP.",
     "Package/dependency changes."
   ],
-  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were authorized or run for T001 or T002.",
-  "external_tool_policy": "No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001 or T002.",
+  "context_tools_policy": "No CCE, Graphify, Repomix, AI Context, MCP tools, or LeanCTX were authorized or run for T001, T002, or T003.",
+  "external_tool_policy": "No external tools were installed, cloned, fetched, pulled, executed, imported, copied, or vendored in T001, T002, or T003.",
   "candidate_record_policy": "Candidate records remain candidate-only and review-pending and never become canon, memory, owner decisions, or promotion by default. T001 does not modify candidate schema/record/storage/persistence/list/index modules.",
   "review_queue_policy": "Review queue entries are workflow support only, not approval, canon, memory, storyform truth, owner decisions, generated prose, or apply-promotion. T001 does not implement review UI/API, routes, owner action execution, or persistence beyond the inherited PHASE8-IMPL-012 helper.",
   "review_api_policy": "backend.review_api is authorized as a pure helper module in PHASE8-IMPL-014. Read-only route registration over backend.review_api is authorized in PHASE8-IMPL-015-T004 only. T002 authorizes backend/routes/review_queue.py for T004 only and only for four GET-only read-only review queue routes, with backend/main.py edited only for minimal router inclusion. Any read-only route must wrap backend.review_api helpers, must never call write helpers, must never call apply-promotion, must never write memory/canon, must never persist raw artifacts, must never run runtime extraction, must never call a model, and must never generate prose. T001 and T002 do not register routes.",
