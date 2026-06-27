@@ -1,3 +1,83 @@
+# PHASE8-IMPL-015-T001 Publish Review API Route Implementation and Read-Only Frontend Review Queue Surface Parent
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/planning only. Published `PHASE8-IMPL-015` as the next active Writer Assistant Core parent after the completed `PHASE8-IMPL-014` parent.
+- Parent task: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface. Parent result: ACTIVE after T001.
+- Completed child recorded: `PHASE8-IMPL-015-T001` - Publish review API route implementation and read-only frontend review queue surface parent.
+- Next child: `PHASE8-IMPL-015-T002` - Route/read-only frontend implementation reconciliation decision (ready/active; docs/decision only).
+- Precondition confirmed: `PHASE8-IMPL-014` complete through `PHASE8-IMPL-014-T007`; `PHASE8-IMPL-015` not active before T001; `backend/review_api.py` exists with all seven public APIs; `tests/test_writer_assistant_review_api_contract.py` exists and is green (161 tests); `backend/story_knowledge/review_queue_storage.py` and contract test tracked; `backend/story_knowledge/candidate_review_gate.py` and contract test tracked; no FastAPI review route registration; no frontend review UI; no frontend API helper; no owner action command API routes; no owner action execution; no apply-promotion; no memory/canon mutation; no raw artifact persistence; no runtime extraction; no real BookNLP/spaCy install/run/import; no model-assisted extraction; no NCP/Subtxt/dramatica-flow runtime integration; `.external_sources/` ignored and not staged.
+
+### Files Changed
+
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-015.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-015.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml` (active_frontier + PHASE8-IMPL-015 parent entry + child entries T001-T007; context_pack pointer `.codex-context/PHASE8-IMPL-015/`)
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md` (this entry)
+- Updated: `docs/roadmap/decision_log.md` (publication entry)
+- Updated: `docs/roadmap/risk_register.md` (route/frontend boundary risk entries)
+- Updated: `docs/roadmap/open_questions.md` (frontend test harness question)
+
+### Tracked-Artifact Confirmation
+
+- `backend/review_api.py`: tracked (PHASE8-IMPL-014-T003/T004/T005; pure, route-free, frontend-free helper module only with all seven public APIs).
+- `tests/test_writer_assistant_review_api_contract.py`: tracked (PHASE8-IMPL-013-T005; green after PHASE8-IMPL-014).
+- `backend/story_knowledge/review_queue_storage.py`: tracked (PHASE8-IMPL-012-T005).
+- `tests/test_writer_assistant_core_review_queue_storage_contract.py`: tracked.
+- `backend/story_knowledge/candidate_review_gate.py`: tracked (PHASE8-IMPL-011-T005).
+- `tests/test_writer_assistant_core_candidate_review_gate_contract.py`: tracked.
+- `.external_sources/`: ignored and not staged.
+- `backend/routes/review_queue.py`: absent (not created in T001).
+- `backend/main.py`: not modified in T001 (no FastAPI review routes registered).
+- `backend/app.py`: not modified in T001.
+
+### T001 Validation Results
+
+- `enrichment_json_parse`: PASS (Python `json.loads` succeeds on `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`).
+- `check_enrichment`: PASS (`python3 scripts/check_enrichment.py`).
+- `validate_roadmap`: PASS (`python3 scripts/validate_roadmap.py`).
+- `roadmap_index_yaml_sanity`: PASS (YAML parses; PHASE8-IMPL-015 parent, T001-T007 children, and `.codex-context/PHASE8-IMPL-015/` pointer are present; malformed duplicate/missing-comma fragments are absent).
+- `duplicate_partial_edit_check`: PASS (exactly one PHASE8-IMPL-015 backlog row; exactly one Writer Assistant Core lead-in paragraph marker; no duplicated PHASE8-IMPL-011+ master plan status passage).
+- `whitespace_check`: PASS (no trailing whitespace in changed docs).
+- `narrow_git_diff_check`: PASS (`/usr/bin/git diff --check -- ...` reports no whitespace errors).
+- `source_cache_safety`: PASS (`.external_sources/` not staged and ignored; `/usr/bin/git status --short -- .external_sources` returns empty).
+
+### T001 Safety/Boundary Confirmations
+
+- No backend code changed.
+- No frontend code changed.
+- No tests changed.
+- No FastAPI routes registered in `backend/main.py` or any new route file.
+- No `backend/routes/review_queue.py` created.
+- No `backend.review_api` module created or modified.
+- No frontend review UI implemented.
+- No frontend API helper implemented.
+- No owner action execution implemented.
+- No owner action command HTTP routes implemented.
+- No apply-promotion implemented.
+- No memory/canon mutation occurred.
+- No raw artifact persistence added.
+- No runtime extraction added.
+- No model calls added.
+- No real BookNLP/spaCy install or execution.
+- No NCP/Subtxt/dramatica-flow runtime integration added.
+- No package/dependency files changed.
+- No project runtime files created.
+- No raw artifact writes.
+- No generated prose/rewrite/continuation behavior added.
+- No training/JSONL/dataset work.
+- No staging/commit/push.
+
+### T001 Next Step Recommendation
+
+- `PHASE8-IMPL-015-T002` - Route/read-only frontend implementation reconciliation decision (docs/decision only).
+
 # PHASE8-IMPL-014-T007 Roadmap/Status Closeout
 
 ### Result

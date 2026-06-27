@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-014",
-    "current_parent_task_title": "Writer Assistant Core review API implementation and tests-first route boundary",
-    "frontier_note": "PHASE8-IMPL-014 is complete through PHASE8-IMPL-014-T007 (roadmap/status closeout). PHASE8-IMPL-014 delivered the pure backend.review_api helper module only: backend/review_api.py with all seven public APIs (list_review_queue_entries_readonly, get_review_queue_entry_readonly, get_review_queue_index_readonly, get_review_queue_summary_readonly, validate_review_queue_read_request, validate_owner_action_command_request, build_owner_action_command_response). T003 created validators and response builders; T004 integrated read-only queue helpers over review_queue_storage via optional keyword-only project_dir; T005 hardened owner action command validation/response shaping; T006 confirmed safety boundaries with no code change; T007 closed the parent as docs/status only. Review API contract tests pass (161 tests); review queue storage plus candidate review gate regressions pass (513 tests). No FastAPI route registration, frontend review UI, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, real BookNLP/spaCy install/run/import, model-assisted extraction, or NCP/Subtxt/dramatica-flow runtime integration was added. PHASE8-IMPL-014 is not the final MVP gate. Recommended next parent: PHASE8-IMPL-015 - Review API route implementation and read-only frontend review queue surface (MVP-required; recommendation-only until separately published by T001). Required future parent sequence remains PHASE8-IMPL-015 through PHASE8-IMPL-022. Fine-tuning remains deferred after MVP. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, and prose-production paths are permanently forbidden."
+    "current_parent_task_id": "PHASE8-IMPL-015",
+    "current_parent_task_title": "Review API route implementation and read-only frontend review queue surface",
+    "frontier_note": "PHASE8-IMPL-015 is active after PHASE8-IMPL-015-T001 (docs/status/planning only). PHASE8-IMPL-015-T001 published the parent task record at docs/roadmap/tasks/PHASE8-IMPL-015.md, inventory at docs/roadmap/inventory/PHASE8-IMPL-015.md, enrichment JSON at docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json, and context_pack pointer .codex-context/PHASE8-IMPL-015/. Last completed parent: PHASE8-IMPL-014 - Writer Assistant Core review API implementation and tests-first route boundary (complete through PHASE8-IMPL-014-T007). Last completed child: PHASE8-IMPL-014-T007 - Roadmap/status closeout (complete; docs/status only). Next child after publication: PHASE8-IMPL-015-T002 - Route/read-only frontend implementation reconciliation decision (ready/active; docs/decision only). PHASE8-IMPL-015 is read-only route/frontend surface work only unless a future child decision narrows the boundary further. Owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, and NCP/Subtxt/dramatica-flow runtime integration remain out of scope for PHASE8-IMPL-015 and MVP-required in later Phase 8 parents PHASE8-IMPL-016 through PHASE8-IMPL-022. Fine-tuning remains deferred after MVP. Generated prose, rewrite, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise flows, and prose-production paths are permanently forbidden."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3155,20 +3155,249 @@
       "id": "PHASE8-IMPL-015",
       "title": "Review API route implementation and read-only frontend review queue surface",
       "type": "runtime",
-      "status": "planned",
+      "status": "active",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-014"
       ],
       "boundary_tags": [
-        "mvp_required_frontend_owner_action_execution",
-        "owner_review_required",
+        "docs_only_t001",
         "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "tests_first",
+        "review_ui_planning",
         "no_apply_promotion",
+        "no_auto_promotion",
         "no_memory_canon_mutation",
-        "generated_prose_permanently_forbidden"
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence",
+        "no_booknlp_install",
+        "no_spacy_install",
+        "mvp_required_analysis_runtime"
       ],
-      "result": "planned"
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-015.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-015.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-015/",
+      "result": "active",
+      "final_summary": "Active after PHASE8-IMPL-015-T001 (docs/status/planning only). PHASE8-IMPL-015-T001 created the parent task record, inventory, enrichment JSON, and roadmap/status updates and marked PHASE8-IMPL-015-T002 ready/active; T003-T007 remain planned. PHASE8-IMPL-015 inherits the PHASE8-IMPL-014 backend.review_api helper module boundary (pure, route-free, frontend-free helper module only with all seven public APIs; read-only queue helpers over review_queue_storage via optional keyword-only project_dir; no FastAPI route registration, no frontend review UI, no frontend API helpers, no owner action command routes, no owner action execution, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model-assisted extraction, no NCP/Subtxt/dramatica-flow runtime integration) and authorizes read-only review queue routes over backend.review_api only plus an optional read-only frontend review queue surface. Future children must keep owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, and NCP/Subtxt/dramatica-flow runtime integration out of this parent unless a later child explicitly authorizes a narrow display-only boundary. Recommended next parent after PHASE8-IMPL-015-T007 closeout: PHASE8-IMPL-016 - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published).",
+      "notes": "Active after T001. T001 published docs/roadmap/tasks/PHASE8-IMPL-015.md, docs/roadmap/inventory/PHASE8-IMPL-015.md, docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json, and the roadmap_index.yaml context_pack pointer .codex-context/PHASE8-IMPL-015/. T001 did not register routes, did not modify backend/main.py or backend/app.py, did not modify frontend files, did not implement frontend review UI or frontend API helpers, did not implement owner action execution, did not implement apply-promotion, did not mutate memory/canon, did not persist raw artifacts, did not implement runtime extraction, did not install or import BookNLP/spaCy, did not run a model, and did not generate prose. Preconditions confirmed: PHASE8-IMPL-014 complete through T007, PHASE8-IMPL-015 not active before T001, backend/review_api.py tracked with all seven public APIs, tests/test_writer_assistant_review_api_contract.py green, backend/story_knowledge/review_queue_storage.py tracked, tests/test_writer_assistant_core_review_queue_storage_contract.py green, backend/story_knowledge/candidate_review_gate.py tracked, no FastAPI review route registration, no frontend review UI, no frontend API helper, no owner action command API routes, no owner action execution, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no real BookNLP/spaCy install/run/import, .external_sources/ ignored and not staged."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T001",
+      "title": "Publish review API route implementation and read-only frontend review queue surface parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "tests_first",
+        "review_ui_planning",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence",
+        "no_booknlp_install",
+        "no_spacy_install",
+        "mvp_required_analysis_runtime"
+      ],
+      "result": "complete",
+      "notes": "Docs/status/planning only. Created docs/roadmap/tasks/PHASE8-IMPL-015.md, docs/roadmap/inventory/PHASE8-IMPL-015.md, and docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json; updated docs/roadmap/roadmap_index.yaml, docs/roadmap/implementation_status.md, docs/roadmap/task_backlog.md, docs/roadmap/phase_map.md, docs/master_plan.md, docs/roadmap/validation/latest_roadmap_validation.md, and where appropriate docs/roadmap/decision_log.md, docs/roadmap/risk_register.md, and docs/roadmap/open_questions.md. Marked PHASE8-IMPL-015 active, T001 complete, T002 ready/active, T003-T007 planned. Did not register FastAPI routes, did not modify backend/main.py or backend/app.py, did not create backend/routes/review_queue.py, did not implement frontend review UI, did not implement frontend API helpers, did not implement owner action execution, did not implement apply-promotion, did not mutate memory/canon, did not persist raw artifacts, did not implement runtime extraction, did not install or run BookNLP/spaCy, did not run a model, did not generate prose, and did not change package/dependency files, tests, training/JSONL/dataset files, or project runtime files. Preconditions confirmed: PHASE8-IMPL-014 complete through T007, PHASE8-IMPL-015 not active before T001, backend/review_api.py tracked, tests/test_writer_assistant_review_api_contract.py green, backend/story_knowledge/review_queue_storage.py tracked, backend/story_knowledge/candidate_review_gate.py tracked, no FastAPI review route registration, no frontend review UI, no frontend API helper, no owner action command API routes, no owner action execution, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no real BookNLP/spaCy install/run/import, .external_sources/ ignored and not staged."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T002",
+      "title": "Route/read-only frontend implementation reconciliation decision",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "tests_first",
+        "review_ui_planning",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Docs/decision only. Decide exact read-only review queue route split (list/get/index/summary) and route response projection of existing backend.review_api helper shapes. Decide whether new routes are added to backend/main.py or to a future backend/routes/review_queue.py file added in T004. Decide whether owner action command HTTP routes remain deferred to PHASE8-IMPL-016. Decide how the future read-only routes satisfy the future contract tests added by T003 without scope creep. Decide whether T005 produces frontend API helper + read-only review queue surface contract tests or a frontend implementation plan given the existing frontend test harness constraints. Add new boundary tags to docs/roadmap/roadmap_governance.md only if validators require them. No runtime code, no tests, no route implementation, no UI, no owner action execution, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, no package/dependency changes, no generated prose."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T003",
+      "title": "Backend route contract tests for read-only review queue endpoints",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015-T002"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Tests-first or expected-red only. Add backend route contract tests for the future read-only review queue routes wrapping the existing backend.review_api helper module at the FastAPI test client level. Pin the future read-only route surface (paths, methods, request/query parameter shapes, response shapes projected from backend.review_api, fail-closed behavior, evidence/provenance/uncertainty preservation, no-state-mutation guarantees, no-apply-promotion guarantees, no-memory/canon-mutation guarantees, no-raw-persistence guarantees, no-runtime-extraction guarantees, no-model-call guarantees, no-generated-prose guarantees). Do not register routes in backend/main.py or any new route file. Do not modify backend.review_api.py beyond narrow test-authorized read-only safety fixes. No FastAPI route that writes, mutates, or persists queue state, candidate state, owner action state, memory/canon state, raw artifact state, or generated prose state. No owner action command routes, no apply-promotion, no memory/canon mutation, no raw persistence, no runtime extraction, no model calls, no generated prose, no package/dependency changes, no test changes outside the approved contract test file."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T004",
+      "title": "Minimal backend route implementation over backend.review_api for read-only review queue endpoints",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015-T003"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Minimal route registration only. Register read-only review queue routes in backend/main.py (or in backend/routes/review_queue.py if T002 authorizes adding the file) wrapping backend.review_api helpers only. Routes must call backend.review_api helpers only. Routes must produce the T002 read-only response shape and preserve evidence, provenance, source document, source locator, raw output refs, uncertainty, normalization status, and human_review_required. Routes must fail closed for unsafe IDs, malformed queue entries, missing candidate linkage, unknown query fields, malformed JSON, invalid HTTP methods, and forbidden fields. No FastAPI route that writes, mutates, or persists queue state, candidate state, owner action state, memory/canon state, raw artifact state, or generated prose state. No FastAPI route that runs runtime extraction, calls a model, installs or imports BookNLP/spaCy, or imports NCP/Subtxt/dramatica-flow runtime code. No FastAPI route that performs apply-promotion, executes owner actions, or auto-promotes candidates. No frontend changes; no package/dependency changes; no mutating backend.review_api.py beyond narrow T006 read-only safety fixes; no mutating backend/story_knowledge/review_queue_storage.py, candidate_review_gate.py, extraction_orchestrator.py, booknlp_fixture_parser.py, raw_extraction_storage.py, booknlp_adapter_contract.py, source_map.py, or evidence.py beyond narrow T006 read-only safety fixes."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T005",
+      "title": "Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015-T004"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "owner_review_required",
+        "review_ui_planning",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "T005 scope depends on the existing frontend test harness decision in T002. If T002 authorizes frontend contract tests: add frontend API helper + read-only review queue surface contract tests only (tests-first or expected-red). If T002 authorizes a frontend implementation plan: produce a frontend implementation plan at docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md documenting the frontend API helper module name, frontend read-only review queue surface component name, props, allowlisted fields, evidence/provenance/uncertainty display, accessibility expectations, no-promotion/no-canon/no-generated-prose/no-runtime-extraction display rules, and human_review_required warning state. Do not register routes in backend/main.py or any new route file. Do not modify backend.review_api.py or backend/story_knowledge/review_queue_storage.py beyond narrow T006 read-only safety fixes. Do not implement owner action command controls, frontend owner-action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model integration, or generated prose. No package/dependency changes; no mutating frontend files outside the approved frontend surface file; no mutating tests outside the approved frontend contract test file."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T006",
+      "title": "Route/frontend read-only safety regression or conditional hardening",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "review_api_implementation",
+        "route_boundary",
+        "review_ui_planning",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Validation-only; conditional hardening inside backend.review_api.py, the approved route file, the approved frontend surface, or the approved frontend test file only if expected tests or regressions fail. Run tests/test_writer_assistant_review_api_contract.py, the future read-only route contract tests from T003, and any approved frontend contract tests from T005; confirm green. Confirm existing regressions remain green. Confirm approved route file source contains no route-write/runtime/prose/raw/mutation/execution terms. Confirm no route registration appears in backend/app.py or any backend router file other than the approved route file. Confirm no frontend files outside the approved frontend surface file were changed and no command controls exist. Confirm BookNLP/spaCy availability guard reports both false. Conditional hardening inside the approved files only."
+    },
+    {
+      "id": "PHASE8-IMPL-015-T007",
+      "title": "Roadmap/status closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-015",
+      "depends_on": [
+        "PHASE8-IMPL-015-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "candidate_only",
+        "owner_review_required",
+        "no_apply_promotion",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "no_package_changes",
+        "no_owner_action_execution",
+        "owner_action_api_planning",
+        "no_raw_artifact_persistence"
+      ],
+      "result": "planned",
+      "notes": "Docs/status closeout only. Close PHASE8-IMPL-015 as complete after T001-T006. Confirm tracked artifacts (backend/review_api.py, tests/test_writer_assistant_review_api_contract.py, the approved route file, the approved frontend surface, backend/story_knowledge/review_queue_storage.py, tests/test_writer_assistant_core_review_queue_storage_contract.py, backend/story_knowledge/candidate_review_gate.py, tests/test_writer_assistant_core_candidate_review_gate_contract.py, and any approved frontend contract test file). Re-validate review API contract (still green), read-only route contract (now green), and existing regressions; confirm .external_sources/ remains ignored and not staged. Recommend next parent only."
     },
     {
       "id": "PHASE8-IMPL-016",
