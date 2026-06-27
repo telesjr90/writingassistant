@@ -69,6 +69,8 @@ FORBIDDEN_COMMANDS = (
     "continue_scene",
     "outline_chapter",
     "create_training_jsonl",
+    "export_dataset",
+    "write_model_artifact",
 )
 
 UNSAFE_PROJECT_IDS = (
@@ -100,7 +102,10 @@ UNEXPECTED_WRITE_TARGET_FIELDS = (
     "model_prompt",
     "generated_text",
     "prose_text",
+    "scene_prose",
     "jsonl_output_path",
+    "dataset_manifest_path",
+    "model_artifact_path",
 )
 
 FORBIDDEN_RESPONSE_FIELDS = (

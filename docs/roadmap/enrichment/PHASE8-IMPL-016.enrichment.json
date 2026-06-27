@@ -58,8 +58,8 @@
     "PHASE8-IMPL-016-T003": "complete/PASS expected-red tests-first review command owner-action candidate review route contract",
     "PHASE8-IMPL-016-T004": "complete/PASS minimal backend review-action command route/helper implementation",
     "PHASE8-IMPL-016-T005": "complete/PASS minimal frontend owner-action review workflow/surface for bounded review commands",
-    "PHASE8-IMPL-016-T006": "ready/active next",
-    "PHASE8-IMPL-016-T007": "planned"
+    "PHASE8-IMPL-016-T006": "complete/PASS focused owner-action workflow safety regression coverage",
+    "PHASE8-IMPL-016-T007": "ready/active next"
   },
   "t002_decision_summary": {
     "owner_action_execution_purpose": "owner-confirmed candidate review workflow commands affect review workflow state only",
@@ -70,6 +70,7 @@
     "t003_expected_red_contract": "PHASE8-IMPL-016-T003 created tests/test_writer_assistant_review_action_command_routes_contract.py for the future review command owner-action candidate review route POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions; it covers mark_reviewed, request_more_evidence, defer, reject, quarantine, update_owner_note, set_review_status, forbidden apply_promotion, promote_candidate, write_memory, write_canon, persist_raw_artifact, run_extraction, run_booknlp, run_spacy, call_model, generate_prose, rewrite_prose, continue_scene, create_training_jsonl, fail closed malformed payloads, route separation, response boundary, no silent promotion, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, and no generated prose",
     "t004_implementation_summary": "PHASE8-IMPL-016-T004 implemented the minimal backend route/helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions as response-only review workflow command acceptance/rejection; it accepts only mark_reviewed, request_more_evidence, defer, reject, quarantine, update_owner_note, and set_review_status, rejects forbidden commands and unsafe payloads fail closed, and does not implement apply-promotion, memory/canon mutation, project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
     "t005_implementation_summary": "PHASE8-IMPL-016-T005 implemented the minimal frontend owner-action review workflow/surface for bounded review commands; it added a deterministic frontend helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions, read-only candidate details separated from explicit owner action controls, candidate-only/no-canon warnings, evidence/provenance/source locator display and preservation, fail-closed unsupported command and missing-ID behavior, and no apply-promotion, memory/canon/project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
-    "next_child": "PHASE8-IMPL-016-T006 ready/active next for safety regression coverage"
+    "t006_implementation_summary": "PHASE8-IMPL-016-T006 added focused safety regression coverage proving the backend action route remains response-only review workflow state, forbidden commands and payload fields fail closed, frontend controls expose only allowed review workflow commands with explicit owner confirmation, candidate-only/no-canon/evidence/provenance/source locator warnings remain present, command payload construction excludes forbidden fields, and the targeted source boundary scan distinguishes rejected fixtures from implementation behavior without the earlier contradictory substring issue",
+    "next_child": "PHASE8-IMPL-016-T007 ready/active next for parent closeout"
   }
 }

@@ -6,10 +6,10 @@
 - Title: Frontend owner-action execution workflow and review command boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-016-T001` complete/PASS; `PHASE8-IMPL-016-T002` complete/PASS; `PHASE8-IMPL-016-T003` complete/PASS as tests-first expected-red contract; `PHASE8-IMPL-016-T004` complete/PASS; `PHASE8-IMPL-016-T005` complete/PASS
+- Status: active MVP-required parent; `PHASE8-IMPL-016-T001` complete/PASS; `PHASE8-IMPL-016-T002` complete/PASS; `PHASE8-IMPL-016-T003` complete/PASS as tests-first expected-red contract; `PHASE8-IMPL-016-T004` complete/PASS; `PHASE8-IMPL-016-T005` complete/PASS; `PHASE8-IMPL-016-T006` complete/PASS
 - Depends on: completed `PHASE8-IMPL-015`
-- Current child: `PHASE8-IMPL-016-T006` ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS; T005 complete/PASS; T006 ready/active next; T007 planned
+- Current child: `PHASE8-IMPL-016-T007` ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS; T005 complete/PASS; T006 complete/PASS; T007 ready/active next
 - Recommended next parent after this one: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 
 ## 2. Why This Parent Exists
@@ -28,6 +28,7 @@ T003/T004/T005 contract coverage:
 - response boundary with review workflow state only, candidate linkage, evidence/provenance/source locator preservation, no silent promotion, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, and no generated prose
 - T004 minimal backend implementation of the command route/helper as response-only review workflow command acceptance/rejection, with no queue persistence, candidate persistence, apply-promotion, memory/canon mutation, project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifact creation
 - T005 minimal frontend workflow/surface with a deterministic helper for `POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions`, read-only candidate details separated from explicit owner-action controls, candidate-only/no-canon warning text, evidence/provenance/source locator context display and payload preservation, fail-closed unsupported command/missing ID behavior, and no apply-promotion, memory/canon/project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifact creation
+- T006 focused safety regression coverage proving the backend route remains response-only review workflow state, forbidden owner-action commands and payload fields fail closed, frontend controls expose only allowed review workflow commands with explicit owner confirmation and candidate-only/no-canon/evidence/provenance/source locator context, and the targeted source boundary scan avoids the earlier contradictory forbidden-substring issue by distinguishing rejected test fixtures from implementation behavior
 
 ## 3. Boundary Summary
 
