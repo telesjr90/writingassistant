@@ -10,7 +10,7 @@ Review API route implementation and read-only frontend review queue surface
 
 ## Status
 
-Active after `PHASE8-IMPL-015-T005` frontend read-only surface implementation decision. `PHASE8-IMPL-015-T001` and `PHASE8-IMPL-015-T002` are complete. `PHASE8-IMPL-015-T003` is complete/PASS as tests-first expected-red contract coverage. `PHASE8-IMPL-015-T004` is complete/PASS and created `backend/routes/review_queue.py` with four GET-only read-only review queue routes over `backend.review_api`, plus minimal `backend/main.py` router inclusion; the route contract now passes. `PHASE8-IMPL-015-T005` is complete/PASS as the planning path because no usable frontend/component test harness exists without package changes at T005 start. `PHASE8-IMPL-015-T006` is ready/active. `PHASE8-IMPL-015-T007` is planned and is not started until the owner approves the prior child. `PHASE8-IMPL-015` is read-only route/frontend surface work only unless a future child decision narrows the boundary further.
+Active after `PHASE8-IMPL-015-T006` route/frontend read-only safety regression. `PHASE8-IMPL-015-T001` and `PHASE8-IMPL-015-T002` are complete. `PHASE8-IMPL-015-T003` is complete/PASS as tests-first expected-red contract coverage. `PHASE8-IMPL-015-T004` is complete/PASS and created `backend/routes/review_queue.py` with four GET-only read-only review queue routes over `backend.review_api`, plus minimal `backend/main.py` router inclusion; the route contract now passes. `PHASE8-IMPL-015-T005` is complete/PASS as the planning path because no usable frontend/component test harness exists without package changes at T005 start. `PHASE8-IMPL-015-T006` is complete/PASS as validation-only safety regression with no hardening required. `PHASE8-IMPL-015-T007` is ready/active for docs/status closeout. `PHASE8-IMPL-015` is read-only route/frontend surface work only unless a future child decision narrows the boundary further.
 
 `PHASE8-IMPL-015-T001` is docs/status/planning only. It creates the parent task record, inventory, enrichment JSON, and roadmap/status updates. It does not implement routes, frontend review UI, frontend API helpers, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, or generated prose.
 
@@ -161,8 +161,8 @@ These exclusions mean "not in `PHASE8-IMPL-015`." They do not mean "not required
 3. `PHASE8-IMPL-015-T003` - Backend route contract tests for read-only review queue endpoints. Status: complete/PASS expected-red.
 4. `PHASE8-IMPL-015-T004` - Minimal backend route implementation over `backend.review_api` for read-only review queue endpoints. Status: complete/PASS.
 5. `PHASE8-IMPL-015-T005` - Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints. Status: complete/PASS.
-6. `PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening. Status: ready/active.
-7. `PHASE8-IMPL-015-T007` - Roadmap/status closeout. Status: planned.
+6. `PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening. Status: complete/PASS.
+7. `PHASE8-IMPL-015-T007` - Roadmap/status closeout. Status: ready/active.
 
 ## Child Task Details
 
@@ -243,6 +243,7 @@ These exclusions mean "not in `PHASE8-IMPL-015`." They do not mean "not required
 - Confirm no frontend files outside the approved frontend surface file were changed and no command controls exist.
 - Confirm BookNLP/spaCy availability guard still reports both false.
 - Confirm `.external_sources/` remains ignored/protected from commit.
+- Status: complete/PASS. T006 used the corrected scoped frontend planning-path non-implementation check: `frontend/src/api/reviewQueue.js` and `frontend/src/components/ReviewQueueSurface.jsx` do not exist, no frontend files are changed, and no T005-approved frontend surface exists; therefore no T005-created command/promotion/canon/runtime/model/prose controls exist. Route contract, existing review API contract, review queue storage/candidate gate regressions, broader candidate/orchestrator regressions, roadmap validation, approved route source scan, `backend/main.py` inclusion scan, BookNLP/spaCy runtime import guard, raw/model/runtime/prose source scan, git diff check, and source-cache safety all passed. No conditional hardening was required.
 - If expected tests fail, narrow patch only inside `backend.review_api.py`, the approved route file, the approved frontend surface, or the approved frontend test file, and only to satisfy the contract tests without scope creep.
 - No implementation outside `backend.review_api.py`, the approved route file, the approved frontend surface, or the approved frontend test file unless T002-T005 explicitly authorize it.
 
@@ -313,11 +314,11 @@ Do not run pytest in T001 because no tests or runtime code change.
 
 ## Current Status
 
-`PHASE8-IMPL-015` is active after `PHASE8-IMPL-015-T005` frontend read-only surface implementation decision. `PHASE8-IMPL-015-T001` is complete as docs/status/planning only and created the parent task record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-015-T002` is complete as docs/decision only and created `docs/roadmap/decisions/PHASE8-IMPL-015-route-read-only-frontend-implementation-reconciliation-decision.md`. `PHASE8-IMPL-015-T003` is complete/PASS as tests-first expected-red coverage and added `tests/test_writer_assistant_review_api_routes_contract.py`. `PHASE8-IMPL-015-T004` is complete/PASS and added the four GET-only read-only review queue routes in `backend/routes/review_queue.py` with minimal `backend/main.py` router inclusion. The route contract now passes. `PHASE8-IMPL-015-T005` is complete/PASS and created `docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md` as the planning path because no usable frontend/component test harness exists without package changes. `PHASE8-IMPL-015-T006` is ready/active. `PHASE8-IMPL-015-T007` is planned. T005 added no backend route changes, production frontend files, frontend tests, package files, owner action command route, write route, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model calls, generated prose behavior, runtime project files, training files, model artifacts, or source-cache changes.
+`PHASE8-IMPL-015` is active after `PHASE8-IMPL-015-T006` route/frontend read-only safety regression. `PHASE8-IMPL-015-T001` is complete as docs/status/planning only and created the parent task record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-015-T002` is complete as docs/decision only and created `docs/roadmap/decisions/PHASE8-IMPL-015-route-read-only-frontend-implementation-reconciliation-decision.md`. `PHASE8-IMPL-015-T003` is complete/PASS as tests-first expected-red coverage and added `tests/test_writer_assistant_review_api_routes_contract.py`. `PHASE8-IMPL-015-T004` is complete/PASS and added the four GET-only read-only review queue routes in `backend/routes/review_queue.py` with minimal `backend/main.py` router inclusion. The route contract now passes. `PHASE8-IMPL-015-T005` is complete/PASS and created `docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md` as the planning path because no usable frontend/component test harness exists without package changes. `PHASE8-IMPL-015-T006` is complete/PASS as validation-only safety regression with the corrected scoped frontend planning-path non-implementation check. `PHASE8-IMPL-015-T007` is ready/active. T006 added no backend route changes, production frontend files, frontend tests, package files, owner action command route, write route, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model calls, generated prose behavior, runtime project files, training files, model artifacts, or source-cache changes.
 
 ## Next Child
 
-`PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening.
+`PHASE8-IMPL-015-T007` - Roadmap/status closeout.
 
 ## Recommended Next Parent
 

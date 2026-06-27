@@ -1,3 +1,46 @@
+# PHASE8-IMPL-015-T006 Route/Frontend Read-Only Safety Regression
+
+### Result
+
+- Result: PASS.
+- Scope: validation-only route/frontend read-only safety regression after T004/T005.
+- Parent task: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface.
+- Frontend correction: T006 used the scoped T005 planning-path non-implementation check instead of recursively scanning legacy frontend files. Existing legacy boundary copy is not a T005-created surface.
+- Next child: `PHASE8-IMPL-015-T007` - Roadmap/status closeout (ready/active).
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md` (this entry)
+- Updated: `docs/roadmap/decision_log.md`
+
+### Validation Results
+
+- Route contract: PASS, 48 passed.
+- Existing review API contract: PASS, 161 passed.
+- Review queue storage + candidate review gate regressions: PASS, 513 passed.
+- Broader focused candidate/orchestrator regressions: PASS, 374 passed.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Approved route file safety scan: PASS.
+- `backend/main.py` router inclusion safety scan: PASS.
+- Scoped frontend planning-path non-implementation check: PASS; planned T005 files do not exist and no frontend files are changed.
+- BookNLP/spaCy runtime import guard: PASS.
+- Raw/model/runtime/prose source scan: PASS.
+- Git diff check: PASS.
+- Source-cache safety: PASS.
+
+### Boundary Confirmation
+
+- No conditional hardening was required.
+- No backend route changes, frontend files, tests, package/dependency files, owner action command routes, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model calls, generated prose, source-cache changes, staging, commit, or push.
+
 # PHASE8-IMPL-015-T005 Frontend Read-Only Surface Implementation Decision
 
 ### Result

@@ -269,7 +269,7 @@
       "id": "PHASE8-IMPL-015-T006",
       "title": "Route/frontend read-only safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-015-T005"
       ],
@@ -279,17 +279,17 @@
         "Confirm existing regressions remain green.",
         "Confirm approved route file source contains no route-write/runtime/prose/raw/mutation/execution terms.",
         "Confirm no route registration appears in backend/app.py or any backend router file other than the approved route file.",
-        "Confirm no frontend files outside the approved frontend surface file were changed and no command controls exist.",
+        "Confirm the scoped T005 planning-path non-implementation check: frontend/src/api/reviewQueue.js and frontend/src/components/ReviewQueueSurface.jsx do not exist, no frontend files are changed, and no T005-approved frontend surface exists.",
         "Confirm BookNLP/spaCy availability guard reports both false.",
         "Conditional hardening inside the approved files only."
       ],
-      "result": "ready/active"
+      "result": "PASS validation-only; no conditional hardening required; corrected scoped frontend planning-path check passed"
     },
     {
       "id": "PHASE8-IMPL-015-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-015-T006"
       ],
@@ -301,7 +301,7 @@
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "result": "planned"
+      "result": "ready/active"
     }
   ],
   "acceptance_criteria": [
@@ -312,7 +312,8 @@
     "PHASE8-IMPL-015-T003 is complete/PASS expected-red.",
     "PHASE8-IMPL-015-T004 is complete/PASS.",
     "PHASE8-IMPL-015-T005 is complete/PASS.",
-    "PHASE8-IMPL-015-T006 is ready/active.",
+    "PHASE8-IMPL-015-T006 is complete/PASS.",
+    "PHASE8-IMPL-015-T007 is ready/active.",
     "T001 records PHASE8-IMPL-014 complete through T007.",
     "T001 records the backend.review_api helper module boundary from PHASE8-IMPL-014 as preserved.",
     "T001 records the review queue as workflow support only and queue presence as non-approval.",
@@ -498,11 +499,11 @@
     "model_call_added": false,
     "generated_prose_added": false
   },
-  "t005_status": "ready",
-  "t005_result": "ready/active",
-  "t006_status": "planned",
-  "t006_result": "pending",
-  "t007_status": "planned",
-  "t007_result": "pending",
+  "t005_status": "complete",
+  "t005_result": "PASS planning path; no production frontend files, frontend tests, package files, backend routes, owner action execution, apply-promotion, memory/canon mutation, raw persistence, runtime extraction, model calls, generated prose, or source-cache changes",
+  "t006_status": "complete",
+  "t006_result": "PASS validation-only; corrected scoped frontend planning-path non-implementation check passed; no conditional hardening required",
+  "t007_status": "ready",
+  "t007_result": "ready/active",
   "recommended_next_parent": "PHASE8-IMPL-016 - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published after PHASE8-IMPL-015-T007)"
 }
