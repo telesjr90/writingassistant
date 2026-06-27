@@ -1,3 +1,75 @@
+# PHASE8-IMPL-015-T002 Route/Read-Only Frontend Implementation Reconciliation Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only. Created the route/read-only frontend implementation reconciliation decision for `PHASE8-IMPL-015`.
+- Parent task: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface. Parent result: ACTIVE after T002.
+- Completed child recorded: `PHASE8-IMPL-015-T002` - Route/read-only frontend implementation reconciliation decision.
+- Next child: `PHASE8-IMPL-015-T003` - Backend route contract tests for read-only review queue endpoints (ready/active; tests-first or expected-red only).
+- Context confirmed: `PHASE8-IMPL-015` context pack files existed and were read-only references. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-015-route-read-only-frontend-implementation-reconciliation-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md` (this entry)
+- Updated: `docs/roadmap/decision_log.md`
+
+### Decision Summary
+
+- Backend route split: four GET-only read-only review queue routes over `backend.review_api` list/get/index/summary helpers.
+- Route placement: `backend/routes/review_queue.py` authorized for T004 only and only for read-only routes; `backend/main.py` may be edited only for minimal router inclusion.
+- Owner action command HTTP route boundary: deferred to `PHASE8-IMPL-016`; `PHASE8-IMPL-015` has no owner action command HTTP routes.
+- T003 handoff: add expected-red route contract tests at `tests/test_writer_assistant_review_api_routes_contract.py`.
+- T004 handoff: minimal route implementation over `backend.review_api` helpers only.
+- T005 handoff: produce a frontend implementation plan unless an existing frontend/component test harness is available without package changes.
+- T006 handoff: run route no-write checks, frontend no-command-control checks if applicable, no BookNLP/spaCy runtime/import checks, no model/runtime extraction/raw persistence checks, and source-cache safety checks.
+
+### T002 Validation Results
+
+- `enrichment_json_parse`: PASS.
+- `check_enrichment`: PASS (`python3 scripts/check_enrichment.py`).
+- `validate_roadmap`: PASS (`python3 scripts/validate_roadmap.py`).
+- `decision_content_check`: PASS.
+- `whitespace_check`: PASS.
+- `narrow_git_diff_check`: PASS (`/usr/bin/git diff --check -- ...` reports no whitespace errors).
+- `source_cache_safety`: PASS (`.external_sources/` not staged and ignored).
+
+### T002 Safety/Boundary Confirmations
+
+- Docs/decision only.
+- No backend code changed.
+- No frontend code changed.
+- No tests changed.
+- No package/dependency files changed.
+- No runtime project files changed.
+- No training/JSONL/dataset/model files changed.
+- No source-cache files changed.
+- No route implementation added.
+- No frontend implementation added.
+- No owner action execution implemented.
+- No apply-promotion implemented.
+- No memory/canon mutation occurred.
+- No runtime extraction added.
+- No raw artifact persistence added.
+- No model calls added.
+- No generated prose/rewrite/continuation behavior added.
+- No LeanCTX, CCE, Graphify, Repomix, AI Context, MCP, scaffold, collect-plan, context health scripts, or baseline refresh commands were run.
+- No staging/commit/push.
+
+### T002 Next Step Recommendation
+
+- Commit PHASE8-IMPL-015-T002 docs after review.
+- Then run a T002 context delta outside implementation task if needed.
+- Then prepare `PHASE8-IMPL-015-T003` only after review.
+
 # PHASE8-IMPL-015-T001 Publish Review API Route Implementation and Read-Only Frontend Review Queue Surface Parent
 
 ### Result
