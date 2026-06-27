@@ -6,10 +6,11 @@
 - Title: Review API route implementation and read-only frontend review queue surface
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active after `PHASE8-IMPL-015-T005`
+- Status: complete/PASS after `PHASE8-IMPL-015-T007`.
 - Depends on: completed `PHASE8-IMPL-014` (complete through `PHASE8-IMPL-014-T007`)
-- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` complete/PASS expected-red; `PHASE8-IMPL-015-T004` complete/PASS; `PHASE8-IMPL-015-T005` complete/PASS; `PHASE8-IMPL-015-T006` complete/PASS; `PHASE8-IMPL-015-T007` ready/active
-- Recommended next parent: `PHASE8-IMPL-016` - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published after `PHASE8-IMPL-015-T007`)
+- Current child: none; parent closed complete after T007
+- Child sequence: T001 complete; T002 complete/PASS; T003 complete/PASS; T004 complete/PASS; T005 complete/PASS; T006 complete/PASS; T007 complete/PASS
+- Recommended next parent: `PHASE8-IMPL-016` - Frontend owner-action execution workflow and review command boundary (MVP-required; ready/active pending T001 publication)
 
 ## 2. Why This Parent Exists
 
@@ -241,4 +242,4 @@ Explicitly excluded for the entire parent:
 4. `PHASE8-IMPL-015-T004` - Minimal backend route implementation over `backend.review_api` for read-only review queue endpoints. Status: complete/PASS.
 5. `PHASE8-IMPL-015-T005` - Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints. Status: complete/PASS.
 6. `PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening. Status: complete/PASS.
-7. `PHASE8-IMPL-015-T007` - Roadmap/status closeout. Status: ready/active.
+7. `PHASE8-IMPL-015-T007` - Roadmap/status closeout. Status: complete/PASS.

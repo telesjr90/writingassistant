@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-015",
   "title": "Review API route implementation and read-only frontend review queue surface",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-014"
@@ -289,7 +289,7 @@
       "id": "PHASE8-IMPL-015-T007",
       "title": "Roadmap/status closeout",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-015-T006"
       ],
@@ -297,11 +297,11 @@
         "Docs/status closeout only.",
         "Close PHASE8-IMPL-015 as complete after T001-T006.",
         "Confirm tracked artifacts.",
-        "Re-validate review API contract (still green), read-only route contract (now green), and existing regressions.",
+        "Re-validate review API contract, read-only route contract, and existing regressions.",
         "Recommend next parent only.",
         "No runtime expansion."
       ],
-      "result": "ready/active"
+      "result": "PASS docs/status closeout only; closed PHASE8-IMPL-015 complete after T001-T006; recommended PHASE8-IMPL-016 as next MVP-required parent"
     }
   ],
   "acceptance_criteria": [
@@ -313,7 +313,8 @@
     "PHASE8-IMPL-015-T004 is complete/PASS.",
     "PHASE8-IMPL-015-T005 is complete/PASS.",
     "PHASE8-IMPL-015-T006 is complete/PASS.",
-    "PHASE8-IMPL-015-T007 is ready/active.",
+    "PHASE8-IMPL-015-T007 is complete/PASS.",
+    "PHASE8-IMPL-015 is complete/PASS.",
     "T001 records PHASE8-IMPL-014 complete through T007.",
     "T001 records the backend.review_api helper module boundary from PHASE8-IMPL-014 as preserved.",
     "T001 records the review queue as workflow support only and queue presence as non-approval.",
@@ -503,7 +504,7 @@
   "t005_result": "PASS planning path; no production frontend files, frontend tests, package files, backend routes, owner action execution, apply-promotion, memory/canon mutation, raw persistence, runtime extraction, model calls, generated prose, or source-cache changes",
   "t006_status": "complete",
   "t006_result": "PASS validation-only; corrected scoped frontend planning-path non-implementation check passed; no conditional hardening required",
-  "t007_status": "ready",
-  "t007_result": "ready/active",
-  "recommended_next_parent": "PHASE8-IMPL-016 - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published after PHASE8-IMPL-015-T007)"
+  "t007_status": "complete",
+  "t007_result": "PASS docs/status closeout only; closed PHASE8-IMPL-015 complete after T001-T006; route contract PASS (48 tests); review API contract PASS (161 tests); review queue storage plus candidate review gate regressions PASS (513 tests); broader candidate/orchestrator regressions PASS (374 tests); closeout content check PASS; route/source boundary still intact",
+  "recommended_next_parent": "PHASE8-IMPL-016 - Frontend owner-action execution workflow and review command boundary (MVP-required; ready/active pending T001 publication)"
 }
