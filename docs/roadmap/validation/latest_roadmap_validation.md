@@ -1,20 +1,20 @@
-# PHASE8-IMPL-016-T007 Owner-Action Workflow Parent Closeout
+# PHASE8-IMPL-017-T001 Apply-Promotion Parent Publication
 
 ### Result
 
 - Result: PASS.
-- Scope: docs/status closeout only.
-- Parent task: `PHASE8-IMPL-016` - Frontend owner-action execution workflow and review command boundary.
-- Completed child recorded: `PHASE8-IMPL-016-T007` - Parent closeout.
-- Prior child: `PHASE8-IMPL-016-T006` - Safety regression for owner-action command workflow (complete/PASS and committed before this task).
-- Next parent: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary (MVP-required; ready/active next pending T001 publication).
-- No context tools were run inside T007. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+- Scope: docs/status publication only.
+- Parent task: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary.
+- Completed child recorded: `PHASE8-IMPL-017-T001` - Parent publication/inventory/enrichment/status alignment.
+- Prior parent: `PHASE8-IMPL-016` - complete/PASS and committed through `PHASE8-IMPL-016-T007`.
+- Next child: `PHASE8-IMPL-017-T002` - Apply-promotion boundary decision and audit model (ready/active next).
+- No context tools were run inside T001. Generated context artifacts remain evidence only, not roadmap truth or task completion.
 
 ### Files Changed
 
-- Updated: `docs/roadmap/tasks/PHASE8-IMPL-016.md`
-- Updated: `docs/roadmap/inventory/PHASE8-IMPL-016.md`
-- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-016.enrichment.json`
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-017.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-017.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json`
 - Updated: `docs/roadmap/implementation_status.md`
 - Updated: `docs/roadmap/roadmap_index.yaml`
 - Updated: `docs/roadmap/task_backlog.md`
@@ -24,32 +24,22 @@
 - Updated: `docs/roadmap/risk_register.md`
 - Updated: `docs/master_plan.md`
 
-### Closeout Summary
+### Publication Summary
 
-- `PHASE8-IMPL-016-T007` is complete/PASS.
-- `PHASE8-IMPL-016` is complete/PASS through T001-T007.
-- T001 published parent/inventory/enrichment/status.
-- T002 accepted owner-action execution boundary decision.
-- T003 added tests-first command route contract.
-- T004 implemented minimal backend review-action command route/helper.
-- T005 added frontend owner-action review workflow/surface.
-- T006 added focused safety regression coverage.
-- T007 closed parent and recommends `PHASE8-IMPL-017`.
-- Did not deliver: apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, NCP/Subtxt/dramatica-flow runtime, or generated prose/prose-production paths.
+- `PHASE8-IMPL-017` is published as the active MVP-required parent.
+- `PHASE8-IMPL-017-T001` is complete/PASS.
+- `PHASE8-IMPL-017-T002` is ready/active next.
+- `PHASE8-IMPL-017-T003` through `PHASE8-IMPL-017-T007` remain planned.
+- `PHASE8-IMPL-017` owns future explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation only after explicit owner action.
+- T001 did not implement apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, NCP/Subtxt/dramatica-flow runtime, or generated prose/prose-production paths.
 
-### Tracked Artifacts Confirmed
+### Future Parent Sequence
 
-- `backend/review_api.py`
-- `backend/routes/review_queue.py`
-- `frontend/src/api.js`
-- `frontend/src/App.jsx`
-- `frontend/src/components/ReviewQueuePanel.jsx`
-- `frontend/src/components/OwnerActionReviewControls.jsx`
-- `frontend/src/styles.css`
-- `tests/test_writer_assistant_review_action_command_routes_contract.py`
-- `tests/test_frontend_owner_action_review_workflow_source.py`
-- `tests/test_frontend_project_workspace_source.py`
-- `tests/test_owner_action_review_workflow_safety_regression.py`
+- `PHASE8-IMPL-018` remains future MVP-required raw artifact persistence.
+- `PHASE8-IMPL-019` remains future MVP-required runtime extraction plus real BookNLP/spaCy install/run/import.
+- `PHASE8-IMPL-020` remains future MVP-required model-assisted evidence-backed extraction.
+- `PHASE8-IMPL-021` remains future MVP-required NCP/Subtxt/dramatica-flow analysis-only runtime.
+- `PHASE8-IMPL-022` remains future MVP-required end-to-end MVP usability validation.
 
 ### Boundary Confirmation
 
@@ -57,8 +47,8 @@
 - No frontend implementation code changes.
 - No product test changes.
 - No package/dependency changes.
-- No apply-promotion.
-- No memory/canon mutation.
+- No apply-promotion runtime implementation.
+- No memory/canon mutation runtime implementation.
 - No project truth mutation.
 - No raw artifact persistence.
 - No runtime extraction.
@@ -72,8 +62,25 @@
 
 ### MVP Scope Preservation
 
-- `PHASE8-IMPL-016` is complete/PASS.
-- `PHASE8-IMPL-017` is ready/active next pending T001 publication.
+- `PHASE8-IMPL-017` is active and MVP-required.
 - `PHASE8-IMPL-018` through `PHASE8-IMPL-022` remain future MVP-required parents.
 - Fine-tuning remains deferred after MVP.
 - Generated prose/prose-production paths remain permanently forbidden.
+
+### Required Boundary Tags Published
+
+- `mvp_required_apply_promotion`
+- `approved_memory_canon_mutation`
+- `owner_confirmed_only`
+- `audited_promotion`
+- `candidate_to_approved_boundary`
+- `no_auto_promotion`
+- `no_confidence_as_truth`
+- `no_queue_presence_as_approval`
+- `no_extraction_as_canon`
+- `no_generated_prose`
+- `generated_prose_permanently_forbidden`
+- `no_model_calls`
+- `no_runtime_extraction`
+- `no_raw_artifact_persistence`
+- `no_training_artifacts`

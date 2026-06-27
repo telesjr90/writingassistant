@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-017",
+  "title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-016"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "mvp_required_apply_promotion",
+    "approved_memory_canon_mutation",
+    "owner_confirmed_only",
+    "audited_promotion",
+    "candidate_to_approved_boundary",
+    "no_auto_promotion",
+    "no_confidence_as_truth",
+    "no_queue_presence_as_approval",
+    "no_extraction_as_canon",
+    "no_generated_prose",
+    "generated_prose_permanently_forbidden",
+    "no_model_calls",
+    "no_runtime_extraction",
+    "no_raw_artifact_persistence",
+    "no_training_artifacts"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-017.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-017.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-016.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-016.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-016.enrichment.json",
+    "future_parent_sequence": [
+      "PHASE8-IMPL-018",
+      "PHASE8-IMPL-019",
+      "PHASE8-IMPL-020",
+      "PHASE8-IMPL-021",
+      "PHASE8-IMPL-022"
+    ],
+    "child_sequence": [
+      "PHASE8-IMPL-017-T001",
+      "PHASE8-IMPL-017-T002",
+      "PHASE8-IMPL-017-T003",
+      "PHASE8-IMPL-017-T004",
+      "PHASE8-IMPL-017-T005",
+      "PHASE8-IMPL-017-T006",
+      "PHASE8-IMPL-017-T007"
+    ]
+  },
+  "current_child_status": {
+    "PHASE8-IMPL-017-T001": "complete/PASS parent publication/inventory/enrichment/status alignment",
+    "PHASE8-IMPL-017-T002": "ready/active apply-promotion boundary decision and audit model",
+    "PHASE8-IMPL-017-T003": "planned tests-first expected-red apply-promotion contract",
+    "PHASE8-IMPL-017-T004": "planned minimal backend apply-promotion service/route implementation",
+    "PHASE8-IMPL-017-T005": "planned frontend apply-promotion confirmation workflow/surface",
+    "PHASE8-IMPL-017-T006": "planned approved memory/canon mutation safety regression",
+    "PHASE8-IMPL-017-T007": "planned parent closeout"
+  },
+  "publication_summary": {
+    "mvp_required": true,
+    "follows": "PHASE8-IMPL-016",
+    "owns": "future apply-promotion and approved memory/canon mutation boundary",
+    "t001_scope": "docs/status publication only",
+    "owner_confirmation": "apply-promotion must be explicit owner-confirmed only",
+    "audit": "promotion records must be audited before approved memory/canon mutation",
+    "no_automatic_promotion": "confidence, queue status, model output, extraction, raw artifacts, and candidate persistence cannot promote or create canon",
+    "no_generated_prose": "generated prose and prose-production paths remain permanently forbidden",
+    "no_model_calls": "apply-promotion must not call models or generate prose",
+    "future_parent_deferrals": {
+      "PHASE8-IMPL-018": "raw artifact persistence",
+      "PHASE8-IMPL-019": "runtime extraction plus real BookNLP/spaCy install/run/import",
+      "PHASE8-IMPL-020": "model-assisted evidence-backed extraction",
+      "PHASE8-IMPL-021": "NCP/Subtxt/dramatica-flow analysis-only runtime",
+      "PHASE8-IMPL-022": "end-to-end MVP validation"
+    }
+  }
+}

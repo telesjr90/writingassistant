@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-017",
     "current_parent_task_title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
-    "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 (roadmap/status closeout; docs/status only). PHASE8-IMPL-016-T001 through T007 are complete/PASS. T004 delivered the minimal backend review-action command route/helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions as response-only review workflow command acceptance/rejection. T005 delivered the frontend owner-action review workflow/surface with deterministic API helper, read-only candidate details, explicit owner-action controls, candidate-only/no-canon warnings, and evidence/provenance/source locator display. T006 delivered focused safety regression coverage at tests/test_owner_action_review_workflow_safety_regression.py. T007 closed the parent as docs/status closeout only. PHASE8-IMPL-016 did not deliver apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, or generated prose/prose-production paths. Last completed parent: PHASE8-IMPL-016 (complete through PHASE8-IMPL-016-T007). Last completed child: PHASE8-IMPL-016-T007 - Parent closeout (complete/PASS). Recommended next parent: PHASE8-IMPL-017 - Apply-promotion contract, audit log, and approved memory/canon mutation boundary (MVP-required; ready/active next pending T001 publication). PHASE8-IMPL-017 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
+      "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 and committed. PHASE8-IMPL-017 is published as the active MVP-required parent after PHASE8-IMPL-017-T001 complete/PASS. PHASE8-IMPL-017 owns future explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation only after explicit owner action. PHASE8-IMPL-017-T002 - Apply-promotion boundary decision and audit model is ready/active next. PHASE8-IMPL-017-T003 through PHASE8-IMPL-017-T007 remain planned. Apply-promotion must never run automatically from confidence, queue status, model output, extraction, candidate persistence, or raw artifact presence. T001 did not implement apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, model calls, generated prose, or training artifacts. PHASE8-IMPL-018 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3579,12 +3579,156 @@
       "context_pack": ".codex-context/PHASE8-IMPL-017/",
       "boundary_tags": [
         "mvp_required_apply_promotion",
-        "mvp_required_memory_canon_mutation",
         "owner_review_required",
         "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_raw_artifact_persistence",
+        "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "ready/active next pending T001 publication"
+      "result": "active MVP-required parent; PHASE8-IMPL-017-T001 complete/PASS; PHASE8-IMPL-017-T002 ready/active next"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T001",
+      "title": "Parent publication/inventory/enrichment/status alignment",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "mvp_required_apply_promotion",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_raw_artifact_persistence",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "complete/PASS docs/status publication only; did not implement apply-promotion, approved memory/canon mutation, runtime behavior, raw persistence, extraction, model calls, generated prose, or training artifacts"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T002",
+      "title": "Apply-promotion boundary decision and audit model",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017-T001"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_raw_artifact_persistence",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "ready/active next"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T003",
+      "title": "Tests-first expected-red apply-promotion contract",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017-T002"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T004",
+      "title": "Minimal backend apply-promotion service/route implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017-T003"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T005",
+      "title": "Frontend apply-promotion confirmation workflow/surface",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017-T004"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T006",
+      "title": "Approved memory/canon mutation safety regression",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017-T005"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-017-T007",
+      "title": "Parent closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-017",
+      "depends_on": [
+        "PHASE8-IMPL-017-T006"
+      ],
+      "boundary_tags": [
+        "mvp_required_apply_promotion",
+        "no_runtime_feature_scope",
+        "no_model_calls",
+        "no_runtime_extraction",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
     },
     {
       "id": "PHASE8-IMPL-018",
