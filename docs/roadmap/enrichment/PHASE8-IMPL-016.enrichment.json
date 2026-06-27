@@ -29,6 +29,7 @@
     "task_record": "docs/roadmap/tasks/PHASE8-IMPL-016.md",
     "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-016.md",
     "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-016.enrichment.json",
+    "t002_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-016-owner-action-execution-boundary-decision.md",
     "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-015.md",
     "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-015.md",
     "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json",
@@ -49,5 +50,23 @@
       "PHASE8-IMPL-016-T006",
       "PHASE8-IMPL-016-T007"
     ]
+  }
+  ,
+  "current_child_status": {
+    "PHASE8-IMPL-016-T001": "complete/PASS",
+    "PHASE8-IMPL-016-T002": "complete/PASS owner-action review command boundary decision",
+    "PHASE8-IMPL-016-T003": "ready/active next",
+    "PHASE8-IMPL-016-T004": "planned",
+    "PHASE8-IMPL-016-T005": "planned",
+    "PHASE8-IMPL-016-T006": "planned",
+    "PHASE8-IMPL-016-T007": "planned"
+  },
+  "t002_decision_summary": {
+    "owner_action_execution_purpose": "owner-confirmed candidate review workflow commands affect review workflow state only",
+    "command_taxonomy": "allowed safe review command taxonomy includes acknowledge, request more evidence, defer, reject, quarantine, owner note/rationale metadata, and bounded non-canon review status updates; forbidden taxonomy includes apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model calls, generated prose, and training data",
+    "request_boundary": "future requests carry project_id, queue_entry_id or candidate_id, action_type, actor or owner confirmation marker, explicit confirmation where needed, owner_note/rationale, expected current review status/version, and evidence/provenance/source locator preservation requirements, with no payload that can directly write canon or generate prose",
+    "response_boundary": "future responses report accepted/rejected and updated review workflow state only, immutable candidate linkage, no canon mutation result, no apply-promotion result, no raw artifact result, warnings that queue/candidate/review status is not canon, and fail closed errors",
+    "frontend_workflow": "future frontend workflow separates read-only candidate details from command controls, requires explicit owner action, displays candidate-only/no-canon warnings, preserves evidence/provenance/source locator context, exposes no prose-generation controls, and does not silently execute commands",
+    "next_child": "PHASE8-IMPL-016-T003 ready/active next for tests-first command boundary contract"
   }
 }

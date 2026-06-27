@@ -6,10 +6,10 @@
 - Title: Frontend owner-action execution workflow and review command boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-016-T001` complete/PASS
+- Status: active MVP-required parent; `PHASE8-IMPL-016-T001` complete/PASS; `PHASE8-IMPL-016-T002` complete/PASS
 - Depends on: completed `PHASE8-IMPL-015`
-- Current child: `PHASE8-IMPL-016-T002` ready/active next
-- Child sequence: T001 complete/PASS; T002 ready/active next; T003 planned; T004 planned; T005 planned; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-016-T003` ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 ready/active next; T004 planned; T005 planned; T006 planned; T007 planned
 - Recommended next parent after this one: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 
 ## 2. Why This Parent Exists
@@ -25,6 +25,7 @@ Allowed in this parent:
 - owner-action execution workflow planning
 - review command taxonomy and sequencing
 - explicit owner-confirmed review actions
+- request boundary and response boundary definition for review workflow commands
 - fail-closed/no silent promotion language
 - frontend owner-action workflow/surface planning
 

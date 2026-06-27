@@ -10,7 +10,7 @@ Frontend owner-action execution workflow and review command boundary
 
 ## Status
 
-Active MVP-required parent published after `PHASE8-IMPL-015` closeout. `PHASE8-IMPL-016-T001` is complete/PASS after publishing this parent record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-016-T002` is ready/active next.
+Active MVP-required parent published after `PHASE8-IMPL-015` closeout. `PHASE8-IMPL-016-T001` is complete/PASS after publishing this parent record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-016-T002` is complete/PASS after accepting the owner-action review command boundary decision. `PHASE8-IMPL-016-T003` is ready/active next.
 
 ## Goal
 
@@ -36,8 +36,8 @@ The parent is intentionally narrow. It exists to publish the execution record an
 ## Child Sequence
 
 - T001 — Parent publication/inventory/enrichment/status alignment. Complete/PASS.
-- T002 — Owner-action execution boundary decision: command taxonomy, allowed/forbidden actions, route/frontend sequencing, and explicit deferral of apply-promotion/memory-canon mutation. Ready/active next.
-- T003 — Tests-first command boundary contract for review actions without promotion/canon mutation. Planned.
+- T002 — Owner-action execution boundary decision: command taxonomy, allowed/forbidden actions, request boundary, response boundary, frontend workflow boundary, route/frontend sequencing, no silent promotion, and explicit deferral of apply-promotion/memory-canon mutation. Complete/PASS.
+- T003 — Tests-first command boundary contract for review actions without promotion/canon mutation. Ready/active next.
 - T004 — Minimal backend command route/helper implementation for review-action execution only, no apply-promotion/canon mutation. Planned.
 - T005 — Frontend owner-action workflow/surface implementation or planning path, depending on existing frontend harness/package constraints. Planned.
 - T006 — Safety regression: no silent promotion, no memory/canon mutation, no generated prose, no model/runtime/raw persistence. Planned.

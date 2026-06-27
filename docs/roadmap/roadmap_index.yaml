@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-016",
     "current_parent_task_title": "Frontend owner-action execution workflow and review command boundary",
-    "frontier_note": "PHASE8-IMPL-015 is complete/PASS through PHASE8-IMPL-015-T007 (roadmap/status closeout; docs/status only). T001 complete/PASS; T002 ready/active next. Delivered read-only review queue route implementation in backend/routes/review_queue.py, route contract tests, frontend read-only surface planning decision, and validation-only read-only safety regression with no hardening required. PHASE8-IMPL-016 is active and PHASE8-IMPL-016-T002 is ready/active next. Did not deliver owner action execution, apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, frontend production review surface, or generated prose/prose-production paths. Last completed parent: PHASE8-IMPL-015 (complete through PHASE8-IMPL-015-T007). Last completed child: PHASE8-IMPL-016-T001 - Parent publication/inventory/enrichment/status alignment (complete/PASS docs/status only). Recommended next parent: PHASE8-IMPL-017 - Apply-promotion contract, audit log, and approved memory/canon mutation boundary (MVP-required; deferred until after PHASE8-IMPL-016). PHASE8-IMPL-017 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden."
+    "frontier_note": "PHASE8-IMPL-015 is complete/PASS through PHASE8-IMPL-015-T007 (roadmap/status closeout; docs/status only). PHASE8-IMPL-016 is active. PHASE8-IMPL-016-T001 is complete/PASS and PHASE8-IMPL-016-T002 is complete/PASS after accepting the owner-action review command boundary decision. PHASE8-IMPL-016-T003 is ready/active next. Delivered read-only review queue route implementation in backend/routes/review_queue.py, route contract tests, frontend read-only surface planning decision, and validation-only read-only safety regression with no hardening required. PHASE8-IMPL-016-T002 delivered docs/decision only: owner-confirmed review command taxonomy, allowed/forbidden command boundary, request boundary, response boundary, frontend workflow boundary, fail closed/quarantine policy, T003 test implications, and explicit deferrals. Did not deliver owner action execution, command routes, apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, frontend production review surface, or generated prose/prose-production paths. Last completed parent: PHASE8-IMPL-015 (complete through PHASE8-IMPL-015-T007). Last completed child: PHASE8-IMPL-016-T002 - Owner-action execution boundary decision (complete/PASS docs/decision only). Recommended next parent: PHASE8-IMPL-017 - Apply-promotion contract, audit log, and approved memory/canon mutation boundary (MVP-required; deferred until after PHASE8-IMPL-016). PHASE8-IMPL-017 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3190,7 +3190,7 @@
       "context_pack": ".codex-context/PHASE8-IMPL-015/",
       "result": "complete",
       "final_summary": "Complete/PASS through PHASE8-IMPL-015-T007 (docs/status closeout). T001 published the parent task record, inventory, enrichment JSON, and roadmap/status updates. T002 created the route/read-only frontend reconciliation decision with four GET-only read-only review queue routes over backend.review_api, backend/routes/review_queue.py authorized for T004 only, owner action command HTTP routes deferred to PHASE8-IMPL-016, and T005 directed to a frontend implementation plan unless a usable frontend/component test harness exists without package changes. T003 added tests/test_writer_assistant_review_api_routes_contract.py. T004 created backend/routes/review_queue.py and minimally included the router from backend/main.py; route contract PASS. T005 created the frontend read-only surface planning decision because no usable frontend/component test harness exists without package changes. T006 passed validation-only read-only safety regression with no hardening required. T007 closed the parent as docs/status only. Delivered read-only review queue route implementation, route contract tests, frontend read-only surface planning decision, and read-only safety regression. Did not deliver owner action execution, apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, frontend production review surface, or generated prose/prose-production paths. Recommended next parent: PHASE8-IMPL-016 - Frontend owner-action execution workflow and review command boundary (MVP-required; active after T001 publication). PHASE8-IMPL-017 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.",
-      "notes": "Complete after T007. T001 complete/PASS; T002 ready/active next. T004 created backend/routes/review_queue.py with four GET-only read-only review queue routes and minimally included the router from backend/main.py. T005 followed the planning path and created docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md without production frontend files. T006 required no conditional hardening. T007 closed the parent as docs/status closeout only and recommends PHASE8-IMPL-016 as the next MVP-required parent. No owner action command HTTP routes, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, frontend production review surface, package/dependency changes, model calls, generated prose/prose-production paths, or training/JSONL/dataset work was added."
+      "notes": "Complete after T007. T001 through T007 complete/PASS. T004 created backend/routes/review_queue.py with four GET-only read-only review queue routes and minimally included the router from backend/main.py. T005 followed the planning path and created docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md without production frontend files. T006 required no conditional hardening. T007 closed the parent as docs/status closeout only and recommends PHASE8-IMPL-016 as the next MVP-required parent. No owner action command HTTP routes, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, frontend production review surface, package/dependency changes, model calls, generated prose/prose-production paths, or training/JSONL/dataset work was added."
     },
     {
       "id": "PHASE8-IMPL-015-T001",
@@ -3425,7 +3425,7 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "active; T001 complete/PASS and T002 ready/active next"
+  "result": "active; T001 complete/PASS; T002 complete/PASS; T003 ready/active next"
     },
     {
       "id": "PHASE8-IMPL-016-T001",
@@ -3451,25 +3451,26 @@
       "id": "PHASE8-IMPL-016-T002",
       "title": "Owner-action execution boundary decision",
       "type": "planning_microtask",
-      "status": "active",
-      "parent": "PHASE8-IMPL-016",
-      "depends_on": [
-        "PHASE8-IMPL-016-T001"
-      ],
-      "boundary_tags": [
+  "status": "done",
+  "parent": "PHASE8-IMPL-016",
+  "depends_on": [
+    "PHASE8-IMPL-016-T001"
+  ],
+  "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-016-owner-action-execution-boundary-decision.md",
+  "boundary_tags": [
         "owner_review_required",
         "owner_action_api_planning",
         "no_apply_promotion",
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "ready/active next"
+  "result": "complete/PASS docs/decision only; accepted docs/roadmap/decisions/PHASE8-IMPL-016-owner-action-execution-boundary-decision.md"
     },
     {
       "id": "PHASE8-IMPL-016-T003",
       "title": "Tests-first command boundary contract for review actions without promotion/canon mutation",
       "type": "runtime_microtask",
-      "status": "planned",
+  "status": "active",
       "parent": "PHASE8-IMPL-016",
       "depends_on": [
         "PHASE8-IMPL-016-T002"
@@ -3481,7 +3482,7 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned"
+  "result": "ready/active next"
     },
     {
       "id": "PHASE8-IMPL-016-T004",
