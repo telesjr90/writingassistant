@@ -6,9 +6,9 @@
 - Title: Review API route implementation and read-only frontend review queue surface
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active after `PHASE8-IMPL-015-T004`
+- Status: active after `PHASE8-IMPL-015-T005`
 - Depends on: completed `PHASE8-IMPL-014` (complete through `PHASE8-IMPL-014-T007`)
-- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` complete/PASS expected-red; `PHASE8-IMPL-015-T004` complete/PASS; `PHASE8-IMPL-015-T005` ready/active; `PHASE8-IMPL-015-T006` through `PHASE8-IMPL-015-T007` planned
+- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` complete/PASS expected-red; `PHASE8-IMPL-015-T004` complete/PASS; `PHASE8-IMPL-015-T005` complete/PASS; `PHASE8-IMPL-015-T006` ready/active; `PHASE8-IMPL-015-T007` planned
 - Recommended next parent: `PHASE8-IMPL-016` - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published after `PHASE8-IMPL-015-T007`)
 
 ## 2. Why This Parent Exists
@@ -119,6 +119,7 @@ Still missing/deferred after this parent:
 - Read-only review queue routes registered in `backend/routes/review_queue.py`, with minimal `backend/main.py` inclusion only as needed, wrapping `backend.review_api` helpers only. T004 completed this target with four GET-only routes.
 - Read-only route response projection of the existing `backend.review_api` helper shapes only; no new helper shapes in `backend.review_api` unless T006 read-only safety fix is required.
 - Optional frontend API helper module `frontend/src/api/reviewQueue.js` and read-only review queue surface component `frontend/src/components/ReviewQueueSurface.jsx`, or a frontend implementation plan if T005 follows the planning path.
+- T005 followed the planning path and created `docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md` because no usable frontend/component test harness exists without package changes. No production frontend files or frontend tests were added.
 - No owner action command HTTP route, no apply-promotion route, no memory/canon mutation route, no raw persistence route, no runtime extraction route, no model integration route, no generated prose route.
 - No frontend owner action command controls, no apply-promotion controls, no memory/canon write controls, no runtime extraction controls, no raw artifact persistence controls, no model call controls, no generated prose controls.
 
@@ -236,8 +237,8 @@ Explicitly excluded for the entire parent:
 
 1. `PHASE8-IMPL-015-T001` - Publish review API route implementation and read-only frontend review queue surface parent. Status: complete.
 2. `PHASE8-IMPL-015-T002` - Route/read-only frontend implementation reconciliation decision. Status: complete.
-3. `PHASE8-IMPL-015-T003` - Backend route contract tests for read-only review queue endpoints. Status: ready/active.
-4. `PHASE8-IMPL-015-T004` - Minimal backend route implementation over `backend.review_api` for read-only review queue endpoints. Status: planned.
-5. `PHASE8-IMPL-015-T005` - Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints. Status: planned.
-6. `PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening. Status: planned.
+3. `PHASE8-IMPL-015-T003` - Backend route contract tests for read-only review queue endpoints. Status: complete/PASS expected-red.
+4. `PHASE8-IMPL-015-T004` - Minimal backend route implementation over `backend.review_api` for read-only review queue endpoints. Status: complete/PASS.
+5. `PHASE8-IMPL-015-T005` - Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints. Status: complete/PASS.
+6. `PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening. Status: ready/active.
 7. `PHASE8-IMPL-015-T007` - Roadmap/status closeout. Status: planned.

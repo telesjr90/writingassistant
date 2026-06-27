@@ -1,3 +1,49 @@
+# PHASE8-IMPL-015-T005 Frontend Read-Only Surface Implementation Decision
+
+### Result
+
+- Result: PASS.
+- Scope: frontend API helper/read-only review queue surface contract or implementation plan.
+- Parent task: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface.
+- Path decision: planning path. `frontend/package.json` has no usable frontend/component test harness because `npm test` exits with `Error: no test specified`, and no root `package.json` exists.
+- Decision file: `docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md`.
+- Next child: `PHASE8-IMPL-015-T006` - Route/frontend read-only safety regression or conditional hardening (ready/active).
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md` (this entry)
+- Updated: `docs/roadmap/decision_log.md`
+
+### Decision Summary
+
+- Future helper candidate: `frontend/src/api/reviewQueue.js`, GET-only, read-only list/get/index/summary calls.
+- Future surface candidate: `frontend/src/components/ReviewQueueSurface.jsx`, read-only display only.
+- Allowed fields include queue entry ID, candidate linkage, candidate kind/type when present, status/review state, evidence, provenance, source document, source locator, raw refs as support-only metadata, confidence as uncertainty/support strength, normalization status, `human_review_required`, warnings/errors, and read-only/no-promotion/no-canon metadata.
+- Required labels include pending candidates are not canon, queue presence is not approval, valid API response is not owner approval, confidence is uncertainty/support strength, frontend display is not promotion, and owner action/apply-promotion/memory-canon mutation/runtime-model-generated-prose behavior is not available in this parent.
+
+### Validation Results
+
+- Backend route contract: PASS.
+- Existing review API contract: PASS.
+- Review queue storage + candidate review gate regressions: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- T005 decision content check: PASS.
+- Git diff check: PASS.
+- Source-cache safety: PASS.
+
+### Boundary Confirmation
+
+- No backend route changes, production frontend files, frontend tests, package/dependency files, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model calls, generated prose, source-cache changes, staging, commit, or push.
+
 # PHASE8-IMPL-015-T004 Minimal Backend Read-Only Route Implementation
 
 ### Result

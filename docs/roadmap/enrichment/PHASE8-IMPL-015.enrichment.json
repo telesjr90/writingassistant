@@ -67,9 +67,9 @@
     "route_read_only_frontend_implementation_reconciliation_decision": "docs/roadmap/decisions/PHASE8-IMPL-015-route-read-only-frontend-implementation-reconciliation-decision.md",
     "future_route_module": "backend/routes/review_queue.py (authorized by T002 for T004 only and only for read-only review queue GET routes; backend/main.py may be edited only for minimal router inclusion)",
     "future_read_only_route_contract_test": "tests/test_writer_assistant_review_api_routes_contract.py",
-    "future_frontend_read_only_surface_decision": "docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md",
-    "future_frontend_review_api_helper_module": "frontend/src/api/reviewQueue.js (placeholder if T005 authorizes implementation)",
-    "future_frontend_review_queue_component": "frontend/src/components/ReviewQueueSurface.jsx (placeholder if T005 authorizes implementation)"
+    "frontend_read_only_surface_decision": "docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md",
+    "future_frontend_review_api_helper_module": "frontend/src/api/reviewQueue.js (planned by T005 only; not implemented)",
+    "future_frontend_review_queue_component": "frontend/src/components/ReviewQueueSurface.jsx (planned by T005 only; not implemented)"
   },
   "context_pack": ".codex-context/PHASE8-IMPL-015/",
   "goal": "Publish the implementation parent that authorizes route wiring over the existing backend.review_api helper module (T003-T005 from PHASE8-IMPL-014) and a read-only frontend review queue surface, while keeping owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, and NCP/Subtxt/dramatica-flow runtime integration out of this parent unless a later child explicitly authorizes a narrow display-only boundary. PHASE8-IMPL-015-T001 is docs/status/planning only and does not register routes, modify backend/main.py or backend/app.py, modify frontend files, implement frontend review UI, implement frontend API helpers, implement owner action execution, implement apply-promotion, mutate memory/canon, persist raw artifacts, implement runtime extraction, install or import BookNLP/spaCy, run a model, or generate prose.",
@@ -248,27 +248,28 @@
       "id": "PHASE8-IMPL-015-T005",
       "title": "Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-015-T004"
       ],
       "scope": [
         "T005 scope depends on the existing frontend test harness decision in T002.",
         "Produce a frontend implementation plan unless an existing frontend/component test harness is available without package changes at T005 start.",
-        "If frontend contract tests are available without package changes: add frontend API helper + read-only review queue surface contract tests only (tests-first or expected-red).",
-        "If T005 follows the planning path: produce a frontend implementation plan at docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md.",
+        "T005 followed the planning path because frontend/package.json has no runnable test harness and no root package.json exists.",
+        "Created docs/roadmap/decisions/PHASE8-IMPL-015-frontend-read-only-surface-implementation-decision.md.",
+        "Planned frontend/src/api/reviewQueue.js as a future GET-only read-only helper and frontend/src/components/ReviewQueueSurface.jsx as a future read-only display surface.",
         "Do not register routes in backend/main.py or any new route file.",
         "Do not modify backend.review_api.py or backend/story_knowledge/review_queue_storage.py beyond narrow T006 read-only safety fixes.",
         "Do not implement owner action command controls, frontend owner-action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model integration, or generated prose.",
         "No package or dependency changes."
       ],
-      "result": "ready/active"
+      "result": "PASS planning path; no production frontend files, frontend tests, package files, backend routes, owner action execution, apply-promotion, memory/canon mutation, raw persistence, runtime extraction, model calls, generated prose, or source-cache changes"
     },
     {
       "id": "PHASE8-IMPL-015-T006",
       "title": "Route/frontend read-only safety regression or conditional hardening",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-015-T005"
       ],
@@ -282,7 +283,7 @@
         "Confirm BookNLP/spaCy availability guard reports both false.",
         "Conditional hardening inside the approved files only."
       ],
-      "result": "planned"
+      "result": "ready/active"
     },
     {
       "id": "PHASE8-IMPL-015-T007",
@@ -310,7 +311,8 @@
     "PHASE8-IMPL-015-T002 is complete.",
     "PHASE8-IMPL-015-T003 is complete/PASS expected-red.",
     "PHASE8-IMPL-015-T004 is complete/PASS.",
-    "PHASE8-IMPL-015-T005 is ready/active.",
+    "PHASE8-IMPL-015-T005 is complete/PASS.",
+    "PHASE8-IMPL-015-T006 is ready/active.",
     "T001 records PHASE8-IMPL-014 complete through T007.",
     "T001 records the backend.review_api helper module boundary from PHASE8-IMPL-014 as preserved.",
     "T001 records the review queue as workflow support only and queue presence as non-approval.",
