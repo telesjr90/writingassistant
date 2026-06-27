@@ -6,9 +6,9 @@
 - Title: Review API route implementation and read-only frontend review queue surface
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active after `PHASE8-IMPL-015-T003`
+- Status: active after `PHASE8-IMPL-015-T004`
 - Depends on: completed `PHASE8-IMPL-014` (complete through `PHASE8-IMPL-014-T007`)
-- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` complete/PASS expected-red; `PHASE8-IMPL-015-T004` ready/active; `PHASE8-IMPL-015-T005` through `PHASE8-IMPL-015-T007` planned
+- Current child: `PHASE8-IMPL-015-T001` complete; `PHASE8-IMPL-015-T002` complete; `PHASE8-IMPL-015-T003` complete/PASS expected-red; `PHASE8-IMPL-015-T004` complete/PASS; `PHASE8-IMPL-015-T005` ready/active; `PHASE8-IMPL-015-T006` through `PHASE8-IMPL-015-T007` planned
 - Recommended next parent: `PHASE8-IMPL-016` - Frontend owner-action execution workflow and review command boundary (MVP-required; recommendation-only until separately published after `PHASE8-IMPL-015-T007`)
 
 ## 2. Why This Parent Exists
@@ -92,7 +92,7 @@ From `PHASE8-IMPL-011`, `PHASE8-IMPL-012`, `PHASE8-IMPL-013`, and `PHASE8-IMPL-0
 
 Implemented in this parent (planned scope):
 
-- backend read-only review queue routes wrapping `backend.review_api` helpers only;
+- backend read-only review queue routes wrapping `backend.review_api` helpers only (complete/PASS in T004);
 - backend route file `backend/routes/review_queue.py` authorized by T002 for T004 only and only for read-only review queue GET routes;
 - optional frontend API helper module and optional read-only review queue surface component, or a frontend implementation plan if T005 confirms frontend tests/implementation would require package or harness changes;
 - read-only route contract tests at the FastAPI test client level in `tests/test_writer_assistant_review_api_routes_contract.py`;
@@ -116,7 +116,7 @@ Still missing/deferred after this parent:
 
 ## 6. Implementation Target
 
-- Read-only review queue routes registered in `backend/routes/review_queue.py`, with minimal `backend/main.py` inclusion only as needed, wrapping `backend.review_api` helpers only.
+- Read-only review queue routes registered in `backend/routes/review_queue.py`, with minimal `backend/main.py` inclusion only as needed, wrapping `backend.review_api` helpers only. T004 completed this target with four GET-only routes.
 - Read-only route response projection of the existing `backend.review_api` helper shapes only; no new helper shapes in `backend.review_api` unless T006 read-only safety fix is required.
 - Optional frontend API helper module `frontend/src/api/reviewQueue.js` and read-only review queue surface component `frontend/src/components/ReviewQueueSurface.jsx`, or a frontend implementation plan if T005 follows the planning path.
 - No owner action command HTTP route, no apply-promotion route, no memory/canon mutation route, no raw persistence route, no runtime extraction route, no model integration route, no generated prose route.

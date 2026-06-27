@@ -404,7 +404,8 @@ def test_single_entry_route_fails_closed_for_unsafe_queue_entry_ids(
     route_client: RouteClient,
     unsafe_queue_entry_id: str,
 ):
-    path = f"/api/projects/{PROJECT_ID}/review-queue/{unsafe_queue_entry_id}"
+    path_entry_id = "%2E" if unsafe_queue_entry_id == "." else unsafe_queue_entry_id
+    path = f"/api/projects/{PROJECT_ID}/review-queue/{path_entry_id}"
 
     response = route_client.get(path)
 

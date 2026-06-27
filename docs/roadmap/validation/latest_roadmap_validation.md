@@ -1,3 +1,53 @@
+# PHASE8-IMPL-015-T004 Minimal Backend Read-Only Route Implementation
+
+### Result
+
+- Result: PASS.
+- Scope: minimal backend route implementation over `backend.review_api` plus approved roadmap/status updates.
+- Parent task: `PHASE8-IMPL-015` - Review API route implementation and read-only frontend review queue surface.
+- Runtime files: created `backend/routes/review_queue.py`; updated `backend/main.py` only for router inclusion.
+- Test harness note: `tests/test_writer_assistant_review_api_routes_contract.py` was adjusted only for the unsafe `.` queue-entry path case because `httpx` normalizes a literal `/.` before the ASGI app receives it.
+
+### Files Changed
+
+- Created: `backend/routes/review_queue.py`
+- Updated: `backend/main.py`
+- Updated: `tests/test_writer_assistant_review_api_routes_contract.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-015.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-015.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md` (this entry)
+- Updated: `docs/roadmap/decision_log.md`
+
+### Route Summary
+
+- `GET /api/projects/{project_id}/review-queue` wraps `list_review_queue_entries_readonly`.
+- `GET /api/projects/{project_id}/review-queue/{queue_entry_id}` wraps `get_review_queue_entry_readonly`.
+- `GET /api/projects/{project_id}/review-queue/index` wraps `get_review_queue_index_readonly`.
+- `GET /api/projects/{project_id}/review-queue/summary` wraps `get_review_queue_summary_readonly`.
+- All routes validate through `validate_review_queue_read_request`, reject unknown query fields and forbidden GET request bodies, fail closed on unsafe IDs/invalid query values/malformed helper payloads, and preserve helper response support fields.
+
+### Validation Results
+
+- Route contract collect-only: PASS.
+- Route contract run: PASS.
+- Existing review API contract: PASS.
+- Review queue storage + candidate review gate regressions: PASS.
+- `python3 scripts/check_enrichment.py`: PASS.
+- `python3 scripts/validate_roadmap.py`: PASS.
+- Route source boundary check: PASS.
+- Main router inclusion check: PASS.
+- Git diff check: PASS.
+- Source-cache safety: PASS.
+
+### Boundary Confirmation
+
+- No owner action command route, write route, owner action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model call, generated prose, frontend change, package change, runtime project file, training/model/source-cache change, staging, commit, or push was added.
+
 # PHASE8-IMPL-015-T003 Backend Route Contract Tests
 
 ### Result

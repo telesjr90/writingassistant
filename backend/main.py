@@ -7,10 +7,12 @@ from pydantic import BaseModel
 
 try:
     from . import analysis_engine, project_manager, storyform
+    from .routes import review_queue
 except ImportError:  # pragma: no cover - supports uvicorn main:app from backend/
     import analysis_engine
     import project_manager
     import storyform
+    from routes import review_queue
 
 
 class ProjectCreate(BaseModel):
@@ -83,6 +85,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(review_queue.router)
 
 
 def _patch_route(path: str):

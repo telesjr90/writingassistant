@@ -226,7 +226,7 @@
       "id": "PHASE8-IMPL-015-T004",
       "title": "Minimal backend route implementation over backend.review_api for read-only review queue endpoints",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "complete",
       "depends_on": [
         "PHASE8-IMPL-015-T003"
       ],
@@ -242,13 +242,13 @@
         "No FastAPI route that performs apply-promotion, executes owner actions, or auto-promotes candidates.",
         "No frontend changes; no package or dependency changes."
       ],
-      "result": "ready/active"
+      "result": "PASS; created backend/routes/review_queue.py with four GET-only read-only review queue routes, included the router from backend/main.py, and moved tests/test_writer_assistant_review_api_routes_contract.py from expected-red to PASS"
     },
     {
       "id": "PHASE8-IMPL-015-T005",
       "title": "Frontend API helper/read-only review queue surface contract or implementation plan, depending on existing frontend test harness constraints",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "depends_on": [
         "PHASE8-IMPL-015-T004"
       ],
@@ -262,7 +262,7 @@
         "Do not implement owner action command controls, frontend owner-action execution, apply-promotion, memory/canon mutation, raw artifact persistence, runtime extraction, model integration, or generated prose.",
         "No package or dependency changes."
       ],
-      "result": "planned"
+      "result": "ready/active"
     },
     {
       "id": "PHASE8-IMPL-015-T006",
@@ -309,7 +309,8 @@
     "PHASE8-IMPL-015-T001 is complete.",
     "PHASE8-IMPL-015-T002 is complete.",
     "PHASE8-IMPL-015-T003 is complete/PASS expected-red.",
-    "PHASE8-IMPL-015-T004 is ready/active.",
+    "PHASE8-IMPL-015-T004 is complete/PASS.",
+    "PHASE8-IMPL-015-T005 is ready/active.",
     "T001 records PHASE8-IMPL-014 complete through T007.",
     "T001 records the backend.review_api helper module boundary from PHASE8-IMPL-014 as preserved.",
     "T001 records the review queue as workflow support only and queue presence as non-approval.",
@@ -461,12 +462,42 @@
     "ncp_subtxt_dramatica_flow_runtime_added": false,
     "training_jsonl_dataset_changed": false
   },
-  "t003_status": "ready",
-  "t003_result": "pending",
-  "t004_status": "planned",
-  "t004_result": "pending",
-  "t005_status": "planned",
-  "t005_result": "pending",
+  "t003_status": "complete",
+  "t003_result": "PASS expected-red route contract",
+  "t004_status": "complete",
+  "t004_result": "PASS minimal read-only backend route implementation",
+  "t004_validation_results": {
+    "route_contract_collect_only": "PASS",
+    "route_contract_run": "PASS",
+    "existing_review_api_contract": "PASS",
+    "review_queue_storage_candidate_gate_regressions": "PASS",
+    "check_enrichment": "PASS",
+    "validate_roadmap": "PASS",
+    "route_source_boundary_check": "PASS",
+    "main_router_inclusion_check": "PASS",
+    "git_diff_check": "PASS",
+    "source_cache_safety": "PASS"
+  },
+  "t004_changes": {
+    "backend_routes_review_queue_created": true,
+    "backend_main_modified": true,
+    "route_contract_test_harness_adjusted": true,
+    "frontend_files_changed": false,
+    "package_files_changed": false,
+    "runtime_project_files_changed": false,
+    "training_jsonl_dataset_changed": false,
+    "source_cache_changed": false,
+    "owner_action_api_routes_implemented": false,
+    "owner_action_execution_implemented": false,
+    "apply_promotion_added": false,
+    "memory_canon_mutation": false,
+    "raw_artifact_persistence_added": false,
+    "runtime_extraction_added": false,
+    "model_call_added": false,
+    "generated_prose_added": false
+  },
+  "t005_status": "ready",
+  "t005_result": "ready/active",
   "t006_status": "planned",
   "t006_result": "pending",
   "t007_status": "planned",
