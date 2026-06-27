@@ -6,10 +6,10 @@
 - Title: Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS
+- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS
 - Depends on: completed `PHASE8-IMPL-016`
-- Current child: `PHASE8-IMPL-017-T002` - ready/active next
-- Child sequence: T001 complete/PASS; T002 ready/active; T003 planned; T004 planned; T005 planned; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-017-T003` - ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 ready/active; T004 planned; T005 planned; T006 planned; T007 planned
 
 ## 2. Why This Parent Exists
 
@@ -41,6 +41,24 @@ Forbidden in `PHASE8-IMPL-017-T001`:
 - generated prose or prose-production behavior
 - training/JSONL/dataset/model artifacts
 
+Forbidden in `PHASE8-IMPL-017-T002`:
+
+- backend implementation code changes
+- frontend implementation code changes
+- product test changes
+- apply-promotion runtime implementation
+- approved memory/canon mutation runtime implementation
+- project truth mutation
+- raw artifact persistence
+- runtime extraction
+- BookNLP/spaCy install/run/import
+- model/Ollama calls
+- NCP/Subtxt/dramatica-flow runtime
+- generated prose or prose-production behavior
+- training/JSONL/dataset/model artifacts
+
+`PHASE8-IMPL-017-T002` changed docs/status only and created the decision document `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`. No backend/frontend/tests/runtime files changed.
+
 Required boundary tags for this parent:
 
 - `mvp_required_apply_promotion`
@@ -66,6 +84,7 @@ Required boundary tags for this parent:
 ## 5. Cross-References
 
 - Prior parent: `PHASE8-IMPL-016` - frontend owner-action execution workflow and review command boundary
+- Decision document: `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`
 - Next MVP-required parents: `PHASE8-IMPL-018`, `PHASE8-IMPL-019`, `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, `PHASE8-IMPL-022`
 
 ## 6. Future Parent Deferrals
