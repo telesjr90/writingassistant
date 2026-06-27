@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-017",
     "current_parent_task_title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
-      "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 and committed. PHASE8-IMPL-017 is active after PHASE8-IMPL-017-T002 complete/PASS. PHASE8-IMPL-017 owns future explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation only after explicit owner action. PHASE8-IMPL-017-T002 accepted docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md as docs/decision/status only. PHASE8-IMPL-017-T003 - Tests-first expected-red apply-promotion contract is ready/active next. PHASE8-IMPL-017-T004 through PHASE8-IMPL-017-T007 remain planned. Apply-promotion must never run automatically from confidence, queue status, model output, extraction, candidate persistence, or raw artifact presence. Candidate persistence is not canon; queue presence is not approval; confidence is not truth; raw artifacts are support data. T002 did not implement apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, model calls, generated prose, or training artifacts. PHASE8-IMPL-018 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
+      "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 and committed. PHASE8-IMPL-017 is active after PHASE8-IMPL-017-T003 complete/PASS. PHASE8-IMPL-017 owns future explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation only after explicit owner action. PHASE8-IMPL-017-T002 accepted docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md as docs/decision/status only. PHASE8-IMPL-017-T003 added expected-red contract tests at tests/test_writer_assistant_core_apply_promotion_contract.py; the target fails only because future backend.story_knowledge.apply_promotion APIs do not exist yet. PHASE8-IMPL-017-T004 is ready/active next. PHASE8-IMPL-017-T005 through PHASE8-IMPL-017-T007 remain planned. Apply-promotion must never run automatically from confidence, queue status, model output, extraction, candidate persistence, or raw artifact presence. Candidate persistence is not canon; queue presence is not approval; confidence is not truth; raw artifacts are support data. T003 did not implement apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, model calls, generated prose, or training artifacts. PHASE8-IMPL-018 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3587,7 +3587,7 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "active MVP-required parent; PHASE8-IMPL-017-T001 complete/PASS; PHASE8-IMPL-017-T002 complete/PASS; PHASE8-IMPL-017-T003 ready/active next"
+      "result": "active MVP-required parent; PHASE8-IMPL-017-T001 complete/PASS; PHASE8-IMPL-017-T002 complete/PASS; PHASE8-IMPL-017-T003 complete/PASS expected-red; PHASE8-IMPL-017-T004 ready/active next"
     },
     {
       "id": "PHASE8-IMPL-017-T001",
@@ -3635,7 +3635,7 @@
       "id": "PHASE8-IMPL-017-T003",
       "title": "Tests-first expected-red apply-promotion contract",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-017",
       "depends_on": [
         "PHASE8-IMPL-017-T002"
@@ -3649,13 +3649,13 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "ready/active next"
+      "result": "complete/PASS expected-red contract tests at tests/test_writer_assistant_core_apply_promotion_contract.py; expected-red failure limited to missing backend.story_knowledge.apply_promotion module/API; no runtime behavior implemented"
     },
     {
       "id": "PHASE8-IMPL-017-T004",
       "title": "Minimal backend apply-promotion service/route implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-017",
       "depends_on": [
         "PHASE8-IMPL-017-T003"
@@ -3669,7 +3669,7 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "planned"
+      "result": "ready/active next"
     },
     {
       "id": "PHASE8-IMPL-017-T005",

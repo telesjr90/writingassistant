@@ -6,10 +6,10 @@
 - Title: Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS
+- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff
 - Depends on: completed `PHASE8-IMPL-016`
-- Current child: `PHASE8-IMPL-017-T003` - ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 ready/active; T004 planned; T005 planned; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-017-T004` - ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 ready/active; T005 planned; T006 planned; T007 planned
 
 ## 2. Why This Parent Exists
 
@@ -58,6 +58,24 @@ Forbidden in `PHASE8-IMPL-017-T002`:
 - training/JSONL/dataset/model artifacts
 
 `PHASE8-IMPL-017-T002` changed docs/status only and created the decision document `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`. No backend/frontend/tests/runtime files changed.
+
+Forbidden in `PHASE8-IMPL-017-T003`:
+
+- backend implementation code changes
+- frontend implementation code changes
+- package/dependency changes
+- apply-promotion runtime implementation
+- approved memory/canon mutation runtime implementation
+- project truth mutation
+- raw artifact persistence
+- runtime extraction
+- BookNLP/spaCy install/run/import
+- model/Ollama calls
+- NCP/Subtxt/dramatica-flow runtime
+- generated prose or prose-production behavior
+- training/JSONL/dataset/model artifacts
+
+`PHASE8-IMPL-017-T003` added only `tests/test_writer_assistant_core_apply_promotion_contract.py` as an expected-red contract for future `backend.story_knowledge.apply_promotion` APIs. The target is expected to fail only because the future module/API is absent before T004.
 
 Required boundary tags for this parent:
 

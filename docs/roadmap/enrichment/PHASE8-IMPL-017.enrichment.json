@@ -55,8 +55,8 @@
   "current_child_status": {
     "PHASE8-IMPL-017-T001": "complete/PASS parent publication/inventory/enrichment/status alignment",
     "PHASE8-IMPL-017-T002": "complete/PASS apply-promotion boundary decision and audit model docs/status only",
-    "PHASE8-IMPL-017-T003": "ready/active next tests-first expected-red apply-promotion contract",
-    "PHASE8-IMPL-017-T004": "planned minimal backend apply-promotion service/route implementation",
+    "PHASE8-IMPL-017-T003": "complete/PASS tests-first expected-red apply-promotion contract at tests/test_writer_assistant_core_apply_promotion_contract.py; expected-red failure limited to missing backend.story_knowledge.apply_promotion module/API",
+    "PHASE8-IMPL-017-T004": "ready/active next minimal backend apply-promotion service/route implementation",
     "PHASE8-IMPL-017-T005": "planned frontend apply-promotion confirmation workflow/surface",
     "PHASE8-IMPL-017-T006": "planned approved memory/canon mutation safety regression",
     "PHASE8-IMPL-017-T007": "planned parent closeout"
@@ -67,6 +67,8 @@
     "owns": "future apply-promotion and approved memory/canon mutation boundary",
     "t001_scope": "docs/status publication only",
     "t002_scope": "docs/decision/status only; no backend/frontend/tests/runtime files changed",
+    "t003_scope": "tests/docs/status only; expected-red contract tests added without runtime implementation",
+    "t003_contract_path": "tests/test_writer_assistant_core_apply_promotion_contract.py",
     "t002_decision_path": "docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md",
     "owner_confirmation": "apply-promotion must be explicit owner-confirmed only",
     "audit": "promotion records must be audited before approved memory/canon mutation",

@@ -1,19 +1,19 @@
-# PHASE8-IMPL-017-T002 Apply-Promotion Boundary Decision and Audit Model
+# PHASE8-IMPL-017-T003 Expected-Red Apply-Promotion Contract
 
 ### Result
 
 - Result: PASS.
-- Scope: docs/decision/status only.
+- Scope: tests/docs/status only.
 - Parent task: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary.
-- Completed child recorded: `PHASE8-IMPL-017-T002` - Apply-promotion boundary decision and audit model.
-- Decision document: `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`.
-- Prior child: `PHASE8-IMPL-017-T001` - complete/PASS and committed.
-- Next child: `PHASE8-IMPL-017-T003` - Tests-first expected-red apply-promotion contract (ready/active next).
-- No context tools were run inside T002. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+- Completed child recorded: `PHASE8-IMPL-017-T003` - Tests-first expected-red apply-promotion contract.
+- Expected-red contract: `tests/test_writer_assistant_core_apply_promotion_contract.py`.
+- Prior child: `PHASE8-IMPL-017-T002` - complete/PASS and committed.
+- Next child: `PHASE8-IMPL-017-T004` - Minimal backend apply-promotion service/route implementation (ready/active next).
+- No context tools were run inside T003. Generated context artifacts remain evidence only, not roadmap truth or task completion.
 
 ### Files Changed
 
-- Created: `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`
+- Created: `tests/test_writer_assistant_core_apply_promotion_contract.py`
 - Updated: `docs/roadmap/tasks/PHASE8-IMPL-017.md`
 - Updated: `docs/roadmap/inventory/PHASE8-IMPL-017.md`
 - Updated: `docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json`
@@ -23,24 +23,18 @@
 - Updated: `docs/roadmap/phase_map.md`
 - Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
 - Updated: `docs/roadmap/decision_log.md`
-- Updated: `docs/roadmap/risk_register.md`
-- Updated: `docs/roadmap/open_questions.md`
-- Updated: `docs/master_plan.md`
 
-### Decision Summary
+### Expected-Red Contract Summary
 
-- Apply-promotion is the only approved path from candidate/review workflow state into approved memory/canon for `PHASE8-IMPL-017`.
-- Apply-promotion must be explicit owner-confirmed, audited, evidence/provenance-backed, and fail closed.
-- Candidate records, review queue entries, owner-action review commands, confidence, extraction output, model output, raw artifact refs, and queue presence are not canon.
-- Candidate persistence is not canon; queue presence is not approval; confidence is not truth; raw artifacts are support data.
-- The future audit model requires `promotion_record_id`, `candidate_id`, `destination_type`, `destination_path` or `destination_key`, `owner_confirmation`, `evidence_refs`, `provenance_refs`, `source_locator_refs`, `promotion_status`, `no_generated_prose_confirmation`, `no_model_call_confirmation`, and `no_training_artifact_confirmation`.
-- The future transaction model is two-stage: validate and build a promotion plan, then apply the owner-confirmed promotion plan and write an audit record.
-- Future implementation must fail closed before mutation if validation fails; partial mutation without audit is forbidden.
+- The contract imports the future module path `backend.story_knowledge.apply_promotion`.
+- The expected future public APIs are `validate_promotion_request`, `build_promotion_plan`, `validate_promotion_plan`, `build_promotion_audit_record`, `apply_promotion_plan`, `validate_promotion_audit_record`, `promotion_audit_storage_dir`, `promotion_audit_record_path`, `write_promotion_audit_record`, `read_promotion_audit_record`, and `list_promotion_audit_records`.
+- The target test run is expected-red only because `backend.story_knowledge.apply_promotion` does not exist yet.
+- The expected-red failure shape is limited to `ModuleNotFoundError` or `ImportError` for the missing future module/API.
+- The contract covers promotion request validation, candidate/review boundaries, destination allowlist and forbidden destinations/actions, promotion plan shape, audit record shape, transaction/mutation behavior, fail-closed quarantine cases, and no-prose/no-model/no-training/no-runtime-extraction boundaries.
 
-### Future Parent Sequence
+### Future Child Sequence
 
-- `PHASE8-IMPL-017-T003` is ready/active next.
-- `PHASE8-IMPL-017-T004` remains planned.
+- `PHASE8-IMPL-017-T004` is ready/active next.
 - `PHASE8-IMPL-017-T005` remains planned.
 - `PHASE8-IMPL-017-T006` remains planned.
 - `PHASE8-IMPL-017-T007` remains planned.
@@ -54,7 +48,6 @@
 
 - No backend implementation code changes.
 - No frontend implementation code changes.
-- No product test changes.
 - No package/dependency changes.
 - No apply-promotion runtime implementation.
 - No memory/canon mutation runtime implementation.
