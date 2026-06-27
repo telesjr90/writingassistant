@@ -6,10 +6,10 @@
 - Title: Frontend owner-action execution workflow and review command boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-016-T001` complete/PASS; `PHASE8-IMPL-016-T002` complete/PASS; `PHASE8-IMPL-016-T003` complete/PASS as tests-first expected-red contract
+- Status: active MVP-required parent; `PHASE8-IMPL-016-T001` complete/PASS; `PHASE8-IMPL-016-T002` complete/PASS; `PHASE8-IMPL-016-T003` complete/PASS as tests-first expected-red contract; `PHASE8-IMPL-016-T004` complete/PASS
 - Depends on: completed `PHASE8-IMPL-015`
-- Current child: `PHASE8-IMPL-016-T004` ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 ready/active next; T005 planned; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-016-T005` ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS; T005 ready/active next; T006 planned; T007 planned
 - Recommended next parent after this one: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 
 ## 2. Why This Parent Exists
@@ -18,7 +18,7 @@ The read-only review queue work from `PHASE8-IMPL-015` established display-only 
 
 The parent was docs/status/planning only at T001. T002 accepted the owner-action review command decision. T003 added the expected-red review command route contract for future owner-action candidate review commands, without implementing runtime behavior. Later children can author backend helper wiring, frontend workflow surface, and safety regression in controlled steps.
 
-T003 contract coverage:
+T003/T004 contract coverage:
 
 - future `POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions` route
 - allowed review command validation for `mark_reviewed`, `request_more_evidence`, `defer`, `reject`, `quarantine`, `update_owner_note`, and `set_review_status`
@@ -26,6 +26,7 @@ T003 contract coverage:
 - fail closed malformed/unsafe payload behavior, including queue/candidate mismatch and unsafe write-target fields
 - route separation from read-only GET review queue routes and no apply-promotion route in this parent
 - response boundary with review workflow state only, candidate linkage, evidence/provenance/source locator preservation, no silent promotion, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, and no generated prose
+- T004 minimal backend implementation of the command route/helper as response-only review workflow command acceptance/rejection, with no queue persistence, candidate persistence, apply-promotion, memory/canon mutation, project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifact creation
 
 ## 3. Boundary Summary
 
@@ -47,7 +48,7 @@ Forbidden in this parent:
 - runtime extraction
 - model calls
 - generated prose
-- backend command route implementation
+- backend command route behavior beyond response-only review workflow command acceptance/rejection
 - frontend runtime implementation beyond planning/artifacts in later children
 
 ## 4. MVP Relation

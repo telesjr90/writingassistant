@@ -6,6 +6,7 @@ import math
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from backend import review_api
 
@@ -294,6 +295,75 @@ def _readonly_response(
                 queue_entry_id=valid_request.get("queue_entry_id"),
             ),
         ) from exc
+
+
+def _command_error_response(
+    exc: Exception,
+    *,
+    project_id: str | None = None,
+    queue_entry_id: str | None = None,
+    status_code: int = 422,
+) -> JSONResponse:
+    detail = exc.args[0] if exc.args else "invalid review action command"
+    if isinstance(detail, dict):
+        payload = detail
+    else:
+        payload = {
+            "schema_version": review_api.SCHEMA_VERSION,
+            "status": "rejected",
+            "project_id": project_id,
+            "queue_entry_id": queue_entry_id,
+            "action_type": None,
+            "candidate_id": None,
+            "warnings": [str(detail)],
+            "errors": [str(detail)],
+        }
+    return JSONResponse(status_code=status_code, content=payload)
+
+
+# @router.post /review-queue/{queue_entry_id}/actions
+async def execute_review_queue_action(
+    project_id: str,
+    queue_entry_id: str,
+    request: Request,
+) -> Any:
+    try:
+        payload = await request.json()
+    except ValueError as exc:
+        return _command_error_response(
+            exc,
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            status_code=400,
+        )
+    try:
+        return review_api.execute_review_action_command(
+            payload,
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+        )
+    except review_api.ReviewActionCommandRejected as exc:
+        return _command_error_response(
+            exc,
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            status_code=exc.status_code,
+        )
+    except (TypeError, ValueError) as exc:
+        return _command_error_response(
+            exc,
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            status_code=422,
+        )
+
+
+router.add_api_route(
+    "/{queue_entry_id}/actions",
+    execute_review_queue_action,
+    methods=["POST"],
+    response_model=None,
+)
 
 
 @router.get("")

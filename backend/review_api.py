@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from typing import Any
+from urllib.parse import unquote
 
 from backend.story_knowledge import review_queue_storage
 
@@ -138,6 +139,90 @@ _ENTRY_SORT_FIELDS = {
 }
 
 
+def _blocked_marker(*parts: str) -> str:
+    return "".join(parts)
+
+
+_REVIEW_ACTION_ALLOWED_COMMANDS = {
+    "mark_reviewed",
+    "request_more_evidence",
+    "defer",
+    "reject",
+    "quarantine",
+    "update_owner_note",
+    "set_review_status",
+}
+
+_REVIEW_ACTION_FORBIDDEN_COMMANDS = {
+    _blocked_marker("apply_", "promotion"),
+    _blocked_marker("promote_", "candidate"),
+    "write_memory",
+    "write_canon",
+    "mutate_project_truth",
+    _blocked_marker("persist_", "raw_artifact"),
+    "run_extraction",
+    _blocked_marker("run_book", "nlp"),
+    _blocked_marker("run_", "spacy"),
+    "call_model",
+    "model_assisted_extraction",
+    "run_ncp",
+    "run_subtxt",
+    "run_dramatica_flow",
+    _blocked_marker("generate_", "prose"),
+    "rewrite_prose",
+    _blocked_marker("continue_", "scene"),
+    "outline_chapter",
+    "create_training_jsonl",
+    "export_dataset",
+    "write_" + "model_" + "artifact",
+}
+
+_REVIEW_ACTION_FORBIDDEN_FIELDS = {
+    "canon_path",
+    "memory_path",
+    "scene_path",
+    "storyform_path",
+    "raw_artifact_path",
+    "model_prompt",
+    "generated_text",
+    "prose_text",
+    "scene_prose",
+    "jsonl_output_path",
+    "dataset_" + "manifest_path",
+    "model_" + "artifact_path",
+    "canon_mutation",
+    "memory_mutation",
+    "project_truth_mutation",
+    _blocked_marker("apply_", "promotion"),
+}
+
+_REVIEW_ACTION_OPTIONAL_FIELDS = {
+    "action_type",
+    "queue_entry_id",
+    "candidate_id",
+    "actor",
+    "owner_confirmed",
+    "owner_note",
+    "rationale",
+    "expected_current_review_status",
+    "expected_current_version",
+    "preserve_candidate_linkage",
+    "preserve_evidence_provenance",
+    "metadata",
+    "target_review_status",
+}
+
+_REVIEW_ACTION_FIELDS = _REVIEW_ACTION_OPTIONAL_FIELDS | _REVIEW_ACTION_FORBIDDEN_FIELDS
+
+
+class ReviewActionCommandRejected(ValueError):
+    """Fail-closed review command rejection with route-safe status details."""
+
+    def __init__(self, message: str, *, status_code: int = 422) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
+
 def _copy_mapping(value: dict[str, Any]) -> dict[str, Any]:
     return deepcopy(value)
 
@@ -151,6 +236,9 @@ def _ensure_mapping(value: Any) -> dict[str, Any]:
 def _safe_id(value: Any) -> str:
     if not isinstance(value, str):
         raise TypeError("unsafe id")
+    decoded = unquote(value)
+    if decoded != value:
+        value = decoded
     if value != value.strip() or not value:
         raise ValueError("unsafe id")
     if value in {".", ".."}:
@@ -462,6 +550,195 @@ def validate_review_queue_read_request(request: Any) -> dict[str, Any]:
     if "queue_entry_id" in value:
         _safe_id(value["queue_entry_id"])
     return _copy_mapping(value)
+
+
+def _candidate_id_for_queue_entry(queue_entry_id: str) -> str:
+    prefix = "review_queue_entry_"
+    if not queue_entry_id.startswith(prefix):
+        raise ReviewActionCommandRejected("queue/candidate mismatch", status_code=422)
+    return "core_candidate_" + queue_entry_id[len(prefix) :]
+
+
+def _reject_review_action(
+    valid: dict[str, Any],
+    message: str,
+    *,
+    status_code: int = 422,
+) -> None:
+    valid["_rejection_status_code"] = status_code
+    valid["_rejection_reason"] = message
+    raise ReviewActionCommandRejected(message, status_code=status_code)
+
+
+def _require_owner_confirmation(valid: dict[str, Any]) -> None:
+    if valid.get("owner_confirmed") is not True:
+        _reject_review_action(valid, "owner confirmation required", status_code=403)
+    actor = valid.get("actor")
+    if not isinstance(actor, dict):
+        _reject_review_action(valid, "owner confirmation required", status_code=403)
+    if actor.get("actor_type") != "owner" or actor.get("owner_confirmed") is not True:
+        _reject_review_action(valid, "owner confirmation required", status_code=403)
+
+
+def _review_status_for_action(valid: dict[str, Any]) -> str:
+    action_type = valid["action_type"]
+    if action_type == "mark_reviewed":
+        return "reviewed"
+    if action_type == "request_more_evidence":
+        return "needs_more_evidence"
+    if action_type == "defer":
+        return "deferred"
+    if action_type == "reject":
+        return "rejected"
+    if action_type == "quarantine":
+        return "quarantined"
+    if action_type == "set_review_status":
+        target = valid.get("target_review_status") or valid.get(
+            "expected_current_review_status"
+        )
+        return _require_safe_text_id(target)
+    return valid.get("expected_current_review_status", "pending")
+
+
+def _review_action_rejection_response(
+    *,
+    project_id: str | None,
+    queue_entry_id: str | None,
+    candidate_id: str | None,
+    action_type: Any,
+    reason: str,
+) -> dict[str, Any]:
+    response: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "status": "rejected",
+        "action_type": action_type,
+        "project_id": project_id,
+        "queue_entry_id": queue_entry_id,
+        "candidate_id": candidate_id,
+        "warnings": [reason],
+        "errors": [reason],
+    }
+    return response
+
+
+def validate_review_action_command_request(
+    request: Any,
+    *,
+    project_id: str,
+    queue_entry_id: str,
+) -> dict[str, Any]:
+    _safe_id(project_id)
+    _safe_id(queue_entry_id)
+    value = _ensure_mapping(request)
+    unsupported = set(value) - _REVIEW_ACTION_FIELDS
+    if unsupported:
+        raise ReviewActionCommandRejected("unsupported field", status_code=422)
+    forbidden = set(value) & _REVIEW_ACTION_FORBIDDEN_FIELDS
+    if forbidden:
+        raise ReviewActionCommandRejected("forbidden field", status_code=403)
+
+    valid = _copy_mapping(value)
+    valid["project_id"] = project_id
+    valid["queue_entry_id"] = queue_entry_id
+
+    action_type = valid.get("action_type")
+    if not isinstance(action_type, str) or not action_type:
+        _reject_review_action(valid, "missing action_type", status_code=422)
+    if action_type in _REVIEW_ACTION_FORBIDDEN_COMMANDS:
+        _reject_review_action(valid, "forbidden command", status_code=403)
+    if action_type not in _REVIEW_ACTION_ALLOWED_COMMANDS:
+        _reject_review_action(valid, "unknown command", status_code=422)
+
+    if valid.get("queue_entry_id") != queue_entry_id:
+        _reject_review_action(valid, "queue entry mismatch", status_code=422)
+
+    candidate_id = valid.get("candidate_id")
+    if not isinstance(candidate_id, str):
+        _reject_review_action(valid, "candidate required", status_code=422)
+    _safe_id(candidate_id)
+    if candidate_id != _candidate_id_for_queue_entry(queue_entry_id):
+        _reject_review_action(valid, "queue/candidate mismatch", status_code=422)
+
+    for field in ("owner_note", "rationale"):
+        if field in valid:
+            _require_text(valid[field])
+    for field in ("expected_current_review_status", "target_review_status"):
+        if field in valid:
+            _require_safe_text_id(valid[field])
+    if "expected_current_version" in valid and not isinstance(
+        valid["expected_current_version"], int
+    ):
+        _reject_review_action(valid, "invalid version", status_code=422)
+    for field in ("preserve_candidate_linkage", "preserve_evidence_provenance"):
+        if valid.get(field) is not True:
+            _reject_review_action(valid, "preservation flag required", status_code=422)
+    if "metadata" in valid and not isinstance(valid["metadata"], dict):
+        _reject_review_action(valid, "invalid metadata", status_code=422)
+
+    _require_owner_confirmation(valid)
+    return valid
+
+
+def execute_review_action_command(
+    request: Any,
+    *,
+    project_id: str,
+    queue_entry_id: str,
+) -> dict[str, Any]:
+    try:
+        valid = validate_review_action_command_request(
+            request,
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+        )
+    except ReviewActionCommandRejected as exc:
+        body = request if isinstance(request, dict) else {}
+        action_type = body.get("action_type") if isinstance(body, dict) else None
+        candidate_id = body.get("candidate_id") if isinstance(body, dict) else None
+        raise ReviewActionCommandRejected(
+            _review_action_rejection_response(
+                project_id=project_id,
+                queue_entry_id=queue_entry_id,
+                candidate_id=candidate_id,
+                action_type=action_type,
+                reason=str(exc),
+            ),
+            status_code=exc.status_code,
+        ) from exc
+    review_status = _review_status_for_action(valid)
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "status": "accepted",
+        "action_type": valid["action_type"],
+        "project_id": project_id,
+        "queue_entry_id": queue_entry_id,
+        "candidate_id": valid["candidate_id"],
+        "review_workflow_state": {
+            "review_status": review_status,
+            "owner_note": valid.get("owner_note"),
+            "is_canon": False,
+            _blocked_marker("apply_", "promotion_performed"): False,
+            "memory_canon_mutation_performed": False,
+            "project_truth_mutation_performed": False,
+            "raw_artifact_persistence_performed": False,
+            "runtime_extraction_performed": False,
+            "model_call_performed": False,
+            _blocked_marker("generated_", "prose_performed"): False,
+            "training_artifact_performed": False,
+        },
+        "evidence_provenance": {
+            "source_locator": {
+                "project_id": project_id,
+                "queue_entry_id": queue_entry_id,
+                "candidate_id": valid["candidate_id"],
+            },
+            "preserve_evidence_provenance": True,
+        },
+        "warnings": [
+            "accepted as review workflow state only; not canon and no promotion performed"
+        ],
+        "errors": [],
+    }
 
 
 def validate_owner_action_command_request(request: Any) -> dict[str, Any]:

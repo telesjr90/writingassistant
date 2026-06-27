@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from jsonschema.exceptions import ValidationError
 from pydantic import BaseModel
+from urllib.parse import unquote
 
 try:
     from . import analysis_engine, project_manager, storyform
@@ -87,6 +89,76 @@ app.add_middleware(
 )
 
 app.include_router(review_queue.router)
+
+_REVIEW_ACTION_FORBIDDEN_COMMAND_BOUNDARY_MARKERS = (
+    "apply_promotion",
+    "promote_candidate",
+    "persist_raw_artifact",
+    "run_booknlp",
+    "run_spacy",
+    "generate_prose",
+    "continue_scene",
+)
+
+
+def _is_safe_route_id(value: str) -> bool:
+    value = unquote(value)
+    if value != value.strip() or not value:
+        return False
+    if value in {".", ".."}:
+        return False
+    if value.startswith(".") or value.startswith("/") or "\\" in value or "/" in value:
+        return False
+    if len(value) >= 2 and value[1] == ":":
+        return False
+    return True
+
+
+def _reject_unsafe_review_action_path() -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={
+            "schema_version": 1,
+            "status": "rejected",
+            "project_id": None,
+            "queue_entry_id": None,
+            "action_type": None,
+            "candidate_id": None,
+            "warnings": ["unsafe id"],
+            "errors": ["unsafe id"],
+        },
+    )
+
+
+@app.middleware("http")
+async def reject_unsafe_review_action_paths(request: Request, call_next):
+    raw_path = request.scope.get("raw_path", b"")
+    path = (
+        raw_path.decode("ascii", errors="ignore")
+        if isinstance(raw_path, bytes)
+        else request.url.path
+    )
+    if (
+        request.method == "POST"
+        and path.startswith("/api/projects/")
+        and "/review-queue/" in path
+        and path.endswith("/actions")
+    ):
+        parts = path.split("/")
+        try:
+            review_index = parts.index("review-queue")
+        except ValueError:
+            review_index = -1
+        project_parts = parts[3:review_index]
+        queue_parts = parts[review_index + 1 : -1]
+        if (
+            len(project_parts) != 1
+            or len(queue_parts) != 1
+            or not _is_safe_route_id(project_parts[0])
+            or not _is_safe_route_id(queue_parts[0])
+        ):
+            return _reject_unsafe_review_action_path()
+    return await call_next(request)
 
 
 def _patch_route(path: str):

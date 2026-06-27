@@ -17,6 +17,7 @@ from __future__ import annotations
 import anyio
 import httpx
 import pytest
+from urllib.parse import quote
 
 from backend import main
 
@@ -195,6 +196,10 @@ def review_command_payload(action_type: str, **overrides) -> dict:
     return payload
 
 
+def encode_unsafe_route_id(value: str) -> str:
+    return quote(value, safe="").replace(".", "%2E")
+
+
 def assert_no_forbidden_response_fields(value) -> None:
     if isinstance(value, dict):
         for key, nested in value.items():
@@ -332,7 +337,7 @@ def test_unsafe_project_id_fails_closed_for_command_route(
     unsafe_project_id: str,
 ):
     path = ACTION_ROUTE_TEMPLATE.format(
-        project_id=unsafe_project_id,
+        project_id=encode_unsafe_route_id(unsafe_project_id),
         queue_entry_id=QUEUE_ENTRY_ID,
     )
 
@@ -349,7 +354,7 @@ def test_unsafe_queue_entry_id_fails_closed_for_command_route(
     route_client: RouteClient,
     unsafe_queue_entry_id: str,
 ):
-    path_entry_id = "%2E" if unsafe_queue_entry_id == "." else unsafe_queue_entry_id
+    path_entry_id = encode_unsafe_route_id(unsafe_queue_entry_id)
     path = ACTION_ROUTE_TEMPLATE.format(
         project_id=PROJECT_ID,
         queue_entry_id=path_entry_id,
