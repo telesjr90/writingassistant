@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-016",
-    "current_parent_task_title": "Frontend owner-action execution workflow and review command boundary",
-    "frontier_note": "PHASE8-IMPL-015 is complete/PASS through PHASE8-IMPL-015-T007 (roadmap/status closeout; docs/status only). PHASE8-IMPL-016 is active. PHASE8-IMPL-016-T001 is complete/PASS, PHASE8-IMPL-016-T002 is complete/PASS after accepting the owner-action review command boundary decision, PHASE8-IMPL-016-T003 is complete/PASS as tests-first review command owner-action candidate review route contract coverage, PHASE8-IMPL-016-T004 is complete/PASS after implementing the minimal backend command route/helper, PHASE8-IMPL-016-T005 is complete/PASS after adding the frontend owner-action review workflow/surface, and PHASE8-IMPL-016-T006 is complete/PASS after adding focused owner-action workflow safety regressions. PHASE8-IMPL-016-T007 is ready/active next. Delivered read-only review queue route implementation in backend/routes/review_queue.py, route contract tests, frontend read-only surface planning decision, validation-only read-only safety regression with no hardening required, T002 owner-confirmed review command taxonomy/allowed-forbidden command boundary/request boundary/response boundary/frontend workflow boundary/fail closed-quarantine policy/explicit deferrals, T003 tests at tests/test_writer_assistant_review_action_command_routes_contract.py, T004 response-only command route/helper behavior for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions, T005 frontend helper and owner-action review controls, and T006 focused safety regression coverage at tests/test_owner_action_review_workflow_safety_regression.py. T006 confirms allowed commands mark_reviewed, request_more_evidence, defer, reject, quarantine, update_owner_note, set_review_status remain review workflow state only; forbidden commands and payload fields fail closed; frontend controls expose only allowed review workflow commands with explicit owner confirmation; candidate-only/no-canon, queue presence/confidence/review status not canon/project truth, and evidence/provenance/source locator display remain present; and the targeted source scan distinguishes rejected fixtures from implementation behavior without the earlier contradictory forbidden-substring issue. Did not deliver apply-promotion, approved memory/canon mutation, project truth mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, or generated prose/prose-production paths. Last completed parent: PHASE8-IMPL-015 (complete through PHASE8-IMPL-015-T007). Last completed child: PHASE8-IMPL-016-T006 - Safety regression for owner-action command workflow (complete/PASS). Recommended next parent: PHASE8-IMPL-017 - Apply-promotion contract, audit log, and approved memory/canon mutation boundary (MVP-required; deferred until after PHASE8-IMPL-016). PHASE8-IMPL-017 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden."
+    "current_parent_task_id": "PHASE8-IMPL-017",
+    "current_parent_task_title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
+    "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 (roadmap/status closeout; docs/status only). PHASE8-IMPL-016-T001 through T007 are complete/PASS. T004 delivered the minimal backend review-action command route/helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions as response-only review workflow command acceptance/rejection. T005 delivered the frontend owner-action review workflow/surface with deterministic API helper, read-only candidate details, explicit owner-action controls, candidate-only/no-canon warnings, and evidence/provenance/source locator display. T006 delivered focused safety regression coverage at tests/test_owner_action_review_workflow_safety_regression.py. T007 closed the parent as docs/status closeout only. PHASE8-IMPL-016 did not deliver apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, or generated prose/prose-production paths. Last completed parent: PHASE8-IMPL-016 (complete through PHASE8-IMPL-016-T007). Last completed child: PHASE8-IMPL-016-T007 - Parent closeout (complete/PASS). Recommended next parent: PHASE8-IMPL-017 - Apply-promotion contract, audit log, and approved memory/canon mutation boundary (MVP-required; ready/active next pending T001 publication). PHASE8-IMPL-017 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3403,7 +3403,7 @@
       "id": "PHASE8-IMPL-016",
       "title": "Frontend owner-action execution workflow and review command boundary",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-015"
@@ -3425,7 +3425,8 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-  "result": "active; T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 ready/active next"
+      "final_summary": "Complete/PASS through PHASE8-IMPL-016-T007 (docs/status closeout). T001 published parent/inventory/enrichment/status. T002 accepted owner-action execution boundary decision. T003 added tests-first command route contract. T004 implemented minimal backend review-action command route/helper. T005 added frontend owner-action review workflow/surface. T006 added focused safety regression. T007 closed parent and recommends PHASE8-IMPL-017. Did not deliver apply-promotion, approved memory/canon mutation, raw artifact persistence, runtime extraction, model-assisted extraction, NCP/Subtxt/dramatica-flow runtime, or generated prose.",
+      "result": "complete/PASS through PHASE8-IMPL-016-T007; recommends PHASE8-IMPL-017 as next MVP-required parent"
     },
     {
       "id": "PHASE8-IMPL-016-T001",
@@ -3470,7 +3471,7 @@
       "id": "PHASE8-IMPL-016-T003",
       "title": "Tests-first command boundary contract for review actions without promotion/canon mutation",
       "type": "runtime_microtask",
-  "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-016",
       "depends_on": [
         "PHASE8-IMPL-016-T002"
@@ -3482,14 +3483,14 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-  "test_record": "tests/test_writer_assistant_review_action_command_routes_contract.py",
-  "result": "complete/PASS expected-red tests-first contract; target file collects and fails because POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions is not implemented yet"
+      "test_record": "tests/test_writer_assistant_review_action_command_routes_contract.py",
+      "result": "complete/PASS tests-first contract; PASS after T004 implementation"
     },
     {
       "id": "PHASE8-IMPL-016-T004",
       "title": "Minimal backend command route/helper implementation for review-action execution only",
       "type": "runtime_microtask",
-  "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-016",
       "depends_on": [
         "PHASE8-IMPL-016-T003"
@@ -3501,13 +3502,13 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-  "result": "ready/active next"
+      "result": "complete/PASS minimal backend review-action command route/helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions"
     },
     {
       "id": "PHASE8-IMPL-016-T005",
       "title": "Frontend owner-action workflow/surface implementation or planning path",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-016",
       "depends_on": [
         "PHASE8-IMPL-016-T004"
@@ -3519,13 +3520,13 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned"
+      "result": "complete/PASS frontend owner-action review workflow/surface for bounded review commands"
     },
     {
       "id": "PHASE8-IMPL-016-T006",
       "title": "Safety regression for owner-action execution boundary",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-016",
       "depends_on": [
         "PHASE8-IMPL-016-T005"
@@ -3539,13 +3540,13 @@
         "no_model_calls",
         "no_generated_prose"
       ],
-      "result": "planned"
+      "result": "complete/PASS focused owner-action workflow safety regression coverage"
     },
     {
       "id": "PHASE8-IMPL-016-T007",
       "title": "Parent closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-016",
       "depends_on": [
         "PHASE8-IMPL-016-T006"
@@ -3553,19 +3554,29 @@
       "boundary_tags": [
         "docs_only_t001",
         "no_runtime_feature_scope",
-        "no_generated_prose"
+        "no_generated_prose",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_raw_artifact_persistence",
+        "no_runtime_extraction",
+        "no_model_calls",
+        "generated_prose_permanently_forbidden"
       ],
-      "result": "planned"
+      "result": "PASS docs/status closeout only; closed PHASE8-IMPL-016 complete after T001-T006; recommended PHASE8-IMPL-017 as next MVP-required parent"
     },
     {
       "id": "PHASE8-IMPL-017",
       "title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
       "type": "runtime",
-      "status": "planned",
+      "status": "active",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-016"
       ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-017.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-017.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-017/",
       "boundary_tags": [
         "mvp_required_apply_promotion",
         "mvp_required_memory_canon_mutation",
@@ -3573,7 +3584,7 @@
         "no_auto_promotion",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "planned"
+      "result": "ready/active next pending T001 publication"
     },
     {
       "id": "PHASE8-IMPL-018",

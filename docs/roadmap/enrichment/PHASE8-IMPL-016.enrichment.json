@@ -3,7 +3,7 @@
   "task_id": "PHASE8-IMPL-016",
   "title": "Frontend owner-action execution workflow and review command boundary",
   "type": "runtime",
-  "status": "active",
+  "status": "complete",
   "parent": null,
   "depends_on": [
     "PHASE8-IMPL-015"
@@ -50,16 +50,15 @@
       "PHASE8-IMPL-016-T006",
       "PHASE8-IMPL-016-T007"
     ]
-  }
-  ,
+  },
   "current_child_status": {
     "PHASE8-IMPL-016-T001": "complete/PASS",
     "PHASE8-IMPL-016-T002": "complete/PASS owner-action review command boundary decision",
-    "PHASE8-IMPL-016-T003": "complete/PASS expected-red tests-first review command owner-action candidate review route contract",
+    "PHASE8-IMPL-016-T003": "complete/PASS tests-first review command owner-action candidate review route contract",
     "PHASE8-IMPL-016-T004": "complete/PASS minimal backend review-action command route/helper implementation",
     "PHASE8-IMPL-016-T005": "complete/PASS minimal frontend owner-action review workflow/surface for bounded review commands",
     "PHASE8-IMPL-016-T006": "complete/PASS focused owner-action workflow safety regression coverage",
-    "PHASE8-IMPL-016-T007": "ready/active next"
+    "PHASE8-IMPL-016-T007": "complete/PASS parent closeout"
   },
   "t002_decision_summary": {
     "owner_action_execution_purpose": "owner-confirmed candidate review workflow commands affect review workflow state only",
@@ -67,10 +66,10 @@
     "request_boundary": "future requests carry project_id, queue_entry_id or candidate_id, action_type, actor or owner confirmation marker, explicit confirmation where needed, owner_note/rationale, expected current review status/version, and evidence/provenance/source locator preservation requirements, with no payload that can directly write canon or generate prose",
     "response_boundary": "future responses report accepted/rejected and updated review workflow state only, immutable candidate linkage, no canon mutation result, no apply-promotion result, no raw artifact result, warnings that queue/candidate/review status is not canon, and fail closed errors",
     "frontend_workflow": "future frontend workflow separates read-only candidate details from command controls, requires explicit owner action, displays candidate-only/no-canon warnings, preserves evidence/provenance/source locator context, exposes no prose-generation controls, and does not silently execute commands",
-    "t003_expected_red_contract": "PHASE8-IMPL-016-T003 created tests/test_writer_assistant_review_action_command_routes_contract.py for the future review command owner-action candidate review route POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions; it covers mark_reviewed, request_more_evidence, defer, reject, quarantine, update_owner_note, set_review_status, forbidden apply_promotion, promote_candidate, write_memory, write_canon, persist_raw_artifact, run_extraction, run_booknlp, run_spacy, call_model, generate_prose, rewrite_prose, continue_scene, create_training_jsonl, fail closed malformed payloads, route separation, response boundary, no silent promotion, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, and no generated prose",
+    "t003_expected_red_contract": "PHASE8-IMPL-016-T003 created tests/test_writer_assistant_review_action_command_routes_contract.py for the review command owner-action candidate review route POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions; it covers mark_reviewed, request_more_evidence, defer, reject, quarantine, update_owner_note, set_review_status, forbidden apply_promotion, promote_candidate, write_memory, write_canon, persist_raw_artifact, run_extraction, run_booknlp, run_spacy, call_model, generate_prose, rewrite_prose, continue_scene, create_training_jsonl, fail closed malformed payloads, route separation, response boundary, no silent promotion, no apply-promotion, no memory/canon mutation, no raw artifact persistence, no runtime extraction, no model calls, and no generated prose",
     "t004_implementation_summary": "PHASE8-IMPL-016-T004 implemented the minimal backend route/helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions as response-only review workflow command acceptance/rejection; it accepts only mark_reviewed, request_more_evidence, defer, reject, quarantine, update_owner_note, and set_review_status, rejects forbidden commands and unsafe payloads fail closed, and does not implement apply-promotion, memory/canon mutation, project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
     "t005_implementation_summary": "PHASE8-IMPL-016-T005 implemented the minimal frontend owner-action review workflow/surface for bounded review commands; it added a deterministic frontend helper for POST /api/projects/{project_id}/review-queue/{queue_entry_id}/actions, read-only candidate details separated from explicit owner action controls, candidate-only/no-canon warnings, evidence/provenance/source locator display and preservation, fail-closed unsupported command and missing-ID behavior, and no apply-promotion, memory/canon/project truth mutation, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
     "t006_implementation_summary": "PHASE8-IMPL-016-T006 added focused safety regression coverage proving the backend action route remains response-only review workflow state, forbidden commands and payload fields fail closed, frontend controls expose only allowed review workflow commands with explicit owner confirmation, candidate-only/no-canon/evidence/provenance/source locator warnings remain present, command payload construction excludes forbidden fields, and the targeted source boundary scan distinguishes rejected fixtures from implementation behavior without the earlier contradictory substring issue",
-    "next_child": "PHASE8-IMPL-016-T007 ready/active next for parent closeout"
+    "t007_closeout_summary": "PHASE8-IMPL-016-T007 closed the parent as docs/status closeout only; confirmed tracked artifacts from T004/T005/T006; re-validated command route contract, frontend source tests, safety regression, review API contracts, and review queue storage plus candidate review gate regressions; confirmed no apply-promotion, memory/canon mutation, raw persistence, runtime extraction, model calls, generated prose, or training artifacts; recommended PHASE8-IMPL-017 as next MVP-required parent ready/active pending T001 publication"
   }
 }
