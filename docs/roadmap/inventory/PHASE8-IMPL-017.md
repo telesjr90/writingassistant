@@ -6,10 +6,10 @@
 - Title: Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff
+- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation
 - Depends on: completed `PHASE8-IMPL-016`
-- Current child: `PHASE8-IMPL-017-T004` - ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 ready/active; T005 planned; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-017-T005` - ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 ready/active; T006 planned; T007 planned
 
 ## 2. Why This Parent Exists
 
@@ -23,7 +23,7 @@ Allowed in this parent sequence:
 
 - apply-promotion boundary decision and audit model
 - tests-first expected-red apply-promotion contract
-- minimal backend apply-promotion service/route implementation in a later child
+- minimal backend apply-promotion service/route implementation in T004
 - frontend apply-promotion confirmation workflow/surface in a later child
 - approved memory/canon mutation safety regression
 - parent closeout after validation
@@ -76,6 +76,16 @@ Forbidden in `PHASE8-IMPL-017-T003`:
 - training/JSONL/dataset/model artifacts
 
 `PHASE8-IMPL-017-T003` added only `tests/test_writer_assistant_core_apply_promotion_contract.py` as an expected-red contract for future `backend.story_knowledge.apply_promotion` APIs. The target is expected to fail only because the future module/API is absent before T004.
+
+Allowed and completed in `PHASE8-IMPL-017-T004`:
+
+- `backend/story_knowledge/apply_promotion.py` implements the minimal backend apply-promotion APIs.
+- `backend/routes/apply_promotion.py` exposes `POST /api/projects/{project_id}/apply-promotion`.
+- `backend/main.py` includes the new route.
+- Apply-promotion remains explicit owner-confirmed, audited, evidence/provenance/source-locator-backed, project-local, and fail-closed.
+- Approved memory/canon mutation is bounded to `writer_assistant/approved_memory/` after valid owner-confirmed apply-promotion only.
+- Promotion audit records are bounded to `writer_assistant/promotion_audit/`.
+- No frontend implementation code, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts were added.
 
 Required boundary tags for this parent:
 

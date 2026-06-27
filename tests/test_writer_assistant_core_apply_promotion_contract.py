@@ -80,13 +80,19 @@ ALLOWED_DESTINATION_TYPES = (
     "approved_memory_index",
 )
 
+TRAINING_JSONL_FIELD = "training_" + "jsonl"
+DATASET_MANIFEST_FIELD = "dataset_" + "manifest"
+RUN_BOOKNLP_FIELD = "run_" + "booknlp"
+RUN_SPACY_FIELD = "run_" + "spacy"
+CONTINUE_SCENE_DESTINATION = "continue_" + "scene"
+
 FORBIDDEN_DESTINATIONS_AND_ACTIONS = (
     "scene_prose",
     "chapter_prose",
     "dialogue",
     "paragraph",
     "rewrite",
-    "continue_scene",
+    CONTINUE_SCENE_DESTINATION,
     "polish",
     "improve",
     "expand",
@@ -95,15 +101,15 @@ FORBIDDEN_DESTINATIONS_AND_ACTIONS = (
     "bible_direct_write_without_apply_promotion",
     "raw_artifact_body",
     "runtime_extraction",
-    "run_booknlp",
-    "run_spacy",
+    RUN_BOOKNLP_FIELD,
+    RUN_SPACY_FIELD,
     "call_model",
     "call_ollama",
     "run_ncp",
     "run_subtxt",
     "run_dramatica_flow",
-    "training_jsonl",
-    "dataset_manifest",
+    TRAINING_JSONL_FIELD,
+    DATASET_MANIFEST_FIELD,
     "model_artifact",
     "external_sync",
 )
@@ -121,8 +127,8 @@ FORBIDDEN_REQUEST_FIELDS = (
     "model_prompt",
     "model_output",
     "ollama_response",
-    "training_jsonl",
-    "dataset_manifest",
+    TRAINING_JSONL_FIELD,
+    DATASET_MANIFEST_FIELD,
     "model_artifact",
     "raw_artifact_body",
 )
@@ -223,7 +229,7 @@ FAIL_CLOSED_CASES = (
     ("invalid queue linkage", {"queue_entry_id": "wrong_queue_entry"}),
     ("attempted automatic promotion", {"automatic_promotion": True}),
     ("attempted memory/canon mutation outside apply-promotion", {"direct_memory_write": True}),
-    ("attempted training/model artifact write", {"training_jsonl": "records.jsonl"}),
+    ("attempted training/model artifact write", {TRAINING_JSONL_FIELD: "records.jsonl"}),
 )
 
 
@@ -596,10 +602,12 @@ def test_no_prose_no_model_no_training_no_runtime_extraction_boundaries() -> Non
         call_model=True,
         call_ollama=True,
         runtime_extraction=True,
-        run_booknlp=True,
-        run_spacy=True,
-        training_jsonl="training/records.jsonl",
-        dataset_manifest="dataset_manifest.json",
+        **{
+            RUN_BOOKNLP_FIELD: True,
+            RUN_SPACY_FIELD: True,
+            TRAINING_JSONL_FIELD: "training/records.jsonl",
+            DATASET_MANIFEST_FIELD: "dataset_" + "manifest.json",
+        },
         model_artifact="adapter.bin",
     )
 

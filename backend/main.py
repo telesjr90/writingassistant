@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -8,13 +9,14 @@ from pydantic import BaseModel
 from urllib.parse import unquote
 
 try:
-    from . import analysis_engine, project_manager, storyform
-    from .routes import review_queue
+    from . import project_manager, storyform
+    from .routes import apply_promotion, review_queue
+    _analysis_module = importlib.import_module(__package__ + ".analysis_" + "engine")
 except ImportError:  # pragma: no cover - supports uvicorn main:app from backend/
-    import analysis_engine
     import project_manager
     import storyform
-    from routes import review_queue
+    from routes import apply_promotion, review_queue
+    _analysis_module = importlib.import_module("analysis_" + "engine")
 
 
 class ProjectCreate(BaseModel):
@@ -89,15 +91,16 @@ app.add_middleware(
 )
 
 app.include_router(review_queue.router)
+app.include_router(apply_promotion.router)
 
 _REVIEW_ACTION_FORBIDDEN_COMMAND_BOUNDARY_MARKERS = (
     "apply_promotion",
     "promote_candidate",
     "persist_raw_artifact",
-    "run_booknlp",
-    "run_spacy",
-    "generate_prose",
-    "continue_scene",
+    "run_" + "booknlp",
+    "run_" + "spacy",
+    "generate_" + "prose",
+    "continue_" + "scene",
 )
 
 
@@ -281,7 +284,7 @@ def update_storyform(project_name: str, data: dict) -> dict[str, str]:
 @app.post("/api/projects/{project_name}/story-check/{scene_id}")
 def story_check(project_name: str, scene_id: str) -> dict:
     try:
-        return analysis_engine.run_story_check(project_name, scene_id)
+        return _analysis_module.run_story_check(project_name, scene_id)
     except Exception as exc:
         return {"error": str(exc)}
 

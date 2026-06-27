@@ -1,19 +1,23 @@
-# PHASE8-IMPL-017-T003 Expected-Red Apply-Promotion Contract
+# PHASE8-IMPL-017-T004 Backend Apply-Promotion Implementation
 
 ### Result
 
 - Result: PASS.
-- Scope: tests/docs/status only.
+- Scope: minimal backend apply-promotion service/route implementation plus roadmap/status alignment.
 - Parent task: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary.
-- Completed child recorded: `PHASE8-IMPL-017-T003` - Tests-first expected-red apply-promotion contract.
-- Expected-red contract: `tests/test_writer_assistant_core_apply_promotion_contract.py`.
-- Prior child: `PHASE8-IMPL-017-T002` - complete/PASS and committed.
-- Next child: `PHASE8-IMPL-017-T004` - Minimal backend apply-promotion service/route implementation (ready/active next).
-- No context tools were run inside T003. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+- Completed child recorded: `PHASE8-IMPL-017-T004` - Minimal backend apply-promotion service/route implementation.
+- Backend module: `backend/story_knowledge/apply_promotion.py`.
+- Backend route: `backend/routes/apply_promotion.py`.
+- Route included from: `backend/main.py`.
+- Prior child: `PHASE8-IMPL-017-T003` - complete/PASS and committed.
+- Next child: `PHASE8-IMPL-017-T005` - Frontend apply-promotion confirmation workflow/surface (ready/active next).
+- No context tools were run inside T004. Generated context artifacts remain evidence only, not roadmap truth or task completion.
 
 ### Files Changed
 
-- Created: `tests/test_writer_assistant_core_apply_promotion_contract.py`
+- Created: `backend/story_knowledge/apply_promotion.py`
+- Created: `backend/routes/apply_promotion.py`
+- Updated: `backend/main.py`
 - Updated: `docs/roadmap/tasks/PHASE8-IMPL-017.md`
 - Updated: `docs/roadmap/inventory/PHASE8-IMPL-017.md`
 - Updated: `docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json`
@@ -22,36 +26,22 @@
 - Updated: `docs/roadmap/task_backlog.md`
 - Updated: `docs/roadmap/phase_map.md`
 - Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
-- Updated: `docs/roadmap/decision_log.md`
 
-### Expected-Red Contract Summary
+### Backend Summary
 
-- The contract imports the future module path `backend.story_knowledge.apply_promotion`.
-- The expected future public APIs are `validate_promotion_request`, `build_promotion_plan`, `validate_promotion_plan`, `build_promotion_audit_record`, `apply_promotion_plan`, `validate_promotion_audit_record`, `promotion_audit_storage_dir`, `promotion_audit_record_path`, `write_promotion_audit_record`, `read_promotion_audit_record`, and `list_promotion_audit_records`.
-- The target test run is expected-red only because `backend.story_knowledge.apply_promotion` does not exist yet.
-- The expected-red failure shape is limited to `ModuleNotFoundError` or `ImportError` for the missing future module/API.
-- The contract covers promotion request validation, candidate/review boundaries, destination allowlist and forbidden destinations/actions, promotion plan shape, audit record shape, transaction/mutation behavior, fail-closed quarantine cases, and no-prose/no-model/no-training/no-runtime-extraction boundaries.
-
-### Future Child Sequence
-
-- `PHASE8-IMPL-017-T004` is ready/active next.
-- `PHASE8-IMPL-017-T005` remains planned.
-- `PHASE8-IMPL-017-T006` remains planned.
-- `PHASE8-IMPL-017-T007` remains planned.
-- `PHASE8-IMPL-018` remains future MVP-required raw artifact persistence.
-- `PHASE8-IMPL-019` remains future MVP-required runtime extraction plus real BookNLP/spaCy install/run/import.
-- `PHASE8-IMPL-020` remains future MVP-required model-assisted evidence-backed extraction.
-- `PHASE8-IMPL-021` remains future MVP-required NCP/Subtxt/dramatica-flow analysis-only runtime.
-- `PHASE8-IMPL-022` remains future MVP-required end-to-end MVP usability validation.
+- Implemented the expected public APIs: `validate_promotion_request`, `build_promotion_plan`, `validate_promotion_plan`, `build_promotion_audit_record`, `apply_promotion_plan`, `validate_promotion_audit_record`, `promotion_audit_storage_dir`, `promotion_audit_record_path`, `write_promotion_audit_record`, `read_promotion_audit_record`, and `list_promotion_audit_records`.
+- Added `POST /api/projects/{project_id}/apply-promotion`.
+- Apply-promotion requires explicit owner confirmation, candidate id/type, approved destination, evidence refs, provenance refs, source locator refs, and owner actor identity.
+- Supported destinations remain limited to approved memory/canon categories.
+- Plan building validates and previews mutation without writing.
+- Apply writes structured approved memory under `writer_assistant/approved_memory/` only after a valid owner-confirmed plan.
+- Audit records are project-local under `writer_assistant/promotion_audit/` and append-only.
+- Fail-closed behavior rejects unsafe ids/paths, unsupported candidates/destinations, stale snapshots, invalid queue linkage, automatic promotion, confidence-as-truth, queue-presence-as-approval, extraction/model/raw artifact canon claims, generated prose fields, model prompt/output fields, and training artifact fields.
 
 ### Boundary Confirmation
 
-- No backend implementation code changes.
 - No frontend implementation code changes.
 - No package/dependency changes.
-- No apply-promotion runtime implementation.
-- No memory/canon mutation runtime implementation.
-- No project truth mutation.
 - No raw artifact persistence.
 - No runtime extraction.
 - No BookNLP/spaCy install/run/import.
@@ -65,24 +55,8 @@
 ### MVP Scope Preservation
 
 - `PHASE8-IMPL-017` is active and MVP-required.
+- `PHASE8-IMPL-017-T005` is ready/active next.
+- `PHASE8-IMPL-017-T006` and `PHASE8-IMPL-017-T007` remain planned.
 - `PHASE8-IMPL-018` through `PHASE8-IMPL-022` remain future MVP-required parents.
 - Fine-tuning remains deferred after MVP.
 - Generated prose/prose-production paths remain permanently forbidden.
-
-### Required Boundary Tags Preserved
-
-- `mvp_required_apply_promotion`
-- `approved_memory_canon_mutation`
-- `owner_confirmed_only`
-- `audited_promotion`
-- `candidate_to_approved_boundary`
-- `no_auto_promotion`
-- `no_confidence_as_truth`
-- `no_queue_presence_as_approval`
-- `no_extraction_as_canon`
-- `no_generated_prose`
-- `generated_prose_permanently_forbidden`
-- `no_model_calls`
-- `no_runtime_extraction`
-- `no_raw_artifact_persistence`
-- `no_training_artifacts`
