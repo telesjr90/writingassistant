@@ -157,3 +157,103 @@ export async function fetchMaterialMetadata(materialId, projectId = PROJECT_ID) 
 export async function saveMaterialMetadata(materialId, metadata, projectId = PROJECT_ID) {
   return requestData(() => client.put(`/projects/${projectId}/materials/${materialId}/metadata`, { metadata }));
 }
+
+const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
+
+export const REVIEW_ACTION_TYPES = Object.freeze([
+  'mark_reviewed',
+  'request_more_evidence',
+  'defer',
+  'reject',
+  'quarantine',
+  'update_owner_note',
+  'set_review_status',
+]);
+
+export function isSafeReviewRouteId(value) {
+  return typeof value === 'string' && SAFE_ID_PATTERN.test(value);
+}
+
+function requireSafeReviewRouteId(value, label) {
+  if (!isSafeReviewRouteId(value)) {
+    throw new Error(`${label} is required before sending an owner review action.`);
+  }
+}
+
+function requireReviewActionType(actionType) {
+  if (!REVIEW_ACTION_TYPES.includes(actionType)) {
+    throw new Error('Unsupported owner review action.');
+  }
+}
+
+function compactStringField(value) {
+  return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
+}
+
+export async function fetchReviewQueueEntries(projectId = PROJECT_ID) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  return requestData(() => client.get(`/projects/${projectId}/review-queue`));
+}
+
+export async function submitReviewQueueAction({
+  projectId = PROJECT_ID,
+  queueEntryId,
+  candidateId,
+  actionType,
+  ownerNote,
+  rationale,
+  expectedCurrentReviewStatus,
+  expectedCurrentVersion,
+  reviewStatus,
+}) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(queueEntryId, 'queue_entry_id');
+  requireSafeReviewRouteId(candidateId, 'candidate_id');
+  requireReviewActionType(actionType);
+
+  const payload = {
+    action_type: actionType,
+    queue_entry_id: queueEntryId,
+    actor: {
+      actor_type: 'owner',
+      owner_confirmed: true,
+      owner_confirmation_marker: 'owner-reviewed',
+    },
+    owner_confirmed: true,
+    preserve_candidate_linkage: true,
+    preserve_evidence_provenance: true,
+    metadata: {
+      client_surface: 'owner-action-review-controls',
+      no_silent_promotion: true,
+      no_model_calls: true,
+      no_generated_prose: true,
+    },
+  };
+
+  payload.candidate_id = candidateId;
+
+  const note = compactStringField(ownerNote);
+  const actionRationale = compactStringField(rationale);
+  const currentStatus = compactStringField(expectedCurrentReviewStatus);
+  const nextReviewStatus = compactStringField(reviewStatus);
+
+  if (note) {
+    payload.owner_note = note;
+  }
+  if (actionRationale) {
+    payload.rationale = actionRationale;
+  }
+  if (currentStatus) {
+    payload.expected_current_review_status = currentStatus;
+  }
+  if (Number.isInteger(expectedCurrentVersion)) {
+    payload.expected_current_version = expectedCurrentVersion;
+  }
+  if (actionType === 'set_review_status' && nextReviewStatus) {
+    payload.target_review_status = nextReviewStatus;
+  }
+
+  return requestData(() => (
+    client.post(`/projects/${projectId}/review-queue/${queueEntryId}/actions`, payload)
+  ));
+}

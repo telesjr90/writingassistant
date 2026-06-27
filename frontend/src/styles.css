@@ -146,7 +146,8 @@ h2 {
 }
 
 .project-context,
-.omi-panel {
+.omi-panel,
+.review-queue-panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -564,6 +565,75 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.review-queue-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
+  gap: 16px;
+}
+
+.review-queue-list,
+.review-queue-detail,
+.owner-action-controls,
+.owner-action-form {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.review-queue-list h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.review-queue-entry {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  color: #172033;
+  text-align: left;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.review-queue-entry:hover,
+.review-queue-entry:focus-visible,
+.review-queue-entry.is-active {
+  background: #eef4ff;
+  border-color: #8fb3ff;
+  outline: none;
+}
+
+.review-queue-entry span,
+.review-queue-entry small {
+  color: #637089;
+  font-size: 12px;
+}
+
+.review-boundary-note {
+  padding: 10px 12px;
+  color: #46546c;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-left: 4px solid #234a84;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.owner-action-note {
+  min-height: 80px;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 .editor-actions {

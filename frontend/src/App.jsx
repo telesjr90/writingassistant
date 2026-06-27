@@ -7,6 +7,7 @@ import Editor from './components/Editor.jsx';
 import AnalysisSidebar from './components/AnalysisSidebar.jsx';
 import ProjectContext from './components/ProjectContext.jsx';
 import OMIPanel from './components/OMIPanel.jsx';
+import ReviewQueuePanel from './components/ReviewQueuePanel.jsx';
 import {
   DEFAULT_DOCUMENT_TYPE,
   DOCUMENT_TYPES,
@@ -959,6 +960,8 @@ export default function App() {
               onUpdateIdeaDecision={handleUpdateOMIIdeaDecision}
               onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
             />
+
+            <ReviewQueuePanel projectId={activeProjectId} />
 
             <Editor
               key={`${activeEditorDocument.type}-${activeEditorDocument.id}`}
