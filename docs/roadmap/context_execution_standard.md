@@ -283,6 +283,13 @@ For task packs, prefer exact file lists from:
 .codex-context/<PARENT_TASK_ID>/repomix-include-candidates.txt
 ```
 
+Task-specific AI Context packs must be verified after generation before use in
+implementation prompts. If a task-specific pack includes broad unrelated repo
+files or repo-wide token counts, do not use it for implementation prompts;
+repair the script/config or use a temporary exact-file staged pack before
+relying on it. Generated AI Context packs remain evidence only and must not be
+staged.
+
 Do not run Repomix or `scripts/generate_ai_context.sh` inside implementation prompts.
 
 ### 8. Snapshot Context Collection Results
@@ -551,6 +558,10 @@ Use the smallest context refresh that matches the change:
 * Contract-test task: tests pack + relevant implementation files.
 * Parent/phase boundary: repo-wide baseline refresh.
 * Context metadata repair: delta refresh only.
+
+For any task-specific AI Context pack, verify generated scope against the
+requested file list before using it. A broad pack is a tooling defect, not task
+evidence.
 
 ## Required Boundary Language for Future Prompts
 

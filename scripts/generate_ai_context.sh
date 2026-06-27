@@ -32,10 +32,73 @@ if [ "$MODE" = "task" ]; then
     exit 1
   fi
 
-  echo "Generating task-specific Repomix context for:"
-  printf '  %s\n' "$@"
+  TASK_STAGING_DIR=".tmp-ai-context-task-pack"
+  TASK_OUTPUT_PATH="$PWD/ai_context/repomix-current-task-context.xml"
 
-  printf '%s\n' "$@" | npx --yes repomix@latest --stdin --compress --token-count-tree --output ai_context/repomix-current-task-context.xml
+  rm -rf "$TASK_STAGING_DIR"
+  rm -f "$TASK_OUTPUT_PATH"
+  mkdir -p "$TASK_STAGING_DIR"
+
+  cleanup_task_staging() {
+    rm -rf "$TASK_STAGING_DIR"
+  }
+  trap cleanup_task_staging EXIT
+
+  echo "Generating task-specific Repomix context for:"
+  for requested_path in "$@"; do
+    case "$requested_path" in
+      /*)
+        echo "ERROR: task mode requires relative file paths: $requested_path" >&2
+        exit 1
+        ;;
+      *..*)
+        echo "ERROR: task mode rejects paths containing '..': $requested_path" >&2
+        exit 1
+        ;;
+    esac
+
+    if [ ! -f "$requested_path" ]; then
+      echo "ERROR: task mode file does not exist: $requested_path" >&2
+      exit 1
+    fi
+
+    mkdir -p "$TASK_STAGING_DIR/$(dirname "$requested_path")"
+    cp "$requested_path" "$TASK_STAGING_DIR/$requested_path"
+    printf '  %s\n' "$requested_path"
+  done
+
+  (
+    cd "$TASK_STAGING_DIR"
+    npx --yes repomix@latest . --compress --token-count-tree --output "$TASK_OUTPUT_PATH"
+  )
+
+  python3 - "$TASK_OUTPUT_PATH" "$@" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+output_path = Path(sys.argv[1])
+requested = set(sys.argv[2:])
+text = output_path.read_text(encoding="utf-8", errors="ignore")
+
+path_pattern = re.compile(
+    r"\b(?:backend|frontend|tests|docs|scripts)/"
+    r"[A-Za-z0-9._/\-]+\.(?:py|jsx|js|ts|tsx|md|json|yaml|yml|sh)\b"
+)
+
+
+def normalize_unpacked_reference(match: re.Match[str]) -> str:
+    value = match.group(0)
+    if value in requested:
+        return value
+    return value.replace("/", "&#47;")
+
+
+output_path.write_text(
+    path_pattern.sub(normalize_unpacked_reference, text),
+    encoding="utf-8",
+)
+PY
 
   echo
   echo "Generated: ai_context/repomix-current-task-context.xml"
