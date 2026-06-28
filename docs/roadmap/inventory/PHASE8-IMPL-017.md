@@ -6,10 +6,10 @@
 - Title: Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation; `PHASE8-IMPL-017-T005` complete/PASS frontend apply-promotion confirmation workflow/surface; `PHASE8-IMPL-017-T006` complete/PASS approved memory/canon mutation safety regression
+- Status: complete/PASS MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation; `PHASE8-IMPL-017-T005` complete/PASS frontend apply-promotion confirmation workflow/surface; `PHASE8-IMPL-017-T006` complete/PASS approved memory/canon mutation safety regression; `PHASE8-IMPL-017-T007` complete/PASS parent closeout
 - Depends on: completed `PHASE8-IMPL-016`
-- Current child: `PHASE8-IMPL-017-T007` - ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 complete/PASS frontend confirmation workflow; T006 complete/PASS safety regression; T007 ready/active parent closeout
+- Current child: none; parent complete/PASS
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 complete/PASS frontend confirmation workflow; T006 complete/PASS safety regression; T007 complete/PASS parent closeout
 
 ## 2. Why This Parent Exists
 
@@ -107,6 +107,14 @@ Allowed and completed in `PHASE8-IMPL-017-T006`:
 - Backend source safety rejects unsupported destinations/actions without adding runtime extraction, model calls, generated prose, raw artifact persistence, or training artifacts.
 - Minimal backend hardening changed only forbidden runtime marker construction in `backend/story_knowledge/apply_promotion.py` without adding destination categories or product behavior.
 
+Allowed and completed in `PHASE8-IMPL-017-T007`:
+
+- Docs/status/governance closeout only.
+- Parent marked complete/PASS.
+- `PHASE8-IMPL-017-T007` marked complete/PASS.
+- `PHASE8-IMPL-018` recommended as active/ready next parent.
+- No backend implementation code, frontend implementation code, product tests, package/dependency files, raw artifact persistence, runtime extraction, BookNLP/spaCy install/run/import, model/Ollama calls, NCP/Subtxt/dramatica-flow runtime, generated prose, or training/JSONL/dataset/model artifacts were added.
+
 Required boundary tags for this parent:
 
 - `mvp_required_apply_promotion`
@@ -127,12 +135,20 @@ Required boundary tags for this parent:
 
 ## 4. MVP Relation
 
-`PHASE8-IMPL-017` is MVP-required and active. It is required before the MVP can claim approved memory/canon mutation through owner-approved workflow. `PHASE8-IMPL-018` through `PHASE8-IMPL-022` remain future MVP-required parents.
+`PHASE8-IMPL-017` is MVP-required and complete/PASS. It delivered the explicit owner-confirmed apply-promotion path and approved memory/canon mutation boundary required before the MVP can claim approved memory/canon mutation through owner-approved workflow. `PHASE8-IMPL-018` is the next active/ready MVP-required parent. `PHASE8-IMPL-019` through `PHASE8-IMPL-022` remain future MVP-required parents.
 
 ## 5. Cross-References
 
 - Prior parent: `PHASE8-IMPL-016` - frontend owner-action execution workflow and review command boundary
 - Decision document: `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`
+- Final delivered backend module: `backend/story_knowledge/apply_promotion.py`
+- Final delivered backend route: `backend/routes/apply_promotion.py`
+- Final delivered route path: `POST /api/projects/{project_id}/apply-promotion`
+- Final delivered frontend API helper: `submitApplyPromotion(projectId, payload)` in `frontend/src/api.js`
+- Final delivered frontend confirmation component: `frontend/src/components/ApplyPromotionConfirmation.jsx`
+- Final delivered safety regression: `tests/test_apply_promotion_memory_canon_safety_regression.py`
+- Final delivered contract tests: `tests/test_writer_assistant_core_apply_promotion_contract.py`
+- Final delivered frontend source tests: `tests/test_frontend_apply_promotion_workflow_source.py`
 - Next MVP-required parents: `PHASE8-IMPL-018`, `PHASE8-IMPL-019`, `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, `PHASE8-IMPL-022`
 
 ## 6. Future Parent Deferrals
@@ -143,7 +159,8 @@ Required boundary tags for this parent:
 - `PHASE8-IMPL-021` owns NCP/Subtxt/dramatica-flow analysis-only runtime integration.
 - `PHASE8-IMPL-022` owns end-to-end MVP usability validation.
 
-Generated context artifacts remain evidence only and must not be treated as roadmap truth:
+Generated context artifacts remain evidence only and must not be treated as roadmap truth or task completion:
 
 - `.codex-context/PHASE8-IMPL-016/` (ignored)
+- `.codex-context/PHASE8-IMPL-017/` (ignored/evidence only if present)
 - `ai_context/repomix-current-task-context.xml` (ignored; evidence only)
