@@ -10,7 +10,7 @@ Raw artifact persistence implementation and project-local extraction artifact li
 
 ## Status
 
-MVP-required active parent after committed `PHASE8-IMPL-017` complete/PASS closeout through `PHASE8-IMPL-017-T007`. `PHASE8-IMPL-018-T001` is complete/PASS after publishing this parent record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-018-T002` is ready/active next for the raw artifact persistence boundary decision and manifest model. `PHASE8-IMPL-018-T003` through `PHASE8-IMPL-018-T007` remain planned. `PHASE8-IMPL-019` through `PHASE8-IMPL-022` remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+MVP-required active parent after committed `PHASE8-IMPL-017` complete/PASS closeout through `PHASE8-IMPL-017-T007`. `PHASE8-IMPL-018-T001` is complete/PASS after publishing this parent record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-018-T002` is complete/PASS after accepting the raw artifact persistence boundary decision and manifest model at `docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md`. `PHASE8-IMPL-018-T003` is ready/active next for tests-first expected-red raw artifact persistence contract coverage. `PHASE8-IMPL-018-T004` through `PHASE8-IMPL-018-T007` remain planned. `PHASE8-IMPL-019` through `PHASE8-IMPL-022` remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Goal
 
@@ -29,8 +29,8 @@ Apply-promotion and approved memory/canon mutation were delivered in `PHASE8-IMP
 ## Child Sequence
 
 - `PHASE8-IMPL-018-T001` - Parent publication/inventory/enrichment/status alignment. Complete/PASS.
-- `PHASE8-IMPL-018-T002` - Raw artifact persistence boundary decision and manifest model. Ready/active next.
-- `PHASE8-IMPL-018-T003` - Tests-first expected-red raw artifact persistence contract. Planned.
+- `PHASE8-IMPL-018-T002` - Raw artifact persistence boundary decision and manifest model. Complete/PASS.
+- `PHASE8-IMPL-018-T003` - Tests-first expected-red raw artifact persistence contract. Ready/active next.
 - `PHASE8-IMPL-018-T004` - Minimal backend raw artifact persistence helper implementation. Planned.
 - `PHASE8-IMPL-018-T005` - Raw artifact bundle/index lifecycle and provenance linkage. Planned.
 - `PHASE8-IMPL-018-T006` - Raw artifact safety regression: non-canon, non-training, path-safe, no extraction. Planned.
@@ -58,8 +58,8 @@ Apply-promotion and approved memory/canon mutation were delivered in `PHASE8-IMP
 
 ## Deferred Boundaries
 
-This parent does not authorize backend implementation code, frontend implementation code, product test changes, package/dependency changes, runtime extraction, BookNLP/spaCy install/run/import, model-assisted extraction, model/Ollama calls, NCP/Subtxt/dramatica-flow runtime, apply-promotion changes, approved memory/canon mutation, raw artifact-driven candidate creation, raw artifact-driven canon promotion, generated prose, or training/JSONL/dataset/model artifacts in `PHASE8-IMPL-018-T001`.
+This parent does not authorize backend implementation code, frontend implementation code, product test changes, package/dependency changes, runtime extraction, BookNLP/spaCy install/run/import, model-assisted extraction, model/Ollama calls, NCP/Subtxt/dramatica-flow runtime, apply-promotion changes, approved memory/canon mutation, raw artifact-driven candidate creation, raw artifact-driven canon promotion, generated prose, or training/JSONL/dataset/model artifacts in `PHASE8-IMPL-018-T001` or `PHASE8-IMPL-018-T002`.
 
-`PHASE8-IMPL-018-T002` will define the raw artifact persistence boundary and manifest model only. `PHASE8-IMPL-018-T003` will add expected-red contract tests only. `PHASE8-IMPL-018-T004` will be the first child allowed to implement minimal backend raw artifact persistence helpers if separately authorized by the child contract. `PHASE8-IMPL-018-T005` is limited to bundle/index lifecycle and provenance linkage. `PHASE8-IMPL-018-T006` is limited to safety regression coverage proving raw artifacts remain support data only, path-safe, fail-closed, non-canon, non-candidate, non-training-data, and no_runtime_extraction.
+`PHASE8-IMPL-018-T002` defined the raw artifact persistence boundary and manifest model only. It decided future raw artifacts are project-local support data only, not canon, not approved memory, not candidates by themselves, not training data, manifest-backed by `manifest.json`, linked through `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`, path-safe, fail-closed, quarantined/rejected when invalid, and separate from apply-promotion, approved memory/canon mutation, runtime extraction, model calls, and generated prose. Future contract symbols include `validate_raw_artifact_manifest`, `build_raw_artifact_manifest`, `write_raw_artifact_bundle`, `read_raw_artifact_manifest`, `list_raw_artifact_bundles`, `rebuild_raw_artifact_index`, and `quarantine_raw_artifact_bundle`. `PHASE8-IMPL-018-T003` will add expected-red contract tests only. `PHASE8-IMPL-018-T004` will be the first child allowed to implement minimal backend raw artifact persistence helpers if separately authorized by the child contract. `PHASE8-IMPL-018-T005` is limited to bundle/index lifecycle and provenance linkage. `PHASE8-IMPL-018-T006` is limited to safety regression coverage proving raw artifacts remain support data only, path-safe, fail-closed, non-canon, non-candidate, non-training-data, no_runtime_extraction, no_booknlp_spacy_runtime, no_model_calls, no_apply_promotion, no_memory_canon_mutation, and no_generated_prose.
 
 Real BookNLP/spaCy install/run/import plus runtime extraction remains `PHASE8-IMPL-019`. Model-assisted evidence-backed extraction remains `PHASE8-IMPL-020`. NCP/Subtxt/dramatica-flow analysis-only runtime remains `PHASE8-IMPL-021`. End-to-end MVP validation remains `PHASE8-IMPL-022`. Fine-tuning remains deferred after MVP. Generated prose remains permanently forbidden.

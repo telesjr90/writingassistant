@@ -6,10 +6,10 @@
 - Title: Raw artifact persistence implementation and project-local extraction artifact lifecycle
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-018-T001` complete/PASS; `PHASE8-IMPL-018-T002` ready/active next; `PHASE8-IMPL-018-T003` through `PHASE8-IMPL-018-T007` planned
+- Status: active MVP-required parent; `PHASE8-IMPL-018-T001` complete/PASS; `PHASE8-IMPL-018-T002` complete/PASS; `PHASE8-IMPL-018-T003` ready/active next; `PHASE8-IMPL-018-T004` through `PHASE8-IMPL-018-T007` planned
 - Depends on: completed `PHASE8-IMPL-017`
-- Current child: `PHASE8-IMPL-018-T002` ready/active next after T001 publication
-- Child sequence: T001 complete/PASS; T002 ready/active next; T003 planned; T004 planned; T005 planned; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-018-T003` ready/active next after T002 decision
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 ready/active next; T004 planned; T005 planned; T006 planned; T007 planned
 - Prior parent: `PHASE8-IMPL-017` complete/PASS through `PHASE8-IMPL-017-T007`
 - Future MVP-required parents: `PHASE8-IMPL-019`, `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, `PHASE8-IMPL-022`
 
@@ -66,7 +66,7 @@ Required boundary statements for this parent:
 - Fine-tuning remains deferred after MVP.
 - Generated prose remains permanently forbidden.
 
-Forbidden in `PHASE8-IMPL-018-T001`:
+Forbidden in `PHASE8-IMPL-018-T001` and `PHASE8-IMPL-018-T002`:
 
 - backend implementation code changes
 - frontend implementation code changes
@@ -86,6 +86,8 @@ Forbidden in `PHASE8-IMPL-018-T001`:
 - raw artifact file creation
 
 `PHASE8-IMPL-018-T001` changed docs/status only and published the parent record, inventory, enrichment JSON, and roadmap/status alignment. It did not implement raw artifact persistence or any runtime behavior.
+
+`PHASE8-IMPL-018-T002` changed docs/status only and accepted `docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md`. The decision defines raw artifacts as project-local support data only, not canon, not approved memory, not candidates by themselves, not training data, and not evidence by themselves unless linked to source/evidence/provenance. Future storage is `projects/{project_id}/writer_assistant/raw_artifacts/{raw_artifact_bundle_id}/` with required `manifest.json`, `artifacts/`, `indexes/`, `quarantine/`, optional safe metadata-only `logs/`, and owner/admin-authored non-prose bundle notes. Future manifest fields include `artifact_files`, `artifact_file_id`, `relative_path`, `sha256`, `bundle_hash`, `source_refs`, `evidence_refs`, `provenance_refs`, `source_locator_refs`, boundary confirmations, and validation/quarantine state. It defines fail-closed validation, quarantine/rejection behavior, derived/rebuildable indexes, separation from apply-promotion and approved memory/canon, separation from runtime extraction/model calls, and future T003/T004/T005/T006 guidance around `validate_raw_artifact_manifest`, `build_raw_artifact_manifest`, `write_raw_artifact_bundle`, `read_raw_artifact_manifest`, `list_raw_artifact_bundles`, `rebuild_raw_artifact_index`, and `quarantine_raw_artifact_bundle`.
 
 Required boundary tags for this parent:
 
