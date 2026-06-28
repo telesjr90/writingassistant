@@ -24,8 +24,6 @@ ALLOWED_COMMANDS = (
 )
 
 FORBIDDEN_MARKER_PARTS = (
-    ("apply", "-", "promotion"),
-    ("Apply", "Promotion"),
     ("promote", "_", "candidate"),
     ("write", "_", "memory"),
     ("write", "_", "canon"),
@@ -143,3 +141,11 @@ def test_read_only_queue_display_is_separate_from_post_controls() -> None:
     assert "submitReviewQueueAction" not in controls_source
     assert "onSubmitAction" in controls_source
     assert "controlsUnavailableReason" in controls_source
+
+
+def test_review_workflow_controls_do_not_call_apply_promotion() -> None:
+    controls_source = read_source(OWNER_ACTION_CONTROLS_JSX)
+
+    assert "submitApplyPromotion" not in controls_source
+    assert "/apply-promotion" not in controls_source
+    assert "ApplyPromotionConfirmation" not in controls_source

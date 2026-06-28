@@ -10,7 +10,7 @@ Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 
 ## Status
 
-Active MVP-required parent after committed `PHASE8-IMPL-016` closeout. `PHASE8-IMPL-017-T001` is complete/PASS after publishing this parent record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-017-T002` is complete/PASS after accepting the apply-promotion boundary decision and audit model at `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`. `PHASE8-IMPL-017-T003` is complete/PASS as an expected-red contract handoff at `tests/test_writer_assistant_core_apply_promotion_contract.py`. `PHASE8-IMPL-017-T004` is complete/PASS after implementing the minimal backend apply-promotion service at `backend/story_knowledge/apply_promotion.py`, the backend route at `backend/routes/apply_promotion.py`, and route inclusion in `backend/main.py`. `PHASE8-IMPL-017-T005` is ready/active next. `PHASE8-IMPL-017-T006` through `PHASE8-IMPL-017-T007` remain planned.
+Active MVP-required parent after committed `PHASE8-IMPL-016` closeout. `PHASE8-IMPL-017-T001` is complete/PASS after publishing this parent record, inventory, enrichment JSON, and roadmap/status updates. `PHASE8-IMPL-017-T002` is complete/PASS after accepting the apply-promotion boundary decision and audit model at `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`. `PHASE8-IMPL-017-T003` is complete/PASS as an expected-red contract handoff at `tests/test_writer_assistant_core_apply_promotion_contract.py`. `PHASE8-IMPL-017-T004` is complete/PASS after implementing the minimal backend apply-promotion service at `backend/story_knowledge/apply_promotion.py`, the backend route at `backend/routes/apply_promotion.py`, and route inclusion in `backend/main.py`. `PHASE8-IMPL-017-T005` is complete/PASS after implementing the minimal frontend apply-promotion confirmation workflow/surface. `PHASE8-IMPL-017-T006` is ready/active next. `PHASE8-IMPL-017-T007` remains planned.
 
 ## Goal
 
@@ -18,7 +18,7 @@ Define and sequence the MVP-required apply-promotion workflow and approved memor
 
 ## Scope
 
-This parent follows `PHASE8-IMPL-016`, which delivered owner-action review command workflow only. `PHASE8-IMPL-017` is the first parent allowed to design and implement the candidate-to-approved boundary, but `PHASE8-IMPL-017-T001` is docs/status publication only, `PHASE8-IMPL-017-T002` is docs/decision/status only, and `PHASE8-IMPL-017-T003` is tests/docs/status only. `PHASE8-IMPL-017-T004` implements only the minimal backend apply-promotion service/route boundary needed by the contract: explicit owner-confirmed promotion requests, validated plans, approved-memory writes, and immutable project-local audit records.
+This parent follows `PHASE8-IMPL-016`, which delivered owner-action review command workflow only. `PHASE8-IMPL-017` is the first parent allowed to design and implement the candidate-to-approved boundary, but `PHASE8-IMPL-017-T001` is docs/status publication only, `PHASE8-IMPL-017-T002` is docs/decision/status only, and `PHASE8-IMPL-017-T003` is tests/docs/status only. `PHASE8-IMPL-017-T004` implements only the minimal backend apply-promotion service/route boundary needed by the contract: explicit owner-confirmed promotion requests, validated plans, approved-memory writes, and immutable project-local audit records. `PHASE8-IMPL-017-T005` implements only the minimal frontend confirmation surface and API helper needed to call the backend apply-promotion route after final owner confirmation.
 
 The parent must keep apply-promotion explicit, owner-confirmed, and audited. It must not automatically promote based on confidence, queue status, model output, extraction, candidate persistence, or raw artifact presence. Queue presence is not approval. Confidence is not truth. Candidate persistence is not canon. Extraction is not canon.
 
@@ -30,8 +30,8 @@ Apply-promotion must not call models, run extraction, persist raw artifacts, cre
 - `PHASE8-IMPL-017-T002` - Apply-promotion boundary decision and audit model. Complete/PASS. Decision: `docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md`.
 - `PHASE8-IMPL-017-T003` - Tests-first expected-red apply-promotion contract. Complete/PASS. Contract: `tests/test_writer_assistant_core_apply_promotion_contract.py`.
 - `PHASE8-IMPL-017-T004` - Minimal backend apply-promotion service/route implementation. Complete/PASS. Implementation: `backend/story_knowledge/apply_promotion.py`; route: `backend/routes/apply_promotion.py`.
-- `PHASE8-IMPL-017-T005` - Frontend apply-promotion confirmation workflow/surface. Ready/active next.
-- `PHASE8-IMPL-017-T006` - Approved memory/canon mutation safety regression. Planned.
+- `PHASE8-IMPL-017-T005` - Frontend apply-promotion confirmation workflow/surface. Complete/PASS.
+- `PHASE8-IMPL-017-T006` - Approved memory/canon mutation safety regression. Ready/active next.
 - `PHASE8-IMPL-017-T007` - Parent closeout. Planned.
 
 ## Boundary Tags
@@ -54,7 +54,7 @@ Apply-promotion must not call models, run extraction, persist raw artifacts, cre
 
 ## Deferred Boundaries
 
-This parent does not authorize `PHASE8-IMPL-017-T001`, `PHASE8-IMPL-017-T002`, or `PHASE8-IMPL-017-T003` to implement runtime behavior. T002 defines the apply-promotion boundary and audit model only. T003 adds expected-red contract tests only. T004 implements the minimal backend apply-promotion module and route only; it does not implement frontend UI, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, generated prose, or training artifacts.
+This parent does not authorize `PHASE8-IMPL-017-T001`, `PHASE8-IMPL-017-T002`, or `PHASE8-IMPL-017-T003` to implement runtime behavior. T002 defines the apply-promotion boundary and audit model only. T003 adds expected-red contract tests only. T004 implements the minimal backend apply-promotion module and route only. T005 implements the minimal frontend API helper and confirmation surface only. T004/T005 do not implement raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, generated prose, or training artifacts.
 
 Raw artifact persistence remains `PHASE8-IMPL-018`. Runtime extraction plus real BookNLP/spaCy install/run/import remains `PHASE8-IMPL-019`. Model-assisted evidence-backed extraction remains `PHASE8-IMPL-020`. NCP/Subtxt/dramatica-flow analysis-only runtime remains `PHASE8-IMPL-021`. End-to-end MVP validation remains `PHASE8-IMPL-022`.
 

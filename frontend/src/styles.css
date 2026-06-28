@@ -576,11 +576,24 @@ h2 {
 .review-queue-list,
 .review-queue-detail,
 .owner-action-controls,
-.owner-action-form {
+.owner-action-form,
+.apply-promotion-confirmation,
+.apply-promotion-form {
   display: flex;
   min-width: 0;
   flex-direction: column;
   gap: 10px;
+}
+
+.apply-promotion-confirmation {
+  padding-top: 14px;
+  border-top: 1px solid #dfe5ef;
+}
+
+.apply-promotion-form .field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .review-queue-list h3 {

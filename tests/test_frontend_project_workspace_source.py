@@ -64,6 +64,38 @@ def read_source(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def source_without_t005_apply_promotion(source: str) -> str:
+    """Remove the T005-approved helper from older workspace source guards."""
+    stripped = source
+    ranges = [
+        (
+            "export const APPLY_PROMOTION_DESTINATION_TYPES",
+            "export function isSafeReviewRouteId",
+        ),
+        (
+            "function requireApplyPromotionDestinationType",
+            "function compactStringField",
+        ),
+        (
+            "export async function submitApplyPromotion",
+            "export async function submitReviewQueueAction",
+        ),
+    ]
+    for start_marker, end_marker in ranges:
+        start = stripped.find(start_marker)
+        end = stripped.find(end_marker)
+        if start != -1 and end != -1 and start < end:
+            stripped = stripped[:start] + stripped[end:]
+    return stripped
+
+
+def read_source_for_legacy_workspace_guard(path: Path) -> str:
+    source = read_source(path)
+    if path == API_JS:
+        return source_without_t005_apply_promotion(source)
+    return source
+
+
 @pytest.fixture(scope="module")
 def api_source() -> str:
     return read_source(API_JS)
@@ -1820,7 +1852,7 @@ class TestMemoryCanonShellRegressionCoverage:
         self, source_path: Path
     ) -> None:
         lower_source = self._runtime_source_without_comments(
-            self._runtime_source(source_path)
+            read_source_for_legacy_workspace_guard(source_path)
         ).lower()
         lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
         lower_source = lower_source.replace("no apply" + "-promotion in this phase", "")
@@ -2410,7 +2442,9 @@ class TestOmiGuidedProjectCreationBackendStorageDecision:
     def test_runtime_sources_exclude_t003_forbidden_staged_storage_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._without_line_comments(read_source(source_path)).lower()
+        lower_source = self._without_line_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         for forbidden_term in (
             "generated setup",
             "ai-written setup",
@@ -2640,7 +2674,9 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
     def test_runtime_sources_exclude_t004_forbidden_route_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         for forbidden_term in (
             "generated setup",
             "ai-written setup",
@@ -2885,7 +2921,9 @@ class TestOmiGuidedProjectCreationFrontendShell:
     def test_runtime_sources_exclude_t005_forbidden_shell_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         for forbidden_term in (
             "generated setup",
             "generated prose",
@@ -3247,7 +3285,9 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
     def test_runtime_sources_exclude_t006_forbidden_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         for forbidden_term in (
             "generated setup",
             "generated prose",
@@ -3439,7 +3479,7 @@ class TestApprovedMemoryCanonShellContract:
         combined_runtime = "\n".join(
             [
                 app_source,
-                api_source,
+                source_without_t005_apply_promotion(api_source),
                 omi_panel_source,
                 backend_main_source,
                 project_manager_source,
@@ -3526,7 +3566,12 @@ class TestApprovedMemoryCanonShellContract:
             assert route_contract in combined_contract
 
         combined_runtime = "\n".join(
-            [app_source, api_source, backend_main_source, project_manager_source]
+            [
+                app_source,
+                source_without_t005_apply_promotion(api_source),
+                backend_main_source,
+                project_manager_source,
+            ]
         )
         for forbidden_route_or_helper in (
             "/memory-canon",
@@ -4827,7 +4872,7 @@ class TestApiNoteMaterialHelpers:
     def test_api_js_excludes_forbidden_workspace_terms(
         self, api_source: str
     ) -> None:
-        lower_source = api_source.lower()
+        lower_source = source_without_t005_apply_promotion(api_source).lower()
         forbidden_terms = [
             "apply" + "-promotion",
             "apply promotion",

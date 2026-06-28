@@ -159,6 +159,7 @@ export async function saveMaterialMetadata(materialId, metadata, projectId = PRO
 }
 
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
+const SAFE_DESTINATION_PATH_PATTERN = /^memory\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.json$/;
 
 export const REVIEW_ACTION_TYPES = Object.freeze([
   'mark_reviewed',
@@ -168,6 +169,19 @@ export const REVIEW_ACTION_TYPES = Object.freeze([
   'quarantine',
   'update_owner_note',
   'set_review_status',
+]);
+
+export const APPLY_PROMOTION_DESTINATION_TYPES = Object.freeze([
+  'approved_character',
+  'approved_location',
+  'approved_timeline_event',
+  'approved_relationship',
+  'approved_organization',
+  'approved_object',
+  'approved_plot_thread',
+  'approved_continuity_record',
+  'approved_open_question',
+  'approved_memory_index',
 ]);
 
 export function isSafeReviewRouteId(value) {
@@ -186,6 +200,24 @@ function requireReviewActionType(actionType) {
   }
 }
 
+function requireApplyPromotionDestinationType(destinationType) {
+  if (!APPLY_PROMOTION_DESTINATION_TYPES.includes(destinationType)) {
+    throw new Error('Unsupported apply-promotion destination.');
+  }
+}
+
+function requireNonEmptyRefList(value, label) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${label} is required before apply-promotion.`);
+  }
+}
+
+function requireSafeDestinationPath(value) {
+  if (typeof value !== 'string' || !SAFE_DESTINATION_PATH_PATTERN.test(value)) {
+    throw new Error('destination_path is required before apply-promotion.');
+  }
+}
+
 function compactStringField(value) {
   return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
 }
@@ -193,6 +225,73 @@ function compactStringField(value) {
 export async function fetchReviewQueueEntries(projectId = PROJECT_ID) {
   requireSafeReviewRouteId(projectId, 'project_id');
   return requestData(() => client.get(`/projects/${projectId}/review-queue`));
+}
+
+export async function submitApplyPromotion(projectId = PROJECT_ID, payload = {}) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(payload.candidate_id, 'candidate_id');
+  requireSafeReviewRouteId(payload.owner_actor_id, 'owner_actor_id');
+  requireApplyPromotionDestinationType(payload.destination_type);
+  requireSafeDestinationPath(payload.destination_path);
+  requireNonEmptyRefList(payload.evidence_refs, 'evidence_refs');
+  requireNonEmptyRefList(payload.provenance_refs, 'provenance_refs');
+  requireNonEmptyRefList(payload.source_locator_refs, 'source_locator_refs');
+
+  if (typeof payload.candidate_type !== 'string' || payload.candidate_type.trim() === '') {
+    throw new Error('candidate_type is required before apply-promotion.');
+  }
+  if (payload.destination_key && !isSafeReviewRouteId(payload.destination_key)) {
+    throw new Error('destination_key is required before apply-promotion.');
+  }
+  if (payload.queue_entry_id && !isSafeReviewRouteId(payload.queue_entry_id)) {
+    throw new Error('queue_entry_id must be safe before apply-promotion.');
+  }
+  if (payload.owner_confirmation !== true) {
+    throw new Error('owner_confirmation is required before apply-promotion.');
+  }
+
+  const requestPayload = {
+    project_id: projectId,
+    candidate_id: payload.candidate_id,
+    queue_entry_id: compactStringField(payload.queue_entry_id),
+    candidate_type: payload.candidate_type,
+    owner_actor_id: payload.owner_actor_id,
+    owner_actor_label: compactStringField(payload.owner_actor_label),
+    owner_confirmation: true,
+    owner_note: compactStringField(payload.owner_note) ?? '',
+    destination_type: payload.destination_type,
+    destination_path: payload.destination_path,
+    destination_key: compactStringField(payload.destination_key),
+    approved_payload: {
+      record_type: payload.destination_type,
+      candidate_id: payload.candidate_id,
+      destination_key: compactStringField(payload.destination_key),
+      evidence_refs: payload.evidence_refs,
+      provenance_refs: payload.provenance_refs,
+      source_locator_refs: payload.source_locator_refs,
+    },
+    evidence_refs: payload.evidence_refs,
+    provenance_refs: payload.provenance_refs,
+    source_locator_refs: payload.source_locator_refs,
+    source_candidate_snapshot_hash: compactStringField(payload.source_candidate_snapshot_hash),
+    requested_at: compactStringField(payload.requested_at),
+    boundary_flags: [
+      'candidate persistence is not canon',
+      'queue presence is not approval',
+      'confidence is not truth',
+      'raw artifacts are support data',
+      'no_auto_promotion',
+      'no_confidence_as_truth',
+      'no_queue_presence_as_approval',
+      'no_generated_prose',
+      'no_model_calls',
+      'no_training_artifacts',
+    ],
+  };
+
+  return requestData(() => (
+    client.post(`/projects/${projectId}/apply-promotion`, requestPayload)
+  ));
 }
 
 export async function submitReviewQueueAction({

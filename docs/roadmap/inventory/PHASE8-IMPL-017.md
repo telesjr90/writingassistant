@@ -6,10 +6,10 @@
 - Title: Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation
+- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation; `PHASE8-IMPL-017-T005` complete/PASS frontend apply-promotion confirmation workflow/surface
 - Depends on: completed `PHASE8-IMPL-016`
-- Current child: `PHASE8-IMPL-017-T005` - ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 ready/active; T006 planned; T007 planned
+- Current child: `PHASE8-IMPL-017-T006` - ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 complete/PASS frontend confirmation workflow; T006 ready/active; T007 planned
 
 ## 2. Why This Parent Exists
 
@@ -24,7 +24,7 @@ Allowed in this parent sequence:
 - apply-promotion boundary decision and audit model
 - tests-first expected-red apply-promotion contract
 - minimal backend apply-promotion service/route implementation in T004
-- frontend apply-promotion confirmation workflow/surface in a later child
+- frontend apply-promotion confirmation workflow/surface in T005
 - approved memory/canon mutation safety regression
 - parent closeout after validation
 
@@ -86,6 +86,14 @@ Allowed and completed in `PHASE8-IMPL-017-T004`:
 - Approved memory/canon mutation is bounded to `writer_assistant/approved_memory/` after valid owner-confirmed apply-promotion only.
 - Promotion audit records are bounded to `writer_assistant/promotion_audit/`.
 - No frontend implementation code, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts were added.
+
+Allowed and completed in `PHASE8-IMPL-017-T005`:
+
+- `frontend/src/api.js` exposes `submitApplyPromotion(projectId, payload)` for `POST /api/projects/{project_id}/apply-promotion`.
+- `frontend/src/components/ApplyPromotionConfirmation.jsx` provides a separate final owner confirmation surface from review workflow commands.
+- Apply-promotion remains explicit owner-confirmed, audited by the backend, evidence/provenance/source-locator-backed, project-local, and fail-closed.
+- The frontend destination allowlist is limited to approved memory/canon destination categories.
+- No backend implementation code, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts were added.
 
 Required boundary tags for this parent:
 

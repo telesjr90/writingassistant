@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-017",
     "current_parent_task_title": "Apply-promotion contract, audit log, and approved memory/canon mutation boundary",
-      "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 and committed. PHASE8-IMPL-017 is active after PHASE8-IMPL-017-T004 complete/PASS. PHASE8-IMPL-017 owns explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation only after explicit owner action. PHASE8-IMPL-017-T002 accepted docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md as docs/decision/status only. PHASE8-IMPL-017-T003 added contract tests at tests/test_writer_assistant_core_apply_promotion_contract.py. PHASE8-IMPL-017-T004 implemented backend/story_knowledge/apply_promotion.py, backend/routes/apply_promotion.py, and route inclusion in backend/main.py; the apply-promotion contract is now green. PHASE8-IMPL-017-T005 is ready/active next. PHASE8-IMPL-017-T006 through PHASE8-IMPL-017-T007 remain planned. Apply-promotion must never run automatically from confidence, queue status, model output, extraction, candidate persistence, or raw artifact presence. Candidate persistence is not canon; queue presence is not approval; confidence is not truth; raw artifacts are support data. T004 did not implement frontend apply-promotion UI, raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, model calls, generated prose, or training artifacts. PHASE8-IMPL-018 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
+      "frontier_note": "PHASE8-IMPL-016 is complete/PASS through PHASE8-IMPL-016-T007 and committed. PHASE8-IMPL-017 is active after PHASE8-IMPL-017-T005 complete/PASS. PHASE8-IMPL-017 owns explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation only after explicit owner action. PHASE8-IMPL-017-T002 accepted docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md as docs/decision/status only. PHASE8-IMPL-017-T003 added contract tests at tests/test_writer_assistant_core_apply_promotion_contract.py. PHASE8-IMPL-017-T004 implemented backend/story_knowledge/apply_promotion.py, backend/routes/apply_promotion.py, and route inclusion in backend/main.py; the apply-promotion contract is now green. PHASE8-IMPL-017-T005 implemented the frontend apply-promotion API helper and confirmation surface at frontend/src/api.js and frontend/src/components/ApplyPromotionConfirmation.jsx. PHASE8-IMPL-017-T006 is ready/active next. PHASE8-IMPL-017-T007 remains planned. Apply-promotion must never run automatically from confidence, queue status, model output, extraction, candidate persistence, or raw artifact presence. Candidate persistence is not canon; queue presence is not approval; confidence is not truth; raw artifacts are support data. T005 did not edit backend implementation code, implement raw artifact persistence, runtime extraction, model-assisted extraction, real BookNLP/spaCy install/run/import, NCP/Subtxt/dramatica-flow runtime integration, model calls, generated prose, or training artifacts. PHASE8-IMPL-018 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3675,7 +3675,7 @@
       "id": "PHASE8-IMPL-017-T005",
       "title": "Frontend apply-promotion confirmation workflow/surface",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-017",
       "depends_on": [
         "PHASE8-IMPL-017-T004"
@@ -3689,13 +3689,13 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "planned"
+      "result": "complete/PASS frontend apply-promotion confirmation workflow/surface at frontend/src/api.js and frontend/src/components/ApplyPromotionConfirmation.jsx; source tests added at tests/test_frontend_apply_promotion_workflow_source.py"
     },
     {
       "id": "PHASE8-IMPL-017-T006",
       "title": "Approved memory/canon mutation safety regression",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "parent": "PHASE8-IMPL-017",
       "depends_on": [
         "PHASE8-IMPL-017-T005"
@@ -3709,7 +3709,7 @@
         "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "planned"
+      "result": "ready/active next approved memory/canon mutation safety regression"
     },
     {
       "id": "PHASE8-IMPL-017-T007",

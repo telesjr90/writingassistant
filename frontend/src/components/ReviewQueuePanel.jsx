@@ -3,6 +3,7 @@ import {
   fetchReviewQueueEntries,
   submitReviewQueueAction,
 } from '../api.js';
+import ApplyPromotionConfirmation from './ApplyPromotionConfirmation.jsx';
 import OwnerActionReviewControls from './OwnerActionReviewControls.jsx';
 
 function formatValue(value) {
@@ -210,6 +211,12 @@ export default function ReviewQueuePanel({ projectId }) {
                 queueEntry={selectedEntry}
                 disabled={isLoading}
                 onSubmitAction={handleSubmitAction}
+              />
+
+              <ApplyPromotionConfirmation
+                projectId={projectId}
+                queueEntry={selectedEntry}
+                disabled={isLoading}
               />
             </>
           )}
