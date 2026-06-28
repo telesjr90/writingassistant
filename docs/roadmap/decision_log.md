@@ -5,6 +5,7 @@
 | Decision | Status | Rationale |
 | --- | --- | --- |
 | Product is analysis-only | Accepted | Protects writer authorship and keeps training/eval bounded |
+| PHASE8-IMPL-018-T004 raw artifact helper implementation | Accepted | `PHASE8-IMPL-018-T004` is complete/PASS with the minimal standard-library backend helper at `backend/story_knowledge/raw_artifacts.py`; raw artifacts remain manifest-backed project-local support data, not canon, not candidates, not training data, with no_runtime_extraction, no_model_calls, no_apply_promotion, no_memory_canon_mutation, and no_generated_prose. `PHASE8-IMPL-018-T005` is ready/active next. |
 | Standard refusal message | Accepted | Consistent no-prose behavior across app and training |
 | Local-first architecture | Accepted | Current app uses FastAPI, React, local project files, and Ollama |
 | Current baseline model is `qwen3:8b` | Accepted | Verified in `backend/analysis_engine.py` default |
