@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "task_id": "PHASE8-IMPL-018",
+  "title": "Raw artifact persistence implementation and project-local extraction artifact lifecycle",
+  "type": "runtime",
+  "status": "active",
+  "parent": null,
+  "depends_on": [
+    "PHASE8-IMPL-017"
+  ],
+  "track": "Writer Assistant Core",
+  "phase": "Phase 8",
+  "boundary_tags": [
+    "mvp_required_raw_persistence",
+    "storage_contract_first",
+    "raw_artifacts_non_canon",
+    "raw_artifacts_non_candidate",
+    "evidence_first",
+    "local_first",
+    "no_runtime_extraction",
+    "no_model_calls",
+    "no_apply_promotion",
+    "no_memory_canon_mutation",
+    "no_generated_prose",
+    "generated_prose_permanently_forbidden",
+    "no_package_changes",
+    "no_booknlp_install",
+    "no_spacy_install",
+    "fine_tuning_deferred"
+  ],
+  "records": {
+    "task_record": "docs/roadmap/tasks/PHASE8-IMPL-018.md",
+    "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-018.md",
+    "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-018.enrichment.json",
+    "prior_parent_task": "docs/roadmap/tasks/PHASE8-IMPL-017.md",
+    "prior_parent_inventory": "docs/roadmap/inventory/PHASE8-IMPL-017.md",
+    "prior_parent_enrichment": "docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json",
+    "prior_parent_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-017-apply-promotion-boundary-audit-model-decision.md",
+    "future_parent_sequence": [
+      "PHASE8-IMPL-019",
+      "PHASE8-IMPL-020",
+      "PHASE8-IMPL-021",
+      "PHASE8-IMPL-022"
+    ],
+    "child_sequence": [
+      "PHASE8-IMPL-018-T001",
+      "PHASE8-IMPL-018-T002",
+      "PHASE8-IMPL-018-T003",
+      "PHASE8-IMPL-018-T004",
+      "PHASE8-IMPL-018-T005",
+      "PHASE8-IMPL-018-T006",
+      "PHASE8-IMPL-018-T007"
+    ]
+  },
+  "current_child_status": {
+    "PHASE8-IMPL-018-T001": "complete/PASS parent publication/inventory/enrichment/status alignment",
+    "PHASE8-IMPL-018-T002": "ready/active next raw artifact persistence boundary decision and manifest model",
+    "PHASE8-IMPL-018-T003": "planned tests-first expected-red raw artifact persistence contract",
+    "PHASE8-IMPL-018-T004": "planned minimal backend raw artifact persistence helper implementation",
+    "PHASE8-IMPL-018-T005": "planned raw artifact bundle/index lifecycle and provenance linkage",
+    "PHASE8-IMPL-018-T006": "planned raw artifact safety regression: non-canon, non-training, path-safe, no extraction",
+    "PHASE8-IMPL-018-T007": "planned parent closeout"
+  },
+  "publication_summary": {
+    "mvp_required": true,
+    "follows": "PHASE8-IMPL-017",
+    "owns": "raw artifact persistence lifecycle only",
+    "parent_result": "active",
+    "t001_result": "complete/PASS",
+    "next_child": "PHASE8-IMPL-018-T002",
+    "t001_scope": "docs/status publication only",
+    "raw_artifacts": "project-local support data only; not canon; not approved memory; not candidates by themselves; not training data",
+    "manifest_boundary": "raw artifact persistence must be manifest-backed, path-safe, and fail-closed",
+    "provenance_boundary": "raw artifact persistence must preserve source/evidence/provenance linkage",
+    "promotion_boundary": "raw artifact persistence must not automatically create candidates and must not automatically promote to canon",
+    "runtime_boundary": "raw artifact persistence must not call models, must not trigger extraction, must not install/run/import BookNLP or spaCy, must not call NCP/Subtxt/dramatica-flow runtimes, and must not generate prose",
+    "apply_promotion_separation": "apply-promotion and approved memory/canon mutation were delivered in PHASE8-IMPL-017 and must remain separate from raw artifact persistence",
+    "future_parent_deferrals": {
+      "PHASE8-IMPL-019": "real BookNLP/spaCy install/run/import plus runtime extraction",
+      "PHASE8-IMPL-020": "model-assisted evidence-backed extraction",
+      "PHASE8-IMPL-021": "NCP/Subtxt/dramatica-flow analysis-only runtime",
+      "PHASE8-IMPL-022": "end-to-end MVP validation"
+    },
+    "fine_tuning": "deferred after MVP",
+    "generated_prose": "generated prose remains permanently forbidden"
+  },
+  "required_parent_boundary_markers": [
+    "mvp_required_raw_artifact_persistence",
+    "raw_artifacts_support_data_only",
+    "raw_artifacts_not_canon",
+    "raw_artifacts_not_candidates",
+    "raw_artifacts_not_training_data",
+    "project_local_raw_artifacts",
+    "manifest_backed_raw_artifacts",
+    "evidence_provenance_linked",
+    "path_safe_fail_closed",
+    "no_runtime_extraction",
+    "no_booknlp_spacy_runtime",
+    "no_model_calls",
+    "no_apply_promotion",
+    "no_memory_canon_mutation",
+    "no_generated_prose",
+    "generated_prose_permanently_forbidden",
+    "no_training_artifacts"
+  ]
+}

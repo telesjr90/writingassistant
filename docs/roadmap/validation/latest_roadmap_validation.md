@@ -1,66 +1,70 @@
-# PHASE8-IMPL-017-T007 Parent Closeout
+# PHASE8-IMPL-018-T001 Parent Publication
 
 ### Result
 
 - Result: PASS.
-- Scope: docs/status/governance closeout only.
-- Parent task: `PHASE8-IMPL-017` - Apply-promotion contract, audit log, and approved memory/canon mutation boundary.
-- Completed child recorded: `PHASE8-IMPL-017-T007` - Parent closeout.
-- Last completed parent: `PHASE8-IMPL-017` complete/PASS.
-- Active/ready next parent: `PHASE8-IMPL-018` - Raw artifact persistence implementation and project-local extraction artifact lifecycle.
-- Next child if child-level frontier is required: `PHASE8-IMPL-018-T001`.
-- No context tools were run inside T007. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+- Scope: docs/status parent-publication only.
+- Parent task: `PHASE8-IMPL-018` - Raw artifact persistence implementation and project-local extraction artifact lifecycle.
+- Completed child recorded: `PHASE8-IMPL-018-T001` - Parent publication/inventory/enrichment/status alignment.
+- Active parent: `PHASE8-IMPL-018` MVP-required.
+- Active/ready next child: `PHASE8-IMPL-018-T002` - Raw artifact persistence boundary decision and manifest model.
+- Planned children: `PHASE8-IMPL-018-T003`, `PHASE8-IMPL-018-T004`, `PHASE8-IMPL-018-T005`, `PHASE8-IMPL-018-T006`, and `PHASE8-IMPL-018-T007`.
+- Prior parent: `PHASE8-IMPL-017` remains complete/PASS through `PHASE8-IMPL-017-T007`.
+- No context tools were run inside T001. Generated context artifacts remain evidence only, not roadmap truth or task completion.
 
 ### Files Changed
 
-- Updated: `docs/roadmap/tasks/PHASE8-IMPL-017.md`
-- Updated: `docs/roadmap/inventory/PHASE8-IMPL-017.md`
-- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-017.enrichment.json`
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-018.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-018.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-018.enrichment.json`
 - Updated: `docs/roadmap/implementation_status.md`
 - Updated: `docs/roadmap/roadmap_index.yaml`
 - Updated: `docs/roadmap/task_backlog.md`
 - Updated: `docs/roadmap/phase_map.md`
 - Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
-- Updated: `docs/roadmap/decision_log.md`
-- Updated: `docs/roadmap/risk_register.md`
-- Updated: `docs/roadmap/open_questions.md`
 - Updated: `docs/master_plan.md`
 
-### Parent Closeout Summary
+### Publication Summary
 
-- T001 parent publication/inventory/enrichment/status alignment is complete/PASS.
-- T002 apply-promotion boundary decision and audit model is complete/PASS.
-- T003 expected-red apply-promotion contract tests are complete/PASS at `tests/test_writer_assistant_core_apply_promotion_contract.py`.
-- T004 backend apply-promotion service and route are complete/PASS at `backend/story_knowledge/apply_promotion.py` and `backend/routes/apply_promotion.py`.
-- T004 route path is `POST /api/projects/{project_id}/apply-promotion`.
-- T005 frontend apply-promotion confirmation workflow/surface is complete/PASS with `submitApplyPromotion(projectId, payload)` in `frontend/src/api.js` and `frontend/src/components/ApplyPromotionConfirmation.jsx`.
-- T005 frontend source tests are complete/PASS at `tests/test_frontend_apply_promotion_workflow_source.py`.
-- T006 approved memory/canon mutation safety regression is complete/PASS at `tests/test_apply_promotion_memory_canon_safety_regression.py`.
-- T007 parent closeout is complete/PASS.
+- `PHASE8-IMPL-018` is MVP-required and follows `PHASE8-IMPL-017`.
+- `PHASE8-IMPL-018` owns raw artifact persistence lifecycle only.
+- Raw artifacts are project-local support data only.
+- Raw artifacts are not canon, not approved memory, not candidates by themselves, and not training data.
+- Raw artifact persistence must be manifest-backed, evidence/provenance-linked, path-safe, and fail-closed.
+- Raw artifact persistence must preserve source/evidence/provenance linkage.
+- Raw artifact persistence must not automatically create candidates.
+- Raw artifact persistence must not automatically promote to canon.
+- Raw artifact persistence must not call models.
+- Raw artifact persistence must not trigger extraction.
+- Raw artifact persistence must not install/run/import BookNLP or spaCy.
+- Raw artifact persistence must not call NCP/Subtxt/dramatica-flow runtimes.
+- Raw artifact persistence must not generate prose.
+- Apply-promotion and approved memory/canon mutation were delivered in `PHASE8-IMPL-017` and remain separate from raw artifact persistence.
+
+### Child Sequence
+
+- `PHASE8-IMPL-018-T001` - Parent publication/inventory/enrichment/status alignment: complete/PASS.
+- `PHASE8-IMPL-018-T002` - Raw artifact persistence boundary decision and manifest model: ready/active next.
+- `PHASE8-IMPL-018-T003` - Tests-first expected-red raw artifact persistence contract: planned.
+- `PHASE8-IMPL-018-T004` - Minimal backend raw artifact persistence helper implementation: planned.
+- `PHASE8-IMPL-018-T005` - Raw artifact bundle/index lifecycle and provenance linkage: planned.
+- `PHASE8-IMPL-018-T006` - Raw artifact safety regression: non-canon, non-training, path-safe, no extraction: planned.
+- `PHASE8-IMPL-018-T007` - Parent closeout: planned.
 
 ### Boundary Confirmation
 
-- Apply-promotion is explicit owner-confirmed only.
-- Apply-promotion is audited.
-- Approved memory/canon mutation occurs only through valid apply-promotion.
-- Candidate persistence is not canon.
-- Queue presence is not approval.
-- Confidence is not truth.
-- Raw artifacts are support data, not canon.
-- Review queue actions do not mutate approved memory/canon.
-- Frontend review commands remain separate from apply-promotion.
-- Plan-building/validation performs no approved memory/canon mutation.
-- Failed validation performs no partial mutation.
-- Successful apply writes approved memory/canon plus applied audit record.
-- No backend implementation code changes in T007.
-- No frontend implementation code changes in T007.
-- No product test changes in T007.
+- No backend implementation code changes in T001.
+- No frontend implementation code changes in T001.
+- No product test changes in T001.
 - No package/dependency changes.
-- No raw artifact persistence.
+- No raw artifact persistence runtime implementation.
+- No raw artifact write/read/list helpers.
 - No runtime extraction.
 - No BookNLP/spaCy install/run/import.
 - No model/Ollama calls.
 - No NCP/Subtxt/dramatica-flow runtime.
+- No apply-promotion changes.
+- No approved memory/canon mutation.
 - No generated prose.
 - No training/JSONL/dataset/model artifacts.
 - No source-cache/generated context artifacts staged.
@@ -68,7 +72,29 @@
 
 ### MVP Scope Preservation
 
-- `PHASE8-IMPL-018` is active/ready next.
-- `PHASE8-IMPL-019` through `PHASE8-IMPL-022` remain future MVP-required parents.
+- `PHASE8-IMPL-019` remains future MVP-required for real BookNLP/spaCy install/run/import plus runtime extraction.
+- `PHASE8-IMPL-020` remains future MVP-required for model-assisted evidence-backed extraction.
+- `PHASE8-IMPL-021` remains future MVP-required for NCP/Subtxt/dramatica-flow analysis-only runtime integration.
+- `PHASE8-IMPL-022` remains future MVP-required for end-to-end MVP usability validation.
 - Fine-tuning remains deferred after MVP.
 - Generated prose/prose-production paths remain permanently forbidden.
+
+### Boundary Markers
+
+- `mvp_required_raw_artifact_persistence`
+- `raw_artifacts_support_data_only`
+- `raw_artifacts_not_canon`
+- `raw_artifacts_not_candidates`
+- `raw_artifacts_not_training_data`
+- `project_local_raw_artifacts`
+- `manifest_backed_raw_artifacts`
+- `evidence_provenance_linked`
+- `path_safe_fail_closed`
+- `no_runtime_extraction`
+- `no_booknlp_spacy_runtime`
+- `no_model_calls`
+- `no_apply_promotion`
+- `no_memory_canon_mutation`
+- `no_generated_prose`
+- `generated_prose_permanently_forbidden`
+- `no_training_artifacts`
