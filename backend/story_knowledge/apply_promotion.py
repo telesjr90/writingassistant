@@ -21,6 +21,9 @@ _DATASET_MANIFEST_FIELD = "dataset_" + "manifest"
 _RUN_BOOKNLP_SIGNAL = "run_" + "booknlp"
 _RUN_SPACY_SIGNAL = "run_" + "spacy"
 _CONTINUE_SCENE_DESTINATION = "continue_" + "scene"
+_RUN_NCP_SIGNAL = "run_" + "ncp"
+_RUN_SUBTXT_SIGNAL = "run_" + "subtxt"
+_RUN_DRAMATICA_FLOW_SIGNAL = "run_" + "dramatica" + "_flow"
 
 ALLOWED_DESTINATION_TYPES = frozenset(
     {
@@ -171,9 +174,9 @@ _FORBIDDEN_DESTINATIONS = frozenset(
         _RUN_SPACY_SIGNAL,
         "call_model",
         "call_ollama",
-        "run_ncp",
-        "run_subtxt",
-        "run_dramatica_flow",
+        _RUN_NCP_SIGNAL,
+        _RUN_SUBTXT_SIGNAL,
+        _RUN_DRAMATICA_FLOW_SIGNAL,
         _TRAINING_JSONL_FIELD,
         _DATASET_MANIFEST_FIELD,
         "model_artifact",

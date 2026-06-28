@@ -58,8 +58,8 @@
     "PHASE8-IMPL-017-T003": "complete/PASS tests-first expected-red apply-promotion contract at tests/test_writer_assistant_core_apply_promotion_contract.py",
     "PHASE8-IMPL-017-T004": "complete/PASS minimal backend apply-promotion service/route implementation at backend/story_knowledge/apply_promotion.py and backend/routes/apply_promotion.py",
     "PHASE8-IMPL-017-T005": "complete/PASS frontend apply-promotion confirmation workflow/surface",
-    "PHASE8-IMPL-017-T006": "ready/active next approved memory/canon mutation safety regression",
-    "PHASE8-IMPL-017-T007": "planned parent closeout"
+    "PHASE8-IMPL-017-T006": "complete/PASS approved memory/canon mutation safety regression",
+    "PHASE8-IMPL-017-T007": "ready/active next parent closeout"
   },
   "publication_summary": {
     "mvp_required": true,
@@ -70,6 +70,8 @@
     "t003_scope": "tests/docs/status only; expected-red contract tests added without runtime implementation",
     "t004_scope": "minimal backend apply-promotion service/route implementation only; no frontend UI, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
     "t005_scope": "minimal frontend apply-promotion API helper and confirmation workflow/surface only; no backend implementation code, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
+    "t006_scope": "focused approved memory/canon mutation safety regression plus minimal backend source marker hardening only; no new product features, destination categories, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts",
+    "t006_safety_regression_path": "tests/test_apply_promotion_memory_canon_safety_regression.py",
     "t003_contract_path": "tests/test_writer_assistant_core_apply_promotion_contract.py",
     "t004_backend_module": "backend/story_knowledge/apply_promotion.py",
     "t004_backend_route": "backend/routes/apply_promotion.py",

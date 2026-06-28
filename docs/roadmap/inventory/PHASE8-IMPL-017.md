@@ -6,10 +6,10 @@
 - Title: Apply-promotion contract, audit log, and approved memory/canon mutation boundary
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation; `PHASE8-IMPL-017-T005` complete/PASS frontend apply-promotion confirmation workflow/surface
+- Status: active MVP-required parent; `PHASE8-IMPL-017-T001` complete/PASS; `PHASE8-IMPL-017-T002` complete/PASS; `PHASE8-IMPL-017-T003` complete/PASS expected-red contract handoff; `PHASE8-IMPL-017-T004` complete/PASS minimal backend apply-promotion service/route implementation; `PHASE8-IMPL-017-T005` complete/PASS frontend apply-promotion confirmation workflow/surface; `PHASE8-IMPL-017-T006` complete/PASS approved memory/canon mutation safety regression
 - Depends on: completed `PHASE8-IMPL-016`
-- Current child: `PHASE8-IMPL-017-T006` - ready/active next
-- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 complete/PASS frontend confirmation workflow; T006 ready/active; T007 planned
+- Current child: `PHASE8-IMPL-017-T007` - ready/active next
+- Child sequence: T001 complete/PASS; T002 complete/PASS; T003 complete/PASS expected-red; T004 complete/PASS backend implementation; T005 complete/PASS frontend confirmation workflow; T006 complete/PASS safety regression; T007 ready/active parent closeout
 
 ## 2. Why This Parent Exists
 
@@ -94,6 +94,18 @@ Allowed and completed in `PHASE8-IMPL-017-T005`:
 - Apply-promotion remains explicit owner-confirmed, audited by the backend, evidence/provenance/source-locator-backed, project-local, and fail-closed.
 - The frontend destination allowlist is limited to approved memory/canon destination categories.
 - No backend implementation code, raw artifact persistence, runtime extraction, model calls, generated prose, or training artifacts were added.
+
+Allowed and completed in `PHASE8-IMPL-017-T006`:
+
+- `tests/test_apply_promotion_memory_canon_safety_regression.py` proves validation and plan-building do not mutate approved memory/canon.
+- Missing or false `owner_confirmation` fails closed without approved memory/canon writes or applied audit records.
+- Failed validation for unsafe destinations, missing evidence/provenance/source locators, unsupported candidate type, and forbidden fields does not partially mutate approved memory/canon.
+- Valid apply-promotion writes one structured approved-memory JSON file and one applied promotion audit JSON record with evidence/provenance/source locator refs and no generated-prose/model/training confirmations.
+- Duplicate apply behavior is deterministic and does not create duplicate conflicting applied audit records.
+- Review queue action commands remain separate from apply-promotion and do not create approved memory/canon files.
+- Frontend source safety preserves final owner confirmation, candidate-only/no-canon warning copy, and review/apply separation.
+- Backend source safety rejects unsupported destinations/actions without adding runtime extraction, model calls, generated prose, raw artifact persistence, or training artifacts.
+- Minimal backend hardening changed only forbidden runtime marker construction in `backend/story_knowledge/apply_promotion.py` without adding destination categories or product behavior.
 
 Required boundary tags for this parent:
 
