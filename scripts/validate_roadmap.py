@@ -19,9 +19,10 @@ ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "roadmap" / "roadmap_index.yaml"
 
 PARENT_RE = re.compile(r"^PHASE[0-9]+-IMPL-[0-9]{3}$")
+UX_PARENT_RE = re.compile(r"^PHASE[0-9]+-UX-[0-9]{3}$")
 CHILD_RE = re.compile(r"^(PHASE[0-9]+-IMPL-[0-9]{3})-T[0-9]{3}$")
 
-PARENT_TASK_TYPES = {"runtime", "validation"}
+PARENT_TASK_TYPES = {"runtime", "validation", "docs-only"}
 CHILD_TASK_TYPES = {"planning_microtask", "runtime_microtask", "validation_microtask"}
 TASK_TYPES = PARENT_TASK_TYPES | CHILD_TASK_TYPES
 
@@ -116,9 +117,10 @@ def validate_registry(data: dict[str, Any]) -> list[str]:
 
     for task_id, task in tasks_by_id.items():
         parent_match = PARENT_RE.match(task_id)
+        ux_parent_match = UX_PARENT_RE.match(task_id)
         child_match = CHILD_RE.match(task_id)
         require(
-            bool(parent_match or child_match),
+            bool(parent_match or ux_parent_match or child_match),
             errors,
             f"{task_id} does not match parent or child task ID policy",
         )
@@ -141,13 +143,19 @@ def validate_registry(data: dict[str, Any]) -> list[str]:
                 errors,
                 f"{task_id} is a child task and must use one of {sorted(CHILD_TASK_TYPES)}",
             )
-        elif parent_match:
+        elif parent_match or ux_parent_match:
             require(task.get("parent") is None, errors, f"{task_id} is a parent task and parent must be null")
             require(
                 task.get("type") in PARENT_TASK_TYPES,
                 errors,
                 f"{task_id} is a parent task and must use one of {sorted(PARENT_TASK_TYPES)}",
             )
+            if ux_parent_match:
+                require(
+                    task.get("type") == "docs-only",
+                    errors,
+                    f"{task_id} UX parent task must use type docs-only",
+                )
 
         if task.get("type") in {"validation", "validation_microtask"}:
             tags = task.get("boundary_tags", [])

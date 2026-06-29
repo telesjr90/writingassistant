@@ -100,3 +100,4 @@ training/models/hf_cache/
 .claude/settings.local.json
 # Generated Graphify outputs
 **/graphify-out/
+.aider*
