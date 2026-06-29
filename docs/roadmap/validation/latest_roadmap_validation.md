@@ -1,3 +1,67 @@
+# PHASE8-IMPL-018-T007 Parent Closeout
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/governance parent closeout only.
+- Parent task: `PHASE8-IMPL-018` - Raw artifact persistence implementation and project-local extraction artifact lifecycle.
+- Completed child recorded: `PHASE8-IMPL-018-T007` - Parent closeout.
+- Parent result: complete/PASS.
+- Completed child sequence: `PHASE8-IMPL-018-T001`, `PHASE8-IMPL-018-T002`, `PHASE8-IMPL-018-T003`, `PHASE8-IMPL-018-T004`, `PHASE8-IMPL-018-T005`, `PHASE8-IMPL-018-T006`, and `PHASE8-IMPL-018-T007` are complete/PASS.
+- Delivered decision: `docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md`.
+- Delivered backend helper: `backend/story_knowledge/raw_artifacts.py`.
+- Delivered contracts/regressions: `tests/test_writer_assistant_core_raw_artifacts_contract.py`, `tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py`, and `tests/test_writer_assistant_core_raw_artifact_safety_regression.py`.
+- Active/ready next parent: `PHASE8-IMPL-019` - Real BookNLP/spaCy install/run/import and runtime extraction pipeline.
+- Future MVP-required parents after `PHASE8-IMPL-019`: `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, and `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- No context tools were run inside T007. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-018.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-018.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-018.enrichment.json`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+- Updated: `docs/master_plan.md`
+
+### Parent Closeout Summary
+
+- Raw artifact persistence is manifest-backed by `manifest.json`, bundle-based, index-aware, project-local, path-safe, quarantine-aware, evidence/provenance-linked, and fail-closed.
+- Implemented APIs include `validate_raw_artifact_manifest`, `build_raw_artifact_manifest`, `validate_raw_artifact_file_ref`, `raw_artifact_bundle_storage_dir`, `raw_artifact_manifest_path`, `raw_artifact_index_path`, `write_raw_artifact_bundle`, `read_raw_artifact_manifest`, `read_raw_artifact_file`, `list_raw_artifact_bundles`, `rebuild_raw_artifact_index`, `quarantine_raw_artifact_bundle`, and `compute_raw_artifact_bundle_hash`.
+- Delivered behavior includes valid-only default listing/indexing, derived/rebuildable support-data indexes, `source_refs`, `evidence_refs`, `provenance_refs`, `source_locator_refs`, quarantine handling, superseded/deleted_tombstone exclusion by default, duplicate/idempotency handling, canonical deterministic bundle hashing, and fail-closed validation.
+- Raw artifacts remain support data only, not canon, not approved memory, not candidates, and not training data.
+
+### Boundary Confirmation
+
+- No runtime extraction.
+- No real BookNLP/spaCy install/run/import.
+- No model-assisted extraction.
+- No model/Ollama calls.
+- No NCP/Subtxt/dramatica-flow runtime.
+- No routes added.
+- No UI added.
+- No package/dependency changes.
+- No apply-promotion changes.
+- No approved memory/canon mutation beyond the existing `PHASE8-IMPL-017` path.
+- No candidate/review queue creation.
+- No generated prose.
+- No training/JSONL/dataset/model artifacts.
+- No source-cache/generated context artifacts staged.
+
+### Future Guidance
+
+- `PHASE8-IMPL-019` is ready/active next only as a future MVP-required parent handoff for real BookNLP/spaCy install/run/import plus runtime extraction.
+- `PHASE8-IMPL-019` must be bounded by environment guards, source/evidence/provenance requirements, raw artifact persistence support from `PHASE8-IMPL-018`, candidate-first output, owner review, no automatic canon, no generated prose, and no apply-promotion unless explicitly owner-confirmed through the existing separate path.
+- Do not implement `PHASE8-IMPL-019` until separately scoped.
+
 # PHASE8-IMPL-018-T006 Raw Artifact Safety Regression
 
 ### Result
