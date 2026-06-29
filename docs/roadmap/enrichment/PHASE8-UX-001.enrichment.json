@@ -1,0 +1,82 @@
+{
+  "task_id": "PHASE8-UX-001",
+  "title": "Master Plan UX / Navigation Proposal",
+  "status": "planned",
+  "task_type": "docs-only",
+  "context_pack": ".codex-context/PHASE8-UX-001/",
+  "purpose": "Create a UX master proposal that explains current UI/UX, planned UI/UX, missing UI/UX, recommended navigation, user workflows, Aider recommendations, Impeccable UI/UX QA workflow, and UI/UX reference search targets.",
+  "boundaries": [
+    "analysis-only",
+    "candidate-first",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "owner-authored prose storage/editing is allowed",
+    "AI-generated prose is permanently forbidden",
+    "no generated story prose",
+    "no rewrite",
+    "no continuation",
+    "no imitation",
+    "no polish",
+    "no improvement",
+    "no expansion",
+    "no outline",
+    "no draft",
+    "no story-prose-production controls",
+    "queue presence is not approval",
+    "confidence is not truth",
+    "candidate persistence is not canon",
+    "raw artifacts are support data, not canon",
+    "apply-promotion must be explicit, audited, owner-confirmed, and separate from extraction, queue state, confidence, and candidate persistence"
+  ],
+  "expected_outputs": [
+    "docs/roadmap/ux/PHASE8-UX-001-master-plan-ux-navigation-proposal.md",
+    "docs/roadmap/ux/PHASE8-UX-001-impeccable-ui-ux-qa-workflow.md"
+  ],
+  "allowed_files": [
+    "docs/roadmap/tasks/PHASE8-UX-001.md",
+    "docs/roadmap/enrichment/PHASE8-UX-001.enrichment.json",
+    "docs/roadmap/ux/PHASE8-UX-001-master-plan-ux-navigation-proposal.md",
+    "docs/roadmap/ux/PHASE8-UX-001-impeccable-ui-ux-qa-workflow.md",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md"
+  ],
+  "disallowed_files": [
+    "frontend/**",
+    "backend/**",
+    "tests/**",
+    "training/data/**",
+    ".external_sources/**",
+    ".codex-context/**",
+    "ai_context/**",
+    "graphify-out/**"
+  ],
+  "impeccable_workflow": {
+    "role": "UI/UX design QA and polishing layer for frontend/design tasks only",
+    "install_scope": "project-local",
+    "recommended_install_command": "npx impeccable install --providers=codex --scope=project",
+    "allowed_usage": [
+      "frontend UI critique",
+      "UX copy clarification",
+      "layout polish",
+      "accessibility audit",
+      "responsive/mobile adaptation",
+      "empty/error/warning state review"
+    ],
+    "disallowed_usage": [
+      "backend-only tasks",
+      "runtime extraction tasks",
+      "model integration tasks",
+      "roadmap context collection tasks",
+      "canon mutation",
+      "candidate creation",
+      "generated prose features"
+    ]
+  },
+  "validation_commands": [
+    "python3 scripts/check_enrichment.py",
+    "python3 scripts/validate_roadmap.py",
+    "git diff --check",
+    "git status --short --branch"
+  ]
+}
