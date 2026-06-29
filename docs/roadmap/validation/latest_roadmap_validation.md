@@ -1,3 +1,72 @@
+# PHASE8-IMPL-019-T001 Publication
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/governance publication only.
+- Parent task: `PHASE8-IMPL-019` - Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-019-T001` - Publish/activate guarded runtime extraction parent.
+- Active/ready next child: `PHASE8-IMPL-019-T002` - Guarded runtime extraction boundary decision and environment model.
+- Planned children: `PHASE8-IMPL-019-T003`, `PHASE8-IMPL-019-T004`, `PHASE8-IMPL-019-T005`, `PHASE8-IMPL-019-T006`, and `PHASE8-IMPL-019-T007`.
+- Future MVP-required parents after `PHASE8-IMPL-019`: `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, and `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools were run inside T001. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+
+### Files Changed
+
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-019.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-019.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-019.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Publication Summary
+
+Deliver real BookNLP/spaCy install/run/import checks and guarded runtime extraction from owner-authored or owner-provided project text into raw artifact bundles and candidate-first review handoff, without canon mutation, model calls, automatic apply-promotion, training artifacts, or generated prose.
+
+Runtime extraction in PHASE8-IMPL-019 may be introduced only through explicitly scoped children after T001 and may run only over owner-authored or owner-provided project text/materials. Output is candidate-first and owner-review-gated; runtime extraction output is never canon by itself, raw tool output is never authoritative by itself, extractor confidence is not truth, and extractor output cannot mutate approved memory/canon, apply promotion, create training data, or generate prose. Raw artifacts must be persisted through PHASE8-IMPL-018 helpers. Candidate persistence/review queue handoff may use existing candidate/review infrastructure only when explicitly scoped. Apply-promotion remains the separate PHASE8-IMPL-017 owner-confirmed path. Missing tools, missing models, unsafe paths, missing source/evidence/provenance, invalid source locators, malformed tool outputs, or unavailable environment must fail-closed or return explicit unavailable/quarantined state. No silent fallback may claim extraction succeeded.
+
+Future runtime extraction contracts must preserve `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`; use PHASE8-IMPL-018 raw artifact persistence; return candidate-first handoff for owner review; and distinguish availability, unavailable, quarantine, fail-closed, malformed output, unsafe path, and missing evidence/provenance states. The install_import_run boundary is published for later children only.
+
+PHASE8-UX-001 was used only as a read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and was not edited.
+
+### Boundary Confirmation
+
+- No backend implementation code changes.
+- No frontend implementation code changes.
+- No product test changes.
+- No routes added.
+- No UI added.
+- No package/dependency changes.
+- No runtime extraction.
+- No BookNLP/spaCy install/run/import.
+- No model/Ollama calls.
+- No NCP/Subtxt/dramatica-flow runtime.
+- No apply-promotion changes.
+- No approved memory/canon mutation.
+- No candidate/review queue creation.
+- No generated prose.
+- No training/JSONL/dataset/model artifacts.
+- No source-cache/generated context artifacts staged.
+
+### Future Guidance
+
+- `PHASE8-IMPL-019-T002` is ready/active next and remains docs/decision only.
+- `PHASE8-IMPL-020` remains the next parent after `PHASE8-IMPL-019`.
+- `PHASE8-IMPL-020` through `PHASE8-IMPL-022` remain future MVP-required parents.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
 # PHASE8-IMPL-018-T007 Parent Closeout
 
 ### Result

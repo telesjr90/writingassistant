@@ -1,3 +1,14 @@
+# PHASE8-IMPL-019 Active Runtime Extraction Parent
+
+- `PHASE8-IMPL-019` is active: Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline.
+- `PHASE8-IMPL-019-T001` is complete/PASS as docs/status publication only.
+- `PHASE8-IMPL-019-T002` is ready/active next for the guarded runtime extraction boundary decision and environment model.
+- `PHASE8-IMPL-019-T003` through `PHASE8-IMPL-019-T007` remain planned.
+- Parent goal: Deliver real BookNLP/spaCy install/run/import checks and guarded runtime extraction from owner-authored or owner-provided project text into raw artifact bundles and candidate-first review handoff, without canon mutation, model calls, automatic apply-promotion, training artifacts, or generated prose.
+- Boundary: Runtime extraction in PHASE8-IMPL-019 may be introduced only through explicitly scoped children after T001 and may run only over owner-authored or owner-provided project text/materials. Output is candidate-first and owner-review-gated; runtime extraction output is never canon by itself, raw tool output is never authoritative by itself, extractor confidence is not truth, and extractor output cannot mutate approved memory/canon, apply promotion, create training data, or generate prose. Raw artifacts must be persisted through PHASE8-IMPL-018 helpers. Candidate persistence/review queue handoff may use existing candidate/review infrastructure only when explicitly scoped. Apply-promotion remains the separate PHASE8-IMPL-017 owner-confirmed path. Missing tools, missing models, unsafe paths, missing source/evidence/provenance, invalid source locators, malformed tool outputs, or unavailable environment must fail-closed or return explicit unavailable/quarantined state. No silent fallback may claim extraction succeeded.
+- Future sequence: `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, and `PHASE8-IMPL-022` remain future MVP-required parents; fine-tuning remains deferred after MVP; generated prose/prose-production paths remain permanently forbidden.
+- UX reference: PHASE8-UX-001 was used only as a read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and was not edited.
+
 # Phase Map
 
 ## App MVP Track

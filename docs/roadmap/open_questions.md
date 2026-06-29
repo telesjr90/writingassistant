@@ -1,3 +1,7 @@
+58. ~~When should `PHASE8-IMPL-019` be published and started?~~ **Resolved in `PHASE8-IMPL-019-T001`:** `PHASE8-IMPL-019 - Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline` is published and active. `PHASE8-IMPL-019-T001` is complete/PASS as docs/status/governance publication only. `PHASE8-IMPL-019-T002` is ready/active next and must remain docs/decision only, defining BookNLP/spaCy dependency policy, environment guards, install/run/import verification, request shape, source_refs/evidence_refs/provenance_refs/source_locator_refs, PHASE8-IMPL-018 raw artifact persistence handoff, candidate-first owner review handoff, unavailable/quarantine/fail-closed semantics, no silent fallback, and no-prose/no-canon/no-training/no-apply-promotion boundaries. PHASE8-UX-001 remains read-only terminology/boundary reference only and does not override roadmap truth.
+
+59. Open for `PHASE8-IMPL-019-T002`: exact BookNLP/spaCy dependency policy, allowed install/import/run probe shape, environment variable/config gates, unavailable/quarantined state vocabulary, path and source locator validation details, and adapter output validation rules. T002 may decide these in docs only; it must not install, import, run, or implement runtime extraction.
+
 # Open Questions
 
 Owner decisions have answered the original roadmap questions. Remaining items below are implementation or verification follow-ups, not unresolved product decisions.

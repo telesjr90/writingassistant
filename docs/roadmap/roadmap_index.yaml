@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-018",
-    "current_parent_task_title": "Raw artifact persistence implementation and project-local extraction artifact lifecycle",
-    "frontier_note": "PHASE8-IMPL-018 is complete/PASS through PHASE8-IMPL-018-T007 and committed closeout is ready for review. PHASE8-IMPL-018-T001 is complete/PASS for parent publication/inventory/enrichment/status alignment. PHASE8-IMPL-018-T002 is complete/PASS for raw artifact persistence boundary decision and manifest model at docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md. PHASE8-IMPL-018-T003 is complete/PASS as an expected-red raw artifact persistence contract handoff at tests/test_writer_assistant_core_raw_artifacts_contract.py. PHASE8-IMPL-018-T004 is complete/PASS after adding the minimal backend raw artifact persistence helper at backend/story_knowledge/raw_artifacts.py; the raw artifact persistence contract now passes. PHASE8-IMPL-018-T005 is complete/PASS after hardening raw artifact bundle/index lifecycle and provenance linkage in backend/story_knowledge/raw_artifacts.py with focused lifecycle coverage at tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py. PHASE8-IMPL-018-T006 is complete/PASS after adding raw artifact safety regression coverage at tests/test_writer_assistant_core_raw_artifact_safety_regression.py proving support data only, not canon, not candidates, not training data, path-safe, fail-closed, no extraction, no_runtime_extraction, no_booknlp_spacy_runtime, no_model_calls, no_apply_promotion, no_memory_canon_mutation, no_generated_prose, no approved memory/canon mutation, no candidate/review queue creation, no training artifacts, and no generated prose/prose-production behavior. PHASE8-IMPL-018-T007 is complete/PASS parent closeout. PHASE8-IMPL-018 delivered raw artifact persistence lifecycle only. Raw artifacts are project-local support data only: not canon, not approved memory, not candidates by themselves, not candidates, and not training data. Raw artifact persistence is manifest-backed with manifest.json, artifact_files, artifact_file_id, relative_path, sha256, bundle_hash, manifest_hash, source_refs, evidence_refs, provenance_refs, and source_locator_refs; it is evidence/provenance-linked, path-safe, quarantine-aware, and fail-closed; it preserves source/evidence/provenance linkage and must not automatically create candidates or automatically promote to canon. Implemented contract APIs include validate_raw_artifact_manifest, build_raw_artifact_manifest, validate_raw_artifact_file_ref, raw_artifact_bundle_storage_dir, raw_artifact_manifest_path, raw_artifact_index_path, write_raw_artifact_bundle, read_raw_artifact_manifest, read_raw_artifact_file, list_raw_artifact_bundles, rebuild_raw_artifact_index, quarantine_raw_artifact_bundle, and compute_raw_artifact_bundle_hash. T005 hardens pending_validation, valid, rejected, quarantined, superseded, and deleted_tombstone lifecycle handling; default valid-only listing/indexing; derived/rebuildable support data indexes; stale/missing/invalid bundle skipping; quarantine_reason preservation; superseded/deleted_tombstone exclusion by default; duplicate/idempotency behavior; and canonical JSON bundle_hash behavior. Explicit non-deliveries in PHASE8-IMPL-018: no runtime extraction, no real BookNLP/spaCy install/run/import, no model-assisted extraction, no NCP/Subtxt/dramatica-flow runtime, no routes, no UI, no apply-promotion changes, no approved memory/canon mutation beyond the existing PHASE8-IMPL-017 path, no candidate/review queue creation, no training/JSONL/dataset/model artifacts, and no generated prose. PHASE8-IMPL-019 is ready/active next only as a future MVP-required parent handoff for real BookNLP/spaCy install/run/import plus runtime extraction, bounded by environment guards, source/evidence/provenance requirements, raw artifact persistence support from PHASE8-IMPL-018, candidate-first output, owner review, no automatic canon, no generated prose, and no apply-promotion unless explicitly owner-confirmed through the existing separate path. PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents for model-assisted evidence-backed extraction, NCP/Subtxt/dramatica-flow analysis-only runtime integration, and end-to-end MVP usability validation. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth or task completion."
+    "current_parent_task_id": "PHASE8-IMPL-019",
+    "current_parent_task_title": "Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline",
+    "frontier_note": "PHASE8-IMPL-019 is active after PHASE8-IMPL-019-T001 docs/status publication. PHASE8-IMPL-019-T001 is complete/PASS. PHASE8-IMPL-019-T002 is ready/active next. PHASE8-IMPL-019-T003 through PHASE8-IMPL-019-T007 remain planned. PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Deliver real BookNLP/spaCy install/run/import checks and guarded runtime extraction from owner-authored or owner-provided project text into raw artifact bundles and candidate-first review handoff, without canon mutation, model calls, automatic apply-promotion, training artifacts, or generated prose. Runtime extraction in PHASE8-IMPL-019 may be introduced only through explicitly scoped children after T001 and may run only over owner-authored or owner-provided project text/materials. Output is candidate-first and owner-review-gated; runtime extraction output is never canon by itself, raw tool output is never authoritative by itself, extractor confidence is not truth, and extractor output cannot mutate approved memory/canon, apply promotion, create training data, or generate prose. Raw artifacts must be persisted through PHASE8-IMPL-018 helpers. Candidate persistence/review queue handoff may use existing candidate/review infrastructure only when explicitly scoped. Apply-promotion remains the separate PHASE8-IMPL-017 owner-confirmed path. Missing tools, missing models, unsafe paths, missing source/evidence/provenance, invalid source locators, malformed tool outputs, or unavailable environment must fail-closed or return explicit unavailable/quarantined state. No silent fallback may claim extraction succeeded. Future runtime extraction contracts must preserve source_refs, evidence_refs, provenance_refs, source_locator_refs, raw artifact persistence, candidate-first, owner review, no automatic canon, no apply-promotion, no memory/canon mutation, no model calls, no generated prose, no training artifacts, availability, unavailable, quarantine, fail-closed, no silent fallback, environment guards, install/run/import, install_import_run, owner-authored and owner-provided source boundaries. PHASE8-UX-001 remains read-only terminology reference only. PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3734,7 +3734,7 @@
       "id": "PHASE8-IMPL-018",
       "title": "Raw artifact persistence implementation and project-local extraction artifact lifecycle",
       "type": "runtime",
-      "status": "active",
+      "status": "done",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-017"
@@ -3761,7 +3761,7 @@
         "no_spacy_install",
         "fine_tuning_deferred"
       ],
-      "result": "complete/PASS MVP-required parent after PHASE8-IMPL-017 complete/PASS; PHASE8-IMPL-018-T001 through PHASE8-IMPL-018-T007 are complete/PASS; delivered decision docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md; delivered backend helper backend/story_knowledge/raw_artifacts.py; delivered contracts/regressions tests/test_writer_assistant_core_raw_artifacts_contract.py, tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py, and tests/test_writer_assistant_core_raw_artifact_safety_regression.py; implemented validate_raw_artifact_manifest, build_raw_artifact_manifest, validate_raw_artifact_file_ref, raw_artifact_bundle_storage_dir, raw_artifact_manifest_path, raw_artifact_index_path, write_raw_artifact_bundle, read_raw_artifact_manifest, read_raw_artifact_file, list_raw_artifact_bundles, rebuild_raw_artifact_index, quarantine_raw_artifact_bundle, and compute_raw_artifact_bundle_hash; raw artifacts are project-local support data only and are not canon, not approved memory, not candidates by themselves, not candidates, and not training data; persistence is manifest-backed, bundle/index/provenance linked through source_refs, evidence_refs, provenance_refs, and source_locator_refs, path-safe, fail-closed, quarantine-aware, valid-only by default, excludes superseded/deleted_tombstone by default, supports duplicate/idempotency handling, and uses canonical deterministic bundle hashing; no_runtime_extraction, no_booknlp_spacy_runtime, no_model_calls, no_apply_promotion, no_memory_canon_mutation, no_generated_prose; no routes, UI, package changes, candidate/review queue creation, approved memory/canon mutation, training/JSONL/dataset/model artifacts, or generated prose"
+      "result": "complete/PASS MVP-required parent through PHASE8-IMPL-018-T007; raw artifact persistence lifecycle delivered and committed; PHASE8-IMPL-019 is active after PHASE8-IMPL-019-T001 publication"
     },
     {
       "id": "PHASE8-IMPL-018-T001",
@@ -3910,7 +3910,7 @@
       "id": "PHASE8-IMPL-018-T006",
       "title": "Raw artifact safety regression: non-canon, non-training, path-safe, no extraction",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-018",
       "depends_on": [
         "PHASE8-IMPL-018-T005"
@@ -3932,13 +3932,13 @@
         "no_booknlp_install",
         "no_spacy_install"
       ],
-      "result": "ready/active next raw artifact safety regression"
+      "result": "complete/PASS"
     },
     {
       "id": "PHASE8-IMPL-018-T007",
       "title": "Parent closeout",
       "type": "planning_microtask",
-      "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-018",
       "depends_on": [
         "PHASE8-IMPL-018-T006"
@@ -3960,13 +3960,13 @@
         "no_booknlp_install",
         "no_spacy_install"
       ],
-      "result": "planned parent closeout"
+      "result": "complete/PASS"
     },
     {
       "id": "PHASE8-IMPL-019",
-      "title": "Real BookNLP/spaCy install/run/import and runtime extraction pipeline",
+      "title": "Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline",
       "type": "runtime",
-      "status": "planned",
+      "status": "active",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-018"
@@ -3976,9 +3976,187 @@
         "mvp_required_raw_persistence",
         "owner_review_required",
         "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
         "generated_prose_permanently_forbidden"
       ],
-      "result": "ready/active next future MVP-required parent for real BookNLP/spaCy install/run/import plus runtime extraction; bounded by environment guards, source/evidence/provenance requirements, raw artifact persistence support from PHASE8-IMPL-018, candidate-first output, owner review, no automatic canon, no generated prose, and no apply-promotion unless explicitly owner-confirmed through the existing separate path; do not implement until separately scoped"
+      "result": "active MVP-required parent; PHASE8-IMPL-019-T001 complete/PASS docs/status publication; PHASE8-IMPL-019-T002 ready/active next; guarded runtime extraction parent for real BookNLP/spaCy install/run/import checks and runtime extraction over owner-authored or owner-provided project text, bounded by source_refs, evidence_refs, provenance_refs, source_locator_refs, environment guards, availability/unavailable/quarantine/fail-closed states, no silent fallback, PHASE8-IMPL-018 raw artifact persistence handoff, candidate-first owner review, no automatic canon, no apply-promotion, no memory/canon mutation, no model calls, no generated prose, no training artifacts",
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-019.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-019.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-019.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-019/"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T001",
+      "title": "Publish/activate guarded runtime extraction parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "complete/PASS docs/status publication only; published task record, inventory, enrichment JSON, roadmap/status/governance alignment; no install/run/import, no runtime extraction, no code/tests/package changes"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T002",
+      "title": "Guarded runtime extraction boundary decision and environment model",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019-T001"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "ready/active next docs/decision only"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T003",
+      "title": "Expected-red guarded runtime extraction contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019-T002"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned expected-red tests only; no implementation"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T004",
+      "title": "Minimal guarded dependency availability and import/run probe implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019-T003"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned minimal guarded availability/import/run probe implementation"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T005",
+      "title": "Guarded runtime extraction request and raw artifact handoff implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019-T004"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned guarded runtime extraction request and raw artifact handoff implementation"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T006",
+      "title": "Runtime extraction safety regression",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019-T005"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned safety regression"
+    },
+    {
+      "id": "PHASE8-IMPL-019-T007",
+      "title": "Parent closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-019",
+      "depends_on": [
+        "PHASE8-IMPL-019-T006"
+      ],
+      "boundary_tags": [
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned parent closeout; PHASE8-IMPL-020 ready/active next"
     },
     {
       "id": "PHASE8-IMPL-020",
