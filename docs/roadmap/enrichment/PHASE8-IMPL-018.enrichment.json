@@ -58,8 +58,8 @@
     "PHASE8-IMPL-018-T003": "complete/PASS expected-red raw artifact persistence contract at tests/test_writer_assistant_core_raw_artifacts_contract.py",
     "PHASE8-IMPL-018-T004": "complete/PASS minimal backend raw artifact persistence helper implementation at backend/story_knowledge/raw_artifacts.py",
     "PHASE8-IMPL-018-T005": "complete/PASS raw artifact bundle/index lifecycle and provenance linkage at backend/story_knowledge/raw_artifacts.py with tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py",
-    "PHASE8-IMPL-018-T006": "ready/active next raw artifact safety regression: non-canon, non-training, path-safe, no extraction",
-    "PHASE8-IMPL-018-T007": "planned parent closeout"
+    "PHASE8-IMPL-018-T006": "complete/PASS raw artifact safety regression at tests/test_writer_assistant_core_raw_artifact_safety_regression.py proving support data only, not canon, not candidates, not training data, path-safe, fail-closed, no extraction, no_runtime_extraction, no_model_calls, no_apply_promotion, no_memory_canon_mutation, no_generated_prose",
+    "PHASE8-IMPL-018-T007": "ready/active next parent closeout"
   },
   "publication_summary": {
     "mvp_required": true,
@@ -68,7 +68,7 @@
     "parent_result": "active",
     "t001_result": "complete/PASS",
     "t002_result": "complete/PASS",
-    "next_child": "PHASE8-IMPL-018-T006",
+    "next_child": "PHASE8-IMPL-018-T007",
     "t001_scope": "docs/status publication only",
     "t002_scope": "docs/status decision only",
     "t002_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md",
@@ -83,6 +83,7 @@
     "t004_result": "complete/PASS minimal backend raw artifact persistence helper at backend/story_knowledge/raw_artifacts.py; tests/test_writer_assistant_core_raw_artifacts_contract.py passes",
     "t004_scope": "standard-library-only raw artifact support data helper; manifest-backed, path-safe, fail-closed, no_runtime_extraction, no_model_calls, no_apply_promotion, no_memory_canon_mutation, no_generated_prose",
     "t005_result": "complete/PASS raw artifact bundle/index lifecycle and provenance linkage hardening at backend/story_knowledge/raw_artifacts.py with tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py; default listing/indexing is valid-only for support data, not canon, not candidates, not training data; pending_validation, rejected, quarantined, superseded, and deleted_tombstone are excluded by default; source/evidence/provenance/source_locator_refs and artifact file refs are preserved; stale/missing/invalid bundles fail closed or are skipped; quarantine preserves reason and refs; duplicate/idempotency and canonical JSON bundle_hash behavior are deterministic",
+    "t006_result": "complete/PASS raw artifact safety regression at tests/test_writer_assistant_core_raw_artifact_safety_regression.py; coverage proves support data only, not canon, not candidates, not training data, path-safe, fail-closed, no extraction, no_runtime_extraction, no_model_calls, no_apply_promotion, no_memory_canon_mutation, no_generated_prose, quarantine safety, forbidden canon/candidate/training/model/prose/runtime artifact values, no approved memory/canon mutation, no candidate/review queue creation, no training artifacts, and no generated prose/prose-production behavior",
     "future_contract_guidance": "PHASE8-IMPL-018-T004 implements backend.story_knowledge.raw_artifacts APIs validate_raw_artifact_manifest, build_raw_artifact_manifest, validate_raw_artifact_file_ref, raw_artifact_bundle_storage_dir, raw_artifact_manifest_path, raw_artifact_index_path, write_raw_artifact_bundle, read_raw_artifact_manifest, read_raw_artifact_file, list_raw_artifact_bundles, rebuild_raw_artifact_index, quarantine_raw_artifact_bundle, and compute_raw_artifact_bundle_hash; PHASE8-IMPL-018-T005 hardens lifecycle/provenance behavior for those APIs",
     "future_parent_deferrals": {
       "PHASE8-IMPL-019": "real BookNLP/spaCy install/run/import plus runtime extraction",
