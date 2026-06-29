@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-018",
     "current_parent_task_title": "Raw artifact persistence implementation and project-local extraction artifact lifecycle",
-    "frontier_note": "PHASE8-IMPL-017 is complete/PASS through PHASE8-IMPL-017-T007 and committed. PHASE8-IMPL-017 delivered explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation through valid apply-promotion only. PHASE8-IMPL-018 is the active MVP-required parent after PHASE8-IMPL-017. PHASE8-IMPL-018-T001 is complete/PASS for parent publication/inventory/enrichment/status alignment. PHASE8-IMPL-018-T002 is complete/PASS for raw artifact persistence boundary decision and manifest model at docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md. PHASE8-IMPL-018-T003 is complete/PASS as an expected-red raw artifact persistence contract handoff at tests/test_writer_assistant_core_raw_artifacts_contract.py. PHASE8-IMPL-018-T004 is complete/PASS after adding the minimal backend raw artifact persistence helper at backend/story_knowledge/raw_artifacts.py; the raw artifact persistence contract now passes. PHASE8-IMPL-018-T005 is ready/active next for raw artifact bundle/index lifecycle and provenance linkage. PHASE8-IMPL-018-T006 through PHASE8-IMPL-018-T007 remain planned for raw artifact safety regression proving support-data-only/non-canon/non-candidate/non-training/path-safe/no_runtime_extraction/no_booknlp_spacy_runtime/no_model_calls/no_apply_promotion/no_memory_canon_mutation/no_generated_prose behavior, and parent closeout. PHASE8-IMPL-018 owns raw artifact persistence lifecycle only. Raw artifacts are project-local support data only: not canon, not approved memory, not candidates by themselves, and not training data. Raw artifact persistence is manifest-backed with manifest.json, artifact_files, artifact_file_id, relative_path, sha256, bundle_hash, source_refs, evidence_refs, provenance_refs, and source_locator_refs; it is evidence/provenance-linked, path-safe, and fail-closed with quarantine/rejection handling; it preserves source/evidence/provenance linkage and must not automatically create candidates or automatically promote to canon. Implemented contract APIs include validate_raw_artifact_manifest, build_raw_artifact_manifest, validate_raw_artifact_file_ref, raw_artifact_bundle_storage_dir, raw_artifact_manifest_path, raw_artifact_index_path, write_raw_artifact_bundle, read_raw_artifact_manifest, read_raw_artifact_file, list_raw_artifact_bundles, rebuild_raw_artifact_index, quarantine_raw_artifact_bundle, and compute_raw_artifact_bundle_hash. Raw artifact persistence must not call models, must not trigger extraction, must not install/run/import BookNLP or spaCy, must not call NCP/Subtxt/dramatica-flow runtimes, and must not generate prose. Apply-promotion and approved memory/canon mutation remain separate in PHASE8-IMPL-017. PHASE8-IMPL-019 through PHASE8-IMPL-022 remain future MVP-required parents for real BookNLP/spaCy install/run/import plus runtime extraction, model-assisted evidence-backed extraction, NCP/Subtxt/dramatica-flow analysis-only runtime integration, and end-to-end MVP usability validation. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
+    "frontier_note": "PHASE8-IMPL-017 is complete/PASS through PHASE8-IMPL-017-T007 and committed. PHASE8-IMPL-017 delivered explicit owner-confirmed apply-promotion, audited promotion records, and approved memory/canon mutation through valid apply-promotion only. PHASE8-IMPL-018 is the active MVP-required parent after PHASE8-IMPL-017. PHASE8-IMPL-018-T001 is complete/PASS for parent publication/inventory/enrichment/status alignment. PHASE8-IMPL-018-T002 is complete/PASS for raw artifact persistence boundary decision and manifest model at docs/roadmap/decisions/PHASE8-IMPL-018-raw-artifact-persistence-boundary-manifest-model-decision.md. PHASE8-IMPL-018-T003 is complete/PASS as an expected-red raw artifact persistence contract handoff at tests/test_writer_assistant_core_raw_artifacts_contract.py. PHASE8-IMPL-018-T004 is complete/PASS after adding the minimal backend raw artifact persistence helper at backend/story_knowledge/raw_artifacts.py; the raw artifact persistence contract now passes. PHASE8-IMPL-018-T005 is complete/PASS after hardening raw artifact bundle/index lifecycle and provenance linkage in backend/story_knowledge/raw_artifacts.py with focused lifecycle coverage at tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py. PHASE8-IMPL-018-T006 is ready/active next for raw artifact safety regression proving support-data-only/non-canon/non-candidate/non-training/path-safe/no_runtime_extraction/no_booknlp_spacy_runtime/no_model_calls/no_apply_promotion/no_memory_canon_mutation/no_generated_prose behavior. PHASE8-IMPL-018-T007 remains planned for parent closeout. PHASE8-IMPL-018 owns raw artifact persistence lifecycle only. Raw artifacts are project-local support data only: not canon, not approved memory, not candidates by themselves, and not training data. Raw artifact persistence is manifest-backed with manifest.json, artifact_files, artifact_file_id, relative_path, sha256, bundle_hash, manifest_hash, source_refs, evidence_refs, provenance_refs, and source_locator_refs; it is evidence/provenance-linked, path-safe, and fail-closed with quarantine/rejection handling; it preserves source/evidence/provenance linkage and must not automatically create candidates or automatically promote to canon. Implemented contract APIs include validate_raw_artifact_manifest, build_raw_artifact_manifest, validate_raw_artifact_file_ref, raw_artifact_bundle_storage_dir, raw_artifact_manifest_path, raw_artifact_index_path, write_raw_artifact_bundle, read_raw_artifact_manifest, read_raw_artifact_file, list_raw_artifact_bundles, rebuild_raw_artifact_index, quarantine_raw_artifact_bundle, and compute_raw_artifact_bundle_hash. T005 hardens pending_validation, valid, rejected, quarantined, superseded, and deleted_tombstone lifecycle handling; default valid-only listing/indexing; derived support data indexes; stale/missing/invalid bundle skipping; quarantine_reason preservation; duplicate/idempotency behavior; and canonical JSON bundle_hash behavior. Raw artifact persistence must not call models, must not trigger extraction, must not install/run/import BookNLP or spaCy, must not call NCP/Subtxt/dramatica-flow runtimes, and must not generate prose. Apply-promotion and approved memory/canon mutation remain separate in PHASE8-IMPL-017. PHASE8-IMPL-019 through PHASE8-IMPL-022 remain future MVP-required parents for real BookNLP/spaCy install/run/import plus runtime extraction, model-assisted evidence-backed extraction, NCP/Subtxt/dramatica-flow analysis-only runtime integration, and end-to-end MVP usability validation. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. Generated context artifacts remain evidence only and must not be treated as roadmap truth."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3761,7 +3761,7 @@
         "no_spacy_install",
         "fine_tuning_deferred"
       ],
-      "result": "active MVP-required parent after PHASE8-IMPL-017 complete/PASS; PHASE8-IMPL-018-T001 is complete/PASS parent publication/inventory/enrichment/status alignment; PHASE8-IMPL-018-T002 is complete/PASS raw artifact persistence boundary decision and manifest model; PHASE8-IMPL-018-T003 is complete/PASS expected-red contract handoff at tests/test_writer_assistant_core_raw_artifacts_contract.py; PHASE8-IMPL-018-T004 is ready/active next; PHASE8-IMPL-018-T005 through PHASE8-IMPL-018-T007 remain planned; raw artifacts are project-local support data only and are not canon, not approved memory, not candidates by themselves, and not training data"
+      "result": "active MVP-required parent after PHASE8-IMPL-017 complete/PASS; PHASE8-IMPL-018-T001 is complete/PASS parent publication/inventory/enrichment/status alignment; PHASE8-IMPL-018-T002 is complete/PASS raw artifact persistence boundary decision and manifest model; PHASE8-IMPL-018-T003 is complete/PASS expected-red contract handoff at tests/test_writer_assistant_core_raw_artifacts_contract.py; PHASE8-IMPL-018-T004 is complete/PASS minimal backend helper at backend/story_knowledge/raw_artifacts.py; PHASE8-IMPL-018-T005 is complete/PASS raw artifact bundle/index lifecycle and provenance linkage with tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py; PHASE8-IMPL-018-T006 is ready/active next; PHASE8-IMPL-018-T007 remains planned; raw artifacts are project-local support data only and are not canon, not approved memory, not candidates by themselves, and not training data"
     },
     {
       "id": "PHASE8-IMPL-018-T001",
@@ -3854,7 +3854,7 @@
       "id": "PHASE8-IMPL-018-T004",
       "title": "Minimal backend raw artifact persistence helper implementation",
       "type": "runtime_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-018",
       "depends_on": [
         "PHASE8-IMPL-018-T003"
@@ -3876,13 +3876,13 @@
         "no_booknlp_install",
         "no_spacy_install"
       ],
-      "result": "ready/active next minimal backend raw artifact persistence helper implementation"
+      "result": "complete/PASS minimal backend raw artifact persistence helper implementation at backend/story_knowledge/raw_artifacts.py"
     },
     {
       "id": "PHASE8-IMPL-018-T005",
       "title": "Raw artifact bundle/index lifecycle and provenance linkage",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-018",
       "depends_on": [
         "PHASE8-IMPL-018-T004"
@@ -3904,13 +3904,13 @@
         "no_booknlp_install",
         "no_spacy_install"
       ],
-      "result": "planned raw artifact bundle/index lifecycle and provenance linkage"
+      "result": "complete/PASS raw artifact bundle/index lifecycle and provenance linkage at backend/story_knowledge/raw_artifacts.py with tests/test_writer_assistant_core_raw_artifact_lifecycle_contract.py; default valid-only list/index behavior, derived support data index metadata, source/evidence/provenance/source locator linkage, stale/missing/invalid bundle skipping, quarantine_reason preservation, superseded/deleted_tombstone exclusion, duplicate/idempotency determinism, and canonical JSON bundle_hash behavior"
     },
     {
       "id": "PHASE8-IMPL-018-T006",
       "title": "Raw artifact safety regression: non-canon, non-training, path-safe, no extraction",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-018",
       "depends_on": [
         "PHASE8-IMPL-018-T005"
@@ -3932,7 +3932,7 @@
         "no_booknlp_install",
         "no_spacy_install"
       ],
-      "result": "planned raw artifact safety regression"
+      "result": "ready/active next raw artifact safety regression"
     },
     {
       "id": "PHASE8-IMPL-018-T007",
@@ -4037,6 +4037,27 @@
         "generated_prose_permanently_forbidden"
       ],
       "result": "planned"
+    },
+    {
+      "id": "PHASE8-UX-001",
+      "title": "Master Plan UX / Navigation Proposal",
+      "type": "docs-only",
+      "status": "planned",
+      "parent": null,
+      "depends_on": [],
+      "boundary_tags": [
+        "docs_only",
+        "no_generated_prose",
+        "no_model_calls",
+        "no_runtime_feature_scope",
+        "candidate_only",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "review_ui_planning"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-UX-001.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-UX-001.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-UX-001/"
     },
     {
       "id": "PHASE7-IMPL-004-T001",

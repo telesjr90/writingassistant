@@ -35,6 +35,7 @@ generated prose, JSONL, datasets, manifests, or model artifacts.
 from __future__ import annotations
 
 import copy
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -524,6 +525,10 @@ def test_read_manifest_and_file_are_limited_to_valid_project_local_manifest_refs
     tmp_path,
 ):
     project = project_dir(tmp_path)
+    payload = b'{"token": "support data only"}\n'
+    file_ref = valid_artifact_file_ref(sha256=hashlib.sha256(payload).hexdigest())
+    manifest = valid_manifest(artifact_files=[file_ref])
+    write_raw_artifact_bundle(manifest, {ARTIFACT_FILE_ID: payload}, project_dir=project)
 
     manifest = read_raw_artifact_manifest(
         PROJECT_ID, RAW_ARTIFACT_BUNDLE_ID, project_dir=project

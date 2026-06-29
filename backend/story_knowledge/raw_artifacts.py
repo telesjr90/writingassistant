@@ -1,8 +1,10 @@
 """Project-local raw artifact persistence helpers.
 
-These helpers persist already-produced support data bundles only. They do not
-run extraction, call models, create review workflow records, or mutate project
-truth. Callers pass explicit manifest metadata and explicit file payloads.
+These helpers persist already-produced support data bundles only. Indexes are
+derived support data, not canon, not candidates, and not training data. This
+module does not run extraction, call models, create workflow records, generate
+prose, or mutate project truth. Callers pass explicit manifest metadata and
+explicit file payloads.
 """
 
 import copy
@@ -23,6 +25,9 @@ _ALLOWED_STATUSES = frozenset(
         "deleted_tombstone",
     }
 )
+
+_VALID_SUPPORT_STATUS = "valid"
+_NON_DEFAULT_STATUSES = _ALLOWED_STATUSES - {_VALID_SUPPORT_STATUS}
 
 _ALLOWED_ARTIFACT_TYPES = frozenset(
     {
@@ -362,11 +367,11 @@ def validate_raw_artifact_manifest(manifest):
     ):
         _require_optional_string(working[field])
 
-    non_empty_refs = working["status"] == "valid"
+    non_empty_refs = working["status"] == _VALID_SUPPORT_STATUS
     _require_list(working["source_refs"], non_empty=non_empty_refs)
     _require_list(working["evidence_refs"], non_empty=non_empty_refs)
     _require_list(working["provenance_refs"], non_empty=non_empty_refs)
-    _require_list(working["source_locator_refs"])
+    _require_list(working["source_locator_refs"], non_empty=non_empty_refs)
 
     if not isinstance(working["artifact_files"], list) or not working["artifact_files"]:
         raise ValueError("invalid field")
@@ -376,6 +381,13 @@ def validate_raw_artifact_manifest(manifest):
         validated = validate_raw_artifact_file_ref(file_ref)
         if validated["artifact_file_id"] in seen_file_ids:
             raise ValueError("invalid field")
+        if working["status"] == _VALID_SUPPORT_STATUS:
+            if not validated["source_locator_refs"]:
+                raise ValueError("invalid field")
+            if not validated["evidence_refs"]:
+                raise ValueError("invalid field")
+            if not validated["provenance_refs"]:
+                raise ValueError("invalid field")
         seen_file_ids.add(validated["artifact_file_id"])
         validated_files.append(validated)
     working["artifact_files"] = validated_files
@@ -529,45 +541,6 @@ def _load_json_object(path):
     return loaded
 
 
-def _fallback_manifest(project_id, raw_artifact_bundle_id):
-    return build_raw_artifact_manifest(
-        project_id=project_id,
-        raw_artifact_bundle_id=raw_artifact_bundle_id,
-        artifact_files=[
-            {
-                "artifact_file_id": "artifact_file_tokens_001",
-                "artifact_type": "token_table",
-                "relative_path": "artifacts/tokens.jsonl",
-                "media_type": "application/jsonl",
-                "encoding": "utf-8",
-                "size_bytes": 0,
-                "sha256": hashlib.sha256(b"").hexdigest(),
-                "record_count": 0,
-                "line_count": 0,
-                "schema_name": "raw_artifact_support_data",
-                "schema_version": _SCHEMA_VERSION,
-                "parser_hint": "jsonl",
-                "source_locator_refs": ["source_locator_ref_fallback"],
-                "evidence_refs": ["evidence_ref_fallback"],
-                "provenance_refs": ["provenance_ref_fallback"],
-                "boundary_flags": sorted(_REQUIRED_BOUNDARY_FLAGS),
-            }
-        ],
-        artifact_source_type="fixture_adapter_output",
-        artifact_source_id="raw_artifact_support_data_fallback",
-        source_refs=["source_ref_fallback"],
-        evidence_refs=["evidence_ref_fallback"],
-        provenance_refs=["provenance_ref_fallback"],
-        source_locator_refs=["source_locator_ref_fallback"],
-        no_generated_prose_confirmation=True,
-        no_model_call_confirmation=True,
-        no_training_artifact_confirmation=True,
-        no_apply_promotion_confirmation=True,
-        no_memory_canon_mutation_confirmation=True,
-        no_runtime_extraction_confirmation=True,
-    )
-
-
 def _manifest_summary(manifest):
     return {
         "project_id": manifest["project_id"],
@@ -577,7 +550,47 @@ def _manifest_summary(manifest):
         "source_refs": list(manifest["source_refs"]),
         "evidence_refs": list(manifest["evidence_refs"]),
         "provenance_refs": list(manifest["provenance_refs"]),
+        "source_locator_refs": list(manifest["source_locator_refs"]),
         "bundle_hash": manifest["bundle_hash"],
+        "manifest_hash": manifest.get("manifest_hash"),
+        "content_hash": manifest.get("content_hash"),
+    }
+
+
+def _artifact_file_summary(file_ref):
+    return {
+        "artifact_file_id": file_ref["artifact_file_id"],
+        "artifact_type": file_ref["artifact_type"],
+        "relative_path": file_ref["relative_path"],
+        "sha256": file_ref["sha256"],
+        "source_locator_refs": list(file_ref["source_locator_refs"]),
+        "evidence_refs": list(file_ref["evidence_refs"]),
+        "provenance_refs": list(file_ref["provenance_refs"]),
+        "boundary_flags": list(file_ref["boundary_flags"]),
+    }
+
+
+def _index_entry(manifest):
+    return {
+        "raw_artifact_bundle_id": manifest["raw_artifact_bundle_id"],
+        "status": manifest["status"],
+        "artifact_source_type": manifest["artifact_source_type"],
+        "artifact_source_id": manifest["artifact_source_id"],
+        "extraction_run_id": manifest["extraction_run_id"],
+        "source_refs": list(manifest["source_refs"]),
+        "evidence_refs": list(manifest["evidence_refs"]),
+        "provenance_refs": list(manifest["provenance_refs"]),
+        "source_locator_refs": list(manifest["source_locator_refs"]),
+        "artifact_files": [
+            _artifact_file_summary(file_ref)
+            for file_ref in manifest["artifact_files"]
+        ],
+        "bundle_hash": manifest["bundle_hash"],
+        "manifest_hash": manifest.get("manifest_hash"),
+        "content_hash": manifest.get("content_hash"),
+        "validation_status": manifest["validation_status"],
+        "created_at": manifest["created_at"],
+        "updated_at": manifest["updated_at"],
     }
 
 
@@ -657,18 +670,35 @@ def write_raw_artifact_bundle(manifest, artifact_files, *, project_dir):
     )
 
 
+def _artifact_file_path(project_dir, manifest, file_ref):
+    bundle_dir = raw_artifact_bundle_storage_dir(
+        project_dir, manifest["project_id"], manifest["raw_artifact_bundle_id"]
+    )
+    return _safe_bundle_relative_path(bundle_dir, file_ref["relative_path"])
+
+
+def _validate_referenced_artifact_files(project_dir, manifest):
+    for file_ref in manifest["artifact_files"]:
+        file_path = _artifact_file_path(project_dir, manifest, file_ref)
+        if file_path.is_symlink() or not file_path.is_file():
+            raise ValueError("invalid input")
+        if hashlib.sha256(file_path.read_bytes()).hexdigest() != file_ref["sha256"]:
+            raise ValueError("invalid field")
+
+
 def read_raw_artifact_manifest(project_id, raw_artifact_bundle_id, *, project_dir):
     manifest_path = raw_artifact_manifest_path(project_dir, project_id, raw_artifact_bundle_id)
     if not manifest_path.exists():
-        return _fallback_manifest(project_id, raw_artifact_bundle_id)
+        raise ValueError("invalid input")
     loaded = _load_json_object(manifest_path)
     validated = validate_raw_artifact_manifest(loaded)
     if validated["project_id"] != project_id:
         raise ValueError("invalid field")
     if validated["raw_artifact_bundle_id"] != raw_artifact_bundle_id:
         raise ValueError("invalid field")
-    if validated["status"] in {"quarantined", "rejected"}:
+    if validated["status"] != _VALID_SUPPORT_STATUS:
         raise ValueError("invalid field")
+    _validate_referenced_artifact_files(project_dir, validated)
     return validated
 
 
@@ -685,13 +715,13 @@ def read_raw_artifact_file(
     }
     if artifact_file_id not in refs:
         raise ValueError("invalid field")
-    bundle_dir = raw_artifact_bundle_storage_dir(project_dir, project_id, raw_artifact_bundle_id)
-    file_path = _safe_bundle_relative_path(bundle_dir, refs[artifact_file_id]["relative_path"])
-    if not file_path.exists() and artifact_file_id == "artifact_file_tokens_001":
-        return b""
+    file_path = _artifact_file_path(project_dir, manifest, refs[artifact_file_id])
     if file_path.is_symlink() or not file_path.is_file():
         raise ValueError("invalid input")
-    return file_path.read_bytes()
+    payload = file_path.read_bytes()
+    if hashlib.sha256(payload).hexdigest() != refs[artifact_file_id]["sha256"]:
+        raise ValueError("invalid field")
+    return payload
 
 
 def list_raw_artifact_bundles(project_id, *, project_dir, include_quarantined=False):
@@ -717,8 +747,17 @@ def list_raw_artifact_bundles(project_id, *, project_dir, include_quarantined=Fa
             continue
         if manifest["project_id"] != safe_project_id:
             continue
-        if manifest["status"] in {"quarantined", "rejected"} and not include_quarantined:
+        if manifest["project_id"] != safe_project_id:
             continue
+        if not include_quarantined and manifest["status"] != _VALID_SUPPORT_STATUS:
+            continue
+        if include_quarantined is False and manifest["status"] in _NON_DEFAULT_STATUSES:
+            continue
+        if manifest["status"] == _VALID_SUPPORT_STATUS:
+            try:
+                _validate_referenced_artifact_files(project_dir, manifest)
+            except ValueError:
+                continue
         results.append(_manifest_summary(manifest))
     results.sort(key=lambda item: item["raw_artifact_bundle_id"])
     return results
@@ -726,9 +765,31 @@ def list_raw_artifact_bundles(project_id, *, project_dir, include_quarantined=Fa
 
 def rebuild_raw_artifact_index(project_id, *, project_dir):
     safe_project_id = _require_safe_id(project_id)
-    bundles = list_raw_artifact_bundles(
-        safe_project_id, project_dir=project_dir, include_quarantined=False
+    raw_root = (
+        _as_path(project_dir)
+        / "projects"
+        / safe_project_id
+        / "writer_assistant"
+        / "raw_artifacts"
     )
+    bundles = []
+    if raw_root.exists():
+        for item in raw_root.iterdir():
+            if item.is_symlink() or not item.is_dir():
+                continue
+            try:
+                manifest = validate_raw_artifact_manifest(
+                    _load_json_object(item / "manifest.json")
+                )
+                if manifest["project_id"] != safe_project_id:
+                    continue
+                if manifest["status"] != _VALID_SUPPORT_STATUS:
+                    continue
+                _validate_referenced_artifact_files(project_dir, manifest)
+            except ValueError:
+                continue
+            bundles.append(_index_entry(manifest))
+    bundles.sort(key=lambda item: item["raw_artifact_bundle_id"])
     index = {
         "index_type": "raw_artifact_support_data_index",
         "project_id": safe_project_id,
@@ -741,13 +802,6 @@ def rebuild_raw_artifact_index(project_id, *, project_dir):
         "created_candidate_records": [],
         "created_training_records": [],
     }
-    raw_root = (
-        _as_path(project_dir)
-        / "projects"
-        / safe_project_id
-        / "writer_assistant"
-        / "raw_artifacts"
-    )
     raw_root.mkdir(parents=True, exist_ok=True)
     (raw_root / "index.json").write_text(
         json.dumps(index, indent=2, sort_keys=True) + "\n",
