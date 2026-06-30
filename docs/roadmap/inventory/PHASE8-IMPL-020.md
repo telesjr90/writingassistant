@@ -6,11 +6,12 @@
 - Title: Model-assisted evidence-backed extraction and diagnostic workflow
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-020-T001` complete/PASS
+- Status: active MVP-required parent; `PHASE8-IMPL-020-T001` complete/PASS; `PHASE8-IMPL-020-T002` complete/PASS as docs/decision only
 - Depends on: completed/PASS `PHASE8-IMPL-019` through `PHASE8-IMPL-019-T007`
-- Current child: `PHASE8-IMPL-020-T002` - Model-assisted extraction and diagnostic workflow boundary decision
+- Completed child: `PHASE8-IMPL-020-T002` - Model-assisted extraction and diagnostic workflow boundary decision
+- Current child: `PHASE8-IMPL-020-T003` - Expected-red model-assisted extraction contract tests
 - Next child status: ready/active
-- Planned children: `PHASE8-IMPL-020-T003`, `PHASE8-IMPL-020-T004`, `PHASE8-IMPL-020-T005`, `PHASE8-IMPL-020-T006`, and `PHASE8-IMPL-020-T007`
+- Planned children: `PHASE8-IMPL-020-T004`, `PHASE8-IMPL-020-T005`, `PHASE8-IMPL-020-T006`, and `PHASE8-IMPL-020-T007`
 - Future MVP-required parents: `PHASE8-IMPL-021`, `PHASE8-IMPL-022`
 
 ## 2. Why This Parent Exists
@@ -32,8 +33,8 @@ PHASE8-UX-001 is read-only terminology/boundary reference only. It is not roadma
 ## 4. Child Sequence
 
 - `PHASE8-IMPL-020-T001` - Publish/activate model-assisted evidence-backed extraction parent. complete/PASS. Output/scope: task record, inventory, enrichment JSON, roadmap/status/governance alignment; docs/status only.
-- `PHASE8-IMPL-020-T002` - Model-assisted extraction and diagnostic workflow boundary decision. ready/active. Output/scope: docs/decision only.
-- `PHASE8-IMPL-020-T003` - Expected-red model-assisted extraction contract tests. planned.
+- `PHASE8-IMPL-020-T002` - Model-assisted extraction and diagnostic workflow boundary decision. complete/PASS. Output/scope: docs/decision only; accepted request/output guard model, evidence/provenance/source-locator requirements, diagnostic-question fallback, refusal/no-prose checks, model-output-as-candidate-only boundary, state vocabulary, fail-closed behavior, and no silent fallback.
+- `PHASE8-IMPL-020-T003` - Expected-red model-assisted extraction contract tests. ready/active.
 - `PHASE8-IMPL-020-T004` - Minimal model-assisted request/output guard implementation. planned.
 - `PHASE8-IMPL-020-T005` - Evidence-backed diagnostic/candidate handoff implementation. planned.
 - `PHASE8-IMPL-020-T006` - Model-assisted extraction safety regression. planned.

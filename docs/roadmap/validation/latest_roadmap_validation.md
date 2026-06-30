@@ -1,3 +1,74 @@
+# PHASE8-IMPL-020-T002 Boundary Decision
+
+### Result
+
+- Result: PASS.
+- Scope: docs/decision only.
+- Parent task: `PHASE8-IMPL-020` - Model-assisted evidence-backed extraction and diagnostic workflow.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-020-T002` - Model-assisted extraction and diagnostic workflow boundary decision.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-020-model-assisted-extraction-diagnostic-workflow-boundary-decision.md`.
+- Active/ready next child: `PHASE8-IMPL-020-T003` - Expected-red model-assisted extraction contract tests.
+- Planned children: `PHASE8-IMPL-020-T004`, `PHASE8-IMPL-020-T005`, `PHASE8-IMPL-020-T006`, and `PHASE8-IMPL-020-T007`.
+- Prior child: `PHASE8-IMPL-020-T001` complete/PASS as docs/status publication only.
+- Future MVP-required parents after this active parent: `PHASE8-IMPL-021` and `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools were run inside T002. Generated/context artifacts remain evidence only, not roadmap truth or task completion.
+
+### Files Changed
+
+- Created: `docs/roadmap/decisions/PHASE8-IMPL-020-model-assisted-extraction-diagnostic-workflow-boundary-decision.md`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-020.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-020.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-020.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Decision Summary
+
+PHASE8-IMPL-020-T002 accepts the future model-assisted extraction and diagnostic workflow boundary. Future model-assisted requests must be path-safe, over owner-authored or owner-provided project text/materials only, preserve `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` when available, separate raw source text from user intent, and include explicit no generated prose/no rewrite/no continuation/no outline/no training/no canon/no apply-promotion guard confirmations.
+
+Allowed future outputs are evidence-backed candidate observation, diagnostic question, uncertainty note, insufficient-evidence note, candidate extraction support, safe refusal / blocked request result, and unavailable / fail-closed / quarantined result. Forbidden future outputs include generated_prose, rewritten_prose, continuation, outline, draft, revision, style imitation, polish/improvement/expansion, model_prompt artifact, model_completion artifact, training_jsonl, dataset_manifest, model_artifact, promotion_record, approved_memory, canon, bible, storyform, scene_mutation, note_mutation, and material_mutation.
+
+Confidence is not truth. Model output is not canon. No model output as truth. No automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, fail closed, and no silent fallback remain required. Future candidate support is candidate-first and owner-review-required; queue presence is not approval; candidate persistence is not canon; apply-promotion remains the separate explicit audited owner-confirmed path from PHASE8-IMPL-017.
+
+### Boundary Confirmation
+
+- No backend implementation code changes.
+- No frontend implementation code changes.
+- No product test changes.
+- No routes added.
+- No UI added.
+- No package/dependency changes.
+- No model-assisted extraction implementation.
+- No model/Ollama calls.
+- No NCP/Subtxt/dramatica-flow runtime.
+- No apply-promotion changes.
+- No approved memory/canon mutation.
+- No candidate records created.
+- No review queue entries created.
+- No generated prose.
+- No training/JSONL/dataset/model artifacts.
+- No source-cache/generated context artifacts staged.
+
+### Future Guidance
+
+- `PHASE8-IMPL-020-T003` is ready/active next for expected-red model-assisted extraction contract tests.
+- `PHASE8-IMPL-020-T004` through `PHASE8-IMPL-020-T007` remain planned.
+- `PHASE8-IMPL-021` remains the next parent after PHASE8-IMPL-020 closeout.
+- `PHASE8-IMPL-022` remains the end-to-end MVP validation parent.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
 # PHASE8-IMPL-020-T001 Publication
 
 ### Result
