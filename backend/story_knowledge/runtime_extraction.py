@@ -152,21 +152,44 @@ _RAW_ARTIFACT_BOUNDARY_FLAGS = (
 _FORBIDDEN_SUPPORT_VALUES = frozenset(
     {
         "approved_" + "memory",
+        "bible",
         "candidate_record",
         "canon",
         "continuation",
         "dataset_" + "manifest",
         "generated_prose",
+        "material_mutation",
         "model_" + "artifact",
         "model_completion",
         "model_prompt",
+        "note_mutation",
         "outline",
         "promotion_record",
         "review_" + "queue_entry",
         "rewritten_prose",
+        "scene_mutation",
+        "storyform",
         "training_" + "jsonl",
     }
 )
+_FORBIDDEN_ARTIFACT_PATH_PARTS = frozenset(
+    {
+        "approved_memory",
+        "memory",
+        "canon",
+        "promotion_audit",
+        "review_queue",
+        "candidates",
+        "candidate_index",
+        "training",
+        "dataset",
+        "model_" + "artifacts",
+        "scenes",
+        "notes",
+        "materials",
+    }
+)
+_FORBIDDEN_ARTIFACT_PATH_NAMES = frozenset({"bible.json", "storyform.json"})
 
 
 class _FailClosedAlias(str):
@@ -253,6 +276,8 @@ def validate_runtime_extraction_request(request: dict) -> dict:
     for field in ("project_id", "extraction_request_id", "source_id", "source_ref"):
         if not _safe_id(req.get(field)):
             return _closed("unsafe_path", request=req, errors=[f"unsafe:{field}"])
+    if "source_path" in req and not _safe_relative_path(req.get("source_path")):
+        return _closed("unsafe_path", request=req, errors=["unsafe:source_path"])
 
     if req.get("source_type") not in ALLOWED_SOURCE_TYPES:
         result = _closed("rejected", request=req, errors=["unsupported_source_type"])
@@ -429,7 +454,7 @@ def build_raw_artifact_handoff(runtime_output: dict, *, project_dir: Path) -> di
             return quarantine_runtime_extraction_output(output, "malformed_output", project_dir=project_dir)
         if file_ref.get("artifact_type") not in ALLOWED_ARTIFACT_TYPES:
             return quarantine_runtime_extraction_output(output, "malformed_output", project_dir=project_dir)
-        if not _safe_relative_path(file_ref.get("relative_path")):
+        if not _safe_artifact_relative_path(file_ref.get("relative_path")):
             return quarantine_runtime_extraction_output(output, "unsafe_path", project_dir=project_dir)
 
     return {
@@ -872,10 +897,23 @@ def _validate_source_locators(request: dict) -> str:
 def _safe_relative_path(value: Any) -> bool:
     if not isinstance(value, str) or not value.strip():
         return False
+    if "\\" in value:
+        return False
     path = Path(value)
     if path.is_absolute() or ".." in path.parts:
         return False
-    return all(part not in {"", ".", "/"} for part in path.parts)
+    if len(value) >= 2 and value[1] == ":" and value[0].isalpha():
+        return False
+    return bool(path.parts) and all(part not in {"", ".", "/"} for part in path.parts)
+
+
+def _safe_artifact_relative_path(value: Any) -> bool:
+    if not _safe_relative_path(value):
+        return False
+    parts = set(Path(value).parts)
+    if parts & _FORBIDDEN_ARTIFACT_PATH_PARTS:
+        return False
+    return Path(value).name not in _FORBIDDEN_ARTIFACT_PATH_NAMES
 
 
 def _safe_project_dir(project_dir: Path) -> bool:
