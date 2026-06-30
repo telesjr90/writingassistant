@@ -91,9 +91,11 @@ FORBIDDEN_OUTPUT_TYPES = frozenset(
         "draft",
         "revision",
         "style imitation",
+        "style_imitation",
         "polish",
         "improvement",
         "expansion",
+        "story_prose",
         "model_prompt artifact",
         "model_completion artifact",
         "training_jsonl",
@@ -108,6 +110,17 @@ FORBIDDEN_OUTPUT_TYPES = frozenset(
         "note_mutation",
         "material_mutation",
     }
+)
+HANDOFF_BOUNDARY_FLAGS = (
+    "candidate_first",
+    "owner_review_required",
+    "confidence_is_not_truth",
+    "model_output_is_not_truth",
+    "no_automatic_canon",
+    "no_apply_promotion",
+    "no_memory_canon_mutation",
+    "no_training_artifacts",
+    "no_generated_prose",
 )
 
 _SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
@@ -366,6 +379,205 @@ def quarantine_model_assisted_output(output: dict, reason: str) -> dict:
     }
 
 
+def build_model_assisted_diagnostic_handoff(output: dict) -> dict:
+    out = copy.deepcopy(output) if isinstance(output, dict) else {}
+    result = _handoff_boundary("diagnostic", out)
+
+    if _contains_forbidden_output_or_intent(out):
+        return _handoff_fail("refused_no_prose", result)
+
+    diagnostics = build_model_assisted_diagnostic_questions(out)
+    questions = [
+        item
+        for item in diagnostics.get("diagnostic_questions", [])
+        if isinstance(item, dict) and not _contains_forbidden_output_or_intent(item)
+    ]
+    uncertainty_notes = list(diagnostics.get("uncertainty_notes") or [])
+
+    result.update(
+        {
+            "diagnostic_questions": questions,
+            "uncertainty_notes": uncertainty_notes,
+            "uncertainty_note": bool(uncertainty_notes),
+            "insufficient_evidence_note": bool(out.get("insufficient_evidence_notes"))
+            or diagnostics.get("status") == "evidence_insufficient",
+            "candidate_support_ready": False,
+            "diagnostic_questions_ready": bool(questions),
+        }
+    )
+    if questions:
+        result.update(
+            {
+                "status": "diagnostic_questions_ready",
+                "handoff_status": "diagnostic_questions_ready",
+                "fail_closed": False,
+            }
+        )
+        return result
+
+    result.update(
+        {
+            "status": "evidence_insufficient",
+            "handoff_status": "evidence_insufficient",
+            "evidence_insufficient": True,
+            "insufficient_evidence_note": True,
+            "fail_closed": True,
+        }
+    )
+    return result
+
+
+def build_model_assisted_candidate_observation_handoff(
+    output: dict, *, require_source_locator_refs: bool = True
+) -> dict:
+    out = copy.deepcopy(output) if isinstance(output, dict) else {}
+    result = _handoff_boundary("candidate_observation", out)
+
+    if _contains_forbidden_output_or_intent(out):
+        return _handoff_fail("refused_no_prose", result)
+
+    for field in ("source_refs", "evidence_refs", "provenance_refs"):
+        if not _has_refs(out.get(field)):
+            result["owner_review_blockers"].append(f"missing_{field}")
+            return _handoff_fail("evidence_insufficient", result)
+    if require_source_locator_refs and not _has_refs(out.get("source_locator_refs")):
+        result["owner_review_blockers"].append("missing_source_locator_refs")
+        return _handoff_fail("evidence_insufficient", result)
+
+    support = build_model_assisted_candidate_support(out)
+    if support["status"] != "candidate_support_ready":
+        result["owner_review_blockers"].append(support["status"])
+        failed_status = (
+            support["status"]
+            if support["status"]
+            in {"rejected", "quarantined", "fail_closed", "source_locator_invalid"}
+            else "evidence_insufficient"
+        )
+        return _handoff_fail(failed_status, result)
+
+    result.update(
+        {
+            "status": "candidate_support_ready",
+            "handoff_status": "candidate_support_ready",
+            "candidate_support": copy.deepcopy(support.get("candidate_support") or []),
+            "candidate_observations": copy.deepcopy(support.get("candidate_support") or []),
+            "candidate_support_ready": True,
+            "evidence_insufficient": False,
+            "fail_closed": False,
+            "treat_as_candidate_truth": False,
+            "candidate_truth_claim": False,
+        }
+    )
+    return result
+
+
+def build_model_assisted_review_handoff(
+    candidate_output: dict | None = None, diagnostic_output: dict | None = None
+) -> dict:
+    candidate = (
+        copy.deepcopy(candidate_output)
+        if isinstance(candidate_output, dict)
+        and candidate_output.get("handoff_type") == "candidate_observation"
+        else build_model_assisted_candidate_observation_handoff(candidate_output or {})
+    )
+    diagnostic = (
+        copy.deepcopy(diagnostic_output)
+        if isinstance(diagnostic_output, dict)
+        and diagnostic_output.get("handoff_type") == "diagnostic"
+        else build_model_assisted_diagnostic_handoff(diagnostic_output or candidate_output or {})
+    )
+
+    result = _handoff_boundary("review", {})
+    result.update(
+        {
+            "candidate_handoff": candidate,
+            "diagnostic_handoff": diagnostic,
+            "source_refs": _merge_refs(candidate, diagnostic, "source_refs"),
+            "evidence_refs": _merge_refs(candidate, diagnostic, "evidence_refs"),
+            "provenance_refs": _merge_refs(candidate, diagnostic, "provenance_refs"),
+            "source_locator_refs": _merge_refs(candidate, diagnostic, "source_locator_refs"),
+            "in_memory_only": True,
+            "side_effect_free": True,
+            "writes_files": False,
+            "candidate_record_written": False,
+            "review_queue_entry_written": False,
+            "creates_candidate_records": False,
+            "creates_review_queue_entries": False,
+            "candidate_persistence_is_canon": False,
+            "queue_presence_is_approval": False,
+            "queue_boundary_note": "queue presence is not approval",
+            "candidate_persistence_boundary_note": "candidate persistence is not canon",
+            "apply_promotion_boundary_note": (
+                "apply-promotion is a separate explicit owner-confirmed path"
+            ),
+            "apply_promotion_performed": False,
+            "memory_canon_mutated": False,
+            "training_artifact_created": False,
+            "model_call_performed": False,
+            "no_silent_fallback": True,
+            "candidate_support_ready": candidate.get("candidate_support_ready") is True,
+            "diagnostic_questions_ready": diagnostic.get("diagnostic_questions_ready") is True,
+        }
+    )
+
+    if candidate.get("handoff_status") == "candidate_support_ready":
+        result["handoff_status"] = "candidate_support_ready"
+        result["status"] = "candidate_support_ready"
+        result["fail_closed"] = False
+    elif diagnostic.get("handoff_status") == "diagnostic_questions_ready":
+        result["handoff_status"] = "diagnostic_questions_ready"
+        result["status"] = "diagnostic_questions_ready"
+        result["fail_closed"] = False
+    else:
+        status = candidate.get("handoff_status") or diagnostic.get("handoff_status") or "fail_closed"
+        result["handoff_status"] = status
+        result["status"] = status
+        result["evidence_insufficient"] = status == "evidence_insufficient"
+        result["fail_closed"] = True
+
+    return result
+
+
+def validate_model_assisted_review_handoff(handoff: dict) -> dict:
+    obj = copy.deepcopy(handoff) if isinstance(handoff, dict) else {}
+    result = _handoff_boundary("review_validation", obj)
+    missing = [
+        field
+        for field in ("handoff_type", "handoff_status", *REQUIRED_REF_FIELDS)
+        if field not in obj
+    ]
+    boundary_failures = [
+        flag
+        for flag in HANDOFF_BOUNDARY_FLAGS
+        if obj.get(flag) is not True
+    ]
+    false_required = [
+        field
+        for field in (
+            "creates_candidate_records",
+            "creates_review_queue_entries",
+            "apply_promotion_performed",
+            "memory_canon_mutated",
+            "training_artifact_created",
+            "model_call_performed",
+        )
+        if obj.get(field) is not False
+    ]
+    valid = not missing and not boundary_failures and not false_required
+    result.update(
+        {
+            "status": "valid" if valid else "fail_closed",
+            "handoff_status": "valid" if valid else "fail_closed",
+            "handoff_valid": valid,
+            "missing_handoff_fields": missing,
+            "boundary_failures": boundary_failures,
+            "side_effect_boundary_failures": false_required,
+            "fail_closed": not valid,
+        }
+    )
+    return result
+
+
 def run_guarded_model_assisted_extraction(request: dict, config: dict) -> dict:
     request_validation = validate_model_assisted_extraction_request(request)
     if request_validation["status"] != "valid":
@@ -496,6 +708,124 @@ def _execution_boundary(status: str) -> dict[str, Any]:
         "confidence_is_not_truth": True,
         "fail_closed": status != "valid",
     }
+
+
+def _handoff_boundary(handoff_type: str, output: dict[str, Any]) -> dict[str, Any]:
+    result = {
+        "handoff_type": handoff_type,
+        "handoff_status": "fail_closed",
+        "status": "fail_closed",
+        "source_refs": list(output.get("source_refs") or []),
+        "evidence_refs": list(output.get("evidence_refs") or []),
+        "provenance_refs": list(output.get("provenance_refs") or []),
+        "source_locator_refs": list(output.get("source_locator_refs") or []),
+        "owner_review_blockers": [],
+        "candidate_support": [],
+        "candidate_support_ready": False,
+        "diagnostic_questions_ready": False,
+        "evidence_insufficient": False,
+        "refused_no_prose": False,
+        "blocked_request": False,
+        "rejected": False,
+        "quarantined": False,
+        "fail_closed": True,
+        "in_memory_only": True,
+        "side_effect_free": True,
+        "not_canon": True,
+        "not_approved_memory": True,
+        "not_candidate_persistence": True,
+        "not_review_queue_persistence": True,
+        "not_training_data": True,
+        "not_generated_prose": True,
+        "candidate_first": True,
+        "owner_review_required": True,
+        "confidence_is_not_truth": True,
+        "model_output_is_not_truth": True,
+        "model_output_is_not_canon": True,
+        "no_model_output_as_truth": True,
+        "no_automatic_canon": True,
+        "no_apply_promotion": True,
+        "no_memory_canon_mutation": True,
+        "no_training_artifacts": True,
+        "no_generated_prose": True,
+        "no_silent_fallback": True,
+        "writes_files": False,
+        "creates_candidate_records": False,
+        "creates_review_queue_entries": False,
+        "apply_promotion_performed": False,
+        "memory_canon_mutated": False,
+        "training_artifact_created": False,
+        "model_call_performed": False,
+        "generated_prose": False,
+        "rewrite": False,
+        "rewritten_prose": False,
+        "continuation": False,
+        "outline": False,
+        "draft": False,
+        "revision": False,
+        "style_imitation": False,
+        "polish": False,
+        "improvement": False,
+        "expansion": False,
+        "story_prose": False,
+    }
+    return result
+
+
+def _handoff_fail(status: str, result: dict[str, Any]) -> dict[str, Any]:
+    failed = dict(result)
+    failed.update(
+        {
+            "status": status,
+            "handoff_status": status,
+            "candidate_support_ready": False,
+            "diagnostic_questions_ready": False,
+            "evidence_insufficient": status == "evidence_insufficient",
+            "refused_no_prose": status == "refused_no_prose",
+            "blocked_request": status in {"refused_no_prose", "blocked_request"},
+            "rejected": status == "rejected",
+            "quarantined": status == "quarantined",
+            "fail_closed": True,
+            "treat_as_candidate_truth": False,
+            "candidate_truth_claim": False,
+        }
+    )
+    return failed
+
+
+def _merge_refs(left: dict[str, Any], right: dict[str, Any], field: str) -> list[str]:
+    refs: list[str] = []
+    for item in list(left.get(field) or []) + list(right.get(field) or []):
+        if isinstance(item, str) and item and item not in refs:
+            refs.append(item)
+    return refs
+
+
+def _contains_forbidden_output_or_intent(value: Any) -> bool:
+    if isinstance(value, dict):
+        output_type = value.get("output_type")
+        if output_type in FORBIDDEN_OUTPUT_TYPES:
+            return True
+        for key in (
+            "intent",
+            "user_intent",
+            "request_intent",
+            "output_class",
+            "forbidden_output_type",
+            "question",
+        ):
+            item = value.get(key)
+            if item in FORBIDDEN_OUTPUT_TYPES or _is_prose_request(item):
+                return True
+        for item in value.values():
+            if isinstance(item, (dict, list)) and _contains_forbidden_output_or_intent(item):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(_contains_forbidden_output_or_intent(item) for item in value)
+    if isinstance(value, str):
+        return value in FORBIDDEN_OUTPUT_TYPES or _is_prose_request(value)
+    return False
 
 
 def _safe_identifier(value: Any) -> bool:
