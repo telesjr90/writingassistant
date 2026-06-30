@@ -1,8 +1,9 @@
 """Guarded runtime extraction availability and handoff helpers.
 
-This module is deliberately conservative for PHASE8-IMPL-019-T004: it validates
-requests, reports dependency/probe availability, and builds transient handoff
-objects, but it does not perform real extraction or persist candidates/canon.
+This module is deliberately conservative for PHASE8-IMPL-019: it validates
+requests, reports dependency/probe availability, and persists explicitly
+provided raw support-data bundles only. It does not perform real project-text
+extraction, persist candidates/canon, call models, or generate prose.
 """
 
 from __future__ import annotations
@@ -14,6 +15,12 @@ import json
 import re
 from pathlib import Path
 from typing import Any
+
+from backend.story_knowledge.raw_artifacts import (
+    build_raw_artifact_manifest,
+    read_raw_artifact_manifest,
+    write_raw_artifact_bundle,
+)
 
 
 RUNTIME_STATUSES = frozenset(
@@ -122,6 +129,42 @@ _FAIL_CLOSED_ALIASES = frozenset(
         "missing_evidence_refs",
         "missing_provenance_refs",
         "missing_source_locator_refs",
+    }
+)
+_RAW_ARTIFACT_BOUNDARY_FLAGS = (
+    "evidence_provenance_linked",
+    "generated_prose_permanently_forbidden",
+    "manifest_backed_raw_artifacts",
+    "no_apply_promotion",
+    "no_booknlp_spacy_runtime",
+    "no_generated_prose",
+    "no_memory_canon_mutation",
+    "no_model_calls",
+    "no_runtime_extraction",
+    "no_training_artifacts",
+    "path_safe_fail_closed",
+    "project_local_raw_artifacts",
+    "raw_artifacts_not_candidates",
+    "raw_artifacts_not_canon",
+    "raw_artifacts_not_training_data",
+    "raw_artifacts_support_data_only",
+)
+_FORBIDDEN_SUPPORT_VALUES = frozenset(
+    {
+        "approved_" + "memory",
+        "candidate_record",
+        "canon",
+        "continuation",
+        "dataset_" + "manifest",
+        "generated_prose",
+        "model_" + "artifact",
+        "model_completion",
+        "model_prompt",
+        "outline",
+        "promotion_record",
+        "review_" + "queue_entry",
+        "rewritten_prose",
+        "training_" + "jsonl",
     }
 )
 
@@ -379,7 +422,7 @@ def build_raw_artifact_handoff(runtime_output: dict, *, project_dir: Path) -> di
         )
 
     artifact_files = output.get("artifact_files")
-    if not isinstance(artifact_files, list):
+    if not isinstance(artifact_files, list) or not artifact_files:
         return quarantine_runtime_extraction_output(output, "malformed_output", project_dir=project_dir)
     for file_ref in artifact_files:
         if not isinstance(file_ref, dict):
@@ -405,6 +448,101 @@ def build_raw_artifact_handoff(runtime_output: dict, *, project_dir: Path) -> di
         "artifact_files": artifact_files,
         "indexed_as_valid": False,
         "fail_closed": False,
+        "no_silent_fallback": True,
+    }
+
+
+def persist_runtime_extraction_raw_artifacts(runtime_output: dict, *, project_dir: Path) -> dict:
+    if not _safe_project_dir(project_dir):
+        return _closed_runtime_persistence("unsafe_path")
+
+    output = copy.deepcopy(runtime_output or {})
+    handoff = build_raw_artifact_handoff(output, project_dir=project_dir)
+    if handoff.get("status") != "valid":
+        result = _closed_runtime_persistence(handoff.get("status", "fail_closed"))
+        result["handoff"] = handoff
+        return result
+
+    payloads = output.get("artifact_payloads")
+    if not isinstance(payloads, dict) or not payloads:
+        return quarantine_runtime_extraction_output(output, "malformed_output", project_dir=project_dir)
+
+    try:
+        artifact_files = []
+        artifact_payloads = {}
+        for file_ref in handoff["artifact_files"]:
+            completed_ref, payload = _build_raw_artifact_file_ref(
+                file_ref,
+                payloads,
+                fallback_source_locator_refs=handoff["source_locator_refs"],
+                fallback_evidence_refs=handoff["evidence_refs"],
+                fallback_provenance_refs=handoff["provenance_refs"],
+            )
+            artifact_files.append(completed_ref)
+            artifact_payloads[completed_ref["artifact_file_id"]] = payload
+
+        manifest = build_raw_artifact_manifest(
+            project_id=output["project_id"],
+            raw_artifact_bundle_id=handoff["raw_artifact_bundle_id"],
+            artifact_files=artifact_files,
+            artifact_source_type="runtime_extraction",
+            artifact_source_id=output["extraction_request_id"],
+            extraction_run_id=output.get("extraction_run_id"),
+            source_refs=handoff["source_refs"],
+            evidence_refs=handoff["evidence_refs"],
+            provenance_refs=handoff["provenance_refs"],
+            source_locator_refs=handoff["source_locator_refs"],
+            tool_name=_optional_safe_string(output.get("tool_name")),
+            tool_version=_optional_safe_string(output.get("tool_version")),
+            adapter_name=_optional_safe_string(output.get("adapter_name")),
+            adapter_version=_optional_safe_string(output.get("adapter_version")),
+            pipeline_name=_optional_safe_string(output.get("pipeline_name")),
+            pipeline_version=_optional_safe_string(output.get("pipeline_version")),
+            no_generated_prose_confirmation=True,
+            no_model_call_confirmation=True,
+            no_training_artifact_confirmation=True,
+            no_apply_promotion_confirmation=True,
+            no_memory_canon_mutation_confirmation=True,
+            no_runtime_extraction_confirmation=True,
+        )
+        write_result = write_raw_artifact_bundle(
+            manifest,
+            artifact_payloads,
+            project_dir=project_dir,
+        )
+        persisted_manifest = read_raw_artifact_manifest(
+            manifest["project_id"],
+            manifest["raw_artifact_bundle_id"],
+            project_dir=project_dir,
+        )
+    except (OSError, ValueError, TypeError):
+        return _closed_runtime_persistence("fail_closed")
+
+    return {
+        "status": "valid",
+        "raw_artifact_bundle_id": persisted_manifest["raw_artifact_bundle_id"],
+        "project_id": persisted_manifest["project_id"],
+        "manifest": persisted_manifest,
+        "manifest_path": write_result.get("manifest_path"),
+        "source_refs": persisted_manifest["source_refs"],
+        "evidence_refs": persisted_manifest["evidence_refs"],
+        "provenance_refs": persisted_manifest["provenance_refs"],
+        "source_locator_refs": persisted_manifest["source_locator_refs"],
+        "artifact_files": persisted_manifest["artifact_files"],
+        "support_data_only": True,
+        "raw_artifacts_not_canon": True,
+        "raw_artifacts_not_approved_memory": True,
+        "raw_artifacts_not_candidates": True,
+        "raw_artifacts_not_training_data": True,
+        "canon_write_performed": False,
+        "apply_promotion_performed": False,
+        "candidate_persistence_performed": False,
+        "review_queue_write_performed": False,
+        "model_call_performed": False,
+        "generated_prose": False,
+        "training_artifact_created": False,
+        "fail_closed": False,
+        "extraction_succeeded": False,
         "no_silent_fallback": True,
     }
 
@@ -600,6 +738,21 @@ def _closed_runtime(status: str) -> dict:
     return result
 
 
+def _closed_runtime_persistence(status: str) -> dict:
+    result = _closed_runtime(status)
+    result.update(
+        {
+            "persisted": False,
+            "support_data_only": True,
+            "raw_artifacts_not_canon": True,
+            "raw_artifacts_not_approved_memory": True,
+            "raw_artifacts_not_candidates": True,
+            "raw_artifacts_not_training_data": True,
+        }
+    )
+    return result
+
+
 def _normalize_status(value: Any) -> str | None:
     if isinstance(value, str) and value in RUNTIME_STATUSES:
         return value
@@ -626,6 +779,71 @@ def _safe_list_or_empty(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
     return [item for item in value if _safe_id(item)]
+
+
+def _optional_safe_string(value: Any) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or value in _FORBIDDEN_SUPPORT_VALUES:
+        raise ValueError("invalid field")
+    return value
+
+
+def _payload_to_bytes(payload: Any) -> bytes:
+    _reject_forbidden_support_payload(payload)
+    if isinstance(payload, bytes):
+        return payload
+    if isinstance(payload, str):
+        return payload.encode("utf-8")
+    if isinstance(payload, (dict, list)):
+        return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    raise ValueError("invalid field")
+
+
+def _reject_forbidden_support_payload(value: Any) -> None:
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            if key in _FORBIDDEN_SUPPORT_VALUES:
+                raise ValueError("invalid field")
+            _reject_forbidden_support_payload(nested)
+    elif isinstance(value, list):
+        for nested in value:
+            _reject_forbidden_support_payload(nested)
+    elif isinstance(value, str) and value in _FORBIDDEN_SUPPORT_VALUES:
+        raise ValueError("invalid field")
+
+
+def _build_raw_artifact_file_ref(
+    file_ref: dict,
+    payloads: dict,
+    *,
+    fallback_source_locator_refs: list[str],
+    fallback_evidence_refs: list[str],
+    fallback_provenance_refs: list[str],
+) -> tuple[dict, bytes]:
+    artifact_file_id = file_ref.get("artifact_file_id")
+    if not _safe_id(artifact_file_id) or artifact_file_id not in payloads:
+        raise ValueError("invalid field")
+    payload = _payload_to_bytes(payloads[artifact_file_id])
+    completed = copy.deepcopy(file_ref)
+    completed["source_locator_refs"] = completed.get("source_locator_refs") or list(
+        fallback_source_locator_refs
+    )
+    completed["evidence_refs"] = completed.get("evidence_refs") or list(fallback_evidence_refs)
+    completed["provenance_refs"] = completed.get("provenance_refs") or list(
+        fallback_provenance_refs
+    )
+    completed["media_type"] = completed.get("media_type") or "application/json"
+    completed["encoding"] = completed.get("encoding", "utf-8")
+    completed["size_bytes"] = len(payload)
+    completed["sha256"] = hashlib.sha256(payload).hexdigest()
+    completed["record_count"] = completed.get("record_count", 0)
+    completed["line_count"] = completed.get("line_count", 0)
+    completed["schema_name"] = completed.get("schema_name")
+    completed["schema_version"] = completed.get("schema_version")
+    completed["parser_hint"] = completed.get("parser_hint")
+    completed["boundary_flags"] = sorted(_RAW_ARTIFACT_BOUNDARY_FLAGS)
+    return completed, payload
 
 
 def _validate_source_locators(request: dict) -> str:
