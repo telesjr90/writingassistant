@@ -1,24 +1,24 @@
-# PHASE8-IMPL-019-T002 Guarded Runtime Extraction Boundary Decision
+# PHASE8-IMPL-019-T004 Minimal Guarded Runtime Extraction Helper
 
 ### Result
 
 - Result: PASS.
-- Scope: docs/decision/status/governance only.
+- Scope: minimal backend helper plus roadmap/status updates.
 - Parent task: `PHASE8-IMPL-019` - Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline.
 - Parent status: active.
-- Completed child recorded: `PHASE8-IMPL-019-T002` - Guarded runtime extraction boundary decision and environment model.
-- Prior completed child: `PHASE8-IMPL-019-T001` - Publish/activate guarded runtime extraction parent.
-- Active/ready next child: `PHASE8-IMPL-019-T003` - Expected-red guarded runtime extraction contract tests.
-- Planned children: `PHASE8-IMPL-019-T004`, `PHASE8-IMPL-019-T005`, `PHASE8-IMPL-019-T006`, and `PHASE8-IMPL-019-T007`.
+- Completed child recorded: `PHASE8-IMPL-019-T004` - Minimal guarded dependency availability and import/run probe implementation.
+- Prior completed children: `PHASE8-IMPL-019-T001`, `PHASE8-IMPL-019-T002`, and `PHASE8-IMPL-019-T003`.
+- Active/ready next child: `PHASE8-IMPL-019-T005` - Guarded runtime extraction request and raw artifact handoff implementation.
+- Planned children: `PHASE8-IMPL-019-T006` and `PHASE8-IMPL-019-T007`.
 - Future MVP-required parents after `PHASE8-IMPL-019`: `PHASE8-IMPL-020`, `PHASE8-IMPL-021`, and `PHASE8-IMPL-022`.
 - Fine-tuning remains deferred after MVP.
 - Generated prose/prose-production paths remain permanently forbidden.
 - PHASE8-UX-001 remained read-only terminology/boundary reference only.
-- No context tools were run inside T002. Generated context artifacts remain evidence only, not roadmap truth or task completion.
+- No context tools were run inside T004. Generated context artifacts remain evidence only, not roadmap truth or task completion.
 
 ### Files Changed
 
-- Created: `docs/roadmap/decisions/PHASE8-IMPL-019-guarded-runtime-extraction-boundary-environment-model-decision.md`
+- Created: `backend/story_knowledge/runtime_extraction.py`
 - Updated: `docs/roadmap/tasks/PHASE8-IMPL-019.md`
 - Updated: `docs/roadmap/inventory/PHASE8-IMPL-019.md`
 - Updated: `docs/roadmap/enrichment/PHASE8-IMPL-019.enrichment.json`
@@ -32,29 +32,29 @@
 - Updated: `docs/roadmap/risk_register.md`
 - Updated: `docs/roadmap/open_questions.md`
 
-### Decision Summary
+### Implementation Summary
 
-`PHASE8-IMPL-019-T002` accepts the Guarded runtime extraction boundary and environment model decision. BookNLP and spaCy are MVP-required for PHASE8-IMPL-019, but T002 performs no install/import/run and no package changes. Future install/import/run availability checks must be explicit, test-covered, environment-gated, and fail closed. No silent fallback may claim extraction passed.
+`PHASE8-IMPL-019-T004` creates `backend/story_knowledge/runtime_extraction.py` as the minimal guarded runtime extraction helper. It implements `validate_runtime_extraction_environment`, `check_booknlp_availability`, `check_spacy_availability`, `validate_runtime_extraction_request`, `build_runtime_extraction_plan`, `run_runtime_extraction_probe`, `run_guarded_runtime_extraction`, `build_raw_artifact_handoff`, `build_candidate_review_handoff`, and `quarantine_runtime_extraction_output`.
 
-Future runtime extraction must use safe disabled/unavailable defaults and may later implement environment guards such as `WRITER_ASSISTANT_RUNTIME_EXTRACTION_ENABLED`, `WRITER_ASSISTANT_BOOKNLP_ENABLED`, `WRITER_ASSISTANT_SPACY_ENABLED`, `WRITER_ASSISTANT_BOOKNLP_MODEL_DIR`, `WRITER_ASSISTANT_BOOKNLP_JAVA_HOME`, `WRITER_ASSISTANT_SPACY_MODEL`, `WRITER_ASSISTANT_EXTRACTION_TIMEOUT_SECONDS`, and `WRITER_ASSISTANT_EXTRACTION_MAX_INPUT_CHARS`. Future states must distinguish disabled, unavailable, dependency_missing, model_missing, configuration_invalid, probe_failed, runtime_failed, malformed_output, unsafe_path, missing_source_refs, missing_evidence_refs, missing_provenance_refs, missing_source_locator_refs, quarantined, rejected, valid, and fail_closed.
+The helper is disabled/fail-closed by default, separates dependency/import/probe availability from runtime extraction success, validates owner-authored or owner-provided request boundaries, rejects unsafe ids/paths, requires source/evidence/provenance/source-locator refs, builds deterministic side-effect-free plans, returns transient probe status, and produces draft-only raw artifact/candidate review handoff and quarantine shapes. Probe success is not runtime extraction success.
 
-Future requests must be path-safe and source-bounded to owner-authored or owner-provided project text. Required handoff fields include `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`. Raw tool output is never authoritative. Confidence is not truth. Raw artifact outputs must persist through PHASE8-IMPL-018 helpers as project-local support data only. Candidate-first handoff requires owner review; runtime extraction output is never approval, never canon, and never automatic apply-promotion.
+T004 does not install dependencies, edit package files, add routes/UI, run full runtime extraction over project text, call models/Ollama, persist candidates or review queue entries, mutate approved memory/canon, apply promotion, create training artifacts, or generate prose. Raw artifact persistence through PHASE8-IMPL-018 helpers remains future T005 scope.
 
-### T003 Handoff
+### T005 Handoff
 
-`PHASE8-IMPL-019-T003` is ready/active next. It must be tests-first expected-red only for future `backend/story_knowledge/runtime_extraction.py` APIs including `validate_runtime_extraction_environment`, `check_booknlp_availability`, `check_spacy_availability`, `validate_runtime_extraction_request`, `build_runtime_extraction_plan`, `run_runtime_extraction_probe`, `run_guarded_runtime_extraction`, `build_raw_artifact_handoff`, `build_candidate_review_handoff`, and `quarantine_runtime_extraction_output`.
+`PHASE8-IMPL-019-T005` is ready/active next for guarded runtime extraction request and raw artifact handoff implementation. It must preserve owner-authored or owner-provided source boundaries, PHASE8-IMPL-018 raw artifact support data vocabulary, candidate-first owner review handoff, explicit unavailable/quarantine states, and no automatic canon/apply-promotion/memory-canon mutation/model calls/training artifacts/generated prose.
 
 ### Boundary Confirmation
 
-- No backend implementation code changes.
+- Backend implementation limited to `backend/story_knowledge/runtime_extraction.py`.
 - No frontend implementation code changes.
 - No product test changes.
 - No routes added.
 - No UI added.
 - No package/dependency changes.
-- No dependency install/import/run.
-- No runtime extraction.
-- No BookNLP/spaCy install/run/import.
+- No dependency install.
+- No full runtime extraction over project text.
+- No BookNLP/spaCy package addition.
 - No model/Ollama calls.
 - No NCP/Subtxt/dramatica-flow runtime.
 - No apply-promotion changes.
@@ -66,7 +66,8 @@ Future requests must be path-safe and source-bounded to owner-authored or owner-
 
 ### Future Guidance
 
-- `PHASE8-IMPL-019-T003` is ready/active next and remains expected-red tests only.
+- `PHASE8-IMPL-019-T005` is ready/active next.
+- `PHASE8-IMPL-019-T006` and `PHASE8-IMPL-019-T007` remain planned.
 - `PHASE8-IMPL-020` remains the next parent after `PHASE8-IMPL-019`.
 - `PHASE8-IMPL-020` owns model-assisted extraction.
 - `PHASE8-IMPL-021` owns NCP/Subtxt/dramatica-flow runtime.
