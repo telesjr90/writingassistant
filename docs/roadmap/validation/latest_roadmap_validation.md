@@ -1,3 +1,72 @@
+# PHASE8-IMPL-020-T003 Expected-red Contract Tests
+
+### Result
+
+- Result: PASS.
+- Scope: tests-first expected-red contract only.
+- Parent task: `PHASE8-IMPL-020` - Model-assisted evidence-backed extraction and diagnostic workflow.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-020-T003` - Expected-red model-assisted extraction contract tests.
+- Test file: `tests/test_writer_assistant_core_model_assisted_extraction_contract.py`.
+- Expected-red target: future `backend.story_knowledge.model_assisted_extraction` module and public API.
+- Active/ready next child: `PHASE8-IMPL-020-T004` - Minimal model-assisted request/output guard implementation.
+- Planned children: `PHASE8-IMPL-020-T005`, `PHASE8-IMPL-020-T006`, and `PHASE8-IMPL-020-T007`.
+- Prior children: `PHASE8-IMPL-020-T001` complete/PASS as docs/status publication only; `PHASE8-IMPL-020-T002` complete/PASS as docs/decision only.
+- Future MVP-required parents after this active parent: `PHASE8-IMPL-021` and `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools, context generation, model calls, implementation modules, candidate records, review queue entries, apply-promotion, memory/canon mutation, training artifacts, or generated prose were created.
+
+### Files Changed
+
+- Created: `tests/test_writer_assistant_core_model_assisted_extraction_contract.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-020.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-020.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-020.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Contract Summary
+
+T003 adds expected-red tests for the future public APIs: `validate_model_assisted_extraction_request`, `validate_model_assisted_environment`, `build_model_assisted_extraction_prompt_packet`, `validate_model_assisted_output`, `build_model_assisted_candidate_support`, `build_model_assisted_diagnostic_questions`, `quarantine_model_assisted_output`, and `run_guarded_model_assisted_extraction`.
+
+The contract covers path-safe owner-authored or owner-provided requests; required `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`; raw source text separated from user intent; disabled/unavailable/fail-closed model-use states; prompt packet no-prose/no-rewrite/no-continuation/no-outline/no-training/no-canon/no-apply-promotion guards; allowed candidate/diagnostic/uncertainty/insufficient-evidence/refusal/quarantined outputs only; forbidden prose, model artifact, training, promotion, canon, bible, storyform, scene, note, and material mutation outputs; traceable evidence/provenance/source-locator support; candidate-first owner-review handoff; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; fail closed; and no silent fallback.
+
+### Boundary Confirmation
+
+- No `backend/story_knowledge/model_assisted_extraction.py` implementation module created.
+- No backend implementation code changes.
+- No frontend implementation code changes.
+- No routes added.
+- No UI added.
+- No package/dependency changes.
+- No model calls.
+- No NCP/Subtxt/dramatica-flow runtime.
+- No apply-promotion changes.
+- No approved memory/canon mutation.
+- No candidate records created.
+- No review queue entries created.
+- No generated prose.
+- No training/JSONL/dataset/model artifacts.
+- No source-cache/generated context artifacts staged.
+
+### Future Guidance
+
+- `PHASE8-IMPL-020-T004` is ready/active next for minimal model-assisted request/output guard implementation.
+- `PHASE8-IMPL-020-T005` through `PHASE8-IMPL-020-T007` remain planned.
+- `PHASE8-IMPL-021` remains the next parent after PHASE8-IMPL-020 closeout.
+- `PHASE8-IMPL-022` remains the end-to-end MVP validation parent.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
 # PHASE8-IMPL-020-T002 Boundary Decision
 
 ### Result
@@ -62,8 +131,9 @@ Confidence is not truth. Model output is not canon. No model output as truth. No
 
 ### Future Guidance
 
-- `PHASE8-IMPL-020-T003` is ready/active next for expected-red model-assisted extraction contract tests.
-- `PHASE8-IMPL-020-T004` through `PHASE8-IMPL-020-T007` remain planned.
+- `PHASE8-IMPL-020-T003` is complete/PASS as expected-red model-assisted extraction contract tests.
+- `PHASE8-IMPL-020-T004` is ready/active next.
+- `PHASE8-IMPL-020-T005` through `PHASE8-IMPL-020-T007` remain planned.
 - `PHASE8-IMPL-021` remains the next parent after PHASE8-IMPL-020 closeout.
 - `PHASE8-IMPL-022` remains the end-to-end MVP validation parent.
 - Fine-tuning remains deferred after MVP.
