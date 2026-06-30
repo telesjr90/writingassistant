@@ -1,0 +1,39 @@
+{
+  "task_id": "PHASE8-IMPL-020",
+  "parent_title": "PHASE8-IMPL-020 — Model-assisted evidence-backed extraction and diagnostic workflow",
+  "status": "active",
+  "mvp_required": true,
+  "current_child": "PHASE8-IMPL-020-T002",
+  "next_child": "PHASE8-IMPL-020-T002",
+  "completed_children": [
+    "PHASE8-IMPL-020-T001"
+  ],
+  "planned_children": [
+    "PHASE8-IMPL-020-T003",
+    "PHASE8-IMPL-020-T004",
+    "PHASE8-IMPL-020-T005",
+    "PHASE8-IMPL-020-T006",
+    "PHASE8-IMPL-020-T007"
+  ],
+  "boundary_tags": [
+    "mvp_required_model_assisted_extraction",
+    "evidence_first",
+    "candidate_only",
+    "owner_review_required",
+    "no_auto_promotion",
+    "no_apply_promotion",
+    "no_memory_canon_mutation",
+    "no_model_calls",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "generated_prose_permanently_forbidden",
+    "local_first",
+    "no_package_changes"
+  ],
+  "future_parent_sequence": [
+    "PHASE8-IMPL-021",
+    "PHASE8-IMPL-022"
+  ],
+  "publication_summary": "PHASE8-IMPL-020 is active as the next MVP-required parent after completed/PASS PHASE8-IMPL-019. PHASE8-IMPL-020-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-020-T002 is ready/active next as docs/decision only. PHASE8-IMPL-020-T003 through PHASE8-IMPL-020-T007 are planned. Model-assisted evidence-backed extraction and diagnostic workflow may produce evidence-backed candidate observations, diagnostic questions, uncertainty notes, or candidate extraction support only. Required future output support includes source_refs, evidence_refs, provenance_refs, and source_locator_refs when available. Confidence is not truth; model output is not canon, no automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose, no rewrite, no continuation, no outline generation, no model output as truth, fail closed, and no silent fallback. Owner review remains mandatory. Apply-promotion remains the separate explicit owner-confirmed path. PHASE8-IMPL-021 and PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
+}

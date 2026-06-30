@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-019",
-    "current_parent_task_title": "Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline",
-    "frontier_note": "PHASE8-IMPL-019 is complete/PASS after PHASE8-IMPL-019-T007 parent closeout. PHASE8-IMPL-019-T001 through PHASE8-IMPL-019-T007 are complete/PASS. T001 published/activated the parent; T002 accepted the guarded runtime extraction boundary/environment model decision; T003 added expected-red runtime extraction contract tests; T004 implemented minimal guarded runtime extraction helper APIs; T005 implemented guarded request/raw artifact handoff and focused tests; T006 added runtime extraction safety regression and minimal hardening; T007 closes the parent as docs/status/governance only. Final artifacts are backend/story_knowledge/runtime_extraction.py, tests/test_writer_assistant_core_runtime_extraction_contract.py, tests/test_writer_assistant_core_runtime_extraction_raw_artifact_handoff_contract.py, tests/test_writer_assistant_core_runtime_extraction_safety_regression.py, and docs/roadmap/decisions/PHASE8-IMPL-019-guarded-runtime-extraction-boundary-environment-model-decision.md. Final behavior includes explicit runtime extraction environment/availability states, BookNLP/spaCy availability/probe guard shape, path-safe request validation, owner-authored/owner-provided source boundary, source_refs/evidence_refs/provenance_refs/source_locator_refs preservation, deterministic plan building, transient probe result behavior, guarded fail-closed runtime execution shell, PHASE8-IMPL-018 raw artifact handoff persistence, candidate-review draft handoff only, quarantine handling, no silent fallback, and no full BookNLP/spaCy extraction over project text yet. Final boundaries: no package/dependency changes, no routes, no UI, no frontend changes, no full runtime extraction over project text, no model/Ollama calls, no NCP/Subtxt/dramatica-flow runtime, no apply-promotion changes, no approved memory/canon mutation, no candidate persistence/review queue creation, no training/JSONL/dataset/model artifacts, and no generated prose. PHASE8-UX-001 remains read-only terminology reference only. PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is the recommended next MVP-required parent after review. PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden."
+    "current_parent_task_id": "PHASE8-IMPL-020",
+    "current_parent_task_title": "Model-assisted evidence-backed extraction and diagnostic workflow",
+    "frontier_note": "PHASE8-IMPL-019 is complete/PASS through PHASE8-IMPL-019-T007. PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is active as the next MVP-required parent. PHASE8-IMPL-020-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-020-T002 is ready/active next as docs/decision only. PHASE8-IMPL-020-T003 through PHASE8-IMPL-020-T007 are planned. Model-assisted output may produce evidence-backed candidate observations, diagnostic questions, uncertainty notes, or candidate extraction support only; required support includes source_refs/evidence_refs/provenance_refs/source_locator_refs when available. Confidence is not truth; model output is not canon; no automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose, no rewrite, no continuation, no outline generation, no model output as truth, fail closed, and no silent fallback remain required boundaries. Owner review remains mandatory and apply-promotion remains the separate explicit owner-confirmed path. PHASE8-IMPL-021 and PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -3715,7 +3715,7 @@
       "id": "PHASE8-IMPL-017-T007",
       "title": "Parent closeout",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "active",
       "parent": "PHASE8-IMPL-017",
       "depends_on": [
         "PHASE8-IMPL-017-T006"
@@ -4169,10 +4169,157 @@
       ],
       "boundary_tags": [
         "mvp_required_model_assisted_extraction",
-        "owner_review_required",
+        "evidence_first",
         "candidate_only",
+        "owner_review_required",
         "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "generated_prose_permanently_forbidden",
+        "local_first",
+        "no_package_changes"
+      ],
+      "result": "active; PHASE8-IMPL-020-T001 complete/PASS docs/status publication only; PHASE8-IMPL-020-T002 ready/active next; PHASE8-IMPL-020-T003 through PHASE8-IMPL-020-T007 planned; model-assisted evidence-backed extraction and diagnostic workflow may produce candidate observations, diagnostic questions, uncertainty notes, or candidate extraction support only; source_refs/evidence_refs/provenance_refs/source_locator_refs required when available; confidence is not truth; no automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose, no rewrite, no continuation, no outline generation, no model output as truth, fail closed, and no silent fallback",
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-020.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-020.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-020.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-020/"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T001",
+      "title": "Publish/activate model-assisted evidence-backed extraction parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "mvp_required_model_assisted_extraction",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden",
+        "no_package_changes"
+      ],
+      "result": "complete/PASS docs/status publication only; no model-assisted extraction implementation, no model/Ollama calls, no code/tests/package changes"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T002",
+      "title": "Model-assisted extraction and diagnostic workflow boundary decision",
+      "type": "planning_microtask",
+      "status": "active",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "mvp_required_model_assisted_extraction",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_generated_prose",
         "generated_prose_permanently_forbidden"
+      ],
+      "result": "ready/active next; docs/decision only"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T003",
+      "title": "Expected-red model-assisted extraction contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020-T002"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "mvp_required_model_assisted_extraction",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T004",
+      "title": "Minimal model-assisted request/output guard implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020-T003"
+      ],
+      "boundary_tags": [
+        "mvp_required_model_assisted_extraction",
+        "pure_validation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T005",
+      "title": "Evidence-backed diagnostic/candidate handoff implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020-T004"
+      ],
+      "boundary_tags": [
+        "mvp_required_model_assisted_extraction",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T006",
+      "title": "Model-assisted extraction safety regression",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020-T005"
+      ],
+      "boundary_tags": [
+        "mvp_required_model_assisted_extraction",
+        "validation",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-020-T007",
+      "title": "Parent closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-020",
+      "depends_on": [
+        "PHASE8-IMPL-020-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "no_generated_prose"
       ],
       "result": "planned"
     },
