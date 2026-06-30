@@ -1,3 +1,67 @@
+# PHASE8-IMPL-019-T007 Parent Closeout
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/governance parent closeout only.
+- Parent task: `PHASE8-IMPL-019` - Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline.
+- Completed child recorded: `PHASE8-IMPL-019-T007` - Parent closeout.
+- Parent result: complete/PASS.
+- Completed child sequence: `PHASE8-IMPL-019-T001`, `PHASE8-IMPL-019-T002`, `PHASE8-IMPL-019-T003`, `PHASE8-IMPL-019-T004`, `PHASE8-IMPL-019-T005`, `PHASE8-IMPL-019-T006`, and `PHASE8-IMPL-019-T007` are complete/PASS.
+- Next parent recommendation: `PHASE8-IMPL-020` - Model-assisted evidence-backed extraction and diagnostic workflow.
+- PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools were run for context generation. Generated/context artifacts remain evidence only, not roadmap truth or task completion.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-019.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-019.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-019.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Parent Closeout Summary
+
+T001 published/activated the parent. T002 accepted the guarded runtime extraction boundary/environment model decision. T003 added expected-red runtime extraction contract tests. T004 implemented minimal guarded runtime extraction helper APIs. T005 implemented guarded request/raw artifact handoff and focused tests. T006 added runtime extraction safety regression and minimal hardening. T007 closes the parent.
+
+Final artifacts are `backend/story_knowledge/runtime_extraction.py`, `tests/test_writer_assistant_core_runtime_extraction_contract.py`, `tests/test_writer_assistant_core_runtime_extraction_raw_artifact_handoff_contract.py`, `tests/test_writer_assistant_core_runtime_extraction_safety_regression.py`, and `docs/roadmap/decisions/PHASE8-IMPL-019-guarded-runtime-extraction-boundary-environment-model-decision.md`.
+
+Final behavior includes explicit runtime extraction environment/availability states, BookNLP/spaCy availability/probe guard shape, path-safe request validation, owner-authored/owner-provided source boundary, source/evidence/provenance/source-locator ref preservation, deterministic plan building, transient probe result behavior, guarded fail-closed runtime execution shell, PHASE8-IMPL-018 raw artifact handoff persistence, candidate-review draft handoff only, quarantine handling, no silent fallback, and no full BookNLP/spaCy extraction over project text yet.
+
+### Boundary Confirmation
+
+- No package/dependency changes.
+- No routes.
+- No UI.
+- No frontend changes.
+- No full runtime extraction over project text.
+- No model/Ollama calls.
+- No NCP/Subtxt/dramatica-flow runtime.
+- No apply-promotion changes.
+- No approved memory/canon mutation.
+- No candidate persistence/review queue creation.
+- No training/JSONL/dataset/model artifacts.
+- No generated prose.
+- No staging, commit, or push performed.
+
+### Future Guidance
+
+- Commit T007 after review.
+- Prepare `PHASE8-IMPL-020-T001` only after review.
+- Keep PHASE8-IMPL-020 through PHASE8-IMPL-022 future MVP-required.
+- Keep fine-tuning deferred after MVP.
+- Keep generated prose/prose-production paths permanently forbidden.
+
 # PHASE8-IMPL-019-T004 Minimal Guarded Runtime Extraction Helper
 
 ### Result

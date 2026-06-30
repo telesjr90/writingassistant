@@ -10,7 +10,7 @@ Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-
 
 ## Status
 
-PHASE8-IMPL-019 is active after PHASE8-IMPL-019-T006 runtime extraction safety regression. PHASE8-IMPL-019-T001 is complete/PASS. PHASE8-IMPL-019-T002 is complete/PASS. PHASE8-IMPL-019-T003 is complete/PASS as expected-red tests-only handoff. PHASE8-IMPL-019-T004 is complete/PASS. PHASE8-IMPL-019-T005 is complete/PASS. PHASE8-IMPL-019-T006 is complete/PASS. PHASE8-IMPL-019-T007 is ready/active next. PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+PHASE8-IMPL-019 is complete/PASS after PHASE8-IMPL-019-T007 parent closeout. PHASE8-IMPL-019-T001 through PHASE8-IMPL-019-T007 are complete/PASS. PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is the recommended next MVP-required parent after review. PHASE8-IMPL-020 through PHASE8-IMPL-022 remain future MVP-required parents. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Goal
 
@@ -36,6 +36,14 @@ T006 is complete/PASS as focused runtime extraction safety regression coverage a
 
 PHASE8-UX-001 was used only as a read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and was not edited.
 
+T007 is complete/PASS as docs/status/governance closeout only. Final parent result: T001 published/activated the parent; T002 accepted the guarded runtime extraction boundary/environment model decision; T003 added expected-red runtime extraction contract tests; T004 implemented minimal guarded runtime extraction helper APIs; T005 implemented guarded request/raw artifact handoff and focused tests; T006 added runtime extraction safety regression and minimal hardening; T007 closes the parent.
+
+Final implementation artifacts are `backend/story_knowledge/runtime_extraction.py`, `tests/test_writer_assistant_core_runtime_extraction_contract.py`, `tests/test_writer_assistant_core_runtime_extraction_raw_artifact_handoff_contract.py`, `tests/test_writer_assistant_core_runtime_extraction_safety_regression.py`, and `docs/roadmap/decisions/PHASE8-IMPL-019-guarded-runtime-extraction-boundary-environment-model-decision.md`.
+
+Final behavior includes explicit runtime extraction environment/availability states; BookNLP/spaCy availability/probe guard shape; path-safe request validation; owner-authored/owner-provided source boundary; `source_refs`/`evidence_refs`/`provenance_refs`/`source_locator_refs` preservation; deterministic plan building; transient probe result behavior; guarded fail-closed runtime execution shell; PHASE8-IMPL-018 raw artifact handoff persistence; candidate-review draft handoff only; quarantine handling; no silent fallback; and no full BookNLP/spaCy extraction over project text yet.
+
+Final boundaries: no package/dependency changes, no routes, no UI, no frontend changes, no full runtime extraction over project text, no model/Ollama calls, no NCP/Subtxt/dramatica-flow runtime, no apply-promotion changes, no approved memory/canon mutation, no candidate persistence/review queue creation, no training/JSONL/dataset/model artifacts, and no generated prose.
+
 ## Child Sequence
 
 - `PHASE8-IMPL-019-T001` - Publish/activate guarded runtime extraction parent. complete/PASS. Output/scope: task record, inventory, enrichment JSON, roadmap/status/governance alignment; docs/status only; no install/import/run, no runtime extraction, no code/tests/package changes.
@@ -44,7 +52,7 @@ PHASE8-UX-001 was used only as a read-only terminology/boundary reference for la
 - `PHASE8-IMPL-019-T004` - Minimal guarded dependency availability and import/run probe implementation. complete/PASS. Output/scope: minimal backend helper for BookNLP/spaCy availability/import/run probes with environment guards and explicit unavailable states; no package/dependency changes.
 - `PHASE8-IMPL-019-T005` - Guarded runtime extraction request and raw artifact handoff implementation. complete/PASS. Output/scope: bounded backend runtime extraction helper that validates owner-provided source requests, persists valid support-data-only raw outputs through PHASE8-IMPL-018 raw artifact helpers, and returns raw artifact handoff data without canon mutation.
 - `PHASE8-IMPL-019-T006` - Runtime extraction safety regression. complete/PASS. Output/scope: focused regression tests and minimal runtime helper hardening proving no automatic canon, no apply-promotion, no candidate/review queue side effects unless explicitly scoped, no model calls, no generated prose, no training artifacts, path safety, unavailable/quarantine behavior, and no silent fallback.
-- `PHASE8-IMPL-019-T007` - Parent closeout. ready/active next. Output/scope: parent closeout docs/status/governance, PHASE8-IMPL-020 ready/active next; docs/status only.
+- `PHASE8-IMPL-019-T007` - Parent closeout. complete/PASS. Output/scope: parent closeout docs/status/governance, PHASE8-IMPL-020 recommended next after review; docs/status only.
 
 ## Required Risk Linkage
 
