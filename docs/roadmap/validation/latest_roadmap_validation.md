@@ -1,3 +1,25 @@
+# PHASE8-IMPL-022-T004 Minimal MVP Smoke Harness Implementation
+
+### Result
+
+- Result: PASS.
+- Scope: minimal pure in-memory MVP usability smoke harness implementation plus docs/status/governance alignment.
+- Parent task: `PHASE8-IMPL-022` - End-to-end MVP usability validation.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-022-T004` - Minimal MVP smoke harness implementation.
+- Final artifacts: `backend/story_knowledge/mvp_usability_smoke.py` and `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py`.
+- Contract result: T004 turns the T003 expected-red contract green.
+- Active/ready next child: `PHASE8-IMPL-022-T005` - MVP workflow fixture and owner-action validation coverage.
+- Planned children: `PHASE8-IMPL-022-T006` and `PHASE8-IMPL-022-T007`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
+### Boundary Confirmation
+
+T004 adds no routes, frontend, package/dependency files, real runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network/subprocess behavior, persistence, candidate/review queue writes, apply-promotion changes, approved memory/canon mutation, training artifacts, or generated prose.
+
+The helper preserves candidate-first, owner review required, evidence/provenance/source-locator refs when provided, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, queue presence is not approval, candidate persistence is not canon, no generated prose, no rewrite, no continuation, no outline, no training artifacts, fail closed, no silent fallback, MVP is not complete, and end-to-end usability has not passed.
+
 # PHASE8-IMPL-022-T003 Expected-Red MVP Smoke/Contract Tests
 
 ### Result
