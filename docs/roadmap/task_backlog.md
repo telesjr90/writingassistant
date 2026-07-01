@@ -1,3 +1,15 @@
+# PHASE8-IMPL-022-T002 Validation Matrix Decision
+
+- `PHASE8-IMPL-022` remains active: End-to-end MVP usability validation.
+- `PHASE8-IMPL-022-T001` is complete/PASS as docs/status/planning publication only.
+- `PHASE8-IMPL-022-T002` is complete/PASS as docs/decision/planning only.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md`.
+- T002 defines the MVP end-to-end usability validation matrix and acceptance gates for owner-authored or owner-provided project text, project/workspace load, runtime extraction, BookNLP, spaCy, unavailable/quarantine/fail-closed behavior, raw artifact persistence, candidate creation, review handoff, review queue, read-only review surface, frontend owner-action execution, apply-promotion, approved memory/canon, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow, no generated prose, no prose-production, no training artifacts, and no silent fallback.
+- `PHASE8-IMPL-022-T003` is ready/active next and should convert the matrix into expected-red end-to-end MVP smoke/contract tests only; T003 should remain tests-first expected-red and should not implement the smoke harness.
+- `PHASE8-IMPL-022-T004` through `PHASE8-IMPL-022-T007` remain planned.
+- Boundaries preserved: candidate-first, owner review required, evidence/provenance/source-locator backed when available, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon.
+- MVP scope preservation: fine-tuning remains deferred after MVP; generated prose/prose-production paths remain permanently forbidden; T002 does not mark MVP complete and does not record an end-to-end usability pass.
+
 # PHASE8-IMPL-019-T007 Parent Closeout
 
 - `PHASE8-IMPL-019` is complete/PASS: Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline.

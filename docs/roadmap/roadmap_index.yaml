@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-022",
     "current_parent_task_title": "End-to-end MVP usability validation",
-    "frontier_note": "PHASE8-IMPL-022 - End-to-end MVP usability validation is active as the MVP-required validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is ready/active next and should define the MVP end-to-end usability validation matrix and acceptance gates only; T002 remains docs/decision/planning only unless explicitly scoped otherwise. PHASE8-IMPL-022-T003 through PHASE8-IMPL-022-T007 are planned. The parent validates owner-authored or owner-provided project text, runtime extraction availability and guarded failure behavior, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. Candidate-first, owner review, evidence/provenance/source-locator support when available, confidence is not truth, tool output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon remain required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-IMPL-022 will prove or reveal gaps; it does not claim end-to-end usability has passed yet."
+    "frontier_note": "PHASE8-IMPL-022 is active as the MVP-required End-to-end MVP usability validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is complete/PASS as docs/decision/planning only and creates docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates. PHASE8-IMPL-022-T003 is ready/active next and should convert the matrix into expected-red end-to-end MVP smoke/contract tests while remaining tests-first expected-red only and not implementing the smoke harness. PHASE8-IMPL-022-T004 through PHASE8-IMPL-022-T007 are planned. The parent validates owner-authored or owner-provided project text, project/workspace load path required for validation, runtime extraction availability and guarded failure behavior, real BookNLP/spaCy install/import/run checks as already scoped by earlier parents, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. It must preserve candidate-first behavior, owner review required, evidence/provenance/source-locator backed when available, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. T002 does not mark MVP complete and does not record an end-to-end usability pass yet; PHASE8-IMPL-022 remains active and will prove or reveal gaps."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5255,7 +5255,7 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-022.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-022.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-022/",
-      "result": "active MVP-required validation parent; PHASE8-IMPL-022-T001 complete/PASS docs/status/planning publication only; PHASE8-IMPL-022-T002 ready/active next for validation matrix and acceptance gates only; T003 through T007 planned; validates runtime extraction, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow, fail closed/no silent fallback, fine-tuning deferred after MVP, generated prose/prose-production permanently forbidden; no end-to-end usability pass claimed yet"
+      "result": "active MVP-required validation parent; PHASE8-IMPL-022-T001 complete/PASS docs/status/planning publication only; PHASE8-IMPL-022-T002 complete/PASS docs/decision/planning only with docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates; PHASE8-IMPL-022-T003 ready/active next for expected-red smoke/contract tests only; T004 through T007 planned; parent validates runtime extraction, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow, fail closed/no silent fallback, fine-tuning deferred after MVP, generated prose/prose-production permanently forbidden; no end-to-end usability pass or MVP complete claim yet"
     },
     {
       "id": "PHASE8-IMPL-022-T001",
@@ -5278,7 +5278,7 @@
       "id": "PHASE8-IMPL-022-T002",
       "title": "MVP end-to-end usability validation matrix and acceptance gates",
       "type": "planning_microtask",
-      "status": "ready",
+      "status": "done",
       "parent": "PHASE8-IMPL-022",
       "depends_on": [
         "PHASE8-IMPL-022-T001"
@@ -5290,13 +5290,13 @@
         "owner_review_required",
         "no_generated_prose"
       ],
-      "result": "ready/active next; define validation matrix and acceptance gates only; docs/decision/planning only unless explicitly scoped otherwise"
+      "result": "complete/PASS docs/decision/planning only; created docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates; no backend code, tests, routes, frontend code, package/dependency changes, runtime extraction, BookNLP/spaCy execution, model/Ollama calls, NCP/Subtxt/dramatica-flow execution, apply-promotion, approved memory/canon mutation, training artifacts, generated prose, rewrite, continuation, or outline"
     },
     {
       "id": "PHASE8-IMPL-022-T003",
       "title": "Expected-red end-to-end MVP smoke/contract tests",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "ready",
       "parent": "PHASE8-IMPL-022",
       "depends_on": [
         "PHASE8-IMPL-022-T002"
@@ -5308,7 +5308,7 @@
         "owner_review_required",
         "no_generated_prose"
       ],
-      "result": "planned expected-red end-to-end MVP smoke/contract tests"
+      "result": "ready/active next; convert the T002 MVP end-to-end usability validation matrix and acceptance gates into expected-red end-to-end MVP smoke/contract tests; tests-first expected-red only; must not implement the smoke harness"
     },
     {
       "id": "PHASE8-IMPL-022-T004",
