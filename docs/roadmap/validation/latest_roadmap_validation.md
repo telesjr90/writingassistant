@@ -1,3 +1,33 @@
+# PHASE8-IMPL-021-T006 Analysis Runtime Integration Safety Regression
+
+### Result
+
+- Result: PASS.
+- Scope: analysis runtime integration safety regression, minimal helper hardening, docs/status/governance, and final validation.
+- Parent task: `PHASE8-IMPL-021` - Analysis-only NCP/Subtxt/dramatica-flow runtime integration.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression.
+- Final artifact: `tests/test_writer_assistant_core_analysis_runtime_integration_safety_regression.py`.
+- Helper hardening artifact: `backend/story_knowledge/analysis_runtime_integration.py`.
+- Active/ready next child: `PHASE8-IMPL-021-T007` - Parent closeout.
+- Future MVP-required parent after this active parent: `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
+### Safety Regression Summary
+
+T006 adds focused safety regression coverage proving no runtime/tool execution, no NCP/Subtxt/dramatica-flow execution, no network/subprocess/model/Ollama/backend.analysis_engine calls, no git clone, no dependency install, no file write path, no persistence helper, no apply-promotion, no memory/canon mutation, and explicit disabled/unavailable/blocked/fail_closed states instead of silent success.
+
+T006 covers unsafe source and request rejection, allowlist bypass rejection, missing/invalid refs, direct and nested forbidden output classes, refused_no_prose, blocked_request, quarantined, and fail_closed states. Required markers include `unsafe_path`, `allowlist_missing`, `allowlist_denied`, `unsupported_tool`, `unsupported_action`, `missing_source_refs`, `missing_evidence_refs`, `missing_provenance_refs`, `missing_source_locator_refs`, `source_locator_invalid`, `forbidden_output_type`, `refused_no_prose`, `blocked_request`, `quarantined`, and `fail_closed`.
+
+Minimal helper hardening rejects unsafe allowlist/ref values, preserves explicit missing-ref states, rejects nested forbidden output classes, catches improvement/prose intents, and keeps shared non-execution flags explicit.
+
+### Boundary Confirmation
+
+NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is audited allowlist only. Runtime outputs remain candidate-first and owner review required. Confidence is not truth. Tool output is not canon. Tool output is not truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon.
+
+T006 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no network/subprocess calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
+
 # PHASE8-IMPL-021-T005 Runtime Output Handoff Implementation
 
 ### Result

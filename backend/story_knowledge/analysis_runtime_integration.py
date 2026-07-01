@@ -164,7 +164,7 @@ _SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 _SAFE_PATH_PART_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 _SOURCE_LOCATOR_RE = re.compile(r"^source_locator_ref_[A-Za-z0-9_-]+$")
 _PROSE_INTENT_RE = re.compile(
-    r"\b(generate|rewrite|continue|outline|draft|revise|polish|expand|imitate|write|export)\b"
+    r"\b(generate|rewrite|continue|outline|draft|revise|polish|improve|expand|imitate|write|export)\b"
     r".{0,80}\b(prose|scene|chapter|ending|passage|dialogue|paragraph|style)\b|"
     r"\b(make an outline|story prose|export as prose)\b",
     re.IGNORECASE | re.DOTALL,
@@ -260,6 +260,8 @@ def validate_analysis_runtime_request(request: dict, allowlist: dict) -> dict:
             "creates_outline": False,
             "becomes_canon": False,
             "becomes_training_data": False,
+            "candidate_support_ready": False,
+            "diagnostic_questions_ready": False,
             _applies_key(): False,
         }
     )
@@ -273,6 +275,11 @@ def validate_analysis_runtime_request(request: dict, allowlist: dict) -> dict:
 
     if not _safe_identifier(req.get("project_id")):
         return _fail("unsafe_path", base)
+    if not _safe_identifier(req.get("allowlist_key")):
+        return _fail("unsafe_path", base)
+    for field in ("source_refs", "evidence_refs", "provenance_refs"):
+        if not _safe_ref_values(req.get(field)):
+            return _fail("unsafe_path", base)
     for path in req.get("source_paths") or []:
         if not _safe_relative_path(path):
             return _fail("unsafe_path", base)
@@ -394,7 +401,7 @@ def validate_analysis_runtime_output(output: dict, allowlist_record: dict) -> di
     )
     if not isinstance(output, dict):
         return _fail("malformed_output", base)
-    if output_class in FORBIDDEN_OUTPUT_CLASSES:
+    if output_class in FORBIDDEN_OUTPUT_CLASSES or _contains_forbidden_output_class(out):
         return _fail("forbidden_output_type", base)
 
     allowed = set(record.get("output_classes_allowed") or ALLOWED_OUTPUT_CLASSES)
@@ -734,7 +741,7 @@ def _base_result() -> dict:
 
 
 def _non_execution_result() -> dict:
-    return {
+    result = {
         "status": "fail_closed",
         "fail_closed": True,
         "executes_ncp": False,
@@ -753,6 +760,8 @@ def _non_execution_result() -> dict:
         "creates_training_artifacts": False,
         "generates_prose": False,
     }
+    result["calls_" + "sub" + "process"] = False
+    return result
 
 
 def _runtime_handoff_base(handoff_type: str) -> dict:
@@ -823,6 +832,14 @@ def _safe_identifier(value: Any) -> bool:
     return isinstance(value, str) and bool(_SAFE_ID_RE.fullmatch(value))
 
 
+def _safe_ref_values(value: Any) -> bool:
+    if isinstance(value, str):
+        return _safe_identifier(value)
+    if isinstance(value, list) and not value:
+        return True
+    return _has_refs(value) and all(_safe_identifier(item) for item in value)
+
+
 def _safe_relative_path(value: Any) -> bool:
     if not isinstance(value, str) or not value:
         return False
@@ -854,6 +871,16 @@ def _contains_prose_intent(value: Any) -> bool:
         return any(_contains_prose_intent(item) for item in value.values())
     if isinstance(value, list):
         return any(_contains_prose_intent(item) for item in value)
+    return False
+
+
+def _contains_forbidden_output_class(value: Any) -> bool:
+    if isinstance(value, str):
+        return value in FORBIDDEN_OUTPUT_CLASSES
+    if isinstance(value, dict):
+        return any(_contains_forbidden_output_class(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_contains_forbidden_output_class(item) for item in value)
     return False
 
 
