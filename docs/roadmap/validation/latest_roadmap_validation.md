@@ -1,3 +1,74 @@
+# PHASE8-IMPL-021-T001 Publication
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/governance publication only.
+- Parent task: `PHASE8-IMPL-021` - Analysis-only NCP/Subtxt/dramatica-flow runtime integration.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-021-T001` - Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent.
+- Active/ready next child: `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision.
+- Planned children: `PHASE8-IMPL-021-T003`, `PHASE8-IMPL-021-T004`, `PHASE8-IMPL-021-T005`, `PHASE8-IMPL-021-T006`, and `PHASE8-IMPL-021-T007`.
+- Prior parent: `PHASE8-IMPL-020` complete/PASS through `PHASE8-IMPL-020-T007`.
+- Future MVP-required parent after this active parent: `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools, CCE, Graphify, Repomix, AI context generation, source-cache refresh, baseline refresh, scaffold, collect-plan, context health scripts, Codex subagents, model/Ollama calls, BookNLP/spaCy extraction, NCP runtime, Subtxt runtime, or dramatica-flow runtime were run.
+
+### Files Changed
+
+- Created: `docs/roadmap/tasks/PHASE8-IMPL-021.md`
+- Created: `docs/roadmap/inventory/PHASE8-IMPL-021.md`
+- Created: `docs/roadmap/enrichment/PHASE8-IMPL-021.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Publication Summary
+
+PHASE8-IMPL-021 publishes and activates the MVP-required Analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. NCP may be used as structured context interchange only. Subtxt may be used as rubric/diagnostic guidance only. dramatica-flow may be used only through an audited allowlist that blocks prose paths, outline paths, rewrite, continuation, draft, revision, polish, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths.
+
+Future PHASE8-IMPL-021 contracts must preserve `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` when available. Runtime output is candidate-first and owner-review-required; confidence is not truth; tool output is not canon; no automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose, no rewrite, no continuation, no outline, no model output as truth, fail closed, and no silent fallback remain required.
+
+### Boundary Confirmation
+
+- No NCP runtime implemented.
+- No Subtxt runtime implemented.
+- No dramatica-flow runtime implemented.
+- No repositories cloned.
+- No dependencies installed.
+- No backend implementation code changed.
+- No frontend implementation code changed.
+- No tests changed.
+- No routes added.
+- No UI added.
+- No package/dependency changes.
+- No model/Ollama calls.
+- No BookNLP/spaCy extraction over project text.
+- No candidate records created.
+- No review queue entries created.
+- No apply-promotion changes.
+- No approved memory/canon mutation.
+- No bible/storyform/scenes/notes/materials mutation.
+- No training/JSONL/dataset/model artifacts.
+- No generated prose, rewrite, continuation, outline, draft, revision, polish, expansion, style imitation, or story prose.
+- No staging, commit, or push.
+
+### Future Guidance
+
+- `PHASE8-IMPL-021-T002` is ready/active next for the analysis-only runtime integration boundary and allowlist decision.
+- `PHASE8-IMPL-021-T003` through `PHASE8-IMPL-021-T007` remain planned.
+- `PHASE8-IMPL-022` remains the end-to-end MVP validation parent.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
 # PHASE8-IMPL-020-T007 Parent Closeout
 
 ### Result

@@ -1,0 +1,57 @@
+{
+  "task_id": "PHASE8-IMPL-021",
+  "parent_title": "PHASE8-IMPL-021 - Analysis-only NCP/Subtxt/dramatica-flow runtime integration",
+  "status": "active",
+  "mvp_required": true,
+  "current_child": "PHASE8-IMPL-021-T002",
+  "next_child": "PHASE8-IMPL-021-T002",
+  "completed_children": [
+    "PHASE8-IMPL-021-T001"
+  ],
+  "planned_children": [
+    "PHASE8-IMPL-021-T003",
+    "PHASE8-IMPL-021-T004",
+    "PHASE8-IMPL-021-T005",
+    "PHASE8-IMPL-021-T006",
+    "PHASE8-IMPL-021-T007"
+  ],
+  "ready_active_children": [
+    "PHASE8-IMPL-021-T002"
+  ],
+  "boundary_tags": [
+    "writer_assistant_core",
+    "ncp_runtime_integration",
+    "subtxt_runtime_integration",
+    "dramatica_flow_runtime_integration",
+    "analysis_only_runtime",
+    "audited_allowlist_required",
+    "prose_paths_blocked",
+    "outline_paths_blocked",
+    "evidence_backed",
+    "provenance_backed",
+    "candidate_first",
+    "owner_review_required",
+    "source_refs_required",
+    "evidence_refs_required",
+    "provenance_refs_required",
+    "source_locator_required_when_available",
+    "confidence_is_not_truth",
+    "tool_output_is_not_truth",
+    "no_automatic_canon",
+    "no_apply_promotion",
+    "no_memory_canon_mutation",
+    "no_training_artifacts",
+    "no_generated_prose",
+    "no_rewrite",
+    "no_continuation",
+    "no_outline_generation",
+    "no_model_output_as_truth",
+    "fail_closed",
+    "no_silent_fallback",
+    "local_first"
+  ],
+  "future_parent_sequence": [
+    "PHASE8-IMPL-022"
+  ],
+  "publication_summary": "PHASE8-IMPL-021 is active as the MVP-required Analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS PHASE8-IMPL-020. PHASE8-IMPL-021-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-021-T002 is ready/active next for the Analysis-only runtime integration boundary and allowlist decision. PHASE8-IMPL-021-T003 through PHASE8-IMPL-021-T007 are planned. NCP may be used as structured context interchange only. Subtxt may be used as rubric/diagnostic guidance only. dramatica-flow may be used only through audited allowlists that block prose, rewrite, continuation, outline, draft, revision, polish, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths. Runtime outputs must be candidate-first, owner-review-required, evidence-backed, provenance-backed, and source-locator-backed when available; required refs include source_refs, evidence_refs, provenance_refs, and source_locator_refs. Confidence is not truth; tool output is not canon; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback. Owner review remains mandatory. Apply-promotion remains the separate explicit audited owner-confirmed path. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
+}

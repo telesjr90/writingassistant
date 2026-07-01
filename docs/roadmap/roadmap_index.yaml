@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-020",
-    "current_parent_task_title": "Model-assisted evidence-backed extraction and diagnostic workflow",
-    "frontier_note": "PHASE8-IMPL-019 is complete/PASS through PHASE8-IMPL-019-T007. PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is complete/PASS through PHASE8-IMPL-020-T007. PHASE8-IMPL-020-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-020-T002 is complete/PASS as docs/decision only. PHASE8-IMPL-020-T003 is complete/PASS as expected-red tests-only handoff at tests/test_writer_assistant_core_model_assisted_extraction_contract.py. PHASE8-IMPL-020-T004 is complete/PASS as minimal model-assisted request/output guard implementation at backend/story_knowledge/model_assisted_extraction.py. PHASE8-IMPL-020-T005 is complete/PASS as evidence-backed diagnostic/candidate handoff implementation at backend/story_knowledge/model_assisted_extraction.py with focused tests at tests/test_writer_assistant_core_model_assisted_extraction_handoff_contract.py. PHASE8-IMPL-020-T006 is complete/PASS as focused model-assisted extraction safety regression at tests/test_writer_assistant_core_model_assisted_extraction_safety_regression.py with minimal helper hardening. PHASE8-IMPL-020-T007 is complete/PASS as docs/status/governance closeout only. Final artifacts are docs/roadmap/decisions/PHASE8-IMPL-020-model-assisted-extraction-diagnostic-workflow-boundary-decision.md, backend/story_knowledge/model_assisted_extraction.py, tests/test_writer_assistant_core_model_assisted_extraction_contract.py, tests/test_writer_assistant_core_model_assisted_extraction_handoff_contract.py, and tests/test_writer_assistant_core_model_assisted_extraction_safety_regression.py. Model-assisted output may produce evidence-backed candidate observations, diagnostic questions, uncertainty notes, insufficient-evidence notes, safe refusal results, quarantined/fail-closed results, or candidate extraction support only; required support includes source_refs/evidence_refs/provenance_refs/source_locator_refs when available. Confidence is not truth; model output is not canon; no model output as truth; no automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose, no rewrite, no continuation, no outline generation, fail closed, and no silent fallback remain required boundaries. Queue presence is not approval. Candidate persistence is not canon. Owner review remains mandatory and apply-promotion remains the separate explicit owner-confirmed path. PHASE8-IMPL-021 is the recommended next MVP-required parent after review. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
+    "current_parent_task_id": "PHASE8-IMPL-021",
+    "current_parent_task_title": "Analysis-only NCP/Subtxt/dramatica-flow runtime integration",
+    "frontier_note": "PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is complete/PASS through PHASE8-IMPL-020-T007. PHASE8-IMPL-021 - Analysis-only NCP/Subtxt/dramatica-flow runtime integration is active. PHASE8-IMPL-021-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-021-T002 - Analysis-only runtime integration boundary and allowlist decision is ready/active next. PHASE8-IMPL-021-T003 through PHASE8-IMPL-021-T007 are planned. NCP may be used as structured context interchange only. Subtxt may be used as rubric/diagnostic guidance only. dramatica-flow may be used only through an audited allowlist that blocks prose paths, outline paths, rewrite, continuation, draft, revision, polish, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths. Runtime output must be candidate-first, evidence-backed, provenance-backed, source-locator-backed when available, and owner-review-required; source_refs, evidence_refs, provenance_refs, and source_locator_refs are required when available. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Owner review remains mandatory and apply-promotion remains the separate explicit owner-confirmed path. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -4325,19 +4325,155 @@
     },
     {
       "id": "PHASE8-IMPL-021",
-      "title": "NCP/Subtxt/dramatica-flow analysis-only runtime integration",
+      "title": "Analysis-only NCP/Subtxt/dramatica-flow runtime integration",
       "type": "runtime",
-      "status": "planned",
+      "status": "active",
       "parent": null,
       "depends_on": [
         "PHASE8-IMPL-020"
       ],
       "boundary_tags": [
         "mvp_required_analysis_runtime",
-        "owner_review_required",
         "candidate_only",
+        "owner_review_required",
         "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation",
+        "generated_prose_permanently_forbidden",
+        "local_first",
+        "no_package_changes"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-021.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-021.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-021.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-021/",
+      "result": "active; PHASE8-IMPL-021-T001 complete/PASS; PHASE8-IMPL-021-T002 ready/active next; PHASE8-IMPL-021-T003 through PHASE8-IMPL-021-T007 planned; Analysis-only NCP/Subtxt/dramatica-flow runtime integration; NCP structured context interchange only; Subtxt rubric/diagnostic guidance only; dramatica-flow audited allowlist required; prose paths blocked; outline paths blocked; candidate-first, evidence-backed, provenance-backed, owner review required; source_refs/evidence_refs/provenance_refs/source_locator_refs required when available; confidence is not truth; tool output is not canon; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; fail closed; no silent fallback"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T001",
+      "title": "Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "mvp_required_analysis_runtime",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden",
+        "no_package_changes"
+      ],
+      "result": "complete/PASS docs/status publication only; created PHASE8-IMPL-021 task, inventory, and enrichment records; updated roadmap/status/governance docs only; no NCP runtime, no Subtxt runtime, no dramatica-flow runtime, no model/Ollama calls, no backend/frontend/tests/package changes, no candidate persistence, no review queue entries, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T002",
+      "title": "Analysis-only runtime integration boundary and allowlist decision",
+      "type": "planning_microtask",
+      "status": "active",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "mvp_required_analysis_runtime",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose",
         "generated_prose_permanently_forbidden"
+      ],
+      "result": "ready/active next; docs/decision only"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T003",
+      "title": "Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021-T002"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "mvp_required_analysis_runtime",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T004",
+      "title": "Minimal analysis-only runtime request/allowlist guard implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021-T003"
+      ],
+      "boundary_tags": [
+        "mvp_required_analysis_runtime",
+        "pure_validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T005",
+      "title": "Evidence-backed runtime output handoff implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021-T004"
+      ],
+      "boundary_tags": [
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T006",
+      "title": "Analysis-only runtime integration safety regression",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "mvp_required_analysis_runtime",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "planned"
+    },
+    {
+      "id": "PHASE8-IMPL-021-T007",
+      "title": "Parent closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-021",
+      "depends_on": [
+        "PHASE8-IMPL-021-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "no_generated_prose"
       ],
       "result": "planned"
     },
