@@ -3,20 +3,20 @@
   "parent_title": "PHASE8-IMPL-021 - Analysis-only NCP/Subtxt/dramatica-flow runtime integration",
   "status": "active",
   "mvp_required": true,
-  "current_child": "PHASE8-IMPL-021-T002",
-  "next_child": "PHASE8-IMPL-021-T002",
+  "current_child": "PHASE8-IMPL-021-T003",
+  "next_child": "PHASE8-IMPL-021-T003",
   "completed_children": [
-    "PHASE8-IMPL-021-T001"
+    "PHASE8-IMPL-021-T001",
+    "PHASE8-IMPL-021-T002"
   ],
   "planned_children": [
-    "PHASE8-IMPL-021-T003",
     "PHASE8-IMPL-021-T004",
     "PHASE8-IMPL-021-T005",
     "PHASE8-IMPL-021-T006",
     "PHASE8-IMPL-021-T007"
   ],
   "ready_active_children": [
-    "PHASE8-IMPL-021-T002"
+    "PHASE8-IMPL-021-T003"
   ],
   "boundary_tags": [
     "writer_assistant_core",
@@ -53,5 +53,5 @@
   "future_parent_sequence": [
     "PHASE8-IMPL-022"
   ],
-  "publication_summary": "PHASE8-IMPL-021 is active as the MVP-required Analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS PHASE8-IMPL-020. PHASE8-IMPL-021-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-021-T002 is ready/active next for the Analysis-only runtime integration boundary and allowlist decision. PHASE8-IMPL-021-T003 through PHASE8-IMPL-021-T007 are planned. NCP may be used as structured context interchange only. Subtxt may be used as rubric/diagnostic guidance only. dramatica-flow may be used only through audited allowlists that block prose, rewrite, continuation, outline, draft, revision, polish, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths. Runtime outputs must be candidate-first, owner-review-required, evidence-backed, provenance-backed, and source-locator-backed when available; required refs include source_refs, evidence_refs, provenance_refs, and source_locator_refs. Confidence is not truth; tool output is not canon; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback. Owner review remains mandatory. Apply-promotion remains the separate explicit audited owner-confirmed path. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
+  "publication_summary": "PHASE8-IMPL-021 is active as the MVP-required Analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS PHASE8-IMPL-020. PHASE8-IMPL-021-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-021-T002 is complete/PASS as docs/decision only for the Analysis-only runtime integration boundary and allowlist decision. PHASE8-IMPL-021-T003 is ready/active next. PHASE8-IMPL-021-T004 through PHASE8-IMPL-021-T007 are planned. NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is usable only through audited allowlists that block prose, rewrite, continuation, outline, draft, revision, polish, improvement, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths. Future allowlist records require tool_name, module_or_feature_name, allowed_action, forbidden_actions, output_classes_allowed, output_classes_forbidden, required_refs, source_locator_policy, evidence_policy, provenance_policy, owner_review_policy, fail_closed_policy, no_silent_fallback_policy, no_prose_policy, no_training_policy, no_canon_policy, no_apply_promotion_policy, validation_tests_required, and audit_notes. Allowed output classes include evidence_backed_candidate_observation, diagnostic_question, uncertainty_note, insufficient_evidence_note, rubric_mapping_support, context_interchange_support, quarantined_result, unavailable_result, fail_closed_result, refused_no_prose, and blocked_request. Forbidden output classes include generated_prose, rewritten_prose, continuation, outline, chapter_generation, draft, revision, polish, improvement, expansion, style_imitation, export_as_prose, story_prose, training_jsonl, dataset_manifest, model_artifact, promotion_record, approved_memory, canon, storyform_truth, scene_mutation, note_mutation, and material_mutation. Runtime outputs must be candidate-first, owner-review-required, evidence-backed, provenance-backed, and source-locator-backed when available; required refs include source_refs, evidence_refs, provenance_refs, and source_locator_refs. Confidence is not truth; tool output is not canon; tool output is not truth; no model output as truth; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback; queue presence is not approval; candidate persistence is not canon. Owner review remains mandatory. Apply-promotion remains the separate explicit audited owner-confirmed path. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only. T002 implemented no runtime, code, tests, routes, UI, dependency, model, persistence, canon, promotion, training, or generated-prose changes."
 }

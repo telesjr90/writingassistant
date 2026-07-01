@@ -6,12 +6,12 @@
 - Title: Analysis-only NCP/Subtxt/dramatica-flow runtime integration
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-021-T001` complete/PASS; `PHASE8-IMPL-021-T002` ready/active next
+- Status: active MVP-required parent; `PHASE8-IMPL-021-T001` complete/PASS; `PHASE8-IMPL-021-T002` complete/PASS; `PHASE8-IMPL-021-T003` ready/active next
 - Depends on: completed/PASS `PHASE8-IMPL-020` through `PHASE8-IMPL-020-T007`
-- Completed child: `PHASE8-IMPL-021-T001` - Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent
-- Current child: `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision
+- Completed children: `PHASE8-IMPL-021-T001` - Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent; `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision
+- Current child: `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests
 - Next child status: ready/active
-- Planned children: `PHASE8-IMPL-021-T003`, `PHASE8-IMPL-021-T004`, `PHASE8-IMPL-021-T005`, `PHASE8-IMPL-021-T006`, and `PHASE8-IMPL-021-T007`
+- Planned children: `PHASE8-IMPL-021-T004`, `PHASE8-IMPL-021-T005`, `PHASE8-IMPL-021-T006`, and `PHASE8-IMPL-021-T007`
 - Future MVP-required parent after this: `PHASE8-IMPL-022`
 
 ## 2. Why This Parent Exists
@@ -30,13 +30,19 @@ Confidence is not truth. Tool output is not canon. Tool output is not truth. No 
 
 T001 publication creates docs/status/governance records only. No backend implementation code, frontend code, tests, package/dependency files, NCP runtime, Subtxt runtime, dramatica-flow runtime, cloned repositories, dependency installs, model/Ollama calls, BookNLP/spaCy extraction, candidate persistence, review queue entries, apply-promotion changes, approved memory/canon mutation, generated prose, or training/JSONL/dataset/model artifacts are created or changed by T001.
 
+T002 creates the analysis-only runtime integration boundary and audited allowlist decision as docs/decision only. NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is usable only through audited allowlists. Future allowlist records require `tool_name`, `module_or_feature_name`, `allowed_action`, `forbidden_actions`, `output_classes_allowed`, `output_classes_forbidden`, `required_refs`, `source_locator_policy`, `evidence_policy`, `provenance_policy`, `owner_review_policy`, `fail_closed_policy`, `no_silent_fallback_policy`, `no_prose_policy`, `no_training_policy`, `no_canon_policy`, `no_apply_promotion_policy`, `validation_tests_required`, and `audit_notes`.
+
+T002 allows only analysis-only output classes such as `evidence_backed_candidate_observation`, `diagnostic_question`, `uncertainty_note`, `insufficient_evidence_note`, `rubric_mapping_support`, `context_interchange_support`, `quarantined_result`, `unavailable_result`, `fail_closed_result`, `refused_no_prose`, and `blocked_request`. It forbids `generated_prose`, `rewritten_prose`, `continuation`, `outline`, `chapter_generation`, `draft`, `revision`, `polish`, `improvement`, `expansion`, `style_imitation`, `export_as_prose`, `story_prose`, `training_jsonl`, `dataset_manifest`, `model_artifact`, `promotion_record`, `approved_memory`, `canon`, `storyform_truth`, `scene_mutation`, `note_mutation`, and `material_mutation`.
+
+T002 implemented no runtime, code, tests, routes, UI, dependency, model, persistence, canon, promotion, training, or generated-prose changes.
+
 PHASE8-UX-001 is read-only terminology/boundary reference only. It is not roadmap truth and was not edited.
 
 ## 4. Child Sequence
 
 - `PHASE8-IMPL-021-T001` - Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. complete/PASS. Output/scope: task record, inventory, enrichment JSON, roadmap/status/governance alignment; docs/status only.
-- `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision. ready/active next. Output/scope: docs/decision only; define the audited allowlist, blocked prose/outline/write/revise/export paths, NCP/Subtxt/dramatica-flow role boundaries, evidence/provenance/source-locator requirements, fail-closed state vocabulary, and no silent fallback.
-- `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests. planned.
+- `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision. complete/PASS. Output/scope: docs/decision only; defines the audited allowlist, blocked prose/outline/write/revise/export paths, NCP/Subtxt/dramatica-flow role boundaries, evidence/provenance/source-locator requirements, request/output/state vocabulary, fail-closed state vocabulary, and no silent fallback.
+- `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests. ready/active next.
 - `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation. planned.
 - `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. planned.
 - `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression. planned.
@@ -61,4 +67,4 @@ No backend implementation code, frontend implementation code, product tests, rou
 
 ## 7. T002 Ready/Active Handoff
 
-T002 should be docs/decision only. It should define the analysis-only runtime integration boundary and audited allowlist before any tests or implementation. It should explicitly block prose paths, outline paths, rewrite, continuation, draft, revision, polish, expansion, style imitation, chapter generation, write/revise, export-as-prose, automatic canon, apply-promotion, memory/canon mutation, training artifacts, and silent fallback.
+T002 is complete/PASS as docs/decision only. It defines the analysis-only runtime integration boundary and audited allowlist before any tests or implementation. It explicitly blocks prose paths, outline paths, rewrite, continuation, draft, revision, polish, expansion, style imitation, chapter generation, write/revise, export-as-prose, automatic canon, apply-promotion, memory/canon mutation, training artifacts, and silent fallback. `PHASE8-IMPL-021-T003` is ready/active next.

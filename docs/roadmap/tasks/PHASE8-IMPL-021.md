@@ -10,7 +10,7 @@ Analysis-only NCP/Subtxt/dramatica-flow runtime integration
 
 ## Status
 
-PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is ready/active next. `PHASE8-IMPL-021-T003` through `PHASE8-IMPL-021-T007` are planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is ready/active next. `PHASE8-IMPL-021-T004` through `PHASE8-IMPL-021-T007` are planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Goal
 
@@ -28,13 +28,15 @@ Confidence is not truth. Tool output is not canon. Tool output is not truth. No 
 
 PHASE8-IMPL-021-T001 is docs/status/publication only. It creates the parent task record, inventory, enrichment JSON, and roadmap/status/governance alignment. T001 does not implement NCP runtime, does not implement Subtxt runtime, does not implement dramatica-flow runtime, does not clone repositories, does not install dependencies, does not call models/Ollama, does not run BookNLP/spaCy extraction over project text, does not persist candidates, does not create review queue entries, does not mutate approved memory/canon, does not apply promotion, does not create training artifacts, and does not generate prose.
 
+PHASE8-IMPL-021-T002 is docs/decision only. It creates `docs/roadmap/decisions/PHASE8-IMPL-021-analysis-only-runtime-integration-boundary-allowlist-decision.md` and defines NCP as structured context interchange only, Subtxt as rubric/diagnostic guidance only, and dramatica-flow as usable only through an audited allowlist for analysis-only outputs. T002 defines future allowlist record fields, request shape, output classes, state vocabulary, handoff/review boundaries, fail closed behavior, no silent fallback, and source/evidence/provenance/source-locator requirements. T002 implemented no NCP runtime, Subtxt runtime, dramatica-flow runtime, backend code, frontend code, tests, routes, UI, dependency changes, model/Ollama calls, persistence, canon mutation, apply-promotion, training artifacts, or generated prose.
+
 PHASE8-UX-001 may be used only as read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and must not be edited by this parent.
 
 ## Child Sequence
 
 - `PHASE8-IMPL-021-T001` - Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. complete/PASS. Output/scope: task record, inventory, enrichment JSON, roadmap/status/governance alignment; docs/status only; no NCP/Subtxt/dramatica-flow runtime implementation, no models/Ollama, no code/tests/package changes.
-- `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision. ready/active next. Output/scope: docs/decision only; define NCP structured context interchange boundary, Subtxt rubric/diagnostic boundary, dramatica-flow audited allowlist, blocked prose/outline/write/revise/export paths, fail-closed state vocabulary, evidence/provenance/source-locator requirements, and no silent fallback rule.
-- `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests. planned.
+- `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision. complete/PASS. Output/scope: docs/decision only; defines NCP structured context interchange boundary, Subtxt rubric/diagnostic boundary, dramatica-flow audited allowlist, blocked prose/outline/write/revise/export paths, request/output/state vocabulary, fail-closed state vocabulary, evidence/provenance/source-locator requirements, and no silent fallback rule.
+- `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests. ready/active next.
 - `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation. planned.
 - `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. planned.
 - `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression. planned.
@@ -43,6 +45,20 @@ PHASE8-UX-001 may be used only as read-only terminology/boundary reference for l
 ## T001 Publication Result
 
 PHASE8-IMPL-021-T001 publishes and activates the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. PHASE8-IMPL-020 is complete/PASS. PHASE8-IMPL-021 is active. PHASE8-IMPL-021-T001 is complete/PASS. PHASE8-IMPL-021-T002 is ready/active next. PHASE8-IMPL-021-T003 through PHASE8-IMPL-021-T007 are planned. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+
+## T002 Boundary and Allowlist Decision Result
+
+PHASE8-IMPL-021-T002 is complete/PASS as docs/decision only. The accepted decision is `docs/roadmap/decisions/PHASE8-IMPL-021-analysis-only-runtime-integration-boundary-allowlist-decision.md`.
+
+T002 defines NCP as structured context interchange only, Subtxt as rubric/diagnostic guidance only, and dramatica-flow as usable only through audited allowlists. Allowed future outputs are limited to `evidence_backed_candidate_observation`, `diagnostic_question`, `uncertainty_note`, `insufficient_evidence_note`, `rubric_mapping_support`, `context_interchange_support`, `quarantined_result`, `unavailable_result`, `fail_closed_result`, `refused_no_prose`, and `blocked_request`. Forbidden output classes include `generated_prose`, `rewritten_prose`, `continuation`, `outline`, `chapter_generation`, `draft`, `revision`, `polish`, `improvement`, `expansion`, `style_imitation`, `export_as_prose`, `story_prose`, `model_prompt_artifact`, `model_completion_artifact`, `training_jsonl`, `dataset_manifest`, `model_artifact`, `promotion_record`, `approved_memory`, `canon`, `bible`, `storyform_truth`, `scene_mutation`, `note_mutation`, and `material_mutation`.
+
+Future allowlist records must include `tool_name`, `module_or_feature_name`, `allowed_action`, `forbidden_actions`, `output_classes_allowed`, `output_classes_forbidden`, `required_refs`, `source_locator_policy`, `evidence_policy`, `provenance_policy`, `owner_review_policy`, `fail_closed_policy`, `no_silent_fallback_policy`, `no_prose_policy`, `no_training_policy`, `no_canon_policy`, `no_apply_promotion_policy`, `validation_tests_required`, and `audit_notes`.
+
+Future request and output handling must preserve `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` when available. Required states include `allowlist_missing`, `allowlist_denied`, `unsupported_tool`, `unsupported_action`, `forbidden_output_type`, `refused_no_prose`, `blocked_request`, `quarantined`, `diagnostic_questions_ready`, `candidate_support_ready`, `valid`, and `fail_closed`.
+
+Runtime outputs are candidate-first and owner review is required. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon. Apply-promotion remains the separate explicit audited owner-confirmed path.
+
+`PHASE8-IMPL-021-T003` is ready/active next. `PHASE8-IMPL-021-T004` through `PHASE8-IMPL-021-T007` remain planned.
 
 ## Boundary Tags
 
