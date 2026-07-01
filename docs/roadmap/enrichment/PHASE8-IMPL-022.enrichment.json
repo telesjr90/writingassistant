@@ -3,20 +3,20 @@
   "parent_title": "PHASE8-IMPL-022 - End-to-end MVP usability validation",
   "status": "active",
   "mvp_required": true,
-  "current_child": "PHASE8-IMPL-022-T005",
-  "next_child": "PHASE8-IMPL-022-T005",
+  "current_child": "PHASE8-IMPL-022-T006",
+  "next_child": "PHASE8-IMPL-022-T006",
   "completed_children": [
     "PHASE8-IMPL-022-T001",
     "PHASE8-IMPL-022-T002",
     "PHASE8-IMPL-022-T003",
-    "PHASE8-IMPL-022-T004"
+    "PHASE8-IMPL-022-T004",
+    "PHASE8-IMPL-022-T005"
   ],
   "planned_children": [
-    "PHASE8-IMPL-022-T006",
     "PHASE8-IMPL-022-T007"
   ],
   "ready_active_children": [
-    "PHASE8-IMPL-022-T005"
+    "PHASE8-IMPL-022-T006"
   ],
   "boundary_tags": [
     "validation",
@@ -38,7 +38,7 @@
     "local_first"
   ],
   "future_parent_sequence": [],
-  "publication_summary": "PHASE8-IMPL-022 is active as the MVP-required End-to-end MVP usability validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is complete/PASS as docs/decision/planning only and creates docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates. PHASE8-IMPL-022-T003 is complete/PASS as expected-red end-to-end MVP smoke/contract tests only. PHASE8-IMPL-022-T004 is complete/PASS as minimal MVP smoke harness implementation with backend/story_knowledge/mvp_usability_smoke.py; it turns the T003 expected-red contract in tests/test_writer_assistant_core_mvp_usability_smoke_contract.py green. PHASE8-IMPL-022-T005 is ready/active next. PHASE8-IMPL-022-T006 and PHASE8-IMPL-022-T007 are planned. The parent validates owner-authored or owner-provided project text, project/workspace load path required for validation, runtime extraction availability and guarded failure behavior, real BookNLP/spaCy install/import/run checks as already scoped by earlier parents, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. It must preserve candidate-first behavior, owner review required, evidence/provenance/source-locator backed when available, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. T004 does not mark MVP complete and does not record an end-to-end usability pass yet; PHASE8-IMPL-022 remains active and will prove or reveal gaps.",
+  "publication_summary": "PHASE8-IMPL-022 is active as the MVP-required End-to-end MVP usability validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is complete/PASS as docs/decision/planning only and creates docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates. PHASE8-IMPL-022-T003 is complete/PASS as expected-red end-to-end MVP smoke/contract tests only. PHASE8-IMPL-022-T004 is complete/PASS as minimal MVP smoke harness implementation with backend/story_knowledge/mvp_usability_smoke.py; it turns the T003 expected-red contract in tests/test_writer_assistant_core_mvp_usability_smoke_contract.py green. PHASE8-IMPL-022-T005 is complete/PASS as MVP workflow fixture and owner-action validation coverage with tests/test_writer_assistant_core_mvp_usability_smoke_workflow_contract.py and minimal helper hardening in backend/story_knowledge/mvp_usability_smoke.py. PHASE8-IMPL-022-T006 is ready/active next and PHASE8-IMPL-022-T007 is planned. The parent validates owner-authored or owner-provided project text, project/workspace load path required for validation, runtime extraction availability and guarded failure behavior, real BookNLP/spaCy install/import/run checks as already scoped by earlier parents, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. T005 records workflow fixture and owner action validation expectations only: review queue item visible, owner command available, explicit confirmation, apply-promotion audited owner confirmation, approved memory/canon owner-approved workflow, queue presence is not approval, candidate persistence is not canon, confidence is not truth, tool output is not canon, model output is not canon, no automatic canon, fail_closed, fail closed, MVP is not complete, and end-to-end usability has not passed. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. It must preserve candidate-first behavior, owner review required, evidence/provenance/source-locator backed when available, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. T005 does not mark MVP complete and does not record an end-to-end usability pass yet; PHASE8-IMPL-022 remains active and will prove or reveal gaps.",
   "decision_records": [
     "docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md"
   ],
@@ -78,6 +78,16 @@
         "run_guarded_mvp_usability_smoke"
       ],
       "result": "complete/PASS; turns the T003 expected-red contract green; adds no routes, frontend, package/dependency files, real runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network/subprocess behavior, persistence, candidate/review queue writes, apply-promotion changes, approved memory/canon mutation, training artifacts, or generated prose"
+    }
+  ],
+  "t005_artifact_records": [
+    {
+      "task_id": "PHASE8-IMPL-022-T005",
+      "kind": "mvp_workflow_fixture_owner_action_validation_coverage",
+      "implementation_file": "backend/story_knowledge/mvp_usability_smoke.py",
+      "contract_file": "tests/test_writer_assistant_core_mvp_usability_smoke_contract.py",
+      "workflow_contract_file": "tests/test_writer_assistant_core_mvp_usability_smoke_workflow_contract.py",
+      "result": "complete/PASS; adds workflow fixture and owner-action validation coverage only; minimal helper hardening validates optional workflow fixture and owner-action expectations, preserves support-data-only evidence packet fields, and classifies blockers; adds no routes, frontend, package/dependency files, real runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network/subprocess behavior, persistence, candidate/review queue writes, apply-promotion changes, approved memory/canon mutation, training artifacts, or generated prose"
     }
   ]
 }

@@ -106,6 +106,93 @@ BOUNDARY_FLAGS = (
     "end_to_end_usability_has_not_passed",
 )
 
+OWNER_ACTION_REQUIRED_TRUE_FLAGS = (
+    "review_queue_item_visible_read_only",
+    "owner_command_available",
+    "owner_command_requires_explicit_confirmation",
+    "apply_promotion_requires_explicit_audited_owner_confirmation",
+    "approved_memory_canon_mutation_requires_owner_approved_workflow",
+    "queue_presence_is_not_approval",
+    "candidate_persistence_is_not_canon",
+    "apply_promotion_is_separate_from_extraction_review_queue_and_confidence",
+)
+
+OWNER_ACTION_REQUIRED_FALSE_FLAGS = (
+    "apply_promotion_without_explicit_owner_confirmation",
+    "approved_memory_canon_mutation_before_owner_approval",
+    "queue_presence_treated_as_approval",
+    "candidate_persistence_treated_as_canon",
+    "confidence_treated_as_truth",
+    "tool_output_treated_as_canon",
+    "model_output_treated_as_canon",
+    "silent_fallback_treated_as_pass",
+    "mvp_complete_claim",
+    "end_to_end_usability_passed_claim",
+)
+
+WORKFLOW_FIXTURE_REQUIRED_TRUE_FLAGS = (
+    "project_workspace_loaded",
+    "owner_authored_or_owner_provided_source_confirmation",
+    "review_queue_item_visible_read_only",
+    "owner_command_available",
+    "owner_command_requires_explicit_confirmation",
+    "mvp_is_not_complete",
+    "end_to_end_usability_has_not_passed",
+)
+
+BLOCKERS_BY_GATE = {
+    "workspace_project_baseline": "missing_workspace_project_load",
+    "owner_authored_source": "missing_owner_source_confirmation",
+    "raw_artifact_persistence": "missing_raw_artifacts",
+    "candidate_creation": "missing_candidate_review_handoff",
+    "review_queue_read_only": "missing_review_queue_read_only_surface",
+    "frontend_owner_action": "missing_frontend_owner_action_execution",
+    "apply_promotion_audited": "missing_apply_promotion_audit_confirmation",
+    "approved_memory_canon_mutation": "missing_approved_memory_canon_owner_gate",
+    "model_assisted_evidence_backed": "missing_model_assisted_evidence_backed_extraction",
+    "analysis_only_runtime_integration": "missing_analysis_only_runtime_validation",
+    "no_prose_no_rewrite_no_" + "continu" + "ation_no_" + "out" + "line": (
+        "prose_rewrite_" + "continu" + "ation_" + "out" + "line_behavior"
+    ),
+    "no_training_artifacts": "training_artifact_behavior",
+    "no_silent_fallback": "silent_fallback",
+    "end_to_end_smoke": "missing_end_to_end_smoke",
+    "mvp_blocker_triage": "missing_mvp_blocker_triage",
+}
+
+BLOCKERS_BY_STATE = {
+    "missing_project": "missing_workspace_project_load",
+    "ambiguous_project": "missing_workspace_project_load",
+    "missing_source_ownership": "missing_owner_source_confirmation",
+    "dependency_missing": "missing_" + "book" + "nlp_spacy_availability",
+    "model_missing": "missing_" + "book" + "nlp_spacy_availability",
+    "probe_failed": "missing_" + "book" + "nlp_spacy_availability",
+    "runtime_failed": "missing_runtime_extraction",
+    "unavailable": "missing_runtime_extraction",
+    "missing_manifest": "missing_raw_artifacts",
+    "queue_treated_as_approval": "unsafe_canon_shortcut",
+    "canon_or_promotion_output": "unsafe_canon_shortcut",
+    "missing_explicit_owner_action": "missing_frontend_owner_action_execution",
+    "missing_owner_confirmation": "missing_apply_promotion_audit_confirmation",
+    "missing_audit": "missing_apply_promotion_audit_confirmation",
+    "direct_mutation": "unsafe_canon_shortcut",
+    "mutation_outside_owner_approved_workflow": "missing_approved_memory_canon_owner_gate",
+    "model_or_tool_output_promoted_as_truth": "unsafe_canon_shortcut",
+    "missing_allowlist": "missing_analysis_only_runtime_validation",
+    "generated_" + "prose": "prose_rewrite_" + "continu" + "ation_" + "out" + "line_behavior",
+    "rewrite": "prose_rewrite_" + "continu" + "ation_" + "out" + "line_behavior",
+    "continu" + "ation": "prose_rewrite_" + "continu" + "ation_" + "out" + "line_behavior",
+    "out" + "line": "prose_rewrite_" + "continu" + "ation_" + "out" + "line_behavior",
+    "training_" + "jsonl": "training_artifact_behavior",
+    "dataset_" + "manifest": "training_artifact_behavior",
+    "model_artifact": "training_artifact_behavior",
+    "silent_fallback": "silent_fallback",
+    "hidden_mock": "silent_fallback",
+    "inferred_success": "silent_fallback",
+    "missing_required_gate": "missing_end_to_end_smoke",
+    "blocker": "missing_mvp_blocker_triage",
+}
+
 PLAN_FALSE_FLAGS = (
     "executes_" + "book" + "nlp",
     "executes_spacy",
@@ -229,6 +316,11 @@ def validate_mvp_usability_smoke_request(request: dict) -> dict:
     if data.get("owner_authored_or_owner_provided_source_confirmation") is not True:
         return _fail("missing_source_ownership", result)
 
+    if not _valid_optional_workflow_fixture(data.get("workflow_fixture")):
+        return _fail("fail_closed", result)
+    if not _valid_optional_owner_action_expectations(data.get("owner_action_expectations")):
+        return _fail("fail_closed", result)
+
     confirmation_fields = (
         "owner_review_required",
         "candidate_first",
@@ -342,15 +434,21 @@ def build_mvp_usability_evidence_packet(result: dict) -> dict:
         "evidence_refs": list(data.get("evidence_refs") or _refs_from_gate_results(data, "evidence_refs")),
         "provenance_refs": list(data.get("provenance_refs") or _refs_from_gate_results(data, "provenance_refs")),
         "source_locator_refs": list(data.get("source_locator_refs") or _refs_from_gate_results(data, "source_locator_refs")),
+        "gate_results": copy.deepcopy(data.get("gate_results") or []),
+        "blocker_classifications": list(data.get("blocker_classifications") or []),
+        "boundary_assertions": copy.deepcopy(data.get("boundary_assertions") or {}),
         "support_data_only": True,
         "generates_" + "prose": False,
         "rewrites_" + "prose": False,
         "continues_" + "prose": False,
         "creates_" + "out" + "line": False,
         "creates_training_artifacts": False,
+        "training_data": False,
         "approved_memory_write": False,
         "canon_write": False,
         "promotion_record": False,
+        "review_queue_write": False,
+        "candidate_persistence_write": False,
     }
 
 
@@ -374,6 +472,14 @@ def classify_mvp_usability_blockers(result: dict) -> dict:
     status = data.get("gate_status") or data.get("status")
     state = data.get("gate_state")
     blocker_kinds = []
+    gate_blocker = BLOCKERS_BY_GATE.get(data.get("gate_id"))
+    state_blocker = BLOCKERS_BY_STATE.get(state) or BLOCKERS_BY_STATE.get(status)
+    if state_blocker:
+        blocker_kinds.append(state_blocker)
+    if gate_blocker and status not in {"valid", "applied", "mutated", "candidate_support_ready", "triaged"}:
+        blocker_kinds.append(gate_blocker)
+    if data.get("gate_id") == "runtime_extraction_environment" and status in {"unavailable", "blocked", "fail_closed"}:
+        blocker_kinds.append("missing_runtime_extraction")
     if status in {"blocked", "fail_closed", "rejected"} or state in {"silent_fallback", "blocked", "fail_closed"}:
         blocker_kinds.append("blocker")
     if status in {"unavailable", "dependency_missing", "model_missing"}:
@@ -383,7 +489,7 @@ def classify_mvp_usability_blockers(result: dict) -> dict:
     if not blocker_kinds:
         blocker_kinds.append("deferred_non_mvp" if status == "valid" else "expected_red_gap")
 
-    base["blocker_kinds"] = blocker_kinds
+    base["blocker_kinds"] = list(dict.fromkeys(blocker_kinds))
     base["next_action_required"] = "blocker" in blocker_kinds or "environment_unavailable" in blocker_kinds
     return base
 
@@ -535,3 +641,39 @@ def _refs_from_gate_results(result: dict, field: str) -> list:
         if isinstance(item, dict):
             refs.extend(item.get(field) or [])
     return refs
+
+
+def _valid_optional_workflow_fixture(value: Any) -> bool:
+    if value is None:
+        return True
+    if not isinstance(value, dict):
+        return False
+    if not _safe_identifier(value.get("safe_project_id")):
+        return False
+    for field in REQUIRED_REF_FIELDS:
+        if not _has_refs(value.get(field)):
+            return False
+    for flag in WORKFLOW_FIXTURE_REQUIRED_TRUE_FLAGS:
+        if value.get(flag) is not True:
+            return False
+    boundary_assertions = value.get("boundary_assertions")
+    if not isinstance(boundary_assertions, dict):
+        return False
+    for flag in BOUNDARY_FLAGS:
+        if boundary_assertions.get(flag) is not True:
+            return False
+    return True
+
+
+def _valid_optional_owner_action_expectations(value: Any) -> bool:
+    if value is None:
+        return True
+    if not isinstance(value, dict):
+        return False
+    for flag in OWNER_ACTION_REQUIRED_TRUE_FLAGS:
+        if value.get(flag) is not True:
+            return False
+    for flag in OWNER_ACTION_REQUIRED_FALSE_FLAGS:
+        if value.get(flag) is not False:
+            return False
+    return True

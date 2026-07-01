@@ -1,3 +1,28 @@
+# PHASE8-IMPL-022-T005 MVP Workflow Fixture and Owner-Action Validation Coverage
+
+### Result
+
+- Result: PASS.
+- Scope: focused workflow fixture and owner-action validation coverage only.
+- Parent task: `PHASE8-IMPL-022` - End-to-end MVP usability validation.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-022-T005` - MVP workflow fixture and owner-action validation coverage.
+- Final artifacts: `backend/story_knowledge/mvp_usability_smoke.py`, `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py`, and `tests/test_writer_assistant_core_mvp_usability_smoke_workflow_contract.py`.
+- Active/ready next child: `PHASE8-IMPL-022-T006` - MVP usability safety regression and no-prose/no-canon boundary validation.
+- Planned child: `PHASE8-IMPL-022-T007`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
+### Coverage Summary
+
+T005 adds a realistic in-memory workflow fixture covering safe project_id, workspace/project load, owner-authored or owner-provided source confirmation, source_refs, evidence_refs, provenance_refs, source_locator_refs, runtime extraction, BookNLP, spaCy, raw artifact persistence, candidate review, review handoff, review queue item visible, read-only review surface, frontend owner-action execution, owner action, owner command, explicit confirmation, apply-promotion audited owner confirmation, approved memory/canon owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow, unavailable, quarantine, fail_closed, fail closed, no generated prose, no rewrite, no continuation, no outline, no training artifacts, no silent fallback, end-to-end smoke, and MVP blocker triage.
+
+Owner-action validation proves review queue item visible/read-only, owner command available, owner command requires explicit confirmation, apply-promotion requires explicit audited owner confirmation, approved memory/canon mutation is allowed only after owner-approved workflow, queue presence is not approval, candidate persistence is not canon, confidence is not truth, tool output is not canon, model output is not canon, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, and no memory/canon mutation outside owner-approved workflow. Forbidden owner-action shortcuts fail closed.
+
+Minimal helper hardening in `backend/story_knowledge/mvp_usability_smoke.py` validates optional workflow fixture and owner-action expectation dictionaries, preserves support-data-only evidence packet fields, and classifies blockers. T005 adds no routes, frontend, package/dependency files, real runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network/subprocess behavior, persistence, candidate/review queue writes, apply-promotion changes, approved memory/canon mutation, training artifacts, or generated prose.
+
+MVP is not complete and end-to-end usability has not passed.
+
 # PHASE8-IMPL-022-T004 Minimal MVP Smoke Harness Implementation
 
 ### Result
