@@ -1,3 +1,53 @@
+# PHASE8-IMPL-021-T003 Expected-red Contract Tests
+
+### Result
+
+- Result: PASS.
+- Scope: tests-first expected-red contract only.
+- Parent task: `PHASE8-IMPL-021` - Analysis-only NCP/Subtxt/dramatica-flow runtime integration.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests.
+- Test file: `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`.
+- Expected-red target: future `backend.story_knowledge.analysis_runtime_integration` module and public API.
+- Active/ready next child: `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation.
+- Planned children: `PHASE8-IMPL-021-T005`, `PHASE8-IMPL-021-T006`, and `PHASE8-IMPL-021-T007`.
+- Future MVP-required parent after this active parent: `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- No context tools, CCE, Graphify, Repomix, AI context generation, source-cache refresh, baseline refresh, scaffold, collect-plan, context health scripts, Codex subagents, model/Ollama calls, BookNLP/spaCy extraction, NCP runtime, Subtxt runtime, or dramatica-flow runtime were run for task context; hook-required compact wrappers were used only when direct git/rg checks were blocked.
+
+### Files Changed
+
+- Created: `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-021.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-021.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-021.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Contract Summary
+
+T003 adds expected-red tests for the future public APIs: `validate_analysis_runtime_allowlist_record`, `validate_analysis_runtime_request`, `build_analysis_runtime_plan`, `validate_analysis_runtime_output`, `build_analysis_runtime_candidate_support`, `build_analysis_runtime_diagnostic_questions`, `quarantine_analysis_runtime_output`, and `run_guarded_analysis_runtime_integration`.
+
+The contract requires allowlist records with `tool_name`, `module_or_feature_name`, `allowed_action`, `forbidden_actions`, `output_classes_allowed`, `output_classes_forbidden`, `required_refs`, `source_locator_policy`, `evidence_policy`, `provenance_policy`, `owner_review_policy`, `fail_closed_policy`, `no_silent_fallback_policy`, `no_prose_policy`, `no_training_policy`, `no_canon_policy`, `no_apply_promotion_policy`, `validation_tests_required`, and `audit_notes`. It requires requests with `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`, owner-authored or owner-provided source boundary, no generated prose, no rewrite, no continuation, no outline, no training, no canon, and no apply-promotion confirmations.
+
+Allowed output classes are `evidence_backed_candidate_observation`, `diagnostic_question`, `uncertainty_note`, `insufficient_evidence_note`, `rubric_mapping_support`, `context_interchange_support`, `quarantined_result`, `unavailable_result`, `fail_closed_result`, `refused_no_prose`, and `blocked_request`. Forbidden output classes are `generated_prose`, `rewritten_prose`, `continuation`, `outline`, `chapter_generation`, `draft`, `revision`, `polish`, `improvement`, `expansion`, `style_imitation`, `export_as_prose`, `story_prose`, `model_prompt_artifact`, `model_completion_artifact`, `training_jsonl`, `dataset_manifest`, `model_artifact`, `promotion_record`, `approved_memory`, `canon`, `bible`, `storyform_truth`, `scene_mutation`, `note_mutation`, and `material_mutation`.
+
+Required states include `disabled`, `unavailable`, `dependency_missing`, `configuration_invalid`, `allowlist_missing`, `allowlist_denied`, `unsupported_tool`, `unsupported_action`, `request_invalid`, `unsafe_path`, `missing_source_refs`, `missing_evidence_refs`, `missing_provenance_refs`, `missing_source_locator_refs`, `source_locator_invalid`, `unsupported_output_type`, `forbidden_output_type`, `malformed_output`, `evidence_insufficient`, `refused_no_prose`, `blocked_request`, `quarantined`, `rejected`, `diagnostic_questions_ready`, `candidate_support_ready`, `valid`, and `fail_closed`.
+
+### Boundary Confirmation
+
+NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is audited allowlist only and its prose/write/revise/export/chapter/outline/generation paths are blocked. Runtime outputs remain candidate-first and owner review remains mandatory. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon. Apply-promotion remains the separate explicit audited owner-confirmed path.
+
+T003 implemented no runtime, helper implementation, routes, UI, dependency changes, model calls, persistence, canon, promotion, training, or generated-prose behavior.
+
 # PHASE8-IMPL-021-T002 Boundary and Allowlist Decision
 
 ### Result
