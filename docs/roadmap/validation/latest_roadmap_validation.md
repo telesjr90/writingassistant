@@ -1,3 +1,63 @@
+# PHASE8-IMPL-020-T007 Parent Closeout
+
+### Result
+
+- Result: PASS.
+- Scope: docs/status/governance parent closeout only.
+- Parent task: `PHASE8-IMPL-020` - Model-assisted evidence-backed extraction and diagnostic workflow.
+- Parent result: complete/PASS.
+- Completed child sequence: `PHASE8-IMPL-020-T001`, `PHASE8-IMPL-020-T002`, `PHASE8-IMPL-020-T003`, `PHASE8-IMPL-020-T004`, `PHASE8-IMPL-020-T005`, `PHASE8-IMPL-020-T006`, and `PHASE8-IMPL-020-T007` are complete/PASS.
+- Completed child recorded: `PHASE8-IMPL-020-T007` - Parent closeout.
+- Recommended next MVP-required parent after review: `PHASE8-IMPL-021` - NCP/Subtxt/dramatica-flow analysis-only runtime integration.
+- Future MVP-required parent after that: `PHASE8-IMPL-022` - End-to-end MVP usability validation.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools, CCE, Graphify, Repomix, LeanCTX, AI context generation, source-cache refresh, baseline refresh, scaffold, collect-plan, context health scripts, Codex subagents, model/Ollama calls, BookNLP/spaCy extraction, or NCP/Subtxt/dramatica-flow runtime were run.
+
+### Files Changed
+
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-020.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-020.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-020.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Final Artifact Summary
+
+- `docs/roadmap/decisions/PHASE8-IMPL-020-model-assisted-extraction-diagnostic-workflow-boundary-decision.md`
+- `backend/story_knowledge/model_assisted_extraction.py`
+- `tests/test_writer_assistant_core_model_assisted_extraction_contract.py`
+- `tests/test_writer_assistant_core_model_assisted_extraction_handoff_contract.py`
+- `tests/test_writer_assistant_core_model_assisted_extraction_safety_regression.py`
+
+### Final Behavior Summary
+
+PHASE8-IMPL-020 delivered the model-assisted extraction boundary decision, pure model-assisted extraction guard helper, request validation, environment validation, in-memory prompt packet shaping, output validation, in-memory candidate support shaping, in-memory diagnostic question shaping, quarantine/fail-closed handling, in-memory diagnostic/candidate/review handoff objects, safety regression coverage, and minimal validation hardening for forbidden output classes, nested forbidden outputs, source locator refs, path traversal variants, and blocked forced success states.
+
+### Final Boundary Summary
+
+PHASE8-IMPL-020 did not add model/Ollama calls, `backend.analysis_engine` imports/calls, routes, UI, frontend changes, package/dependency changes, BookNLP/spaCy extraction, NCP/Subtxt/dramatica-flow runtime, candidate persistence, review queue entry creation, apply-promotion changes, approved memory/canon mutation, bible/storyform/scenes/notes/materials mutation, training/JSONL/dataset/model artifacts, generated prose, rewrite, continuation, outline, draft, revision, polish, expansion, style imitation, or story prose.
+
+### Model-assisted Safety Summary
+
+Model-assisted extraction remains local-first and guarded, candidate-first, and owner-review-required. `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` are preserved when available. Confidence is not truth; model output is not canon; no model output as truth; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback. Queue presence is not approval. Candidate persistence is not canon. Apply-promotion remains the separate explicit audited owner-confirmed path.
+
+### Future Guidance
+
+- `PHASE8-IMPL-021` is the recommended next MVP-required parent after review.
+- `PHASE8-IMPL-022` remains future MVP-required.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remains read-only terminology/boundary reference only.
+
 # PHASE8-IMPL-020-T003 Expected-red Contract Tests
 
 ### Result
