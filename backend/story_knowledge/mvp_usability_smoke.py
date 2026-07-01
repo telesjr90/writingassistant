@@ -140,6 +140,28 @@ WORKFLOW_FIXTURE_REQUIRED_TRUE_FLAGS = (
     "end_to_end_usability_has_not_passed",
 )
 
+WORKFLOW_FIXTURE_REQUIRED_FIELDS = (
+    "runtime_extraction_gate",
+    "runtime_extraction_failure_gate",
+    "booknlp_availability_signal",
+    "spacy_availability_signal",
+    "raw_artifact_persistence_gate",
+    "candidate_creation_review_handoff_gate",
+    "review_queue_read_only_surface_gate",
+    "frontend_owner_action_execution_gate",
+    "apply_promotion_audited_owner_confirmation_gate",
+    "approved_memory_canon_owner_approved_workflow_gate",
+    "model_assisted_evidence_backed_extraction_gate",
+    "analysis_only_ncp_subtxt_dramatica_flow_gate",
+    "unavailable_quarantine_fail_closed_gate",
+    "no_prose_no_rewrite_no_continuation_no_outline_gate",
+    "no_training_artifacts_gate",
+    "no_silent_fallback_gate",
+    "end_to_end_smoke_gate",
+    "mvp_blocker_triage_gate",
+    "owner_command",
+)
+
 BLOCKERS_BY_GATE = {
     "workspace_project_baseline": "missing_workspace_project_load",
     "owner_authored_source": "missing_owner_source_confirmation",
@@ -265,6 +287,114 @@ KNOWN_GUARDED_STATUSES = frozenset(
     }
 )
 
+UNSAFE_PAYLOAD_KEYWORDS = frozenset(
+    {
+        "generated_prose",
+        "generates_prose",
+        "generate_story_prose",
+        "rewritten_prose",
+        "rewrites_prose",
+        "rewrite_prose",
+        "continuation",
+        "continues_prose",
+        "outline",
+        "creates_outline",
+        "draft",
+        "revision",
+        "polish",
+        "improvement",
+        "expansion",
+        "style_imitation",
+        "export_as_prose",
+        "chapter_prose",
+        "story_prose",
+        "prose_production",
+        "tool_output_is_canon",
+        "model_output_is_canon",
+        "model_output_is_truth",
+        "raw_artifact_is_canon",
+        "candidate_is_canon",
+        "candidate_persistence_is_canon",
+        "review_queue_presence_is_approval",
+        "confidence_is_truth",
+        "evidence_packet_is_approved_memory",
+        "evidence_packet_is_canon",
+        "mutates_canon",
+        "canon_mutation_before_owner_approval",
+        "automatic_canon",
+        "apply_promotion_outside_audited_path",
+        "creates_training_artifacts",
+        "training_data",
+        "training_jsonl",
+        "dataset_manifest",
+        "model_artifact",
+        "fine_tuning_dataset",
+        "training_export",
+        "eval_dataset_export",
+        "generated_training_record",
+        "model_completion_artifact_as_truth",
+        "runtime_extraction_execution",
+        "booknlp_execution",
+        "spacy_execution",
+        "ncp_execution",
+        "subtxt_execution",
+        "dramatica_flow_execution",
+        "model_ollama_call",
+        "calls_models_or_ollama",
+        "network",
+        "calls_network",
+        "subprocess",
+        "calls_subprocess",
+        "package_install",
+        "runs_package_installers",
+        "filesystem_write",
+        "writes_files",
+        "project_file_write",
+        "persists_data",
+        "persists_candidates",
+        "creates_review_queue_entries",
+        "candidate_persistence_write",
+        "review_queue_write",
+        "apply_promotion_execution",
+        "applies_promotion",
+        "mutates_memory_canon",
+        "approved_memory_canon_mutation",
+        "silent_fallback_claimed_as_pass",
+        "mvp_complete_claim",
+        "end_to_end_usability_passed_claim",
+    }
+)
+
+UNSAFE_STRING_FIELDS = frozenset(
+    {
+        "action",
+        "authorization",
+        "authorized_behavior",
+        "behavior",
+        "claim",
+        "command",
+        "destination",
+        "intent",
+        "output_class",
+        "payload_class",
+        "requested_action",
+        "result_class",
+        "shortcut",
+        "task_output",
+    }
+)
+
+SAFE_ENUM_FIELDS = frozenset(
+    {
+        "coverage_markers",
+        "expected_state_set",
+        "expected_status_set",
+        "gate_ids",
+        "blocker_classifications",
+        "blocker_kinds",
+    }
+)
+
 _SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 _SAFE_LOCATOR_RE = re.compile(r"^source_locator_ref_[A-Za-z0-9_-]+$")
 
@@ -274,6 +404,9 @@ def validate_mvp_usability_smoke_matrix(matrix: dict) -> dict:
     result = _base_matrix_result(data)
 
     if not isinstance(matrix, dict):
+        return _fail("fail_closed", result)
+
+    if _contains_unsafe_payload(data):
         return _fail("fail_closed", result)
 
     missing_markers = [item for item in COVERAGE_MARKERS if item not in data.get("coverage_markers", [])]
@@ -303,9 +436,16 @@ def validate_mvp_usability_smoke_request(request: dict) -> dict:
     if not isinstance(request, dict):
         return _fail("request_invalid", result)
 
+    if _contains_unsafe_payload(data):
+        return _fail("fail_closed", result)
+
     if not _safe_identifier(data.get("project_id")):
         result["request_valid"] = False
         return _fail("unsafe_path", result)
+
+    source_locator_refs = data.get("source_locator_refs")
+    if isinstance(source_locator_refs, list) and source_locator_refs and not _valid_source_locator_refs(source_locator_refs):
+        return _fail("source_locator_invalid", result)
 
     missing_ref_status = _missing_ref_status(data)
     if missing_ref_status:
@@ -396,6 +536,9 @@ def validate_mvp_usability_smoke_result(result: dict, plan: dict) -> dict:
     if not isinstance(result, dict) or not isinstance(plan, dict):
         return _fail("fail_closed", validation)
 
+    if _contains_unsafe_payload(data):
+        return _fail("fail_closed", validation)
+
     if data.get("project_id") != plan_data.get("project_id"):
         return _fail("fail_closed", validation)
 
@@ -423,8 +566,9 @@ def validate_mvp_usability_smoke_result(result: dict, plan: dict) -> dict:
 
 def build_mvp_usability_evidence_packet(result: dict) -> dict:
     data = copy.deepcopy(result) if isinstance(result, dict) else {}
+    unsafe_payload = _contains_unsafe_payload(data)
     return {
-        "status": "evidence_packet_ready",
+        "status": "fail_closed" if unsafe_payload else "evidence_packet_ready",
         "smoke_key": data.get("smoke_key"),
         "project_id": data.get("project_id"),
         "gate_id": data.get("gate_id"),
@@ -449,6 +593,7 @@ def build_mvp_usability_evidence_packet(result: dict) -> dict:
         "promotion_record": False,
         "review_queue_write": False,
         "candidate_persistence_write": False,
+        "fail_closed": unsafe_payload,
     }
 
 
@@ -467,6 +612,8 @@ def classify_mvp_usability_blockers(result: dict) -> dict:
     }
 
     if data.get("mvp_is_not_complete") is not True or data.get("end_to_end_usability_has_not_passed") is not True:
+        return _fail("fail_closed", base)
+    if _contains_unsafe_payload(data):
         return _fail("fail_closed", base)
 
     status = data.get("gate_status") or data.get("status")
@@ -531,6 +678,9 @@ def run_guarded_mvp_usability_smoke(matrix: dict, request: dict, config: dict) -
     if request_validation.get("status") != "valid":
         status = request_validation.get("status", "request_invalid")
         result.update({"status": status, "gate_status": status, "gate_state": status, "fail_closed": True})
+        return result
+    if _contains_unsafe_payload(cfg):
+        result.update({"status": "fail_closed", "gate_status": "fail_closed", "gate_state": "fail_closed", "fail_closed": True})
         return result
 
     forced_status = cfg.get("forced_status") or request.get("config", {}).get("forced_status") if isinstance(request, dict) else None
@@ -620,6 +770,43 @@ def _valid_source_locator_refs(value: Any) -> bool:
     return isinstance(value, list) and bool(value) and all(isinstance(item, str) and _SAFE_LOCATOR_RE.fullmatch(item) for item in value)
 
 
+def _contains_unsafe_payload(value: Any, parent_key: str = "") -> bool:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            normalized_key = _normalize_payload_marker(key)
+            if (
+                parent_key != "gate_definitions"
+                and normalized_key in UNSAFE_PAYLOAD_KEYWORDS
+                and _unsafe_truthy(item)
+            ):
+                return True
+            if _contains_unsafe_payload(item, normalized_key):
+                return True
+        return False
+    if isinstance(value, list):
+        if parent_key in SAFE_ENUM_FIELDS:
+            return False
+        return any(_contains_unsafe_payload(item, parent_key) for item in value)
+    if isinstance(value, str) and parent_key in UNSAFE_STRING_FIELDS:
+        normalized_value = _normalize_payload_marker(value)
+        if normalized_value in UNSAFE_PAYLOAD_KEYWORDS:
+            return True
+        return any(f"_{keyword}" in f"_{normalized_value}" for keyword in UNSAFE_PAYLOAD_KEYWORDS)
+    return False
+
+
+def _unsafe_truthy(value: Any) -> bool:
+    if value is False or value is None:
+        return False
+    if isinstance(value, (list, tuple, set, dict)):
+        return bool(value)
+    return True
+
+
+def _normalize_payload_marker(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", str(value).strip().lower()).strip("_")
+
+
 def _missing_ref_status(data: dict) -> str | None:
     for field in REQUIRED_REF_FIELDS:
         if not _has_refs(data.get(field)):
@@ -655,6 +842,9 @@ def _valid_optional_workflow_fixture(value: Any) -> bool:
             return False
     for flag in WORKFLOW_FIXTURE_REQUIRED_TRUE_FLAGS:
         if value.get(flag) is not True:
+            return False
+    for field in WORKFLOW_FIXTURE_REQUIRED_FIELDS:
+        if not value.get(field):
             return False
     boundary_assertions = value.get("boundary_assertions")
     if not isinstance(boundary_assertions, dict):

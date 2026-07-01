@@ -10,8 +10,8 @@
 - T003 status: complete/PASS as expected-red end-to-end MVP smoke/contract tests only
 - T004 status: complete/PASS as minimal MVP smoke harness implementation
 - T005 status: complete/PASS as MVP workflow fixture and owner-action validation coverage
-- T006 status: ready/active next as MVP usability safety regression and no-prose/no-canon boundary validation
-- T007 status: planned
+- T006 status: complete/PASS as MVP usability safety regression and no-prose/no-canon boundary validation
+- T007 status: ready/active next
 
 ## Parent Records
 
@@ -44,8 +44,8 @@ PHASE8-IMPL-022 validates the complete Writer Assistant Core MVP path:
 - `PHASE8-IMPL-022-T003` - Expected-red end-to-end MVP smoke/contract tests. complete/PASS. Expected-red collection failure only; final test artifact is `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py` covering the future public APIs `validate_mvp_usability_smoke_matrix`, `validate_mvp_usability_smoke_request`, `build_mvp_usability_smoke_plan`, `validate_mvp_usability_smoke_result`, `build_mvp_usability_evidence_packet`, `classify_mvp_usability_blockers`, and `run_guarded_mvp_usability_smoke` for future `backend.story_knowledge.mvp_usability_smoke`; tests-first expected-red only; the smoke harness is intentionally not implemented.
 - `PHASE8-IMPL-022-T004` - Minimal MVP smoke harness implementation. complete/PASS. Final implementation artifact is `backend/story_knowledge/mvp_usability_smoke.py`; final contract artifact is `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py`; T004 turns the T003 expected-red contract green.
 - `PHASE8-IMPL-022-T005` - MVP workflow fixture and owner-action validation coverage. complete/PASS. Adds `tests/test_writer_assistant_core_mvp_usability_smoke_workflow_contract.py` and minimal helper hardening in `backend/story_knowledge/mvp_usability_smoke.py`.
-- `PHASE8-IMPL-022-T006` - MVP usability safety regression and no-prose/no-canon boundary validation. ready/active next.
-- `PHASE8-IMPL-022-T007` - Parent closeout. planned.
+- `PHASE8-IMPL-022-T006` - MVP usability safety regression and no-prose/no-canon boundary validation. complete/PASS.
+- `PHASE8-IMPL-022-T007` - Parent closeout. ready/active next.
 
 ## Boundary Inventory
 
@@ -72,3 +72,11 @@ T005 records a realistic in-memory workflow fixture covering safe project_id, wo
 Owner-action coverage proves queue presence is not approval, candidate persistence is not canon, confidence is not truth, tool output is not canon, model output is not canon, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, and no memory/canon mutation outside owner-approved workflow. Forbidden owner-action shortcuts fail closed.
 
 Minimal helper hardening in `backend/story_knowledge/mvp_usability_smoke.py` validates optional in-memory workflow fixture and owner-action expectation dictionaries, preserves evidence packet support-data-only fields, and classifies blockers. T005 adds no routes, frontend, package/dependency files, real runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network/subprocess behavior, persistence, candidate/review queue writes, apply-promotion changes, approved memory/canon mutation, training artifacts, or generated prose. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. MVP is not complete and end-to-end usability has not passed.
+
+## T006 Inventory
+
+PHASE8-IMPL-022-T006 is complete/PASS as MVP usability safety regression and no-prose/no-canon boundary validation only. Final artifacts are `backend/story_knowledge/mvp_usability_smoke.py`, `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py`, `tests/test_writer_assistant_core_mvp_usability_smoke_workflow_contract.py`, and `tests/test_writer_assistant_core_mvp_usability_smoke_safety_regression.py`.
+
+T006 records safety regression coverage for no-prose, no-canon, no-training, no-silent-fallback, no execution, and no persistence. It validates generated prose, rewritten prose, continuation, outline, draft, revision, polish, improvement, expansion, style imitation, export-as-prose, chapter prose, story prose, prose-production behavior, tool output is not canon, model output is not canon, no model output as truth, raw artifact canon shortcuts, candidate persistence is not canon, queue presence is not approval, confidence is not truth, automatic canon, apply-promotion outside the explicit audited owner-confirmed path, memory/canon mutation outside owner-approved workflow, `training_jsonl`, `dataset_manifest`, `model_artifact`, `fine_tuning_dataset`, runtime extraction execution, BookNLP execution, spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network, subprocess, filesystem write, project file write, review queue write, approved memory/canon mutation, fail_closed, fail closed, no silent fallback, MVP is not complete, and end-to-end usability has not passed.
+
+Minimal helper hardening in `backend/story_knowledge/mvp_usability_smoke.py` adds private recursive unsafe-payload rejection, tighter required workflow fixture signal validation, and explicit unsafe source locator failure. T006 adds no routes, frontend, package/dependency files, real runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, network/subprocess behavior, persistence, candidate/review queue writes, apply-promotion changes, approved memory/canon mutation, training artifacts, or generated prose. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. `PHASE8-IMPL-022-T007` is ready/active next.
