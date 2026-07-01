@@ -5,7 +5,7 @@
     "current_track": "Writer Assistant Core",
     "current_parent_task_id": "PHASE8-IMPL-021",
     "current_parent_task_title": "Analysis-only NCP/Subtxt/dramatica-flow runtime integration",
-    "frontier_note": "PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is complete/PASS through PHASE8-IMPL-020-T007. PHASE8-IMPL-021 - Analysis-only NCP/Subtxt/dramatica-flow runtime integration is active. PHASE8-IMPL-021-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-021-T002 - Analysis-only runtime integration boundary and allowlist decision is complete/PASS as docs/decision only. PHASE8-IMPL-021-T003 is complete/PASS as tests-first expected-red contract tests only for future backend.story_knowledge.analysis_runtime_integration APIs. PHASE8-IMPL-021-T004 is ready/active next. PHASE8-IMPL-021-T005 through PHASE8-IMPL-021-T007 are planned. NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is usable only through an audited allowlist that blocks prose paths, outline paths, rewrite, continuation, draft, revision, polish, improvement, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths. Future allowlist records require tool_name, module_or_feature_name, allowed_action, forbidden_actions, output_classes_allowed, output_classes_forbidden, required_refs, source_locator_policy, evidence_policy, provenance_policy, owner_review_policy, fail_closed_policy, no_silent_fallback_policy, no_prose_policy, no_training_policy, no_canon_policy, no_apply_promotion_policy, validation_tests_required, and audit_notes. Runtime output must be candidate-first, evidence-backed, provenance-backed, source-locator-backed when available, and owner-review-required; source_refs, evidence_refs, provenance_refs, and source_locator_refs are required when available. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon. Owner review remains mandatory and apply-promotion remains the separate explicit audited owner-confirmed path. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
+    "frontier_note": "PHASE8-IMPL-020 - Model-assisted evidence-backed extraction and diagnostic workflow is complete/PASS through PHASE8-IMPL-020-T007. PHASE8-IMPL-021 - Analysis-only NCP/Subtxt/dramatica-flow runtime integration is active. PHASE8-IMPL-021-T001 is complete/PASS as docs/status publication only. PHASE8-IMPL-021-T002 - Analysis-only runtime integration boundary and allowlist decision is complete/PASS as docs/decision only. PHASE8-IMPL-021-T003 is complete/PASS as tests-first expected-red contract tests only. PHASE8-IMPL-021-T004 is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation at backend/story_knowledge/analysis_runtime_integration.py. PHASE8-IMPL-021-T005 is ready/active next. PHASE8-IMPL-021-T006 through PHASE8-IMPL-021-T007 are planned. T004 implements validate_analysis_runtime_allowlist_record, validate_analysis_runtime_request, build_analysis_runtime_plan, validate_analysis_runtime_output, build_analysis_runtime_candidate_support, build_analysis_runtime_diagnostic_questions, quarantine_analysis_runtime_output, and run_guarded_analysis_runtime_integration. NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is usable only through an audited allowlist that blocks prose paths, outline paths, rewrite, continuation, draft, revision, polish, improvement, expansion, style imitation, chapter generation, write/revise, export-as-prose, and story-prose paths. Allowlist records require tool_name, module_or_feature_name, allowed_action, forbidden_actions, output_classes_allowed, output_classes_forbidden, required_refs, source_locator_policy, evidence_policy, provenance_policy, owner_review_policy, fail_closed_policy, no_silent_fallback_policy, no_prose_policy, no_training_policy, no_canon_policy, no_apply_promotion_policy, validation_tests_required, and audit_notes. Runtime output must be candidate-first, evidence-backed, provenance-backed, source-locator-backed when available, and owner review required; source_refs, evidence_refs, provenance_refs, and source_locator_refs are required when available. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon. T004 added no NCP/Subtxt/dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -4350,7 +4350,7 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-021.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-021.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-021/",
-      "result": "active; PHASE8-IMPL-021-T001 complete/PASS; PHASE8-IMPL-021-T002 complete/PASS docs/decision only; PHASE8-IMPL-021-T003 ready/active next; PHASE8-IMPL-021-T004 through PHASE8-IMPL-021-T007 planned; Analysis-only NCP/Subtxt/dramatica-flow runtime integration; NCP structured context interchange only; Subtxt rubric/diagnostic guidance only; dramatica-flow audited allowlist required; prose paths blocked; outline paths blocked; candidate-first, evidence-backed, provenance-backed, owner review required; source_refs/evidence_refs/provenance_refs/source_locator_refs required when available; tool_name/module_or_feature_name/allowed_action/forbidden_actions allowlist fields required; confidence is not truth; tool output is not canon; tool output is not truth; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback"
+      "result": "active; PHASE8-IMPL-021-T001 complete/PASS; PHASE8-IMPL-021-T002 complete/PASS docs/decision only; PHASE8-IMPL-021-T003 complete/PASS tests-first expected-red contract only; PHASE8-IMPL-021-T004 complete/PASS minimal pure analysis runtime request/allowlist guard helper implementation at backend/story_knowledge/analysis_runtime_integration.py; PHASE8-IMPL-021-T005 ready/active next; PHASE8-IMPL-021-T006 through PHASE8-IMPL-021-T007 planned; Analysis-only NCP/Subtxt/dramatica-flow runtime integration; NCP structured context interchange only; Subtxt rubric/diagnostic guidance only; dramatica-flow audited allowlist required; prose paths blocked; outline paths blocked; candidate-first, evidence-backed, provenance-backed, owner review required; source_refs/evidence_refs/provenance_refs/source_locator_refs required when available; tool_name/module_or_feature_name/allowed_action/forbidden_actions allowlist fields required; confidence is not truth; tool output is not canon; tool output is not truth; no automatic canon; no apply-promotion; no memory/canon mutation; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback"
     },
     {
       "id": "PHASE8-IMPL-021-T001",
@@ -4413,7 +4413,7 @@
       "id": "PHASE8-IMPL-021-T004",
       "title": "Minimal analysis-only runtime request/allowlist guard implementation",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-021",
       "depends_on": [
         "PHASE8-IMPL-021-T003"
@@ -4425,13 +4425,13 @@
         "owner_review_required",
         "no_generated_prose"
       ],
-      "result": "ready/active next"
+      "result": "complete/PASS minimal pure analysis runtime request/allowlist guard helper implementation; created backend/story_knowledge/analysis_runtime_integration.py; implemented validate_analysis_runtime_allowlist_record, validate_analysis_runtime_request, build_analysis_runtime_plan, validate_analysis_runtime_output, build_analysis_runtime_candidate_support, build_analysis_runtime_diagnostic_questions, quarantine_analysis_runtime_output, and run_guarded_analysis_runtime_integration; validates allowlist/request/output/state boundaries, candidate-first support, owner review, source_refs/evidence_refs/provenance_refs/source_locator_refs, confidence is not truth, tool output is not canon, no automatic canon, no apply-promotion, no memory/canon mutation, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, and no silent fallback; added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior"
     },
     {
       "id": "PHASE8-IMPL-021-T005",
       "title": "Evidence-backed runtime output handoff implementation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "parent": "PHASE8-IMPL-021",
       "depends_on": [
         "PHASE8-IMPL-021-T004"
@@ -4442,7 +4442,7 @@
         "owner_review_required",
         "no_auto_promotion"
       ],
-      "result": "planned"
+      "result": "ready/active next"
     },
     {
       "id": "PHASE8-IMPL-021-T006",

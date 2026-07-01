@@ -10,7 +10,7 @@ Analysis-only NCP/Subtxt/dramatica-flow runtime integration
 
 ## Status
 
-PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is complete/PASS as tests-first expected-red contract tests only. `PHASE8-IMPL-021-T004` is ready/active next. `PHASE8-IMPL-021-T005` through `PHASE8-IMPL-021-T007` are planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is complete/PASS as tests-first expected-red contract tests only. `PHASE8-IMPL-021-T004` is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation. `PHASE8-IMPL-021-T005` is ready/active next. `PHASE8-IMPL-021-T006` and `PHASE8-IMPL-021-T007` are planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Goal
 
@@ -32,6 +32,8 @@ PHASE8-IMPL-021-T002 is docs/decision only. It creates `docs/roadmap/decisions/P
 
 PHASE8-IMPL-021-T003 is tests-first expected-red only. It creates `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py` for the future `backend.story_knowledge.analysis_runtime_integration` helper and future public APIs `validate_analysis_runtime_allowlist_record`, `validate_analysis_runtime_request`, `build_analysis_runtime_plan`, `validate_analysis_runtime_output`, `build_analysis_runtime_candidate_support`, `build_analysis_runtime_diagnostic_questions`, `quarantine_analysis_runtime_output`, and `run_guarded_analysis_runtime_integration`. T003 implemented no runtime, helper implementation, routes, UI, dependency changes, model calls, persistence, canon, promotion, training, or generated-prose behavior.
 
+PHASE8-IMPL-021-T004 is complete/PASS as the minimal pure analysis runtime request/allowlist guard helper implementation. It creates `backend/story_knowledge/analysis_runtime_integration.py` and implements `validate_analysis_runtime_allowlist_record`, `validate_analysis_runtime_request`, `build_analysis_runtime_plan`, `validate_analysis_runtime_output`, `build_analysis_runtime_candidate_support`, `build_analysis_runtime_diagnostic_questions`, `quarantine_analysis_runtime_output`, and `run_guarded_analysis_runtime_integration`. T004 keeps all behavior pure, deterministic, in-memory, local-first, and side-effect-free. T004 executes no NCP runtime, no Subtxt runtime, and no dramatica-flow runtime. It adds no routes, UI, frontend changes, package/dependency changes, model/Ollama calls, persistence, canon mutation, apply-promotion, training artifacts, or generated prose behavior.
+
 PHASE8-UX-001 may be used only as read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and must not be edited by this parent.
 
 ## Child Sequence
@@ -39,8 +41,8 @@ PHASE8-UX-001 may be used only as read-only terminology/boundary reference for l
 - `PHASE8-IMPL-021-T001` - Publish/activate analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. complete/PASS. Output/scope: task record, inventory, enrichment JSON, roadmap/status/governance alignment; docs/status only; no NCP/Subtxt/dramatica-flow runtime implementation, no models/Ollama, no code/tests/package changes.
 - `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision. complete/PASS. Output/scope: docs/decision only; defines NCP structured context interchange boundary, Subtxt rubric/diagnostic boundary, dramatica-flow audited allowlist, blocked prose/outline/write/revise/export paths, request/output/state vocabulary, fail-closed state vocabulary, evidence/provenance/source-locator requirements, and no silent fallback rule.
 - `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests. complete/PASS. Output/scope: tests-first expected-red contract only for future `backend.story_knowledge.analysis_runtime_integration`; no helper implementation, runtime, routes, UI, dependency changes, model calls, persistence, canon, promotion, training, or generated-prose behavior.
-- `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation. ready/active next.
-- `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. planned.
+- `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation. complete/PASS. Output/scope: `backend/story_knowledge/analysis_runtime_integration.py`; pure in-memory analysis runtime allowlist/request/output/state guard helper; no NCP/Subtxt/dramatica-flow execution, no routes/UI/frontend/package/dependency changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, no generated prose.
+- `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. ready/active next.
 - `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression. planned.
 - `PHASE8-IMPL-021-T007` - Parent closeout. planned.
 
@@ -74,7 +76,21 @@ Allowed output classes remain `evidence_backed_candidate_observation`, `diagnost
 
 The tests encode NCP as structured context interchange only, Subtxt as rubric/diagnostic guidance only, and dramatica-flow as audited allowlist only. dramatica-flow prose/write/revise/export/chapter/outline/generation paths are blocked. Runtime output remains candidate-first and owner review is mandatory. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon.
 
-`PHASE8-IMPL-021-T004` is ready/active next. `PHASE8-IMPL-021-T005`, `PHASE8-IMPL-021-T006`, and `PHASE8-IMPL-021-T007` remain planned.
+`PHASE8-IMPL-021-T004` is complete/PASS. `PHASE8-IMPL-021-T005` is ready/active next. `PHASE8-IMPL-021-T006` and `PHASE8-IMPL-021-T007` remain planned.
+
+## T004 Guard Helper Implementation Result
+
+PHASE8-IMPL-021-T004 is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation. The final artifact is `backend/story_knowledge/analysis_runtime_integration.py`.
+
+T004 implements the public helper APIs `validate_analysis_runtime_allowlist_record`, `validate_analysis_runtime_request`, `build_analysis_runtime_plan`, `validate_analysis_runtime_output`, `build_analysis_runtime_candidate_support`, `build_analysis_runtime_diagnostic_questions`, `quarantine_analysis_runtime_output`, and `run_guarded_analysis_runtime_integration`.
+
+The helper validates audited allowlist records, path-safe and ref-backed requests, deterministic in-memory non-executing plans, allowed analysis output classes, forbidden output classes, candidate-first support, diagnostic questions without prose suggestions, quarantine records, and guarded disabled/unavailable/allowlist_missing/allowlist_denied/request_invalid/unsupported_tool/unsupported_action/blocked_request/fail_closed states. It preserves `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` when available.
+
+Runtime outputs remain candidate-first and owner review is required. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon.
+
+T004 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
+
+`PHASE8-IMPL-021-T005` is ready/active next. `PHASE8-IMPL-021-T006` and `PHASE8-IMPL-021-T007` remain planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Boundary Tags
 

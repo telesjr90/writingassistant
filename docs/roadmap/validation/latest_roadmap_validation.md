@@ -1,3 +1,31 @@
+# PHASE8-IMPL-021-T004 Guard Helper Implementation
+
+### Result
+
+- Result: PASS.
+- Scope: minimal pure analysis runtime request/allowlist guard helper implementation plus docs/status final validation.
+- Parent task: `PHASE8-IMPL-021` - Analysis-only NCP/Subtxt/dramatica-flow runtime integration.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation.
+- Final artifact: `backend/story_knowledge/analysis_runtime_integration.py`.
+- Active/ready next child: `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation.
+- Planned children: `PHASE8-IMPL-021-T006` and `PHASE8-IMPL-021-T007`.
+- Future MVP-required parent after this active parent: `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
+### Helper Summary
+
+T004 implements `validate_analysis_runtime_allowlist_record`, `validate_analysis_runtime_request`, `build_analysis_runtime_plan`, `validate_analysis_runtime_output`, `build_analysis_runtime_candidate_support`, `build_analysis_runtime_diagnostic_questions`, `quarantine_analysis_runtime_output`, and `run_guarded_analysis_runtime_integration`.
+
+The helper validates audited allowlist records, request refs and confirmations, deterministic in-memory non-executing plans, allowed analysis output classes, forbidden output classes, candidate-first support, diagnostic questions without prose suggestions, quarantine records, and explicit disabled/unavailable/allowlist_missing/allowlist_denied/request_invalid/unsupported_tool/unsupported_action/blocked_request/fail_closed states. It preserves `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` when available.
+
+### Boundary Confirmation
+
+NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is audited allowlist only. Runtime outputs remain candidate-first and owner review is required. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon.
+
+T004 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
+
 # PHASE8-IMPL-021-T003 Expected-red Contract Tests
 
 ### Result
