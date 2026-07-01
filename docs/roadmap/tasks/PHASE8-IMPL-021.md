@@ -10,7 +10,7 @@ Analysis-only NCP/Subtxt/dramatica-flow runtime integration
 
 ## Status
 
-PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is complete/PASS as tests-first expected-red contract tests only. `PHASE8-IMPL-021-T004` is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation. `PHASE8-IMPL-021-T005` is complete/PASS as evidence-backed runtime output handoff implementation. `PHASE8-IMPL-021-T006` is complete/PASS as analysis runtime integration safety regression. `PHASE8-IMPL-021-T007` is ready/active next. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+PHASE8-IMPL-021 is complete/PASS as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is complete/PASS as tests-first expected-red contract tests only. `PHASE8-IMPL-021-T004` is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation. `PHASE8-IMPL-021-T005` is complete/PASS as evidence-backed runtime output handoff implementation. `PHASE8-IMPL-021-T006` is complete/PASS as analysis runtime integration safety regression. `PHASE8-IMPL-021-T007` is complete/PASS as docs/status/governance parent closeout only. `PHASE8-IMPL-022` is the recommended next MVP-required parent after review. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Goal
 
@@ -48,11 +48,11 @@ PHASE8-UX-001 may be used only as read-only terminology/boundary reference for l
 - `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation. complete/PASS. Output/scope: `backend/story_knowledge/analysis_runtime_integration.py`; pure in-memory analysis runtime allowlist/request/output/state guard helper; no NCP/Subtxt/dramatica-flow execution, no routes/UI/frontend/package/dependency changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, no generated prose.
 - `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. complete/PASS. Output/scope: `backend/story_knowledge/analysis_runtime_integration.py` plus `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py`; pure in-memory candidate/diagnostic/review handoff helpers only; no NCP/Subtxt/dramatica-flow execution, no routes/UI/frontend/package changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, no generated prose.
 - `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression. complete/PASS.
-- `PHASE8-IMPL-021-T007` - Parent closeout. ready/active next.
+- `PHASE8-IMPL-021-T007` - Parent closeout. complete/PASS. Output/scope: docs/status/governance closeout only; marks parent complete/PASS; records final artifacts, final behavior, final boundaries, safety summary, context execution boundary, UX reference boundary, MVP scope preservation, and PHASE8-IMPL-022 as recommended next MVP-required parent after review.
 
 ## T001 Publication Result
 
-PHASE8-IMPL-021-T001 publishes and activates the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. PHASE8-IMPL-020 is complete/PASS. PHASE8-IMPL-021 is active. PHASE8-IMPL-021-T001 is complete/PASS. PHASE8-IMPL-021-T002 is ready/active next. PHASE8-IMPL-021-T003 through PHASE8-IMPL-021-T007 are planned. PHASE8-IMPL-022 remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+PHASE8-IMPL-021-T001 published and activated the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent. PHASE8-IMPL-020 is complete/PASS. PHASE8-IMPL-021 is now complete/PASS through PHASE8-IMPL-021-T007. PHASE8-IMPL-021-T001 through PHASE8-IMPL-021-T007 are complete/PASS. PHASE8-IMPL-022 is the recommended next MVP-required parent after review. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## T002 Boundary and Allowlist Decision Result
 
@@ -122,7 +122,19 @@ Review handoffs remain candidate-first, owner review only, and in-memory. Confid
 
 T006 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no network/subprocess calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
 
-`PHASE8-IMPL-021-T007` is ready/active next. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+## T007 Parent Closeout Result
+
+PHASE8-IMPL-021-T007 is complete/PASS as docs/status/governance closeout only. PHASE8-IMPL-021 is complete/PASS. PHASE8-IMPL-021-T001 through PHASE8-IMPL-021-T007 are complete/PASS.
+
+Final artifacts are `docs/roadmap/decisions/PHASE8-IMPL-021-analysis-only-runtime-integration-boundary-allowlist-decision.md`, `backend/story_knowledge/analysis_runtime_integration.py`, `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`, `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py`, and `tests/test_writer_assistant_core_analysis_runtime_integration_safety_regression.py`.
+
+Final behavior delivered analysis-only NCP/Subtxt/dramatica-flow runtime boundary and audited allowlist decision, expected-red analysis runtime contract tests, pure in-memory analysis runtime guard helper, allowlist validation, request validation, non-executing plan building, output validation, candidate support shaping, diagnostic question shaping, quarantine/fail-closed wrapping, guarded runtime state reporting, evidence-backed candidate/diagnostic/review handoff objects, handoff validation, safety regression coverage, and minimal hardening for unsafe refs/allowlist values, missing-ref status preservation, nested forbidden output rejection, prose/improvement intent refusal, and explicit non-execution flags.
+
+PHASE8-IMPL-021 did not add NCP execution, Subtxt execution, dramatica-flow execution, repository cloning, dependency installation, model/Ollama calls, network/subprocess runtime behavior, routes, UI, frontend changes, package/dependency changes, candidate persistence, review queue entry creation, apply-promotion changes, approved memory/canon mutation, bible/storyform/scenes/notes/materials mutation, training/JSONL/dataset/model artifacts, generated prose, rewrite, continuation, outline, draft, revision, polish, expansion, style imitation, export-as-prose, chapter prose, or story prose.
+
+NCP remains structured context interchange only. Subtxt remains rubric/diagnostic guidance only. dramatica-flow remains audited allowlist only. Runtime outputs are candidate-first and owner review is required. `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` are preserved when available. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon. Apply-promotion remains the separate explicit audited owner-confirmed path.
+
+PHASE8-UX-001 remains read-only terminology/boundary reference only. No context tools, CCE, Graphify, Repomix, LeanCTX, AI context generation, source-cache refresh, baseline refresh, scaffold, collect-plan, context health scripts, Codex subagents, NCP runtime, Subtxt runtime, dramatica-flow runtime, models/Ollama, network, subprocess, repository cloning, or dependency installation were run for T007. `PHASE8-IMPL-022` is the recommended next MVP-required parent after review. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Boundary Tags
 
