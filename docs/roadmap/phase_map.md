@@ -1,3 +1,14 @@
+# PHASE8-IMPL-022-T001 Parent Publication
+
+- `PHASE8-IMPL-022` is active: End-to-end MVP usability validation.
+- `PHASE8-IMPL-022-T001` is complete/PASS as docs/status/planning publication only.
+- `PHASE8-IMPL-022-T002` is ready/active next for the MVP end-to-end usability validation matrix and acceptance gates; T002 should remain docs/decision/planning only unless explicitly scoped otherwise.
+- `PHASE8-IMPL-022-T003` through `PHASE8-IMPL-022-T007` are planned.
+- Parent goal: validate whether the Writer Assistant Core MVP is actually usable end-to-end after `PHASE8-IMPL-014` through `PHASE8-IMPL-021` delivered runtime extraction, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon, model-assisted extraction, and analysis-only runtime integration parts.
+- Validation path: owner-authored or owner-provided project text; runtime extraction availability and guarded failure behavior; raw artifact persistence; candidate creation/review handoff; review queue/read-only review surface; frontend owner-action execution; explicit audited apply-promotion; approved memory/canon mutation only through owner-approved workflow; model-assisted evidence-backed extraction; analysis-only NCP/Subtxt/dramatica-flow runtime integration; safe unavailable/quarantine/fail-closed states; no generated prose/prose-production behavior.
+- Boundary: validation/orchestration/smoke planning first, not feature expansion by default; candidate-first; owner review required; evidence/provenance/source-locator backed when available; confidence is not truth; tool output is not canon; no model output as truth; no automatic canon; no apply-promotion outside explicit audited owner-confirmed path; no memory/canon mutation outside owner-approved workflow; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback; queue presence is not approval; candidate persistence is not canon.
+- MVP scope preservation: fine-tuning remains deferred after MVP; generated prose/prose-production paths remain permanently forbidden; T001 does not mark MVP complete and does not claim end-to-end usability has passed yet.
+
 # PHASE8-IMPL-019-T007 Parent Closeout
 
 - `PHASE8-IMPL-019` is complete/PASS: Guarded runtime extraction: real BookNLP/spaCy install/run/import and candidate-first extraction pipeline.

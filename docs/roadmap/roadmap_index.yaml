@@ -3,9 +3,9 @@
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
     "current_track": "Writer Assistant Core",
-    "current_parent_task_id": "PHASE8-IMPL-021",
-    "current_parent_task_title": "Analysis-only NCP/Subtxt/dramatica-flow runtime integration",
-    "frontier_note": "PHASE8-IMPL-021 - Analysis-only NCP/Subtxt/dramatica-flow runtime integration is complete/PASS through PHASE8-IMPL-021-T007. PHASE8-IMPL-021-T001 through PHASE8-IMPL-021-T007 are complete/PASS; T007 is docs/status/governance closeout only. Final artifacts are docs/roadmap/decisions/PHASE8-IMPL-021-analysis-only-runtime-integration-boundary-allowlist-decision.md, backend/story_knowledge/analysis_runtime_integration.py, tests/test_writer_assistant_core_analysis_runtime_integration_contract.py, tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py, and tests/test_writer_assistant_core_analysis_runtime_integration_safety_regression.py. Final behavior includes analysis-only NCP/Subtxt/dramatica-flow runtime boundary and audited allowlist decision, expected-red analysis runtime contract tests, pure in-memory analysis runtime guard helper, allowlist validation, request validation, non-executing plan building, output validation, candidate support shaping, diagnostic question shaping, quarantine/fail-closed wrapping, guarded runtime state reporting, evidence-backed candidate/diagnostic/review handoff objects, handoff validation, safety regression coverage, and minimal hardening for unsafe refs/allowlist values, missing-ref status preservation, nested forbidden output rejection, prose/improvement intent refusal, and explicit non-execution flags. NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is audited allowlist only. Runtime outputs are candidate-first and owner review is required; source_refs, evidence_refs, provenance_refs, and source_locator_refs are preserved when available. Confidence is not truth. Tool output is not canon. Tool output is not truth. No model output as truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon. Apply-promotion remains the separate explicit audited owner-confirmed path. PHASE8-IMPL-021 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no repository cloning, no dependency installation, no model/Ollama calls, no network/subprocess runtime behavior, no routes, no UI, no frontend changes, no package/dependency changes, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training/JSONL/dataset/model artifacts, and no generated prose, rewrite, continuation, outline, draft, revision, polish, expansion, style imitation, export-as-prose, chapter prose, or story prose. PHASE8-IMPL-022 is the recommended next MVP-required parent after review. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-UX-001 remains read-only terminology/boundary reference only."
+    "current_parent_task_id": "PHASE8-IMPL-022",
+    "current_parent_task_title": "End-to-end MVP usability validation",
+    "frontier_note": "PHASE8-IMPL-022 - End-to-end MVP usability validation is active as the MVP-required validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is ready/active next and should define the MVP end-to-end usability validation matrix and acceptance gates only; T002 remains docs/decision/planning only unless explicitly scoped otherwise. PHASE8-IMPL-022-T003 through PHASE8-IMPL-022-T007 are planned. The parent validates owner-authored or owner-provided project text, runtime extraction availability and guarded failure behavior, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. Candidate-first, owner review, evidence/provenance/source-locator support when available, confidence is not truth, tool output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon remain required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. PHASE8-IMPL-022 will prove or reveal gaps; it does not claim end-to-end usability has passed yet."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -4478,28 +4478,6 @@
       "result": "complete/PASS docs/status/governance closeout only; closed PHASE8-IMPL-021 as complete/PASS; recorded final artifacts, final behavior, final boundaries, runtime safety summary, UX reference boundary, context execution boundary, MVP scope preservation, and PHASE8-IMPL-022 as the recommended next MVP-required parent after review"
     },
     {
-      "id": "PHASE8-IMPL-022",
-      "title": "End-to-end MVP usability validation",
-      "type": "runtime",
-      "status": "planned",
-      "parent": null,
-      "depends_on": [
-        "PHASE8-IMPL-021"
-      ],
-      "boundary_tags": [
-        "validation",
-        "mvp_required_runtime_extraction",
-        "mvp_required_raw_persistence",
-        "mvp_required_apply_promotion",
-        "mvp_required_memory_canon_mutation",
-        "mvp_required_model_assisted_extraction",
-        "mvp_required_analysis_runtime",
-        "fine_tuning_deferred",
-        "generated_prose_permanently_forbidden"
-      ],
-      "result": "recommended next MVP-required parent after PHASE8-IMPL-021 closeout review"
-    },
-    {
       "id": "PHASE8-UX-001",
       "title": "Master Plan UX / Navigation Proposal",
       "type": "docs-only",
@@ -5249,6 +5227,154 @@
         "no_generated_prose",
         "no_memory_canon_mutation"
       ]
+    },
+    {
+      "id": "PHASE8-IMPL-022",
+      "title": "End-to-end MVP usability validation",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-IMPL-021"
+      ],
+      "boundary_tags": [
+        "validation",
+        "mvp_required_runtime_extraction",
+        "mvp_required_raw_persistence",
+        "mvp_required_frontend_owner_action_execution",
+        "mvp_required_apply_promotion",
+        "mvp_required_memory_canon_mutation",
+        "mvp_required_model_assisted_extraction",
+        "mvp_required_analysis_runtime",
+        "candidate_only",
+        "owner_review_required",
+        "fine_tuning_deferred",
+        "generated_prose_permanently_forbidden"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-022.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-022.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-022.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-022/",
+      "result": "active MVP-required validation parent; PHASE8-IMPL-022-T001 complete/PASS docs/status/planning publication only; PHASE8-IMPL-022-T002 ready/active next for validation matrix and acceptance gates only; T003 through T007 planned; validates runtime extraction, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow, fail closed/no silent fallback, fine-tuning deferred after MVP, generated prose/prose-production permanently forbidden; no end-to-end usability pass claimed yet"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T001",
+      "title": "Parent publication and MVP usability validation scope",
+      "type": "planning_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022"
+      ],
+      "boundary_tags": [
+        "docs_only_t001",
+        "validation",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "complete/PASS docs/status/planning publication only; created PHASE8-IMPL-022 task, inventory, and enrichment records; updated roadmap/status/governance docs only; no backend code, tests, routes, frontend code, package/dependency edits, runtime extraction, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, model/Ollama calls, candidate persistence, review queue entries, apply-promotion, approved memory/canon mutation, training artifacts, generated prose, rewrite, continuation, or outline"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T002",
+      "title": "MVP end-to-end usability validation matrix and acceptance gates",
+      "type": "planning_microtask",
+      "status": "ready",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022-T001"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "ready/active next; define validation matrix and acceptance gates only; docs/decision/planning only unless explicitly scoped otherwise"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T003",
+      "title": "Expected-red end-to-end MVP smoke/contract tests",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022-T002"
+      ],
+      "boundary_tags": [
+        "tests_first",
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "planned expected-red end-to-end MVP smoke/contract tests"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T004",
+      "title": "Minimal MVP smoke harness implementation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022-T003"
+      ],
+      "boundary_tags": [
+        "validation",
+        "local_first",
+        "no_generated_prose"
+      ],
+      "result": "planned minimal MVP smoke harness implementation"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T005",
+      "title": "MVP workflow fixture and owner-action validation coverage",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022-T004"
+      ],
+      "boundary_tags": [
+        "validation",
+        "owner_review_required",
+        "no_generated_prose"
+      ],
+      "result": "planned MVP workflow fixture and owner-action validation coverage"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T006",
+      "title": "MVP usability safety regression and no-prose/no-canon boundary validation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022-T005"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden"
+      ],
+      "result": "planned MVP usability safety regression and no-prose/no-canon boundary validation"
+    },
+    {
+      "id": "PHASE8-IMPL-022-T007",
+      "title": "Parent closeout",
+      "type": "planning_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-022",
+      "depends_on": [
+        "PHASE8-IMPL-022-T006"
+      ],
+      "boundary_tags": [
+        "docs_only",
+        "validation",
+        "no_generated_prose"
+      ],
+      "result": "planned parent closeout"
     }
   ]
 }
