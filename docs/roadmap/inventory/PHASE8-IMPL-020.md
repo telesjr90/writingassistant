@@ -6,12 +6,12 @@
 - Title: Model-assisted evidence-backed extraction and diagnostic workflow
 - Track: Writer Assistant Core
 - Phase: Phase 8
-- Status: active MVP-required parent; `PHASE8-IMPL-020-T001` complete/PASS; `PHASE8-IMPL-020-T002` complete/PASS as docs/decision only; `PHASE8-IMPL-020-T003` complete/PASS as expected-red tests-only handoff; `PHASE8-IMPL-020-T004` complete/PASS as minimal model-assisted request/output guard implementation; `PHASE8-IMPL-020-T005` complete/PASS as evidence-backed diagnostic/candidate handoff implementation
+- Status: active MVP-required parent; `PHASE8-IMPL-020-T001` complete/PASS; `PHASE8-IMPL-020-T002` complete/PASS as docs/decision only; `PHASE8-IMPL-020-T003` complete/PASS as expected-red tests-only handoff; `PHASE8-IMPL-020-T004` complete/PASS as minimal model-assisted request/output guard implementation; `PHASE8-IMPL-020-T005` complete/PASS as evidence-backed diagnostic/candidate handoff implementation; `PHASE8-IMPL-020-T006` complete/PASS as model-assisted extraction safety regression
 - Depends on: completed/PASS `PHASE8-IMPL-019` through `PHASE8-IMPL-019-T007`
-- Completed child: `PHASE8-IMPL-020-T005` - Evidence-backed diagnostic/candidate handoff implementation
-- Current child: `PHASE8-IMPL-020-T006` - Model-assisted extraction safety regression
+- Completed child: `PHASE8-IMPL-020-T006` - Model-assisted extraction safety regression
+- Current child: `PHASE8-IMPL-020-T007` - Parent closeout
 - Next child status: ready/active
-- Planned child: `PHASE8-IMPL-020-T007`
+- Planned child: none under this parent after T007 closeout
 - Future MVP-required parents: `PHASE8-IMPL-021`, `PHASE8-IMPL-022`
 
 ## 2. Why This Parent Exists
@@ -37,8 +37,8 @@ PHASE8-UX-001 is read-only terminology/boundary reference only. It is not roadma
 - `PHASE8-IMPL-020-T003` - Expected-red model-assisted extraction contract tests. complete/PASS. Output/scope: tests-only contract at `tests/test_writer_assistant_core_model_assisted_extraction_contract.py`; expected-red import boundary for future `backend.story_knowledge.model_assisted_extraction`; no implementation module created.
 - `PHASE8-IMPL-020-T004` - Minimal model-assisted request/output guard implementation. complete/PASS. Output/scope: pure guarded helper at `backend/story_knowledge/model_assisted_extraction.py`; no model calls, no routes/UI, no persistence, no apply-promotion, no memory/canon mutation, no training artifacts, and no generated prose.
 - `PHASE8-IMPL-020-T005` - Evidence-backed diagnostic/candidate handoff implementation. complete/PASS.
-- `PHASE8-IMPL-020-T006` - Model-assisted extraction safety regression. ready/active next.
-- `PHASE8-IMPL-020-T007` - Parent closeout. planned.
+- `PHASE8-IMPL-020-T006` - Model-assisted extraction safety regression. complete/PASS.
+- `PHASE8-IMPL-020-T007` - Parent closeout. ready/active next.
 
 ## 5. Existing Runtime Extraction Context
 
@@ -105,3 +105,11 @@ No backend implementation code, frontend implementation code, product tests, rou
 - Result: complete/PASS as evidence-backed diagnostic/candidate handoff implementation.
 - Public APIs implemented: `build_model_assisted_review_handoff`, `validate_model_assisted_review_handoff`, `build_model_assisted_diagnostic_handoff`, and `build_model_assisted_candidate_observation_handoff`.
 - Boundary: pure in-memory handoff objects only; evidence/provenance/source-locator refs preserved; diagnostic questions and candidate observations remain candidate-first and owner-review-required; queue presence is not approval; candidate persistence is not canon; apply-promotion remains separate explicit owner-confirmed path; no model calls, no candidate records, no review queue entries, no apply-promotion, no memory/canon mutation, no training artifacts, and no generated prose.
+
+## 13. T006 Safety Regression Result
+
+- Updated: `backend/story_knowledge/model_assisted_extraction.py`
+- Created: `tests/test_writer_assistant_core_model_assisted_extraction_safety_regression.py`
+- Result: complete/PASS as focused model-assisted extraction safety regression.
+- Coverage: no model/Ollama/network/process/analysis_engine execution, unsafe path/source/id/source-locator rejection, missing ref fail-closed behavior, forbidden output/prose rejection, prompt packet guard safety, in-memory handoff safety, explicit state vocabulary, and no false success.
+- Boundary: pure, deterministic, local-first, side-effect-free in-memory helper only; no routes/UI/frontend/package changes, no candidate persistence, no review queue entries, no apply-promotion, no memory/canon mutation, no training artifacts, and no generated prose/rewrite/continuation/outline/prose-production behavior.

@@ -96,7 +96,9 @@ FORBIDDEN_OUTPUT_TYPES = frozenset(
         "improvement",
         "expansion",
         "story_prose",
+        "model_prompt",
         "model_prompt artifact",
+        "model_completion",
         "model_completion artifact",
         "training_jsonl",
         "dataset_manifest",
@@ -181,6 +183,8 @@ def validate_model_assisted_extraction_request(request: dict) -> dict:
     for field in REQUIRED_REF_FIELDS:
         if not _has_refs(req.get(field)):
             return _fail(f"missing_{field}", base)
+    if not _valid_source_locator_refs(req.get("source_locator_refs")):
+        return _fail("source_locator_invalid", base)
 
     confirmations = set(req.get("boundary_confirmations") or [])
     missing = sorted(REQUIRED_BOUNDARY_CONFIRMATIONS - confirmations)
@@ -275,6 +279,8 @@ def validate_model_assisted_output(output: dict) -> dict:
         return _output_result("malformed_output", None, allowed=False)
 
     output_type = output.get("output_type")
+    if _contains_forbidden_output_or_intent(output):
+        return _output_result("unsupported_output_type", output_type, allowed=False)
     if output_type in FORBIDDEN_OUTPUT_TYPES or output_type not in ALLOWED_OUTPUT_TYPES:
         return _output_result("unsupported_output_type", output_type, allowed=False)
 
@@ -600,7 +606,14 @@ def run_guarded_model_assisted_extraction(request: dict, config: dict) -> dict:
         return result
 
     environment = validate_model_assisted_environment(config)
-    result = _execution_boundary(environment["status"])
+    status = environment["status"]
+    if status in {"valid", "candidate_support_ready", "diagnostic_questions_ready"}:
+        status = "model_call_blocked"
+        environment["status"] = status
+        environment["model_assistance_available"] = False
+        environment["model_call_blocked"] = True
+        environment["fail_closed"] = True
+    result = _execution_boundary(status)
     result.update(
         {
             "environment": environment,
@@ -842,6 +855,8 @@ def _safe_relative_path(value: Any) -> bool:
     parts = value.split("/")
     if not parts or any(part in {"", ".", ".."} for part in parts):
         return False
+    if any(part.startswith(".") for part in parts):
+        return False
     return all(_SAFE_PATH_PART_RE.fullmatch(part) for part in parts)
 
 
@@ -855,6 +870,17 @@ def _valid_source_locator_item(item: dict[str, Any]) -> bool:
     if status in {"ambiguous", "invalid", "unsupported"}:
         return False
     return _has_refs(refs) and all("ambiguous" not in ref for ref in refs)
+
+
+def _valid_source_locator_refs(value: Any) -> bool:
+    return _has_refs(value) and all(
+        isinstance(ref, str)
+        and ref.startswith("source_locator_ref_")
+        and "ambiguous" not in ref
+        and "/" not in ref
+        and "\\" not in ref
+        for ref in value
+    )
 
 
 def _truthy(value: Any) -> bool:
