@@ -1,3 +1,35 @@
+# PHASE8-IMPL-021-T005 Runtime Output Handoff Implementation
+
+### Result
+
+- Result: PASS.
+- Scope: evidence-backed runtime output handoff implementation plus docs/status final validation.
+- Parent task: `PHASE8-IMPL-021` - Analysis-only NCP/Subtxt/dramatica-flow runtime integration.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation.
+- Final artifacts: `backend/story_knowledge/analysis_runtime_integration.py`, `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`, and `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py`.
+- Active/ready next child: `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression.
+- Planned child: `PHASE8-IMPL-021-T007`.
+- Future MVP-required parent after this active parent: `PHASE8-IMPL-022`.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+
+### Handoff Summary
+
+T005 adds public helper APIs `build_analysis_runtime_candidate_observation_handoff`, `build_analysis_runtime_diagnostic_handoff`, `build_analysis_runtime_review_handoff`, and `validate_analysis_runtime_review_handoff`.
+
+Candidate observation handoffs are pure dictionaries/lists, in-memory only, candidate-first, owner review required, evidence-backed, provenance-backed, and source-locator-backed when available. They preserve `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`, and fail closed on missing/invalid refs, insufficient evidence, rejected, quarantined, unavailable, or fail_closed states.
+
+Diagnostic handoffs preserve diagnostic questions, uncertainty notes, insufficient-evidence notes, refused_no_prose, blocked_request, quarantined, unavailable, and fail_closed states. They do not contain prose suggestions, rewrites, continuations, outlines, drafts, revisions, polish, expansion, style imitation, export-as-prose, chapter prose, or story prose.
+
+Review handoffs aggregate candidate and diagnostic handoffs only. They are not persistence, not review queue creation, not canon, not approved memory, not apply-promotion, and not training data.
+
+### Boundary Confirmation
+
+NCP is structured context interchange only. Subtxt is rubric/diagnostic guidance only. dramatica-flow is audited allowlist only. Confidence is not truth. Tool output is not canon. Tool output is not truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback. Queue presence is not approval. Candidate persistence is not canon.
+
+T005 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
+
 # PHASE8-IMPL-021-T004 Guard Helper Implementation
 
 ### Result

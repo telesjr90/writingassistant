@@ -10,7 +10,7 @@ Analysis-only NCP/Subtxt/dramatica-flow runtime integration
 
 ## Status
 
-PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is complete/PASS as tests-first expected-red contract tests only. `PHASE8-IMPL-021-T004` is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation. `PHASE8-IMPL-021-T005` is ready/active next. `PHASE8-IMPL-021-T006` and `PHASE8-IMPL-021-T007` are planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+PHASE8-IMPL-021 is active as the MVP-required analysis-only NCP/Subtxt/dramatica-flow runtime integration parent after completed/PASS `PHASE8-IMPL-020`. `PHASE8-IMPL-021-T001` is complete/PASS as docs/status publication only. `PHASE8-IMPL-021-T002` is complete/PASS as docs/decision only. `PHASE8-IMPL-021-T003` is complete/PASS as tests-first expected-red contract tests only. `PHASE8-IMPL-021-T004` is complete/PASS as minimal pure analysis runtime request/allowlist guard helper implementation. `PHASE8-IMPL-021-T005` is complete/PASS as evidence-backed runtime output handoff implementation. `PHASE8-IMPL-021-T006` is ready/active next. `PHASE8-IMPL-021-T007` is planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Goal
 
@@ -34,6 +34,8 @@ PHASE8-IMPL-021-T003 is tests-first expected-red only. It creates `tests/test_wr
 
 PHASE8-IMPL-021-T004 is complete/PASS as the minimal pure analysis runtime request/allowlist guard helper implementation. It creates `backend/story_knowledge/analysis_runtime_integration.py` and implements `validate_analysis_runtime_allowlist_record`, `validate_analysis_runtime_request`, `build_analysis_runtime_plan`, `validate_analysis_runtime_output`, `build_analysis_runtime_candidate_support`, `build_analysis_runtime_diagnostic_questions`, `quarantine_analysis_runtime_output`, and `run_guarded_analysis_runtime_integration`. T004 keeps all behavior pure, deterministic, in-memory, local-first, and side-effect-free. T004 executes no NCP runtime, no Subtxt runtime, and no dramatica-flow runtime. It adds no routes, UI, frontend changes, package/dependency changes, model/Ollama calls, persistence, canon mutation, apply-promotion, training artifacts, or generated prose behavior.
 
+PHASE8-IMPL-021-T005 is complete/PASS as evidence-backed runtime output handoff implementation. It extends `backend/story_knowledge/analysis_runtime_integration.py` with in-memory handoff APIs `build_analysis_runtime_candidate_observation_handoff`, `build_analysis_runtime_diagnostic_handoff`, `build_analysis_runtime_review_handoff`, and `validate_analysis_runtime_review_handoff`, and adds focused coverage in `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py` alongside the existing `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`. Candidate handoffs require `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs` when required/available; missing or invalid support fails closed. Diagnostic handoffs support diagnostic questions, uncertainty notes, insufficient-evidence notes, refused_no_prose, blocked_request, quarantined, unavailable, and fail_closed states without prose suggestions. Review handoffs aggregate candidate and diagnostic handoffs only. T005 added no NCP/Subtxt/dramatica-flow execution, no routes, no UI, no frontend changes, no dependency/package changes, no model/Ollama calls, no persistence, no candidate persistence, no review queue entries, no canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
+
 PHASE8-UX-001 may be used only as read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and must not be edited by this parent.
 
 ## Child Sequence
@@ -42,8 +44,8 @@ PHASE8-UX-001 may be used only as read-only terminology/boundary reference for l
 - `PHASE8-IMPL-021-T002` - Analysis-only runtime integration boundary and allowlist decision. complete/PASS. Output/scope: docs/decision only; defines NCP structured context interchange boundary, Subtxt rubric/diagnostic boundary, dramatica-flow audited allowlist, blocked prose/outline/write/revise/export paths, request/output/state vocabulary, fail-closed state vocabulary, evidence/provenance/source-locator requirements, and no silent fallback rule.
 - `PHASE8-IMPL-021-T003` - Expected-red NCP/Subtxt/dramatica-flow runtime integration contract tests. complete/PASS. Output/scope: tests-first expected-red contract only for future `backend.story_knowledge.analysis_runtime_integration`; no helper implementation, runtime, routes, UI, dependency changes, model calls, persistence, canon, promotion, training, or generated-prose behavior.
 - `PHASE8-IMPL-021-T004` - Minimal analysis-only runtime request/allowlist guard implementation. complete/PASS. Output/scope: `backend/story_knowledge/analysis_runtime_integration.py`; pure in-memory analysis runtime allowlist/request/output/state guard helper; no NCP/Subtxt/dramatica-flow execution, no routes/UI/frontend/package/dependency changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, no generated prose.
-- `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. ready/active next.
-- `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression. planned.
+- `PHASE8-IMPL-021-T005` - Evidence-backed runtime output handoff implementation. complete/PASS. Output/scope: `backend/story_knowledge/analysis_runtime_integration.py` plus `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py`; pure in-memory candidate/diagnostic/review handoff helpers only; no NCP/Subtxt/dramatica-flow execution, no routes/UI/frontend/package changes, no model/Ollama calls, no persistence, no canon mutation, no apply-promotion, no training artifacts, no generated prose.
+- `PHASE8-IMPL-021-T006` - Analysis-only runtime integration safety regression. ready/active next.
 - `PHASE8-IMPL-021-T007` - Parent closeout. planned.
 
 ## T001 Publication Result
@@ -90,7 +92,21 @@ Runtime outputs remain candidate-first and owner review is required. Confidence 
 
 T004 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
 
-`PHASE8-IMPL-021-T005` is ready/active next. `PHASE8-IMPL-021-T006` and `PHASE8-IMPL-021-T007` remain planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
+## T005 Runtime Output Handoff Result
+
+PHASE8-IMPL-021-T005 is complete/PASS as evidence-backed runtime output handoff implementation. Final artifacts are `backend/story_knowledge/analysis_runtime_integration.py`, `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`, and `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py`.
+
+T005 implements the public helper APIs `build_analysis_runtime_candidate_observation_handoff`, `build_analysis_runtime_diagnostic_handoff`, `build_analysis_runtime_review_handoff`, and `validate_analysis_runtime_review_handoff`.
+
+Candidate observation handoffs are pure dictionaries/lists, in-memory only, candidate-first, owner review required, evidence-backed, provenance-backed, and source-locator-backed when available. They preserve `source_refs`, `evidence_refs`, `provenance_refs`, and `source_locator_refs`, reject missing/invalid refs as fail-closed states such as `missing_source_refs`, `missing_evidence_refs`, `missing_provenance_refs`, `missing_source_locator_refs`, `source_locator_invalid`, `evidence_insufficient`, `rejected`, `quarantined`, or `fail_closed`, and do not persist candidates.
+
+Diagnostic handoffs are pure in-memory dictionaries/lists that may carry diagnostic questions, uncertainty notes, insufficient-evidence notes, refused_no_prose, blocked_request, quarantined, unavailable, or fail_closed states. They do not contain prose suggestions, rewrites, continuations, outlines, drafts, revisions, polish, expansion, style imitation, export-as-prose, chapter prose, or story prose.
+
+Review handoffs aggregate candidate and diagnostic handoffs only. They are not persistence, not review queue creation, not canon, not approved memory, not apply-promotion, and not training data. Queue presence is not approval. Candidate persistence is not canon. Confidence is not truth. Tool output is not canon. Tool output is not truth. No automatic canon. No apply-promotion. No memory/canon mutation. No training artifacts. No generated prose. No rewrite. No continuation. No outline. Fail closed. No silent fallback.
+
+T005 added no NCP execution, no Subtxt execution, no dramatica-flow execution, no routes, no UI, no frontend changes, no package/dependency changes, no model/Ollama calls, no persistence, no candidate persistence, no review queue entries, no approved memory/canon mutation, no apply-promotion, no training artifacts, and no generated prose behavior.
+
+`PHASE8-IMPL-021-T006` is ready/active next. `PHASE8-IMPL-021-T007` remains planned. `PHASE8-IMPL-022` remains future MVP-required. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden.
 
 ## Boundary Tags
 

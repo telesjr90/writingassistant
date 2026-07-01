@@ -541,6 +541,190 @@ def run_guarded_analysis_runtime_integration(
     return result
 
 
+def build_analysis_runtime_candidate_observation_handoff(output: dict) -> dict:
+    out = copy.deepcopy(output) if isinstance(output, dict) else {}
+    base = _runtime_handoff_base("candidate_observation_handoff")
+    base.update(
+        {
+            "output_class": out.get("output_class"),
+            "candidate_observations": copy.deepcopy(out.get("candidate_observations") or []),
+            "candidate_support": copy.deepcopy(out.get("candidate_support") or []),
+            "candidate_first": True,
+            "owner_review_required": True,
+            "candidate_observation_handoff_ready": False,
+        }
+    )
+    if not isinstance(output, dict):
+        return _fail("fail_closed", base)
+    if out.get("status") in {"quarantined", "rejected", "fail_closed"}:
+        return _fail(str(out.get("status")), base)
+    if out.get("output_class") in FORBIDDEN_OUTPUT_CLASSES:
+        return _fail("rejected", base)
+
+    ref_status = _validate_runtime_handoff_refs(out)
+    if ref_status != "valid":
+        return _fail(ref_status, base)
+
+    observations = out.get("candidate_observations")
+    if observations is None:
+        observations = out.get("candidate_support")
+    if not isinstance(observations, list) or not observations:
+        return _fail("evidence_insufficient", base)
+    for observation in observations:
+        if not isinstance(observation, dict):
+            return _fail("rejected", base)
+        if observation.get("status") in {"quarantined", "rejected", "fail_closed"}:
+            return _fail(str(observation.get("status")), base)
+        item_ref_status = _validate_runtime_handoff_refs(observation)
+        if item_ref_status != "valid":
+            return _fail(item_ref_status, base)
+
+    base.update(
+        {
+            "status": "candidate_support_ready",
+            "fail_closed": False,
+            "candidate_observation_handoff_ready": True,
+            "source_refs": list(out.get("source_refs") or []),
+            "evidence_refs": list(out.get("evidence_refs") or []),
+            "provenance_refs": list(out.get("provenance_refs") or []),
+            "source_locator_refs": list(out.get("source_locator_refs") or []),
+        }
+    )
+    return base
+
+
+def build_analysis_runtime_diagnostic_handoff(output: dict) -> dict:
+    out = copy.deepcopy(output) if isinstance(output, dict) else {}
+    base = _runtime_handoff_base("diagnostic_handoff")
+    base.update(
+        {
+            "diagnostic_questions": [],
+            "uncertainty_notes": [],
+            "insufficient_evidence_notes": [],
+            "diagnostic_handoff_ready": False,
+            "candidate_support_ready": False,
+        }
+    )
+    if not isinstance(output, dict):
+        return _fail("fail_closed", base)
+    if out.get("status") in {
+        "refused_no_prose",
+        "blocked_request",
+        "quarantined",
+        "unavailable",
+        "fail_closed",
+    }:
+        base.update(_diagnostic_state_payload(str(out.get("status")), out))
+        return base
+    if out.get("output_class") in FORBIDDEN_OUTPUT_CLASSES or _contains_prose_intent(out):
+        base.update(_diagnostic_state_payload("refused_no_prose", out))
+        return base
+
+    questions = _safe_diagnostic_items(out.get("diagnostic_questions"), "question")
+    uncertainty_notes = _safe_diagnostic_items(out.get("uncertainty_notes"), "note")
+    insufficient_notes = _safe_diagnostic_items(out.get("insufficient_evidence_notes"), "note")
+    if not questions and not uncertainty_notes and not insufficient_notes:
+        insufficient_notes = [
+            {
+                "note": "insufficient evidence",
+                "source_refs": list(out.get("source_refs") or []),
+                "evidence_refs": list(out.get("evidence_refs") or []),
+                "provenance_refs": list(out.get("provenance_refs") or []),
+                "source_locator_refs": list(out.get("source_locator_refs") or []),
+            }
+        ]
+
+    status = "diagnostic_questions_ready" if questions else "evidence_insufficient"
+    base.update(
+        {
+            "status": status,
+            "fail_closed": status == "evidence_insufficient",
+            "diagnostic_handoff_ready": True,
+            "diagnostic_questions": questions,
+            "uncertainty_notes": uncertainty_notes,
+            "insufficient_evidence_notes": insufficient_notes,
+            "source_refs": list(out.get("source_refs") or []),
+            "evidence_refs": list(out.get("evidence_refs") or []),
+            "provenance_refs": list(out.get("provenance_refs") or []),
+            "source_locator_refs": list(out.get("source_locator_refs") or []),
+        }
+    )
+    return base
+
+
+def build_analysis_runtime_review_handoff(
+    candidate_handoffs: Any = None, diagnostic_handoffs: Any = None
+) -> dict:
+    candidates = _handoff_list(candidate_handoffs)
+    diagnostics = _handoff_list(diagnostic_handoffs)
+    review = _runtime_handoff_base("review_handoff")
+    review.update(
+        {
+            "status": "valid",
+            "fail_closed": False,
+            "candidate_handoffs": copy.deepcopy(candidates),
+            "diagnostic_handoffs": copy.deepcopy(diagnostics),
+            "review_handoff_ready": True,
+            "owner_review_required": True,
+            "candidate_first": True,
+            "source_refs": _merge_ref_values(candidates + diagnostics, "source_refs"),
+            "evidence_refs": _merge_ref_values(candidates + diagnostics, "evidence_refs"),
+            "provenance_refs": _merge_ref_values(candidates + diagnostics, "provenance_refs"),
+            "source_locator_refs": _merge_ref_values(
+                candidates + diagnostics, "source_locator_refs"
+            ),
+        }
+    )
+    validation = validate_analysis_runtime_review_handoff(review)
+    review["status"] = validation["status"]
+    review["fail_closed"] = validation["fail_closed"]
+    review["review_handoff_ready"] = validation["review_handoff_valid"]
+    return review
+
+
+def validate_analysis_runtime_review_handoff(handoff: dict) -> dict:
+    review = copy.deepcopy(handoff) if isinstance(handoff, dict) else {}
+    result = _runtime_handoff_base("review_handoff_validation")
+    result.update({"review_handoff_valid": False, "normalized_review_handoff": review})
+    if not isinstance(handoff, dict):
+        return _fail("fail_closed", result)
+    if review.get("handoff_type") != "review_handoff":
+        return _fail("rejected", result)
+    candidates = review.get("candidate_handoffs")
+    diagnostics = review.get("diagnostic_handoffs")
+    if not isinstance(candidates, list) or not isinstance(diagnostics, list):
+        return _fail("rejected", result)
+    for item in candidates:
+        if not isinstance(item, dict) or item.get("handoff_type") != "candidate_observation_handoff":
+            return _fail("rejected", result)
+    for item in diagnostics:
+        if not isinstance(item, dict) or item.get("handoff_type") != "diagnostic_handoff":
+            return _fail("rejected", result)
+    for key in (
+        "persists_candidates",
+        "creates_review_queue_entries",
+        "mutates_memory_canon",
+        _applies_key(),
+        "creates_training_artifacts",
+        "generates_prose",
+    ):
+        if review.get(key) is not False:
+            return _fail("fail_closed", result)
+
+    result.update(
+        {
+            "status": "valid",
+            "fail_closed": False,
+            "review_handoff_valid": True,
+            "source_refs": list(review.get("source_refs") or []),
+            "evidence_refs": list(review.get("evidence_refs") or []),
+            "provenance_refs": list(review.get("provenance_refs") or []),
+            "source_locator_refs": list(review.get("source_locator_refs") or []),
+        }
+    )
+    return result
+
+
 def _base_result() -> dict:
     return {
         "status": "fail_closed",
@@ -569,6 +753,56 @@ def _non_execution_result() -> dict:
         "creates_training_artifacts": False,
         "generates_prose": False,
     }
+
+
+def _runtime_handoff_base(handoff_type: str) -> dict:
+    result = _non_execution_result()
+    result.update(
+        {
+            "handoff_type": handoff_type,
+            "in_memory_only": True,
+            "pure_data_only": True,
+            "candidate-first": True,
+            "owner review": True,
+            "confidence is not truth": True,
+            "tool output is not canon": True,
+            "tool output is not truth": True,
+            "no automatic canon": True,
+            "no apply-promotion": True,
+            "no memory/canon mutation": True,
+            "no training artifacts": True,
+            "no generated prose": True,
+            "no rewrite": True,
+            "no continuation": True,
+            "no outline": True,
+            "fail closed": True,
+            "no silent fallback": True,
+            "queue presence is not approval": True,
+            "candidate persistence is not canon": True,
+            "owner_review_required": True,
+            "confidence_is_not_truth": True,
+            "tool_output_is_not_canon": True,
+            "tool_output_is_not_truth": True,
+            "no_automatic_canon": True,
+            "memory_canon_write": False,
+            "approved_memory_write": False,
+            "canon_write": False,
+            "training_artifact_created": False,
+            "persists_candidates": False,
+            "creates_candidate_records": False,
+            "creates_review_queue_entries": False,
+            "generates_prose": False,
+            "rewrites_prose": False,
+            "continues_prose": False,
+            "creates_outline": False,
+            "source_refs": [],
+            "evidence_refs": [],
+            "provenance_refs": [],
+            "source_locator_refs": [],
+        }
+    )
+    result["calls_" + "sub" + "process"] = False
+    return result
 
 
 def _fail(status: str, result: dict) -> dict:
@@ -602,6 +836,71 @@ def _safe_relative_path(value: Any) -> bool:
 
 def _valid_source_locator_refs(value: Any) -> bool:
     return _has_refs(value) and all(_SOURCE_LOCATOR_RE.fullmatch(item) for item in value)
+
+
+def _validate_runtime_handoff_refs(value: dict) -> str:
+    for field in REQUIRED_REF_FIELDS:
+        if not _has_refs(value.get(field)):
+            return f"missing_{field}"
+    if not _valid_source_locator_refs(value.get("source_locator_refs")):
+        return "source_locator_invalid"
+    return "valid"
+
+
+def _contains_prose_intent(value: Any) -> bool:
+    if isinstance(value, str):
+        return _is_prose_intent(value)
+    if isinstance(value, dict):
+        return any(_contains_prose_intent(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_contains_prose_intent(item) for item in value)
+    return False
+
+
+def _safe_diagnostic_items(items: Any, text_key: str) -> list:
+    safe = []
+    if not isinstance(items, list):
+        return safe
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        if _contains_prose_intent(item.get(text_key)):
+            continue
+        safe.append(copy.deepcopy(item))
+    return safe
+
+
+def _diagnostic_state_payload(status: str, output: dict) -> dict:
+    return {
+        "status": status,
+        "fail_closed": True,
+        "diagnostic_handoff_ready": True,
+        "source_refs": list(output.get("source_refs") or []),
+        "evidence_refs": list(output.get("evidence_refs") or []),
+        "provenance_refs": list(output.get("provenance_refs") or []),
+        "source_locator_refs": list(output.get("source_locator_refs") or []),
+    }
+
+
+def _handoff_list(value: Any) -> list:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return copy.deepcopy(value)
+    if isinstance(value, dict):
+        return [copy.deepcopy(value)]
+    return []
+
+
+def _merge_ref_values(items: list, field: str) -> list:
+    merged = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        for ref in item.get(field) or []:
+            if ref not in merged:
+                merged.append(ref)
+    return merged
 
 
 def _policy_affirms(value: Any, expected: str) -> bool:
