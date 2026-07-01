@@ -3,20 +3,20 @@
   "parent_title": "PHASE8-IMPL-022 - End-to-end MVP usability validation",
   "status": "active",
   "mvp_required": true,
-  "current_child": "PHASE8-IMPL-022-T003",
-  "next_child": "PHASE8-IMPL-022-T003",
+  "current_child": "PHASE8-IMPL-022-T004",
+  "next_child": "PHASE8-IMPL-022-T004",
   "completed_children": [
     "PHASE8-IMPL-022-T001",
-    "PHASE8-IMPL-022-T002"
+    "PHASE8-IMPL-022-T002",
+    "PHASE8-IMPL-022-T003"
   ],
   "planned_children": [
-    "PHASE8-IMPL-022-T004",
     "PHASE8-IMPL-022-T005",
     "PHASE8-IMPL-022-T006",
     "PHASE8-IMPL-022-T007"
   ],
   "ready_active_children": [
-    "PHASE8-IMPL-022-T003"
+    "PHASE8-IMPL-022-T004"
   ],
   "boundary_tags": [
     "validation",
@@ -38,8 +38,27 @@
     "local_first"
   ],
   "future_parent_sequence": [],
-  "publication_summary": "PHASE8-IMPL-022 is active as the MVP-required End-to-end MVP usability validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is complete/PASS as docs/decision/planning only and creates docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates. PHASE8-IMPL-022-T003 is ready/active next and should convert the matrix into expected-red end-to-end MVP smoke/contract tests while remaining tests-first expected-red only and not implementing the smoke harness. PHASE8-IMPL-022-T004 through PHASE8-IMPL-022-T007 are planned. The parent validates owner-authored or owner-provided project text, project/workspace load path required for validation, runtime extraction availability and guarded failure behavior, real BookNLP/spaCy install/import/run checks as already scoped by earlier parents, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. It must preserve candidate-first behavior, owner review required, evidence/provenance/source-locator backed when available, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. T002 does not mark MVP complete and does not record an end-to-end usability pass yet; PHASE8-IMPL-022 remains active and will prove or reveal gaps.",
+  "publication_summary": "PHASE8-IMPL-022 is active as the MVP-required End-to-end MVP usability validation parent after completed/PASS PHASE8-IMPL-021. PHASE8-IMPL-022-T001 is complete/PASS as docs/status/planning publication only. PHASE8-IMPL-022-T002 is complete/PASS as docs/decision/planning only and creates docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md defining the MVP end-to-end usability validation matrix and acceptance gates. PHASE8-IMPL-022-T003 is complete/PASS as expected-red end-to-end MVP smoke/contract tests only; the future backend.story_knowledge.mvp_usability_smoke module is intentionally absent and the target tests/test_writer_assistant_core_mvp_usability_smoke_contract.py fails at collection with ModuleNotFoundError. PHASE8-IMPL-022-T004 is ready/active next for the minimal MVP smoke harness implementation. PHASE8-IMPL-022-T005 through PHASE8-IMPL-022-T007 are planned. The parent validates owner-authored or owner-provided project text, project/workspace load path required for validation, runtime extraction availability and guarded failure behavior, real BookNLP/spaCy install/import/run checks as already scoped by earlier parents, raw artifact persistence, candidate creation/review handoff, candidate review and review queue/read-only review surface, frontend owner-action execution, explicit audited apply-promotion, approved memory/canon mutation only through owner-approved workflow, model-assisted evidence-backed extraction, analysis-only NCP/Subtxt/dramatica-flow runtime integration, safe unavailable/quarantine/fail-closed states, and no generated prose/prose-production behavior. PHASE8-IMPL-022 is validation/orchestration/smoke planning first, not feature expansion by default. It must preserve candidate-first behavior, owner review required, evidence/provenance/source-locator backed when available, confidence is not truth, tool output is not canon, model output is not canon, no model output as truth, no automatic canon, no apply-promotion outside explicit audited owner-confirmed path, no memory/canon mutation outside owner-approved workflow, no training artifacts, no generated prose, no rewrite, no continuation, no outline, fail closed, no silent fallback, queue presence is not approval, and candidate persistence is not canon. Fine-tuning remains deferred after MVP. Generated prose/prose-production paths remain permanently forbidden. T003 does not mark MVP complete and does not record an end-to-end usability pass yet; PHASE8-IMPL-022 remains active and will prove or reveal gaps.",
   "decision_records": [
     "docs/roadmap/decisions/PHASE8-IMPL-022-mvp-usability-validation-matrix-decision.md"
+  ],
+  "t003_artifact_records": [
+    {
+      "task_id": "PHASE8-IMPL-022-T003",
+      "kind": "expected_red_contract_test",
+      "test_file": "tests/test_writer_assistant_core_mvp_usability_smoke_contract.py",
+      "future_module": "backend.story_knowledge.mvp_usability_smoke",
+      "future_public_apis": [
+        "validate_mvp_usability_smoke_matrix",
+        "validate_mvp_usability_smoke_request",
+        "build_mvp_usability_smoke_plan",
+        "validate_mvp_usability_smoke_result",
+        "build_mvp_usability_evidence_packet",
+        "classify_mvp_usability_blockers",
+        "run_guarded_mvp_usability_smoke"
+      ],
+      "expected_red_target": "ImportError: No module named 'backend.story_knowledge.mvp_usability_smoke'",
+      "result": "complete/PASS as expected-red tests-first only; smoke harness implementation deferred to PHASE8-IMPL-022-T004"
+    }
   ]
 }

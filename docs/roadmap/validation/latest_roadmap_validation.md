@@ -1,3 +1,52 @@
+# PHASE8-IMPL-022-T003 Expected-Red MVP Smoke/Contract Tests
+
+### Result
+
+- Result: PASS.
+- Scope: tests-first expected-red contract only.
+- Parent task: `PHASE8-IMPL-022` - End-to-end MVP usability validation.
+- Parent status: active.
+- Completed child recorded: `PHASE8-IMPL-022-T003` - Expected-red end-to-end MVP smoke/contract tests.
+- Test file: `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py`.
+- Expected-red target: future `backend.story_knowledge.mvp_usability_smoke` module and the documented public APIs `validate_mvp_usability_smoke_matrix`, `validate_mvp_usability_smoke_request`, `build_mvp_usability_smoke_plan`, `validate_mvp_usability_smoke_result`, `build_mvp_usability_evidence_packet`, `classify_mvp_usability_blockers`, and `run_guarded_mvp_usability_smoke`.
+- Active/ready next child: `PHASE8-IMPL-022-T004` - Minimal MVP smoke harness implementation.
+- Planned children: `PHASE8-IMPL-022-T005`, `PHASE8-IMPL-022-T006`, and `PHASE8-IMPL-022-T007`.
+- Future MVP-required parents after this active parent: none remaining; `PHASE8-IMPL-022` is the final MVP-required validation parent.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production paths remain permanently forbidden.
+- PHASE8-UX-001 remained read-only terminology/boundary reference only.
+- No context tools, CCE, Graphify, Repomix, LeanCTX, AI context generation, source-cache refresh, baseline refresh, scaffold, collect-plan, context health scripts, Claude subagents, models/Ollama, runtime extraction, BookNLP/spaCy, NCP/Subtxt/dramatica-flow, or subprocess runtime workflows were run for T003.
+
+### Files Changed
+
+- Created: `tests/test_writer_assistant_core_mvp_usability_smoke_contract.py`
+- Updated: `docs/roadmap/tasks/PHASE8-IMPL-022.md`
+- Updated: `docs/roadmap/inventory/PHASE8-IMPL-022.md`
+- Updated: `docs/roadmap/enrichment/PHASE8-IMPL-022.enrichment.json`
+- Updated: `docs/master_plan.md`
+- Updated: `docs/roadmap/implementation_status.md`
+- Updated: `docs/roadmap/roadmap_index.yaml`
+- Updated: `docs/roadmap/task_backlog.md`
+- Updated: `docs/roadmap/phase_map.md`
+- Updated: `docs/roadmap/validation/latest_roadmap_validation.md`
+- Updated: `docs/roadmap/decision_log.md`
+- Updated: `docs/roadmap/risk_register.md`
+- Updated: `docs/roadmap/open_questions.md`
+
+### Contract Summary
+
+T003 adds expected-red tests for the future public APIs: `validate_mvp_usability_smoke_matrix`, `validate_mvp_usability_smoke_request`, `build_mvp_usability_smoke_plan`, `validate_mvp_usability_smoke_result`, `build_mvp_usability_evidence_packet`, `classify_mvp_usability_blockers`, and `run_guarded_mvp_usability_smoke`.
+
+The contract requires a matrix with `matrix_key`, `matrix_version`, `matrix_intent`, `gate_ids`, `coverage_markers`, and `gate_definitions` for `workspace_project_baseline`, `owner_authored_source`, `runtime_extraction_environment`, `runtime_extraction_unavailable`, `raw_artifact_persistence`, `candidate_creation`, `review_queue_read_only`, `frontend_owner_action`, `apply_promotion_audited`, `approved_memory_canon_mutation`, `model_assisted_evidence_backed`, `analysis_only_runtime_integration`, `no_prose_no_rewrite_no_continuation_no_outline`, `no_training_artifacts`, `no_silent_fallback`, `end_to_end_smoke`, and `mvp_blocker_triage`. It requires requests with `project_id`, `smoke_key`, `smoke_intent`, `source_refs`, `evidence_refs`, `provenance_refs`, `source_locator_refs`, owner-authored or owner-provided source boundary, no generated prose, no rewrite, no continuation, no outline, no training, no canon, and no apply-promotion confirmations.
+
+Coverage markers include `workspace/project load`, `owner-authored or owner-provided project text`, `runtime extraction`, `BookNLP`, `spaCy`, `unavailable`, `quarantine`, `fail_closed`, `raw artifact persistence`, `candidate creation`, `candidate review`, `review handoff`, `review queue`, `read-only review surface`, `frontend owner-action execution`, `apply-promotion`, `approved memory/canon`, `model-assisted evidence-backed extraction`, `analysis-only NCP/Subtxt/dramatica-flow`, `candidate-first`, `owner review required`, `confidence is not truth`, `tool output is not canon`, `model output is not canon`, `no model output as truth`, `no automatic canon`, `no apply-promotion outside explicit audited owner-confirmed path`, `no memory/canon mutation outside owner-approved workflow`, `queue presence is not approval`, `candidate persistence is not canon`, `no generated prose`, `no rewrite`, `no continuation`, `no outline`, `no training artifacts`, `no silent fallback`, `MVP is not complete`, and `end-to-end usability has not passed`.
+
+### Boundary Confirmation
+
+The MVP usability smoke contract is candidate-first; owner review required; evidence/provenance/source-locator backed when available; confidence is not truth; tool output is not canon; model output is not canon; no model output as truth; no automatic canon; no apply-promotion outside explicit audited owner-confirmed path; no memory/canon mutation outside owner-approved workflow; no training artifacts; no generated prose; no rewrite; no continuation; no outline; fail closed; no silent fallback; queue presence is not approval; candidate persistence is not canon; MVP is not complete; and end-to-end usability has not passed.
+
+T003 implemented no smoke harness, no runtime, helper, routes, UI, dependency changes, model calls, persistence, canon, promotion, training, or generated-prose behavior. T003 also did not mark MVP complete and did not record an end-to-end usability pass.
+
 # PHASE8-IMPL-022-T002 Validation Matrix Decision Snapshot
 
 - Result: PASS; `PHASE8-IMPL-022-T002` is complete/PASS as docs/decision/planning only.
