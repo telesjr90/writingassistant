@@ -1,3 +1,50 @@
+# MVP-READINESS-BROWSER-TOOLING-001 Playwright Browser Evidence Tooling Install Record
+
+### Result
+
+- Result: PASS.
+- Scope: docs/governance record only; package metadata inspection only.
+- Task: `MVP-READINESS-BROWSER-TOOLING-001` — Record Playwright browser evidence tooling install.
+- Prior inspection state: no root `package.json`; `frontend/package.json` existed; browser/test dependencies were none found; no Playwright/Puppeteer references.
+- Owner manual install (approved): `npm install -D @playwright/test` under `frontend/`; `npx playwright install chromium`.
+- Changed package files inspected: `frontend/package.json`, `frontend/package-lock.json`.
+
+### Package / Tooling Summary
+
+- `@playwright/test` `^1.61.1` added to `frontend/package.json` `devDependencies` only.
+- `frontend/package-lock.json` records `@playwright/test`, transitive `playwright`, and `playwright-core` at `1.61.1` with `dev: true`.
+- No root `package.json`; no backend package manifest; no Puppeteer references; no production/runtime dependency changes to React/Vite/TipTap/axios.
+- Existing frontend npm scripts unchanged; no Playwright config file; no browser evidence script added in this task.
+- Intended use: MVP readiness browser screenshots/workflow evidence tooling only — not product runtime behavior, not app test harness expansion by default, and not prose generation.
+
+### Boundary Summary
+
+- Owner approved Playwright as MVP readiness evidence tooling after browser automation dependencies were missing.
+- This install does not mark MVP complete.
+- This does not claim end-to-end usability has passed.
+- This does not change product behavior; no backend app logic, frontend app logic, routes, UI, or browser evidence script was added in this task.
+- Generated prose/prose-production paths remain permanently forbidden.
+- Known project isolation bug remains deferred; this task does not fix it.
+- No staging, commit, or push performed in this task.
+
+### Docs Updated
+
+- `docs/roadmap/validation/latest_roadmap_validation.md`
+- `docs/roadmap/decision_log.md`
+- `docs/roadmap/risk_register.md`
+- `docs/roadmap/open_questions.md`
+
+### Validation Owner Manual Follow-Up
+
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- `git diff --check`
+- `git status --short --branch`
+
+### Recommended Next Step
+
+- Commit the owner-reviewed Playwright package install (`frontend/package.json`, `frontend/package-lock.json`) after review, then create the browser evidence script in a separately scoped task.
+
 # PHASE8-IMPL-022-T007 Parent Closeout
 
 ### Result
