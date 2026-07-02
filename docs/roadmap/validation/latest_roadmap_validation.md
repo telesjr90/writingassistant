@@ -1,3 +1,22 @@
+# PHASE8-UX-002-T001-MASTER-PLAN-ALIGNMENT Master Plan Alignment
+
+### Result
+
+- Result: PASS for docs/status/planning alignment.
+- Scope: master plan and roadmap/status governance only; no product implementation.
+- Updated `docs/master_plan.md` so it records `PHASE8-UX-002 - MVP acceptance UI completion and route wiring` as the active MVP-first UX parent after `PHASE8-IMPL-022`.
+- Recorded that `PHASE8-UX-002-T001` is complete/PASS as docs/status/planning parent publication only.
+- Recorded that latest owner acceptance evidence reached `SCRIPT_EXIT=0`, final automated decision remains `MANUAL_REVIEW_REQUIRED`, owner acceptance remains pending, and MVP is not complete.
+- Recorded the seven MVP UI/workflow gaps: owner-authored source workflow, selected-source Story Check diagnostic-only UI, no-prose refusal/fail-closed UI, Notes/Materials save-reload proof, runtime/raw artifact evidence UI, review/apply-promotion evidence UI, and NCP/Subtxt/dramatica-flow exposure decision.
+- Recorded active children `PHASE8-UX-002-T001` through `PHASE8-UX-002-T007`; `PHASE8-UX-002-T002A` remains post-MVP/deferred only.
+- Recorded that external SaaS investigation, Dramatica/current-platform investigation, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, controlled external experiments, and authorized non-black-box external reference collection are post-MVP/deferred unless separately opened by the owner.
+- Updated status breadcrumbs in `docs/roadmap/implementation_status.md` and `docs/roadmap/open_questions.md` to remove stale unpublished/active-parent-none wording.
+
+### Boundary Summary
+
+- No frontend/backend/tests/package changes.
+- No crawler scripts, raw captures, `.external_sources`, context artifacts, model/Ollama calls, generated prose, copied proprietary content, canon/memory mutation, candidate creation, apply-promotion shortcut, training/JSONL/dataset/model artifacts, staging, commit, or push.
+
 # PHASE8-UX-002-PRE-T001-DEFER-SAAS External SaaS Investigation Deferral
 
 ### Result
@@ -1543,3 +1562,18 @@ Expected outputs:
 - `docs/roadmap/ux/PHASE8-UX-001-impeccable-ui-ux-qa-workflow.md`
 
 Generated context evidence, if collected, must remain under `.codex-context/PHASE8-UX-001/` and must not be staged.
+# PHASE8-UX-002-T001 Parent Publication Validation
+
+`PHASE8-UX-002 - MVP acceptance UI completion and route wiring` is published as the active MVP-first UI parent. `PHASE8-UX-002-T001` is complete/PASS as docs/status/planning parent publication only.
+
+Roadmap status: owner acceptance remains pending; MVP is not complete. Latest owner acceptance evidence remains `MANUAL_REVIEW_REQUIRED` due to missing UI/workflow surfaces.
+
+Publication artifacts:
+
+- `docs/roadmap/tasks/PHASE8-UX-002.md`
+- `docs/roadmap/inventory/PHASE8-UX-002.md`
+- `docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json`
+
+Deferred research status: external SaaS investigation, Dramatica/current-platform investigation, controlled external experiments, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, and authorized non-black-box external reference collection are post-MVP/deferred. `PHASE8-UX-002-T002A` is post-MVP/deferred only and is not part of the active MVP child sequence.
+
+Boundary validation: no frontend/backend/tests/package changes, no crawler scripts, no raw captures, no `.external_sources`, no context bundle, no model calls, no generated prose, no hidden algorithm claims from black-box observation, no copied proprietary content, no canon/memory mutation, no apply-promotion shortcut, and no staging/commit/push.

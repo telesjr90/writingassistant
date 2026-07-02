@@ -249,3 +249,12 @@ Active product direction after the completed Project Workspace Foundation. `PHAS
 ## Suggested Labels
 
 `app`, `backend`, `frontend`, `storage`, `ncp`, `story-check`, `guardrails`, `dataset`, `book-backed`, `external-dataset`, `training`, `runpod`, `evaluation`, `deployment`, `docs`, `blocked`, `decision-needed`.
+# PHASE8-UX-002-T001 Parent Publication
+
+- `PHASE8-UX-002` is published as the active MVP-first UI parent for MVP acceptance UI completion and route wiring.
+- `PHASE8-UX-002-T001` is complete/PASS as docs/status/planning parent publication only.
+- `PHASE8-UX-002-T002` is the next planned docs/decision/planning task: UI acceptance matrix + route/workflow decision.
+- Owner acceptance remains pending and MVP is not complete.
+- Latest owner acceptance evidence remains `MANUAL_REVIEW_REQUIRED` due to missing UI/workflow surfaces.
+- External SaaS investigation, controlled external experiments, and authorized non-black-box external reference collection are post-MVP/deferred.
+- Raw captures remain forbidden from Git and generated prose/prose-production remains permanently forbidden.

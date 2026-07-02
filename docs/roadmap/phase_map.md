@@ -281,3 +281,12 @@ gantt
     Full fine-tune blocked :crit, train, 8, 2
     Export/eval/model swap :deploy, 10, 2
 ```
+# PHASE8-UX-002 MVP Acceptance UI Parent
+
+- Parent: `PHASE8-UX-002 - MVP acceptance UI completion and route wiring`.
+- Status: active after `PHASE8-UX-002-T001` publication.
+- Purpose: complete missing browser-testable UI/workflow surfaces required for MVP owner acceptance.
+- Current readiness: owner acceptance pending; MVP not complete; latest owner acceptance evidence remains `MANUAL_REVIEW_REQUIRED`.
+- Active child sequence: T001 parent publication; T002 UI acceptance matrix + route/workflow decision; T003 expected-red source/Story Check/no-prose UI tests; T004 owner-authored source/scene create/import/select UI; T005 Story Check diagnostic-only/no-prose evidence UI; T006 Notes/Materials + runtime/review evidence UI; T007 closeout + owner acceptance harness rerun.
+- Deferred: `PHASE8-UX-002-T002A`, external SaaS investigation, Dramatica/current-platform investigation, controlled external experiments, and authorized non-black-box external reference collection.
+- Boundaries: no generated prose, no canon/memory mutation, no apply-promotion shortcut, raw artifacts support data only, confidence is not truth, queue presence is not approval.

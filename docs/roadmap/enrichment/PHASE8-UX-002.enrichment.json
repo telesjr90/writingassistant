@@ -1,0 +1,181 @@
+{
+  "task_id": "PHASE8-UX-002",
+  "title": "MVP acceptance UI completion and route wiring",
+  "status": "active",
+  "task_type": "docs/status/planning parent",
+  "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
+  "mvp_required": true,
+  "context_pack": ".codex-context/PHASE8-UX-002/",
+  "purpose": "Publish the MVP-first UX parent for completing the app's missing browser-testable UI and workflow surfaces required before owner MVP acceptance.",
+  "current_evidence_summary": [
+    "PHASE8-IMPL-022 is complete/PASS as the end-to-end MVP usability validation parent.",
+    "Project isolation browser evidence now passes.",
+    "MVP owner acceptance harness exists and runs.",
+    "Cyber Detective owner acceptance fixture exists and was committed.",
+    "Latest owner acceptance evidence reached SCRIPT_EXIT=0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
+    "Owner acceptance remains pending.",
+    "MVP is not complete."
+  ],
+  "boundaries": [
+    "docs/status/planning only for T001",
+    "analysis-only",
+    "candidate-first",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "owner-authored prose storage/editing is allowed",
+    "AI-generated prose is permanently forbidden",
+    "no generated prose",
+    "no rewrite",
+    "no continue",
+    "no imitate",
+    "no polish",
+    "no improve",
+    "no expand",
+    "no outline",
+    "no draft",
+    "no revise",
+    "no story-prose-production controls",
+    "queue presence is not approval",
+    "confidence is not truth",
+    "candidate persistence is not canon",
+    "raw artifacts are support data only",
+    "apply-promotion must be explicit, audited, owner-confirmed, and separate from extraction, queue state, confidence, and candidate persistence",
+    "external SaaS investigation is post-MVP/deferred",
+    "controlled external experiments are post-MVP/deferred",
+    "authorized non-black-box external reference collection is post-MVP/deferred unless separately opened by the owner",
+    "no hidden algorithm claims from black-box observation alone",
+    "no frontend implementation in T001",
+    "no backend implementation in T001",
+    "no route/API changes in T001",
+    "no tests in T001",
+    "no package/dependency changes",
+    "no crawlers",
+    "no raw captures",
+    "no .external_sources creation",
+    "no model or Ollama calls",
+    "no canon or memory mutation",
+    "no candidate creation",
+    "no apply-promotion shortcut",
+    "no training/JSONL/dataset/model artifacts"
+  ],
+  "expected_outputs": [
+    "docs/roadmap/tasks/PHASE8-UX-002.md",
+    "docs/roadmap/inventory/PHASE8-UX-002.md",
+    "docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json",
+    "roadmap/status/governance updates publishing PHASE8-UX-002 as the active MVP acceptance UI completion parent",
+    "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
+    "MVP owner acceptance pending and MVP not complete recorded",
+    "SaaS research and controlled-experiment deferral recorded"
+  ],
+  "allowed_files": [
+    "docs/roadmap/tasks/PHASE8-UX-002.md",
+    "docs/roadmap/inventory/PHASE8-UX-002.md",
+    "docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/phase_map.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/open_questions.md",
+    "docs/master_plan.md"
+  ],
+  "disallowed_files": [
+    "frontend/**",
+    "backend/**",
+    "tests/**",
+    "package.json",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "training/**",
+    ".external_sources/**",
+    ".codex-context/**",
+    "ai_context/**",
+    "graphify-out/**",
+    "raw screenshots",
+    "traces",
+    "HAR/WARC/WACZ",
+    "auth state",
+    "browser profiles",
+    "crawler scripts",
+    "generated capture outputs"
+  ],
+  "validation_commands": [
+    "python3 scripts/check_enrichment.py",
+    "python3 scripts/validate_roadmap.py",
+    "git diff --check",
+    "git status --short --branch",
+    "git diff --name-only"
+  ],
+  "references": [
+    "docs/roadmap/ux/PHASE8-UX-001-master-plan-ux-navigation-proposal.md",
+    "docs/roadmap/ux/PHASE8-UX-001-impeccable-ui-ux-qa-workflow.md",
+    "docs/roadmap/ux/PHASE8-UX-002-prepublication-reference-research-boundary.md",
+    "docs/roadmap/ux/PHASE8-UX-002-prepublication-controlled-experiment-method.md",
+    "docs/roadmap/validation/mvp_owner_acceptance_browser_evidence.md",
+    "docs/roadmap/validation/mvp_owner_manual_acceptance_checklist.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/open_questions.md",
+    "docs/master_plan.md"
+  ],
+  "active_child_sequence": [
+    {
+      "task_id": "PHASE8-UX-002-T001",
+      "title": "Parent publication",
+      "status": "complete/PASS",
+      "scope": "docs/status/planning only. Publish the parent and record boundaries, scope, planned child sequence, validation, and current MVP readiness status."
+    },
+    {
+      "task_id": "PHASE8-UX-002-T002",
+      "title": "UI acceptance matrix + route/workflow decision",
+      "status": "planned",
+      "scope": "docs/decision/planning only. Convert owner acceptance gaps into route/workflow/UI acceptance matrix. Decide which surfaces are MVP-required, which are backend/helper-only, and which remain manual."
+    },
+    {
+      "task_id": "PHASE8-UX-002-T003",
+      "title": "Expected-red tests for source/Story Check/no-prose UI",
+      "status": "planned",
+      "scope": "tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, review/apply-promotion UI evidence as applicable."
+    },
+    {
+      "task_id": "PHASE8-UX-002-T004",
+      "title": "Implement owner-authored source/scene create/import/select UI",
+      "status": "planned",
+      "scope": "frontend/API only if needed and explicitly scoped later. Project-scoped owner-authored source workflow that unlocks Story Check and no-prose evidence."
+    },
+    {
+      "task_id": "PHASE8-UX-002-T005",
+      "title": "Implement Story Check diagnostic-only/no-prose evidence UI",
+      "status": "planned",
+      "scope": "frontend/API only if needed and explicitly scoped later. Safe selected-source Story Check path, diagnostic-only output state, no-prose refusal/fail-closed evidence."
+    },
+    {
+      "task_id": "PHASE8-UX-002-T006",
+      "title": "Implement Notes/Materials + runtime/review evidence UI",
+      "status": "planned",
+      "scope": "likely split if too large. Notes/Materials save-reload proof, raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence."
+    },
+    {
+      "task_id": "PHASE8-UX-002-T007",
+      "title": "Closeout + rerun owner acceptance harness",
+      "status": "planned",
+      "scope": "docs/status/governance plus owner-run evidence. Re-run owner acceptance harness after missing UI surfaces are built. Do not mark MVP complete unless owner explicitly accepts through the correct checklist/roadmap gate."
+    }
+  ],
+  "deferred_children": [
+    {
+      "task_id": "PHASE8-UX-002-T002A",
+      "status": "post-MVP/deferred",
+      "scope": "External SaaS UI reference research only if separately opened by the owner after MVP UI fixes and owner acceptance."
+    }
+  ],
+  "mvp_readiness_decision": {
+    "owner_acceptance": "pending",
+    "mvp_complete": false,
+    "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
+  }
+}
