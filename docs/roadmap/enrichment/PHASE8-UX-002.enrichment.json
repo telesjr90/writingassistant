@@ -2,7 +2,7 @@
   "task_id": "PHASE8-UX-002",
   "title": "MVP acceptance UI completion and route wiring",
   "status": "active",
-  "task_type": "docs/status/planning parent",
+  "task_type": "docs/status/planning parent with completed docs/decision/planning child",
   "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-002/",
@@ -18,6 +18,7 @@
   ],
   "boundaries": [
     "docs/status/planning only for T001",
+    "docs/decision/planning only for T002",
     "analysis-only",
     "candidate-first",
     "evidence/provenance-backed",
@@ -44,10 +45,10 @@
     "controlled external experiments are post-MVP/deferred",
     "authorized non-black-box external reference collection is post-MVP/deferred unless separately opened by the owner",
     "no hidden algorithm claims from black-box observation alone",
-    "no frontend implementation in T001",
-    "no backend implementation in T001",
-    "no route/API changes in T001",
-    "no tests in T001",
+    "no frontend implementation in T001 or T002",
+    "no backend implementation in T001 or T002",
+    "no route/API changes in T001 or T002",
+    "no tests in T001 or T002",
     "no package/dependency changes",
     "no crawlers",
     "no raw captures",
@@ -62,8 +63,12 @@
     "docs/roadmap/tasks/PHASE8-UX-002.md",
     "docs/roadmap/inventory/PHASE8-UX-002.md",
     "docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json",
+    "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
+    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md",
     "roadmap/status/governance updates publishing PHASE8-UX-002 as the active MVP acceptance UI completion parent",
+    "PHASE8-UX-002-T002 recorded complete/PASS as docs/decision/planning only",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
+    "PHASE8-UX-002-T003 recorded as the next planned child",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
   ],
@@ -79,7 +84,9 @@
     "docs/roadmap/decision_log.md",
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
-    "docs/master_plan.md"
+    "docs/master_plan.md",
+    "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
+    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
   ],
   "disallowed_files": [
     "frontend/**",
@@ -104,6 +111,7 @@
   "validation_commands": [
     "python3 scripts/check_enrichment.py",
     "python3 scripts/validate_roadmap.py",
+    "python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null",
     "git diff --check",
     "git status --short --branch",
     "git diff --name-only"
@@ -120,7 +128,9 @@
     "docs/roadmap/decision_log.md",
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
-    "docs/master_plan.md"
+    "docs/master_plan.md",
+    "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
+    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
   ],
   "active_child_sequence": [
     {
@@ -132,13 +142,17 @@
     {
       "task_id": "PHASE8-UX-002-T002",
       "title": "UI acceptance matrix + route/workflow decision",
-      "status": "planned",
-      "scope": "docs/decision/planning only. Convert owner acceptance gaps into route/workflow/UI acceptance matrix. Decide which surfaces are MVP-required, which are backend/helper-only, and which remain manual."
+      "status": "complete/PASS",
+      "scope": "docs/decision/planning only. Convert owner acceptance gaps into route/workflow/UI acceptance matrix. Decide which surfaces are MVP-required, which are backend/helper-only, and which remain manual.",
+      "outputs": [
+        "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
+        "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
+      ]
     },
     {
       "task_id": "PHASE8-UX-002-T003",
       "title": "Expected-red tests for source/Story Check/no-prose UI",
-      "status": "planned",
+      "status": "next planned",
       "scope": "tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, review/apply-promotion UI evidence as applicable."
     },
     {
@@ -177,5 +191,13 @@
     "owner_acceptance": "pending",
     "mvp_complete": false,
     "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
-  }
+  },
+  "latest_child_task": "PHASE8-UX-002-T002",
+  "latest_child_status": "complete/PASS",
+  "latest_child_outputs": [
+    "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
+    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
+  ],
+  "next_planned_child": "PHASE8-UX-002-T003",
+  "next_planned_child_scope": "Expected-red tests for source/scene create/import/select, Story Check disabled/result states, no-prose refusal/fail-closed paths, Notes/Materials save/reload proof, runtime/raw artifact unavailable/read-only evidence, review/apply-promotion confirmation/audit evidence, and NCP/Subtxt/dramatica-flow exposure decision behavior."
 }

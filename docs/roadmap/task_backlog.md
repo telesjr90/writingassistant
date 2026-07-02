@@ -1,3 +1,14 @@
+# PHASE8-UX-002-T002 UI Acceptance Matrix + Route/Workflow Decision
+
+- `PHASE8-UX-002` remains active as the MVP-first UX parent.
+- `PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only.
+- Outputs: `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md` and `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`.
+- `PHASE8-UX-002-T003` is next for expected-red tests covering source/scene create/import/select, Story Check disabled/result states, no-prose refusal/fail-closed paths, Notes/Materials save/reload proof, runtime/raw artifact unavailable/read-only evidence, review/apply-promotion confirmation/audit evidence, and NCP/Subtxt/dramatica-flow exposure decision behavior.
+- T004/T005/T006 planned split: T004 owner-authored source/scene UI; T005 Story Check/no-prose evidence UI; T006 Notes/Materials plus runtime/review evidence UI, splittable later if too large.
+- Owner acceptance remains pending; MVP is not complete.
+- External SaaS investigation remains post-MVP/deferred and `PHASE8-UX-002-T002A` is not active in the MVP child sequence.
+- No product implementation occurred. Generated prose/prose-production remains permanently forbidden.
+
 # PHASE8-IMPL-022-T004 Minimal MVP Smoke Harness Implementation
 
 - `PHASE8-IMPL-022` remains active: End-to-end MVP usability validation.

@@ -1,3 +1,13 @@
+# PHASE8-UX-002-T002 UI Acceptance Matrix + Route/Workflow Decision
+
+- `PHASE8-UX-002` remains active: MVP acceptance UI completion and route wiring.
+- `PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only.
+- Decision record: `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md`.
+- Acceptance matrix: `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`.
+- T003 is next for expected-red tests covering source/scene create/import/select, Story Check disabled/result states, no-prose refusal/fail-closed paths, Notes/Materials save/reload proof, runtime/raw artifact unavailable/read-only evidence, review/apply-promotion confirmation/audit evidence, and NCP/Subtxt/dramatica-flow exposure decision behavior.
+- Owner acceptance remains pending and MVP is not complete.
+- External SaaS investigation remains post-MVP/deferred. No product implementation occurred. Generated prose/prose-production remains permanently forbidden.
+
 # PHASE8-UX-002-T001-MASTER-PLAN-ALIGNMENT Master Plan Alignment
 
 ### Result

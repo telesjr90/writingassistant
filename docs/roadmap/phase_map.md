@@ -1,3 +1,14 @@
+# PHASE8-UX-002-T002 UI Acceptance Matrix + Route/Workflow Decision
+
+- `PHASE8-UX-002` remains active as the MVP-first UX parent for missing browser-testable owner-acceptance UI/workflow surfaces.
+- `PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only.
+- Decision: `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md`.
+- Matrix: `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`.
+- T003 is next for expected-red tests; T004/T005/T006 remain planned implementation slices.
+- Owner acceptance remains pending and MVP is not complete.
+- External SaaS investigation, Dramatica/current-platform investigation, controlled external experiments, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, and authorized non-black-box external reference collection remain post-MVP/deferred.
+- No frontend/backend/tests/package changes, route/API changes, product behavior changes, context tools, model calls, generated prose, canon/memory mutation, candidate creation, apply-promotion shortcut, staging, commit, or push occurred in T002.
+
 # PHASE8-IMPL-022-T004 Minimal MVP Smoke Harness Implementation
 
 - `PHASE8-IMPL-022` remains active: End-to-end MVP usability validation.

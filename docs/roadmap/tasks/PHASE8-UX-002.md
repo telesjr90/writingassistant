@@ -6,6 +6,8 @@
 
 `PHASE8-UX-002-T001` is complete/PASS as docs/status/planning parent publication only. No UI, routes, tests, crawlers, dependencies, raw captures, context artifacts, `.external_sources`, frontend code, backend code, product behavior, model calls, canon/memory mutation, candidate creation, generated prose, or apply-promotion shortcut were created by T001.
 
+`PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only. T002 created the UI acceptance matrix and route/workflow decision, recorded browser-testable MVP UI surfaces, preserved SaaS/research deferral, and identified `PHASE8-UX-002-T003` as the next child. No product implementation occurred.
+
 MVP owner acceptance remains pending. MVP is not complete.
 
 ## Purpose
@@ -158,8 +160,8 @@ No authorized reference collection happens in `PHASE8-UX-002-T001`.
 ## Active Child Task Sequence
 
 - `PHASE8-UX-002-T001` - Parent publication. Scope: docs/status/planning only. Publish the parent and record boundaries, scope, planned child sequence, validation, and current MVP readiness status. Status: complete/PASS.
-- `PHASE8-UX-002-T002` - UI acceptance matrix + route/workflow decision. Scope: docs/decision/planning only. Convert owner acceptance gaps into route/workflow/UI acceptance matrix. Decide which surfaces are MVP-required, which are backend/helper-only, and which remain manual.
-- `PHASE8-UX-002-T003` - Expected-red tests for source/Story Check/no-prose UI. Scope: tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, and review/apply-promotion UI evidence as applicable.
+- `PHASE8-UX-002-T002` - UI acceptance matrix + route/workflow decision. Scope: docs/decision/planning only. Convert owner acceptance gaps into route/workflow/UI acceptance matrix. Decide which surfaces are MVP-required, which are backend/helper-only, and which remain manual. Status: complete/PASS. Decision: `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md`. Matrix: `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`.
+- `PHASE8-UX-002-T003` - Expected-red tests for source/Story Check/no-prose UI. Scope: tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, and review/apply-promotion UI evidence as applicable. Status: next planned child.
 - `PHASE8-UX-002-T004` - Implement owner-authored source/scene create/import/select UI. Scope: frontend/API only if needed and explicitly scoped later. Project-scoped owner-authored source workflow that unlocks Story Check and no-prose evidence.
 - `PHASE8-UX-002-T005` - Implement Story Check diagnostic-only/no-prose evidence UI. Scope: frontend/API only if needed and explicitly scoped later. Safe selected-source Story Check path, diagnostic-only output state, and no-prose refusal/fail-closed evidence.
 - `PHASE8-UX-002-T006` - Implement Notes/Materials + runtime/review evidence UI. Scope: likely split if too large. Notes/Materials save-reload proof, raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence.
@@ -174,6 +176,17 @@ T001 validation:
 ```bash
 python3 scripts/check_enrichment.py
 python3 scripts/validate_roadmap.py
+git diff --check
+git status --short --branch
+git diff --name-only
+```
+
+T002 validation:
+
+```bash
+python3 scripts/check_enrichment.py
+python3 scripts/validate_roadmap.py
+python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null
 git diff --check
 git status --short --branch
 git diff --name-only

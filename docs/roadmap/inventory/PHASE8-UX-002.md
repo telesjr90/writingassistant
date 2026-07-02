@@ -2,6 +2,8 @@
 
 ## Relevant Docs
 
+- `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md`
+- `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`
 - `docs/roadmap/ux/PHASE8-UX-001-master-plan-ux-navigation-proposal.md`
 - `docs/roadmap/ux/PHASE8-UX-001-impeccable-ui-ux-qa-workflow.md`
 - `docs/roadmap/ux/PHASE8-UX-002-prepublication-reference-research-boundary.md`
@@ -34,29 +36,38 @@ The owner acceptance harness reached `SCRIPT_EXIT=0`, but final automated decisi
 Later implementation or tests-first tasks may inspect only when explicitly scoped:
 
 - Project creation, project selection, project header, and active project routing.
-- Scene/source list, create/import/select controls, and selected source state.
+- Scene/source list, create/import/select controls, selected source state, save/reload state, and selected-source Story Check binding.
 - `AnalysisSidebar` / Story Check control and result display.
-- Notes and Materials navigation, body editor, save/reload behavior, and project isolation.
-- Review queue display and owner-action controls.
-- Apply-promotion confirmation UI and audit detail display.
+- Safe no-prose refusal/fail-closed UI surfaces for forbidden prose-production intents.
+- Notes and Materials navigation, body editor, create controls, save/reload behavior, and project isolation.
+- Runtime/raw artifact unavailable/read-only support-data labels and evidence surfaces.
+- Review queue display, owner-action controls, candidate-only/non-canon labels, and explicit no-promotion warnings.
+- Apply-promotion confirmation UI, audit detail display, and failed/rejected unchanged-memory/canon evidence.
 - Memory/Canon approved-only views.
-- Runtime/raw artifact unavailable/read-only evidence surfaces, if present or planned.
-- No-prose refusal/fail-closed browser-visible paths.
+- NCP/Subtxt/dramatica-flow `NOT_EXPOSED` or analysis-label-only status surfaces.
 
 ## Planned Backend/API Areas to Inspect Only If Later Implementation Requires Route Support
 
 Later tasks may inspect backend/API areas only if explicitly scoped by the child task:
 
 - Existing project/scene/source routes and storage helpers.
-- Existing Story Check route behavior and selected-source requirements.
-- Notes and Materials routes and storage helpers.
+- Existing Story Check route behavior, selected-source requirements, and unavailable/fail-closed response shape.
+- Notes and Materials routes and storage helpers for create/save/reload proof.
 - Review queue routes and review API helpers.
-- Apply-promotion route and audit helpers.
-- Raw artifact manifest/read/list helpers.
+- Apply-promotion route and audit helpers, including invalid-promotion fail-closed behavior and unchanged approved memory/canon proof.
+- Raw artifact manifest/read/list helpers for read-only evidence or unavailable status.
 - Runtime extraction availability/status helpers.
 - Analysis runtime helper/status boundaries for NCP, Subtxt, and dramatica-flow.
 
-No backend/API inspection in T001 authorizes route changes, behavior changes, runtime execution, model calls, or product implementation.
+No backend/API inspection in T002 authorizes route changes, behavior changes, runtime execution, model calls, or product implementation.
+
+## T002 Artifacts
+
+- Decision doc: `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md`
+- Acceptance matrix: `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`
+- T003 next scope: expected-red tests for source/scene create/import/select, Story Check disabled/result states, no-prose refusal/fail-closed paths, Notes/Materials save/reload proof, runtime/raw artifact unavailable/read-only evidence, review/apply-promotion confirmation/audit evidence, and NCP/Subtxt/dramatica-flow exposure decision behavior.
+- T004/T005/T006 implementation split: T004 source/scene workflow, T005 Story Check/no-prose evidence UI, T006 Notes/Materials plus runtime/review evidence UI.
+- Backend/frontend areas remain future inspection only and were not touched in T002.
 
 ## Known Acceptance Gaps
 
