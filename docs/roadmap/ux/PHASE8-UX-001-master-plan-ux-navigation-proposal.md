@@ -72,6 +72,15 @@ Partially implemented:
 - Memory/Canon shell exists but approved record browsing is not populated.
 - Raw artifact viewer is planned but not implemented.
 - Future analysis lenses are planned but not implemented.
+- Project-scoped navigation after OMI-guided project creation: header/selector/overview activation passed browser evidence (`MVP-READINESS-BROWSER-EVIDENCE-001-C`), but scenes nav and OMI/Memory views still leak example project data (`scene_001`, `The Princess and the Pea`).
+
+Confirmed MVP manual readiness blockers (browser evidence, exit code `1`, not tooling blocked):
+
+- Scenes navigation is not fully project-scoped — example `scene_001` appears for newly created projects.
+- OMI/Memory/Canon navigation is not fully project-scoped — example project strings leak into new project context.
+- Setup candidate from guided project creation is not visibly labeled as candidate/planning; must not appear as approved memory or canon.
+- Evidence: `artifacts/mvp-readiness/project-isolation/` (script: `scripts/mvp-project-isolation-browser-smoke.mjs`).
+- MVP manual readiness blocked until isolation passes; `PHASE8-IMPL-022` smoke-harness closeout does not equal owner MVP acceptance.
 
 Planned but not implemented:
 
@@ -512,6 +521,7 @@ These searches should focus on patterns, not implementation dependencies.
 
 ### Validation/Smoke Tasks
 
+- Fix and re-run project isolation browser evidence: `node scripts/mvp-project-isolation-browser-smoke.mjs` (target exit code `0`; current FAIL-with-evidence at `artifacts/mvp-readiness/project-isolation/`).
 - Re-run browser/manual smoke for notes/materials flows.
 - Re-run browser/manual smoke for review queue flows.
 - Re-run browser/manual smoke for apply-promotion confirmation flows.
@@ -536,6 +546,7 @@ These searches should focus on patterns, not implementation dependencies.
 
 ## 15. Open Questions
 
+- When will project-scoped scenes and OMI/Memory/Canon navigation pass browser isolation evidence (`MVP-READINESS-BROWSER-EVIDENCE-001-C`)?
 - Does OMI need a dedicated Candidate Detail page, or is panel-based detail sufficient for MVP?
 - How should raw artifacts be displayed without implying canon?
 - How should future Subtxt/NCP/dramatica-flow panels be separated from Story Check?

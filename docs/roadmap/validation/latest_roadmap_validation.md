@@ -1,3 +1,58 @@
+# MVP-READINESS-BROWSER-EVIDENCE-001-C Project Isolation Browser Evidence Record
+
+### Result
+
+- Result: FAIL-with-evidence / MVP manual readiness **BLOCKED**.
+- Scope: docs/governance record only; no product fix attempted.
+- Task: `MVP-READINESS-BROWSER-EVIDENCE-001-C` — Record browser evidence in UX/readiness docs.
+- Parent evidence task: `MVP-READINESS-BROWSER-EVIDENCE-001`.
+- Evidence script: `scripts/mvp-project-isolation-browser-smoke.mjs`.
+- Evidence directory: `artifacts/mvp-readiness/project-isolation`.
+- Browser/app/script ran; exit code `1`; workflow log records `toolingBlocked: false`.
+- Treat as **FAIL-with-evidence**, not tooling blocked.
+
+### Evidence Summary
+
+- New project created and activated: `MVP Isolation Test 1782963719999` (`mvp-isolation-test-1782963719999`).
+- Post-create header/selector/overview project id matched the new project (not `example`).
+- Blockers captured:
+  - `hardcoded_scene_route` — `scenes_nav_no_scene_001_leak`
+  - `hardcoded_scene_route` — `new_project_scene_list_has_no_example_scene_items`
+  - `omi_cross_project_data_leakage` — `omi_memory_view_no_princess_and_pea`
+  - `omi_cross_project_data_leakage` — `omi_memory_view_no_scene_001`
+  - `candidate_setup_not_visible` — `setup_candidate_not_labeled_approved_memory_or_canon`
+- Artifacts: `evidence-report.md`, `workflow-log.json`, five screenshots under `screenshots/`.
+
+### MVP Readiness Decision
+
+- Owner manual readiness browser evidence reproduced project isolation/routing leakage.
+- MVP manual readiness is blocked until project isolation passes.
+- `PHASE8-IMPL-022` closeout remains valid as smoke-harness closeout only.
+- `PHASE8-IMPL-022` closeout does not equal owner MVP acceptance.
+- Full manual MVP testing should run Ollama, backend, frontend, and browser/manual checks; this evidence script did not call Ollama/model directly.
+- This does not mark MVP complete and does not claim end-to-end usability has passed.
+- Generated prose/prose-production remains permanently forbidden.
+
+### Docs Updated
+
+- `docs/roadmap/validation/mvp_manual_readiness_project_isolation_blocker.md` (created)
+- `docs/roadmap/validation/latest_roadmap_validation.md`
+- `docs/roadmap/ux/PHASE8-UX-001-master-plan-ux-navigation-proposal.md`
+- `docs/roadmap/decision_log.md`
+- `docs/roadmap/risk_register.md`
+- `docs/roadmap/open_questions.md`
+
+### Validation Owner Manual Follow-Up
+
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- `git diff --check`
+- `git status --short --branch`
+
+### Recommended Next Step
+
+- Implement scoped project isolation fixes for scenes navigation and OMI/Memory/Canon views, then re-run `node scripts/mvp-project-isolation-browser-smoke.mjs` until exit code `0`.
+
 # MVP-READINESS-BROWSER-TOOLING-001 Playwright Browser Evidence Tooling Install Record
 
 ### Result
