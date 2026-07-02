@@ -1,3 +1,28 @@
+# MVP-READINESS-OWNER-ACCEPTANCE-004 Cyber Detective Owner Fixture Automation
+
+### Result
+
+- Result: PASS for harness/source/docs update; browser acceptance script not run by Codex.
+- Scope: owner acceptance readiness harness and documentation only; no product behavior changes.
+- Updated script: `scripts/mvp-owner-acceptance-browser-smoke.mjs`.
+- Updated source tests: `tests/test_mvp_owner_acceptance_browser_smoke_source.py`.
+- Updated validation docs: `docs/roadmap/validation/mvp_owner_acceptance_browser_evidence.md` and `docs/roadmap/validation/mvp_owner_manual_acceptance_checklist.md`.
+- Added default fixture support with `MVP_ACCEPTANCE_FIXTURE=cyber-detective`.
+- The fixture title is `Cyber detective`; it is owner-authored MVP acceptance source material with mature/violent content warning metadata for internal evidence only.
+- The harness creates `Cyber detective MVP Acceptance <timestamp>` through the browser UI, fills OMI-guided setup fields with the owner-authored fixture, reviews before create, records source visibility, creates the project, and verifies active project scoping.
+- OMI/setup fixture material remains candidate/planning only; Memory/Canon remains approved-only and must not display the fixture as approved canon.
+- Story Check and no-prose checks record `PASS`, `BLOCKED`, `MANUAL_REVIEW_REQUIRED`, or `NOT_EXPOSED` based on safe browser exposure. Missing safe Cyber detective source/input paths are not fake-passed.
+- The harness does not run the live acceptance script in this task; owner must run it with backend/frontend and Ollama available if model-backed evidence is desired.
+
+### Boundary Summary
+
+- Cyber detective is used only as owner-authored analysis/testing fixture material.
+- No generated prose, continuation, rewrite, outline, draft, polish, improvement, expansion, imitation, or story-prose path was added.
+- No direct `/api/chat` or direct generation endpoint calls were added.
+- No BookNLP/spaCy execution and no NCP/Subtxt/dramatica-flow execution.
+- No automatic memory/canon mutation, no apply-promotion shortcut, no training/JSONL/dataset/model artifacts, no staging, commit, or push.
+- MVP readiness decision remains **MANUAL_REVIEW_REQUIRED** until owner runs and reviews evidence; this does not mark MVP complete.
+
 # MVP-READINESS-OWNER-ACCEPTANCE-003 WSL-to-Windows Ollama Host Fallback
 
 ### Result

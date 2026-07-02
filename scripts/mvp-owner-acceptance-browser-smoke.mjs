@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * MVP-READINESS-OWNER-ACCEPTANCE-002
+ * MVP-READINESS-OWNER-ACCEPTANCE-004
  * Playwright automated owner MVP acceptance checklist evidence harness.
  *
  * Evidence-only runner. It does not mark MVP complete, does not record owner
@@ -22,6 +22,7 @@ const FRONTEND_NODE_MODULES = path.join(REPO_ROOT, 'frontend', 'node_modules');
 
 const APP_BASE_URL = process.env.APP_BASE_URL ?? 'http://localhost:5173';
 const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL ?? 'http://localhost:8000';
+const MVP_ACCEPTANCE_FIXTURE = process.env.MVP_ACCEPTANCE_FIXTURE ?? getCliFixtureName() ?? 'cyber-detective';
 const DEFAULT_OLLAMA_BASE_URL = 'http://localhost:11434';
 const WSL_OLLAMA_REMEDIATION_COMMAND = [
   "WINDOWS_HOST=$(ip route show | grep -i default | awk '{ print $3 }')",
@@ -56,8 +57,56 @@ const SECTION_ORDER = Object.freeze([
   'Apply-Promotion Checks',
   'Model-Assisted / Analysis Runtime Checks',
   'No-Prose Checks',
+  'Cyber Detective Fixture',
   'Final Owner Decision',
 ]);
+
+const CYBER_DETECTIVE_CONTENT = `A paranoid, grumpy, cybersecurity detective and his team work as private investigators. The detective only has analog equipment in his home and steals cable, power, water, everything from his neighbors.
+
+Their secretary is a person who is in hiding after being caught doing corporate espionage by him.
+The IT is a girl who used to run digital scams for her family's business.
+
+The muscle is a heavily traumatized, ptsd, drug user, survavilist, israeli woman who shot up her platoon and blew up a base during a mission where she caught them raping kids, and was shot by her commander and left for dead. Palestines saved her.
+After that she escaped and made her way to Canada.
+
+The detective found her and kept her safe.
+
+The detective is trying to find his kid. She killed her stepmother and stepbrother trying to kill her father on a contract.
+He trained her, they had a loving relationship. she disappeared when she was 16 and he only saw her again five years later at the accident that killed the rest of his family.
+He has no idea why she ran away, and why she killed them.
+
+Nowadays he mostly works in small cases to pay the bills and tries to rebuild his life.`;
+
+const ACCEPTANCE_FIXTURES = Object.freeze({
+  'cyber-detective': Object.freeze({
+    id: 'cyber-detective',
+    slug: 'cyber-detective',
+    title: 'Cyber detective',
+    rawOwnerAuthoredContent: CYBER_DETECTIVE_CONTENT,
+    contentWarningMetadata: Object.freeze([
+      'mature material',
+      'violence',
+      'trauma',
+      'abuse references',
+      'drug use references',
+    ]),
+    ownerAuthored: true,
+    allowedIntent: 'analysis/diagnostic only',
+    forbiddenIntents: Object.freeze([
+      'rewrite',
+      'continue',
+      'outline',
+      'draft',
+      'polish',
+      'improve',
+      'imitate',
+      'expand',
+      'generate prose',
+    ]),
+    setupNotes:
+      'Owner-authored MVP acceptance fixture for analysis-only OMI and Story Check workflow testing.',
+  }),
+});
 
 const CHECKLIST_ITEMS = Object.freeze([
   { id: 'startup_backend_running', section: 'Startup Requirements', text: 'Backend is running.' },
@@ -110,6 +159,19 @@ const CHECKLIST_ITEMS = Object.freeze([
   { id: 'no_prose_no_outline_generation', section: 'No-Prose Checks', text: 'No outline generation behavior is exposed or accepted.' },
   { id: 'no_prose_no_generated_prose', section: 'No-Prose Checks', text: 'No generated prose behavior is exposed or accepted.' },
   { id: 'no_prose_no_imitation_polish_improve_expand_draft_chapter', section: 'No-Prose Checks', text: 'No imitation, polish, improvement, expansion, draft, chapter generation, or prose-production path is exposed or accepted.' },
+  { id: 'cyber_fixture_project_created', section: 'Cyber Detective Fixture', text: 'Cyber detective owner-authored fixture project is created through the browser UI.' },
+  { id: 'cyber_fixture_owner_source_visible_on_review', section: 'Cyber Detective Fixture', text: 'Cyber detective owner-authored source is visible on review before creation.' },
+  { id: 'cyber_fixture_active_project_scoped', section: 'Cyber Detective Fixture', text: 'Cyber detective project is active and scoped in header, selector, and Overview.' },
+  { id: 'cyber_fixture_omi_candidate_planning_only', section: 'Cyber Detective Fixture', text: 'Cyber detective OMI/setup material remains candidate/planning only.' },
+  { id: 'cyber_fixture_memory_canon_not_mutated', section: 'Cyber Detective Fixture', text: 'Cyber detective fixture does not mutate approved Memory/Canon.' },
+  { id: 'cyber_fixture_story_check_analysis_only', section: 'Cyber Detective Fixture', text: 'Cyber detective Story Check path is diagnostic-only when safely exposed.' },
+  { id: 'cyber_fixture_story_check_no_prose_generated', section: 'Cyber Detective Fixture', text: 'Cyber detective Story Check produces no continuation, rewrite, outline, draft, polish, imitation, expansion, or story prose.' },
+  { id: 'cyber_fixture_model_output_not_canon', section: 'Cyber Detective Fixture', text: 'Cyber detective model-backed output is not presented as canon, approved memory, or truth.' },
+  { id: 'cyber_fixture_no_rewrite', section: 'Cyber Detective Fixture', text: 'Cyber detective negative path rejects or fail-closes rewrite requests.' },
+  { id: 'cyber_fixture_no_continuation', section: 'Cyber Detective Fixture', text: 'Cyber detective negative path rejects or fail-closes continuation requests.' },
+  { id: 'cyber_fixture_no_outline', section: 'Cyber Detective Fixture', text: 'Cyber detective negative path rejects or fail-closes outline requests.' },
+  { id: 'cyber_fixture_no_draft_polish_imitation', section: 'Cyber Detective Fixture', text: 'Cyber detective negative path rejects or fail-closes draft, polish, improve, expand, and imitate requests.' },
+  { id: 'cyber_fixture_runtime_tools_not_directly_executed', section: 'Cyber Detective Fixture', text: 'Cyber detective harness does not execute BookNLP, spaCy, NCP, Subtxt, or dramatica-flow directly.' },
   { id: 'final_owner_decision_pending', section: 'Final Owner Decision', text: 'Pending owner acceptance - checklist not yet complete or not yet accepted.' },
   { id: 'final_owner_decision_accepted_by_owner', section: 'Final Owner Decision', text: 'Accepted by owner - owner explicitly accepts MVP manual readiness.' },
   { id: 'final_owner_decision_blocked_with_reason', section: 'Final Owner Decision', text: 'Blocked with reason - owner finds a blocker.' },
@@ -128,12 +190,20 @@ const NO_PROSE_NEGATIVE_REQUESTS = Object.freeze([
   'polish/improve/expand/imitate this prose',
 ]);
 
-const OWNER_DIAGNOSTIC_TEXT =
-  'Owner-authored diagnostic-only test text. Analyze whether the scene has enough evidence for structure claims. Do not write, rewrite, continue, outline, imitate, polish, improve, expand, or draft prose.';
-const PROJECT_SETUP_IDEA =
-  'Owner-authored MVP acceptance setup idea. This is evidence fixture text only and is not canon.';
-const PROJECT_SETUP_NOTES =
-  'Owner-authored MVP acceptance setup notes. Candidate planning data only.';
+const STORY_CHECK_DIAGNOSTIC_INSTRUCTION =
+  'Analyze this owner-authored setup for story diagnostics only. Do not rewrite, continue, outline, expand, polish, imitate, or generate prose.';
+const FORBIDDEN_PROSE_OUTPUT_PATTERNS = Object.freeze([
+  /rewrite/i,
+  /continuation/i,
+  /continue this scene/i,
+  /outline the next chapter/i,
+  /chapter outline/i,
+  /draft/i,
+  /polished version/i,
+  /improved version/i,
+  /expanded version/i,
+  /in the style of/i,
+]);
 
 let page = null;
 let browser = null;
@@ -145,6 +215,9 @@ let toolingBlocked = false;
 let uniqueProjectTitle = '';
 let uniqueProjectId = '';
 let previousProjectId = '';
+let selectedFixture = selectAcceptanceFixture(MVP_ACCEPTANCE_FIXTURE);
+let cyberFixtureStoryCheckStatus = STATUSES.MANUAL_REVIEW_REQUIRED;
+let cyberFixtureNoProseStatus = STATUSES.MANUAL_REVIEW_REQUIRED;
 let ollamaHealth = {
   version: { ok: false, error: 'not checked' },
   tags: { ok: false, error: 'not checked' },
@@ -178,6 +251,25 @@ function logAction(action, details = {}) {
   workflowLog.push(entry);
   const suffix = Object.keys(details).length ? ` ${JSON.stringify(details)}` : '';
   console.log(`[ACTION] ${action}${suffix}`);
+}
+
+function getCliFixtureName() {
+  const fixtureArg = process.argv.find((arg) => arg.startsWith('--fixture='));
+  if (!fixtureArg) {
+    return '';
+  }
+  return fixtureArg.slice('--fixture='.length).trim();
+}
+
+function selectAcceptanceFixture(fixtureName) {
+  const normalized = String(fixtureName ?? '').trim() || 'cyber-detective';
+  const fixture = ACCEPTANCE_FIXTURES[normalized];
+  if (!fixture) {
+    throw new Error(
+      `Unknown MVP acceptance fixture: ${normalized}. Supported fixtures: ${Object.keys(ACCEPTANCE_FIXTURES).join(', ')}`,
+    );
+  }
+  return fixture;
 }
 
 function recordChecklistItem(id, status, evidence = {}, note = '') {
@@ -229,6 +321,10 @@ async function ensureEvidenceDirs() {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function containsForbiddenGeneratedProse(text) {
+  return FORBIDDEN_PROSE_OUTPUT_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 async function loadPlaywrightChromium() {
@@ -589,12 +685,22 @@ async function getActiveProjectSnapshot() {
 }
 
 async function createUniqueProjectThroughUi() {
-  uniqueProjectTitle = `MVP Owner Acceptance ${Date.now()}`;
-  logAction('create_unique_project_begin', { uniqueProjectTitle });
+  uniqueProjectTitle = `${selectedFixture.title} MVP Acceptance ${Date.now()}`;
+  logAction('cyber_fixture_create_project_begin', {
+    fixtureId: selectedFixture.id,
+    fixtureTitle: selectedFixture.title,
+    fixtureSlug: selectedFixture.slug,
+    uniqueProjectTitle,
+    contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+    ownerAuthored: selectedFixture.ownerAuthored,
+    allowedIntent: selectedFixture.allowedIntent,
+    forbiddenIntents: selectedFixture.forbiddenIntents,
+    didGenerateStoryProseFromFixture: false,
+  });
 
   await fillFirstMatching(['OMI-guided project title', 'Project title', 'Owner project title'], uniqueProjectTitle);
-  await fillFirstMatching(['Owner-authored setup idea'], PROJECT_SETUP_IDEA);
-  await fillFirstMatching(['Owner-authored setup notes'], PROJECT_SETUP_NOTES);
+  await fillFirstMatching(['Owner-authored setup idea'], selectedFixture.rawOwnerAuthoredContent);
+  await fillFirstMatching(['Owner-authored setup notes'], selectedFixture.setupNotes);
   const setupText = await getScopedText('section[aria-label="OMI-guided project setup"]', 'omi-guided-project-setup');
   softAssert(
     'manual_workspace_omi_candidates_not_approved_memory',
@@ -604,12 +710,45 @@ async function createUniqueProjectThroughUi() {
     'Setup candidate/planning labels are visible.',
     'Setup candidate/planning labels were not visible.',
   );
+  softAssert(
+    'cyber_fixture_omi_candidate_planning_only',
+    setupText.includes('Setup candidate') && setupText.includes('not approved project truth'),
+    STATUSES.FAIL,
+    { setupTextSnippet: setupText.slice(0, 800), fixtureId: selectedFixture.id },
+    'Cyber detective setup is visibly labeled candidate/planning only.',
+    'Cyber detective setup candidate/planning labels were not visible.',
+  );
 
   await clickByText(['Review before creating project']);
-  await screenshot('02-review-before-create', [
+  logAction('cyber_fixture_review_before_create', {
+    fixtureId: selectedFixture.id,
+    uniqueProjectTitle,
+    contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+  });
+  await screenshot('02-cyber-fixture-review-before-create', [
     'manual_workspace_create_project',
     'project_isolation_new_project_activated',
+    'cyber_fixture_owner_source_visible_on_review',
   ]);
+  const reviewText = await getScopedText('form[aria-label="Review setup draft"]', 'cyber-fixture-review-setup-draft');
+  const fixtureSourceVisible = reviewText.includes(selectedFixture.title)
+    && reviewText.includes(selectedFixture.rawOwnerAuthoredContent.slice(0, 80))
+    && /Setup draft/i.test(reviewText)
+    && /Candidate planning data/i.test(reviewText);
+  softAssert(
+    'cyber_fixture_owner_source_visible_on_review',
+    fixtureSourceVisible,
+    STATUSES.FAIL,
+    {
+      fixtureId: selectedFixture.id,
+      fixtureTitle: selectedFixture.title,
+      contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+      ownerAuthored: selectedFixture.ownerAuthored,
+      reviewTextSnippet: reviewText.slice(0, 1200),
+    },
+    'Cyber detective owner-authored source is visible in review as setup/candidate planning data.',
+    'Cyber detective owner-authored source was not visible in the review step.',
+  );
   const confirmCheckbox = page.getByRole('checkbox', {
     name: /confirm this owner-authored setup can create a project/i,
   });
@@ -629,10 +768,16 @@ async function createUniqueProjectThroughUi() {
   await clickByText(['Create project']);
   await page.waitForTimeout(1000);
   await waitForAppReady();
-  await screenshot('03-after-project-creation', [
+  logAction('cyber_fixture_after_project_creation', {
+    fixtureId: selectedFixture.id,
+    uniqueProjectTitle,
+  });
+  await screenshot('03-cyber-fixture-after-project-creation', [
     'manual_workspace_create_project',
     'project_isolation_new_project_activated',
     'manual_workspace_overview_active_only',
+    'cyber_fixture_project_created',
+    'cyber_fixture_active_project_scoped',
   ]);
 
   const snapshot = await getActiveProjectSnapshot();
@@ -649,12 +794,38 @@ async function createUniqueProjectThroughUi() {
     'Project creation did not produce a non-example active project.',
   );
   softAssert(
+    'cyber_fixture_project_created',
+    Boolean(uniqueProjectId) && uniqueProjectId !== 'example' && snapshot.headerTitle.includes(selectedFixture.title),
+    STATUSES.FAIL,
+    {
+      fixtureId: selectedFixture.id,
+      fixtureTitle: selectedFixture.title,
+      fixtureSlug: selectedFixture.slug,
+      contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+      ownerAuthored: selectedFixture.ownerAuthored,
+      uniqueProjectTitle,
+      uniqueProjectId,
+      snapshot,
+      didGenerateStoryProseFromFixture: false,
+    },
+    'Cyber detective fixture project was created through the browser UI.',
+    'Cyber detective fixture project was not created through the browser UI.',
+  );
+  softAssert(
     'project_isolation_new_project_activated',
     titleActive && selectActive && overviewActive,
     STATUSES.FAIL,
     { uniqueProjectTitle, uniqueProjectId, snapshot },
     'Header, selector, and Overview reflect the created project.',
     'Header, selector, and Overview did not all reflect the created project.',
+  );
+  softAssert(
+    'cyber_fixture_active_project_scoped',
+    titleActive && selectActive && overviewActive,
+    STATUSES.FAIL,
+    { uniqueProjectTitle, uniqueProjectId, snapshot },
+    'Cyber detective header, selector, and Overview reflect only the created project.',
+    'Cyber detective active project scoping did not match header, selector, and Overview.',
   );
   softAssert(
     'manual_workspace_overview_active_only',
@@ -670,6 +841,17 @@ async function createUniqueProjectThroughUi() {
 async function runStartupChecks() {
   logAction('section_start', { section: 'Startup Requirements' });
   await ensureEvidenceDirs();
+  logAction('fixture_selected', {
+    fixtureId: selectedFixture.id,
+    fixtureTitle: selectedFixture.title,
+    fixtureSlug: selectedFixture.slug,
+    contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+    ownerAuthored: selectedFixture.ownerAuthored,
+    contentWarningMetadata: selectedFixture.contentWarningMetadata,
+    allowedIntent: selectedFixture.allowedIntent,
+    forbiddenIntents: selectedFixture.forbiddenIntents,
+    didGenerateStoryProseFromFixture: false,
+  });
 
   const backend = await safeFetchJson(`${BACKEND_BASE_URL.replace(/\/$/, '')}/api/projects`);
   softAssert(
@@ -818,6 +1000,16 @@ async function runProjectIsolationChecks() {
     { scopedText: memoryText.slice(0, 1200) },
     'Memory/Canon approved-only boundary copy is visible.',
     'Memory/Canon approved-only boundary copy was missing.',
+  );
+  softAssert(
+    'cyber_fixture_memory_canon_not_mutated',
+    /approved records only/i.test(memoryText)
+      && /Candidate records remain/i.test(memoryText)
+      && !memoryText.includes(selectedFixture.rawOwnerAuthoredContent.slice(0, 80)),
+    STATUSES.FAIL,
+    { scopedText: memoryText.slice(0, 1200), fixtureId: selectedFixture.id },
+    'Cyber detective owner-authored fixture content is not displayed as approved Memory/Canon.',
+    'Cyber detective fixture content appeared in approved Memory/Canon.',
   );
 
   const projectIsolationPass =
@@ -1094,6 +1286,166 @@ async function runNoProseChecks() {
   }
 }
 
+async function runCyberDetectiveFixtureChecks() {
+  logAction('section_start', { section: 'Cyber Detective Fixture', fixtureId: selectedFixture.id });
+  recordChecklistItem(
+    'cyber_fixture_runtime_tools_not_directly_executed',
+    STATUSES.PASS,
+    {
+      fixtureId: selectedFixture.id,
+      directRuntimeToolsExecuted: false,
+      tools: ['BookNLP', 'spaCy', 'NCP', 'Subtxt', 'dramatica-flow'],
+    },
+    'Harness did not execute BookNLP, spaCy, NCP, Subtxt, or dramatica-flow directly.',
+  );
+
+  if (!page || !uniqueProjectId) {
+    for (const id of [
+      'cyber_fixture_story_check_analysis_only',
+      'cyber_fixture_story_check_no_prose_generated',
+      'cyber_fixture_model_output_not_canon',
+      'cyber_fixture_no_rewrite',
+      'cyber_fixture_no_continuation',
+      'cyber_fixture_no_outline',
+      'cyber_fixture_no_draft_polish_imitation',
+    ]) {
+      if (checklistResults[id].status === STATUSES.MANUAL_REVIEW_REQUIRED) {
+        recordChecklistItem(id, STATUSES.BLOCKED, { fixtureId: selectedFixture.id }, 'Cyber detective project/browser startup blocked.');
+      }
+    }
+    logAction('cyber_fixture_final_status', {
+      fixtureId: selectedFixture.id,
+      storyCheckStatus: STATUSES.BLOCKED,
+      noProseStatus: STATUSES.BLOCKED,
+    });
+    logAction('cyber_fixture_no_prose_checks_blocked', {
+      fixtureId: selectedFixture.id,
+      reason: 'Cyber detective project/browser startup blocked.',
+    });
+    return;
+  }
+
+  await clickByText(['Overview']).catch(() => {});
+  await page.waitForTimeout(500);
+  await screenshot('12-cyber-fixture-story-check-before', [
+    'cyber_fixture_story_check_analysis_only',
+    'cyber_fixture_story_check_no_prose_generated',
+    'cyber_fixture_model_output_not_canon',
+  ]);
+
+  const visible = await getVisibleText();
+  const storyCheckButton = page.getByRole('button', { name: /Run Story Check/i }).first();
+  const storyCheckButtonVisible = await storyCheckButton.count().then((count) => count > 0).catch(() => false);
+  const storyCheckButtonEnabled = storyCheckButtonVisible
+    ? await storyCheckButton.isEnabled().catch(() => false)
+    : false;
+  const analysisSurfaceVisible = /Run Story Check|Story Check|Analysis/i.test(visible);
+  const analysisBoundaryVisible = /candidate analysis|does not change project truth/i.test(visible);
+
+  logAction('cyber_fixture_story_check_attempted', {
+    fixtureId: selectedFixture.id,
+    diagnosticInstruction: STORY_CHECK_DIAGNOSTIC_INSTRUCTION,
+    storyCheckButtonVisible,
+    storyCheckButtonEnabled,
+    analysisSurfaceVisible,
+    ollamaReady: ollamaHealth.ok,
+  });
+
+  if (!ollamaHealth.ok) {
+    cyberFixtureStoryCheckStatus = STATUSES.BLOCKED;
+    for (const id of [
+      'cyber_fixture_story_check_analysis_only',
+      'cyber_fixture_story_check_no_prose_generated',
+      'cyber_fixture_model_output_not_canon',
+    ]) {
+      recordChecklistItem(id, STATUSES.BLOCKED, { fixtureId: selectedFixture.id, ollamaHealth }, 'Cyber detective model-backed check blocked because Ollama readiness failed.');
+    }
+    logAction('cyber_fixture_story_check_blocked', { fixtureId: selectedFixture.id, reason: 'ollama_unreachable' });
+  } else if (!analysisSurfaceVisible || !storyCheckButtonVisible || !storyCheckButtonEnabled) {
+    cyberFixtureStoryCheckStatus = analysisSurfaceVisible ? STATUSES.MANUAL_REVIEW_REQUIRED : STATUSES.NOT_EXPOSED;
+    const note = analysisSurfaceVisible
+      ? 'Story Check is visible, but no safe selected Cyber detective scene/source workflow is exposed for the owner-authored fixture.'
+      : 'No Story Check/model-backed UI surface is visible for the Cyber detective fixture.';
+    for (const id of [
+      'cyber_fixture_story_check_analysis_only',
+      'cyber_fixture_story_check_no_prose_generated',
+      'cyber_fixture_model_output_not_canon',
+    ]) {
+      recordChecklistItem(id, cyberFixtureStoryCheckStatus, {
+        fixtureId: selectedFixture.id,
+        diagnosticInstruction: STORY_CHECK_DIAGNOSTIC_INSTRUCTION,
+        storyCheckButtonVisible,
+        storyCheckButtonEnabled,
+        analysisBoundaryVisible,
+      }, note);
+    }
+    logAction('cyber_fixture_story_check_skipped', { fixtureId: selectedFixture.id, status: cyberFixtureStoryCheckStatus, reason: note });
+  } else {
+    await storyCheckButton.click();
+    await page.waitForTimeout(3000);
+    await screenshot('13-cyber-fixture-story-check-after', [
+      'cyber_fixture_story_check_analysis_only',
+      'cyber_fixture_story_check_no_prose_generated',
+      'cyber_fixture_model_output_not_canon',
+    ]);
+    const resultText = await getScopedText('aside.analysis-sidebar', 'cyber-fixture-analysis-sidebar');
+    const forbiddenOutput = containsForbiddenGeneratedProse(resultText);
+    const analysisOnly = /candidate analysis|diagnostic|evidence|insufficient evidence/i.test(resultText);
+    const outputNotCanon = /does not change project truth|not canon|candidate analysis/i.test(resultText);
+    recordChecklistItem('cyber_fixture_story_check_analysis_only', analysisOnly && !forbiddenOutput ? STATUSES.PASS : STATUSES.FAIL, { fixtureId: selectedFixture.id, resultTextSnippet: resultText.slice(0, 1500) }, analysisOnly && !forbiddenOutput ? 'Story Check result is diagnostic/candidate analysis only.' : 'Story Check result was not safely diagnostic-only.');
+    recordChecklistItem('cyber_fixture_story_check_no_prose_generated', !forbiddenOutput ? STATUSES.PASS : STATUSES.FAIL, { fixtureId: selectedFixture.id, resultTextSnippet: resultText.slice(0, 1500) }, !forbiddenOutput ? 'No generated prose pattern was detected in Story Check result.' : 'Forbidden prose-generation pattern detected in Story Check result.');
+    recordChecklistItem('cyber_fixture_model_output_not_canon', outputNotCanon && !forbiddenOutput ? STATUSES.PASS : STATUSES.FAIL, { fixtureId: selectedFixture.id, resultTextSnippet: resultText.slice(0, 1500) }, outputNotCanon && !forbiddenOutput ? 'Model-backed output is presented as candidate/non-canon analysis.' : 'Model-backed output canon/truth boundary was missing or unsafe.');
+    cyberFixtureStoryCheckStatus = forbiddenOutput ? STATUSES.FAIL : STATUSES.PASS;
+    logAction(forbiddenOutput ? 'cyber_fixture_story_check_blocked' : 'cyber_fixture_story_check_passed', {
+      fixtureId: selectedFixture.id,
+      forbiddenOutput,
+      analysisOnly,
+      outputNotCanon,
+    });
+  }
+
+  await screenshot('14-cyber-fixture-no-prose-checks', [
+    'cyber_fixture_no_rewrite',
+    'cyber_fixture_no_continuation',
+    'cyber_fixture_no_outline',
+    'cyber_fixture_no_draft_polish_imitation',
+  ]);
+
+  const hasSafeNoProseInput = false;
+  logAction('cyber_fixture_no_prose_checks_attempted', {
+    fixtureId: selectedFixture.id,
+    negativeRequests: NO_PROSE_NEGATIVE_REQUESTS,
+    hasSafeNoProseInput,
+  });
+  if (hasSafeNoProseInput) {
+    cyberFixtureNoProseStatus = STATUSES.PASS;
+    logAction('cyber_fixture_no_prose_checks_passed', {
+      fixtureId: selectedFixture.id,
+      negativeRequests: NO_PROSE_NEGATIVE_REQUESTS,
+    });
+  } else {
+    cyberFixtureNoProseStatus = STATUSES.MANUAL_REVIEW_REQUIRED;
+    const noProseNote = 'No safe Cyber detective no-prose prompt/input path is exposed in the browser UI; owner must manually verify negative prompts fail closed if a safe analysis input is later exposed.';
+    recordChecklistItem('cyber_fixture_no_rewrite', STATUSES.MANUAL_REVIEW_REQUIRED, { fixtureId: selectedFixture.id, negativeRequest: 'rewrite this scene' }, noProseNote);
+    recordChecklistItem('cyber_fixture_no_continuation', STATUSES.MANUAL_REVIEW_REQUIRED, { fixtureId: selectedFixture.id, negativeRequest: 'continue this scene' }, noProseNote);
+    recordChecklistItem('cyber_fixture_no_outline', STATUSES.MANUAL_REVIEW_REQUIRED, { fixtureId: selectedFixture.id, negativeRequest: 'outline the next chapter' }, noProseNote);
+    recordChecklistItem('cyber_fixture_no_draft_polish_imitation', STATUSES.MANUAL_REVIEW_REQUIRED, { fixtureId: selectedFixture.id, negativeRequests: ['generate a draft', 'polish/improve/expand/imitate this prose'] }, noProseNote);
+    logAction('cyber_fixture_no_prose_checks_skipped', {
+      fixtureId: selectedFixture.id,
+      status: cyberFixtureNoProseStatus,
+      reason: noProseNote,
+    });
+  }
+  logAction('cyber_fixture_final_status', {
+    fixtureId: selectedFixture.id,
+    projectId: uniqueProjectId,
+    storyCheckStatus: cyberFixtureStoryCheckStatus,
+    noProseStatus: cyberFixtureNoProseStatus,
+    omiCandidatePlanningStatus: checklistResults.cyber_fixture_omi_candidate_planning_only.status,
+    memoryCanonStatus: checklistResults.cyber_fixture_memory_canon_not_mutated.status,
+  });
+}
+
 function runFinalOwnerDecisionChecks() {
   logAction('section_start', { section: 'Final Owner Decision' });
   recordChecklistItem(
@@ -1169,11 +1521,22 @@ async function writeEvidenceArtifacts() {
   }, {});
 
   await fs.writeFile(workflowPath, `${JSON.stringify({
-    task: 'MVP-READINESS-OWNER-ACCEPTANCE-002',
+    task: 'MVP-READINESS-OWNER-ACCEPTANCE-004',
     startedAt: runStartedAt,
     finishedAt,
     appBaseUrl: APP_BASE_URL,
     backendBaseUrl: BACKEND_BASE_URL,
+    fixture: {
+      id: selectedFixture.id,
+      slug: selectedFixture.slug,
+      title: selectedFixture.title,
+      contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+      ownerAuthored: selectedFixture.ownerAuthored,
+      contentWarningMetadata: selectedFixture.contentWarningMetadata,
+      allowedIntent: selectedFixture.allowedIntent,
+      forbiddenIntents: selectedFixture.forbiddenIntents,
+      didGenerateStoryProseFromFixture: false,
+    },
     ollamaBaseUrl: ollamaHealth.selectedBaseUrl,
     ollamaSource: ollamaHealth.selectedSource,
     ollamaAttemptedCandidates: ollamaHealth.attemptedCandidates,
@@ -1190,8 +1553,18 @@ async function writeEvidenceArtifacts() {
   }, null, 2)}\n`, 'utf8');
 
   await fs.writeFile(checklistPath, `${JSON.stringify({
-    task: 'MVP-READINESS-OWNER-ACCEPTANCE-002',
+    task: 'MVP-READINESS-OWNER-ACCEPTANCE-004',
     resultModel: Object.values(STATUSES),
+    fixture: {
+      id: selectedFixture.id,
+      slug: selectedFixture.slug,
+      title: selectedFixture.title,
+      contentLength: selectedFixture.rawOwnerAuthoredContent.length,
+      ownerAuthored: selectedFixture.ownerAuthored,
+      allowedIntent: selectedFixture.allowedIntent,
+      forbiddenIntents: selectedFixture.forbiddenIntents,
+      didGenerateStoryProseFromFixture: false,
+    },
     finalDecision,
     exitCode,
     summary,
@@ -1204,7 +1577,7 @@ async function writeEvidenceArtifacts() {
   const report = [
     '# MVP Owner Acceptance Browser Evidence Report',
     '',
-    `- Task: \`MVP-READINESS-OWNER-ACCEPTANCE-002\``,
+    `- Task: \`MVP-READINESS-OWNER-ACCEPTANCE-004\``,
     `- Final automated decision: **${finalDecision}**`,
     `- Exit code: \`${exitCode}\``,
     `- App base URL: \`${APP_BASE_URL}\``,
@@ -1240,6 +1613,29 @@ async function writeEvidenceArtifacts() {
     '',
     '```bash',
     WSL_OLLAMA_REMEDIATION_COMMAND,
+    '```',
+    '',
+    '## Cyber Detective Fixture',
+    '',
+    `- Fixture title: \`${selectedFixture.title}\``,
+    `- Fixture id/slug: \`${selectedFixture.id}\` / \`${selectedFixture.slug}\``,
+    `- Created project title: \`${uniqueProjectTitle || 'not created'}\``,
+    `- Project id/slug: \`${uniqueProjectId || 'unknown'}\``,
+    `- Content length: \`${selectedFixture.rawOwnerAuthoredContent.length}\` characters`,
+    `- Owner-authored source confirmed: \`${selectedFixture.ownerAuthored ? 'yes' : 'no'}\``,
+    `- Allowed intent: \`${selectedFixture.allowedIntent}\``,
+    `- Forbidden intents: ${selectedFixture.forbiddenIntents.map((intent) => `\`${intent}\``).join(', ')}`,
+    '- Content warning metadata is recorded for internal evidence only.',
+    '- Harness generated story prose from fixture: `no`',
+    `- Story Check/model-backed status: **${cyberFixtureStoryCheckStatus}**`,
+    `- No-prose negative-path status: **${cyberFixtureNoProseStatus}**`,
+    `- OMI candidate/planning status: **${checklistResults.cyber_fixture_omi_candidate_planning_only.status}**`,
+    `- Memory/Canon non-canon status: **${checklistResults.cyber_fixture_memory_canon_not_mutated.status}**`,
+    '',
+    'Diagnostic-only Story Check instruction:',
+    '',
+    '```text',
+    STORY_CHECK_DIAGNOSTIC_INSTRUCTION,
     '```',
     '',
     '## Checklist Results',
@@ -1303,8 +1699,10 @@ async function main() {
       await runApplyPromotionChecks();
       await runModelAssistedChecks();
       await runNoProseChecks();
+      await runCyberDetectiveFixtureChecks();
     } else {
       markModelBackedBlocked();
+      await runCyberDetectiveFixtureChecks();
     }
     runFinalOwnerDecisionChecks();
   } catch (error) {

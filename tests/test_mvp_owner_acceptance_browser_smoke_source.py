@@ -109,9 +109,105 @@ def test_script_has_every_owner_checklist_section() -> None:
         "Apply-Promotion Checks",
         "Model-Assisted / Analysis Runtime Checks",
         "No-Prose Checks",
+        "Cyber Detective Fixture",
         "Final Owner Decision",
     ):
         assert section in source
+
+
+def test_script_has_cyber_detective_owner_authored_fixture() -> None:
+    source = read_source()
+
+    assert "MVP_ACCEPTANCE_FIXTURE" in source
+    assert "'cyber-detective'" in source
+    assert "Cyber detective" in source
+    assert "rawOwnerAuthoredContent" in source
+    assert "A paranoid, grumpy, cybersecurity detective" in source
+    assert "ownerAuthored: true" in source
+    assert "contentWarningMetadata" in source
+    assert "analysis/diagnostic only" in source
+    assert "didGenerateStoryProseFromFixture: false" in source
+    assert "contentLength: selectedFixture.rawOwnerAuthoredContent.length" in source
+
+
+def test_script_records_cyber_fixture_checklist_ids() -> None:
+    source = read_source()
+
+    for item_id in (
+        "cyber_fixture_project_created",
+        "cyber_fixture_owner_source_visible_on_review",
+        "cyber_fixture_active_project_scoped",
+        "cyber_fixture_omi_candidate_planning_only",
+        "cyber_fixture_memory_canon_not_mutated",
+        "cyber_fixture_story_check_analysis_only",
+        "cyber_fixture_story_check_no_prose_generated",
+        "cyber_fixture_model_output_not_canon",
+        "cyber_fixture_no_rewrite",
+        "cyber_fixture_no_continuation",
+        "cyber_fixture_no_outline",
+        "cyber_fixture_no_draft_polish_imitation",
+        "cyber_fixture_runtime_tools_not_directly_executed",
+    ):
+        assert item_id in source
+
+
+def test_script_records_cyber_fixture_workflow_actions() -> None:
+    source = read_source()
+
+    for action in (
+        "fixture_selected",
+        "cyber_fixture_create_project_begin",
+        "cyber_fixture_review_before_create",
+        "cyber_fixture_after_project_creation",
+        "cyber_fixture_story_check_attempted",
+        "cyber_fixture_story_check_skipped",
+        "cyber_fixture_story_check_blocked",
+        "cyber_fixture_story_check_passed",
+        "cyber_fixture_no_prose_checks_attempted",
+        "cyber_fixture_no_prose_checks_skipped",
+        "cyber_fixture_no_prose_checks_blocked",
+        "cyber_fixture_no_prose_checks_passed",
+        "cyber_fixture_final_status",
+    ):
+        assert action in source
+
+
+def test_script_includes_diagnostic_only_story_check_instruction() -> None:
+    source = read_source()
+
+    assert (
+        "Analyze this owner-authored setup for story diagnostics only. "
+        "Do not rewrite, continue, outline, expand, polish, imitate, or generate prose."
+    ) in source
+    assert "STORY_CHECK_DIAGNOSTIC_INSTRUCTION" in source
+
+
+def test_script_forbids_cyber_fixture_prose_intents() -> None:
+    source = read_source()
+
+    for forbidden in (
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "imitate",
+        "expand",
+        "generate prose",
+    ):
+        assert forbidden in source
+
+
+def test_script_records_manual_review_when_safe_cyber_ui_is_missing() -> None:
+    source = read_source()
+    body = function_body(source, "runCyberDetectiveFixtureChecks")
+
+    assert "STATUSES.MANUAL_REVIEW_REQUIRED" in body
+    assert "STATUSES.NOT_EXPOSED" in body
+    assert "no safe selected cyber detective scene/source workflow is exposed" in body.lower()
+    assert "No safe Cyber detective no-prose prompt/input path is exposed" in body
+    assert "hasSafeNoProseInput = false" in body
 
 
 def test_script_uses_scoped_memory_canon_checks_not_global_body_for_leakage() -> None:
@@ -199,3 +295,43 @@ def test_script_has_no_generated_prose_implementation_paths() -> None:
 
     assert "NO_PROSE_NEGATIVE_REQUESTS" in source
     assert "Generated prose behavior is not implemented by the harness" not in source
+
+
+def test_script_does_not_call_direct_generation_or_training_artifact_paths() -> None:
+    source = read_source()
+
+    forbidden_direct_calls = (
+        "/api/chat",
+        "/api/generate",
+        "/api/completions",
+        "/api/embeddings",
+        "create_training_jsonl",
+        "fine_tuning",
+        "fine-tuning",
+    )
+    for forbidden in forbidden_direct_calls:
+        assert forbidden not in source
+
+    assert re.search(r"fs\.writeFile\([^)]*\.jsonl", source, flags=re.IGNORECASE) is None
+    assert re.search(r"fs\.writeFile\([^)]*dataset", source, flags=re.IGNORECASE) is None
+    assert re.search(r"fs\.writeFile\([^)]*(?:model_artifact|\.bin|\.safetensors|\.gguf)", source, flags=re.IGNORECASE) is None
+    assert "/api/version" in source
+    assert "/api/tags" in source
+
+
+def test_script_does_not_execute_runtime_tools_directly() -> None:
+    source = read_source()
+
+    for forbidden_call in (
+        "runBookNLP",
+        "runSpacy",
+        "runSpaCy",
+        "booknlp.process",
+        "spacy.load",
+        "subtxt run",
+        "ncp run",
+    ):
+        assert forbidden_call not in source
+
+    assert "cyber_fixture_runtime_tools_not_directly_executed" in source
+    assert "directRuntimeToolsExecuted: false" in source

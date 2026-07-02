@@ -42,6 +42,8 @@ curl "$OLLAMA_HOST/api/version"
 
 The owner acceptance browser harness tries `OLLAMA_BASE_URL`, `OLLAMA_HOST`, `http://localhost:11434`, and then a detected WSL Windows-host fallback. It records selected and attempted Ollama candidates in the evidence artifacts. This is startup/readiness configuration only, not product behavior and not MVP completion.
 
+The owner acceptance browser harness now defaults to the owner-authored `Cyber detective` MVP acceptance fixture unless a different fixture is provided with `MVP_ACCEPTANCE_FIXTURE`. The fixture includes mature/violent material and must be used only for analysis/testing boundaries. It must not be used to generate, continue, rewrite, polish, improve, imitate, expand, draft, or outline story prose.
+
 Backend Story Check startup in WSL uses `OLLAMA_BASE_URL` based on `backend/analysis_engine.py`:
 
 ```bash
@@ -115,6 +117,22 @@ PY=".venv-unsloth-clean/bin/python"
 - [ ] No outline generation behavior is exposed or accepted.
 - [ ] No generated prose behavior is exposed or accepted.
 - [ ] No imitation, polish, improvement, expansion, draft, chapter generation, or prose-production path is exposed or accepted.
+
+## Cyber Detective Fixture Checks
+
+- [ ] Cyber detective owner-authored fixture project is created through the browser UI.
+- [ ] Cyber detective owner-authored source is visible on review before creation as setup/candidate/planning material.
+- [ ] Cyber detective project is active and scoped in the header, selector, and Overview.
+- [ ] Cyber detective OMI/setup material remains candidate/planning only.
+- [ ] Cyber detective fixture content does not appear as approved Memory/Canon.
+- [ ] Story Check/model-backed status is reviewed as `PASS`, `BLOCKED`, `MANUAL_REVIEW_REQUIRED`, or `NOT_EXPOSED`.
+- [ ] Story Check output, if safely run, is diagnostic/candidate-first only and does not generate prose.
+- [ ] Model-backed output, if safely run, is not presented as canon, approved memory, or truth.
+- [ ] No-prose negative paths for rewrite, continuation, outline, draft, polish, improve, expand, and imitate are refused, blocked, redirected to diagnostics, unavailable, or fail-closed.
+- [ ] Runtime extraction labels/states are reviewed if visible; BookNLP, spaCy, NCP, Subtxt, and dramatica-flow are not executed directly by the harness.
+- [ ] Apply-promotion is not performed automatically; fixture content must not become approved memory/canon without an explicitly owner-approved workflow.
+
+This fixture improves owner acceptance evidence but does not mark MVP complete and does not claim owner acceptance.
 
 ## Final Owner Decision
 
