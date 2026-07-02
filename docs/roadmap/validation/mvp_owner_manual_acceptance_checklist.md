@@ -125,12 +125,19 @@ PY=".venv-unsloth-clean/bin/python"
 - [ ] Cyber detective project is active and scoped in the header, selector, and Overview.
 - [ ] Cyber detective OMI/setup material remains candidate/planning only.
 - [ ] Cyber detective fixture content does not appear as approved Memory/Canon.
-- [ ] Story Check/model-backed status is reviewed as `PASS`, `BLOCKED`, `MANUAL_REVIEW_REQUIRED`, or `NOT_EXPOSED`.
-- [ ] Story Check output, if safely run, is diagnostic/candidate-first only and does not generate prose.
+- [ ] Cyber detective owner-authored source/scene is safely selected for Story Check (`cyber_fixture_story_check_source_selected`).
+- [ ] Story Check is submitted only through the visible app UI after safe source selection (`cyber_fixture_story_check_submitted`).
+- [ ] Story Check result is diagnostic/candidate-first only (`cyber_fixture_story_check_result_diagnostic_only`).
+- [ ] Story Check result contains no generated story prose (`cyber_fixture_story_check_no_generated_prose`).
 - [ ] Model-backed output, if safely run, is not presented as canon, approved memory, or truth.
-- [ ] No-prose negative paths for rewrite, continuation, outline, draft, polish, improve, expand, and imitate are refused, blocked, redirected to diagnostics, unavailable, or fail-closed.
+- [ ] No-prose negative rewrite prompt is refused, blocked, redirected to diagnostics, unavailable, or fail-closed (`cyber_fixture_no_prose_rewrite_refused`).
+- [ ] No-prose negative continuation prompt is refused, blocked, redirected to diagnostics, unavailable, or fail-closed (`cyber_fixture_no_prose_continue_refused`).
+- [ ] No-prose negative outline prompt is refused, blocked, redirected to diagnostics, unavailable, or fail-closed (`cyber_fixture_no_prose_outline_refused`).
+- [ ] No-prose negative draft, polish, improve, expand, and imitate prompts are refused, blocked, redirected to diagnostics, unavailable, or fail-closed (`cyber_fixture_no_prose_draft_polish_imitation_refused`).
 - [ ] Runtime extraction labels/states are reviewed if visible; BookNLP, spaCy, NCP, Subtxt, and dramatica-flow are not executed directly by the harness.
 - [ ] Apply-promotion is not performed automatically; fixture content must not become approved memory/canon without an explicitly owner-approved workflow.
+
+Current automated diagnosis: the app exposes a visible `Run Story Check` control, but the Cyber fixture setup project has no browser-visible create/import scene/source workflow, so the harness keeps Story Check and no-prose negative prompt checks at `MANUAL_REVIEW_REQUIRED` unless a future safe browser-visible workflow is present.
 
 This fixture improves owner acceptance evidence but does not mark MVP complete and does not claim owner acceptance.
 

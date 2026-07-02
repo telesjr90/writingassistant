@@ -5,7 +5,8 @@
 - Task: `MVP-READINESS-OWNER-ACCEPTANCE-002`
 - Updated by: `MVP-READINESS-OWNER-ACCEPTANCE-003`
 - Updated by: `MVP-READINESS-OWNER-ACCEPTANCE-004`
-- Result: **Harness created, WSL Ollama fallback added, and Cyber detective owner-authored fixture automation added; owner run pending**
+- Updated by: `MVP-READINESS-OWNER-ACCEPTANCE-005`
+- Result: **Harness created, WSL Ollama fallback added, Cyber detective fixture automation added, and safe Story Check/no-prose browser workflow diagnosis automated; owner run pending**
 - Script: `scripts/mvp-owner-acceptance-browser-smoke.mjs`
 - Evidence directory: `artifacts/mvp-readiness/owner-acceptance`
 - Browser acceptance script status: **not run by Codex**
@@ -47,7 +48,11 @@ The harness must not generate, continue, rewrite, polish, improve, imitate, expa
 
 The Cyber detective path creates a project through the browser UI, fills the OMI-guided title/source/notes fields, reviews before creation, asserts owner-authored source visibility in the review step, creates the project, and checks that the created project is active in the header, selector, and Overview. OMI/setup evidence remains candidate/planning only, and Memory/Canon evidence remains approved-only/non-canon.
 
-If Story Check or no-prose negative-path inputs are not safely exposed for the created fixture project, the harness records `MANUAL_REVIEW_REQUIRED` or `NOT_EXPOSED` with screenshots instead of faking `PASS`. If a safe Story Check workflow is exposed and run, results may pass only when diagnostic/candidate-first, non-canon, and free of story prose generation.
+`MVP-READINESS-OWNER-ACCEPTANCE-005` adds browser-visible Story Check source workflow diagnosis. The current frontend exposes a visible `Run Story Check` control, but Story Check requires a selected scene. The Cyber fixture project is created from OMI-guided setup text, and the current browser UI shows empty Scenes for the new project without a create/import owner-authored scene/source control. The harness therefore records `MANUAL_REVIEW_REQUIRED` for `cyber_fixture_story_check_source_selected` and related Story Check IDs unless a future safe browser-visible scene/source workflow appears. It will only click `Run Story Check` if a selected scene visibly contains the owner-authored Cyber fixture text.
+
+No-prose negative prompts are not submitted through arbitrary text fields. The current UI does not expose a safe analysis-only negative-prompt input route for rewrite, continuation, outline, draft, polish, improve, expand, or imitation prompts. The harness records that missing surface as `MANUAL_REVIEW_REQUIRED` and captures the no-prose attempt/result screenshot instead of faking `PASS`.
+
+If a safe Story Check workflow is exposed and run, results may pass only when diagnostic/candidate-first, non-canon, and free of story prose generation. Generated-story-prose markers cause `FAIL`.
 
 ## Ollama Readiness Handling
 

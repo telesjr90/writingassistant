@@ -1,3 +1,26 @@
+# MVP-READINESS-OWNER-ACCEPTANCE-005 Safe Cyber Detective Story Check and No-Prose Boundary Fixture
+
+### Result
+
+- Result: PASS for harness/source/docs update; browser acceptance script not run by Codex.
+- Scope: owner acceptance readiness harness and documentation only; no product behavior changes.
+- Updated script: `scripts/mvp-owner-acceptance-browser-smoke.mjs`.
+- Updated source tests: `tests/test_mvp_owner_acceptance_browser_smoke_source.py`.
+- Updated validation/governance docs.
+- Story Check diagnosis: the app exposes a visible `Run Story Check` control, but the Cyber detective fixture project is created from OMI-guided setup text and has no browser-visible create/import owner-authored scene/source workflow. The harness only submits Story Check if a selected scene visibly contains the owner-authored fixture text; otherwise it records `MANUAL_REVIEW_REQUIRED` with missing-surface evidence.
+- No-prose negative-path diagnosis: no safe browser-visible analysis-only prompt/input route is exposed for rewrite, continuation, outline, draft, polish, improve, expand, or imitation prompts. The harness records `MANUAL_REVIEW_REQUIRED` and does not submit unsafe prompts.
+- Added checklist IDs for safe source selection, Story Check submission/result/no-prose output, and no-prose negative refusals.
+- Added screenshots for Cyber fixture source/scene selection, Story Check before submit, Story Check result/error when run, and no-prose negative prompt attempt/result.
+- Generated story-prose markers cause `FAIL`; missing safe UI remains `MANUAL_REVIEW_REQUIRED` instead of fake `PASS`.
+
+### Boundary Summary
+
+- No frontend/backend product behavior changes.
+- No generated prose, continuation, rewrite, outline, draft, polish, improvement, expansion, imitation, or story-prose path.
+- No direct `/api/chat` or generation endpoint calls.
+- No BookNLP/spaCy, NCP/Subtxt/dramatica-flow, apply-promotion, approved memory/canon mutation, training/JSONL/dataset/model artifacts, staging, commit, or push.
+- MVP readiness decision remains **MANUAL_REVIEW_REQUIRED** until owner run/review resolves remaining manual items; this does not mark MVP complete.
+
 # MVP-READINESS-OWNER-ACCEPTANCE-004 Cyber Detective Owner Fixture Automation
 
 ### Result

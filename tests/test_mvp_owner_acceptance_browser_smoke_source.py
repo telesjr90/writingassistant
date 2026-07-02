@@ -139,9 +139,17 @@ def test_script_records_cyber_fixture_checklist_ids() -> None:
         "cyber_fixture_active_project_scoped",
         "cyber_fixture_omi_candidate_planning_only",
         "cyber_fixture_memory_canon_not_mutated",
+        "cyber_fixture_story_check_source_selected",
+        "cyber_fixture_story_check_submitted",
+        "cyber_fixture_story_check_result_diagnostic_only",
+        "cyber_fixture_story_check_no_generated_prose",
         "cyber_fixture_story_check_analysis_only",
         "cyber_fixture_story_check_no_prose_generated",
         "cyber_fixture_model_output_not_canon",
+        "cyber_fixture_no_prose_rewrite_refused",
+        "cyber_fixture_no_prose_continue_refused",
+        "cyber_fixture_no_prose_outline_refused",
+        "cyber_fixture_no_prose_draft_polish_imitation_refused",
         "cyber_fixture_no_rewrite",
         "cyber_fixture_no_continuation",
         "cyber_fixture_no_outline",
@@ -202,12 +210,73 @@ def test_script_forbids_cyber_fixture_prose_intents() -> None:
 def test_script_records_manual_review_when_safe_cyber_ui_is_missing() -> None:
     source = read_source()
     body = function_body(source, "runCyberDetectiveFixtureChecks")
+    select_body = function_body(source, "selectSafeCyberFixtureSceneForStoryCheck")
 
     assert "STATUSES.MANUAL_REVIEW_REQUIRED" in body
-    assert "STATUSES.NOT_EXPOSED" in body
     assert "no safe selected cyber detective scene/source workflow is exposed" in body.lower()
     assert "No safe Cyber detective no-prose prompt/input path is exposed" in body
+    assert "recordCyberStoryCheckManualReview" in body
+    assert "missing_scene_create_or_import_workflow" in select_body
+    assert "no browser-visible create/import owner-authored scene/source control is exposed" in select_body
     assert "hasSafeNoProseInput = false" in body
+
+
+def test_script_has_new_story_check_and_no_prose_checklist_ids() -> None:
+    source = read_source()
+
+    for item_id in (
+        "cyber_fixture_story_check_source_selected",
+        "cyber_fixture_story_check_submitted",
+        "cyber_fixture_story_check_result_diagnostic_only",
+        "cyber_fixture_story_check_no_generated_prose",
+        "cyber_fixture_no_prose_rewrite_refused",
+        "cyber_fixture_no_prose_continue_refused",
+        "cyber_fixture_no_prose_outline_refused",
+        "cyber_fixture_no_prose_draft_polish_imitation_refused",
+    ):
+        assert item_id in source
+
+
+def test_script_uses_browser_ui_story_check_workflow_not_direct_chat() -> None:
+    source = read_source()
+    body = function_body(source, "runCyberDetectiveFixtureChecks")
+    select_body = function_body(source, "selectSafeCyberFixtureSceneForStoryCheck")
+
+    assert "getByRole('button', { name: /Run Story Check/i })" in body
+    assert "storyCheckButton.click()" in body
+    assert "selectedSceneContainsFixture" in select_body
+    assert "selectedFixture.rawOwnerAuthoredContent.slice(0, 80)" in select_body
+    assert "/api/chat" not in source
+    assert "/api/generate" not in source
+    assert "/api/completions" not in source
+
+
+def test_script_records_required_cyber_story_check_screenshots() -> None:
+    source = read_source()
+
+    for screenshot_name in (
+        "12-cyber-fixture-source-scene-selection",
+        "13-cyber-fixture-story-check-before-submit",
+        "14-cyber-fixture-story-check-result-error",
+        "15-cyber-fixture-no-prose-negative-prompt-attempt-result",
+    ):
+        assert screenshot_name in source
+
+
+def test_script_fails_on_generated_prose_markers() -> None:
+    source = read_source()
+    body = function_body(source, "runCyberDetectiveFixtureChecks")
+
+    for marker in (
+        "here(?:'s| is) (?:a|the) (?:rewrite|rewritten|continuation|continued|outline|draft|polished|improved|expanded|imitation)",
+        "(?:INT\\.|EXT\\.)",
+        "chapter\\s+\\d+\\s*:",
+    ):
+        assert marker in source
+
+    assert "containsForbiddenGeneratedProse(resultText)" in body
+    assert "STATUSES.FAIL" in body
+    assert "Generated story prose marker detected" in source
 
 
 def test_script_uses_scoped_memory_canon_checks_not_global_body_for_leakage() -> None:
