@@ -1,5 +1,23 @@
 # MVP Manual Readiness — Project Isolation Blocker
 
+## Superseding Repair Evidence
+
+- Superseding task: `MVP-READINESS-OWNER-ACCEPTANCE-001`
+- Current status: **REPAIRED / READY FOR OWNER MANUAL ACCEPTANCE TESTING**
+- The prior project isolation blocker is repaired and live browser evidence passed.
+- Evidence script: `scripts/mvp-project-isolation-browser-smoke.mjs`
+- Evidence report: `artifacts/mvp-readiness/project-isolation/evidence-report.md`
+- Workflow log: `artifacts/mvp-readiness/project-isolation/workflow-log.json`
+- Browser evidence result: **PASS**
+- `SCRIPT_EXIT=0`
+- Blockers: None
+- Covered browser smoke path: project creation, active project switching, Scenes project isolation, and Memory/Canon project isolation.
+- `PHASE8-IMPL-022` closeout plus repair evidence supports readiness for manual acceptance testing.
+- MVP owner acceptance is still pending until `docs/roadmap/validation/mvp_owner_manual_acceptance_checklist.md` is completed and explicitly accepted by the owner.
+- This superseding evidence does not mark MVP complete.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production remains permanently forbidden.
+
 ## Result
 
 - Task: `MVP-READINESS-BROWSER-EVIDENCE-001-C`

@@ -1,3 +1,110 @@
+# MVP-READINESS-OWNER-ACCEPTANCE-003 WSL-to-Windows Ollama Host Fallback
+
+### Result
+
+- Result: PASS for harness/source/docs update; browser acceptance script not run by Codex.
+- Scope: owner acceptance readiness harness and documentation only; no product behavior changes.
+- Updated script: `scripts/mvp-owner-acceptance-browser-smoke.mjs`.
+- Updated source tests: `tests/test_mvp_owner_acceptance_browser_smoke_source.py`.
+- Updated validation docs: `docs/roadmap/validation/mvp_owner_acceptance_browser_evidence.md` and `docs/roadmap/validation/mvp_owner_manual_acceptance_checklist.md`.
+- The harness now tries Ollama readiness candidates in order: `OLLAMA_BASE_URL`, `OLLAMA_HOST`, `http://localhost:11434`, and detected WSL Windows-host fallback.
+- WSL/Ubuntu running the backend or test may not reach Windows-hosted Ollama at `localhost`; use the Windows host IP from the WSL default gateway.
+- Recommended WSL test command:
+
+```bash
+WINDOWS_HOST=$(ip route show | grep -i default | awk '{ print $3 }')
+export OLLAMA_HOST="http://$WINDOWS_HOST:11434"
+curl "$OLLAMA_HOST/api/version"
+```
+
+- Backend inspection found Story Check reads `OLLAMA_BASE_URL`, not `OLLAMA_HOST`; if backend runs in WSL and Ollama runs on Windows, start backend with:
+
+```bash
+WINDOWS_HOST=$(ip route show | grep -i default | awk '{ print $3 }')
+export OLLAMA_BASE_URL="http://$WINDOWS_HOST:11434"
+PY=".venv-unsloth-clean/bin/python"
+"$PY" -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### Boundary Summary
+
+- Ollama checks remain readiness-only `/api/version` and `/api/tags`.
+- No `/api/chat` or generation endpoint calls were added to the harness.
+- No frontend/backend product logic, package/dependency files, generated prose, BookNLP/spaCy, NCP/Subtxt/dramatica-flow, canon/memory mutation, apply-promotion, staging, commit, or push.
+- MVP readiness decision remains **MANUAL_REVIEW_REQUIRED** until owner runs and reviews evidence; this does not mark MVP complete.
+
+# MVP-READINESS-OWNER-ACCEPTANCE-002 Owner Acceptance Browser Evidence Harness
+
+### Result
+
+- Result: PASS for harness/source/docs creation; browser acceptance script not run by Codex.
+- Scope: automated owner MVP acceptance checklist evidence runner only; no product fixes.
+- Created script: `scripts/mvp-owner-acceptance-browser-smoke.mjs`.
+- Created source tests: `tests/test_mvp_owner_acceptance_browser_smoke_source.py`.
+- Created evidence doc: `docs/roadmap/validation/mvp_owner_acceptance_browser_evidence.md`.
+- Evidence output directory for owner runs: `artifacts/mvp-readiness/owner-acceptance`.
+- Script output artifacts: `screenshots/*.png`, `workflow-log.json`, `checklist-results.json`, and `evidence-report.md`.
+- Result model: `PASS`, `FAIL`, `BLOCKED`, `NOT_EXPOSED`, and `MANUAL_REVIEW_REQUIRED`.
+- MVP owner acceptance remains pending; this task does not mark MVP complete.
+
+### Harness Coverage
+
+- Startup checks cover frontend navigation, backend `/api/projects`, existing project isolation script presence, and Ollama readiness through `/api/version` and `/api/tags`.
+- If Ollama is unreachable, the harness records `startup_ollama_unreachable = BLOCKED`, blocks model-backed checks, and records remediation to run `ollama serve`, then retry `curl http://localhost:11434/api/version`.
+- Project isolation and manual workspace checks use browser-visible project creation/switching, scoped Scenes text, and scoped Memory/Canon text.
+- Runtime extraction, candidate/review, apply-promotion, model-assisted, and no-prose checks record visible evidence where available and otherwise mark `NOT_EXPOSED` or `MANUAL_REVIEW_REQUIRED`; absent surfaces are not treated as PASS.
+- Final owner decision remains pending; the script may output `READY_FOR_OWNER_REVIEW`, `BLOCKED`, or `MANUAL_REVIEW_REQUIRED`, but not owner acceptance.
+
+### Boundary Summary
+
+- No frontend/backend product logic changes, package/dependency changes, generated prose, model creative generation calls, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, automatic canon/memory mutation, apply-promotion shortcut, training artifacts, staging, commit, or push.
+
+### Validation Owner Manual Follow-Up
+
+- Owner should run `node scripts/mvp-owner-acceptance-browser-smoke.mjs` only after frontend/backend are running and Ollama is running if model-backed workflow review is desired.
+- Review `artifacts/mvp-readiness/owner-acceptance/evidence-report.md` before making any owner MVP acceptance decision.
+
+# MVP-READINESS-OWNER-ACCEPTANCE-001 Owner Manual Acceptance Checklist and Evidence Review
+
+### Result
+
+- Result: READY FOR OWNER MANUAL ACCEPTANCE TESTING.
+- Scope: docs/governance checklist and evidence review only; no product changes.
+- Created checklist: `docs/roadmap/validation/mvp_owner_manual_acceptance_checklist.md`.
+- Project isolation blocker is repaired and live browser evidence passed.
+- Evidence script: `scripts/mvp-project-isolation-browser-smoke.mjs`.
+- Evidence report: `artifacts/mvp-readiness/project-isolation/evidence-report.md`.
+- Workflow log: `artifacts/mvp-readiness/project-isolation/workflow-log.json`.
+- Browser evidence result: PASS; `SCRIPT_EXIT=0`; blockers: none.
+- Covered browser smoke path: project creation, active project switching, Scenes project isolation, and Memory/Canon project isolation.
+
+### MVP Readiness Decision
+
+- `PHASE8-IMPL-022` closeout plus repair evidence supports readiness for owner manual acceptance testing.
+- MVP owner acceptance is still pending until the checklist is completed and explicitly owner-accepted.
+- This does not mark MVP complete and does not claim final end-to-end usability acceptance.
+- Fine-tuning remains deferred after MVP.
+- Generated prose/prose-production remains permanently forbidden.
+
+### Checklist Coverage
+
+- Startup requirements: Ollama reachable if model-backed workflows are tested, backend running, frontend running, and browser evidence script available.
+- Project isolation: confirmed by Playwright evidence with `SCRIPT_EXIT=0`.
+- Manual workspace checks: create/select project, Overview, Scenes empty/new project behavior, Notes, Materials, Memory/Canon approved-only boundary, and OMI/setup candidate boundary.
+- Runtime extraction checks: unavailable/fail-closed states, raw artifact support-data-only behavior, and no canon mutation.
+- Candidate/review checks: candidate-first behavior, review queue/read-only state, and owner-action execution only.
+- Apply-promotion checks: explicit owner confirmation only, audit behavior, and approved memory/canon mutation only through approved workflow.
+- Model-assisted / analysis runtime checks: evidence-backed only, confidence is not truth, and NCP/Subtxt/dramatica-flow analysis-only boundaries.
+- No-prose checks: no rewrite, no continuation, no outline, and no generated prose.
+- Final owner decision section: Pending owner acceptance, Accepted by owner, or Blocked with reason.
+
+### Validation Owner Manual Follow-Up
+
+- `python3 scripts/check_enrichment.py`
+- `python3 scripts/validate_roadmap.py`
+- `git diff --check`
+- `git status --short --branch`
+
 # MVP-READINESS-REPAIR-001 Project Isolation Routing Repair Attempt
 
 ### Result
