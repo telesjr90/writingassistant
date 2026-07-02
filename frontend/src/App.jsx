@@ -249,67 +249,130 @@ export default function App() {
     setMaterialSaveStatus('');
     setNoteError('');
     setMaterialError('');
+    setScenes([]);
+    setNotes([]);
+    setMaterials([]);
+    setBibleText('{}');
+    setLastSavedBibleText('{}');
+    setBibleStatus('No bible JSON for this project yet.');
+    setStoryformText('{}');
+    setLastSavedStoryformText('{}');
+    setStoryformStatus('No storyform JSON for this project yet.');
+    setStoryformContext('');
+    setOmiData({ index: null, ideas: [], candidates: [], promotions: [] });
+    setOmiStatus('Loading OMI status...');
+    setOmiError('');
     setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
 
     async function loadInitialData() {
       setIsLoadingScenes(true);
       setIsLoadingNotes(true);
       setIsLoadingMaterials(true);
+      setIsLoadingOMI(true);
       setSceneError('');
       setNotesError('');
       setMaterialsError('');
 
-      try {
-        const [
-          scenePayload,
-          notesPayload,
-          materialsPayload,
-          biblePayload,
-          storyformPayload,
-          contextPayload,
-          omiPayload,
-        ] = await Promise.all([
-          fetchScenes(activeProjectId),
-          fetchNotes(activeProjectId),
-          fetchMaterials(activeProjectId),
-          fetchBible(activeProjectId),
-          fetchStoryform(activeProjectId),
-          fetchStoryformContext(activeProjectId),
-          getOMI(activeProjectId),
-        ]);
+      const [
+        sceneResult,
+        notesResult,
+        materialsResult,
+        bibleResult,
+        storyformResult,
+        contextResult,
+        omiResult,
+      ] = await Promise.allSettled([
+        fetchScenes(activeProjectId),
+        fetchNotes(activeProjectId),
+        fetchMaterials(activeProjectId),
+        fetchBible(activeProjectId),
+        fetchStoryform(activeProjectId),
+        fetchStoryformContext(activeProjectId),
+        getOMI(activeProjectId),
+      ]);
 
-        if (!isMounted) {
-          return;
-        }
+      if (!isMounted) {
+        return;
+      }
 
+      if (sceneResult.status === 'fulfilled') {
+        const scenePayload = sceneResult.value;
         setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? []);
+      } else {
+        const message = sceneResult.reason instanceof Error
+          ? sceneResult.reason.message
+          : 'Failed to load scenes.';
+        setSceneError(message);
+      }
+
+      if (notesResult.status === 'fulfilled') {
+        const notesPayload = notesResult.value;
         setNotes(notesPayload?.notes ?? []);
+      } else {
+        const message = notesResult.reason instanceof Error
+          ? notesResult.reason.message
+          : 'Failed to load notes.';
+        setNotesError(message);
+      }
+
+      if (materialsResult.status === 'fulfilled') {
+        const materialsPayload = materialsResult.value;
         setMaterials(materialsPayload?.materials ?? []);
+      } else {
+        const message = materialsResult.reason instanceof Error
+          ? materialsResult.reason.message
+          : 'Failed to load materials.';
+        setMaterialsError(message);
+      }
+
+      if (bibleResult.status === 'fulfilled') {
+        const biblePayload = bibleResult.value;
         const formattedBible = formatJson(biblePayload);
-        const formattedStoryform = formatJson(storyformPayload);
         setBibleText(formattedBible);
         setLastSavedBibleText(formattedBible);
         setBibleStatus('Saved');
+      } else {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        setBibleStatus('No bible JSON for this project yet.');
+      }
+
+      if (storyformResult.status === 'fulfilled') {
+        const storyformPayload = storyformResult.value;
+        const formattedStoryform = formatJson(storyformPayload);
         setStoryformText(formattedStoryform);
         setLastSavedStoryformText(formattedStoryform);
         setStoryformStatus('Saved');
+      } else {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        setStoryformStatus('No storyform JSON for this project yet.');
+      }
+
+      if (contextResult.status === 'fulfilled') {
+        const contextPayload = contextResult.value;
         setStoryformContext(contextPayload.context ?? '');
+      } else {
+        setStoryformContext('');
+      }
+
+      if (omiResult.status === 'fulfilled') {
+        const omiPayload = omiResult.value;
         setOmiData(omiPayload);
         setOmiStatus('Ready');
-      } catch (error) {
-        if (isMounted) {
-          const message = error instanceof Error ? error.message : 'Failed to load project data.';
-          setSceneError(message);
-          setNotesError(message);
-          setMaterialsError(message);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingScenes(false);
-          setIsLoadingNotes(false);
-          setIsLoadingMaterials(false);
-        }
+      } else {
+        const message = omiResult.reason instanceof Error
+          ? omiResult.reason.message
+          : 'Failed to load OMI data.';
+        setOmiData({ index: null, ideas: [], candidates: [], promotions: [] });
+        setOmiStatus('Load failed');
+        setOmiError(message);
       }
+
+      setIsLoadingScenes(false);
+      setIsLoadingNotes(false);
+      setIsLoadingMaterials(false);
+      setIsLoadingOMI(false);
     }
 
     loadInitialData();
@@ -896,34 +959,36 @@ export default function App() {
         onSelectMaterial={handleSelectMaterial}
       />
       <main className="editor-column" aria-label="Project workspace">
-        <OmiGuidedProjectCreation
-          onCreateProject={handleCreateProject}
-          disabled={isCreatingProject}
-          onCancel={() => {
-            setCreateProjectError('');
-            setCreateProjectStatus('');
-          }}
-          onComplete={() => {
-            setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
-          }}
-        />
         {activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (
-          <ProjectOverview
-            project={activeProject}
-            scenes={scenes}
-            notes={notes}
-            materials={materials}
-            omiStatus={{
-              status: isLoadingOMI ? 'Loading OMI status...' : omiStatus || 'Ready',
-              ideas: omiData?.ideas,
-              candidates: omiData?.candidates,
-            }}
-            approvedMemoryStatus="No approved memory/canon items shown here yet."
-            onOpenScenes={handleOpenEditorWorkspace}
-            onOpenNotes={handleOpenEditorWorkspace}
-            onOpenMaterials={handleOpenEditorWorkspace}
-            onOpenOmi={handleOpenEditorWorkspace}
-          />
+          <>
+            <OmiGuidedProjectCreation
+              onCreateProject={handleCreateProject}
+              disabled={isCreatingProject}
+              onCancel={() => {
+                setCreateProjectError('');
+                setCreateProjectStatus('');
+              }}
+              onComplete={() => {
+                setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
+              }}
+            />
+            <ProjectOverview
+              project={activeProject}
+              scenes={scenes}
+              notes={notes}
+              materials={materials}
+              omiStatus={{
+                status: isLoadingOMI ? 'Loading OMI status...' : omiStatus || 'Ready',
+                ideas: omiData?.ideas,
+                candidates: omiData?.candidates,
+              }}
+              approvedMemoryStatus="No approved memory/canon items shown here yet."
+              onOpenScenes={handleOpenEditorWorkspace}
+              onOpenNotes={handleOpenEditorWorkspace}
+              onOpenMaterials={handleOpenEditorWorkspace}
+              onOpenOmi={handleOpenEditorWorkspace}
+            />
+          </>
         ) : activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON ? (
           <MemoryCanonShell
             projectTitle={activeProject.title}

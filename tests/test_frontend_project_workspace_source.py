@@ -397,6 +397,69 @@ class TestAppActiveProjectState:
     def test_unsaved_confirmation_before_project_create(self, app_source: str) -> None:
         assert "UNSAVED_PROJECT_CREATE_MESSAGE" in app_source
 
+    def test_project_switch_clears_stale_project_scoped_workspace_state(
+        self, app_source: str
+    ) -> None:
+        reset_block = app_source.split("useEffect(() => {", 1)[1].split(
+            "async function loadInitialData()",
+            1,
+        )[0]
+
+        for reset_call in (
+            "setSelectedSceneId('')",
+            "setScenes([])",
+            "setNotes([])",
+            "setMaterials([])",
+            "setBibleText('{}')",
+            "setStoryformText('{}')",
+            "setStoryformContext('')",
+            "setOmiData({ index: null, ideas: [], candidates: [], promotions: [] })",
+            "setOmiError('')",
+            "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)",
+        ):
+            assert reset_call in reset_block
+
+    def test_project_load_does_not_let_missing_optional_context_preserve_old_lists(
+        self, app_source: str
+    ) -> None:
+        initial_load_block = app_source.split("async function loadInitialData()", 1)[1].split(
+            "\n    loadInitialData();",
+            1,
+        )[0]
+
+        assert "Promise.allSettled" in initial_load_block
+        assert "Promise.all([" not in initial_load_block
+        assert "sceneResult.status === 'fulfilled'" in initial_load_block
+        assert "bibleResult.status === 'fulfilled'" in initial_load_block
+        assert "storyformResult.status === 'fulfilled'" in initial_load_block
+        assert "omiResult.status === 'fulfilled'" in initial_load_block
+        assert "setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? [])" in (
+            initial_load_block
+        )
+        assert "setOmiData({ index: null, ideas: [], candidates: [], promotions: [] })" in (
+            initial_load_block
+        )
+        assert "setOmiStatus('Load failed')" in initial_load_block
+
+    def test_setup_wizard_is_not_rendered_on_memory_canon_or_editor_views(
+        self, app_source: str
+    ) -> None:
+        main_render = app_source.split('<main className="editor-column"', 1)[1]
+        memory_marker = ") : activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON ? ("
+        overview_branch = main_render.split(
+            memory_marker,
+            1,
+        )[0]
+        memory_branch = main_render.split(
+            memory_marker,
+            1,
+        )[1].split(") : (", 1)[0]
+        editor_branch = main_render.split(") : (", 1)[1]
+
+        assert "<OmiGuidedProjectCreation" in overview_branch
+        assert "<OmiGuidedProjectCreation" not in memory_branch
+        assert "<OmiGuidedProjectCreation" not in editor_branch
+
 
 class TestProjectNavSelectorUi:
     def test_includes_library_section(self, project_nav_source: str) -> None:

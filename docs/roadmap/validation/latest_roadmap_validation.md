@@ -1,3 +1,18 @@
+# MVP-READINESS-REPAIR-001 Project Isolation Routing Repair Attempt
+
+### Result
+
+- Result: PASS for focused source/backend validation; browser evidence not rerun by Codex.
+- Scope: project-scoped Scenes and OMI/Memory/Canon routing repair only.
+- Repair summary: frontend project reload now clears stale project-scoped state on active project changes, loads scenes/notes/materials/OMI independently from optional bible/storyform context so missing optional files cannot preserve example data, and keeps the OMI-guided setup shell on the overview view so Memory/Canon approved-only copy is not co-rendered with setup candidate copy.
+- Backend/source coverage added for non-example empty scenes and OMI summaries remaining project-scoped even when `example` has data.
+- MVP manual readiness remains blocked until the owner reruns `scripts/mvp-project-isolation-browser-smoke.mjs` with backend and frontend running and records exit code `0`.
+- No generated prose, model/Ollama calls, BookNLP/spaCy execution, NCP/Subtxt/dramatica-flow execution, automatic canon/memory mutation, apply-promotion shortcut, training artifacts, staging, commit, or push.
+
+### Validation
+
+- `.venv-unsloth-clean/bin/python -m pytest tests/test_frontend_project_workspace_source.py tests/test_project_creation.py tests/test_scene_routes.py tests/test_omi_routes.py tests/test_omi_boundaries.py -q` — PASS (`468 passed`, warnings only).
+
 # MVP-READINESS-BROWSER-EVIDENCE-001-C Project Isolation Browser Evidence Record
 
 ### Result

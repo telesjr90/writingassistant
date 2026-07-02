@@ -63,6 +63,15 @@ Owner manual readiness browser evidence **reproduced project isolation and routi
 
 This blocker does **not** mark MVP complete and does **not** claim end-to-end usability has passed.
 
+## Repair Attempt — MVP-READINESS-REPAIR-001
+
+- Date: 2026-07-02.
+- Result: focused repair implemented; browser evidence not rerun by Codex.
+- Root cause addressed: frontend project reload preserved stale example data when optional bible/storyform/storyform-context requests failed for new blank projects, because one `Promise.all` rejection prevented scenes/OMI empty-state payloads from replacing previous project state.
+- UI routing addressed: OMI-guided setup remains available on Overview, but is no longer rendered above Scenes or Memory/Canon views, preventing setup candidate copy from being co-presented with approved-only Memory/Canon copy.
+- Focused validation passed for frontend source contracts, project creation, scene routes, OMI routes, and OMI boundaries.
+- MVP manual readiness remains blocked until the owner reruns `scripts/mvp-project-isolation-browser-smoke.mjs` with backend and frontend running and records exit code `0`.
+
 ## Relationship to PHASE8-IMPL-022
 
 - `PHASE8-IMPL-022` closeout remains valid as **smoke-harness closeout** (deterministic in-memory MVP usability validation parent complete/PASS).

@@ -9,13 +9,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 class _FakeFastAPI:
+    def __init__(self, *args, **kwargs):
+        pass
+
     def add_middleware(self, *args, **kwargs):
         return None
+
+    def include_router(self, *args, **kwargs):
+        return None
+
+    def add_api_route(self, *args, **kwargs):
+        return None
+
+    def middleware(self, *args, **kwargs):
+        return self._decorator
 
     def get(self, *args, **kwargs):
         return self._decorator
 
     def post(self, *args, **kwargs):
+        return self._decorator
+
+    def patch(self, *args, **kwargs):
         return self._decorator
 
     def put(self, *args, **kwargs):
@@ -24,6 +39,10 @@ class _FakeFastAPI:
     @staticmethod
     def _decorator(func):
         return func
+
+
+class _FakeAPIRouter(_FakeFastAPI):
+    pass
 
 
 class _FakeHTTPException(Exception):
@@ -38,17 +57,22 @@ class _FakeBaseModel:
 
 
 fake_fastapi = types.ModuleType("fastapi")
+fake_fastapi.APIRouter = _FakeAPIRouter
 fake_fastapi.FastAPI = _FakeFastAPI
 fake_fastapi.HTTPException = _FakeHTTPException
+fake_fastapi.Request = object
 fake_middleware = types.ModuleType("fastapi.middleware")
 fake_cors = types.ModuleType("fastapi.middleware.cors")
 fake_cors.CORSMiddleware = object
+fake_responses = types.ModuleType("fastapi.responses")
+fake_responses.JSONResponse = dict
 fake_pydantic = types.ModuleType("pydantic")
 fake_pydantic.BaseModel = _FakeBaseModel
 
 sys.modules.setdefault("fastapi", fake_fastapi)
 sys.modules.setdefault("fastapi.middleware", fake_middleware)
 sys.modules.setdefault("fastapi.middleware.cors", fake_cors)
+sys.modules.setdefault("fastapi.responses", fake_responses)
 sys.modules.setdefault("pydantic", fake_pydantic)
 
 from backend import main
@@ -79,7 +103,6 @@ def test_phase7_impl_008_t004_backend_staged_setup_routes_are_deferred():
         "update_staged_setup",
         "finalize_staged_setup",
         "create_project_from_omi",
-        "apply_promotion",
     ):
         assert deferred_helper not in source
 
@@ -162,6 +185,18 @@ def test_scene_list_route_lists_legacy_scenes_without_metadata_directory(
 
     assert main.get_scenes("example") == {"scenes": ["scene_001", "scene_002"]}
     assert not metadata_dir.exists()
+
+
+def test_new_non_example_project_scene_list_is_project_scoped_empty(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    main.project_manager.save_scene("example", "scene_001", "Example owner body.")
+    metadata = main.project_manager.create_project("Project Scoped Blank", projects_dir=tmp_path)
+
+    assert metadata["project_id"] == "project-scoped-blank"
+    assert main.get_scenes("project-scoped-blank") == {"scenes": []}
+    assert main.get_scenes("example") == {"scenes": ["scene_001"]}
 
 
 def test_scene_read_route_returns_body_when_metadata_exists(tmp_path, monkeypatch):

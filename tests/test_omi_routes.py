@@ -7,13 +7,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 class _FakeFastAPI:
+    def __init__(self, *args, **kwargs):
+        pass
+
     def add_middleware(self, *args, **kwargs):
         return None
+
+    def include_router(self, *args, **kwargs):
+        return None
+
+    def add_api_route(self, *args, **kwargs):
+        return None
+
+    def middleware(self, *args, **kwargs):
+        return self._decorator
 
     def get(self, *args, **kwargs):
         return self._decorator
 
     def post(self, *args, **kwargs):
+        return self._decorator
+
+    def patch(self, *args, **kwargs):
         return self._decorator
 
     def put(self, *args, **kwargs):
@@ -22,6 +37,10 @@ class _FakeFastAPI:
     @staticmethod
     def _decorator(func):
         return func
+
+
+class _FakeAPIRouter(_FakeFastAPI):
+    pass
 
 
 class _FakeHTTPException(Exception):
@@ -36,17 +55,22 @@ class _FakeBaseModel:
 
 
 fake_fastapi = types.ModuleType("fastapi")
+fake_fastapi.APIRouter = _FakeAPIRouter
 fake_fastapi.FastAPI = _FakeFastAPI
 fake_fastapi.HTTPException = _FakeHTTPException
+fake_fastapi.Request = object
 fake_middleware = types.ModuleType("fastapi.middleware")
 fake_cors = types.ModuleType("fastapi.middleware.cors")
 fake_cors.CORSMiddleware = object
+fake_responses = types.ModuleType("fastapi.responses")
+fake_responses.JSONResponse = dict
 fake_pydantic = types.ModuleType("pydantic")
 fake_pydantic.BaseModel = _FakeBaseModel
 
 sys.modules.setdefault("fastapi", fake_fastapi)
 sys.modules.setdefault("fastapi.middleware", fake_middleware)
 sys.modules.setdefault("fastapi.middleware.cors", fake_cors)
+sys.modules.setdefault("fastapi.responses", fake_responses)
 sys.modules.setdefault("pydantic", fake_pydantic)
 
 from backend import main
@@ -71,6 +95,27 @@ def test_omi_routes_create_and_list_ideas(tmp_path, monkeypatch):
     assert summary["ideas"][0]["idea_id"] == idea["idea_id"]
     assert summary["candidates"] == []
     assert main.get_omi_idea("example", idea["idea_id"]) == idea
+
+
+def test_new_non_example_project_omi_summary_is_project_scoped_empty(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(main.project_manager, "PROJECTS_DIR", tmp_path)
+    example_idea = main.create_omi_idea(
+        "example",
+        _payload(raw_idea="Example-only OMI planning note.", provenance=None),
+    )
+    metadata = main.project_manager.create_project("Project Scoped OMI", projects_dir=tmp_path)
+
+    summary = main.get_omi("project-scoped-omi")
+
+    assert metadata["project_id"] == "project-scoped-omi"
+    assert summary["index"]["project_id"] == "project-scoped-omi"
+    assert summary["index"]["idea_ids"] == []
+    assert summary["index"]["candidate_ids"] == []
+    assert summary["ideas"] == []
+    assert summary["candidates"] == []
+    assert example_idea["raw_idea"] not in str(summary)
 
 
 def test_omi_routes_create_and_get_candidate(tmp_path, monkeypatch):
@@ -214,7 +259,7 @@ def test_omi_routes_do_not_call_ollama(tmp_path, monkeypatch):
     def fail_story_check(*args, **kwargs):
         raise AssertionError("OMI routes must not call analysis engine")
 
-    monkeypatch.setattr(main.analysis_engine, "run_story_check", fail_story_check)
+    monkeypatch.setattr(main._analysis_module, "run_story_check", fail_story_check)
 
     idea = main.create_omi_idea(
         "example",
@@ -395,7 +440,7 @@ def test_omi_decision_routes_do_not_call_ollama_or_promote(tmp_path, monkeypatch
     def fail_story_check(*args, **kwargs):
         raise AssertionError("OMI decision routes must not call analysis engine")
 
-    monkeypatch.setattr(main.analysis_engine, "run_story_check", fail_story_check)
+    monkeypatch.setattr(main._analysis_module, "run_story_check", fail_story_check)
     idea = main.create_omi_idea(
         "example",
         _payload(raw_idea="Owner-authored planning input.", provenance=None),
@@ -611,7 +656,7 @@ def test_omi_promotion_routes_do_not_call_ollama_or_apply_truth_mutation(
     def fail_story_check(*args, **kwargs):
         raise AssertionError("OMI promotion routes must not call analysis engine")
 
-    monkeypatch.setattr(main.analysis_engine, "run_story_check", fail_story_check)
+    monkeypatch.setattr(main._analysis_module, "run_story_check", fail_story_check)
     candidate = _approved_route_candidate()
     promotion = main.create_omi_promotion(
         "example",

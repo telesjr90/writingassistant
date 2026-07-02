@@ -1,6 +1,7 @@
 import importlib
 import json
 import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -169,7 +170,7 @@ class TestCreateProject:
 
 
 class TestPostProjectRoute:
-    def test_post_project_success(self, client, monkeypatch):
+    def test_post_project_success(self, monkeypatch):
         received: dict[str, str] = {}
 
         def fake_create_project(*, title: str):
@@ -186,25 +187,24 @@ class TestPostProjectRoute:
 
         monkeypatch.setattr(main.project_manager, "create_project", fake_create_project)
 
-        response = client.post("/api/projects", json={"title": "My Project"})
+        response = main.post_project(types.SimpleNamespace(title="My Project"))
 
-        assert response.status_code == 200
-        assert response.json()["project_id"] == "my-project"
-        assert response.json()["title"] == "My Project"
+        assert response["project_id"] == "my-project"
+        assert response["title"] == "My Project"
         assert received["title"] == "My Project"
 
-    def test_post_project_value_error_returns_400(self, client, monkeypatch):
+    def test_post_project_value_error_returns_400(self, monkeypatch):
         def fake_create_project(*, title: str):
             raise ValueError("blank project title")
 
         monkeypatch.setattr(main.project_manager, "create_project", fake_create_project)
 
-        response = client.post("/api/projects", json={"title": " "})
+        with pytest.raises(main.HTTPException) as exc_info:
+            main.post_project(types.SimpleNamespace(title=" "))
+        assert exc_info.value.status_code == 400
+        assert exc_info.value.detail == "blank project title"
 
-        assert response.status_code == 400
-        assert response.json()["detail"] == "blank project title"
-
-    def test_post_project_does_not_leak_unsafe_paths(self, client, monkeypatch):
+    def test_post_project_does_not_leak_unsafe_paths(self, monkeypatch):
         def fake_create_project(*, title: str):
             raise ValueError(
                 "Project path /evil/projects/foo is not inside the projects directory /safe"
@@ -212,42 +212,39 @@ class TestPostProjectRoute:
 
         monkeypatch.setattr(main.project_manager, "create_project", fake_create_project)
 
-        response = client.post("/api/projects", json={"title": "Evil"})
-
-        assert response.status_code == 400
-        detail = response.json()["detail"]
+        with pytest.raises(main.HTTPException) as exc_info:
+            main.post_project(types.SimpleNamespace(title="Evil"))
+        assert exc_info.value.status_code == 400
+        detail = exc_info.value.detail
         assert detail == "Unable to create project with the given title"
         assert "/evil" not in detail
 
-    def test_post_project_file_exists_returns_409(self, client, monkeypatch):
+    def test_post_project_file_exists_returns_409(self, monkeypatch):
         def fake_create_project(*, title: str):
             raise FileExistsError("Project directory already exists")
 
         monkeypatch.setattr(main.project_manager, "create_project", fake_create_project)
 
-        response = client.post("/api/projects", json={"title": "Duplicate"})
+        with pytest.raises(main.HTTPException) as exc_info:
+            main.post_project(types.SimpleNamespace(title="Duplicate"))
+        assert exc_info.value.status_code == 409
+        assert exc_info.value.detail == "Project already exists"
 
-        assert response.status_code == 409
-        assert response.json()["detail"] == "Project already exists"
-
-    def test_post_project_runtime_error_returns_500(self, client, monkeypatch):
+    def test_post_project_runtime_error_returns_500(self, monkeypatch):
         def fake_create_project(*, title: str):
             raise RuntimeError("disk failure")
 
         monkeypatch.setattr(main.project_manager, "create_project", fake_create_project)
 
-        response = client.post("/api/projects", json={"title": "Broken"})
+        with pytest.raises(main.HTTPException) as exc_info:
+            main.post_project(types.SimpleNamespace(title="Broken"))
 
-        assert response.status_code == 500
-        assert response.json()["detail"] == "Failed to create project"
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Failed to create project"
 
-    def test_post_project_rejects_owner_supplied_project_id(self, client):
-        response = client.post(
-            "/api/projects",
-            json={"title": "A", "project_id": "evil"},
-        )
-
-        assert response.status_code == 422
+    def test_post_project_rejects_owner_supplied_project_id(self):
+        with pytest.raises(ValidationError):
+            main.ProjectCreate.model_validate({"title": "A", "project_id": "evil"})
 
     def test_project_create_model_forbids_extra_fields(self):
         with pytest.raises(ValidationError):

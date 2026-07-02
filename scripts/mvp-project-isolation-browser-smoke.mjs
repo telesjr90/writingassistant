@@ -192,6 +192,42 @@ async function getScenesNavText() {
   return text;
 }
 
+async function getActiveOmiMemoryText() {
+  if (!page) {
+    return '';
+  }
+
+  const candidates = [
+    { name: 'memory-canon-shell', locator: page.locator('section.memory-canon-shell') },
+    { name: 'memory-canon-region', locator: page.getByRole('region', { name: /memory\s*\/\s*canon/i }) },
+    { name: 'omi-panel', locator: page.locator('section.omi-panel, [aria-label="OMI"]') },
+    { name: 'project-workspace', locator: page.locator('main.editor-column[aria-label="Project workspace"]') },
+  ];
+
+  for (const candidate of candidates) {
+    const count = await candidate.locator.count().catch(() => 0);
+    if (count === 0) {
+      continue;
+    }
+
+    const text = await candidate.locator.first().innerText().catch(() => '');
+    if (text.trim()) {
+      logAction('get_active_omi_memory_text', {
+        scope: candidate.name,
+        length: text.length,
+      });
+      return text;
+    }
+  }
+
+  const fallbackText = await getVisibleText();
+  logAction('get_active_omi_memory_text_fallback', {
+    scope: 'body',
+    length: fallbackText.length,
+  });
+  return fallbackText;
+}
+
 /**
  * @param {string[]} candidates
  */
@@ -600,7 +636,7 @@ async function runWorkflow() {
   await page.waitForTimeout(500);
   await screenshot('05-omi-or-memory-canon');
 
-  const omiMemoryText = await getVisibleText();
+  const omiMemoryText = await getActiveOmiMemoryText();
   softAssert(
     'omi_memory_view_no_princess_and_pea',
     !omiMemoryText.includes('The Princess and the Pea'),
