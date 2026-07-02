@@ -1,3 +1,30 @@
+# PHASE8-UX-002-PRE-T001-DEFER-SAAS External SaaS Investigation Deferral
+
+### Result
+
+- Result: PASS for docs/status/planning update.
+- Scope: prepublication UX/reference research deferral only; no `PHASE8-UX-002` task, inventory, enrichment, implementation, crawler, or raw capture output created.
+- Updated boundary doc: `docs/roadmap/ux/PHASE8-UX-002-prepublication-reference-research-boundary.md` to record the SaaS deferral status section.
+- Updated controlled-experiment method doc: `docs/roadmap/ux/PHASE8-UX-002-prepublication-controlled-experiment-method.md` to record that controlled external experiments are deferred post-MVP.
+- Updated cross-reference in: `docs/roadmap/ux/PHASE8-UX-001-master-plan-ux-navigation-proposal.md`.
+- Updated roadmap governance breadcrumbs: `docs/roadmap/implementation_status.md`, `docs/roadmap/decision_log.md`, `docs/roadmap/risk_register.md`, `docs/roadmap/open_questions.md`.
+- External SaaS investigation, Playwright against external SaaS, Browsertrix, Crawlee, Stagehand, external crawling, screenshots/traces/HAR/WACZ, and raw capture workflows are deferred until after MVP UI fixes and MVP owner acceptance.
+- The previous `T002A` external SaaS UI reference research spike is reclassified as post-MVP / deferred, not an active `PHASE8-UX-002` child in the MVP path.
+- The active `PHASE8-UX-002` parent must prioritize building our own missing UI surfaces: owner-authored scene/source create/import/select UI, Story Check against selected owner-authored source, no-prose refusal/fail-closed UI, Notes/Materials save-reload project-scoped proof, runtime/raw artifact UI evidence, review/apply-promotion UI evidence, and NCP/Subtxt/dramatica-flow exposure decision.
+- `PHASE8-UX-002-T001` (parent publication) is the next UX work. The first recommended UX child after `T001` is the MVP UI acceptance matrix and missing UI route/workflow fixes.
+- Controlled external experiments and authorized non-black-box external reference collection are deferred post-MVP unless the owner explicitly opens a separate post-MVP research task.
+- The distinction remains: lawful non-black-box evidence may establish information, but black-box observation alone cannot prove hidden algorithms or implementation details.
+- Raw capture prohibitions remain in force. `.external_sources/dramatica-ui-reference/` was not created.
+- Owner acceptance remains pending and MVP is not complete.
+- No product implementation has started.
+
+### Boundary Summary
+
+- No frontend/backend/tests/package changes.
+- No crawler scripts, crawler runs, external SaaS Playwright runs, Browsertrix, Crawlee, Stagehand, model/Ollama calls, or `.external_sources` creation.
+- No raw captures or `auth state`, browser profiles, HAR/WARC/WACZ, traces, or screenshots committed.
+- No canon/memory mutation, no apply-promotion shortcut, no model calls, no generated prose, no training/JSONL/dataset work.
+
 # PHASE8-UX-002-PRE-T001-BLACKBOX Controlled-Experiment Method Addendum
 
 ### Result

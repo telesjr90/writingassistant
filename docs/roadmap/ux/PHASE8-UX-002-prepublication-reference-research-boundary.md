@@ -1,5 +1,21 @@
 # PHASE8-UX-002 Prepublication Reference Research Boundary
 
+## Status: External SaaS Investigation Deferred Until After MVP UI Fixes
+
+`PHASE8-UX-002-PRE-T001-DEFER-SAAS` records that external SaaS investigation is deferred until after MVP UI fixes and MVP owner acceptance. Playwright against external SaaS, Browsertrix, Crawlee, Stagehand, external crawling, screenshots/traces/HAR/WACZ, and raw capture workflows are not part of `PHASE8-UX-002` MVP UI fix work. The previous `T002A` external SaaS UI reference research spike is reclassified as post-MVP / deferred, not an active `PHASE8-UX-002` child in the MVP path. `PHASE8-UX-002` may keep the research boundary as a post-MVP reference, but the active parent must prioritize building our own missing UI surfaces. Raw capture prohibitions remain in force.
+
+The immediate blocker is not external SaaS research. The immediate blocker is missing safe browser-visible UI/workflow surfaces in our own app:
+
+- Owner-authored scene/source create/import/select UI.
+- Story Check against selected owner-authored source.
+- No-prose refusal/fail-closed UI.
+- Notes/Materials save-reload project-scoped proof.
+- Runtime/raw artifact UI evidence.
+- Review/apply-promotion UI evidence.
+- NCP/Subtxt/dramatica-flow exposure decision.
+
+`PHASE8-UX-002` must focus on these MVP UI fixes first. External SaaS investigation is post-MVP only. `PHASE8-UX-002-T001` (parent publication) remains the next UX work. The first recommended UX child after `T001` is the MVP UI acceptance matrix and missing UI route/workflow fixes.
+
 ## Purpose
 
 Crawler/browser-automation reference research is a planning input for `PHASE8-UX-002`. It may inform route, workflow, and UI acceptance matrix decisions before implementation starts.

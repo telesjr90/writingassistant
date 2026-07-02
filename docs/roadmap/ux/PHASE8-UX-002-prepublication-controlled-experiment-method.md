@@ -1,5 +1,11 @@
 # PHASE8-UX-002 Prepublication Controlled-Experiment Method
 
+## Status: Controlled External Experiments Deferred Until After MVP UI Fixes
+
+`PHASE8-UX-002-PRE-T001-DEFER-SAAS` records that controlled external experiments are deferred post-MVP. Authorized non-black-box external reference collection is deferred post-MVP unless the owner explicitly opens a separate post-MVP research task. This method remains documented for later use but must not be used during `PHASE8-UX-002` MVP UI fixes. The distinction remains: lawful non-black-box evidence may establish information, but black-box observation alone cannot prove hidden algorithms or implementation details.
+
+The active `PHASE8-UX-002` parent prioritizes building the missing MVP UI surfaces (owner-authored scene/source create/import/select, Story Check against selected owner-authored source, no-prose refusal/fail-closed UI, Notes/Materials save-reload project-scoped proof, runtime/raw artifact UI evidence, review/apply-promotion UI evidence, NCP/Subtxt/dramatica-flow exposure decision) before any controlled-experiment or external-reference work resumes.
+
 ## Purpose
 
 This document defines a black-box controlled-experiment method for future `PHASE8-UX-002-T002A` external SaaS UI reference research.
