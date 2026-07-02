@@ -4,7 +4,11 @@
 
 Impeccable is a UI/UX design QA, critique, and polishing layer for frontend work.
 
-It is not a backend/runtime implementation tool, not a context collection tool, and not a source of roadmap truth.
+It is not a backend/runtime implementation tool, not a crawler, not a source of external research captures, not a context collection tool, and not a source of roadmap truth.
+
+External crawler/browser-automation research for `PHASE8-UX-002`, if later approved, remains separate from Impeccable UI polish. Impeccable may critique or polish an approved frontend/design task, but it does not authorize crawler runs, raw captures, roadmap structure, implementation scope, or product requirements.
+
+Black-box controlled experiments for future `PHASE8-UX-002-T002A` are research input only. Impeccable remains frontend UI/UX critique and polish only; it is not a crawler, not a reverse-engineering tool, not a context collection tool, and not a source of roadmap truth.
 
 Use Impeccable to improve how users understand and navigate:
 

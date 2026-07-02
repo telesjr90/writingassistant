@@ -490,6 +490,22 @@ Recommended reference categories:
 
 These searches should focus on patterns, not implementation dependencies.
 
+### PHASE8-UX-002 Prepublication Reference Research Boundary
+
+Current owner acceptance evidence shifts the next UX work from general UX polish to MVP acceptance UI completion. The remaining acceptance issue is missing safe browser-visible workflow evidence for owner-authored source/scene selection, Story Check diagnostics, no-prose negative paths, Notes/Materials save-reload proof, raw artifact evidence, review/apply-promotion proof, and analysis runtime exposure decisions.
+
+External SaaS reference research is allowed only as summarized design-pattern input. `PHASE8-UX-002` should use that research to improve the UI acceptance matrix and route/workflow gap map, not to copy or clone Dramatica or any other external product.
+
+Reference boundary: `docs/roadmap/ux/PHASE8-UX-002-prepublication-reference-research-boundary.md`.
+
+The `PHASE8-UX-002` prepublication research boundary now includes a black-box controlled-experiment method. One-variable-at-a-time observations may help map external UI panel and workflow dependencies, but only `observed`, `inferred`, and `unknown` confidence labels are allowed. Hidden algorithm, prompt, routing, ranking, model-weight, or proprietary implementation details can be known only through explicit authorized disclosure, official documentation, owner-provided evidence, or other lawful non-black-box evidence; they must not be claimed as known from black-box observations alone.
+
+`PHASE8-UX` may retrieve authorized official documentation, owner-provided evidence, authorized disclosures, and other lawful non-black-box reference materials after that collection is explicitly scoped. The information still needs to be collected, summarized, provenance-labeled, and reviewed before use as UX/reference input.
+
+Controlled-experiment method: `docs/roadmap/ux/PHASE8-UX-002-prepublication-controlled-experiment-method.md`.
+
+All `PHASE8-UX-001` product boundaries remain in force: analysis-only, candidate-first, owner-controlled, evidence/provenance-backed, no generated prose, no automatic canon, and explicit owner-confirmed apply-promotion only.
+
 ## 14. Implementation Task Breakdown
 
 ### Docs-Only Tasks

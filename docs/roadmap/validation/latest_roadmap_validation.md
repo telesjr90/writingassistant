@@ -1,3 +1,46 @@
+# PHASE8-UX-002-PRE-T001-BLACKBOX Controlled-Experiment Method Addendum
+
+### Result
+
+- Result: PASS for docs/status/planning update.
+- Scope: prepublication UX/reference research boundary only; no `PHASE8-UX-002` task, inventory, enrichment, implementation, crawler, or raw capture output created.
+- Created standalone method doc: `docs/roadmap/ux/PHASE8-UX-002-prepublication-controlled-experiment-method.md`.
+- Updated boundary doc: `docs/roadmap/ux/PHASE8-UX-002-prepublication-reference-research-boundary.md`.
+- Controlled experiments belong to proposed future `PHASE8-UX-002-T002A` after `T001` parent publication and `T002` acceptance matrix framing.
+- `PHASE8-UX-002` should still start with `PHASE8-UX-002-T001` parent publication after review.
+- Owner acceptance remains pending; MVP is not complete.
+- No product implementation has started.
+- Raw captures remain forbidden from Git; `.external_sources/dramatica-ui-reference/` is only a proposed untracked raw-output location and was not created.
+- Inferred dependency graphs are hypothesis maps, not roadmap truth, product architecture, canon, or product requirements.
+
+### Boundary Summary
+
+- No frontend/backend/tests/package changes.
+- No crawler scripts, crawler runs, external SaaS Playwright runs, Browsertrix, Crawlee, Stagehand, model/Ollama calls, or `.external_sources` creation.
+- Controlled experiment observations must be labeled `observed`, `inferred`, or `unknown`.
+- Hidden algorithms, prompts, model weights, model routing, ranking logic, and proprietary implementation details can be known only through explicit authorized disclosure, official documentation, owner-provided evidence, or other lawful non-black-box evidence; they must not be claimed as known from black-box observations alone.
+- `PHASE8-UX` may retrieve authorized official documentation, owner-provided evidence, authorized disclosures, and other lawful non-black-box reference materials after that collection is explicitly scoped; the information still needs to be collected, summarized, provenance-labeled, and reviewed before use as UX/reference input.
+- Captured output must not be used for training or fine-tuning.
+
+# PHASE8-UX-002-PRE-T001 Reference Research Boundary
+
+### Result
+
+- Result: PASS for docs/status/planning update.
+- Scope: prepublication UX/reference research boundary only; no `PHASE8-UX-002` task, inventory, enrichment, implementation, crawler, or raw capture output created.
+- Created boundary doc: `docs/roadmap/ux/PHASE8-UX-002-prepublication-reference-research-boundary.md`.
+- Updated UX/reference planning docs and roadmap governance breadcrumbs.
+- Owner acceptance evidence remains `MANUAL_REVIEW_REQUIRED`; MVP is not complete.
+- `PHASE8-UX-002` should still start with `PHASE8-UX-002-T001` parent publication after review.
+- Proposed research spike: `PHASE8-UX-002-T002A` External SaaS UI reference research spike, proposed only and not executed.
+
+### Boundary Summary
+
+- No product implementation started.
+- No frontend/backend/tests/package changes.
+- No crawler scripts, crawler runs, Playwright external SaaS runs, Browsertrix, Crawlee, Stagehand, model/Ollama calls, or `.external_sources` creation.
+- Raw captures remain forbidden from Git; `.external_sources/dramatica-ui-reference/` is only a proposed untracked raw-output location.
+
 # MVP-READINESS-OWNER-ACCEPTANCE-005 Safe Cyber Detective Story Check and No-Prose Boundary Fixture
 
 ### Result
