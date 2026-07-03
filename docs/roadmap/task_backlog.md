@@ -1,3 +1,14 @@
+# PHASE8-UX-002-T005 Story Check Diagnostic-Only / No-Prose Evidence UI
+
+- `PHASE8-UX-002` remains active as the MVP-first UX parent.
+- `PHASE8-UX-002-T005` is complete/PASS as frontend Story Check diagnostic-only/no-prose evidence UI.
+- Implementation touched `frontend/src/App.jsx`, `frontend/src/api.js`, and `frontend/src/components/AnalysisSidebar.jsx`.
+- Focused T005 test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k "ux2_storycheck_001 or ux2_noprose_001"` -> `2 passed, 5 deselected in 0.03s`.
+- UX2-SOURCE-001 regression remains passing: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_source_001` -> `1 passed, 6 deselected in 0.03s`.
+- Full expected-red file after T005: `3 passed, 4 failed`; remaining failures are expected for T006 surfaces only: `UX2-NOTES-MATERIALS-001`, `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001`.
+- `PHASE8-UX-002-T006` is next for Notes/Materials plus runtime/review evidence UI.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior was added.
+
 # PHASE8-UX-002-T004 Owner-Authored Source UI
 
 - `PHASE8-UX-002` remains active as the MVP-first UX parent.

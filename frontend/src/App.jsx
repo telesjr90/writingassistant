@@ -37,7 +37,7 @@ import {
   fetchStoryformContext,
   getOMI,
   listProjects,
-  runStoryCheck,
+  runStoryCheckForSelectedSource,
   saveBible,
   saveMaterial,
   saveNote,
@@ -958,16 +958,38 @@ export default function App() {
     setAnalysisReport(null);
 
     try {
-      const data = await runStoryCheck(selectedStoryCheckSourceId, activeProjectId);
-      setAnalysisReport(data);
+      const data = await runStoryCheckForSelectedSource({
+        projectId: activeProjectId,
+        selectedStoryCheckSourceId,
+        selectedStoryCheckSource,
+      });
+      setAnalysisReport({
+        ...data,
+        ux2_story_check_boundary: {
+          source_id: selectedStoryCheckSourceId,
+          source_kind: selectedStoryCheckSource?.source_kind ?? 'owner-authored source',
+          result_type: 'diagnostic-only analysis-only result',
+          model_output_boundary: 'model output is not canon',
+          confidence_boundary: 'confidence is not truth',
+          approved_memory_boundary: 'output cannot become approved memory automatically',
+        },
+      });
     } catch (error) {
       setAnalysisReport({
         error: error instanceof Error ? error.message : 'Story check failed.',
+        ux2_story_check_boundary: {
+          source_id: selectedStoryCheckSourceId,
+          source_kind: selectedStoryCheckSource?.source_kind ?? 'owner-authored source',
+          result_type: 'diagnostic-only analysis-only result',
+          model_output_boundary: 'model output is not canon',
+          confidence_boundary: 'confidence is not truth',
+          approved_memory_boundary: 'output cannot become approved memory automatically',
+        },
       });
     } finally {
       setIsAnalyzing(false);
     }
-  }, [activeProjectId, selectedStoryCheckSourceId]);
+  }, [activeProjectId, selectedStoryCheckSource, selectedStoryCheckSourceId]);
 
   const sceneDocument = createDocumentDescriptor({
     type: DOCUMENT_TYPES.SCENE,

@@ -131,6 +131,74 @@ function renderThroughline(title, value) {
   );
 }
 
+function refuseForbiddenProseIntent(intent) {
+  return {
+    refused: true,
+    intent,
+    boundary: 'analysis-only no-prose boundary',
+    message: `forbidden intent: ${intent}; no generated story prose.`,
+  };
+}
+
+function NoProseRefusal() {
+  return (
+    <section
+      className="analysis-section"
+      data-testid="ux2-no-prose-refusal-panel"
+      aria-label="No-prose refusal boundary"
+    >
+      <h3>No-Prose Boundary</h3>
+      <p className="muted-copy">
+        This is an analysis-only no-prose boundary: no generated story prose.
+      </p>
+      <p
+        className="muted-copy"
+        data-testid="ux2-no-arbitrary-prompt-route"
+      >
+        arbitrary prompt route is unavailable.
+      </p>
+      <dl className="analysis-metadata">
+        <div data-testid="ux2-no-prose-rewrite-refused">
+          <dt>{refuseForbiddenProseIntent('rewrite').boundary}</dt>
+          <dd>forbidden intent: rewrite; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-continue-refused">
+          <dt>{refuseForbiddenProseIntent('continue').boundary}</dt>
+          <dd>forbidden intent: continue; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-outline-refused">
+          <dt>{refuseForbiddenProseIntent('outline').boundary}</dt>
+          <dd>forbidden intent: outline; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-draft-refused">
+          <dt>{refuseForbiddenProseIntent('draft').boundary}</dt>
+          <dd>forbidden intent: draft; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-polish-refused">
+          <dt>{refuseForbiddenProseIntent('polish').boundary}</dt>
+          <dd>forbidden intent: polish; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-improve-refused">
+          <dt>{refuseForbiddenProseIntent('improve').boundary}</dt>
+          <dd>forbidden intent: improve; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-expand-refused">
+          <dt>{refuseForbiddenProseIntent('expand').boundary}</dt>
+          <dd>forbidden intent: expand; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-imitate-refused">
+          <dt>{refuseForbiddenProseIntent('imitate').boundary}</dt>
+          <dd>forbidden intent: imitate; no generated story prose.</dd>
+        </div>
+        <div data-testid="ux2-no-prose-generate-prose-refused">
+          <dt>{refuseForbiddenProseIntent('generate prose').boundary}</dt>
+          <dd>forbidden intent: generate prose; no generated story prose.</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
 export default function AnalysisSidebar({
   report,
   selectedSceneId,
@@ -168,7 +236,10 @@ export default function AnalysisSidebar({
           </section>
         )}
         {selectedStoryCheckSourceId && (
-          <section className="analysis-section">
+          <section
+            className="analysis-section"
+            data-testid="ux2-story-check-selected-source"
+          >
             <h3>Project-scoped selected source</h3>
             <dl className="analysis-metadata">
               <div>
@@ -184,8 +255,21 @@ export default function AnalysisSidebar({
                 <dd>Selection is not canon, memory, training data, or approved truth.</dd>
               </div>
             </dl>
+            <p className="muted-copy">
+              Story Check runs diagnostic-only against this owner-authored source.
+            </p>
           </section>
         )}
+        <section
+          className="analysis-section"
+          data-testid="ux2-story-check-diagnostic-result"
+        >
+          <h3>Diagnostic Result Boundary</h3>
+          <p className="muted-copy">
+            Story Check returns a diagnostic-only analysis-only result. model output is not canon,
+            confidence is not truth, and output cannot become approved memory automatically.
+          </p>
+        </section>
         {!selectedSceneId && !selectedStoryCheckSourceId && (
           <p className="muted-copy">Select or import a source to run analysis.</p>
         )}
@@ -201,6 +285,8 @@ export default function AnalysisSidebar({
 
             <p className="analysis-note">
               Story Check is candidate analysis. It does not change project truth.
+              The analysis-only result is diagnostic-only: model output is not canon,
+              confidence is not truth, and output cannot become approved memory automatically.
             </p>
 
             <div className="analysis-row">
@@ -273,11 +359,13 @@ export default function AnalysisSidebar({
             <pre className="raw-response">{JSON.stringify(report, null, 2)}</pre>
           </section>
         )}
+        <NoProseRefusal />
       </div>
 
       <button
         className="primary-action"
         type="button"
+        data-testid="ux2-story-check-run"
         disabled={!selectedStoryCheckSourceId || isAnalyzing}
         onClick={onRunStoryCheck}
       >

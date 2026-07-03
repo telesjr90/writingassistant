@@ -92,12 +92,22 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - T005 is next for Story Check diagnostic-only/no-prose evidence UI.
 - Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior, backend route/API changes, package changes, context artifact updates, crawlers/raw captures, model calls, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
 
+## T005 Story Check Diagnostic-Only / No-Prose Evidence UI Implementation
+
+- Status: `PHASE8-UX-002-T005` complete/PASS.
+- Implementation files touched: `frontend/src/App.jsx`, `frontend/src/api.js`, and `frontend/src/components/AnalysisSidebar.jsx`.
+- `UX2-STORYCHECK-001` is implemented/source-gated: Story Check runs only through `runStoryCheckForSelectedSource` after `selectedStoryCheckSourceId` and selected owner-authored source metadata are present, and the result surface labels output as diagnostic-only, analysis-only, non-canon, confidence-not-truth, and unable to become approved memory automatically.
+- `UX2-NOPROSE-001` is implemented as browser-visible refusal/fail-closed evidence: `NoProseRefusal` displays the analysis-only no-prose boundary, confirms no arbitrary prompt route is available, and visibly refuses rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose intents without exposing executable prose-production controls.
+- Focused T005 test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k "ux2_storycheck_001 or ux2_noprose_001"` -> `2 passed, 5 deselected in 0.03s`.
+- Source regression: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_source_001` -> `1 passed, 6 deselected in 0.03s`.
+- Full expected-red file after T005: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `3 passed, 4 failed`; remaining expected-red surfaces are limited to `UX2-NOTES-MATERIALS-001`, `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001`.
+- T006 is next for Notes/Materials plus runtime/review evidence UI.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior, backend route/API changes, package changes, context artifact updates, crawlers/raw captures, model calls, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 ## Known Acceptance Gaps
 
-- Remaining Story Check acceptance requires T005 diagnostic-only output UI against the selected owner-authored source.
-- Remaining no-prose acceptance requires T005 refusal/fail-closed UI evidence.
-- No safe arbitrary prompt route may be used as a no-prose test path.
-- Browser-testable refusal/fail-closed behavior is needed for rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose requests.
+- Story Check diagnostic-only selected-source acceptance is implemented in T005.
+- No-prose refusal/fail-closed acceptance is implemented in T005; no safe arbitrary prompt route is exposed as a prose-generation path.
 - Notes/Materials create/save/reload and project isolation proof need browser evidence.
 - Runtime extraction/raw artifact states need UI-visible unavailable/fail-closed or read-only evidence.
 - Review/apply-promotion evidence needs a safe fixture, explicit owner confirmation, visible audit details, and proof that failed/rejected promotion leaves approved memory/canon unchanged.

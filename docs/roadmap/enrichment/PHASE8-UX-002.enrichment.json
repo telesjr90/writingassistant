@@ -2,7 +2,7 @@
   "task_id": "PHASE8-UX-002",
   "title": "MVP acceptance UI completion and route wiring",
   "status": "active",
-  "task_type": "MVP-first UX parent with completed source workflow implementation child",
+  "task_type": "MVP-first UX parent with completed source workflow and Story Check/no-prose implementation children",
   "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-002/",
@@ -70,12 +70,13 @@
     "PHASE8-UX-002-T002 recorded complete/PASS as docs/decision/planning only",
     "PHASE8-UX-002-T003 recorded complete/PASS as tests-first expected-red only using the repo virtualenv pytest interpreter",
     "PHASE8-UX-002-T004 recorded complete/PASS as frontend owner-authored source/scene create/import/select UI implementation",
+    "PHASE8-UX-002-T005 recorded complete/PASS as frontend Story Check diagnostic-only/no-prose evidence UI implementation",
     "frontend/src/App.jsx",
     "frontend/src/api.js",
     "frontend/src/components/ProjectNav.jsx",
     "frontend/src/components/AnalysisSidebar.jsx",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
-    "PHASE8-UX-002-T005 recorded as the next planned child",
+    "PHASE8-UX-002-T006 recorded as the next planned child",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
   ],
@@ -101,7 +102,7 @@
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
   ],
   "disallowed_files": [
-    "frontend/** except the T004 touched files listed in allowed_files for the owner-authored source UI implementation",
+    "frontend/** except the T004/T005 touched files listed in allowed_files for the owner-authored source and Story Check/no-prose UI implementations",
     "backend/**",
     "package.json",
     "frontend/package.json",
@@ -202,13 +203,23 @@
     {
       "task_id": "PHASE8-UX-002-T005",
       "title": "Implement Story Check diagnostic-only/no-prose evidence UI",
-      "status": "next planned",
-      "scope": "frontend/API only if needed and explicitly scoped later. Safe selected-source Story Check path, diagnostic-only output state, no-prose refusal/fail-closed evidence."
+      "status": "complete/PASS",
+      "scope": "frontend/API only if needed and explicitly scoped later. Safe selected-source Story Check path, diagnostic-only output state, no-prose refusal/fail-closed evidence.",
+      "outputs": [
+        "frontend/src/App.jsx",
+        "frontend/src/api.js",
+        "frontend/src/components/AnalysisSidebar.jsx"
+      ],
+      "focused_t005_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k \"ux2_storycheck_001 or ux2_noprose_001\"",
+      "focused_t005_test_result": "2 passed, 5 deselected in 0.03s",
+      "source_regression_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_source_001",
+      "source_regression_test_result": "1 passed, 6 deselected in 0.03s",
+      "full_expected_red_after_t005": "3 passed, 4 failed; remaining failures limited to UX2-NOTES-MATERIALS-001, UX2-RAW-ARTIFACT-001, UX2-REVIEW-PROMOTION-001, and UX2-ANALYSIS-RUNTIME-001."
     },
     {
       "task_id": "PHASE8-UX-002-T006",
       "title": "Implement Notes/Materials + runtime/review evidence UI",
-      "status": "planned",
+      "status": "next planned",
       "scope": "likely split if too large. Notes/Materials save-reload proof, raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence."
     },
     {
@@ -230,14 +241,13 @@
     "mvp_complete": false,
     "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
   },
-  "latest_child_task": "PHASE8-UX-002-T004",
+  "latest_child_task": "PHASE8-UX-002-T005",
   "latest_child_status": "complete/PASS",
   "latest_child_outputs": [
     "frontend/src/App.jsx",
     "frontend/src/api.js",
-    "frontend/src/components/ProjectNav.jsx",
     "frontend/src/components/AnalysisSidebar.jsx"
   ],
-  "next_planned_child": "PHASE8-UX-002-T005",
-  "next_planned_child_scope": "Implement Story Check diagnostic-only/no-prose evidence UI against the selected owner-authored source while preserving fail-closed no-prose boundaries."
+  "next_planned_child": "PHASE8-UX-002-T006",
+  "next_planned_child_scope": "Implement Notes/Materials plus runtime/review evidence UI while preserving expected-red boundaries for remaining UX2 surfaces."
 }

@@ -112,6 +112,51 @@ export async function runStoryCheck(sceneId, projectId = PROJECT_ID) {
   return requestData(() => client.post(`/projects/${projectId}/story-check/${sceneId}`));
 }
 
+export async function runStoryCheckForSelectedSource({
+  projectId = PROJECT_ID,
+  selectedStoryCheckSourceId,
+  selectedStoryCheckSource,
+} = {}) {
+  requireSafeOwnerAuthoredSourceId(projectId, 'project_id');
+  requireSafeOwnerAuthoredSourceId(selectedStoryCheckSourceId, 'selected_story_check_source_id');
+
+  if (!selectedStoryCheckSource || selectedStoryCheckSource.source_id !== selectedStoryCheckSourceId) {
+    throw new Error('Story Check requires a selected owner-authored source.');
+  }
+
+  return runStoryCheck(selectedStoryCheckSourceId, projectId);
+}
+
+export function refuseForbiddenProseIntent(intent) {
+  const normalizedIntent = typeof intent === 'string' ? intent.trim().toLowerCase() : '';
+  const forbiddenIntents = new Set([
+    'rewrite',
+    'continue',
+    'outline',
+    'draft',
+    'polish',
+    'improve',
+    'expand',
+    'imitate',
+    'generate prose',
+  ]);
+
+  if (!forbiddenIntents.has(normalizedIntent)) {
+    return {
+      refused: false,
+      boundary: 'analysis-only no-prose boundary',
+      message: 'This interface exposes diagnostics only.',
+    };
+  }
+
+  return {
+    refused: true,
+    intent: normalizedIntent,
+    boundary: 'analysis-only no-prose boundary',
+    message: `forbidden intent: ${normalizedIntent}; no generated story prose.`,
+  };
+}
+
 export async function fetchStoryformContext(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/storyform-context`));
 }
