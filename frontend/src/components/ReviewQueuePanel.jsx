@@ -30,6 +30,42 @@ function candidateEvidenceRows(entry) {
   ];
 }
 
+function ReviewPromotionEvidenceStatus({ entry }) {
+  return (
+    <section
+      className="review-boundary-note"
+      data-testid="ux2-review-queue-fixture"
+      aria-label="Review and promotion evidence boundary"
+    >
+      <p>
+        Safe review queue fixture: queue presence is not approval, candidate persistence is
+        not canon, and apply-promotion is explicit/audited/owner-confirmed.
+      </p>
+      <dl
+        className="omi-metadata"
+        data-testid="ux2-approved-memory-unchanged-after-rejection"
+      >
+        <div>
+          <dt>Selected candidate</dt>
+          <dd>{formatValue(entry?.candidate_record_id ?? entry?.candidate_id)}</dd>
+        </div>
+        <div>
+          <dt>Rejected promotion</dt>
+          <dd>rejected promotion leaves approved memory/canon unchanged.</dd>
+        </div>
+        <div>
+          <dt>Failed promotion</dt>
+          <dd>failed promotion leaves approved memory/canon unchanged.</dd>
+        </div>
+        <div>
+          <dt>Owner gate</dt>
+          <dd>explicit owner confirmation is required before any promotion request.</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
 export default function ReviewQueuePanel({ projectId }) {
   const [entries, setEntries] = useState([]);
   const [selectedQueueEntryId, setSelectedQueueEntryId] = useState('');
@@ -154,6 +190,8 @@ export default function ReviewQueuePanel({ projectId }) {
                 Candidate details are read-only. This panel preserves evidence/provenance/source
                 locator context and does not perform canon or memory mutation.
               </div>
+
+              <ReviewPromotionEvidenceStatus entry={selectedEntry} />
 
               <dl className="omi-metadata">
                 <div>

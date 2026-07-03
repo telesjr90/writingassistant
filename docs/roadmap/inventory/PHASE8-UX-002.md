@@ -125,13 +125,23 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - Full `PHASE8-UX-002-T006` remains in progress. T006C is next for `UX2-REVIEW-PROMOTION-001`.
 - Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No backend route/API changes, package changes, tests changes, context artifact updates, crawlers/raw captures, runtime extraction, NCP/Subtxt/dramatica-flow execution, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
 
+## T006C Review / Promotion Evidence UI Implementation
+
+- Status: `PHASE8-UX-002-T006C` complete/PASS for `UX2-REVIEW-PROMOTION-001`.
+- Implementation files touched: `frontend/src/components/ReviewQueuePanel.jsx` and `frontend/src/components/ApplyPromotionConfirmation.jsx`.
+- `UX2-REVIEW-PROMOTION-001` is implemented as review/promotion evidence UI: review queue fixture evidence states queue presence is not approval and candidate persistence is not canon; apply-promotion confirmation is explicitly owner-confirmed; promotion audit evidence remains visible; failed and rejected promotion outcomes are labeled as leaving approved memory/canon unchanged.
+- Focused review/promotion test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001` -> `1 passed, 6 deselected in 0.03s`.
+- Full UX2 acceptance file: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`.
+- `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No backend route/API changes, package changes, tests changes, context artifact updates, crawlers/raw captures, model calls, generated prose, approved memory/canon mutation, automatic promotion, apply-promotion shortcut, staging, commit, or push occurred.
+
 ## Known Acceptance Gaps
 
 - Story Check diagnostic-only selected-source acceptance is implemented in T005.
 - No-prose refusal/fail-closed acceptance is implemented in T005; no safe arbitrary prompt route is exposed as a prose-generation path.
 - Notes/Materials create/save/reload source-contract evidence is implemented in T006A; broader owner browser acceptance remains pending.
 - Runtime extraction/raw artifact unavailable/read-only evidence is implemented in T006B; broader owner browser acceptance remains pending.
-- Review/apply-promotion evidence needs a safe fixture, explicit owner confirmation, visible audit details, and proof that failed/rejected promotion leaves approved memory/canon unchanged.
+- Review/apply-promotion evidence is implemented in T006C with a safe fixture, explicit owner confirmation, visible audit details, and proof that failed/rejected promotion leaves approved memory/canon unchanged.
 - NCP/Subtxt/dramatica-flow `NOT_EXPOSED` analysis-runtime label evidence is implemented in T006B; runtime execution remains unexposed.
 
 ## Post-MVP / Deferred Research Docs

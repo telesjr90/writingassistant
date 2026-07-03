@@ -2,7 +2,7 @@
   "task_id": "PHASE8-UX-002",
   "title": "MVP acceptance UI completion and route wiring",
   "status": "active",
-  "task_type": "MVP-first UX parent with completed source workflow and Story Check/no-prose implementation children",
+  "task_type": "MVP-first UX parent with completed T006 UI evidence surfaces and T007 closeout next",
   "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-002/",
@@ -76,8 +76,11 @@
     "frontend/src/components/ProjectNav.jsx",
     "frontend/src/components/Editor.jsx",
     "frontend/src/components/AnalysisSidebar.jsx",
+    "frontend/src/components/ReviewQueuePanel.jsx",
+    "frontend/src/components/ApplyPromotionConfirmation.jsx",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
-    "PHASE8-UX-002-T006 recorded as the next planned child",
+    "PHASE8-UX-002-T006 recorded complete/PASS after all seven UX2 tests passed",
+    "PHASE8-UX-002-T007 recorded as the next planned child",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
   ],
@@ -98,12 +101,15 @@
     "frontend/src/api.js",
     "frontend/src/components/ProjectNav.jsx",
     "frontend/src/components/AnalysisSidebar.jsx",
+    "frontend/src/components/ReviewQueuePanel.jsx",
+    "frontend/src/components/ApplyPromotionConfirmation.jsx",
+    "frontend/src/components/OwnerActionReviewControls.jsx",
     "docs/master_plan.md",
     "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
   ],
   "disallowed_files": [
-    "frontend/** except the T004/T005/T006A touched files listed in allowed_files for the owner-authored source, Story Check/no-prose, and Notes/Materials evidence UI implementations",
+    "frontend/** except the T004/T005/T006A/T006B/T006C touched files listed in allowed_files for the owner-authored source, Story Check/no-prose, Notes/Materials, raw/runtime, and review/promotion evidence UI implementations",
     "backend/**",
     "package.json",
     "frontend/package.json",
@@ -220,8 +226,8 @@
     {
       "task_id": "PHASE8-UX-002-T006",
       "title": "Implement Notes/Materials + runtime/review evidence UI",
-      "status": "in progress",
-      "scope": "split into focused slices. T006A Notes/Materials save-reload proof is complete/PASS for UX2-NOTES-MATERIALS-001; T006B raw artifact read-only/support-data UI evidence and analysis-runtime label evidence is complete/PASS for UX2-RAW-ARTIFACT-001 and UX2-ANALYSIS-RUNTIME-001; safe review/apply-promotion fixture and confirmation evidence remains for T006C.",
+      "status": "complete/PASS",
+      "scope": "split into focused slices. T006A Notes/Materials save-reload proof is complete/PASS for UX2-NOTES-MATERIALS-001; T006B raw artifact read-only/support-data UI evidence and analysis-runtime label evidence is complete/PASS for UX2-RAW-ARTIFACT-001 and UX2-ANALYSIS-RUNTIME-001; T006C safe review/apply-promotion fixture, explicit owner confirmation, audit evidence, and unchanged-memory/canon evidence is complete/PASS for UX2-REVIEW-PROMOTION-001.",
       "t006a": {
         "task_id": "PHASE8-UX-002-T006A",
         "title": "Implement Notes/Materials project-scoped evidence UI",
@@ -250,12 +256,27 @@
         "focused_raw_runtime_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k \"ux2_raw_artifact_001 or ux2_analysis_runtime_001\"",
         "focused_raw_runtime_test_result": "2 passed, 5 deselected in 0.03s",
         "boundary": "raw artifact evidence is read-only support data only, raw artifacts are not canon, raw artifact inspection does not mutate memory or canon, NCP/Subtxt/dramatica-flow are NOT_EXPOSED labels only, and no runtime execution path is exposed."
+      },
+      "t006c": {
+        "task_id": "PHASE8-UX-002-T006C",
+        "title": "Implement review/promotion evidence UI",
+        "status": "complete/PASS",
+        "scope": "frontend-only review/apply-promotion evidence for UX2-REVIEW-PROMOTION-001 using existing review queue and apply-promotion surfaces.",
+        "outputs": [
+          "frontend/src/components/ReviewQueuePanel.jsx",
+          "frontend/src/components/ApplyPromotionConfirmation.jsx"
+        ],
+        "focused_review_promotion_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001",
+        "focused_review_promotion_test_result": "1 passed, 6 deselected in 0.03s",
+        "full_ux2_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q",
+        "full_ux2_test_result": "7 passed in 0.03s",
+        "boundary": "queue presence is not approval, candidate persistence is not canon, apply-promotion is explicit/audited/owner-confirmed, and failed or rejected promotion leaves approved memory/canon unchanged."
       }
     },
     {
       "task_id": "PHASE8-UX-002-T007",
       "title": "Closeout + rerun owner acceptance harness",
-      "status": "planned",
+      "status": "next",
       "scope": "docs/status/governance plus owner-run evidence. Re-run owner acceptance harness after missing UI surfaces are built. Do not mark MVP complete unless owner explicitly accepts through the correct checklist/roadmap gate."
     }
   ],
@@ -269,15 +290,14 @@
   "mvp_readiness_decision": {
     "owner_acceptance": "pending",
     "mvp_complete": false,
-    "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
+    "reason": "All seven UX2 source acceptance surfaces now pass, but latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED pending T007 closeout and owner gate."
   },
-  "latest_child_task": "PHASE8-UX-002-T006B",
+  "latest_child_task": "PHASE8-UX-002-T006C",
   "latest_child_status": "complete/PASS",
   "latest_child_outputs": [
-    "frontend/src/App.jsx",
-    "frontend/src/api.js",
-    "frontend/src/components/AnalysisSidebar.jsx"
+    "frontend/src/components/ReviewQueuePanel.jsx",
+    "frontend/src/components/ApplyPromotionConfirmation.jsx"
   ],
-  "next_planned_child": "PHASE8-UX-002-T006C",
-  "next_planned_child_scope": "Implement remaining review/apply-promotion evidence UI while preserving expected-red boundaries for non-target surfaces."
+  "next_planned_child": "PHASE8-UX-002-T007",
+  "next_planned_child_scope": "Closeout plus owner acceptance harness rerun; owner acceptance remains pending and MVP is not complete until the owner gate."
 }

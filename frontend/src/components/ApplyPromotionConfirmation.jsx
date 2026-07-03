@@ -216,9 +216,10 @@ export default function ApplyPromotionConfirmation({
         Apply-promotion is the only approved memory/canon mutation path. This is a
         candidate-only, no-canon confirmation surface: queue presence is not approval,
         confidence is not truth, candidate persistence is not canon, and raw artifacts are support data, not canon.
+        apply-promotion is explicit/audited/owner-confirmed and requires explicit owner confirmation.
       </div>
 
-      <dl className="omi-provenance-grid">
+      <dl className="omi-provenance-grid" data-testid="ux2-promotion-audit-evidence">
         <div>
           <dt>evidence_refs</dt>
           <dd>{formatValue(evidenceRefs)}</dd>
@@ -314,7 +315,10 @@ export default function ApplyPromotionConfirmation({
           destination_path preview: {destinationPath || 'Select a destination key'}
         </p>
 
-        <label className="omi-checkbox-row">
+        <label
+          className="omi-checkbox-row"
+          data-testid="ux2-apply-promotion-owner-confirmation"
+        >
           <input
             type="checkbox"
             checked={ownerConfirmation}

@@ -1,3 +1,14 @@
+# PHASE8-UX-002-T006C Review / Promotion Evidence UI
+
+- `PHASE8-UX-002` remains active as the MVP-first UX parent.
+- `PHASE8-UX-002-T006C` is complete/PASS as frontend review/apply-promotion evidence UI for `UX2-REVIEW-PROMOTION-001`.
+- Implementation touched `frontend/src/components/ReviewQueuePanel.jsx` and `frontend/src/components/ApplyPromotionConfirmation.jsx`.
+- Focused T006C test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001` -> `1 passed, 6 deselected in 0.03s`.
+- Full UX2 expected-red acceptance file now passes: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`.
+- Review/promotion evidence records a safe review queue fixture, explicit owner confirmation, promotion audit evidence, queue presence is not approval, candidate persistence is not canon, and failed/rejected promotion leaves approved memory/canon unchanged.
+- `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior was added.
+
 # PHASE8-UX-002-T005 Story Check Diagnostic-Only / No-Prose Evidence UI
 
 - `PHASE8-UX-002` remains active as the MVP-first UX parent.
