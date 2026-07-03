@@ -2,7 +2,7 @@
   "task_id": "PHASE8-UX-002",
   "title": "MVP acceptance UI completion and route wiring",
   "status": "active",
-  "task_type": "docs/status/planning parent with completed docs/decision/planning child and completed tests-first expected-red child",
+  "task_type": "MVP-first UX parent with completed source workflow implementation child",
   "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-002/",
@@ -69,8 +69,13 @@
     "roadmap/status/governance updates publishing PHASE8-UX-002 as the active MVP acceptance UI completion parent",
     "PHASE8-UX-002-T002 recorded complete/PASS as docs/decision/planning only",
     "PHASE8-UX-002-T003 recorded complete/PASS as tests-first expected-red only using the repo virtualenv pytest interpreter",
+    "PHASE8-UX-002-T004 recorded complete/PASS as frontend owner-authored source/scene create/import/select UI implementation",
+    "frontend/src/App.jsx",
+    "frontend/src/api.js",
+    "frontend/src/components/ProjectNav.jsx",
+    "frontend/src/components/AnalysisSidebar.jsx",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
-    "PHASE8-UX-002-T004 recorded as the next planned child",
+    "PHASE8-UX-002-T005 recorded as the next planned child",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
   ],
@@ -87,12 +92,16 @@
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
     "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py",
+    "frontend/src/App.jsx",
+    "frontend/src/api.js",
+    "frontend/src/components/ProjectNav.jsx",
+    "frontend/src/components/AnalysisSidebar.jsx",
     "docs/master_plan.md",
     "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
   ],
   "disallowed_files": [
-    "frontend/**",
+    "frontend/** except the T004 touched files listed in allowed_files for the owner-authored source UI implementation",
     "backend/**",
     "package.json",
     "frontend/package.json",
@@ -178,13 +187,22 @@
     {
       "task_id": "PHASE8-UX-002-T004",
       "title": "Implement owner-authored source/scene create/import/select UI",
-      "status": "next planned",
-      "scope": "frontend/API only if needed and explicitly scoped later. Project-scoped owner-authored source workflow that unlocks Story Check and no-prose evidence."
+      "status": "complete/PASS",
+      "scope": "frontend/API only; project-scoped owner-authored source workflow that gates Story Check behind selectedStoryCheckSourceId.",
+      "outputs": [
+        "frontend/src/App.jsx",
+        "frontend/src/api.js",
+        "frontend/src/components/ProjectNav.jsx",
+        "frontend/src/components/AnalysisSidebar.jsx"
+      ],
+      "focused_source_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_source_001",
+      "focused_source_test_result": "1 passed, 6 deselected in 0.03s",
+      "full_expected_red_after_t004": "1 passed, 6 failed; remaining failures limited to UX2-STORYCHECK-001, UX2-NOPROSE-001, UX2-NOTES-MATERIALS-001, UX2-RAW-ARTIFACT-001, UX2-REVIEW-PROMOTION-001, and UX2-ANALYSIS-RUNTIME-001."
     },
     {
       "task_id": "PHASE8-UX-002-T005",
       "title": "Implement Story Check diagnostic-only/no-prose evidence UI",
-      "status": "planned",
+      "status": "next planned",
       "scope": "frontend/API only if needed and explicitly scoped later. Safe selected-source Story Check path, diagnostic-only output state, no-prose refusal/fail-closed evidence."
     },
     {
@@ -212,11 +230,14 @@
     "mvp_complete": false,
     "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
   },
-  "latest_child_task": "PHASE8-UX-002-T003",
+  "latest_child_task": "PHASE8-UX-002-T004",
   "latest_child_status": "complete/PASS",
   "latest_child_outputs": [
-    "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py"
+    "frontend/src/App.jsx",
+    "frontend/src/api.js",
+    "frontend/src/components/ProjectNav.jsx",
+    "frontend/src/components/AnalysisSidebar.jsx"
   ],
-  "next_planned_child": "PHASE8-UX-002-T004",
-  "next_planned_child_scope": "Implement owner-authored source/scene create/import/select UI with project-scoped selected source state and Story Check fail-closed behavior until a valid owner-authored source is selected."
+  "next_planned_child": "PHASE8-UX-002-T005",
+  "next_planned_child_scope": "Implement Story Check diagnostic-only/no-prose evidence UI against the selected owner-authored source while preserving fail-closed no-prose boundaries."
 }

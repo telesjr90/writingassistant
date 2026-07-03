@@ -50,6 +50,48 @@ export async function saveScene(sceneId, content, projectId = PROJECT_ID) {
   return requestData(() => client.put(`/projects/${projectId}/scenes/${sceneId}`, { content }));
 }
 
+export async function createOrImportOwnerAuthoredSource(
+  projectId = PROJECT_ID,
+  { sourceId, content } = {},
+) {
+  requireSafeOwnerAuthoredSourceId(projectId, 'project_id');
+  requireSafeOwnerAuthoredSourceId(sourceId, 'source_id');
+
+  const ownerAuthoredContent = typeof content === 'string' ? content : '';
+  await saveScene(sourceId, ownerAuthoredContent, projectId);
+
+  return {
+    project_id: projectId,
+    source_id: sourceId,
+    source_type: 'scene',
+    source_kind: 'owner-authored source',
+    source_scope: 'project-scoped selected source',
+    status: 'saved',
+    is_canon: false,
+    is_memory: false,
+    is_training_data: false,
+    is_approved_truth: false,
+  };
+}
+
+export function selectStoryCheckSource(projectId = PROJECT_ID, sourceId) {
+  requireSafeOwnerAuthoredSourceId(projectId, 'project_id');
+  requireSafeOwnerAuthoredSourceId(sourceId, 'source_id');
+
+  return {
+    project_id: projectId,
+    source_id: sourceId,
+    source_type: 'scene',
+    source_kind: 'owner-authored source',
+    source_scope: 'project-scoped selected source',
+    selected_for: 'Story Check',
+    is_canon: false,
+    is_memory: false,
+    is_training_data: false,
+    is_approved_truth: false,
+  };
+}
+
 export async function fetchBible(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/bible`));
 }
@@ -160,6 +202,12 @@ export async function saveMaterialMetadata(materialId, metadata, projectId = PRO
 
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
 const SAFE_DESTINATION_PATH_PATTERN = /^memory\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.json$/;
+
+function requireSafeOwnerAuthoredSourceId(value, label) {
+  if (!isSafeReviewRouteId(value)) {
+    throw new Error(`${label} is required before selecting an owner-authored source.`);
+  }
+}
 
 export const REVIEW_ACTION_TYPES = Object.freeze([
   'mark_reviewed',

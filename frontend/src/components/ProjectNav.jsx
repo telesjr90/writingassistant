@@ -247,10 +247,23 @@ export default function ProjectNav({
   materialsError = '',
   onSelectNote,
   onSelectMaterial,
+  selectedStoryCheckSourceId = '',
+  storyCheckSourceStatus = 'Story Check requires a selected owner-authored source.',
+  storyCheckSourceError = '',
+  isImportingStoryCheckSource = false,
+  onCreateOrImportStoryCheckSource,
+  onSelectStoryCheckSource,
 }) {
   const [newProjectTitle, setNewProjectTitle] = useState('');
+  const [ownerSourceId, setOwnerSourceId] = useState('');
+  const [ownerSourceContent, setOwnerSourceContent] = useState('');
   const trimmedProjectTitle = newProjectTitle.trim();
+  const trimmedOwnerSourceId = ownerSourceId.trim();
   const canCreateProject = Boolean(trimmedProjectTitle) && !isCreatingProject;
+  const canImportOwnerSource =
+    Boolean(trimmedOwnerSourceId)
+    && ownerSourceContent.trim() !== ''
+    && !isImportingStoryCheckSource;
   const normalizedScenes = normalizeSceneList(scenes);
   const normalizedNotes = normalizeNoteList(notes);
   const normalizedMaterials = normalizeMaterialList(materials);
@@ -269,6 +282,24 @@ export default function ProjectNav({
 
     if (created) {
       setNewProjectTitle('');
+    }
+  }
+
+  async function handleOwnerSourceImportSubmit(event) {
+    event.preventDefault();
+
+    if (!canImportOwnerSource || typeof onCreateOrImportStoryCheckSource !== 'function') {
+      return;
+    }
+
+    const created = await onCreateOrImportStoryCheckSource({
+      sourceId: trimmedOwnerSourceId,
+      content: ownerSourceContent,
+    });
+
+    if (created) {
+      setOwnerSourceId('');
+      setOwnerSourceContent('');
     }
   }
 
@@ -416,6 +447,92 @@ export default function ProjectNav({
           );
         })}
       </nav>
+
+      <section
+        className="project-selector"
+        aria-label="Owner-authored source for Story Check"
+        data-testid="ux2-source-create-import"
+      >
+        <div className="panel-header">
+          <p className="eyebrow">Story Check Source</p>
+        </div>
+        <p className="muted-copy">
+          Create or import an owner-authored source, then choose the
+          project-scoped selected source for Story Check.
+        </p>
+
+        <form
+          className="create-project-form"
+          onSubmit={handleOwnerSourceImportSubmit}
+          aria-label="Create or import owner-authored source"
+        >
+          <label className="project-select-label">
+            <span className="muted-copy">Source ID</span>
+            <input
+              className="project-title-input"
+              type="text"
+              value={ownerSourceId}
+              onChange={(event) => setOwnerSourceId(event.target.value)}
+              placeholder="scene_002"
+              disabled={isImportingStoryCheckSource}
+              aria-label="Owner-authored source ID"
+            />
+          </label>
+          <label className="project-select-label">
+            <span className="muted-copy">Owner-authored source text</span>
+            <textarea
+              className="project-title-input"
+              value={ownerSourceContent}
+              onChange={(event) => setOwnerSourceContent(event.target.value)}
+              placeholder="Paste owner-authored scene/source text"
+              disabled={isImportingStoryCheckSource}
+              aria-label="Owner-authored source text"
+              rows={5}
+            />
+          </label>
+          <button
+            className="scene-item"
+            type="submit"
+            disabled={!canImportOwnerSource}
+            data-testid="ux2-source-import-owner-authored"
+          >
+            <span>{isImportingStoryCheckSource ? 'Importing source...' : 'Import owner-authored source'}</span>
+            <small>Project-scoped source</small>
+          </button>
+        </form>
+
+        <label className="project-select-label">
+          <span className="muted-copy">Selected source</span>
+          <select
+            className="project-select"
+            value={selectedStoryCheckSourceId}
+            onChange={(event) => onSelectStoryCheckSource?.(event.target.value)}
+            aria-label="Select project-scoped Story Check source"
+            data-testid="ux2-selected-story-check-source"
+          >
+            <option value="">Story Check requires a selected owner-authored source</option>
+            {normalizedScenes.map((scene) => {
+              const sceneId = getSceneOptionId(scene);
+              const sceneLabel = getSceneOptionLabel(scene);
+
+              return (
+                <option key={sceneId} value={sceneId}>
+                  {sceneLabel}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+
+        <p className="muted-copy">
+          Selected source is not canon, memory, training data, or approved truth.
+        </p>
+        {storyCheckSourceError ? (
+          <p className="error-copy">{storyCheckSourceError}</p>
+        ) : (
+          <p className="muted-copy">{storyCheckSourceStatus}</p>
+        )}
+      </section>
 
       <nav className="scene-list" aria-label="Notes">
         <div className="panel-header">

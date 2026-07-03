@@ -134,6 +134,8 @@ function renderThroughline(title, value) {
 export default function AnalysisSidebar({
   report,
   selectedSceneId,
+  selectedStoryCheckSourceId,
+  selectedStoryCheckSource,
   isAnalyzing,
   onRunStoryCheck,
 }) {
@@ -157,7 +159,36 @@ export default function AnalysisSidebar({
       </div>
 
       <div className="analysis-stack">
-        {!selectedSceneId && <p className="muted-copy">Select a scene to run analysis.</p>}
+        {!selectedStoryCheckSourceId && (
+          <section className="analysis-section">
+            <h3>Selected Source Required</h3>
+            <p className="muted-copy">
+              Story Check requires a selected owner-authored source before analysis can run.
+            </p>
+          </section>
+        )}
+        {selectedStoryCheckSourceId && (
+          <section className="analysis-section">
+            <h3>Project-scoped selected source</h3>
+            <dl className="analysis-metadata">
+              <div>
+                <dt>Source</dt>
+                <dd>{selectedStoryCheckSourceId}</dd>
+              </div>
+              <div>
+                <dt>Owner control</dt>
+                <dd>{selectedStoryCheckSource?.source_kind ?? 'owner-authored source'}</dd>
+              </div>
+              <div>
+                <dt>Boundary</dt>
+                <dd>Selection is not canon, memory, training data, or approved truth.</dd>
+              </div>
+            </dl>
+          </section>
+        )}
+        {!selectedSceneId && !selectedStoryCheckSourceId && (
+          <p className="muted-copy">Select or import a source to run analysis.</p>
+        )}
         {isAnalyzing && <p className="muted-copy">Analyzing...</p>}
         {!isAnalyzing && hasReport && (
           <>
@@ -247,7 +278,7 @@ export default function AnalysisSidebar({
       <button
         className="primary-action"
         type="button"
-        disabled={!selectedSceneId || isAnalyzing}
+        disabled={!selectedStoryCheckSourceId || isAnalyzing}
         onClick={onRunStoryCheck}
       >
         {isAnalyzing ? 'Analyzing...' : 'Run Story Check'}

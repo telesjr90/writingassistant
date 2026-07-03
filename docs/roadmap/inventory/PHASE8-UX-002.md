@@ -81,11 +81,21 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - Future implementation owner: `PHASE8-UX-002-T005` for Story Check diagnostic-only/no-prose evidence UI.
 - Future implementation owner: `PHASE8-UX-002-T006` for Notes/Materials plus runtime/review evidence UI.
 
+## T004 Owner-Authored Source UI Implementation
+
+- Status: `PHASE8-UX-002-T004` complete/PASS.
+- Implementation files touched: `frontend/src/App.jsx`, `frontend/src/api.js`, and `frontend/src/components/ProjectNav.jsx`; `frontend/src/components/AnalysisSidebar.jsx` was updated only for selected-source fail-closed Story Check gating/copy.
+- `UX2-SOURCE-001` is implemented/source-gated: owner can create/import an owner-authored source through the browser using existing project-scoped scene save/list behavior, choose a project-scoped selected source, and see selected source state before Story Check.
+- Focused source test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_source_001` -> `1 passed, 6 deselected in 0.03s`.
+- Full expected-red file after T004: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `1 passed, 6 failed`; remaining expected-red surfaces are limited to `UX2-STORYCHECK-001`, `UX2-NOPROSE-001`, `UX2-NOTES-MATERIALS-001`, `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001`.
+- T004 keeps selected source UI state only. Selected source is not canon, memory, training data, approved truth, a candidate promotion, or owner acceptance.
+- T005 is next for Story Check diagnostic-only/no-prose evidence UI.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior, backend route/API changes, package changes, context artifact updates, crawlers/raw captures, model calls, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 ## Known Acceptance Gaps
 
-- Missing browser UI to create/import/select owner-authored scene/source for the Cyber Detective fixture project.
-- Story Check cannot be accepted until it runs against a selected owner-authored source and returns diagnostic-only output.
-- Missing-source Story Check path needs disabled/fail-closed browser evidence.
+- Remaining Story Check acceptance requires T005 diagnostic-only output UI against the selected owner-authored source.
+- Remaining no-prose acceptance requires T005 refusal/fail-closed UI evidence.
 - No safe arbitrary prompt route may be used as a no-prose test path.
 - Browser-testable refusal/fail-closed behavior is needed for rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose requests.
 - Notes/Materials create/save/reload and project isolation proof need browser evidence.

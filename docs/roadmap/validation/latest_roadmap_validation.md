@@ -1,3 +1,13 @@
+# PHASE8-UX-002-T004 Owner-Authored Source UI
+
+- Result: PASS for T004 implementation and validation.
+- `PHASE8-UX-002-T004` implemented the browser-visible owner-authored source/scene create/import/select UI using existing project-scoped scene save/list behavior.
+- `UX2-SOURCE-001` focused test passes: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_source_001` -> `1 passed, 6 deselected in 0.03s`.
+- Full expected-red file after T004: `1 passed, 6 failed`; remaining failures are expected for `UX2-STORYCHECK-001`, `UX2-NOPROSE-001`, `UX2-NOTES-MATERIALS-001`, `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001`.
+- `PHASE8-UX-002-T005` is next for Story Check diagnostic-only/no-prose evidence UI.
+- Owner acceptance remains pending. MVP is not complete. External SaaS investigation remains post-MVP/deferred.
+- No backend route/API changes, package changes, crawler/raw capture output, `.external_sources`, context artifact changes, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 # PHASE8-UX-002-T003 Expected-Red UI Contract Tests
 
 - `PHASE8-UX-002` remains active as the MVP-first UX parent.

@@ -21,6 +21,7 @@ import {
 } from './sharedDocumentController.js';
 import {
   PROJECT_ID,
+  createOrImportOwnerAuthoredSource,
   createProject,
   createOMICandidate,
   createOMIIdea,
@@ -42,6 +43,7 @@ import {
   saveNote,
   saveScene,
   saveStoryform,
+  selectStoryCheckSource,
   updateOMICandidateDecision,
   updateOMIIdeaDecision,
 } from './api.js';
@@ -103,6 +105,13 @@ export default function App() {
   const [lastSavedStoryformText, setLastSavedStoryformText] = useState('{}');
   const [omiData, setOmiData] = useState({ index: null, ideas: [], candidates: [] });
   const [analysisReport, setAnalysisReport] = useState(null);
+  const [selectedStoryCheckSourceId, setSelectedStoryCheckSourceId] = useState('');
+  const [selectedStoryCheckSource, setSelectedStoryCheckSource] = useState(null);
+  const [storyCheckSourceStatus, setStoryCheckSourceStatus] = useState(
+    'Story Check requires a selected owner-authored source.',
+  );
+  const [storyCheckSourceError, setStoryCheckSourceError] = useState('');
+  const [isImportingStoryCheckSource, setIsImportingStoryCheckSource] = useState(false);
   const [sceneError, setSceneError] = useState('');
   const [isLoadingScenes, setIsLoadingScenes] = useState(true);
   const [isLoadingScene, setIsLoadingScene] = useState(false);
@@ -234,6 +243,10 @@ export default function App() {
     let isMounted = true;
 
     setSelectedSceneId('');
+    setSelectedStoryCheckSourceId('');
+    setSelectedStoryCheckSource(null);
+    setStoryCheckSourceStatus('Story Check requires a selected owner-authored source.');
+    setStoryCheckSourceError('');
     setSceneContent('');
     setLastSavedContent('');
     setAnalysisReport(null);
@@ -381,6 +394,27 @@ export default function App() {
       isMounted = false;
     };
   }, [activeProjectId]);
+
+  useEffect(() => {
+    if (!selectedStoryCheckSourceId) {
+      return;
+    }
+
+    const sourceStillBelongsToProject = scenes.some((scene) => {
+      if (typeof scene === 'string') {
+        return scene === selectedStoryCheckSourceId;
+      }
+
+      const sceneId = scene?.scene_id ?? scene?.sceneId ?? scene?.id ?? scene?.name;
+      return sceneId === selectedStoryCheckSourceId;
+    });
+
+    if (!sourceStillBelongsToProject) {
+      setSelectedStoryCheckSourceId('');
+      setSelectedStoryCheckSource(null);
+      setStoryCheckSourceStatus('Story Check requires a selected owner-authored source.');
+    }
+  }, [scenes, selectedStoryCheckSourceId]);
 
   const handleSelectOverview = useCallback(() => {
     if (activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW) {
@@ -655,6 +689,65 @@ export default function App() {
     }
   }, [activeProjectId, isSaving, sceneContent, selectedSceneId]);
 
+  const handleCreateOrImportStoryCheckSource = useCallback(async ({ sourceId, content }) => {
+    if (isImportingStoryCheckSource) {
+      return false;
+    }
+
+    setIsImportingStoryCheckSource(true);
+    setStoryCheckSourceError('');
+    setStoryCheckSourceStatus('Saving owner-authored source...');
+
+    try {
+      const source = await createOrImportOwnerAuthoredSource(activeProjectId, {
+        sourceId,
+        content,
+      });
+      const refreshedScenes = await fetchScenes(activeProjectId);
+      setScenes(Array.isArray(refreshedScenes) ? refreshedScenes : refreshedScenes.scenes ?? []);
+      const selectedSource = selectStoryCheckSource(activeProjectId, source.source_id);
+      setSelectedStoryCheckSourceId(selectedSource.source_id);
+      setSelectedStoryCheckSource(selectedSource);
+      setStoryCheckSourceStatus(
+        'Selected owner-authored source saved as the project-scoped selected source for Story Check.',
+      );
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Source import failed.';
+      setStoryCheckSourceError(message);
+      setStoryCheckSourceStatus('Story Check requires a selected owner-authored source.');
+      return false;
+    } finally {
+      setIsImportingStoryCheckSource(false);
+    }
+  }, [activeProjectId, isImportingStoryCheckSource]);
+
+  const handleSelectStoryCheckSource = useCallback((sourceId) => {
+    if (!sourceId) {
+      setSelectedStoryCheckSourceId('');
+      setSelectedStoryCheckSource(null);
+      setStoryCheckSourceStatus('Story Check requires a selected owner-authored source.');
+      return;
+    }
+
+    try {
+      const selectedSource = selectStoryCheckSource(activeProjectId, sourceId);
+      setSelectedStoryCheckSourceId(selectedSource.source_id);
+      setSelectedStoryCheckSource(selectedSource);
+      setStoryCheckSourceError('');
+      setStoryCheckSourceStatus(
+        'Selected owner-authored source is the project-scoped selected source for Story Check.',
+      );
+    } catch (error) {
+      setSelectedStoryCheckSourceId('');
+      setSelectedStoryCheckSource(null);
+      setStoryCheckSourceError(
+        error instanceof Error ? error.message : 'Source selection failed.',
+      );
+      setStoryCheckSourceStatus('Story Check requires a selected owner-authored source.');
+    }
+  }, [activeProjectId]);
+
   const handleSaveBible = useCallback(async () => {
     if (isSavingBible) {
       return;
@@ -854,7 +947,10 @@ export default function App() {
   }, [activeDocumentType, activeWorkspaceView, handleSave, handleSaveMaterial, handleSaveNote]);
 
   const handleRunStoryCheck = useCallback(async () => {
-    if (!selectedSceneId) {
+    if (!selectedStoryCheckSourceId) {
+      setAnalysisReport({
+        error: 'Story Check requires a selected owner-authored source.',
+      });
       return;
     }
 
@@ -862,7 +958,7 @@ export default function App() {
     setAnalysisReport(null);
 
     try {
-      const data = await runStoryCheck(selectedSceneId, activeProjectId);
+      const data = await runStoryCheck(selectedStoryCheckSourceId, activeProjectId);
       setAnalysisReport(data);
     } catch (error) {
       setAnalysisReport({
@@ -871,7 +967,7 @@ export default function App() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [activeProjectId, selectedSceneId]);
+  }, [activeProjectId, selectedStoryCheckSourceId]);
 
   const sceneDocument = createDocumentDescriptor({
     type: DOCUMENT_TYPES.SCENE,
@@ -957,6 +1053,12 @@ export default function App() {
         materialsError={materialsError}
         onSelectNote={handleSelectNote}
         onSelectMaterial={handleSelectMaterial}
+        selectedStoryCheckSourceId={selectedStoryCheckSourceId}
+        storyCheckSourceStatus={storyCheckSourceStatus}
+        storyCheckSourceError={storyCheckSourceError}
+        isImportingStoryCheckSource={isImportingStoryCheckSource}
+        onCreateOrImportStoryCheckSource={handleCreateOrImportStoryCheckSource}
+        onSelectStoryCheckSource={handleSelectStoryCheckSource}
       />
       <main className="editor-column" aria-label="Project workspace">
         {activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (
@@ -1049,6 +1151,8 @@ export default function App() {
       <AnalysisSidebar
         report={analysisReport}
         selectedSceneId={selectedSceneId}
+        selectedStoryCheckSourceId={selectedStoryCheckSourceId}
+        selectedStoryCheckSource={selectedStoryCheckSource}
         isAnalyzing={isAnalyzing}
         onRunStoryCheck={handleRunStoryCheck}
       />
