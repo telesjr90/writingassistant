@@ -74,6 +74,7 @@
     "frontend/src/App.jsx",
     "frontend/src/api.js",
     "frontend/src/components/ProjectNav.jsx",
+    "frontend/src/components/Editor.jsx",
     "frontend/src/components/AnalysisSidebar.jsx",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
     "PHASE8-UX-002-T006 recorded as the next planned child",
@@ -102,7 +103,7 @@
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
   ],
   "disallowed_files": [
-    "frontend/** except the T004/T005 touched files listed in allowed_files for the owner-authored source and Story Check/no-prose UI implementations",
+    "frontend/** except the T004/T005/T006A touched files listed in allowed_files for the owner-authored source, Story Check/no-prose, and Notes/Materials evidence UI implementations",
     "backend/**",
     "package.json",
     "frontend/package.json",
@@ -219,8 +220,23 @@
     {
       "task_id": "PHASE8-UX-002-T006",
       "title": "Implement Notes/Materials + runtime/review evidence UI",
-      "status": "next planned",
-      "scope": "likely split if too large. Notes/Materials save-reload proof, raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence."
+      "status": "in progress",
+      "scope": "split into focused slices. T006A Notes/Materials save-reload proof is complete/PASS for UX2-NOTES-MATERIALS-001; raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence, and analysis-runtime label evidence remain for T006B.",
+      "t006a": {
+        "task_id": "PHASE8-UX-002-T006A",
+        "title": "Implement Notes/Materials project-scoped evidence UI",
+        "status": "complete/PASS",
+        "scope": "frontend-only Notes/Materials create/save/reload evidence for UX2-NOTES-MATERIALS-001 using existing note/material routes.",
+        "outputs": [
+          "frontend/src/App.jsx",
+          "frontend/src/api.js",
+          "frontend/src/components/ProjectNav.jsx",
+          "frontend/src/components/Editor.jsx"
+        ],
+        "focused_notes_materials_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_notes_materials_001",
+        "focused_notes_materials_test_result": "1 passed, 6 deselected in 0.03s",
+        "boundary": "owner-authored note and owner-provided material are project-scoped, not canon by default, and notes/materials do not mutate memory or canon."
+      }
     },
     {
       "task_id": "PHASE8-UX-002-T007",
@@ -241,13 +257,14 @@
     "mvp_complete": false,
     "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
   },
-  "latest_child_task": "PHASE8-UX-002-T005",
+  "latest_child_task": "PHASE8-UX-002-T006A",
   "latest_child_status": "complete/PASS",
   "latest_child_outputs": [
     "frontend/src/App.jsx",
     "frontend/src/api.js",
-    "frontend/src/components/AnalysisSidebar.jsx"
+    "frontend/src/components/ProjectNav.jsx",
+    "frontend/src/components/Editor.jsx"
   ],
-  "next_planned_child": "PHASE8-UX-002-T006",
-  "next_planned_child_scope": "Implement Notes/Materials plus runtime/review evidence UI while preserving expected-red boundaries for remaining UX2 surfaces."
+  "next_planned_child": "PHASE8-UX-002-T006B",
+  "next_planned_child_scope": "Implement remaining runtime/raw artifact, review/apply-promotion, and analysis-runtime evidence UI while preserving expected-red boundaries for non-target surfaces."
 }

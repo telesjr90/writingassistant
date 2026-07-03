@@ -151,6 +151,22 @@ export default function Editor({
       {selectedDocumentId && !isLoading && content.length === 0 && (
         <p className="muted-copy">{labels.emptyContent}</p>
       )}
+      {resolvedDocumentType === DOCUMENT_TYPES.NOTE && selectedDocumentId && (
+        <p
+          className="muted-copy"
+          data-testid="ux2-note-save-reload-proof"
+        >
+          owner-authored note save/reload proof; not canon by default; notes/materials do not mutate memory or canon.
+        </p>
+      )}
+      {resolvedDocumentType === DOCUMENT_TYPES.MATERIAL && selectedDocumentId && (
+        <p
+          className="muted-copy"
+          data-testid="ux2-material-save-reload-proof"
+        >
+          owner-provided material save/reload proof; not canon by default; notes/materials do not mutate memory or canon.
+        </p>
+      )}
       <EditorContent editor={editor} />
     </section>
   );

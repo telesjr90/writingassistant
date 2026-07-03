@@ -245,6 +245,8 @@ export default function ProjectNav({
   isLoadingMaterials = false,
   notesError = '',
   materialsError = '',
+  onCreateOwnerAuthoredNote,
+  onCreateOwnerProvidedMaterial,
   onSelectNote,
   onSelectMaterial,
   selectedStoryCheckSourceId = '',
@@ -257,13 +259,27 @@ export default function ProjectNav({
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const [ownerSourceId, setOwnerSourceId] = useState('');
   const [ownerSourceContent, setOwnerSourceContent] = useState('');
+  const [ownerNoteId, setOwnerNoteId] = useState('');
+  const [ownerNoteContent, setOwnerNoteContent] = useState('');
+  const [ownerMaterialId, setOwnerMaterialId] = useState('');
+  const [ownerMaterialContent, setOwnerMaterialContent] = useState('');
   const trimmedProjectTitle = newProjectTitle.trim();
   const trimmedOwnerSourceId = ownerSourceId.trim();
+  const trimmedOwnerNoteId = ownerNoteId.trim();
+  const trimmedOwnerMaterialId = ownerMaterialId.trim();
   const canCreateProject = Boolean(trimmedProjectTitle) && !isCreatingProject;
   const canImportOwnerSource =
     Boolean(trimmedOwnerSourceId)
     && ownerSourceContent.trim() !== ''
     && !isImportingStoryCheckSource;
+  const canCreateOwnerNote =
+    Boolean(trimmedOwnerNoteId)
+    && ownerNoteContent.trim() !== ''
+    && typeof onCreateOwnerAuthoredNote === 'function';
+  const canCreateOwnerMaterial =
+    Boolean(trimmedOwnerMaterialId)
+    && ownerMaterialContent.trim() !== ''
+    && typeof onCreateOwnerProvidedMaterial === 'function';
   const normalizedScenes = normalizeSceneList(scenes);
   const normalizedNotes = normalizeNoteList(notes);
   const normalizedMaterials = normalizeMaterialList(materials);
@@ -300,6 +316,42 @@ export default function ProjectNav({
     if (created) {
       setOwnerSourceId('');
       setOwnerSourceContent('');
+    }
+  }
+
+  async function handleOwnerNoteCreateSubmit(event) {
+    event.preventDefault();
+
+    if (!canCreateOwnerNote) {
+      return;
+    }
+
+    const created = await onCreateOwnerAuthoredNote({
+      noteId: trimmedOwnerNoteId,
+      content: ownerNoteContent,
+    });
+
+    if (created) {
+      setOwnerNoteId('');
+      setOwnerNoteContent('');
+    }
+  }
+
+  async function handleOwnerMaterialCreateSubmit(event) {
+    event.preventDefault();
+
+    if (!canCreateOwnerMaterial) {
+      return;
+    }
+
+    const created = await onCreateOwnerProvidedMaterial({
+      materialId: trimmedOwnerMaterialId,
+      content: ownerMaterialContent,
+    });
+
+    if (created) {
+      setOwnerMaterialId('');
+      setOwnerMaterialContent('');
     }
   }
 
@@ -538,6 +590,46 @@ export default function ProjectNav({
         <div className="panel-header">
           <p className="eyebrow">Notes</p>
         </div>
+        <form
+          className="create-project-form"
+          onSubmit={handleOwnerNoteCreateSubmit}
+          aria-label="Create owner-authored note"
+        >
+          <label className="project-select-label">
+            <span className="muted-copy">Note ID</span>
+            <input
+              className="project-title-input"
+              type="text"
+              value={ownerNoteId}
+              onChange={(event) => setOwnerNoteId(event.target.value)}
+              placeholder="note_001"
+              aria-label="Owner-authored note ID"
+            />
+          </label>
+          <label className="project-select-label">
+            <span className="muted-copy">Owner-authored note text</span>
+            <textarea
+              className="project-title-input"
+              value={ownerNoteContent}
+              onChange={(event) => setOwnerNoteContent(event.target.value)}
+              placeholder="Write owner-authored note text"
+              aria-label="Owner-authored note text"
+              rows={4}
+            />
+          </label>
+          <button
+            className="scene-item"
+            type="submit"
+            disabled={!canCreateOwnerNote}
+            data-testid="ux2-note-create"
+          >
+            <span>Create owner-authored note</span>
+            <small>Project-scoped, not canon by default</small>
+          </button>
+          <p className="muted-copy">
+            This owner-authored note is project-scoped; notes/materials do not mutate memory or canon.
+          </p>
+        </form>
         {isLoadingNotes && <p className="muted-copy">Loading notes...</p>}
         {!isLoadingNotes && notesError && <p className="error-copy">{notesError}</p>}
         {!isLoadingNotes && !notesError && normalizedNotes.length === 0 && (
@@ -571,6 +663,46 @@ export default function ProjectNav({
         <div className="panel-header">
           <p className="eyebrow">Materials</p>
         </div>
+        <form
+          className="create-project-form"
+          onSubmit={handleOwnerMaterialCreateSubmit}
+          aria-label="Create owner-provided material"
+        >
+          <label className="project-select-label">
+            <span className="muted-copy">Material ID</span>
+            <input
+              className="project-title-input"
+              type="text"
+              value={ownerMaterialId}
+              onChange={(event) => setOwnerMaterialId(event.target.value)}
+              placeholder="material_001"
+              aria-label="Owner-provided material ID"
+            />
+          </label>
+          <label className="project-select-label">
+            <span className="muted-copy">Owner-provided material text</span>
+            <textarea
+              className="project-title-input"
+              value={ownerMaterialContent}
+              onChange={(event) => setOwnerMaterialContent(event.target.value)}
+              placeholder="Paste owner-provided material text"
+              aria-label="Owner-provided material text"
+              rows={4}
+            />
+          </label>
+          <button
+            className="scene-item"
+            type="submit"
+            disabled={!canCreateOwnerMaterial}
+            data-testid="ux2-material-create"
+          >
+            <span>Create owner-provided material</span>
+            <small>Project-scoped, not canon by default</small>
+          </button>
+          <p className="muted-copy">
+            This owner-provided material is project-scoped; notes/materials do not mutate memory or canon.
+          </p>
+        </form>
         {isLoadingMaterials && <p className="muted-copy">Loading materials...</p>}
         {!isLoadingMaterials && materialsError && <p className="error-copy">{materialsError}</p>}
         {!isLoadingMaterials && !materialsError && normalizedMaterials.length === 0 && (

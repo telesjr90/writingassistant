@@ -21,6 +21,8 @@ import {
 } from './sharedDocumentController.js';
 import {
   PROJECT_ID,
+  createOwnerAuthoredNote,
+  createOwnerProvidedMaterial,
   createOrImportOwnerAuthoredSource,
   createProject,
   createOMICandidate,
@@ -43,6 +45,7 @@ import {
   saveNote,
   saveScene,
   saveStoryform,
+  reloadProjectScopedNotesMaterials,
   selectStoryCheckSource,
   updateOMICandidateDecision,
   updateOMIIdeaDecision,
@@ -612,8 +615,15 @@ export default function App() {
 
     try {
       await saveNote(selectedNoteId, noteContent, activeProjectId);
-      setLastSavedNoteContent(noteContent);
-      setNoteSaveStatus('Saved');
+      const reloaded = await reloadProjectScopedNotesMaterials(activeProjectId, {
+        noteId: selectedNoteId,
+      });
+      const reloadedContent = getDocumentResponseContent(reloaded.note);
+      setNotes(reloaded.notes);
+      setMaterials(reloaded.materials);
+      setNoteContent(reloadedContent);
+      setLastSavedNoteContent(reloadedContent);
+      setNoteSaveStatus('Saved and reloaded owner-authored note; not canon by default.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Save failed.';
       setNoteSaveStatus(`Save failed: ${message}`);
@@ -632,8 +642,15 @@ export default function App() {
 
     try {
       await saveMaterial(selectedMaterialId, materialContent, activeProjectId);
-      setLastSavedMaterialContent(materialContent);
-      setMaterialSaveStatus('Saved');
+      const reloaded = await reloadProjectScopedNotesMaterials(activeProjectId, {
+        materialId: selectedMaterialId,
+      });
+      const reloadedContent = getDocumentResponseContent(reloaded.material);
+      setNotes(reloaded.notes);
+      setMaterials(reloaded.materials);
+      setMaterialContent(reloadedContent);
+      setLastSavedMaterialContent(reloadedContent);
+      setMaterialSaveStatus('Saved and reloaded owner-provided material; not canon by default.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Save failed.';
       setMaterialSaveStatus(`Save failed: ${message}`);
@@ -641,6 +658,76 @@ export default function App() {
       setIsSavingMaterial(false);
     }
   }, [activeProjectId, isSavingMaterial, materialContent, selectedMaterialId]);
+
+  const handleCreateOwnerAuthoredNote = useCallback(async ({ noteId, content }) => {
+    if (
+      hasUnsavedDocumentChanges
+      && !window.confirm(getDocumentSwitchMessage(DOCUMENT_TYPES.NOTE, DOCUMENT_SWITCH_MESSAGES))
+    ) {
+      return false;
+    }
+
+    setNotesError('');
+    setNoteError('');
+    setNoteSaveStatus('Creating owner-authored note...');
+
+    try {
+      const note = await createOwnerAuthoredNote(activeProjectId, { noteId, content });
+      const reloaded = await reloadProjectScopedNotesMaterials(activeProjectId, {
+        noteId: note.note_id,
+      });
+      const reloadedContent = getDocumentResponseContent(reloaded.note);
+      setNotes(reloaded.notes);
+      setMaterials(reloaded.materials);
+      setSelectedDocumentType(DOCUMENT_TYPES.NOTE);
+      setSelectedNoteId(note.note_id);
+      setNoteContent(reloadedContent);
+      setLastSavedNoteContent(reloadedContent);
+      setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR);
+      setNoteSaveStatus('Created, saved, and reloaded owner-authored note; not canon by default.');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Create note failed.';
+      setNoteError(message);
+      setNoteSaveStatus(`Save failed: ${message}`);
+      return false;
+    }
+  }, [activeProjectId, hasUnsavedDocumentChanges]);
+
+  const handleCreateOwnerProvidedMaterial = useCallback(async ({ materialId, content }) => {
+    if (
+      hasUnsavedDocumentChanges
+      && !window.confirm(getDocumentSwitchMessage(DOCUMENT_TYPES.MATERIAL, DOCUMENT_SWITCH_MESSAGES))
+    ) {
+      return false;
+    }
+
+    setMaterialsError('');
+    setMaterialError('');
+    setMaterialSaveStatus('Creating owner-provided material...');
+
+    try {
+      const material = await createOwnerProvidedMaterial(activeProjectId, { materialId, content });
+      const reloaded = await reloadProjectScopedNotesMaterials(activeProjectId, {
+        materialId: material.material_id,
+      });
+      const reloadedContent = getDocumentResponseContent(reloaded.material);
+      setNotes(reloaded.notes);
+      setMaterials(reloaded.materials);
+      setSelectedDocumentType(DOCUMENT_TYPES.MATERIAL);
+      setSelectedMaterialId(material.material_id);
+      setMaterialContent(reloadedContent);
+      setLastSavedMaterialContent(reloadedContent);
+      setActiveWorkspaceView(WORKSPACE_VIEWS.EDITOR);
+      setMaterialSaveStatus('Created, saved, and reloaded owner-provided material; not canon by default.');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Create material failed.';
+      setMaterialError(message);
+      setMaterialSaveStatus(`Save failed: ${message}`);
+      return false;
+    }
+  }, [activeProjectId, hasUnsavedDocumentChanges]);
 
   const handleBibleTextChange = useCallback((nextText) => {
     setBibleText(nextText);
@@ -1073,6 +1160,8 @@ export default function App() {
         isLoadingMaterials={isLoadingMaterials}
         notesError={notesError}
         materialsError={materialsError}
+        onCreateOwnerAuthoredNote={handleCreateOwnerAuthoredNote}
+        onCreateOwnerProvidedMaterial={handleCreateOwnerProvidedMaterial}
         onSelectNote={handleSelectNote}
         onSelectMaterial={handleSelectMaterial}
         selectedStoryCheckSourceId={selectedStoryCheckSourceId}

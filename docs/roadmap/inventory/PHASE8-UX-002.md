@@ -104,11 +104,22 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - T006 is next for Notes/Materials plus runtime/review evidence UI.
 - Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior, backend route/API changes, package changes, context artifact updates, crawlers/raw captures, model calls, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
 
+## T006A Notes/Materials Evidence UI Implementation
+
+- Status: `PHASE8-UX-002-T006A` complete/PASS for `UX2-NOTES-MATERIALS-001` only.
+- Implementation files touched: `frontend/src/App.jsx`, `frontend/src/api.js`, `frontend/src/components/ProjectNav.jsx`, and `frontend/src/components/Editor.jsx`.
+- `UX2-NOTES-MATERIALS-001` is implemented/project-scoped: the browser can create an owner-authored note, create an owner-provided material, save each body, reload project-scoped notes/materials after save, and see save/reload proof in the editor.
+- Frontend helper evidence uses existing routes only: `createOwnerAuthoredNote`, `createOwnerProvidedMaterial`, and `reloadProjectScopedNotesMaterials`.
+- Focused Notes/Materials test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_notes_materials_001` -> `1 passed, 6 deselected in 0.03s`.
+- Notes/materials remain owner-authored or owner-provided, project-scoped, not canon by default, and notes/materials do not mutate memory or canon.
+- Full `PHASE8-UX-002-T006` remains in progress. T006B is next for `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001`.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No backend route/API changes, package changes, tests changes, context artifact updates, crawlers/raw captures, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 ## Known Acceptance Gaps
 
 - Story Check diagnostic-only selected-source acceptance is implemented in T005.
 - No-prose refusal/fail-closed acceptance is implemented in T005; no safe arbitrary prompt route is exposed as a prose-generation path.
-- Notes/Materials create/save/reload and project isolation proof need browser evidence.
+- Notes/Materials create/save/reload source-contract evidence is implemented in T006A; broader owner browser acceptance remains pending.
 - Runtime extraction/raw artifact states need UI-visible unavailable/fail-closed or read-only evidence.
 - Review/apply-promotion evidence needs a safe fixture, explicit owner confirmation, visible audit details, and proof that failed/rejected promotion leaves approved memory/canon unchanged.
 - NCP/Subtxt/dramatica-flow need a UI-facing versus backend/helper-only exposure decision; `NOT_EXPOSED` may be acceptable for MVP owner acceptance if documented.

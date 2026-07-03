@@ -1,3 +1,14 @@
+# PHASE8-UX-002-T006A Notes/Materials Evidence UI
+
+- Result: PASS for T006A implementation and validation.
+- `PHASE8-UX-002-T006A` implemented only `UX2-NOTES-MATERIALS-001` as frontend Notes/Materials project-scoped evidence UI.
+- Focused Notes/Materials test passes: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_notes_materials_001` -> `1 passed, 6 deselected in 0.03s`.
+- Implementation uses existing notes/materials frontend APIs and routes through `createOwnerAuthoredNote`, `createOwnerProvidedMaterial`, and `reloadProjectScopedNotesMaterials`.
+- Notes are labeled owner-authored notes; materials are labeled owner-provided materials; both remain project-scoped, not canon by default, and notes/materials do not mutate memory or canon.
+- Full `PHASE8-UX-002-T006` remains in progress. T006B is next for the remaining `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001` surfaces.
+- Owner acceptance remains pending. MVP is not complete. External SaaS investigation remains post-MVP/deferred.
+- No backend route/API changes, package changes, tests changes, crawler/raw capture output, `.external_sources`, context artifact changes, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 # PHASE8-UX-002-T005 Story Check Diagnostic-Only / No-Prose Evidence UI
 
 - Result: PASS for T005 implementation and validation.

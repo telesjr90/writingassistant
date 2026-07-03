@@ -216,6 +216,29 @@ export async function saveNote(noteId, content, projectId = PROJECT_ID) {
   return requestData(() => client.put(`/projects/${projectId}/notes/${noteId}`, { content }));
 }
 
+export async function createOwnerAuthoredNote(
+  projectId = PROJECT_ID,
+  { noteId, content } = {},
+) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(noteId, 'note_id');
+
+  const ownerAuthoredContent = typeof content === 'string' ? content : '';
+  await saveNote(noteId, ownerAuthoredContent, projectId);
+
+  return {
+    project_id: projectId,
+    note_id: noteId,
+    source_kind: 'owner-authored note',
+    source_scope: 'project-scoped notes/materials',
+    canon_boundary: 'not canon by default',
+    memory_boundary: 'notes/materials do not mutate memory or canon',
+    is_canon: false,
+    mutates_memory_or_canon: false,
+    status: 'saved',
+  };
+}
+
 export async function fetchNoteMetadata(noteId, projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/notes/${noteId}/metadata`));
 }
@@ -235,6 +258,56 @@ export async function fetchMaterial(materialId, projectId = PROJECT_ID) {
 
 export async function saveMaterial(materialId, content, projectId = PROJECT_ID) {
   return requestData(() => client.put(`/projects/${projectId}/materials/${materialId}`, { content }));
+}
+
+export async function createOwnerProvidedMaterial(
+  projectId = PROJECT_ID,
+  { materialId, content } = {},
+) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(materialId, 'material_id');
+
+  const ownerProvidedContent = typeof content === 'string' ? content : '';
+  await saveMaterial(materialId, ownerProvidedContent, projectId);
+
+  return {
+    project_id: projectId,
+    material_id: materialId,
+    source_kind: 'owner-provided material',
+    source_scope: 'project-scoped notes/materials',
+    canon_boundary: 'not canon by default',
+    memory_boundary: 'notes/materials do not mutate memory or canon',
+    is_canon: false,
+    mutates_memory_or_canon: false,
+    status: 'saved',
+  };
+}
+
+export async function reloadProjectScopedNotesMaterials(
+  projectId = PROJECT_ID,
+  { noteId, materialId } = {},
+) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+
+  const [notesPayload, materialsPayload, notePayload, materialPayload] = await Promise.all([
+    fetchNotes(projectId),
+    fetchMaterials(projectId),
+    noteId ? fetchNote(noteId, projectId) : Promise.resolve(null),
+    materialId ? fetchMaterial(materialId, projectId) : Promise.resolve(null),
+  ]);
+
+  return {
+    project_id: projectId,
+    notes: notesPayload?.notes ?? [],
+    materials: materialsPayload?.materials ?? [],
+    note: notePayload,
+    material: materialPayload,
+    note_id: noteId ?? null,
+    material_id: materialId ?? null,
+    proof: 'owner-authored note / owner-provided material save-reload proof',
+    canon_boundary: 'not canon by default',
+    memory_boundary: 'notes/materials do not mutate memory or canon',
+  };
 }
 
 export async function fetchMaterialMetadata(materialId, projectId = PROJECT_ID) {
