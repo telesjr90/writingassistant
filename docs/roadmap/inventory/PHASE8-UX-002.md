@@ -69,6 +69,18 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - T004/T005/T006 implementation split: T004 source/scene workflow, T005 Story Check/no-prose evidence UI, T006 Notes/Materials plus runtime/review evidence UI.
 - Backend/frontend areas remain future inspection only and were not touched in T002.
 
+## T003 Expected-Red Test Artifact
+
+- Expected-red test file: `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py`.
+- Targeted expected-red command: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q`.
+- Expected-red result: `7 failed in 0.12s`; pytest reached collection and execution, and all failures are intended assertion failures for missing PHASE8-UX-002 MVP browser-visible UI/workflow contract markers.
+- System Python note: `python3 -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` fails before collection because `/usr/bin/python3` has no `pytest` module, but this is not a T003 blocker because the repo's existing virtualenv is the validated test interpreter.
+- Intended red failure summary: `UX2-SOURCE-001` source create/import/select markers missing; `UX2-STORYCHECK-001` selected-source diagnostic-only Story Check markers missing; `UX2-NOPROSE-001` no-prose refusal/fail-closed markers missing; `UX2-NOTES-MATERIALS-001` notes/materials create/save/reload markers missing; `UX2-RAW-ARTIFACT-001` runtime unavailable/read-only raw artifact evidence markers missing; `UX2-REVIEW-PROMOTION-001` review/apply-promotion confirmation and audit markers missing; `UX2-ANALYSIS-RUNTIME-001` `NOT_EXPOSED`/label-only analysis runtime markers missing.
+- T003 is complete/PASS as tests-first expected-red only. No frontend implementation, backend implementation, route/API changes, product behavior changes, crawler scripts, raw captures, `.external_sources`, context artifacts, model calls, generated prose, canon/memory mutation, candidate creation, apply-promotion shortcut, package/dependency changes, staging, commit, or push occurred.
+- Future implementation owner: `PHASE8-UX-002-T004` for owner-authored source/scene create/import/select UI.
+- Future implementation owner: `PHASE8-UX-002-T005` for Story Check diagnostic-only/no-prose evidence UI.
+- Future implementation owner: `PHASE8-UX-002-T006` for Notes/Materials plus runtime/review evidence UI.
+
 ## Known Acceptance Gaps
 
 - Missing browser UI to create/import/select owner-authored scene/source for the Cyber Detective fixture project.

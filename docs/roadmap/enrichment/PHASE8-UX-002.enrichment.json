@@ -2,7 +2,7 @@
   "task_id": "PHASE8-UX-002",
   "title": "MVP acceptance UI completion and route wiring",
   "status": "active",
-  "task_type": "docs/status/planning parent with completed docs/decision/planning child",
+  "task_type": "docs/status/planning parent with completed docs/decision/planning child and completed tests-first expected-red child",
   "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-002/",
@@ -65,10 +65,12 @@
     "docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json",
     "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md",
+    "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py",
     "roadmap/status/governance updates publishing PHASE8-UX-002 as the active MVP acceptance UI completion parent",
     "PHASE8-UX-002-T002 recorded complete/PASS as docs/decision/planning only",
+    "PHASE8-UX-002-T003 recorded complete/PASS as tests-first expected-red only using the repo virtualenv pytest interpreter",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
-    "PHASE8-UX-002-T003 recorded as the next planned child",
+    "PHASE8-UX-002-T004 recorded as the next planned child",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
   ],
@@ -84,6 +86,7 @@
     "docs/roadmap/decision_log.md",
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
+    "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py",
     "docs/master_plan.md",
     "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
@@ -91,7 +94,6 @@
   "disallowed_files": [
     "frontend/**",
     "backend/**",
-    "tests/**",
     "package.json",
     "frontend/package.json",
     "frontend/package-lock.json",
@@ -112,6 +114,7 @@
     "python3 scripts/check_enrichment.py",
     "python3 scripts/validate_roadmap.py",
     "python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null",
+    ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q",
     "git diff --check",
     "git status --short --branch",
     "git diff --name-only"
@@ -130,7 +133,8 @@
     "docs/roadmap/open_questions.md",
     "docs/master_plan.md",
     "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
-    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
+    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md",
+    "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py"
   ],
   "active_child_sequence": [
     {
@@ -152,13 +156,29 @@
     {
       "task_id": "PHASE8-UX-002-T003",
       "title": "Expected-red tests for source/Story Check/no-prose UI",
-      "status": "next planned",
-      "scope": "tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, review/apply-promotion UI evidence as applicable."
+      "status": "complete/PASS",
+      "scope": "tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, review/apply-promotion UI evidence, and NCP/Subtxt/dramatica-flow label-only exposure behavior as applicable.",
+      "outputs": [
+        "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py"
+      ],
+      "targeted_expected_red_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q",
+      "expected_red_result": "7 failed in 0.12s; pytest reached collection and execution, and all failures are intended assertion failures for missing PHASE8-UX-002 UX2 UI contract markers.",
+      "system_python_note": "python3 -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q fails before collection because /usr/bin/python3 has no pytest module, but this is not a task blocker because the repo virtualenv is the validated test interpreter.",
+      "intended_red_failure_reason": "Required PHASE8-UX-002 MVP browser-visible UI/workflow surfaces are missing from the current frontend/API source.",
+      "intended_failure_summary": [
+        "UX2-SOURCE-001 failed because owner-authored source create/import/select markers are missing.",
+        "UX2-STORYCHECK-001 failed because selected-source diagnostic-only Story Check markers are missing.",
+        "UX2-NOPROSE-001 failed because no-prose refusal/fail-closed markers for forbidden intents are missing.",
+        "UX2-NOTES-MATERIALS-001 failed because project-scoped notes/materials create/save/reload proof markers are missing.",
+        "UX2-RAW-ARTIFACT-001 failed because runtime unavailable/read-only raw artifact evidence markers are missing.",
+        "UX2-REVIEW-PROMOTION-001 failed because review/apply-promotion confirmation and audit markers are missing.",
+        "UX2-ANALYSIS-RUNTIME-001 failed because NOT_EXPOSED/label-only analysis runtime markers are missing."
+      ]
     },
     {
       "task_id": "PHASE8-UX-002-T004",
       "title": "Implement owner-authored source/scene create/import/select UI",
-      "status": "planned",
+      "status": "next planned",
       "scope": "frontend/API only if needed and explicitly scoped later. Project-scoped owner-authored source workflow that unlocks Story Check and no-prose evidence."
     },
     {
@@ -192,12 +212,11 @@
     "mvp_complete": false,
     "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
   },
-  "latest_child_task": "PHASE8-UX-002-T002",
+  "latest_child_task": "PHASE8-UX-002-T003",
   "latest_child_status": "complete/PASS",
   "latest_child_outputs": [
-    "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
-    "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md"
+    "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py"
   ],
-  "next_planned_child": "PHASE8-UX-002-T003",
-  "next_planned_child_scope": "Expected-red tests for source/scene create/import/select, Story Check disabled/result states, no-prose refusal/fail-closed paths, Notes/Materials save/reload proof, runtime/raw artifact unavailable/read-only evidence, review/apply-promotion confirmation/audit evidence, and NCP/Subtxt/dramatica-flow exposure decision behavior."
+  "next_planned_child": "PHASE8-UX-002-T004",
+  "next_planned_child_scope": "Implement owner-authored source/scene create/import/select UI with project-scoped selected source state and Story Check fail-closed behavior until a valid owner-authored source is selected."
 }

@@ -8,6 +8,8 @@
 
 `PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only. T002 created the UI acceptance matrix and route/workflow decision, recorded browser-testable MVP UI surfaces, preserved SaaS/research deferral, and identified `PHASE8-UX-002-T003` as the next child. No product implementation occurred.
 
+`PHASE8-UX-002-T003` is complete/PASS as tests-first expected-red only. T003 added static/source UI contract coverage at `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py` for the seven MVP UI/workflow surfaces from the T002 matrix. The validated targeted expected-red command is `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q`, which reaches pytest collection/execution and produces the intended result: `7 failed in 0.12s`, all assertion failures for missing PHASE8-UX-002 MVP UI contract markers. System `python3 -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` still fails before collection because `/usr/bin/python3` has no `pytest` module, but that is not a T003 blocker because the repo's existing virtualenv is the validated test interpreter. No product implementation occurred.
+
 MVP owner acceptance remains pending. MVP is not complete.
 
 ## Purpose
@@ -161,8 +163,8 @@ No authorized reference collection happens in `PHASE8-UX-002-T001`.
 
 - `PHASE8-UX-002-T001` - Parent publication. Scope: docs/status/planning only. Publish the parent and record boundaries, scope, planned child sequence, validation, and current MVP readiness status. Status: complete/PASS.
 - `PHASE8-UX-002-T002` - UI acceptance matrix + route/workflow decision. Scope: docs/decision/planning only. Convert owner acceptance gaps into route/workflow/UI acceptance matrix. Decide which surfaces are MVP-required, which are backend/helper-only, and which remain manual. Status: complete/PASS. Decision: `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md`. Matrix: `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`.
-- `PHASE8-UX-002-T003` - Expected-red tests for source/Story Check/no-prose UI. Scope: tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, and review/apply-promotion UI evidence as applicable. Status: next planned child.
-- `PHASE8-UX-002-T004` - Implement owner-authored source/scene create/import/select UI. Scope: frontend/API only if needed and explicitly scoped later. Project-scoped owner-authored source workflow that unlocks Story Check and no-prose evidence.
+- `PHASE8-UX-002-T003` - Expected-red tests for source/Story Check/no-prose UI. Scope: tests-first expected-red. Browser/source tests proving missing source/scene workflow, Story Check diagnostic-only path, no-prose refusal path, Notes/Materials save-reload, runtime/raw artifact UI evidence, review/apply-promotion UI evidence, and analysis-runtime exposure label behavior as applicable. Status: complete/PASS as expected-red only. Test: `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py`. Targeted command: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q`. Expected-red result: `7 failed in 0.12s`, all intended assertion failures for missing UX2 UI contract markers. System `python3` lacks `pytest`, but that is not a task blocker because the repo virtualenv is the validated interpreter.
+- `PHASE8-UX-002-T004` - Implement owner-authored source/scene create/import/select UI. Scope: frontend/API only if needed and explicitly scoped later. Project-scoped owner-authored source workflow that unlocks Story Check and no-prose evidence. Status: next planned child.
 - `PHASE8-UX-002-T005` - Implement Story Check diagnostic-only/no-prose evidence UI. Scope: frontend/API only if needed and explicitly scoped later. Safe selected-source Story Check path, diagnostic-only output state, and no-prose refusal/fail-closed evidence.
 - `PHASE8-UX-002-T006` - Implement Notes/Materials + runtime/review evidence UI. Scope: likely split if too large. Notes/Materials save-reload proof, raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence.
 - `PHASE8-UX-002-T007` - Closeout + rerun owner acceptance harness. Scope: docs/status/governance plus owner-run evidence. Re-run owner acceptance harness after missing UI surfaces are built. Do not mark MVP complete unless owner explicitly accepts through the correct checklist/roadmap gate.
@@ -191,6 +193,30 @@ git diff --check
 git status --short --branch
 git diff --name-only
 ```
+
+T003 validation:
+
+```bash
+python3 scripts/check_enrichment.py
+python3 scripts/validate_roadmap.py
+python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null
+.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q
+git diff --check
+git status --short --branch
+git diff --name-only
+```
+
+The T003 targeted pytest command is expected-red and should fail until future implementation adds the required MVP UI/workflow surfaces. The expected-red result is `7 failed in 0.12s`, with intended assertion failures for:
+
+- `UX2-SOURCE-001`: owner-authored source create/import/select markers are missing.
+- `UX2-STORYCHECK-001`: selected-source diagnostic-only Story Check markers are missing.
+- `UX2-NOPROSE-001`: no-prose refusal/fail-closed markers for forbidden intents are missing.
+- `UX2-NOTES-MATERIALS-001`: project-scoped notes/materials create/save/reload proof markers are missing.
+- `UX2-RAW-ARTIFACT-001`: runtime unavailable/read-only raw artifact evidence markers are missing.
+- `UX2-REVIEW-PROMOTION-001`: review/apply-promotion confirmation and audit markers are missing.
+- `UX2-ANALYSIS-RUNTIME-001`: `NOT_EXPOSED`/label-only analysis runtime markers are missing.
+
+Roadmap validation and enrichment JSON validation must still pass.
 
 ## MVP Readiness Status
 

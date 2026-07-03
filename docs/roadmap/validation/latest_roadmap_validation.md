@@ -1,3 +1,17 @@
+# PHASE8-UX-002-T003 Expected-Red UI Contract Tests
+
+- `PHASE8-UX-002` remains active as the MVP-first UX parent.
+- `PHASE8-UX-002-T003` is complete/PASS as tests-first expected-red only.
+- Expected-red test file: `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py`.
+- Targeted expected-red command: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q`.
+- Expected-red result: `7 failed in 0.12s`; pytest reached collection and execution, and all failures are intended assertion failures for missing PHASE8-UX-002 UX2 UI contract markers.
+- System Python note: `python3 -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` remains unavailable because `/usr/bin/python3` has no `pytest` module, but this is not a T003 blocker because the repo virtualenv is the validated test interpreter.
+- Intended failures: `UX2-SOURCE-001`, `UX2-STORYCHECK-001`, `UX2-NOPROSE-001`, `UX2-NOTES-MATERIALS-001`, `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001` fail because the corresponding source/create-select, selected-source Story Check, no-prose refusal, notes/materials, raw artifact, review/promotion, and analysis runtime label markers are missing.
+- `PHASE8-UX-002-T004` remains next for owner-authored source/scene create/import/select UI.
+- Owner acceptance remains pending. MVP is not complete.
+- External SaaS investigation remains post-MVP/deferred.
+- No frontend/backend implementation, route/API change, package change, crawler script, raw capture, `.external_sources` creation, context tool run, model call, generated prose, copied proprietary content, canon/memory mutation, candidate creation, apply-promotion shortcut, staging, commit, or push occurred in T003.
+
 # PHASE8-UX-002-T002 UI Acceptance Matrix + Route/Workflow Decision
 
 - `PHASE8-UX-002` remains active: MVP acceptance UI completion and route wiring.

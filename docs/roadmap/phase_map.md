@@ -1,3 +1,16 @@
+# PHASE8-UX-002-T003 Expected-Red UI Contract Tests
+
+- `PHASE8-UX-002` remains active as the MVP-first UX parent for missing browser-testable owner-acceptance UI/workflow surfaces.
+- `PHASE8-UX-002-T003` is complete/PASS as tests-first expected-red only.
+- Expected-red test file: `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py`.
+- Targeted expected-red command: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q`.
+- Expected-red result: `7 failed in 0.12s`; all seven failures are intended assertion failures for missing UX2 UI contract markers.
+- System `python3` lacks `pytest`, but that is not a T003 blocker because the repo virtualenv is the validated interpreter.
+- T004 remains next for owner-authored source/scene create/import/select UI; T005 remains planned for Story Check diagnostic-only/no-prose evidence UI; T006 remains planned for Notes/Materials plus runtime/review evidence UI.
+- Owner acceptance remains pending and MVP is not complete.
+- External SaaS investigation, Dramatica/current-platform investigation, controlled external experiments, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, and authorized non-black-box external reference collection remain post-MVP/deferred.
+- No frontend/backend implementation, route/API changes, product behavior changes, package changes, context tools, model calls, generated prose, canon/memory mutation, candidate creation, apply-promotion shortcut, staging, commit, or push occurred in T003.
+
 # PHASE8-UX-002-T002 UI Acceptance Matrix + Route/Workflow Decision
 
 - `PHASE8-UX-002` remains active as the MVP-first UX parent for missing browser-testable owner-acceptance UI/workflow surfaces.
