@@ -199,11 +199,85 @@ function NoProseRefusal() {
   );
 }
 
+function RuntimeArtifactEvidencePanel({ status }) {
+  const evidenceStatus = status && typeof status === 'object' ? status : {};
+
+  return (
+    <section className="analysis-section" aria-label="Raw artifact evidence status">
+      <h3>Raw Artifact Evidence</h3>
+      <p
+        className="muted-copy"
+        data-testid="ux2-runtime-extraction-unavailable"
+      >
+        runtime extraction unavailable.
+      </p>
+      <dl
+        className="analysis-metadata"
+        data-testid="ux2-raw-artifact-read-only-evidence"
+      >
+        <div>
+          <dt>Status</dt>
+          <dd>{evidenceStatus.evidence_status ?? 'read-only raw artifact evidence'}</dd>
+        </div>
+        <div>
+          <dt>Boundary</dt>
+          <dd>{evidenceStatus.support_data_boundary ?? 'raw artifacts are support data only'}</dd>
+        </div>
+        <div>
+          <dt>Canon</dt>
+          <dd>{evidenceStatus.canon_boundary ?? 'raw artifacts are not canon'}</dd>
+        </div>
+        <div>
+          <dt>Mutation</dt>
+          <dd>
+            {evidenceStatus.mutation_boundary
+              ?? 'raw artifact inspection does not mutate memory or canon'}
+          </dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+function AnalysisRuntimeStatusPanel() {
+  return (
+    <section
+      className="analysis-section"
+      data-testid="ux2-analysis-runtime-status"
+      aria-label="Analysis runtime status"
+    >
+      <h3>Analysis Runtime Status</h3>
+      <p className="muted-copy">
+        analysis runtime labels only; runtime execution is not exposed.
+      </p>
+      <dl className="analysis-metadata">
+        <div>
+          <dt>NCP: NOT_EXPOSED</dt>
+          <dd>NCP is structured context interchange only.</dd>
+        </div>
+        <div>
+          <dt>Subtxt: NOT_EXPOSED</dt>
+          <dd>Subtxt is rubric/diagnostic guidance only.</dd>
+        </div>
+        <div>
+          <dt>dramatica-flow: NOT_EXPOSED</dt>
+          <dd>dramatica-flow is audited allowlist only.</dd>
+        </div>
+        <div>
+          <dt>Execution</dt>
+          <dd>no runtime execution path.</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
 export default function AnalysisSidebar({
   report,
   selectedSceneId,
   selectedStoryCheckSourceId,
   selectedStoryCheckSource,
+  rawArtifactEvidenceStatus,
   isAnalyzing,
   onRunStoryCheck,
 }) {
@@ -359,6 +433,8 @@ export default function AnalysisSidebar({
             <pre className="raw-response">{JSON.stringify(report, null, 2)}</pre>
           </section>
         )}
+        <RuntimeArtifactEvidencePanel status={rawArtifactEvidenceStatus} />
+        <AnalysisRuntimeStatusPanel />
         <NoProseRefusal />
       </div>
 

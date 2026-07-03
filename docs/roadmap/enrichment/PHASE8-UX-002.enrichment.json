@@ -221,7 +221,7 @@
       "task_id": "PHASE8-UX-002-T006",
       "title": "Implement Notes/Materials + runtime/review evidence UI",
       "status": "in progress",
-      "scope": "split into focused slices. T006A Notes/Materials save-reload proof is complete/PASS for UX2-NOTES-MATERIALS-001; raw artifact read-only/support-data UI evidence, safe review/apply-promotion fixture and confirmation evidence, and analysis-runtime label evidence remain for T006B.",
+      "scope": "split into focused slices. T006A Notes/Materials save-reload proof is complete/PASS for UX2-NOTES-MATERIALS-001; T006B raw artifact read-only/support-data UI evidence and analysis-runtime label evidence is complete/PASS for UX2-RAW-ARTIFACT-001 and UX2-ANALYSIS-RUNTIME-001; safe review/apply-promotion fixture and confirmation evidence remains for T006C.",
       "t006a": {
         "task_id": "PHASE8-UX-002-T006A",
         "title": "Implement Notes/Materials project-scoped evidence UI",
@@ -236,6 +236,20 @@
         "focused_notes_materials_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_notes_materials_001",
         "focused_notes_materials_test_result": "1 passed, 6 deselected in 0.03s",
         "boundary": "owner-authored note and owner-provided material are project-scoped, not canon by default, and notes/materials do not mutate memory or canon."
+      },
+      "t006b": {
+        "task_id": "PHASE8-UX-002-T006B",
+        "title": "Implement raw artifact and analysis runtime status UI",
+        "status": "complete/PASS",
+        "scope": "frontend-only raw artifact unavailable/read-only evidence and analysis-runtime NOT_EXPOSED labels for UX2-RAW-ARTIFACT-001 and UX2-ANALYSIS-RUNTIME-001.",
+        "outputs": [
+          "frontend/src/App.jsx",
+          "frontend/src/api.js",
+          "frontend/src/components/AnalysisSidebar.jsx"
+        ],
+        "focused_raw_runtime_test_command": ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k \"ux2_raw_artifact_001 or ux2_analysis_runtime_001\"",
+        "focused_raw_runtime_test_result": "2 passed, 5 deselected in 0.03s",
+        "boundary": "raw artifact evidence is read-only support data only, raw artifacts are not canon, raw artifact inspection does not mutate memory or canon, NCP/Subtxt/dramatica-flow are NOT_EXPOSED labels only, and no runtime execution path is exposed."
       }
     },
     {
@@ -257,14 +271,13 @@
     "mvp_complete": false,
     "reason": "Latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED due to missing UI/workflow surfaces."
   },
-  "latest_child_task": "PHASE8-UX-002-T006A",
+  "latest_child_task": "PHASE8-UX-002-T006B",
   "latest_child_status": "complete/PASS",
   "latest_child_outputs": [
     "frontend/src/App.jsx",
     "frontend/src/api.js",
-    "frontend/src/components/ProjectNav.jsx",
-    "frontend/src/components/Editor.jsx"
+    "frontend/src/components/AnalysisSidebar.jsx"
   ],
-  "next_planned_child": "PHASE8-UX-002-T006B",
-  "next_planned_child_scope": "Implement remaining runtime/raw artifact, review/apply-promotion, and analysis-runtime evidence UI while preserving expected-red boundaries for non-target surfaces."
+  "next_planned_child": "PHASE8-UX-002-T006C",
+  "next_planned_child_scope": "Implement remaining review/apply-promotion evidence UI while preserving expected-red boundaries for non-target surfaces."
 }

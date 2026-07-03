@@ -1,3 +1,15 @@
+# PHASE8-UX-002-T006B Raw Artifact / Analysis Runtime Status UI
+
+- Result: PASS for T006B implementation and focused validation.
+- `PHASE8-UX-002-T006B` implemented only `UX2-RAW-ARTIFACT-001` and `UX2-ANALYSIS-RUNTIME-001` as frontend status/evidence UI.
+- Focused raw artifact / analysis runtime test passes: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k "ux2_raw_artifact_001 or ux2_analysis_runtime_001"` -> `2 passed, 5 deselected in 0.03s`.
+- Raw artifact UI evidence labels runtime extraction unavailable, read-only raw artifact evidence, raw artifacts as support data only, raw artifacts as not canon, and raw artifact inspection as non-mutating for memory/canon.
+- Analysis runtime UI evidence labels NCP, Subtxt, and dramatica-flow as `NOT_EXPOSED`; NCP is structured context interchange only, Subtxt is rubric/diagnostic guidance only, dramatica-flow is audited allowlist only, and no runtime execution path is exposed.
+- Prior `UX2-SOURCE-001`, `UX2-STORYCHECK-001`, `UX2-NOPROSE-001`, and `UX2-NOTES-MATERIALS-001` surfaces remain expected to pass.
+- Full `PHASE8-UX-002-T006` remains in progress. T006C is next for `UX2-REVIEW-PROMOTION-001`.
+- Owner acceptance remains pending. MVP is not complete. External SaaS investigation remains post-MVP/deferred.
+- No backend route/API changes, package changes, tests changes, crawler/raw capture output, `.external_sources`, context artifact changes, runtime extraction, NCP/Subtxt/dramatica-flow execution, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 # PHASE8-UX-002-T006A Notes/Materials Evidence UI
 
 - Result: PASS for T006A implementation and validation.

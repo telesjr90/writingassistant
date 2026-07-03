@@ -115,14 +115,24 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - Full `PHASE8-UX-002-T006` remains in progress. T006B is next for `UX2-RAW-ARTIFACT-001`, `UX2-REVIEW-PROMOTION-001`, and `UX2-ANALYSIS-RUNTIME-001`.
 - Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No backend route/API changes, package changes, tests changes, context artifact updates, crawlers/raw captures, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
 
+## T006B Raw Artifact / Analysis Runtime Evidence UI Implementation
+
+- Status: `PHASE8-UX-002-T006B` complete/PASS for `UX2-RAW-ARTIFACT-001` and `UX2-ANALYSIS-RUNTIME-001` only.
+- Implementation files touched: `frontend/src/App.jsx`, `frontend/src/api.js`, and `frontend/src/components/AnalysisSidebar.jsx`.
+- `UX2-RAW-ARTIFACT-001` is implemented/status-only: `fetchRawArtifactEvidenceStatus` returns read-only support-data boundary evidence, the UI labels runtime extraction unavailable, and raw artifact inspection is shown as non-canon and non-mutating.
+- `UX2-ANALYSIS-RUNTIME-001` is implemented/label-only: NCP, Subtxt, and dramatica-flow are shown as `NOT_EXPOSED`; NCP remains structured context interchange only, Subtxt remains rubric/diagnostic guidance only, dramatica-flow remains audited allowlist only, and no runtime execution path is exposed.
+- Focused T006B test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k "ux2_raw_artifact_001 or ux2_analysis_runtime_001"` -> `2 passed, 5 deselected in 0.03s`.
+- Full `PHASE8-UX-002-T006` remains in progress. T006C is next for `UX2-REVIEW-PROMOTION-001`.
+- Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No backend route/API changes, package changes, tests changes, context artifact updates, crawlers/raw captures, runtime extraction, NCP/Subtxt/dramatica-flow execution, model calls, generated prose, canon/memory mutation, apply-promotion shortcut, staging, commit, or push occurred.
+
 ## Known Acceptance Gaps
 
 - Story Check diagnostic-only selected-source acceptance is implemented in T005.
 - No-prose refusal/fail-closed acceptance is implemented in T005; no safe arbitrary prompt route is exposed as a prose-generation path.
 - Notes/Materials create/save/reload source-contract evidence is implemented in T006A; broader owner browser acceptance remains pending.
-- Runtime extraction/raw artifact states need UI-visible unavailable/fail-closed or read-only evidence.
+- Runtime extraction/raw artifact unavailable/read-only evidence is implemented in T006B; broader owner browser acceptance remains pending.
 - Review/apply-promotion evidence needs a safe fixture, explicit owner confirmation, visible audit details, and proof that failed/rejected promotion leaves approved memory/canon unchanged.
-- NCP/Subtxt/dramatica-flow need a UI-facing versus backend/helper-only exposure decision; `NOT_EXPOSED` may be acceptable for MVP owner acceptance if documented.
+- NCP/Subtxt/dramatica-flow `NOT_EXPOSED` analysis-runtime label evidence is implemented in T006B; runtime execution remains unexposed.
 
 ## Post-MVP / Deferred Research Docs
 

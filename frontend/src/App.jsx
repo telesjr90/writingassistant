@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ProjectNav from './components/ProjectNav.jsx';
 import ProjectOverview from './components/ProjectOverview.jsx';
 import MemoryCanonShell from './components/MemoryCanonShell.jsx';
@@ -32,6 +32,7 @@ import {
   fetchMaterials,
   fetchMaterial,
   fetchNotes,
+  fetchRawArtifactEvidenceStatus,
   fetchNote,
   fetchScene,
   fetchScenes,
@@ -1131,6 +1132,10 @@ export default function App() {
       || project?.projectId === activeProjectId
       || project?.id === activeProjectId
     )) ?? { project_id: activeProjectId, title: activeProjectId, status: 'Not available' };
+  const rawArtifactEvidenceStatus = useMemo(
+    () => fetchRawArtifactEvidenceStatus(activeProjectId),
+    [activeProjectId],
+  );
 
   return (
     <div className="app-shell">
@@ -1264,6 +1269,7 @@ export default function App() {
         selectedSceneId={selectedSceneId}
         selectedStoryCheckSourceId={selectedStoryCheckSourceId}
         selectedStoryCheckSource={selectedStoryCheckSource}
+        rawArtifactEvidenceStatus={rawArtifactEvidenceStatus}
         isAnalyzing={isAnalyzing}
         onRunStoryCheck={handleRunStoryCheck}
       />

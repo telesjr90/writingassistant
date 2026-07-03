@@ -127,6 +127,21 @@ export async function runStoryCheckForSelectedSource({
   return runStoryCheck(selectedStoryCheckSourceId, projectId);
 }
 
+export function fetchRawArtifactEvidenceStatus(projectId = PROJECT_ID) {
+  requireSafeOwnerAuthoredSourceId(projectId, 'project_id');
+
+  return {
+    project_id: projectId,
+    runtime_extraction_status: 'runtime extraction unavailable',
+    evidence_status: 'read-only raw artifact evidence',
+    support_data_boundary: 'raw artifacts are support data only',
+    canon_boundary: 'raw artifacts are not canon',
+    mutation_boundary: 'raw artifact inspection does not mutate memory or canon',
+    runtime_execution_available: false,
+    mutates_memory_or_canon: false,
+  };
+}
+
 export function refuseForbiddenProseIntent(intent) {
   const normalizedIntent = typeof intent === 'string' ? intent.trim().toLowerCase() : '';
   const forbiddenIntents = new Set([
