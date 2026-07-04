@@ -25,6 +25,15 @@ APPLY_PROMOTION_CONFIRMATION_JSX = (
 OWNER_ACTION_CONTROLS_JSX = (
     FRONTEND_SRC / "components" / "OwnerActionReviewControls.jsx"
 )
+OMI_SHELL_JSX = FRONTEND_SRC / "components" / "OMIShell.jsx"
+OMI_DASHBOARD_JSX = FRONTEND_SRC / "components" / "OMIDashboard.jsx"
+OMI_BOUNDARY_BANNER_JSX = FRONTEND_SRC / "components" / "OMIBoundaryBanner.jsx"
+OMI_CANDIDATE_CANON_STATUS_JSX = (
+    FRONTEND_SRC / "components" / "OMICandidateCanonStatusStrip.jsx"
+)
+OMI_WORKFLOW_STATUS_ROW_JSX = (
+    FRONTEND_SRC / "components" / "OMIWorkflowStatusRow.jsx"
+)
 
 SOURCE_PATHS = (
     APP_JSX,
@@ -35,6 +44,11 @@ SOURCE_PATHS = (
     REVIEW_QUEUE_PANEL_JSX,
     APPLY_PROMOTION_CONFIRMATION_JSX,
     OWNER_ACTION_CONTROLS_JSX,
+    OMI_SHELL_JSX,
+    OMI_DASHBOARD_JSX,
+    OMI_BOUNDARY_BANNER_JSX,
+    OMI_CANDIDATE_CANON_STATUS_JSX,
+    OMI_WORKFLOW_STATUS_ROW_JSX,
 )
 
 FORBIDDEN_PROSE_INTENTS = (
@@ -234,4 +248,82 @@ def test_ux2_analysis_runtime_001_not_exposed_label_only_contract() -> None:
         ),
         "UX2-ANALYSIS-RUNTIME-001",
     )
+
+
+def test_omi_dashboard_only_boundary_and_separation_contract() -> None:
+    """First OMI frontend slice requires dashboard-only safe review operations."""
+
+    source = combined_source(
+        (
+            APP_JSX,
+            PROJECT_NAV_JSX,
+            OMI_SHELL_JSX,
+            OMI_DASHBOARD_JSX,
+            OMI_BOUNDARY_BANNER_JSX,
+            OMI_CANDIDATE_CANON_STATUS_JSX,
+            OMI_WORKFLOW_STATUS_ROW_JSX,
+        )
+    )
+
+    assert_markers_present(
+        source,
+        (
+            "data-testid=\"omi-dashboard\"",
+            "data-testid=\"omi-boundary-banner\"",
+            "data-testid=\"omi-candidate-canon-status\"",
+            "data-testid=\"omi-dashboard-approved-memory-snapshot\"",
+            "data-testid=\"omi-dashboard-disabled-apply-reason\"",
+            "data-testid=\"omi-workspace-entry\"",
+            "OMI stores review material only. Nothing becomes Memory/Canon until the owner explicitly confirms a separate apply-promotion step.",
+            "Disabled: apply-promotion requires owner approval, destination, evidence/provenance review, duplicate resolution, dependency review, and final confirmation.",
+            "aria-describedby={disabledApplyReasonId}",
+            "Owner Input",
+            "Candidates",
+            "Grouped Review",
+            "Duplicate Decisions",
+            "Promotion Handoff Readiness",
+            "Promotion Audit Records",
+            "Deferred Categories",
+            "Approved Memory/Canon Snapshot",
+            "Warnings / Health",
+            "Loading OMI status.",
+            "No owner input is stored for this project.",
+            "No candidates are stored for this project.",
+            "No inferred counts are shown while OMI status is degraded.",
+            "Candidates are not approved Memory/Canon",
+            "Approved Memory/Canon is shown separately from candidates and promotion audit records.",
+        ),
+        "OMI-DASHBOARD-ONLY",
+    )
+
+
+def test_omi_dashboard_source_has_no_generated_prose_controls() -> None:
+    """OMI Dashboard must not expose prose-production controls."""
+
+    source = combined_source(
+        (
+            OMI_SHELL_JSX,
+            OMI_DASHBOARD_JSX,
+            OMI_BOUNDARY_BANNER_JSX,
+            OMI_CANDIDATE_CANON_STATUS_JSX,
+            OMI_WORKFLOW_STATUS_ROW_JSX,
+        )
+    ).lower()
+
+    forbidden_control_labels = (
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "expand",
+        "imitate",
+        "generate prose",
+        "generated prose",
+    )
+
+    assert not [
+        label for label in forbidden_control_labels if label in source
+    ], "OMI dashboard source must not expose generated-prose controls."
 

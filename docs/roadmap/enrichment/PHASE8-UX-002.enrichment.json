@@ -10,6 +10,7 @@
   "current_evidence_summary": [
     "PHASE8-IMPL-022 is complete/PASS as the end-to-end MVP usability validation parent.",
     "Project isolation browser evidence now passes.",
+    "Focused OMI Dashboard browser evidence passes with desktop and mobile screenshots; backend was unavailable so the smoke used a read-only zero-state Playwright API fixture and blocked mutating API methods.",
     "MVP owner acceptance harness exists and runs.",
     "Cyber Detective owner acceptance fixture exists and was committed.",
     "Latest owner acceptance evidence reached SCRIPT_EXIT=0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
@@ -80,6 +81,11 @@
     "frontend/src/components/ApplyPromotionConfirmation.jsx",
     "active child sequence recorded from PHASE8-UX-002-T001 through PHASE8-UX-002-T007",
     "PHASE8-UX-002-T006 recorded complete/PASS after all seven UX2 tests passed",
+    "scripts/omi-dashboard-browser-smoke.mjs",
+    "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+    "docs/roadmap/validation/omi-dashboard-browser-evidence/workflow-log.json",
+    "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/01-desktop-omi-dashboard.png",
+    "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/02-mobile-omi-dashboard.png",
     "PHASE8-UX-002-T007 recorded as the next planned child",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
@@ -96,6 +102,8 @@
     "docs/roadmap/decision_log.md",
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
+    "scripts/omi-dashboard-browser-smoke.mjs",
+    "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
     "tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py",
     "frontend/src/App.jsx",
     "frontend/src/api.js",
@@ -132,6 +140,8 @@
     "python3 scripts/validate_roadmap.py",
     "python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null",
     ".venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q",
+    "npm --prefix frontend run build",
+    "node scripts/omi-dashboard-browser-smoke.mjs",
     "git diff --check",
     "git status --short --branch",
     "git diff --name-only"
@@ -291,6 +301,40 @@
     "owner_acceptance": "pending",
     "mvp_complete": false,
     "reason": "All seven UX2 source acceptance surfaces now pass, but latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED pending T007 closeout and owner gate."
+  },
+  "latest_browser_evidence": {
+    "task": "OMI Dashboard Browser Evidence Only",
+    "status": "PASS",
+    "command": "node scripts/omi-dashboard-browser-smoke.mjs",
+    "report": "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+    "workflow_log": "docs/roadmap/validation/omi-dashboard-browser-evidence/workflow-log.json",
+    "desktop_screenshot": "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/01-desktop-omi-dashboard.png",
+    "mobile_screenshot": "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/02-mobile-omi-dashboard.png",
+    "api_mode": "fixture",
+    "api_mode_reason": "The local backend proxy at 127.0.0.1:8000 was unavailable during validation.",
+    "assertions": [
+      "OMI Dashboard reachable from the app",
+      "active project/project-local label visible",
+      "OMI boundary banner visible",
+      "candidate/canon status strip visible",
+      "dense workflow rows visible",
+      "Approved Memory/Canon snapshot visually separate from candidate and promotion audit counts",
+      "Apply to Memory/Canon disabled",
+      "disabled apply-promotion reason visible",
+      "disabled apply-promotion reason associated using aria-describedby",
+      "no generated prose controls visible",
+      "opening dashboard does not create candidates",
+      "opening dashboard does not mutate Memory/Canon",
+      "mobile stacked workflow row layout visible"
+    ],
+    "safety": [
+      "no backend code changed",
+      "no candidates created",
+      "Memory/Canon not mutated",
+      "no model/Ollama calls",
+      "apply-promotion not run or enabled",
+      "no generated prose controls added"
+    ]
   },
   "latest_child_task": "PHASE8-UX-002-T006C",
   "latest_child_status": "complete/PASS",

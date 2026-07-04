@@ -1,3 +1,16 @@
+# OMI Dashboard Browser Evidence
+
+- Result: PASS for focused OMI Dashboard browser-visible evidence.
+- Script: `node scripts/omi-dashboard-browser-smoke.mjs` -> exit `0`.
+- Browser evidence report: `docs/roadmap/validation/omi_dashboard_browser_evidence.md`.
+- Workflow log: `docs/roadmap/validation/omi-dashboard-browser-evidence/workflow-log.json`.
+- Desktop screenshot: `docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/01-desktop-omi-dashboard.png`.
+- Mobile screenshot: `docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/02-mobile-omi-dashboard.png`.
+- Evidence mode: Vite started locally; backend proxy at `127.0.0.1:8000` was unavailable, so the smoke used its read-only zero-state Playwright API fixture and blocked mutating API methods.
+- Assertions passed for dashboard reachability, active project/project-local label, OMI boundary banner, candidate/canon status strip, dense workflow rows, separated Approved Memory/Canon snapshot, disabled Apply to Memory/Canon, visible disabled reason, `aria-describedby` association, no generated prose controls, no candidate creation, no Memory/Canon mutation, and mobile stacked workflow rows.
+- No backend code changed, no candidates were created, Memory/Canon was not mutated, no model/Ollama calls were made, apply-promotion was not run or enabled, and no generated prose controls were added.
+- OMI Dashboard evidence is ready to commit with the current frontend slice; owner acceptance remains pending and MVP is not complete.
+
 # PHASE8-UX-002-T006C Review / Promotion Evidence UI Validation
 
 - Result: PASS for focused T006C source validation before roadmap closeout.

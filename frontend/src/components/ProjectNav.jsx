@@ -239,6 +239,7 @@ export default function ProjectNav({
   activeWorkspaceView = 'overview',
   onSelectOverview,
   onSelectMemoryCanon,
+  onSelectOMIDashboard,
   activeDocumentType = DEFAULT_DOCUMENT_TYPE,
   activeDocumentId = '',
   isLoadingNotes = false,
@@ -467,6 +468,15 @@ export default function ProjectNav({
         >
           <span>Memory / Canon</span>
           <small>Approved-only</small>
+        </button>
+        <button
+          className={`scene-item${activeWorkspaceView === 'omi-dashboard' ? ' is-active' : ''}`}
+          type="button"
+          onClick={() => onSelectOMIDashboard?.()}
+          data-testid="omi-workspace-entry"
+        >
+          <span>OMI</span>
+          <small>Review dashboard</small>
         </button>
       </nav>
 

@@ -531,16 +531,17 @@ h2 {
   padding: 8px 10px;
   background: #fbfcff;
   border: 1px solid #e7ecf4;
-  border-left-width: 4px;
   border-radius: 8px;
 }
 
 .omi-checklist li.is-met {
-  border-left-color: #3b6948;
+  border-color: #8ec79c;
+  background: #f3fbf5;
 }
 
 .omi-checklist li.is-blocked {
-  border-left-color: #a93636;
+  border-color: #e2a3a3;
+  background: #fff7f7;
 }
 
 .omi-checklist strong {
@@ -635,8 +636,7 @@ h2 {
   padding: 10px 12px;
   color: #46546c;
   background: #fbfcff;
-  border: 1px solid #dfe5ef;
-  border-left: 4px solid #234a84;
+  border: 1px solid #9fb3d4;
   border-radius: 8px;
   font-size: 13px;
   line-height: 1.45;
@@ -897,6 +897,244 @@ h2 {
   margin-top: auto;
 }
 
+.omi-shell,
+.omi-dashboard {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.omi-shell {
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-shell-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dfe5ef;
+}
+
+.omi-shell-header h1 {
+  margin-top: 4px;
+}
+
+.omi-boundary-banner,
+.omi-error-state,
+.omi-health-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #fbfcff;
+  border: 1px solid #9fb3d4;
+  border-radius: 8px;
+}
+
+.omi-boundary-banner p,
+.omi-error-state p,
+.omi-health-panel p {
+  margin: 0;
+  color: #2c374c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.omi-error-state {
+  border-color: #e2a3a3;
+  background: #fff7f7;
+}
+
+.omi-error-state h3,
+.omi-health-panel h3,
+.omi-approved-snapshot h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+.omi-status-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.omi-status-strip div {
+  min-width: 0;
+  padding: 10px;
+  background: #f7f9fc;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-status-strip .is-approved-memory {
+  background: #f3fbf5;
+  border-color: #8ec79c;
+}
+
+.omi-status-strip span {
+  display: block;
+  color: #637089;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-status-strip strong {
+  display: block;
+  margin-top: 4px;
+  color: #172033;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.omi-loading-state {
+  margin: 0;
+  padding: 10px 12px;
+  color: #46546c;
+  background: #f7f9fc;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.omi-workflow-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-workflow-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.omi-workflow-table caption {
+  padding: 10px 12px;
+  color: #46546c;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  background: #f7f9fc;
+  border-bottom: 1px solid #dfe5ef;
+}
+
+.omi-workflow-table th,
+.omi-workflow-table td {
+  padding: 10px 12px;
+  color: #2c374c;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e7ecf4;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.omi-workflow-table thead th {
+  color: #46546c;
+  background: #fbfcff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.omi-workflow-table tbody th {
+  color: #101828;
+  font-weight: 700;
+}
+
+.omi-workflow-table tbody tr:last-child th,
+.omi-workflow-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.omi-status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  color: #234a84;
+  background: #eef4ff;
+  border: 1px solid #bdd0f2;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: normal;
+}
+
+.omi-status-badge.is-warning {
+  color: #8a5a00;
+  background: #fff8e6;
+  border-color: #e7c978;
+}
+
+.omi-status-badge.is-error {
+  color: #a93636;
+  background: #fff1f1;
+  border-color: #e2a3a3;
+}
+
+.omi-row-action {
+  width: 100%;
+}
+
+.omi-approved-snapshot {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #f8fcfa;
+  border: 1px solid #8ec79c;
+  border-radius: 8px;
+}
+
+.omi-approved-snapshot dl {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.omi-approved-snapshot div {
+  min-width: 0;
+}
+
+.omi-approved-snapshot dt {
+  color: #557062;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-approved-snapshot dd {
+  margin: 2px 0 0;
+  color: #172033;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.omi-health-panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #2c374c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.omi-health-panel .primary-button {
+  align-self: flex-start;
+}
+
+.omi-disabled-reason {
+  max-width: 72ch;
+  color: #46546c;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     flex-direction: column;
@@ -920,11 +1158,85 @@ h2 {
   .omi-decision-grid,
   .omi-promotion-form,
   .omi-metadata,
-  .omi-checklist li {
+  .omi-checklist li,
+  .omi-status-strip,
+  .omi-approved-snapshot dl {
     grid-template-columns: 1fr;
   }
 
   .omi-detail-header {
     flex-direction: column;
+  }
+
+  .omi-shell {
+    padding: 16px;
+  }
+
+  .omi-workflow-table {
+    min-width: 0;
+  }
+
+  .omi-workflow-table thead {
+    display: none;
+  }
+
+  .omi-workflow-table,
+  .omi-workflow-table tbody,
+  .omi-workflow-table tr,
+  .omi-workflow-table th,
+  .omi-workflow-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .omi-workflow-table tr {
+    padding: 12px;
+    border-bottom: 1px solid #dfe5ef;
+  }
+
+  .omi-workflow-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .omi-workflow-table th,
+  .omi-workflow-table td {
+    padding: 5px 0;
+    border-bottom: 0;
+  }
+
+  .omi-workflow-table td::before {
+    display: block;
+    margin-bottom: 2px;
+    color: #637089;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .omi-workflow-table td:nth-child(2)::before {
+    content: "Count";
+  }
+
+  .omi-workflow-table td:nth-child(3)::before {
+    content: "Status";
+  }
+
+  .omi-workflow-table td:nth-child(4)::before {
+    content: "Blockers";
+  }
+
+  .omi-workflow-table td:nth-child(5)::before {
+    content: "Evidence / Provenance";
+  }
+
+  .omi-workflow-table td:nth-child(6)::before {
+    content: "Action";
+  }
+
+  .omi-workflow-table td:nth-child(7)::before {
+    content: "Disabled risky action / reason";
+  }
+
+  .omi-health-panel .primary-button {
+    width: 100%;
   }
 }
