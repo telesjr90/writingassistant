@@ -1,0 +1,464 @@
+{
+  "task": "MVP-READINESS-OWNER-ACCEPTANCE-005",
+  "startedAt": "2026-07-04T22:28:24.728Z",
+  "finishedAt": "2026-07-04T22:28:25.949Z",
+  "appBaseUrl": "http://localhost:5173",
+  "backendBaseUrl": "http://localhost:8000",
+  "fixture": {
+    "id": "cyber-detective",
+    "slug": "cyber-detective",
+    "title": "Cyber detective",
+    "contentLength": 1165,
+    "ownerAuthored": true,
+    "contentWarningMetadata": [
+      "mature material",
+      "violence",
+      "trauma",
+      "abuse references",
+      "drug use references"
+    ],
+    "allowedIntent": "analysis/diagnostic only",
+    "forbiddenIntents": [
+      "rewrite",
+      "continue",
+      "outline",
+      "draft",
+      "polish",
+      "improve",
+      "imitate",
+      "expand",
+      "generate prose"
+    ],
+    "didGenerateStoryProseFromFixture": false
+  },
+  "ollamaBaseUrl": "http://172.25.144.1:11434",
+  "ollamaSource": "WSL Windows-host fallback",
+  "ollamaAttemptedCandidates": [
+    {
+      "source": "localhost",
+      "baseUrl": "http://localhost:11434",
+      "versionUrl": "http://localhost:11434/api/version",
+      "tagsUrl": "http://localhost:11434/api/tags",
+      "ok": false,
+      "versionStatus": null,
+      "tagsStatus": null,
+      "errorSummary": "fetch failed | fetch failed"
+    },
+    {
+      "source": "WSL Windows-host fallback",
+      "baseUrl": "http://172.25.144.1:11434",
+      "versionUrl": "http://172.25.144.1:11434/api/version",
+      "tagsUrl": "http://172.25.144.1:11434/api/tags",
+      "ok": true,
+      "versionStatus": 200,
+      "tagsStatus": 200,
+      "errorSummary": ""
+    }
+  ],
+  "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance",
+  "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783204105804",
+  "uniqueProjectId": "",
+  "finalDecision": "BLOCKED",
+  "exitCode": 2,
+  "phase8Ux003OwnerHarnessRouteCoverage": {
+    "b": {
+      "marker": "PHASE8-UX-003-B",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "blockers": [
+        "candidate_review_candidate_first_visible",
+        "candidate_review_queue_not_approval",
+        "candidate_review_read_only_state",
+        "candidate_review_owner_action_explicit",
+        "candidate_review_confidence_not_truth",
+        "candidate_review_persistence_not_canon",
+        "apply_promotion_requires_confirmation",
+        "apply_promotion_audit_details",
+        "apply_promotion_only_approved_workflow",
+        "apply_promotion_failed_rejected_unchanged",
+        "apply_promotion_no_bypass"
+      ],
+      "evidenceRoutes": {
+        "owner_harness_route:evidence:omi_dashboard": "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+        "owner_harness_route:evidence:omi_candidate_detail": "docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+        "owner_harness_route:evidence:omi_evidence_drawer": "docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
+        "owner_harness_route:evidence:omi_apply_promotion_confirmation": "docs/roadmap/validation/omi_apply_promotion_browser_evidence.md"
+      },
+      "resultRules": [
+        "owner_harness_result_rule:missing_route_is_not_exposed_not_pass",
+        "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+        "owner_harness_assertion:apply_promotion_not_executed"
+      ],
+      "notes": []
+    },
+    "cNonCyber": {
+      "marker": "PHASE8-UX-003-C-NON-CYBER",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "blockers": [
+        "manual_workspace_notes_project_scoped",
+        "manual_workspace_materials_project_scoped",
+        "model_assisted_ncp_structured_context_only",
+        "model_assisted_subtxt_rubric_only",
+        "model_assisted_dramatica_flow_analysis_only"
+      ],
+      "evidenceRoutes": {
+        "owner_harness_route:notes_project_scoped_save_reload": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A",
+        "owner_harness_route:materials_project_scoped_save_reload": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A",
+        "owner_harness_route:analysis_runtime_label_status": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006B"
+      },
+      "resultRules": [
+        "owner_harness_result_rule:missing_route_is_not_exposed_not_pass",
+        "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+        "owner_harness_assertion:apply_promotion_not_executed"
+      ],
+      "notes": []
+    },
+    "cCyber": {
+      "marker": "PHASE8-UX-003-C-CYBER",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "blockers": [
+        "cyber_fixture_story_check_selected_source_path",
+        "cyber_fixture_no_prose_prompt_path"
+      ],
+      "evidenceRoutes": {
+        "owner_harness_route:cyber_owner_authored_source_select": "PHASE8-UX-003-T005",
+        "owner_harness_route:cyber_selected_source_story_check": "PHASE8-UX-003-T005",
+        "owner_harness_route:cyber_no_prose_refusal_fail_closed": "PHASE8-UX-003-T005"
+      },
+      "resultRules": [
+        "owner_harness_result_rule:missing_route_is_not_exposed_not_pass",
+        "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+        "owner_harness_assertion:apply_promotion_not_executed"
+      ],
+      "notes": [
+        "Cyber selected-source Story Check and Cyber no-prose evidence are evaluated by PHASE8-UX-003-T005."
+      ]
+    }
+  },
+  "toolingBlocked": true,
+  "startupBlocked": true,
+  "appBlockerFound": true,
+  "ollamaHealth": {
+    "version": {
+      "ok": true,
+      "status": 200,
+      "data": {
+        "version": "0.31.1"
+      },
+      "error": null
+    },
+    "tags": {
+      "ok": true,
+      "status": 200,
+      "data": {
+        "models": [
+          {
+            "name": "nomic-embed-text:latest",
+            "model": "nomic-embed-text:latest",
+            "modified_at": "2026-05-20T18:01:15.8551187-07:00",
+            "size": 274302450,
+            "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "nomic-bert",
+              "families": [
+                "nomic-bert"
+              ],
+              "parameter_size": "137M",
+              "quantization_level": "F16",
+              "context_length": 2048,
+              "embedding_length": 768
+            },
+            "capabilities": [
+              "embedding"
+            ]
+          },
+          {
+            "name": "qwen3:8b",
+            "model": "qwen3:8b",
+            "modified_at": "2026-05-20T18:01:00.6265837-07:00",
+            "size": 5225388164,
+            "digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen3",
+              "families": [
+                "qwen3"
+              ],
+              "parameter_size": "8.2B",
+              "quantization_level": "Q4_K_M",
+              "context_length": 40960,
+              "embedding_length": 4096
+            },
+            "capabilities": [
+              "completion",
+              "tools",
+              "thinking"
+            ]
+          },
+          {
+            "name": "qwen2.5:7b",
+            "model": "qwen2.5:7b",
+            "modified_at": "2026-03-28T12:23:02.2460097-07:00",
+            "size": 4683087332,
+            "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen2",
+              "families": [
+                "qwen2"
+              ],
+              "parameter_size": "7.6B",
+              "quantization_level": "Q4_K_M",
+              "context_length": 32768,
+              "embedding_length": 3584
+            },
+            "capabilities": [
+              "completion",
+              "tools"
+            ]
+          },
+          {
+            "name": "phi3:mini",
+            "model": "phi3:mini",
+            "modified_at": "2026-03-28T12:19:39.8189264-07:00",
+            "size": 2176178913,
+            "digest": "4f222292793889a9a40a020799cfd28d53f3e01af25d48e06c5e708610fc47e9",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "phi3",
+              "families": [
+                "phi3"
+              ],
+              "parameter_size": "3.8B",
+              "quantization_level": "Q4_0",
+              "context_length": 131072,
+              "embedding_length": 3072
+            },
+            "capabilities": [
+              "completion"
+            ]
+          }
+        ]
+      },
+      "error": null
+    },
+    "ok": true,
+    "selectedBaseUrl": "http://172.25.144.1:11434",
+    "selectedSource": "WSL Windows-host fallback",
+    "attemptedCandidates": [
+      {
+        "source": "localhost",
+        "baseUrl": "http://localhost:11434",
+        "versionUrl": "http://localhost:11434/api/version",
+        "tagsUrl": "http://localhost:11434/api/tags",
+        "ok": false,
+        "versionStatus": null,
+        "tagsStatus": null,
+        "errorSummary": "fetch failed | fetch failed"
+      },
+      {
+        "source": "WSL Windows-host fallback",
+        "baseUrl": "http://172.25.144.1:11434",
+        "versionUrl": "http://172.25.144.1:11434/api/version",
+        "tagsUrl": "http://172.25.144.1:11434/api/tags",
+        "ok": true,
+        "versionStatus": 200,
+        "tagsStatus": 200,
+        "errorSummary": ""
+      }
+    ],
+    "wslRemediationCommand": "WINDOWS_HOST=$(ip route show | grep -i default | awk '{ print $3 }')\nexport OLLAMA_HOST=\"http://$WINDOWS_HOST:11434\"\ncurl \"$OLLAMA_HOST/api/version\""
+  },
+  "actions": [
+    {
+      "ts": "2026-07-04T22:28:24.734Z",
+      "action": "section_start",
+      "section": "Startup Requirements"
+    },
+    {
+      "ts": "2026-07-04T22:28:24.740Z",
+      "action": "ensure_evidence_dirs",
+      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance",
+      "screenshotDir": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots"
+    },
+    {
+      "ts": "2026-07-04T22:28:24.741Z",
+      "action": "fixture_selected",
+      "fixtureId": "cyber-detective",
+      "fixtureTitle": "Cyber detective",
+      "fixtureSlug": "cyber-detective",
+      "contentLength": 1165,
+      "ownerAuthored": true,
+      "contentWarningMetadata": [
+        "mature material",
+        "violence",
+        "trauma",
+        "abuse references",
+        "drug use references"
+      ],
+      "allowedIntent": "analysis/diagnostic only",
+      "forbiddenIntents": [
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "imitate",
+        "expand",
+        "generate prose"
+      ],
+      "didGenerateStoryProseFromFixture": false
+    },
+    {
+      "ts": "2026-07-04T22:28:24.798Z",
+      "action": "checklist_item",
+      "id": "startup_backend_running",
+      "status": "BLOCKED",
+      "note": "Backend safe endpoint was not reachable."
+    },
+    {
+      "ts": "2026-07-04T22:28:24.798Z",
+      "action": "checklist_item",
+      "id": "startup_project_isolation_script_available",
+      "status": "PASS",
+      "note": "Existing project isolation browser smoke script exists."
+    },
+    {
+      "ts": "2026-07-04T22:28:24.798Z",
+      "action": "checklist_item",
+      "id": "startup_owner_understands_analysis_boundaries",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Owner understanding remains a manual review item."
+    },
+    {
+      "ts": "2026-07-04T22:28:24.803Z",
+      "action": "ollama_health_candidate",
+      "source": "localhost",
+      "baseUrl": "http://localhost:11434",
+      "versionUrl": "http://localhost:11434/api/version",
+      "tagsUrl": "http://localhost:11434/api/tags",
+      "ok": false,
+      "versionStatus": null,
+      "tagsStatus": null,
+      "errorSummary": "fetch failed | fetch failed"
+    },
+    {
+      "ts": "2026-07-04T22:28:24.827Z",
+      "action": "ollama_health_candidate",
+      "source": "WSL Windows-host fallback",
+      "baseUrl": "http://172.25.144.1:11434",
+      "versionUrl": "http://172.25.144.1:11434/api/version",
+      "tagsUrl": "http://172.25.144.1:11434/api/tags",
+      "ok": true,
+      "versionStatus": 200,
+      "tagsStatus": 200,
+      "errorSummary": ""
+    },
+    {
+      "ts": "2026-07-04T22:28:24.828Z",
+      "action": "ollama_health",
+      "ok": true,
+      "selectedBaseUrl": "http://172.25.144.1:11434",
+      "selectedSource": "WSL Windows-host fallback",
+      "attemptedCandidates": [
+        {
+          "source": "localhost",
+          "baseUrl": "http://localhost:11434",
+          "versionUrl": "http://localhost:11434/api/version",
+          "tagsUrl": "http://localhost:11434/api/tags",
+          "ok": false,
+          "versionStatus": null,
+          "tagsStatus": null,
+          "errorSummary": "fetch failed | fetch failed"
+        },
+        {
+          "source": "WSL Windows-host fallback",
+          "baseUrl": "http://172.25.144.1:11434",
+          "versionUrl": "http://172.25.144.1:11434/api/version",
+          "tagsUrl": "http://172.25.144.1:11434/api/tags",
+          "ok": true,
+          "versionStatus": 200,
+          "tagsStatus": 200,
+          "errorSummary": ""
+        }
+      ],
+      "error": "http://localhost:11434: fetch failed | fetch failed"
+    },
+    {
+      "ts": "2026-07-04T22:28:24.828Z",
+      "action": "checklist_item",
+      "id": "startup_ollama_reachable",
+      "status": "PASS",
+      "note": "Ollama /api/version and /api/tags are reachable."
+    },
+    {
+      "ts": "2026-07-04T22:28:24.828Z",
+      "action": "checklist_item",
+      "id": "startup_ollama_unreachable",
+      "status": "PASS",
+      "note": "No Ollama unreachable blocker recorded."
+    },
+    {
+      "ts": "2026-07-04T22:28:25.285Z",
+      "action": "playwright_import_ok",
+      "modulePath": "/home/tjrpirateking/projects/WritingAssistantApplication/frontend/node_modules/@playwright/test/index.js"
+    },
+    {
+      "ts": "2026-07-04T22:28:25.787Z",
+      "action": "navigate_frontend",
+      "url": "http://localhost:5173"
+    },
+    {
+      "ts": "2026-07-04T22:28:25.803Z",
+      "action": "checklist_item",
+      "id": "startup_frontend_running",
+      "status": "BLOCKED",
+      "note": "Frontend was not reachable or app shell did not render."
+    },
+    {
+      "ts": "2026-07-04T22:28:25.804Z",
+      "action": "section_start",
+      "section": "Project Isolation"
+    },
+    {
+      "ts": "2026-07-04T22:28:25.804Z",
+      "action": "checklist_item",
+      "id": "project_isolation_playwright_evidence_reviewed",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Prior project isolation evidence review remains a manual review item."
+    },
+    {
+      "ts": "2026-07-04T22:28:25.804Z",
+      "action": "cyber_fixture_create_project_begin",
+      "fixtureId": "cyber-detective",
+      "fixtureTitle": "Cyber detective",
+      "fixtureSlug": "cyber-detective",
+      "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783204105804",
+      "contentLength": 1165,
+      "ownerAuthored": true,
+      "allowedIntent": "analysis/diagnostic only",
+      "forbiddenIntents": [
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "imitate",
+        "expand",
+        "generate prose"
+      ],
+      "didGenerateStoryProseFromFixture": false
+    },
+    {
+      "ts": "2026-07-04T22:28:25.903Z",
+      "action": "unhandled_error",
+      "error": "Error: Unable to fill any candidate: OMI-guided project title, Project title, Owner project title\n    at fillFirstMatching (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:595:9)\n    at async createUniqueProjectThroughUi (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:989:3)\n    at async runProjectIsolationChecks (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:1238:19)\n    at async main (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:2256:7)"
+    }
+  ]
+}
