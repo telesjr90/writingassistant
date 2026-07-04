@@ -5,7 +5,7 @@
     "current_track": "MVP Acceptance UI",
     "current_parent_task_id": "PHASE8-UX-003",
     "current_parent_task_title": "Owner Acceptance Harness Route/Workflow Evidence Follow-up",
-    "frontier_note": "PHASE8-UX-003 is published as the separate owner acceptance harness route/workflow evidence follow-up after PHASE8-UX-002-T007. PHASE8-UX-003-T001 is complete/PASS as docs/status/planning publication only. PHASE8-UX-003-T002 is complete/PASS as docs/decision/planning only via docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md. T002 maps B blockers to existing OMI Dashboard, Candidate Detail, Evidence Drawer, Apply-Promotion Confirmation, and their PASS evidence reports/smoke scripts; maps C blockers to existing Notes/Materials save/reload, analysis-runtime label/status, owner-authored source, selected-source Story Check, and no-prose evidence surfaces; and keeps A-category blockers manual owner review only. PHASE8-UX-003-T003 is complete/PASS as tests-first expected-red coverage only after committed test file tests/test_phase8_ux003_owner_harness_expected_red.py; .venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q -> 2 failed, 3 passed in 0.07s, with intentional failures limited to missing PHASE8-UX-003-B and PHASE8-UX-003-C owner harness coverage markers. PHASE8-UX-003-T004 is next for owner harness route wiring to existing Notes/Materials, OMI review, OMI apply-promotion, and analysis-runtime label surfaces. PHASE8-UX-003-T005 remains planned for Cyber fixture selected-source Story Check and no-prose evidence routing using existing owner-authored source UI. PHASE8-UX-002 is not reopened. No new product UI is authorized by default. Owner acceptance remains pending and MVP is not complete. Generated prose/prose-production remains permanently forbidden. Apply-promotion remains guarded/disabled in browser smoke evidence unless separately authorized."
+    "frontier_note": "PHASE8-UX-003 is published as the separate owner acceptance harness route/workflow evidence follow-up after PHASE8-UX-002-T007. PHASE8-UX-003-T001 is complete/PASS as docs/status/planning publication only. PHASE8-UX-003-T002 is complete/PASS as docs/decision/planning only via docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md. PHASE8-UX-003-T003 is complete/PASS as tests-first expected-red coverage only. PHASE8-UX-003-T004 is complete/PASS for owner harness route wiring to existing Notes/Materials, OMI review, OMI apply-promotion, and analysis-runtime label surfaces: PHASE8-UX-003-B PASS is wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence; PHASE8-UX-003-C-NON-CYBER PASS is wired to existing Notes/Materials save/reload proof and analysis-runtime label/status evidence; PHASE8-UX-003-C-CYBER remains MANUAL_REVIEW_REQUIRED for T005. Focused T004 coverage passes, owner harness source guards pass, and the owner acceptance harness exits 0 with final automated decision MANUAL_REVIEW_REQUIRED. PHASE8-UX-003-T005 is next for Cyber fixture selected-source Story Check and no-prose evidence routing using existing owner-authored source UI. PHASE8-UX-002 is not reopened. No new product UI is authorized by default. Owner acceptance remains pending and MVP is not complete. Generated prose/prose-production remains permanently forbidden. Apply-promotion remains guarded/disabled in browser smoke evidence unless separately authorized."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5447,9 +5447,9 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-UX-003.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
       "context_pack": ".codex-context/PHASE8-UX-003/",
-      "latest_child_task": "PHASE8-UX-003-T003",
+      "latest_child_task": "PHASE8-UX-003-T004",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-UX-003-T004"
+      "next_child_task": "PHASE8-UX-003-T005"
     }
   ]
 }

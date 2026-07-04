@@ -48,6 +48,87 @@ const FINAL_DECISIONS = Object.freeze({
   MANUAL_REVIEW_REQUIRED: 'MANUAL_REVIEW_REQUIRED',
 });
 
+const PHASE8_UX003_OWNER_HARNESS_B_ROUTE_COVERAGE = 'PHASE8-UX-003-B';
+const PHASE8_UX003_OWNER_HARNESS_C_NON_CYBER_ROUTE_COVERAGE = 'PHASE8-UX-003-C-NON-CYBER';
+const PHASE8_UX003_OWNER_HARNESS_C_CYBER_ROUTE_COVERAGE = 'PHASE8-UX-003-C-CYBER';
+
+const PHASE8_UX003_OMI_EVIDENCE_REPORTS = Object.freeze({
+  'owner_harness_route:evidence:omi_dashboard': 'docs/roadmap/validation/omi_dashboard_browser_evidence.md',
+  'owner_harness_route:evidence:omi_candidate_detail': 'docs/roadmap/validation/omi_candidate_detail_browser_evidence.md',
+  'owner_harness_route:evidence:omi_evidence_drawer': 'docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md',
+  'owner_harness_route:evidence:omi_apply_promotion_confirmation': 'docs/roadmap/validation/omi_apply_promotion_browser_evidence.md',
+});
+
+const phase8Ux003OwnerHarnessMappedBBlockers = Object.freeze([
+  'candidate_review_candidate_first_visible',
+  'candidate_review_queue_not_approval',
+  'candidate_review_read_only_state',
+  'candidate_review_owner_action_explicit',
+  'candidate_review_confidence_not_truth',
+  'candidate_review_persistence_not_canon',
+  'apply_promotion_requires_confirmation',
+  'apply_promotion_audit_details',
+  'apply_promotion_only_approved_workflow',
+  'apply_promotion_failed_rejected_unchanged',
+  'apply_promotion_no_bypass',
+]);
+
+const phase8Ux003OwnerHarnessMappedCNonCyberBlockers = Object.freeze([
+  'manual_workspace_notes_project_scoped',
+  'manual_workspace_materials_project_scoped',
+  'model_assisted_ncp_structured_context_only',
+  'model_assisted_subtxt_rubric_only',
+  'model_assisted_dramatica_flow_analysis_only',
+]);
+
+const phase8Ux003OwnerHarnessMappedCCyberBlockers = Object.freeze([
+  'cyber_fixture_story_check_selected_source_path',
+  'cyber_fixture_no_prose_prompt_path',
+]);
+
+const PHASE8_UX003_NON_CYBER_C_EVIDENCE_SOURCES = Object.freeze({
+  'owner_harness_route:notes_project_scoped_save_reload': 'docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A',
+  'owner_harness_route:materials_project_scoped_save_reload': 'docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A',
+  'owner_harness_route:analysis_runtime_label_status': 'docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006B',
+});
+
+const PHASE8_UX003_RESULT_RULES = Object.freeze([
+  'owner_harness_result_rule:missing_route_is_not_exposed_not_pass',
+  'owner_harness_result_rule:manual_or_not_exposed_is_not_pass',
+  'owner_harness_assertion:apply_promotion_not_executed',
+]);
+
+const phase8Ux003OwnerHarnessRouteCoverage = {
+  b: {
+    marker: PHASE8_UX003_OWNER_HARNESS_B_ROUTE_COVERAGE,
+    status: STATUSES.MANUAL_REVIEW_REQUIRED,
+    blockers: phase8Ux003OwnerHarnessMappedBBlockers,
+    evidenceRoutes: PHASE8_UX003_OMI_EVIDENCE_REPORTS,
+    resultRules: PHASE8_UX003_RESULT_RULES,
+    notes: [],
+  },
+  cNonCyber: {
+    marker: PHASE8_UX003_OWNER_HARNESS_C_NON_CYBER_ROUTE_COVERAGE,
+    status: STATUSES.MANUAL_REVIEW_REQUIRED,
+    blockers: phase8Ux003OwnerHarnessMappedCNonCyberBlockers,
+    evidenceRoutes: PHASE8_UX003_NON_CYBER_C_EVIDENCE_SOURCES,
+    resultRules: PHASE8_UX003_RESULT_RULES,
+    notes: [],
+  },
+  cCyber: {
+    marker: PHASE8_UX003_OWNER_HARNESS_C_CYBER_ROUTE_COVERAGE,
+    status: STATUSES.MANUAL_REVIEW_REQUIRED,
+    blockers: phase8Ux003OwnerHarnessMappedCCyberBlockers,
+    evidenceRoutes: {
+      'owner_harness_route:cyber_owner_authored_source_select': 'PHASE8-UX-003-T005',
+      'owner_harness_route:cyber_selected_source_story_check': 'PHASE8-UX-003-T005',
+      'owner_harness_route:cyber_no_prose_refusal_fail_closed': 'PHASE8-UX-003-T005',
+    },
+    resultRules: PHASE8_UX003_RESULT_RULES,
+    notes: ['Cyber selected-source Story Check and Cyber no-prose evidence remain planned for PHASE8-UX-003-T005.'],
+  },
+};
+
 const SECTION_ORDER = Object.freeze([
   'Startup Requirements',
   'Project Isolation',
@@ -495,6 +576,148 @@ async function safeFetchJson(url, options = {}) {
   } finally {
     clearTimeout(timeout);
   }
+}
+
+async function readRepoEvidence(relativePath) {
+  return fs.readFile(path.join(REPO_ROOT, relativePath), 'utf8').catch(() => '');
+}
+
+function evidenceReportPasses(text) {
+  return /Result:\s*(?:\*\*)?PASS(?:\*\*)?/i.test(text)
+    || /Final automated decision:\s*\*\*MANUAL_REVIEW_REQUIRED\*\*/i.test(text);
+}
+
+async function recordPhase8Ux003OwnerHarnessRouteCoverage() {
+  const omiEvidence = {};
+  for (const [route, reportPath] of Object.entries(PHASE8_UX003_OMI_EVIDENCE_REPORTS)) {
+    const text = await readRepoEvidence(reportPath);
+    omiEvidence[route] = {
+      marker: route,
+      reportPath,
+      status: evidenceReportPasses(text) ? STATUSES.PASS : STATUSES.NOT_EXPOSED,
+      hasPassEvidence: evidenceReportPasses(text),
+      bytesRead: text.length,
+    };
+  }
+
+  const allOmiEvidencePresent = Object.values(omiEvidence).every((entry) => entry.status === STATUSES.PASS);
+  phase8Ux003OwnerHarnessRouteCoverage.b = {
+    ...phase8Ux003OwnerHarnessRouteCoverage.b,
+    status: allOmiEvidencePresent ? STATUSES.PASS : STATUSES.NOT_EXPOSED,
+    evidence: omiEvidence,
+    notes: allOmiEvidencePresent
+      ? ['B-category evidence is wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence.']
+      : ['One or more existing OMI evidence reports were missing or did not record PASS; missing route evidence is NOT_EXPOSED, not PASS.'],
+  };
+
+  for (const itemId of phase8Ux003OwnerHarnessMappedBBlockers) {
+    if (checklistResults[itemId]) {
+      recordChecklistItem(
+        itemId,
+        phase8Ux003OwnerHarnessRouteCoverage.b.status,
+        {
+          marker: PHASE8_UX003_OWNER_HARNESS_B_ROUTE_COVERAGE,
+          routeCoverage: 'phase8Ux003OwnerHarnessMappedBBlockers',
+          evidenceRoutes: PHASE8_UX003_OMI_EVIDENCE_REPORTS,
+          resultRules: PHASE8_UX003_RESULT_RULES,
+          didRunApplyPromotion: false,
+          didMutateMemoryCanon: false,
+        },
+        allOmiEvidencePresent
+          ? 'PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance.'
+          : 'PHASE8-UX-003-B owner harness route marker found missing OMI evidence; not passed.',
+      );
+    }
+  }
+
+  const latestValidation = await readRepoEvidence('docs/roadmap/validation/latest_roadmap_validation.md');
+  const notesMaterialsEvidence = /PHASE8-UX-002-T006A Notes\/Materials Evidence UI/i.test(latestValidation)
+    && /createOwnerAuthoredNote/i.test(latestValidation)
+    && /createOwnerProvidedMaterial/i.test(latestValidation)
+    && /reloadProjectScopedNotesMaterials/i.test(latestValidation);
+  const analysisRuntimeEvidence = /PHASE8-UX-002-T006B Raw Artifact \/ Analysis Runtime Status UI/i.test(latestValidation)
+    && /NCP is structured context interchange only/i.test(latestValidation)
+    && /Subtxt is rubric\/diagnostic guidance only/i.test(latestValidation)
+    && /dramatica-flow is audited allowlist only/i.test(latestValidation);
+  const nonCyberEvidencePresent = notesMaterialsEvidence && analysisRuntimeEvidence;
+
+  phase8Ux003OwnerHarnessRouteCoverage.cNonCyber = {
+    ...phase8Ux003OwnerHarnessRouteCoverage.cNonCyber,
+    status: nonCyberEvidencePresent ? STATUSES.PASS : STATUSES.NOT_EXPOSED,
+    evidence: {
+      owner_harness_route_notes_project_scoped_save_reload: {
+        marker: 'owner_harness_route:notes_project_scoped_save_reload',
+        status: notesMaterialsEvidence ? STATUSES.PASS : STATUSES.NOT_EXPOSED,
+        source: PHASE8_UX003_NON_CYBER_C_EVIDENCE_SOURCES['owner_harness_route:notes_project_scoped_save_reload'],
+      },
+      owner_harness_route_materials_project_scoped_save_reload: {
+        marker: 'owner_harness_route:materials_project_scoped_save_reload',
+        status: notesMaterialsEvidence ? STATUSES.PASS : STATUSES.NOT_EXPOSED,
+        source: PHASE8_UX003_NON_CYBER_C_EVIDENCE_SOURCES['owner_harness_route:materials_project_scoped_save_reload'],
+      },
+      owner_harness_route_analysis_runtime_label_status: {
+        marker: 'owner_harness_route:analysis_runtime_label_status',
+        status: analysisRuntimeEvidence ? STATUSES.PASS : STATUSES.NOT_EXPOSED,
+        source: PHASE8_UX003_NON_CYBER_C_EVIDENCE_SOURCES['owner_harness_route:analysis_runtime_label_status'],
+      },
+    },
+    notes: nonCyberEvidencePresent
+      ? ['Non-Cyber C-category evidence is wired to existing Notes/Materials save/reload proof and analysis-runtime label/status evidence.']
+      : ['One or more non-Cyber C evidence sources were missing; missing route evidence is NOT_EXPOSED, not PASS.'],
+  };
+
+  const nonCyberChecklistIds = [
+    'manual_workspace_notes_project_scoped',
+    'manual_workspace_materials_project_scoped',
+    'model_assisted_ncp_structured_context_only',
+    'model_assisted_subtxt_diagnostic_only',
+    'model_assisted_dramatica_flow_analysis_only',
+  ];
+  for (const itemId of nonCyberChecklistIds) {
+    if (checklistResults[itemId]) {
+      recordChecklistItem(
+        itemId,
+        phase8Ux003OwnerHarnessRouteCoverage.cNonCyber.status,
+        {
+          marker: PHASE8_UX003_OWNER_HARNESS_C_NON_CYBER_ROUTE_COVERAGE,
+          routeCoverage: 'phase8Ux003OwnerHarnessMappedCNonCyberBlockers',
+          mappedBlockers: phase8Ux003OwnerHarnessMappedCNonCyberBlockers,
+          evidenceRoutes: PHASE8_UX003_NON_CYBER_C_EVIDENCE_SOURCES,
+          resultRules: PHASE8_UX003_RESULT_RULES,
+          didExecuteRuntimeExtraction: false,
+          didCallModelsOrOllamaForCoverage: false,
+          didMutateMemoryCanon: false,
+        },
+        nonCyberEvidencePresent
+          ? 'PHASE8-UX-003-C-NON-CYBER owner harness route marker wired to existing Notes/Materials and analysis-runtime label/status PASS evidence.'
+          : 'PHASE8-UX-003-C-NON-CYBER owner harness route marker found missing evidence; not passed.',
+      );
+    }
+  }
+
+  phase8Ux003OwnerHarnessRouteCoverage.cCyber = {
+    ...phase8Ux003OwnerHarnessRouteCoverage.cCyber,
+    status: STATUSES.MANUAL_REVIEW_REQUIRED,
+    evidence: {
+      owner_harness_route_cyber_owner_authored_source_select: {
+        marker: 'owner_harness_route:cyber_owner_authored_source_select',
+        status: STATUSES.MANUAL_REVIEW_REQUIRED,
+        plannedFor: 'PHASE8-UX-003-T005',
+      },
+      owner_harness_route_cyber_selected_source_story_check: {
+        marker: 'owner_harness_route:cyber_selected_source_story_check',
+        status: STATUSES.MANUAL_REVIEW_REQUIRED,
+        plannedFor: 'PHASE8-UX-003-T005',
+      },
+      owner_harness_route_cyber_no_prose_refusal_fail_closed: {
+        marker: 'owner_harness_route:cyber_no_prose_refusal_fail_closed',
+        status: STATUSES.MANUAL_REVIEW_REQUIRED,
+        plannedFor: 'PHASE8-UX-003-T005',
+      },
+    },
+  };
+
+  logAction('phase8_ux003_owner_harness_route_coverage', phase8Ux003OwnerHarnessRouteCoverage);
 }
 
 function normalizeOllamaBaseUrl(value) {
@@ -1673,6 +1896,7 @@ async function writeEvidenceArtifacts() {
     uniqueProjectId,
     finalDecision,
     exitCode,
+    phase8Ux003OwnerHarnessRouteCoverage,
     toolingBlocked,
     startupBlocked,
     appBlockerFound,
@@ -1695,6 +1919,7 @@ async function writeEvidenceArtifacts() {
     },
     finalDecision,
     exitCode,
+    phase8Ux003OwnerHarnessRouteCoverage,
     summary,
     groupedResults: groupedResults(),
     results: Object.values(checklistResults),
@@ -1721,6 +1946,24 @@ async function writeEvidenceArtifacts() {
     problemItems.length === 0
       ? '- None. All automated checklist items passed.'
       : problemItems.map((item) => `- **${item.status}** \`${item.id}\` — ${item.text} ${item.notes.length ? `(${item.notes.join(' ')})` : ''}`).join('\n'),
+    '',
+    '## PHASE8-UX-003 Owner Harness Route Coverage',
+    '',
+    `- B marker: \`${PHASE8_UX003_OWNER_HARNESS_B_ROUTE_COVERAGE}\` -> **${phase8Ux003OwnerHarnessRouteCoverage.b.status}**`,
+    '- B-category evidence is wired to existing OMI evidence surfaces: OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation.',
+    `- Non-Cyber C marker: \`${PHASE8_UX003_OWNER_HARNESS_C_NON_CYBER_ROUTE_COVERAGE}\` -> **${phase8Ux003OwnerHarnessRouteCoverage.cNonCyber.status}**`,
+    '- Non-Cyber C-category evidence is wired to existing Notes/Materials save/reload proof and analysis-runtime label/status surfaces.',
+    `- Cyber C marker: \`${PHASE8_UX003_OWNER_HARNESS_C_CYBER_ROUTE_COVERAGE}\` -> **${phase8Ux003OwnerHarnessRouteCoverage.cCyber.status}**`,
+    '- Cyber selected-source Story Check and Cyber no-prose evidence remain planned for `PHASE8-UX-003-T005`.',
+    '- Existing route evidence is not owner acceptance by itself; owner acceptance remains pending.',
+    '- Missing routes resolve to `MANUAL_REVIEW_REQUIRED` or `NOT_EXPOSED`, not false `PASS`.',
+    '- Apply-promotion was not executed by this route coverage wiring.',
+    '',
+    '### PHASE8-UX-003 Structured Route Results',
+    '',
+    '```json',
+    JSON.stringify(phase8Ux003OwnerHarnessRouteCoverage, null, 2),
+    '```',
     '',
     '## Ollama Readiness Handling',
     '',
@@ -1832,6 +2075,7 @@ async function main() {
       markModelBackedBlocked();
       await runCyberDetectiveFixtureChecks();
     }
+    await recordPhase8Ux003OwnerHarnessRouteCoverage();
     runFinalOwnerDecisionChecks();
   } catch (error) {
     appBlockerFound = true;

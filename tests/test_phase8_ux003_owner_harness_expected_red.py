@@ -60,12 +60,15 @@ B_BLOCKERS = (
     "apply_promotion_no_bypass",
 )
 
-C_BLOCKERS = (
+C_NON_CYBER_BLOCKERS = (
     "manual_workspace_notes_project_scoped",
     "manual_workspace_materials_project_scoped",
     "model_assisted_ncp_structured_context_only",
     "model_assisted_subtxt_rubric_only",
     "model_assisted_dramatica_flow_analysis_only",
+)
+
+C_CYBER_BLOCKERS = (
     "cyber_fixture_story_check_selected_source_path",
     "cyber_fixture_no_prose_prompt_path",
 )
@@ -141,26 +144,44 @@ def test_phase8_ux003_b_blockers_require_owner_harness_route_markers() -> None:
     )
 
 
-def test_phase8_ux003_c_blockers_require_owner_harness_route_markers() -> None:
-    """C blockers need owner-harness markers for existing route/workflow surfaces."""
+def test_phase8_ux003_c_non_cyber_blockers_require_owner_harness_route_markers() -> None:
+    """T004 wires non-Cyber C blockers to existing route/workflow evidence."""
 
     source = combined_text((OWNER_HARNESS, MAPPING_DECISION, TASK_RECORD))
 
-    assert_present(source, C_BLOCKERS, "PHASE8-UX-003-C-source-inventory")
+    assert_present(source, C_NON_CYBER_BLOCKERS, "PHASE8-UX-003-C-NON-CYBER-source-inventory")
     assert_present(
         source,
         (
-            "PHASE8_UX003_OWNER_HARNESS_C_ROUTE_COVERAGE",
-            "phase8Ux003OwnerHarnessMappedCBlockers",
+            "PHASE8_UX003_OWNER_HARNESS_C_NON_CYBER_ROUTE_COVERAGE",
+            "phase8Ux003OwnerHarnessMappedCNonCyberBlockers",
             "owner_harness_route:notes_project_scoped_save_reload",
             "owner_harness_route:materials_project_scoped_save_reload",
             "owner_harness_route:analysis_runtime_label_status",
+            "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+        ),
+        "PHASE8-UX-003-C-NON-CYBER",
+    )
+
+
+def test_phase8_ux003_c_cyber_blockers_remain_planned_for_t005() -> None:
+    """Cyber selected-source and no-prose coverage must remain pending after T004."""
+
+    source = combined_text((OWNER_HARNESS, MAPPING_DECISION, TASK_RECORD))
+
+    assert_present(source, C_CYBER_BLOCKERS, "PHASE8-UX-003-C-CYBER-source-inventory")
+    assert_present(
+        source,
+        (
+            "PHASE8_UX003_OWNER_HARNESS_C_CYBER_ROUTE_COVERAGE",
             "owner_harness_route:cyber_owner_authored_source_select",
             "owner_harness_route:cyber_selected_source_story_check",
             "owner_harness_route:cyber_no_prose_refusal_fail_closed",
             "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+            "PHASE8-UX-003-T005",
+            "Cyber selected-source Story Check and Cyber no-prose evidence remain planned",
         ),
-        "PHASE8-UX-003-C",
+        "PHASE8-UX-003-C-CYBER",
     )
 
 

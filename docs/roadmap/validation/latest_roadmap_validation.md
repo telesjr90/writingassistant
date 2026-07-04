@@ -1,3 +1,16 @@
+# PHASE8-UX-003-T004 Owner Harness Route Wiring
+
+- Result: PASS for B and non-Cyber C owner harness route wiring.
+- `PHASE8-UX-003-B`: PASS, wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence.
+- `PHASE8-UX-003-C-NON-CYBER`: PASS, wired to existing Notes/Materials project-scoped save/reload proof and NCP/Subtxt/dramatica-flow analysis-runtime label/status evidence.
+- `PHASE8-UX-003-C-CYBER`: `MANUAL_REVIEW_REQUIRED`, intentionally left for `PHASE8-UX-003-T005`.
+- Focused expected-red/green coverage: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q` -> `6 passed in 0.05s`.
+- Owner harness source/unit coverage: `.venv-unsloth-clean/bin/python -m pytest tests/test_mvp_owner_acceptance_browser_smoke_source.py -q` -> `24 passed in 0.12s`.
+- Owner acceptance harness: `node scripts/mvp-owner-acceptance-browser-smoke.mjs` -> exit `0`; final automated decision `MANUAL_REVIEW_REQUIRED`.
+- Evidence artifacts updated: `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`, `artifacts/mvp-readiness/owner-acceptance/checklist-results.json`, and `artifacts/mvp-readiness/owner-acceptance/workflow-log.json`.
+- Owner acceptance remains pending. MVP is not complete.
+- No frontend/backend product code changed, no new product UI was added, no candidates were created outside authorized isolated harness behavior, Memory/Canon was not mutated, apply-promotion was not enabled or run, runtime extraction was not executed, no model-backed generation was required for T004 route wiring, and no generated prose controls were added.
+
 # PHASE8-UX-003-T003 Expected-Red Owner Harness Coverage
 
 - Result: PASS for tests-first expected-red coverage only.

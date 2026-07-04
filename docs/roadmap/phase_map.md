@@ -1,3 +1,20 @@
+# PHASE8-UX-003-T004 Owner Harness Route Wiring
+
+- `PHASE8-UX-003` is active as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
+- `PHASE8-UX-003-T001` is complete/PASS as docs/status/planning publication only.
+- `PHASE8-UX-003-T002` is complete/PASS as docs/decision/planning only; decision record: `docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md`.
+- `PHASE8-UX-003-T003` is complete/PASS as tests-first expected-red coverage only.
+- `PHASE8-UX-003-T004` is complete/PASS for owner harness route wiring to existing Notes/Materials, OMI review, OMI apply-promotion, and analysis-runtime label surfaces.
+- T004 expected-red/green coverage: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q` -> `6 passed in 0.05s`.
+- Owner harness source guards: `.venv-unsloth-clean/bin/python -m pytest tests/test_mvp_owner_acceptance_browser_smoke_source.py -q` -> `24 passed in 0.12s`.
+- Owner acceptance harness: `node scripts/mvp-owner-acceptance-browser-smoke.mjs` -> exit `0`, final automated decision `MANUAL_REVIEW_REQUIRED`.
+- `PHASE8-UX-003-B` is wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence.
+- `PHASE8-UX-003-C-NON-CYBER` is wired to existing Notes/Materials save/reload proof and analysis-runtime label/status evidence.
+- `PHASE8-UX-003-C-CYBER` remains `MANUAL_REVIEW_REQUIRED`; `PHASE8-UX-003-T005` remains planned for Cyber fixture selected-source Story Check and no-prose evidence routing using existing owner-authored source UI.
+- A-category blockers remain manual owner review only.
+- `PHASE8-UX-002` is not reopened. Owner acceptance remains pending and MVP is not complete.
+- No frontend/backend product code changed, no new product UI was added, Memory/Canon was not mutated, apply-promotion was not enabled or run, runtime extraction was not executed, and no generated prose controls were added.
+
 # PHASE8-UX-003-T003 Expected-Red Owner Harness Coverage
 
 - `PHASE8-UX-003` is active as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
