@@ -2,11 +2,11 @@
 
 - Result: **PASS**
 - Exit code: `0`
-- Started: `2026-07-04T03:58:52.804Z`
-- Finished: `2026-07-04T03:58:55.865Z`
+- Started: `2026-07-04T04:07:33.294Z`
+- Finished: `2026-07-04T04:07:37.509Z`
 - App base URL: `http://localhost:5173`
 - Project ID: `example`
-- API mode: `fixture`
+- API mode: `live-backend`
 - Evidence directory: `docs/roadmap/validation/omi-dashboard-browser-evidence`
 - Workflow log: `docs/roadmap/validation/omi-dashboard-browser-evidence/workflow-log.json`
 
@@ -48,8 +48,8 @@
 
 ## Read-Only Snapshot Check
 
-- Candidate count before: `0`
-- Candidate count after: `0`
+- Candidate count before: `2`
+- Candidate count after: `2`
 - Approved Memory/Canon total before: `0`
 - Approved Memory/Canon total after: `0`
 
