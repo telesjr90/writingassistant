@@ -1,3 +1,18 @@
+# PHASE8-UX-003-T003 Expected-Red Owner Harness Coverage
+
+- Result: PASS for tests-first expected-red coverage only.
+- Expected-red test file: `tests/test_phase8_ux003_owner_harness_expected_red.py`.
+- Expected-red command: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q`.
+- Expected-red result: `2 failed, 3 passed in 0.07s`.
+- The two failures are intentional and limited to missing PHASE8-UX-003 owner harness coverage markers:
+  - `PHASE8-UX-003-B`
+  - `PHASE8-UX-003-C`
+- These expected-red failures are not product failures and do not mark T004/T005 implementation complete.
+- A-category blockers remain manual owner review only.
+- T004 is next for owner harness route wiring to existing Notes/Materials, OMI review, OMI apply-promotion, and analysis-runtime label surfaces.
+- T005 remains planned for Cyber fixture selected-source Story Check and no-prose evidence routing using existing owner-authored source UI.
+- Owner acceptance was not marked PASS. MVP was not marked complete. No frontend/backend/browser harness code changed, no tests were edited in this closeout, no candidates were created, Memory/Canon was not mutated, models/Ollama were not called, extraction was not run, apply-promotion was not enabled or run, and no generated prose controls were added.
+
 # PHASE8-UX-003-T002 Harness Route/Workflow Mapping Decision
 
 - Result: PASS for docs/decision/planning.

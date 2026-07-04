@@ -2,11 +2,11 @@
   "task_id": "PHASE8-UX-003",
   "title": "Owner Acceptance Harness Route/Workflow Evidence Follow-up",
   "status": "active",
-  "task_type": "docs-only UX follow-up parent with T002 mapping decision complete",
+  "task_type": "docs-only UX follow-up parent with T003 expected-red coverage complete",
   "parent_title": "PHASE8-UX-003 - Owner Acceptance Harness Route/Workflow Evidence Follow-up",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-003/",
-  "purpose": "Track the separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, including the T002 mapping decision for target B/C blockers without reopening PHASE8-UX-002 and without adding product UI by default.",
+  "purpose": "Track the separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, including the T002 mapping decision and T003 tests-first expected-red coverage for target B/C blockers without reopening PHASE8-UX-002 and without adding product UI by default.",
   "current_evidence_summary": [
     "PHASE8-UX-002-T007 is complete/PARTIAL.",
     "Owner acceptance harness exited 0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
@@ -14,6 +14,9 @@
     "OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation browser evidence surfaces are PASS.",
     "PHASE8-UX-003-T002 maps target B blockers to existing OMI Dashboard, Candidate Detail, Evidence Drawer, Apply-Promotion Confirmation, and their evidence reports/smoke scripts.",
     "PHASE8-UX-003-T002 maps target C blockers to existing Notes/Materials save/reload proof, analysis-runtime label/status surfaces, owner-authored source create/import/select UI, selected-source Story Check, and no-prose refusal/fail-closed evidence UI.",
+    "PHASE8-UX-003-T003 is complete/PASS as tests-first expected-red coverage only through tests/test_phase8_ux003_owner_harness_expected_red.py.",
+    "T003 expected-red command .venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q returned 2 failed, 3 passed in 0.07s.",
+    "The T003 failures are intentional and limited to missing PHASE8-UX-003-B and PHASE8-UX-003-C owner harness coverage markers.",
     "A-category blockers remain manual review only.",
     "Owner acceptance remains pending.",
     "MVP is not complete."
@@ -92,8 +95,8 @@
   "expected_outputs": [
     "docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md",
     "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
-    "roadmap/status/governance updates recording PHASE8-UX-003-T002 complete/PASS as docs/decision/planning only",
-    "PHASE8-UX-003-T003 recorded as the next planned child",
+    "roadmap/status/governance updates recording PHASE8-UX-003-T003 complete/PASS as tests-first expected-red coverage only",
+    "PHASE8-UX-003-T004 recorded as the next planned child",
     "owner acceptance pending and MVP not complete recorded"
   ],
   "allowed_files": [
@@ -165,8 +168,8 @@
     {
       "task_id": "PHASE8-UX-003-T003",
       "title": "Add expected-red harness coverage for target B/C blockers",
-      "status": "planned",
-      "scope": "expected-red harness coverage only when explicitly authorized"
+      "status": "complete/PASS",
+      "scope": "tests-first expected-red coverage only; intentional failures limited to missing PHASE8-UX-003-B and PHASE8-UX-003-C owner harness coverage markers"
     },
     {
       "task_id": "PHASE8-UX-003-T004",
@@ -193,9 +196,9 @@
       "scope": "docs/status/governance only; do not mark owner acceptance PASS"
     }
   ],
-  "latest_child_task": "PHASE8-UX-003-T002",
+  "latest_child_task": "PHASE8-UX-003-T003",
   "latest_child_status": "complete/PASS",
-  "next_child_task": "PHASE8-UX-003-T003",
+  "next_child_task": "PHASE8-UX-003-T004",
   "owner_acceptance_status": "pending",
   "mvp_completion_status": "not_complete"
 }
