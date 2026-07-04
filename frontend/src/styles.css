@@ -899,7 +899,9 @@ h2 {
 
 .omi-shell,
 .omi-dashboard,
-.omi-candidate-detail {
+.omi-candidate-detail,
+.omi-apply-route,
+.omi-apply-confirmation {
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -1492,6 +1494,155 @@ h2 {
   font-weight: 700;
 }
 
+.omi-apply-confirmation {
+  padding: 18px;
+  background: #fffaf2;
+  border: 2px solid #b7791f;
+  border-radius: 8px;
+}
+
+.omi-apply-guard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dfb66f;
+}
+
+.omi-apply-guard-header h1 {
+  margin-top: 4px;
+}
+
+.omi-apply-boundary,
+.omi-apply-blockers,
+.omi-apply-section,
+.omi-apply-final-form {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #dfb66f;
+  border-radius: 8px;
+}
+
+.omi-apply-boundary {
+  color: #422006;
+  background: #fff7e6;
+}
+
+.omi-apply-boundary p,
+.omi-apply-section p {
+  margin: 0;
+  color: #2c374c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.omi-apply-boundary p:first-child {
+  color: #101828;
+  font-weight: 800;
+}
+
+.omi-apply-blockers {
+  border-color: #e2a3a3;
+  background: #fff7f7;
+}
+
+.omi-apply-blocker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omi-apply-blocker-list li {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.24fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  color: #2c374c;
+  background: #ffffff;
+  border: 1px solid #e2a3a3;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.omi-apply-blocker-list strong {
+  color: #a93636;
+}
+
+.omi-apply-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.omi-apply-section h2,
+.omi-apply-blockers h2,
+.omi-apply-final-form h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+.omi-apply-metadata {
+  display: grid;
+  grid-template-columns: minmax(132px, 0.38fr) minmax(0, 1fr);
+  gap: 9px 12px;
+  margin: 0;
+}
+
+.omi-apply-metadata div {
+  display: contents;
+}
+
+.omi-apply-metadata dt {
+  color: #637089;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-apply-metadata dd {
+  margin: 0;
+  color: #2c374c;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.omi-apply-final-form {
+  border-color: #b7791f;
+}
+
+.omi-apply-final-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.omi-final-apply-button {
+  min-height: 38px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #8a2c0d;
+  border: 1px solid #8a2c0d;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.omi-final-apply-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     flex-direction: column;
@@ -1520,7 +1671,10 @@ h2 {
   .omi-approved-snapshot dl,
   .omi-candidate-status-grid,
   .omi-candidate-detail-layout,
-  .omi-candidate-metadata {
+  .omi-candidate-metadata,
+  .omi-apply-section-grid,
+  .omi-apply-metadata,
+  .omi-apply-blocker-list li {
     grid-template-columns: 1fr;
   }
 
@@ -1710,6 +1864,16 @@ h2 {
   }
 
   .omi-health-panel .primary-button {
+    width: 100%;
+  }
+
+  .omi-apply-guard-header,
+  .omi-apply-final-actions {
+    flex-direction: column;
+  }
+
+  .omi-apply-final-actions .secondary-button,
+  .omi-apply-final-actions .omi-final-apply-button {
     width: 100%;
   }
 }

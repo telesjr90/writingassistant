@@ -42,6 +42,12 @@ OMI_PROMOTION_READINESS_CHECKLIST_JSX = (
     FRONTEND_SRC / "components" / "OMIPromotionReadinessChecklist.jsx"
 )
 OMI_EVIDENCE_DRAWER_JSX = FRONTEND_SRC / "components" / "OMIEvidenceDrawer.jsx"
+OMI_APPLY_PROMOTION_ROUTE_JSX = (
+    FRONTEND_SRC / "components" / "OMIApplyPromotionRoute.jsx"
+)
+OMI_APPLY_PROMOTION_BLOCKERS_JSX = (
+    FRONTEND_SRC / "components" / "OMIApplyPromotionBlockers.jsx"
+)
 
 SOURCE_PATHS = (
     APP_JSX,
@@ -61,6 +67,8 @@ SOURCE_PATHS = (
     OMI_CANDIDATE_FIELD_TABLE_JSX,
     OMI_PROMOTION_READINESS_CHECKLIST_JSX,
     OMI_EVIDENCE_DRAWER_JSX,
+    OMI_APPLY_PROMOTION_ROUTE_JSX,
+    OMI_APPLY_PROMOTION_BLOCKERS_JSX,
 )
 
 FORBIDDEN_PROSE_INTENTS = (
@@ -589,3 +597,146 @@ def test_omi_evidence_drawer_no_apply_promotion_or_generated_prose_controls() ->
     assert not [
         label for label in forbidden_control_labels if label in lowered
     ], "OMI evidence drawer source must not expose generated-prose controls."
+
+
+def test_omi_apply_promotion_confirmation_only_contract() -> None:
+    """Fourth OMI slice requires a guarded Apply-Promotion Confirmation surface."""
+
+    source = combined_source(
+        (
+            OMI_SHELL_JSX,
+            APPLY_PROMOTION_CONFIRMATION_JSX,
+            OMI_APPLY_PROMOTION_ROUTE_JSX,
+            OMI_APPLY_PROMOTION_BLOCKERS_JSX,
+        )
+    )
+
+    assert_markers_present(
+        source,
+        (
+            "data-testid=\"omi-apply-promotion-confirmation\"",
+            "data-testid=\"omi-apply-promotion-blockers\"",
+            "data-testid=\"omi-apply-promotion-final-action\"",
+            "Apply-Promotion Confirmation",
+            "Candidate Snapshot",
+            "Destination",
+            "Target Path",
+            "Evidence / Provenance Summary",
+            "Source Location Summary",
+            "Duplicate / Link / Dependency Summary",
+            "Approved Memory/Canon Before-State",
+            "Promotion Audit Record",
+            "Audit Preview",
+            "Owner Final Confirmation",
+            "Final Apply-Promotion",
+            "Cancel / Return",
+            "Not Applied to Memory/Canon",
+            "Memory/Canon Unchanged",
+            "This is the only screen that may lead to Memory/Canon mutation.",
+            "Candidate approval, queue presence, confidence, and promotion audit records are not enough.",
+            "Ready means the handoff packet is complete. Memory/Canon has not changed.",
+            "Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete.",
+            "This remains a candidate until apply-promotion is separately confirmed and completed.",
+            "Failure safety copy",
+            "setOmiView('apply-promotion')",
+        ),
+        "OMI-APPLY-PROMOTION-CONFIRMATION",
+    )
+
+
+def test_omi_apply_promotion_blocker_states_and_disabled_association() -> None:
+    """Apply-Promotion final action must remain disabled whenever blockers are visible."""
+
+    source = combined_source((APPLY_PROMOTION_CONFIRMATION_JSX, OMI_APPLY_PROMOTION_BLOCKERS_JSX))
+
+    assert_markers_present(
+        source,
+        (
+            "Candidate not ready",
+            "Missing owner approval",
+            "Missing destination",
+            "Unsupported destination",
+            "Missing evidence/provenance",
+            "Missing source locator",
+            "Duplicate unresolved",
+            "Dependency unresolved",
+            "Promotion audit record missing",
+            "Target file/path missing",
+            "Approved Memory/Canon before-state unavailable",
+            "Final confirmation incomplete",
+            "Apply-promotion unavailable in this version",
+            "Apply-promotion failed or would fail closed",
+            "const finalDisabled = blockers.length > 0 || isSubmitting;",
+            "disabled={finalDisabled}",
+            "aria-describedby={`${blockerReasonId} ${finalReasonId}`}",
+            "Disabled: Final Apply-Promotion cannot run while visible blockers remain",
+            "I am the owner and this is owner final confirmation for apply-promotion.",
+            "ownerFinalConfirmation",
+            "getApplyPromotionBlockers",
+        ),
+        "OMI-APPLY-PROMOTION-BLOCKERS",
+    )
+
+
+def test_omi_apply_promotion_audit_and_before_state_labels() -> None:
+    """Confirmation stack must show audit preview and before-state labels."""
+
+    source = read_source(APPLY_PROMOTION_CONFIRMATION_JSX)
+
+    assert_markers_present(
+        source,
+        (
+            "Before-state snapshot",
+            "Before-state status",
+            "Mutation status",
+            "Promotion Audit Record",
+            "Audit Preview: candidate ID, owner approval, destination, evidence, provenance, target path, timestamp, and confirmation.",
+            "Promotion audit records are audit-only until apply-promotion succeeds.",
+            "Failure Safety",
+            "Memory/Canon must remain unchanged",
+        ),
+        "OMI-APPLY-PROMOTION-AUDIT-BEFORE-STATE",
+    )
+
+
+def test_omi_apply_promotion_no_enabled_apply_outside_confirmation() -> None:
+    """Dashboard, Candidate Detail, and Evidence Drawer must not expose enabled apply-promotion."""
+
+    outside_source = combined_source((OMI_DASHBOARD_JSX, OMI_CANDIDATE_DETAIL_JSX, OMI_EVIDENCE_DRAWER_JSX))
+    confirmation_source = read_source(APPLY_PROMOTION_CONFIRMATION_JSX)
+
+    assert "data-testid=\"omi-apply-promotion-final-action\"" not in outside_source
+    assert "submitApplyPromotion" not in outside_source
+    assert "data-testid=\"omi-apply-promotion-final-action\"" in confirmation_source
+    assert "submitApplyPromotion" in confirmation_source
+    assert "Disabled: apply-promotion requires a completed route-backed confirmation and every handoff gate." in outside_source
+
+
+def test_omi_apply_promotion_source_has_no_generated_prose_controls() -> None:
+    """Apply-Promotion Confirmation must not expose story-prose production controls."""
+
+    source = combined_source(
+        (
+            APPLY_PROMOTION_CONFIRMATION_JSX,
+            OMI_APPLY_PROMOTION_ROUTE_JSX,
+            OMI_APPLY_PROMOTION_BLOCKERS_JSX,
+        )
+    )
+    lowered = source.lower()
+
+    forbidden_control_labels = (
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "expand",
+        "imitate",
+        "revise",
+        "compose",
+    )
+
+    assert not [
+        label for label in forbidden_control_labels if label in lowered
+    ], "OMI apply-promotion confirmation source must not expose generated-prose controls."

@@ -215,6 +215,7 @@ export default function OMICandidateDetail({
   isLoading = false,
   error = '',
   onBackToDashboard = () => {},
+  onOpenApplyPromotion = () => {},
   onOpenEvidence = () => {},
 }) {
   const storedCandidates = asArray(candidates);
@@ -372,6 +373,13 @@ export default function OMICandidateDetail({
 
       <section className="omi-candidate-panel" aria-label="Candidate apply-promotion boundary">
         <h2>Apply to Memory/Canon</h2>
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={onOpenApplyPromotion}
+        >
+          Open Apply-Promotion Handoff
+        </button>
         <button className="primary-button" type="button" disabled>
           Apply to Memory/Canon
         </button>

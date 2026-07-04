@@ -2,11 +2,22 @@ import { useRef, useMemo, useState } from 'react';
 import OMIBoundaryBanner from './OMIBoundaryBanner.jsx';
 import OMICandidateCanonStatusStrip from './OMICandidateCanonStatusStrip.jsx';
 import OMICandidateDetail from './OMICandidateDetail.jsx';
+import OMIApplyPromotionRoute from './OMIApplyPromotionRoute.jsx';
 import OMIDashboard, { getOMIDashboardSummary } from './OMIDashboard.jsx';
 import OMIEvidenceDrawer from './OMIEvidenceDrawer.jsx';
 
 function getCandidateId(candidate) {
   return candidate?.candidate_id ?? candidate?.candidateId ?? candidate?.id ?? '';
+}
+
+function getShellTitle(omiView) {
+  if (omiView === 'candidate-detail') {
+    return 'OMI Candidate Detail';
+  }
+  if (omiView === 'apply-promotion') {
+    return 'Apply-Promotion Confirmation';
+  }
+  return 'OMI Dashboard';
 }
 
 export default function OMIShell({
@@ -30,6 +41,13 @@ export default function OMIShell({
       const firstCandidateId = getCandidateId(candidates[0]);
       setSelectedCandidateId(firstCandidateId);
       setOmiView('candidate-detail');
+      return;
+    }
+
+    if (destination === 'promotion-handoff') {
+      const firstCandidateId = selectedCandidateId || getCandidateId(candidates[0]);
+      setSelectedCandidateId(firstCandidateId);
+      setOmiView('apply-promotion');
       return;
     }
 
@@ -59,7 +77,7 @@ export default function OMIShell({
           >
             Active project: {projectTitle || activeProjectId || 'Project'} / project-local OMI
           </p>
-          <h1>{omiView === 'candidate-detail' ? 'OMI Candidate Detail' : 'OMI Dashboard'}</h1>
+          <h1>{getShellTitle(omiView)}</h1>
           <p
             className="muted-copy"
             data-testid="omi-source-scope-label"
@@ -79,7 +97,15 @@ export default function OMIShell({
         approvedMemoryCount={summary.approvedTotal}
         isDegraded={summary.degraded}
       />
-      {omiView === 'candidate-detail' ? (
+      {omiView === 'apply-promotion' ? (
+        <OMIApplyPromotionRoute
+          activeProjectId={activeProjectId}
+          candidates={candidates}
+          selectedCandidateId={selectedCandidateId}
+          approvedMemoryCanonSnapshot={summary.approvedSnapshot}
+          onCancel={handleBackToDashboard}
+        />
+      ) : omiView === 'candidate-detail' ? (
         <OMICandidateDetail
           activeProjectId={activeProjectId}
           projectTitle={projectTitle}
@@ -88,6 +114,7 @@ export default function OMIShell({
           isLoading={isLoading}
           error={error}
           onBackToDashboard={handleBackToDashboard}
+          onOpenApplyPromotion={() => handleNavigate('promotion-handoff')}
           onOpenEvidence={handleOpenEvidence}
         />
       ) : (

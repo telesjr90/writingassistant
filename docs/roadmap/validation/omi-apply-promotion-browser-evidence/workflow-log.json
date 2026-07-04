@@ -1,0 +1,527 @@
+{
+  "task": "OMI Apply-Promotion Confirmation Browser Evidence Only",
+  "result": "PASS",
+  "exitCode": 0,
+  "startedAt": "2026-07-04T05:30:52.955Z",
+  "finishedAt": "2026-07-04T05:30:58.130Z",
+  "appBaseUrl": "http://localhost:5173",
+  "projectId": "example",
+  "apiMode": "live-backend",
+  "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence",
+  "validationMarkdown": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi_apply_promotion_browser_evidence.md",
+  "screenshots": {
+    "desktop": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence/screenshots/01-desktop-omi-apply-promotion-confirmation.png",
+    "mobile": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence/screenshots/02-mobile-omi-apply-promotion-confirmation.png"
+  },
+  "beforeSnapshot": {
+    "label": "before",
+    "apiMode": "live-backend",
+    "omi": {
+      "candidateCount": 2,
+      "approvedMemoryTotal": 0,
+      "approvedSnapshotJson": "null"
+    },
+    "bibleJson": "{\"schema_version\":\"0.1.0\",\"project_id\":\"example\",\"title\":\"The Princess and the Pea\",\"status\":\"sample_fixture\",\"provenance\":{\"source\":\"public_domain_scene_002\",\"source_path\":\"/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt\",\"content_status\":\"public_domain\",\"notes\":[\"Facts are source-derived from the public-domain scene file only.\",\"No model output, NotebookLM output, retrieved reference, or generated story prose is included.\"]},\"premise\":{\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"genre_notes\":[\"Fairy tale\",\"Public-domain sample fixture\"]},\"characters\":[{\"id\":\"character_prince\",\"name\":\"prince\",\"role\":\"source character\",\"facts\":[\"He wants to marry a real princess.\",\"He travels all over the world to find one.\",\"He comes home sad after failing to find what he wants.\",\"He takes the princess for his wife after the test.\"]},{\"id\":\"character_princess\",\"name\":\"princess\",\"role\":\"source character\",\"facts\":[\"She arrives at the city gate during a terrible storm.\",\"She says that she is a real princess.\",\"She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.\",\"She reports sleeping badly and being black and blue from something hard in the bed.\"]},{\"id\":\"character_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"facts\":[\"She decides to find out whether the visitor is a real princess.\",\"She places a pea on the bottom of the bedstead and piles bedding over it.\"]},{\"id\":\"character_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"facts\":[\"He opens the city gate when knocking is heard during the storm.\"]}],\"settings\":[{\"id\":\"setting_prince_home\",\"name\":\"prince's home\",\"facts\":[\"The prince returns there after travelling all over the world.\"]},{\"id\":\"setting_city_gate\",\"name\":\"city gate\",\"facts\":[\"The princess appears there during thunder, lightning, and heavy rain.\"]},{\"id\":\"setting_bedroom\",\"name\":\"bedroom\",\"facts\":[\"The old queen prepares the bedstead, pea, mattresses, and eider-down beds there.\"]},{\"id\":\"setting_museum\",\"name\":\"museum\",\"facts\":[\"The pea is put there after the prince marries the princess.\"]}],\"objects\":[{\"id\":\"object_pea\",\"name\":\"pea\",\"facts\":[\"The old queen places it under twenty mattresses and twenty eider-down beds.\",\"It becomes evidence used to identify the visitor as a real princess.\",\"It is put in the museum.\"]}],\"unresolved\":{\"main_character\":\"No Dramatica Main Character assignment is asserted for this fixture.\",\"influence_character\":\"No Influence Character assignment is asserted for this fixture.\",\"relationship_story\":\"The marriage outcome is not treated as Relationship Story proof.\",\"cips\":\"Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.\",\"dynamics\":\"Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved.\"}}",
+    "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
+  },
+  "afterSnapshot": {
+    "label": "after",
+    "apiMode": "live-backend",
+    "omi": {
+      "candidateCount": 2,
+      "approvedMemoryTotal": 0,
+      "approvedSnapshotJson": "null"
+    },
+    "bibleJson": "{\"schema_version\":\"0.1.0\",\"project_id\":\"example\",\"title\":\"The Princess and the Pea\",\"status\":\"sample_fixture\",\"provenance\":{\"source\":\"public_domain_scene_002\",\"source_path\":\"/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt\",\"content_status\":\"public_domain\",\"notes\":[\"Facts are source-derived from the public-domain scene file only.\",\"No model output, NotebookLM output, retrieved reference, or generated story prose is included.\"]},\"premise\":{\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"genre_notes\":[\"Fairy tale\",\"Public-domain sample fixture\"]},\"characters\":[{\"id\":\"character_prince\",\"name\":\"prince\",\"role\":\"source character\",\"facts\":[\"He wants to marry a real princess.\",\"He travels all over the world to find one.\",\"He comes home sad after failing to find what he wants.\",\"He takes the princess for his wife after the test.\"]},{\"id\":\"character_princess\",\"name\":\"princess\",\"role\":\"source character\",\"facts\":[\"She arrives at the city gate during a terrible storm.\",\"She says that she is a real princess.\",\"She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.\",\"She reports sleeping badly and being black and blue from something hard in the bed.\"]},{\"id\":\"character_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"facts\":[\"She decides to find out whether the visitor is a real princess.\",\"She places a pea on the bottom of the bedstead and piles bedding over it.\"]},{\"id\":\"character_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"facts\":[\"He opens the city gate when knocking is heard during the storm.\"]}],\"settings\":[{\"id\":\"setting_prince_home\",\"name\":\"prince's home\",\"facts\":[\"The prince returns there after travelling all over the world.\"]},{\"id\":\"setting_city_gate\",\"name\":\"city gate\",\"facts\":[\"The princess appears there during thunder, lightning, and heavy rain.\"]},{\"id\":\"setting_bedroom\",\"name\":\"bedroom\",\"facts\":[\"The old queen prepares the bedstead, pea, mattresses, and eider-down beds there.\"]},{\"id\":\"setting_museum\",\"name\":\"museum\",\"facts\":[\"The pea is put there after the prince marries the princess.\"]}],\"objects\":[{\"id\":\"object_pea\",\"name\":\"pea\",\"facts\":[\"The old queen places it under twenty mattresses and twenty eider-down beds.\",\"It becomes evidence used to identify the visitor as a real princess.\",\"It is put in the museum.\"]}],\"unresolved\":{\"main_character\":\"No Dramatica Main Character assignment is asserted for this fixture.\",\"influence_character\":\"No Influence Character assignment is asserted for this fixture.\",\"relationship_story\":\"The marriage outcome is not treated as Relationship Story proof.\",\"cips\":\"Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.\",\"dynamics\":\"Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved.\"}}",
+    "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
+  },
+  "failures": [],
+  "actions": [
+    {
+      "ts": "2026-07-04T05:30:52.956Z",
+      "action": "ensure_evidence_dirs",
+      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence",
+      "screenshotDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence/screenshots"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.293Z",
+      "action": "playwright_import_ok",
+      "modulePath": "/home/tjrpirateking/projects/WritingAssistantApplication/frontend/node_modules/@playwright/test/index.js"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.312Z",
+      "action": "start_vite_dev_server",
+      "appBaseUrl": "http://localhost:5173"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.421Z",
+      "action": "vite_stdout",
+      "text": "> frontend@1.0.0 dev\n> vite --host 0.0.0.0"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.630Z",
+      "action": "vite_stdout",
+      "text": "VITE v8.0.14  ready in 174 ms"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.631Z",
+      "action": "vite_stdout",
+      "text": "➜  Local:   http://localhost:5173/"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.631Z",
+      "action": "vite_stdout",
+      "text": "➜  Network: http://10.255.255.254:5173/"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.631Z",
+      "action": "vite_stdout",
+      "text": "➜  Network: http://172.25.159.75:5173/"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.846Z",
+      "action": "app_reachable_started_server",
+      "appBaseUrl": "http://localhost:5173"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.847Z",
+      "action": "workflow_start",
+      "appBaseUrl": "http://localhost:5173",
+      "projectId": "example",
+      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.891Z",
+      "action": "read_only_project_snapshot",
+      "label": "before",
+      "apiMode": "live-backend",
+      "omi": {
+        "candidateCount": 2,
+        "approvedMemoryTotal": 0,
+        "approvedSnapshotJson": "null"
+      },
+      "bibleJson": "{\"schema_version\":\"0.1.0\",\"project_id\":\"example\",\"title\":\"The Princess and the Pea\",\"status\":\"sample_fixture\",\"provenance\":{\"source\":\"public_domain_scene_002\",\"source_path\":\"/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt\",\"content_status\":\"public_domain\",\"notes\":[\"Facts are source-derived from the public-domain scene file only.\",\"No model output, NotebookLM output, retrieved reference, or generated story prose is included.\"]},\"premise\":{\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"genre_notes\":[\"Fairy tale\",\"Public-domain sample fixture\"]},\"characters\":[{\"id\":\"character_prince\",\"name\":\"prince\",\"role\":\"source character\",\"facts\":[\"He wants to marry a real princess.\",\"He travels all over the world to find one.\",\"He comes home sad after failing to find what he wants.\",\"He takes the princess for his wife after the test.\"]},{\"id\":\"character_princess\",\"name\":\"princess\",\"role\":\"source character\",\"facts\":[\"She arrives at the city gate during a terrible storm.\",\"She says that she is a real princess.\",\"She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.\",\"She reports sleeping badly and being black and blue from something hard in the bed.\"]},{\"id\":\"character_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"facts\":[\"She decides to find out whether the visitor is a real princess.\",\"She places a pea on the bottom of the bedstead and piles bedding over it.\"]},{\"id\":\"character_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"facts\":[\"He opens the city gate when knocking is heard during the storm.\"]}],\"settings\":[{\"id\":\"setting_prince_home\",\"name\":\"prince's home\",\"facts\":[\"The prince returns there after travelling all over the world.\"]},{\"id\":\"setting_city_gate\",\"name\":\"city gate\",\"facts\":[\"The princess appears there during thunder, lightning, and heavy rain.\"]},{\"id\":\"setting_bedroom\",\"name\":\"bedroom\",\"facts\":[\"The old queen prepares the bedstead, pea, mattresses, and eider-down beds there.\"]},{\"id\":\"setting_museum\",\"name\":\"museum\",\"facts\":[\"The pea is put there after the prince marries the princess.\"]}],\"objects\":[{\"id\":\"object_pea\",\"name\":\"pea\",\"facts\":[\"The old queen places it under twenty mattresses and twenty eider-down beds.\",\"It becomes evidence used to identify the visitor as a real princess.\",\"It is put in the museum.\"]}],\"unresolved\":{\"main_character\":\"No Dramatica Main Character assignment is asserted for this fixture.\",\"influence_character\":\"No Influence Character assignment is asserted for this fixture.\",\"relationship_story\":\"The marriage outcome is not treated as Relationship Story proof.\",\"cips\":\"Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.\",\"dynamics\":\"Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved.\"}}",
+      "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
+    },
+    {
+      "ts": "2026-07-04T05:30:53.975Z",
+      "action": "api_guard_installed",
+      "projectId": "example",
+      "apiMode": "live-backend"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.272Z",
+      "action": "omi_apply_promotion_confirmation_opened"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: Apply-Promotion Confirmation is reachable"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Candidate Snapshot"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Destination"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Target Path"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Evidence / Provenance Summary"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Source Location Summary"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Duplicate / Link / Dependency Summary"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Approved Memory/Canon Before-State"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Audit Preview"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Owner Final Confirmation"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Cancel / Return"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: This is the only screen that may lead to Memory/Canon mutation."
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Candidate approval, queue presence, confidence, and promotion audit records are not enough."
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Ready means the handoff packet is complete. Memory/Canon has not changed."
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: This remains a candidate until apply-promotion is separately confirmed and completed."
+    },
+    {
+      "ts": "2026-07-04T05:30:55.279Z",
+      "action": "assert_pass",
+      "name": "desktop: required confirmation copy visible: Memory/Canon Unchanged"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.307Z",
+      "action": "assert_pass",
+      "name": "desktop: blockers appear before confirmation control",
+      "blockerBox": {
+        "x": 753,
+        "y": 1019.984375,
+        "width": 290,
+        "height": 858.1875
+      },
+      "checkboxBox": {
+        "x": 787,
+        "y": 11066.515625,
+        "width": 13,
+        "height": 13
+      }
+    },
+    {
+      "ts": "2026-07-04T05:30:55.309Z",
+      "action": "assert_pass",
+      "name": "desktop: final action disabled when blocker visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.312Z",
+      "action": "assert_pass",
+      "name": "desktop: disabled final action reason associated",
+      "describedBy": "omi-apply-promotion-visible-blocker-reasons omi-apply-promotion-final-action-disabled-reason"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.314Z",
+      "action": "assert_pass",
+      "name": "desktop: described reason exists omi-apply-promotion-visible-blocker-reasons",
+      "reasonId": "omi-apply-promotion-visible-blocker-reasons"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.316Z",
+      "action": "assert_pass",
+      "name": "desktop: described reason exists omi-apply-promotion-final-action-disabled-reason",
+      "reasonId": "omi-apply-promotion-final-action-disabled-reason"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.318Z",
+      "action": "assert_pass",
+      "name": "desktop: owner final confirmation visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.321Z",
+      "action": "assert_pass",
+      "name": "desktop: cancel return visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.329Z",
+      "action": "assert_pass",
+      "name": "desktop: cancel return keyboard reachable"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.353Z",
+      "action": "assert_pass",
+      "name": "desktop: final action remains disabled after checkbox while blockers visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:55.362Z",
+      "action": "assert_pass",
+      "name": "desktop: no apply-promotion request is made in blocked state",
+      "applyPromotionRequests": []
+    },
+    {
+      "ts": "2026-07-04T05:30:55.369Z",
+      "action": "assert_pass",
+      "name": "desktop: no generated prose controls visible",
+      "matchedForbiddenControls": []
+    },
+    {
+      "ts": "2026-07-04T05:30:56.083Z",
+      "action": "screenshot",
+      "name": "01-desktop-omi-apply-promotion-confirmation",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence/screenshots/01-desktop-omi-apply-promotion-confirmation.png"
+    },
+    {
+      "ts": "2026-07-04T05:30:56.102Z",
+      "action": "read_only_project_snapshot",
+      "label": "after",
+      "apiMode": "live-backend",
+      "omi": {
+        "candidateCount": 2,
+        "approvedMemoryTotal": 0,
+        "approvedSnapshotJson": "null"
+      },
+      "bibleJson": "{\"schema_version\":\"0.1.0\",\"project_id\":\"example\",\"title\":\"The Princess and the Pea\",\"status\":\"sample_fixture\",\"provenance\":{\"source\":\"public_domain_scene_002\",\"source_path\":\"/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt\",\"content_status\":\"public_domain\",\"notes\":[\"Facts are source-derived from the public-domain scene file only.\",\"No model output, NotebookLM output, retrieved reference, or generated story prose is included.\"]},\"premise\":{\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"genre_notes\":[\"Fairy tale\",\"Public-domain sample fixture\"]},\"characters\":[{\"id\":\"character_prince\",\"name\":\"prince\",\"role\":\"source character\",\"facts\":[\"He wants to marry a real princess.\",\"He travels all over the world to find one.\",\"He comes home sad after failing to find what he wants.\",\"He takes the princess for his wife after the test.\"]},{\"id\":\"character_princess\",\"name\":\"princess\",\"role\":\"source character\",\"facts\":[\"She arrives at the city gate during a terrible storm.\",\"She says that she is a real princess.\",\"She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.\",\"She reports sleeping badly and being black and blue from something hard in the bed.\"]},{\"id\":\"character_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"facts\":[\"She decides to find out whether the visitor is a real princess.\",\"She places a pea on the bottom of the bedstead and piles bedding over it.\"]},{\"id\":\"character_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"facts\":[\"He opens the city gate when knocking is heard during the storm.\"]}],\"settings\":[{\"id\":\"setting_prince_home\",\"name\":\"prince's home\",\"facts\":[\"The prince returns there after travelling all over the world.\"]},{\"id\":\"setting_city_gate\",\"name\":\"city gate\",\"facts\":[\"The princess appears there during thunder, lightning, and heavy rain.\"]},{\"id\":\"setting_bedroom\",\"name\":\"bedroom\",\"facts\":[\"The old queen prepares the bedstead, pea, mattresses, and eider-down beds there.\"]},{\"id\":\"setting_museum\",\"name\":\"museum\",\"facts\":[\"The pea is put there after the prince marries the princess.\"]}],\"objects\":[{\"id\":\"object_pea\",\"name\":\"pea\",\"facts\":[\"The old queen places it under twenty mattresses and twenty eider-down beds.\",\"It becomes evidence used to identify the visitor as a real princess.\",\"It is put in the museum.\"]}],\"unresolved\":{\"main_character\":\"No Dramatica Main Character assignment is asserted for this fixture.\",\"influence_character\":\"No Influence Character assignment is asserted for this fixture.\",\"relationship_story\":\"The marriage outcome is not treated as Relationship Story proof.\",\"cips\":\"Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.\",\"dynamics\":\"Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved.\"}}",
+      "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
+    },
+    {
+      "ts": "2026-07-04T05:30:56.102Z",
+      "action": "assert_pass",
+      "name": "opening confirmation does not create candidates",
+      "before": 2,
+      "after": 2
+    },
+    {
+      "ts": "2026-07-04T05:30:56.102Z",
+      "action": "assert_pass",
+      "name": "opening confirmation does not mutate approved Memory/Canon snapshot",
+      "before": {
+        "label": "before",
+        "apiMode": "live-backend",
+        "omi": {
+          "candidateCount": 2,
+          "approvedMemoryTotal": 0,
+          "approvedSnapshotJson": "null"
+        },
+        "bibleJson": "{\"schema_version\":\"0.1.0\",\"project_id\":\"example\",\"title\":\"The Princess and the Pea\",\"status\":\"sample_fixture\",\"provenance\":{\"source\":\"public_domain_scene_002\",\"source_path\":\"/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt\",\"content_status\":\"public_domain\",\"notes\":[\"Facts are source-derived from the public-domain scene file only.\",\"No model output, NotebookLM output, retrieved reference, or generated story prose is included.\"]},\"premise\":{\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"genre_notes\":[\"Fairy tale\",\"Public-domain sample fixture\"]},\"characters\":[{\"id\":\"character_prince\",\"name\":\"prince\",\"role\":\"source character\",\"facts\":[\"He wants to marry a real princess.\",\"He travels all over the world to find one.\",\"He comes home sad after failing to find what he wants.\",\"He takes the princess for his wife after the test.\"]},{\"id\":\"character_princess\",\"name\":\"princess\",\"role\":\"source character\",\"facts\":[\"She arrives at the city gate during a terrible storm.\",\"She says that she is a real princess.\",\"She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.\",\"She reports sleeping badly and being black and blue from something hard in the bed.\"]},{\"id\":\"character_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"facts\":[\"She decides to find out whether the visitor is a real princess.\",\"She places a pea on the bottom of the bedstead and piles bedding over it.\"]},{\"id\":\"character_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"facts\":[\"He opens the city gate when knocking is heard during the storm.\"]}],\"settings\":[{\"id\":\"setting_prince_home\",\"name\":\"prince's home\",\"facts\":[\"The prince returns there after travelling all over the world.\"]},{\"id\":\"setting_city_gate\",\"name\":\"city gate\",\"facts\":[\"The princess appears there during thunder, lightning, and heavy rain.\"]},{\"id\":\"setting_bedroom\",\"name\":\"bedroom\",\"facts\":[\"The old queen prepares the bedstead, pea, mattresses, and eider-down beds there.\"]},{\"id\":\"setting_museum\",\"name\":\"museum\",\"facts\":[\"The pea is put there after the prince marries the princess.\"]}],\"objects\":[{\"id\":\"object_pea\",\"name\":\"pea\",\"facts\":[\"The old queen places it under twenty mattresses and twenty eider-down beds.\",\"It becomes evidence used to identify the visitor as a real princess.\",\"It is put in the museum.\"]}],\"unresolved\":{\"main_character\":\"No Dramatica Main Character assignment is asserted for this fixture.\",\"influence_character\":\"No Influence Character assignment is asserted for this fixture.\",\"relationship_story\":\"The marriage outcome is not treated as Relationship Story proof.\",\"cips\":\"Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.\",\"dynamics\":\"Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved.\"}}",
+        "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
+      },
+      "after": {
+        "label": "after",
+        "apiMode": "live-backend",
+        "omi": {
+          "candidateCount": 2,
+          "approvedMemoryTotal": 0,
+          "approvedSnapshotJson": "null"
+        },
+        "bibleJson": "{\"schema_version\":\"0.1.0\",\"project_id\":\"example\",\"title\":\"The Princess and the Pea\",\"status\":\"sample_fixture\",\"provenance\":{\"source\":\"public_domain_scene_002\",\"source_path\":\"/mnt/e/WritingAssistantApplication/docs/public_domain_scene_002.txt\",\"content_status\":\"public_domain\",\"notes\":[\"Facts are source-derived from the public-domain scene file only.\",\"No model output, NotebookLM output, retrieved reference, or generated story prose is included.\"]},\"premise\":{\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"genre_notes\":[\"Fairy tale\",\"Public-domain sample fixture\"]},\"characters\":[{\"id\":\"character_prince\",\"name\":\"prince\",\"role\":\"source character\",\"facts\":[\"He wants to marry a real princess.\",\"He travels all over the world to find one.\",\"He comes home sad after failing to find what he wants.\",\"He takes the princess for his wife after the test.\"]},{\"id\":\"character_princess\",\"name\":\"princess\",\"role\":\"source character\",\"facts\":[\"She arrives at the city gate during a terrible storm.\",\"She says that she is a real princess.\",\"She sleeps on a bed with a pea under twenty mattresses and twenty eider-down beds.\",\"She reports sleeping badly and being black and blue from something hard in the bed.\"]},{\"id\":\"character_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"facts\":[\"She decides to find out whether the visitor is a real princess.\",\"She places a pea on the bottom of the bedstead and piles bedding over it.\"]},{\"id\":\"character_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"facts\":[\"He opens the city gate when knocking is heard during the storm.\"]}],\"settings\":[{\"id\":\"setting_prince_home\",\"name\":\"prince's home\",\"facts\":[\"The prince returns there after travelling all over the world.\"]},{\"id\":\"setting_city_gate\",\"name\":\"city gate\",\"facts\":[\"The princess appears there during thunder, lightning, and heavy rain.\"]},{\"id\":\"setting_bedroom\",\"name\":\"bedroom\",\"facts\":[\"The old queen prepares the bedstead, pea, mattresses, and eider-down beds there.\"]},{\"id\":\"setting_museum\",\"name\":\"museum\",\"facts\":[\"The pea is put there after the prince marries the princess.\"]}],\"objects\":[{\"id\":\"object_pea\",\"name\":\"pea\",\"facts\":[\"The old queen places it under twenty mattresses and twenty eider-down beds.\",\"It becomes evidence used to identify the visitor as a real princess.\",\"It is put in the museum.\"]}],\"unresolved\":{\"main_character\":\"No Dramatica Main Character assignment is asserted for this fixture.\",\"influence_character\":\"No Influence Character assignment is asserted for this fixture.\",\"relationship_story\":\"The marriage outcome is not treated as Relationship Story proof.\",\"cips\":\"Concern, Issue, Problem, and Solution are not asserted as complete Dramatica truth.\",\"dynamics\":\"Resolve, outcome, judgment, driver, limit, growth, approach, and problem-solving style remain unresolved.\"}}",
+        "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
+      }
+    },
+    {
+      "ts": "2026-07-04T05:30:56.102Z",
+      "action": "assert_pass",
+      "name": "blocked confirmation performs no mutating API requests",
+      "mutatingApiRequests": [],
+      "apiMode": "live-backend"
+    },
+    {
+      "ts": "2026-07-04T05:30:56.152Z",
+      "action": "assert_pass",
+      "name": "Dashboard does not expose enabled apply-promotion"
+    },
+    {
+      "ts": "2026-07-04T05:30:56.212Z",
+      "action": "assert_pass",
+      "name": "Candidate Detail does not expose enabled apply-promotion"
+    },
+    {
+      "ts": "2026-07-04T05:30:56.274Z",
+      "action": "assert_pass",
+      "name": "Evidence Drawer does not expose enabled apply-promotion",
+      "drawerApplyCount": 0
+    },
+    {
+      "ts": "2026-07-04T05:30:57.740Z",
+      "action": "omi_apply_promotion_confirmation_opened"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.747Z",
+      "action": "assert_pass",
+      "name": "mobile: Apply-Promotion Confirmation is reachable"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.747Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Candidate Snapshot"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.747Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Destination"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Target Path"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Evidence / Provenance Summary"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Source Location Summary"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Duplicate / Link / Dependency Summary"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Approved Memory/Canon Before-State"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Audit Preview"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Owner Final Confirmation"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Cancel / Return"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: This is the only screen that may lead to Memory/Canon mutation."
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Candidate approval, queue presence, confidence, and promotion audit records are not enough."
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Ready means the handoff packet is complete. Memory/Canon has not changed."
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: This remains a candidate until apply-promotion is separately confirmed and completed."
+    },
+    {
+      "ts": "2026-07-04T05:30:57.748Z",
+      "action": "assert_pass",
+      "name": "mobile: required confirmation copy visible: Memory/Canon Unchanged"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.784Z",
+      "action": "assert_pass",
+      "name": "mobile: blockers appear before confirmation control",
+      "blockerBox": {
+        "x": 57,
+        "y": -720.21875,
+        "width": 276,
+        "height": 1018.375
+      },
+      "checkboxBox": {
+        "x": 91,
+        "y": 2367.40625,
+        "width": 13,
+        "height": 13
+      }
+    },
+    {
+      "ts": "2026-07-04T05:30:57.786Z",
+      "action": "assert_pass",
+      "name": "mobile: final action disabled when blocker visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.788Z",
+      "action": "assert_pass",
+      "name": "mobile: disabled final action reason associated",
+      "describedBy": "omi-apply-promotion-visible-blocker-reasons omi-apply-promotion-final-action-disabled-reason"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.791Z",
+      "action": "assert_pass",
+      "name": "mobile: described reason exists omi-apply-promotion-visible-blocker-reasons",
+      "reasonId": "omi-apply-promotion-visible-blocker-reasons"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.793Z",
+      "action": "assert_pass",
+      "name": "mobile: described reason exists omi-apply-promotion-final-action-disabled-reason",
+      "reasonId": "omi-apply-promotion-final-action-disabled-reason"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.796Z",
+      "action": "assert_pass",
+      "name": "mobile: owner final confirmation visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.800Z",
+      "action": "assert_pass",
+      "name": "mobile: cancel return visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.810Z",
+      "action": "assert_pass",
+      "name": "mobile: cancel return keyboard reachable"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.858Z",
+      "action": "assert_pass",
+      "name": "mobile: final action remains disabled after checkbox while blockers visible"
+    },
+    {
+      "ts": "2026-07-04T05:30:57.868Z",
+      "action": "assert_pass",
+      "name": "mobile: no apply-promotion request is made in blocked state",
+      "applyPromotionRequests": []
+    },
+    {
+      "ts": "2026-07-04T05:30:57.872Z",
+      "action": "assert_pass",
+      "name": "mobile: no generated prose controls visible",
+      "matchedForbiddenControls": []
+    },
+    {
+      "ts": "2026-07-04T05:30:58.122Z",
+      "action": "screenshot",
+      "name": "02-mobile-omi-apply-promotion-confirmation",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-apply-promotion-browser-evidence/screenshots/02-mobile-omi-apply-promotion-confirmation.png"
+    }
+  ],
+  "safety": {
+    "noBackendCodeChangedByScript": true,
+    "noCandidatesCreatedByScript": true,
+    "noMemoryCanonMutatedByScript": true,
+    "noModelOrOllamaCalls": true,
+    "applyPromotionNotRunDuringBrowserSmoke": true,
+    "noGeneratedProseControlsAdded": true,
+    "mutatingApiRequests": [],
+    "applyPromotionRequests": []
+  }
+}
