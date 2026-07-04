@@ -99,6 +99,7 @@
     "docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/01-desktop-omi-candidate-detail.png",
     "docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/02-mobile-omi-candidate-detail.png",
     "PHASE8-UX-002-T007 recorded complete/PARTIAL after closeout and owner acceptance harness rerun",
+    "docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md",
     "owner acceptance harness rerun artifacts under artifacts/mvp-readiness/owner-acceptance/",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
@@ -115,6 +116,7 @@
     "docs/roadmap/decision_log.md",
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
+    "docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md",
     "scripts/omi-dashboard-browser-smoke.mjs",
     "scripts/omi-candidate-detail-browser-smoke.mjs",
     "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
@@ -178,6 +180,7 @@
     "docs/roadmap/decision_log.md",
     "docs/roadmap/risk_register.md",
     "docs/roadmap/open_questions.md",
+    "docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md",
     "docs/master_plan.md",
     "docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md",
     "docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md",
@@ -325,7 +328,7 @@
   "mvp_readiness_decision": {
     "owner_acceptance": "pending",
     "mvp_complete": false,
-    "reason": "All seven UX2 source acceptance surfaces and all four OMI browser evidence surfaces pass, but T007 owner acceptance evidence remains MANUAL_REVIEW_REQUIRED pending owner review and explicit owner/roadmap gate."
+    "reason": "All seven UX2 source acceptance surfaces and all four OMI browser evidence surfaces pass, and the T007 owner acceptance gate decision classifies remaining blockers, but T007 owner acceptance evidence remains MANUAL_REVIEW_REQUIRED pending owner review and explicit owner/roadmap gate."
   },
   "latest_browser_evidence": {
     "task": "OMI Dashboard Browser Evidence Only",
@@ -365,8 +368,9 @@
   "latest_child_status": "complete/PARTIAL",
   "latest_child_outputs": [
     "docs/roadmap/validation/latest_roadmap_validation.md",
+    "docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md",
     "artifacts/mvp-readiness/owner-acceptance/evidence-report.md"
   ],
   "next_planned_child": "owner/roadmap gate pending",
-  "next_planned_child_scope": "Owner review of T007 evidence and explicit owner decision, or a separately published follow-up task for remaining MANUAL_REVIEW_REQUIRED items."
+  "next_planned_child_scope": "Owner review of T007 evidence, the T007 owner acceptance gate classification decision, and explicit owner Accepted/Blocked decision, or a separately published owner harness route/workflow follow-up if requested."
 }

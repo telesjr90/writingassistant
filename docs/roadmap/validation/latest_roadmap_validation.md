@@ -11,6 +11,7 @@
 - No generated prose controls were added by the OMI evidence reruns or owner acceptance rerun.
 - Owner acceptance harness command: `node scripts/mvp-owner-acceptance-browser-smoke.mjs`.
 - Owner acceptance harness result: exit `0`; final automated decision `MANUAL_REVIEW_REQUIRED`; report `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`; checklist `artifacts/mvp-readiness/owner-acceptance/checklist-results.json`; workflow log `artifacts/mvp-readiness/owner-acceptance/workflow-log.json`.
+- Owner acceptance gate classification: `docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md` classifies remaining blockers as A owner manual review only, B OMI evidence already PASS but not wired into owner harness, or C owner harness route/workflow update. No required blocker is classified as needing new product UI at this gate, and no required blocker is newly deferred post-MVP.
 - Owner acceptance manual-review blockers remain exactly as recorded by the harness: owner boundary understanding review; prior Playwright evidence owner review; Notes and Materials save/reload isolation proof not exposed through this harness path; runtime unavailable/failure fail-closed owner review; candidate/review surface `NOT_EXPOSED`; apply-promotion fixture not visible without a review queue entry; model-assisted confidence/output/no-prose boundary review requiring model output or selected owner-authored scene; NCP/Subtxt/dramatica-flow UI/runtime labels `NOT_EXPOSED`; no-prose negative-path checks requiring selected-scene fixture; Cyber detective Story Check blocked because the created project has no scenes and no browser-visible create/import owner-authored scene/source control in that harness path; Cyber detective no-prose prompt/input path not exposed; final owner Accepted/Blocked decision still manual.
 - Harness-created Cyber detective project/candidate-planning evidence is authorized harness behavior only. The harness records OMI/setup material as candidate/planning only, Memory/Canon non-canon status PASS, no direct BookNLP/spaCy/NCP/Subtxt/dramatica-flow execution, no generated story prose from the fixture, and no approved Memory/Canon mutation.
 - Validation results:
@@ -20,8 +21,8 @@
   - `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `20 passed in 0.05s`.
   - `npm --prefix frontend run build` -> PASS; Vite large chunk warning only.
   - OMI browser evidence commands listed above -> PASS.
-- `PHASE8-UX-002` can be closed as complete/PARTIAL for T007 closeout evidence, but MVP owner acceptance cannot be marked PASS and MVP is not complete.
-- Next explicit owner/roadmap gate: owner review of `artifacts/mvp-readiness/owner-acceptance/evidence-report.md` and the manual acceptance checklist, then an explicit owner decision or a separately published follow-up task for the remaining manual-review blockers.
+- `PHASE8-UX-002` remains complete/PARTIAL for T007 closeout evidence, but MVP owner acceptance cannot be marked PASS and MVP is not complete.
+- Next explicit owner/roadmap gate: owner review of `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`, the manual acceptance checklist, and `docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md`; then an explicit owner Accepted/Blocked decision or a separately published follow-up task for owner harness route/workflow coverage.
 
 # OMI Dashboard Browser Evidence
 

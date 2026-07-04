@@ -6,7 +6,8 @@
 - Apply-promotion confirmation is guarded evidence UI only; final Memory/Canon mutation remains separately controlled by explicit owner-confirmed workflow.
 - Owner acceptance harness command: `node scripts/mvp-owner-acceptance-browser-smoke.mjs` -> exit `0`, final automated decision `MANUAL_REVIEW_REQUIRED`.
 - Remaining blockers are owner acceptance manual-review/not-exposed items recorded in `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`.
-- Owner acceptance remains pending; MVP is not complete. The next recommended parent/task is the explicit owner/roadmap gate or a separately published follow-up for remaining manual-review blockers.
+- Owner acceptance gate classification: `docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md` classifies remaining blockers as A owner manual review only, B OMI evidence already PASS but not wired into owner harness, or C owner harness route/workflow update. No required blocker is classified as needing new product UI at this gate, and no required blocker is newly deferred post-MVP.
+- Owner acceptance remains pending; MVP is not complete. The next recommended parent/task is the explicit owner/roadmap gate or a separately published owner harness route/workflow follow-up if requested by the owner.
 - No backend code changed, no unauthorized candidates were created, Memory/Canon was not mutated outside authorized harness behavior, no model/Ollama calls were added, apply-promotion was not newly enabled, no generated prose controls were added, and no staging/commit/push occurred.
 
 # PHASE8-UX-002-T006C Review / Promotion Evidence UI
