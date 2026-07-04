@@ -898,7 +898,8 @@ h2 {
 }
 
 .omi-shell,
-.omi-dashboard {
+.omi-dashboard,
+.omi-candidate-detail {
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -1135,6 +1136,215 @@ h2 {
   color: #46546c;
 }
 
+.omi-empty-state,
+.omi-candidate-panel,
+.omi-candidate-actions {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-empty-state h2,
+.omi-candidate-panel h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+.omi-empty-state p {
+  margin: 0;
+  color: #46546c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.omi-candidate-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dfe5ef;
+}
+
+.omi-candidate-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.omi-candidate-status-grid div {
+  min-width: 0;
+  padding: 10px;
+  background: #f7f9fc;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-candidate-status-grid span {
+  display: block;
+  color: #637089;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-candidate-status-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: #172033;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.omi-candidate-actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.omi-candidate-actions .omi-disabled-reason {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.omi-mobile-tabs {
+  display: none;
+  gap: 8px;
+}
+
+.omi-mobile-tabs a {
+  min-height: 36px;
+  flex: 1 1 0;
+  padding: 8px 10px;
+  color: #234a84;
+  text-align: center;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #aab8ce;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.omi-candidate-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.omi-candidate-side-rail {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.omi-field-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-candidate-field-table {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.omi-candidate-field-table caption {
+  padding: 10px 12px;
+  color: #46546c;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  background: #f7f9fc;
+  border-bottom: 1px solid #dfe5ef;
+}
+
+.omi-candidate-field-table th,
+.omi-candidate-field-table td {
+  padding: 10px 12px;
+  color: #2c374c;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e7ecf4;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.omi-candidate-field-table thead th {
+  color: #46546c;
+  background: #fbfcff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.omi-candidate-field-table tbody th {
+  color: #101828;
+  font-weight: 700;
+}
+
+.omi-candidate-metadata {
+  display: grid;
+  grid-template-columns: minmax(112px, 0.42fr) minmax(0, 1fr);
+  gap: 8px 10px;
+  margin: 0;
+}
+
+.omi-candidate-metadata div {
+  display: contents;
+}
+
+.omi-candidate-metadata dt {
+  color: #637089;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-candidate-metadata dd {
+  margin: 0;
+  color: #2c374c;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.omi-disabled-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.omi-readonly-reference-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omi-readonly-reference-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  color: #2c374c;
+  background: #ffffff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     flex-direction: column;
@@ -1160,12 +1370,26 @@ h2 {
   .omi-metadata,
   .omi-checklist li,
   .omi-status-strip,
-  .omi-approved-snapshot dl {
+  .omi-approved-snapshot dl,
+  .omi-candidate-status-grid,
+  .omi-candidate-detail-layout,
+  .omi-candidate-metadata {
     grid-template-columns: 1fr;
   }
 
-  .omi-detail-header {
+  .omi-detail-header,
+  .omi-candidate-header,
+  .omi-candidate-actions {
     flex-direction: column;
+  }
+
+  .omi-candidate-actions .primary-button,
+  .omi-candidate-actions .secondary-button {
+    width: 100%;
+  }
+
+  .omi-mobile-tabs {
+    display: flex;
   }
 
   .omi-shell {
@@ -1234,6 +1458,74 @@ h2 {
 
   .omi-workflow-table td:nth-child(7)::before {
     content: "Disabled risky action / reason";
+  }
+
+  .omi-candidate-field-table {
+    min-width: 0;
+  }
+
+  .omi-candidate-field-table thead {
+    display: none;
+  }
+
+  .omi-candidate-field-table,
+  .omi-candidate-field-table tbody,
+  .omi-candidate-field-table tr,
+  .omi-candidate-field-table th,
+  .omi-candidate-field-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .omi-candidate-field-table tr {
+    padding: 12px;
+    border-bottom: 1px solid #dfe5ef;
+  }
+
+  .omi-candidate-field-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .omi-candidate-field-table th,
+  .omi-candidate-field-table td {
+    padding: 5px 0;
+    border-bottom: 0;
+  }
+
+  .omi-candidate-field-table td::before {
+    display: block;
+    margin-bottom: 2px;
+    color: #637089;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .omi-candidate-field-table td:nth-child(2)::before {
+    content: "Proposed value";
+  }
+
+  .omi-candidate-field-table td:nth-child(3)::before {
+    content: "Decision";
+  }
+
+  .omi-candidate-field-table td:nth-child(4)::before {
+    content: "Evidence";
+  }
+
+  .omi-candidate-field-table td:nth-child(5)::before {
+    content: "Provenance";
+  }
+
+  .omi-candidate-field-table td:nth-child(6)::before {
+    content: "Duplicate/dependency";
+  }
+
+  .omi-candidate-field-table td:nth-child(7)::before {
+    content: "Owner note";
+  }
+
+  .omi-candidate-field-table td:nth-child(8)::before {
+    content: "Field action";
   }
 
   .omi-health-panel .primary-button {

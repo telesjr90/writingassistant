@@ -34,6 +34,13 @@ OMI_CANDIDATE_CANON_STATUS_JSX = (
 OMI_WORKFLOW_STATUS_ROW_JSX = (
     FRONTEND_SRC / "components" / "OMIWorkflowStatusRow.jsx"
 )
+OMI_CANDIDATE_DETAIL_JSX = FRONTEND_SRC / "components" / "OMICandidateDetail.jsx"
+OMI_CANDIDATE_FIELD_TABLE_JSX = (
+    FRONTEND_SRC / "components" / "OMICandidateFieldTable.jsx"
+)
+OMI_PROMOTION_READINESS_CHECKLIST_JSX = (
+    FRONTEND_SRC / "components" / "OMIPromotionReadinessChecklist.jsx"
+)
 
 SOURCE_PATHS = (
     APP_JSX,
@@ -49,6 +56,9 @@ SOURCE_PATHS = (
     OMI_BOUNDARY_BANNER_JSX,
     OMI_CANDIDATE_CANON_STATUS_JSX,
     OMI_WORKFLOW_STATUS_ROW_JSX,
+    OMI_CANDIDATE_DETAIL_JSX,
+    OMI_CANDIDATE_FIELD_TABLE_JSX,
+    OMI_PROMOTION_READINESS_CHECKLIST_JSX,
 )
 
 FORBIDDEN_PROSE_INTENTS = (
@@ -327,3 +337,126 @@ def test_omi_dashboard_source_has_no_generated_prose_controls() -> None:
         label for label in forbidden_control_labels if label in source
     ], "OMI dashboard source must not expose generated-prose controls."
 
+
+def test_omi_candidate_detail_only_review_packet_contract() -> None:
+    """Second OMI slice requires candidate-detail-only stored review metadata UI."""
+
+    source = combined_source(
+        (
+            OMI_SHELL_JSX,
+            OMI_DASHBOARD_JSX,
+            OMI_CANDIDATE_DETAIL_JSX,
+            OMI_CANDIDATE_FIELD_TABLE_JSX,
+            OMI_PROMOTION_READINESS_CHECKLIST_JSX,
+        )
+    )
+
+    assert_markers_present(
+        source,
+        (
+            "data-testid=\"omi-candidate-detail\"",
+            "data-testid=\"omi-candidate-field-table\"",
+            "data-testid=\"omi-promotion-readiness-checklist\"",
+            "Candidate: Pending Review",
+            "Candidate: Owner Approved",
+            "Destination",
+            "Source",
+            "Field",
+            "Proposed value",
+            "Decision",
+            "Evidence",
+            "Provenance",
+            "Duplicate/dependency",
+            "Owner note",
+            "Promotion Audit Record",
+            "Not Applied to Memory/Canon",
+            "Approved Memory/Canon links",
+            "Read-only reference",
+            "No candidate selected.",
+            "Candidate not found.",
+            "Unsupported candidate schema",
+            "Missing destination",
+            "Missing evidence",
+            "Missing provenance",
+            "Required field decisions unresolved",
+            "Duplicate unresolved",
+            "Dependency unresolved",
+            "No approved Memory/Canon links.",
+            "Candidate schema unsupported or partially corrupt.",
+            "This remains a candidate until apply-promotion is separately confirmed and completed.",
+            "Ready means the handoff packet is complete. Memory/Canon has not changed.",
+            "Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete.",
+            "Confidence indicates support strength, not truth.",
+            "Stored review metadata only",
+            "Missing / Not linked / Unavailable",
+            "Owner approval prepares this candidate for a future handoff. It does not update Memory/Canon.",
+            "Fields",
+            "Evidence",
+            "Readiness",
+            "onNavigate={handleNavigate}",
+            "setOmiView('candidate-detail')",
+        ),
+        "OMI-CANDIDATE-DETAIL-ONLY",
+    )
+
+
+def test_omi_candidate_detail_disabled_reason_associations() -> None:
+    """Candidate and field approval disabled reasons must be programmatically associated."""
+
+    source = combined_source(
+        (
+            OMI_CANDIDATE_DETAIL_JSX,
+            OMI_CANDIDATE_FIELD_TABLE_JSX,
+        )
+    )
+
+    assert_markers_present(
+        source,
+        (
+            "data-testid=\"omi-candidate-approval-disabled-reason\"",
+            "data-testid=\"omi-field-approval-disabled-reason\"",
+            "aria-describedby={approvalReasonId}",
+            "aria-describedby={reasonId}",
+            "Approve Candidate for Handoff",
+            "Approve field",
+            "aria-label={`Approve field ${row.field} for handoff`}",
+        ),
+        "OMI-CANDIDATE-DISABLED-ASSOCIATIONS",
+    )
+
+
+def test_omi_candidate_detail_no_enabled_apply_or_generated_prose_controls() -> None:
+    """Candidate Detail must not enable apply-promotion or expose story prose controls."""
+
+    source = combined_source(
+        (
+            OMI_CANDIDATE_DETAIL_JSX,
+            OMI_CANDIDATE_FIELD_TABLE_JSX,
+            OMI_PROMOTION_READINESS_CHECKLIST_JSX,
+        )
+    )
+    lowered = source.lower()
+
+    assert "apply to memory/canon" in lowered
+    assert "disabled: apply-promotion requires a completed route-backed confirmation and every handoff gate." in lowered
+    assert "submitApplyPromotion" not in source
+    assert "createOMIPromotion" not in source
+    assert "updateOMICandidateDecision" not in source
+
+    forbidden_control_labels = (
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "expand",
+        "imitate",
+        "generate prose",
+        "generated prose",
+        "compose",
+    )
+
+    assert not [
+        label for label in forbidden_control_labels if label in lowered
+    ], "OMI candidate detail source must not expose generated-prose controls."
