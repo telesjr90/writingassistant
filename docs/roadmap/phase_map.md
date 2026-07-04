@@ -2,12 +2,13 @@
 
 - `PHASE8-UX-003` is active as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
 - `PHASE8-UX-003-T001` is complete/PASS as docs/status/planning publication only.
-- `PHASE8-UX-003-T002` is next for harness route/workflow mapping of target B/C blockers.
+- `PHASE8-UX-003-T002` is complete/PASS as docs/decision/planning only; decision record: `docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md`.
+- `PHASE8-UX-003-T003` is next for expected-red owner-harness coverage of target B/C blockers.
 - Target B blockers are candidate/review and apply-promotion items already covered by OMI PASS evidence but not wired into owner harness.
 - Target C blockers are Notes/Materials project-scoped proof, NCP/Subtxt/dramatica-flow label surfaces, Cyber selected-source Story Check path, and Cyber no-prose evidence path.
 - A-category blockers remain manual owner review only.
 - `PHASE8-UX-002` is not reopened. Owner acceptance remains pending and MVP is not complete.
-- No frontend/backend/test/harness code changed, no candidates were created, Memory/Canon was not mutated, apply-promotion was not enabled or run, and no generated prose controls were added.
+- No frontend/backend/test/harness code changed in T001 or T002, no candidates were created, Memory/Canon was not mutated, apply-promotion was not enabled or run, and no generated prose controls were added.
 
 # PHASE8-UX-002-T005 Story Check Diagnostic-Only / No-Prose Evidence UI
 
@@ -209,7 +210,7 @@ This follows the Project Workspace Foundation. It identifies, organizes, connect
 
 ### Phase 8: Writer Assistant Core MVP Runtime, Review, Promotion, Memory/Canon, and Analysis Integration
 
-Status note: `PHASE8-UX-003` is active as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`. `PHASE8-UX-003-T001` is complete/PASS as docs/status/planning publication only. `PHASE8-UX-002-T007` remains complete/PARTIAL for closeout plus owner acceptance harness rerun: required roadmap/enrichment validation, full UX2 pytest (`20 passed in 0.05s`), frontend build, and all four OMI browser evidence scripts passed; owner acceptance harness exited `0`, but final automated decision remains `MANUAL_REVIEW_REQUIRED`. The follow-up targets B/C blockers from `docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md`; A-category blockers remain manual owner review only. Owner acceptance remains pending and MVP is not complete.
+Status note: `PHASE8-UX-003` is active as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`. `PHASE8-UX-003-T001` is complete/PASS as docs/status/planning publication only. `PHASE8-UX-003-T002` is complete/PASS as docs/decision/planning only and maps target B/C blockers to existing UI/evidence surfaces while keeping A-category blockers manual review only. `PHASE8-UX-003-T003` is next for expected-red owner-harness coverage. `PHASE8-UX-002-T007` remains complete/PARTIAL for closeout plus owner acceptance harness rerun: required roadmap/enrichment validation, full UX2 pytest (`20 passed in 0.05s`), frontend build, and all four OMI browser evidence scripts passed; owner acceptance harness exited `0`, but final automated decision remains `MANUAL_REVIEW_REQUIRED`. Owner acceptance remains pending and MVP is not complete.
 
 - Inputs: usable Project Workspace Foundation, current project file model, OMI storage/lifecycle docs, no-prose guardrails, sample project alignment, Writer Assistant Core product pivot.
 - Outputs: story knowledge candidate schema alignment, evidence/provenance boundaries, raw artifact lifecycle, review queue and API surfaces, frontend owner-action execution, explicit apply-promotion, approved memory/canon mutation, real BookNLP/spaCy runtime extraction, model-assisted extraction, and analysis-only NCP/Subtxt/dramatica-flow runtime integration.

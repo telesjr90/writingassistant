@@ -1,3 +1,14 @@
+# PHASE8-UX-003-T002 Harness Route/Workflow Mapping Decision
+
+- Result: PASS for docs/decision/planning.
+- Decision record: `docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md`.
+- Target B blockers are mapped to existing OMI Dashboard, Candidate Detail, Evidence Drawer, Apply-Promotion Confirmation, their existing evidence reports, and their focused browser smoke scripts.
+- Target C blockers are mapped to existing Notes/Materials project-scoped save/reload proof, analysis-runtime label/status surfaces, owner-authored source create/import/select UI, selected-source Story Check path, and no-prose refusal/fail-closed evidence UI.
+- A-category blockers remain manual review only and cannot be marked PASS by automation.
+- Future harness assertions must use `PASS`, `FAIL`, `BLOCKED`, `NOT_EXPOSED`, or `MANUAL_REVIEW_REQUIRED`; missing route evidence must not be fake-passed.
+- Recommended next child: `PHASE8-UX-003-T003` expected-red owner-harness coverage for the mapped B/C blockers.
+- Owner acceptance was not marked PASS. MVP was not marked complete. No frontend/backend/test/harness code changed, no candidates were created, Memory/Canon was not mutated, models/Ollama were not called, extraction was not run, apply-promotion was not enabled or run, no generated prose controls were added, and no staging/commit/push occurred.
+
 # PHASE8-UX-003-T001 Owner Acceptance Harness Route/Workflow Evidence Follow-up Publication
 
 - Result: PASS for docs/status/planning publication.

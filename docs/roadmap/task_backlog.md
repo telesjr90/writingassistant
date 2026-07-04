@@ -1,3 +1,12 @@
+# PHASE8-UX-003-T002 Harness Route/Workflow Mapping Decision
+
+- `PHASE8-UX-003-T002` is complete/PASS as docs/decision/planning only.
+- Decision record: `docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md`.
+- B blockers are mapped to existing OMI Dashboard, Candidate Detail, Evidence Drawer, Apply-Promotion Confirmation, and their existing reports/smoke scripts.
+- C blockers are mapped to existing Notes/Materials save/reload proof, analysis-runtime label/status surfaces, owner-authored source create/import/select UI, selected-source Story Check, and no-prose evidence UI.
+- A blockers remain manual review only.
+- `PHASE8-UX-003-T003` is next for expected-red owner-harness coverage. T003 must not implement product UI/backend code or mark owner acceptance PASS/MVP complete.
+
 # PHASE8-UX-003-T001 Owner Acceptance Harness Route/Workflow Evidence Follow-up Publication
 
 - `PHASE8-UX-003` is published as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
