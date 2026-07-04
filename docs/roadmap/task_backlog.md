@@ -1,3 +1,12 @@
+# PHASE8-UX-003-T005 Cyber Selected-Source / No-Prose Evidence Routing
+
+- `PHASE8-UX-003-T005` is complete/PARTIAL.
+- Cyber selected-source import/select evidence is covered through existing owner-authored source UI.
+- Cyber no-prose refusal/fail-closed evidence is PASS for rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose without unsafe prompt submission.
+- `PHASE8-UX-003-C-CYBER` remains `MANUAL_REVIEW_REQUIRED` because selected-source Story Check reached the safe route but model-backed diagnostic output was unavailable/fail-closed on missing `storyform.json`.
+- Next child: `PHASE8-UX-003-T006` owner acceptance harness rerun and remaining manual item classification.
+- Owner acceptance remains pending. MVP is not complete.
+
 # PHASE8-UX-003-T004 Owner Harness Route Wiring
 
 - `PHASE8-UX-003-T004` is complete/PASS for owner harness route wiring to existing surfaces only.

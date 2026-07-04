@@ -218,6 +218,12 @@ def test_script_records_manual_review_when_safe_cyber_ui_is_missing() -> None:
     assert "recordCyberStoryCheckManualReview" in body
     assert "missing_scene_create_or_import_workflow" in select_body
     assert "no browser-visible create/import owner-authored scene/source control is exposed" in select_body
+    assert "Owner-authored source ID" in select_body
+    assert "Owner-authored source text" in select_body
+    assert "ux2-source-import-owner-authored" in select_body
+    assert "ux2-selected-story-check-source" in select_body
+    assert "setCyberSelectedSourceEvidence(" in select_body
+    assert "STATUSES.PASS" in select_body
     assert "hasSafeNoProseInput = false" in body
 
 
@@ -242,6 +248,8 @@ def test_script_uses_browser_ui_story_check_workflow_not_direct_chat() -> None:
     body = function_body(source, "runCyberDetectiveFixtureChecks")
     select_body = function_body(source, "selectSafeCyberFixtureSceneForStoryCheck")
 
+    assert "ux2-source-create-import" in select_body
+    assert "cyber_fixture_owner_authored_source_imported" in select_body
     assert "getByRole('button', { name: /Run Story Check/i })" in body
     assert "storyCheckButton.click()" in body
     assert "selectedSceneContainsFixture" in select_body
@@ -275,6 +283,8 @@ def test_script_fails_on_generated_prose_markers() -> None:
         assert marker in source
 
     assert "containsForbiddenGeneratedProse(resultText)" in body
+    assert "storyCheckError" in body
+    assert "fail-closed/manual-review error" in body
     assert "STATUSES.FAIL" in body
     assert "Generated story prose marker detected" in source
 
@@ -309,6 +319,7 @@ def test_script_records_not_exposed_or_manual_review_instead_of_fake_pass() -> N
 def test_script_preserves_no_prose_negative_assertions() -> None:
     source = read_source()
     body = function_body(source, "runNoProseChecks")
+    cyber_body = function_body(source, "runCyberDetectiveFixtureChecks")
 
     for request in (
         "rewrite this scene",
@@ -327,6 +338,11 @@ def test_script_preserves_no_prose_negative_assertions() -> None:
         "no_prose_no_imitation_polish_improve_expand_draft_chapter",
     ):
         assert item_id in body
+
+    assert "ux2-no-prose-refusal-panel" in cyber_body
+    assert "noProseRefusalsCovered" in cyber_body
+    assert "didSubmitUnsafePrompt: false" in cyber_body
+    assert "setCyberNoProseEvidence(" in cyber_body
 
 
 def test_script_writes_required_evidence_artifacts() -> None:

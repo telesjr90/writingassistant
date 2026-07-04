@@ -164,8 +164,8 @@ def test_phase8_ux003_c_non_cyber_blockers_require_owner_harness_route_markers()
     )
 
 
-def test_phase8_ux003_c_cyber_blockers_remain_planned_for_t005() -> None:
-    """Cyber selected-source and no-prose coverage must remain pending after T004."""
+def test_phase8_ux003_c_cyber_blockers_are_wired_by_t005() -> None:
+    """Cyber selected-source and no-prose coverage is wired through existing UI in T005."""
 
     source = combined_text((OWNER_HARNESS, MAPPING_DECISION, TASK_RECORD))
 
@@ -179,7 +179,11 @@ def test_phase8_ux003_c_cyber_blockers_remain_planned_for_t005() -> None:
             "owner_harness_route:cyber_no_prose_refusal_fail_closed",
             "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
             "PHASE8-UX-003-T005",
-            "Cyber selected-source Story Check and Cyber no-prose evidence remain planned",
+            "PHASE8-UX-003-T005 covered Cyber selected-source Story Check and no-prose refusal/fail-closed evidence through existing owner-authored source UI",
+            "cyberFixtureSelectedSourceEvidence",
+            "cyberFixtureStoryCheckEvidence",
+            "cyberFixtureNoProseEvidence",
+            "Cyber C remains MANUAL_REVIEW_REQUIRED unless both Cyber selected-source Story Check route evidence and Cyber no-prose evidence are PASS",
         ),
         "PHASE8-UX-003-C-CYBER",
     )

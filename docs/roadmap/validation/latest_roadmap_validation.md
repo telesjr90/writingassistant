@@ -1,3 +1,19 @@
+# PHASE8-UX-003-T005 Cyber Fixture Selected-Source / No-Prose Evidence Routing
+
+- Result: PARTIAL for Cyber C route evidence; selected-source and no-prose routes are covered, but selected-source Story Check output remains `MANUAL_REVIEW_REQUIRED`.
+- `PHASE8-UX-003-B`: PASS, unchanged from T004.
+- `PHASE8-UX-003-C-NON-CYBER`: PASS, unchanged from T004.
+- `PHASE8-UX-003-C-CYBER`: `MANUAL_REVIEW_REQUIRED`.
+- Cyber selected-source route: covered through existing owner-authored source UI. The harness imports the Cyber fixture as project-scoped owner-authored source text, selects it as the Story Check source, and confirms it is not canon, memory, training data, or approved truth.
+- Cyber selected-source Story Check route: reached through the app UI, but model-backed diagnostic output was unavailable because the created harness project lacked `storyform.json`; the UI recorded a fail-closed/manual-review Story Check error and no diagnostic model output was claimed.
+- Cyber no-prose route: PASS for existing no-prose refusal/fail-closed UI covering rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose without an arbitrary prompt route and without submitting unsafe prompts.
+- Focused PHASE8-UX-003 coverage: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q` -> `6 passed in 0.04s`.
+- Owner harness source coverage: `.venv-unsloth-clean/bin/python -m pytest tests/test_mvp_owner_acceptance_browser_smoke_source.py -q` -> `24 passed in 0.16s`.
+- Owner acceptance harness: `APP_BASE_URL=http://127.0.0.1:5173 BACKEND_BASE_URL=http://127.0.0.1:8000 node scripts/mvp-owner-acceptance-browser-smoke.mjs` -> exit `0`; final automated decision `MANUAL_REVIEW_REQUIRED`.
+- Evidence artifacts updated: `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`, `artifacts/mvp-readiness/owner-acceptance/checklist-results.json`, and `artifacts/mvp-readiness/owner-acceptance/workflow-log.json`.
+- Owner acceptance remains pending. MVP is not complete.
+- No frontend/backend product code changed, no new product UI was added, no candidates were created outside authorized isolated harness behavior, Memory/Canon was not mutated, apply-promotion was not enabled or run, runtime extraction was not executed, no model/Ollama generation calls were added, no generated prose controls were added, and no story prose was generated.
+
 # PHASE8-UX-003-T004 Owner Harness Route Wiring
 
 - Result: PASS for B and non-Cyber C owner harness route wiring.

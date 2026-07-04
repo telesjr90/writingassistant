@@ -1,3 +1,12 @@
+# PHASE8-UX-003-T005 Cyber Fixture Route Evidence
+
+- `PHASE8-UX-003-T005` is complete/PARTIAL for Cyber selected-source Story Check and no-prose evidence routing.
+- B route marker remains PASS.
+- Non-Cyber C route marker remains PASS.
+- Cyber C route marker remains `MANUAL_REVIEW_REQUIRED`: selected-source owner-authored source import/select is covered and no-prose refusal/fail-closed evidence is covered, but Story Check output was unavailable/fail-closed and no diagnostic model output was claimed.
+- `PHASE8-UX-003-T006` is next for remaining manual item classification.
+- Owner acceptance remains pending; MVP is not complete.
+
 # PHASE8-UX-003-T004 Owner Harness Route Wiring
 
 - `PHASE8-UX-003` is active as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
