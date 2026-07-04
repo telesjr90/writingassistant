@@ -1,3 +1,14 @@
+# PHASE8-UX-002-T007 Closeout + Owner Acceptance Harness Rerun
+
+- `PHASE8-UX-002-T007` is complete/PARTIAL as closeout plus owner acceptance harness rerun.
+- Required validation passed: `python3 scripts/check_enrichment.py`, `python3 scripts/validate_roadmap.py`, enrichment JSON parse, full UX2 pytest (`20 passed in 0.05s`), and frontend build.
+- OMI Dashboard, OMI Candidate Detail, OMI Evidence Drawer, and OMI Apply-Promotion Confirmation browser evidence scripts all returned PASS/exit `0`.
+- Apply-promotion confirmation is guarded evidence UI only; final Memory/Canon mutation remains separately controlled by explicit owner-confirmed workflow.
+- Owner acceptance harness command: `node scripts/mvp-owner-acceptance-browser-smoke.mjs` -> exit `0`, final automated decision `MANUAL_REVIEW_REQUIRED`.
+- Remaining blockers are owner acceptance manual-review/not-exposed items recorded in `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`.
+- Owner acceptance remains pending; MVP is not complete. The next recommended parent/task is the explicit owner/roadmap gate or a separately published follow-up for remaining manual-review blockers.
+- No backend code changed, no unauthorized candidates were created, Memory/Canon was not mutated outside authorized harness behavior, no model/Ollama calls were added, apply-promotion was not newly enabled, no generated prose controls were added, and no staging/commit/push occurred.
+
 # PHASE8-UX-002-T006C Review / Promotion Evidence UI
 
 - `PHASE8-UX-002` remains active as the MVP-first UX parent.
@@ -6,7 +17,7 @@
 - Focused T006C test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001` -> `1 passed, 6 deselected in 0.03s`.
 - Full UX2 expected-red acceptance file now passes: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`.
 - Review/promotion evidence records a safe review queue fixture, explicit owner confirmation, promotion audit evidence, queue presence is not approval, candidate persistence is not canon, and failed/rejected promotion leaves approved memory/canon unchanged.
-- `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun.
+- `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is complete/PARTIAL for closeout plus owner acceptance harness rerun; owner acceptance remains `MANUAL_REVIEW_REQUIRED`.
 - Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No generated prose/prose-production behavior was added.
 
 # PHASE8-UX-002-T005 Story Check Diagnostic-Only / No-Prose Evidence UI

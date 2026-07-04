@@ -1,8 +1,8 @@
 {
   "task_id": "PHASE8-UX-002",
   "title": "MVP acceptance UI completion and route wiring",
-  "status": "active",
-  "task_type": "MVP-first UX parent with completed T006 UI evidence surfaces and T007 closeout next",
+  "status": "complete_partial",
+  "task_type": "MVP-first UX parent with completed T007 closeout evidence and owner acceptance still manual-review",
   "parent_title": "PHASE8-UX-002 - MVP acceptance UI completion and route wiring",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-002/",
@@ -13,9 +13,12 @@
     "Focused OMI Dashboard browser evidence passes with desktop and mobile screenshots; backend was unavailable so the smoke used a read-only zero-state Playwright API fixture and blocked mutating API methods.",
     "MVP owner acceptance harness exists and runs.",
     "Cyber Detective owner acceptance fixture exists and was committed.",
-    "Latest owner acceptance evidence reached SCRIPT_EXIT=0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
+    "T007 owner acceptance evidence reached exit 0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
     "Owner acceptance remains pending.",
-    "MVP is not complete."
+    "MVP is not complete.",
+    "T007 reran all four OMI browser evidence surfaces and they pass: Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation.",
+    "Apply-promotion confirmation is guarded evidence UI only; final Memory/Canon mutation remains separately controlled.",
+    "No generated prose controls were added."
   ],
   "boundaries": [
     "docs/status/planning only for T001",
@@ -83,15 +86,20 @@
     "PHASE8-UX-002-T006 recorded complete/PASS after all seven UX2 tests passed",
     "scripts/omi-dashboard-browser-smoke.mjs",
     "scripts/omi-candidate-detail-browser-smoke.mjs",
+    "scripts/omi-evidence-drawer-browser-smoke.mjs",
+    "scripts/omi-apply-promotion-browser-smoke.mjs",
     "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
     "docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+    "docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
+    "docs/roadmap/validation/omi_apply_promotion_browser_evidence.md",
     "docs/roadmap/validation/omi-dashboard-browser-evidence/workflow-log.json",
     "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/01-desktop-omi-dashboard.png",
     "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/02-mobile-omi-dashboard.png",
     "docs/roadmap/validation/omi-candidate-detail-browser-evidence/workflow-log.json",
     "docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/01-desktop-omi-candidate-detail.png",
     "docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/02-mobile-omi-candidate-detail.png",
-    "PHASE8-UX-002-T007 recorded as the next planned child",
+    "PHASE8-UX-002-T007 recorded complete/PARTIAL after closeout and owner acceptance harness rerun",
+    "owner acceptance harness rerun artifacts under artifacts/mvp-readiness/owner-acceptance/",
     "MVP owner acceptance pending and MVP not complete recorded",
     "SaaS research and controlled-experiment deferral recorded"
   ],
@@ -151,6 +159,9 @@
     "npm --prefix frontend run build",
     "node scripts/omi-dashboard-browser-smoke.mjs",
     "node scripts/omi-candidate-detail-browser-smoke.mjs",
+    "node scripts/omi-evidence-drawer-browser-smoke.mjs",
+    "node scripts/omi-apply-promotion-browser-smoke.mjs",
+    "node scripts/mvp-owner-acceptance-browser-smoke.mjs",
     "git diff --check",
     "git status --short --branch",
     "git diff --name-only"
@@ -295,8 +306,13 @@
     {
       "task_id": "PHASE8-UX-002-T007",
       "title": "Closeout + rerun owner acceptance harness",
-      "status": "next",
-      "scope": "docs/status/governance plus owner-run evidence. Re-run owner acceptance harness after missing UI surfaces are built. Do not mark MVP complete unless owner explicitly accepts through the correct checklist/roadmap gate."
+      "status": "complete/PARTIAL",
+      "scope": "docs/status/governance plus owner-run evidence. Re-run owner acceptance harness after missing UI surfaces are built. Do not mark MVP complete unless owner explicitly accepts through the correct checklist/roadmap gate.",
+      "result": "Required validation and all four OMI browser evidence surfaces passed. Owner acceptance harness exited 0 with final automated decision MANUAL_REVIEW_REQUIRED.",
+      "owner_acceptance_command": "node scripts/mvp-owner-acceptance-browser-smoke.mjs",
+      "owner_acceptance_result": "MANUAL_REVIEW_REQUIRED",
+      "owner_acceptance_evidence_dir": "artifacts/mvp-readiness/owner-acceptance/",
+      "boundary": "apply-promotion confirmation is guarded evidence UI only; final Memory/Canon mutation remains separately controlled; no generated prose controls were added; MVP is not complete."
     }
   ],
   "deferred_children": [
@@ -309,7 +325,7 @@
   "mvp_readiness_decision": {
     "owner_acceptance": "pending",
     "mvp_complete": false,
-    "reason": "All seven UX2 source acceptance surfaces now pass, but latest owner acceptance evidence remains MANUAL_REVIEW_REQUIRED pending T007 closeout and owner gate."
+    "reason": "All seven UX2 source acceptance surfaces and all four OMI browser evidence surfaces pass, but T007 owner acceptance evidence remains MANUAL_REVIEW_REQUIRED pending owner review and explicit owner/roadmap gate."
   },
   "latest_browser_evidence": {
     "task": "OMI Dashboard Browser Evidence Only",
@@ -319,8 +335,8 @@
     "workflow_log": "docs/roadmap/validation/omi-dashboard-browser-evidence/workflow-log.json",
     "desktop_screenshot": "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/01-desktop-omi-dashboard.png",
     "mobile_screenshot": "docs/roadmap/validation/omi-dashboard-browser-evidence/screenshots/02-mobile-omi-dashboard.png",
-    "api_mode": "fixture",
-    "api_mode_reason": "The local backend proxy at 127.0.0.1:8000 was unavailable during validation.",
+    "api_mode": "live-backend",
+    "api_mode_reason": "T007 rerun reached the live backend while browser evidence remained read-only and non-mutating.",
     "assertions": [
       "OMI Dashboard reachable from the app",
       "active project/project-local label visible",
@@ -345,12 +361,12 @@
       "no generated prose controls added"
     ]
   },
-  "latest_child_task": "PHASE8-UX-002-T006C",
-  "latest_child_status": "complete/PASS",
+  "latest_child_task": "PHASE8-UX-002-T007",
+  "latest_child_status": "complete/PARTIAL",
   "latest_child_outputs": [
-    "frontend/src/components/ReviewQueuePanel.jsx",
-    "frontend/src/components/ApplyPromotionConfirmation.jsx"
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "artifacts/mvp-readiness/owner-acceptance/evidence-report.md"
   ],
-  "next_planned_child": "PHASE8-UX-002-T007",
-  "next_planned_child_scope": "Closeout plus owner acceptance harness rerun; owner acceptance remains pending and MVP is not complete until the owner gate."
+  "next_planned_child": "owner/roadmap gate pending",
+  "next_planned_child_scope": "Owner review of T007 evidence and explicit owner decision, or a separately published follow-up task for remaining MANUAL_REVIEW_REQUIRED items."
 }

@@ -28,8 +28,16 @@
 - `docs/roadmap/validation/mvp_owner_manual_acceptance_checklist.md`
 - `artifacts/mvp-readiness/owner-acceptance/` as owner-run evidence output, not committed roadmap truth.
 - `artifacts/mvp-readiness/project-isolation/` as prior project isolation browser evidence output.
+- `scripts/omi-dashboard-browser-smoke.mjs`
+- `scripts/omi-candidate-detail-browser-smoke.mjs`
+- `scripts/omi-evidence-drawer-browser-smoke.mjs`
+- `scripts/omi-apply-promotion-browser-smoke.mjs`
+- `docs/roadmap/validation/omi_dashboard_browser_evidence.md`
+- `docs/roadmap/validation/omi_candidate_detail_browser_evidence.md`
+- `docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md`
+- `docs/roadmap/validation/omi_apply_promotion_browser_evidence.md`
 
-The owner acceptance harness reached `SCRIPT_EXIT=0`, but final automated decision remains `MANUAL_REVIEW_REQUIRED`. Owner acceptance remains pending and MVP is not complete.
+The T007 owner acceptance harness rerun reached exit `0`, but final automated decision remains `MANUAL_REVIEW_REQUIRED`. Owner acceptance remains pending and MVP is not complete.
 
 ## Planned Frontend Areas to Inspect in Later Tasks
 
@@ -134,6 +142,17 @@ No backend/API inspection in T002 authorizes route changes, behavior changes, ru
 - Full UX2 acceptance file: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`.
 - `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun.
 - Owner acceptance remains pending; MVP is not complete. External SaaS investigation remains post-MVP/deferred. No backend route/API changes, package changes, tests changes, context artifact updates, crawlers/raw captures, model calls, generated prose, approved memory/canon mutation, automatic promotion, apply-promotion shortcut, staging, commit, or push occurred.
+
+## T007 Closeout + Owner Acceptance Harness Rerun
+
+- Status: `PHASE8-UX-002-T007` complete/PARTIAL.
+- Required validation passed: `python3 scripts/check_enrichment.py`, `python3 scripts/validate_roadmap.py`, enrichment JSON parse, full UX2 pytest (`20 passed in 0.05s`), and `npm --prefix frontend run build`.
+- OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation browser evidence scripts all passed with exit `0`.
+- Apply-promotion remains guarded evidence UI only: dashboard/detail/drawer expose no enabled apply-promotion path, blocked confirmation makes no apply-promotion request, and final Memory/Canon mutation remains separately controlled by explicit owner-confirmed workflow.
+- Owner acceptance harness command: `node scripts/mvp-owner-acceptance-browser-smoke.mjs`.
+- Owner acceptance result: exit `0`; final automated decision `MANUAL_REVIEW_REQUIRED`; evidence under `artifacts/mvp-readiness/owner-acceptance/`.
+- Remaining blockers are manual-review/not-exposed owner acceptance items, especially owner boundary review, project isolation evidence owner review, Notes/Materials save-reload proof in the harness path, runtime fail-closed review, candidate/review and apply-promotion surfaces without a queue fixture, model/no-prose checks needing selected owner-authored scene or model output, Cyber detective Story Check blocked by missing selected scene/source workflow, Cyber detective no-prose prompt/input path not exposed, and final explicit owner decision.
+- No backend code changed, no unauthorized candidates were created, Memory/Canon was not mutated outside authorized harness behavior, no model/Ollama calls were added, apply-promotion was not newly enabled, no generated prose controls were added, no staging/commit/push occurred, and MVP was not declared complete.
 
 ## Known Acceptance Gaps
 

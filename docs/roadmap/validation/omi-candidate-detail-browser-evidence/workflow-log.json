@@ -2,8 +2,8 @@
   "task": "OMI Candidate Detail Browser Evidence Only",
   "result": "PASS",
   "exitCode": 0,
-  "startedAt": "2026-07-04T05:04:24.311Z",
-  "finishedAt": "2026-07-04T05:04:27.490Z",
+  "startedAt": "2026-07-04T05:44:52.031Z",
+  "finishedAt": "2026-07-04T05:44:55.272Z",
   "appBaseUrl": "http://localhost:5173",
   "projectId": "example",
   "apiMode": "live-backend",
@@ -38,55 +38,55 @@
   "failures": [],
   "actions": [
     {
-      "ts": "2026-07-04T05:04:24.313Z",
+      "ts": "2026-07-04T05:44:52.032Z",
       "action": "ensure_evidence_dirs",
       "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence",
       "screenshotDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots"
     },
     {
-      "ts": "2026-07-04T05:04:24.638Z",
+      "ts": "2026-07-04T05:44:52.381Z",
       "action": "playwright_import_ok",
       "modulePath": "/home/tjrpirateking/projects/WritingAssistantApplication/frontend/node_modules/@playwright/test/index.js"
     },
     {
-      "ts": "2026-07-04T05:04:24.658Z",
+      "ts": "2026-07-04T05:44:52.402Z",
       "action": "start_vite_dev_server",
       "appBaseUrl": "http://localhost:5173"
     },
     {
-      "ts": "2026-07-04T05:04:24.771Z",
+      "ts": "2026-07-04T05:44:52.514Z",
       "action": "vite_stdout",
       "text": "> frontend@1.0.0 dev\n> vite --host 0.0.0.0"
     },
     {
-      "ts": "2026-07-04T05:04:24.993Z",
+      "ts": "2026-07-04T05:44:52.735Z",
       "action": "vite_stdout",
-      "text": "VITE v8.0.14  ready in 187 ms"
+      "text": "VITE v8.0.14  ready in 181 ms"
     },
     {
-      "ts": "2026-07-04T05:04:24.993Z",
+      "ts": "2026-07-04T05:44:52.735Z",
       "action": "vite_stdout",
       "text": "➜  Local:   http://localhost:5173/"
     },
     {
-      "ts": "2026-07-04T05:04:24.993Z",
+      "ts": "2026-07-04T05:44:52.735Z",
       "action": "vite_stdout",
       "text": "➜  Network: http://10.255.255.254:5173/\n  ➜  Network: http://172.25.159.75:5173/"
     },
     {
-      "ts": "2026-07-04T05:04:25.202Z",
+      "ts": "2026-07-04T05:44:52.938Z",
       "action": "app_reachable_started_server",
       "appBaseUrl": "http://localhost:5173"
     },
     {
-      "ts": "2026-07-04T05:04:25.202Z",
+      "ts": "2026-07-04T05:44:52.939Z",
       "action": "workflow_start",
       "appBaseUrl": "http://localhost:5173",
       "projectId": "example",
       "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence"
     },
     {
-      "ts": "2026-07-04T05:04:25.257Z",
+      "ts": "2026-07-04T05:44:52.979Z",
       "action": "read_only_project_snapshot",
       "label": "before",
       "apiMode": "live-backend",
@@ -99,102 +99,102 @@
       "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
     },
     {
-      "ts": "2026-07-04T05:04:26.598Z",
+      "ts": "2026-07-04T05:44:54.348Z",
       "action": "omi_candidate_detail_opened"
     },
     {
-      "ts": "2026-07-04T05:04:26.603Z",
+      "ts": "2026-07-04T05:44:54.352Z",
       "action": "assert_pass",
       "name": "desktop: Candidate Detail is reachable"
     },
     {
-      "ts": "2026-07-04T05:04:26.605Z",
+      "ts": "2026-07-04T05:44:54.354Z",
       "action": "assert_pass",
       "name": "desktop: field table visible"
     },
     {
-      "ts": "2026-07-04T05:04:26.607Z",
+      "ts": "2026-07-04T05:44:54.357Z",
       "action": "assert_pass",
       "name": "desktop: readiness checklist visible"
     },
     {
-      "ts": "2026-07-04T05:04:26.612Z",
+      "ts": "2026-07-04T05:44:54.362Z",
       "action": "assert_pass",
       "name": "desktop: candidate approval disabled"
     },
     {
-      "ts": "2026-07-04T05:04:26.616Z",
+      "ts": "2026-07-04T05:44:54.366Z",
       "action": "assert_pass",
       "name": "desktop: field approval disabled"
     },
     {
-      "ts": "2026-07-04T05:04:26.620Z",
+      "ts": "2026-07-04T05:44:54.372Z",
       "action": "assert_pass",
       "name": "desktop: apply to Memory/Canon disabled"
     },
     {
-      "ts": "2026-07-04T05:04:26.626Z",
+      "ts": "2026-07-04T05:44:54.379Z",
       "action": "assert_pass",
       "name": "desktop: disabled candidate approval reason associated",
       "candidateDescribedBy": "omi-candidate-approval-disabled-reason",
       "candidateReasonId": "omi-candidate-approval-disabled-reason"
     },
     {
-      "ts": "2026-07-04T05:04:26.633Z",
+      "ts": "2026-07-04T05:44:54.386Z",
       "action": "assert_pass",
       "name": "desktop: disabled field approval reason associated",
       "fieldDescribedBy": "omi-field-approval-disabled-missing-field-review-row",
       "fieldReasonId": "omi-field-approval-disabled-missing-field-review-row"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: This remains a candidate until apply-promotion is separately confirmed and completed."
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: Ready means the handoff packet is complete. Memory/Canon has not changed."
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: Confidence indicates support strength, not truth."
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: Promotion Audit Record"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: Not Applied to Memory/Canon"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:44:54.389Z",
       "action": "assert_pass",
       "name": "desktop: required copy visible: No approved Memory/Canon links."
     },
     {
-      "ts": "2026-07-04T05:04:26.663Z",
+      "ts": "2026-07-04T05:44:54.413Z",
       "action": "assert_pass",
       "name": "desktop: no generated prose controls visible",
       "matchedForbiddenControls": []
     },
     {
-      "ts": "2026-07-04T05:04:26.946Z",
+      "ts": "2026-07-04T05:44:54.702Z",
       "action": "screenshot",
       "name": "01-desktop-omi-candidate-detail",
       "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/01-desktop-omi-candidate-detail.png"
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:44:54.718Z",
       "action": "read_only_project_snapshot",
       "label": "after",
       "apiMode": "live-backend",
@@ -207,14 +207,14 @@
       "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:44:54.718Z",
       "action": "assert_pass",
       "name": "opening candidate detail does not create candidates",
       "before": 2,
       "after": 2
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:44:54.718Z",
       "action": "assert_pass",
       "name": "opening candidate detail does not mutate approved Memory/Canon snapshot",
       "before": {
@@ -241,99 +241,99 @@
       }
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:44:54.718Z",
       "action": "assert_pass",
       "name": "opening candidate detail performs no mutating API requests",
       "mutatingApiRequests": [],
       "apiMode": "live-backend"
     },
     {
-      "ts": "2026-07-04T05:04:27.220Z",
+      "ts": "2026-07-04T05:44:54.977Z",
       "action": "assert_pass",
       "name": "mobile: Candidate Detail is reachable"
     },
     {
-      "ts": "2026-07-04T05:04:27.223Z",
+      "ts": "2026-07-04T05:44:54.980Z",
       "action": "assert_pass",
       "name": "mobile: field table visible"
     },
     {
-      "ts": "2026-07-04T05:04:27.225Z",
+      "ts": "2026-07-04T05:44:54.982Z",
       "action": "assert_pass",
       "name": "mobile: readiness checklist visible"
     },
     {
-      "ts": "2026-07-04T05:04:27.230Z",
+      "ts": "2026-07-04T05:44:54.986Z",
       "action": "assert_pass",
       "name": "mobile: candidate approval disabled"
     },
     {
-      "ts": "2026-07-04T05:04:27.234Z",
+      "ts": "2026-07-04T05:44:54.990Z",
       "action": "assert_pass",
       "name": "mobile: field approval disabled"
     },
     {
-      "ts": "2026-07-04T05:04:27.238Z",
+      "ts": "2026-07-04T05:44:54.993Z",
       "action": "assert_pass",
       "name": "mobile: apply to Memory/Canon disabled"
     },
     {
-      "ts": "2026-07-04T05:04:27.243Z",
+      "ts": "2026-07-04T05:44:54.999Z",
       "action": "assert_pass",
       "name": "mobile: disabled candidate approval reason associated",
       "candidateDescribedBy": "omi-candidate-approval-disabled-reason",
       "candidateReasonId": "omi-candidate-approval-disabled-reason"
     },
     {
-      "ts": "2026-07-04T05:04:27.249Z",
+      "ts": "2026-07-04T05:44:55.005Z",
       "action": "assert_pass",
       "name": "mobile: disabled field approval reason associated",
       "fieldDescribedBy": "omi-field-approval-disabled-missing-field-review-row",
       "fieldReasonId": "omi-field-approval-disabled-missing-field-review-row"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: This remains a candidate until apply-promotion is separately confirmed and completed."
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: Ready means the handoff packet is complete. Memory/Canon has not changed."
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: Confidence indicates support strength, not truth."
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: Promotion Audit Record"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: Not Applied to Memory/Canon"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:44:55.007Z",
       "action": "assert_pass",
       "name": "mobile: required copy visible: No approved Memory/Canon links."
     },
     {
-      "ts": "2026-07-04T05:04:27.255Z",
+      "ts": "2026-07-04T05:44:55.011Z",
       "action": "assert_pass",
       "name": "mobile: no generated prose controls visible",
       "matchedForbiddenControls": []
     },
     {
-      "ts": "2026-07-04T05:04:27.267Z",
+      "ts": "2026-07-04T05:44:55.022Z",
       "action": "assert_pass",
       "name": "mobile: Candidate Detail uses exactly Fields, Evidence, Readiness tabs",
       "labels": [
@@ -344,7 +344,7 @@
       "display": "flex"
     },
     {
-      "ts": "2026-07-04T05:04:27.483Z",
+      "ts": "2026-07-04T05:44:55.266Z",
       "action": "screenshot",
       "name": "02-mobile-omi-candidate-detail",
       "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/02-mobile-omi-candidate-detail.png"

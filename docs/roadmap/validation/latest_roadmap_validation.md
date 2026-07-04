@@ -1,3 +1,28 @@
+# PHASE8-UX-002-T007 Closeout + Owner Acceptance Harness Rerun
+
+- Result: PARTIAL for owner acceptance closeout; PASS for required roadmap/source/build/OMI evidence validation.
+- `PHASE8-UX-002-T007` reran the latest committed UI evidence and owner acceptance harness on 2026-07-04.
+- Required OMI browser evidence surfaces are complete/PASS:
+  - OMI Dashboard: `node scripts/omi-dashboard-browser-smoke.mjs` -> exit `0`; report `docs/roadmap/validation/omi_dashboard_browser_evidence.md`.
+  - OMI Candidate Detail: `node scripts/omi-candidate-detail-browser-smoke.mjs` -> exit `0`; report `docs/roadmap/validation/omi_candidate_detail_browser_evidence.md`.
+  - OMI Evidence Drawer: `node scripts/omi-evidence-drawer-browser-smoke.mjs` -> exit `0`; report `docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md`.
+  - OMI Apply-Promotion Confirmation: `node scripts/omi-apply-promotion-browser-smoke.mjs` -> exit `0`; report `docs/roadmap/validation/omi_apply_promotion_browser_evidence.md`.
+- Apply-promotion evidence remains guarded UI only in the rerun: dashboard/detail/drawer do not expose enabled apply-promotion; confirmation is blocked when blockers are visible; no apply-promotion request was made; final Memory/Canon mutation remains separately controlled by explicit owner-confirmed workflow.
+- No generated prose controls were added by the OMI evidence reruns or owner acceptance rerun.
+- Owner acceptance harness command: `node scripts/mvp-owner-acceptance-browser-smoke.mjs`.
+- Owner acceptance harness result: exit `0`; final automated decision `MANUAL_REVIEW_REQUIRED`; report `artifacts/mvp-readiness/owner-acceptance/evidence-report.md`; checklist `artifacts/mvp-readiness/owner-acceptance/checklist-results.json`; workflow log `artifacts/mvp-readiness/owner-acceptance/workflow-log.json`.
+- Owner acceptance manual-review blockers remain exactly as recorded by the harness: owner boundary understanding review; prior Playwright evidence owner review; Notes and Materials save/reload isolation proof not exposed through this harness path; runtime unavailable/failure fail-closed owner review; candidate/review surface `NOT_EXPOSED`; apply-promotion fixture not visible without a review queue entry; model-assisted confidence/output/no-prose boundary review requiring model output or selected owner-authored scene; NCP/Subtxt/dramatica-flow UI/runtime labels `NOT_EXPOSED`; no-prose negative-path checks requiring selected-scene fixture; Cyber detective Story Check blocked because the created project has no scenes and no browser-visible create/import owner-authored scene/source control in that harness path; Cyber detective no-prose prompt/input path not exposed; final owner Accepted/Blocked decision still manual.
+- Harness-created Cyber detective project/candidate-planning evidence is authorized harness behavior only. The harness records OMI/setup material as candidate/planning only, Memory/Canon non-canon status PASS, no direct BookNLP/spaCy/NCP/Subtxt/dramatica-flow execution, no generated story prose from the fixture, and no approved Memory/Canon mutation.
+- Validation results:
+  - `python3 scripts/check_enrichment.py` -> PASS.
+  - `python3 scripts/validate_roadmap.py` -> PASS.
+  - `python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null` -> PASS.
+  - `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `20 passed in 0.05s`.
+  - `npm --prefix frontend run build` -> PASS; Vite large chunk warning only.
+  - OMI browser evidence commands listed above -> PASS.
+- `PHASE8-UX-002` can be closed as complete/PARTIAL for T007 closeout evidence, but MVP owner acceptance cannot be marked PASS and MVP is not complete.
+- Next explicit owner/roadmap gate: owner review of `artifacts/mvp-readiness/owner-acceptance/evidence-report.md` and the manual acceptance checklist, then an explicit owner decision or a separately published follow-up task for the remaining manual-review blockers.
+
 # OMI Dashboard Browser Evidence
 
 - Result: PASS for focused OMI Dashboard browser-visible evidence.
@@ -16,7 +41,7 @@
 - Result: PASS for focused T006C source validation before roadmap closeout.
 - Focused review/promotion test: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001` -> `1 passed, 6 deselected in 0.03s`.
 - Full UX2 expected-red acceptance file: `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`.
-- `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun.
+- `PHASE8-UX-002-T006` is complete/PASS. `PHASE8-UX-002-T007` is now complete/PARTIAL for closeout plus owner acceptance harness rerun; owner acceptance remains `MANUAL_REVIEW_REQUIRED`.
 - Owner acceptance remains pending and MVP is not complete.
 
 # PHASE8-UX-002-T006B Raw Artifact / Analysis Runtime Status UI
