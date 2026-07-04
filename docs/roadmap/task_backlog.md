@@ -1,3 +1,16 @@
+# PHASE8-UX-003-T001 Owner Acceptance Harness Route/Workflow Evidence Follow-up Publication
+
+- `PHASE8-UX-003` is published as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
+- `PHASE8-UX-003-T001` is complete/PASS as docs/status/planning publication only.
+- New records: `docs/roadmap/tasks/PHASE8-UX-003.md`, `docs/roadmap/inventory/PHASE8-UX-003.md`, and `docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json`.
+- `PHASE8-UX-003-T002` is next: decide harness route/workflow mapping for B/C blockers.
+- Planned child sequence: T002 route/workflow mapping; T003 expected-red harness coverage; T004 wire owner harness to existing Notes/Materials, OMI review, OMI apply-promotion, and analysis-runtime label surfaces; T005 wire Cyber fixture selected-source Story Check and no-prose evidence paths using existing owner-authored source UI only; T006 rerun owner acceptance harness and classify remaining manual items; T007 closeout and owner Accepted/Blocked gate preparation.
+- Target B blockers: candidate/review and apply-promotion items already covered by OMI PASS evidence but not wired into owner harness.
+- Target C blockers: Notes/Materials project-scoped proof, NCP/Subtxt/dramatica-flow label surfaces, Cyber selected-source Story Check path, and Cyber no-prose evidence path.
+- A-category blockers remain manual owner review only.
+- Owner acceptance remains pending; MVP is not complete.
+- No frontend/backend/test/harness code changed, no candidates were created, Memory/Canon was not mutated, apply-promotion was not enabled or run, no generated prose controls were added, and no staging/commit/push occurred.
+
 # PHASE8-UX-002-T007 Closeout + Owner Acceptance Harness Rerun
 
 - `PHASE8-UX-002-T007` is complete/PARTIAL as closeout plus owner acceptance harness rerun.

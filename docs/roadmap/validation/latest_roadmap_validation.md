@@ -1,3 +1,16 @@
+# PHASE8-UX-003-T001 Owner Acceptance Harness Route/Workflow Evidence Follow-up Publication
+
+- Result: PASS for docs/status/planning publication.
+- New follow-up ID: `PHASE8-UX-003`.
+- `PHASE8-UX-003` is published as the separate owner acceptance harness route/workflow evidence follow-up after `PHASE8-UX-002-T007`.
+- `PHASE8-UX-003-T001` is complete/PASS as parent/task publication only.
+- Next planned child: `PHASE8-UX-003-T002` - Decide harness route/workflow mapping for B/C blockers.
+- The follow-up targets B-category candidate/review and apply-promotion blockers already covered by OMI PASS evidence but not wired into the owner harness, plus C-category Notes/Materials, analysis-runtime label, Cyber selected-source Story Check, and no-prose route/workflow blockers.
+- A-category blockers remain owner manual review only.
+- Owner acceptance was not marked PASS.
+- MVP was not marked complete.
+- No frontend code, backend code, tests, browser harness scripts, candidates, Memory/Canon mutation, model/Ollama calls, extraction, apply-promotion execution, generated prose controls, staging, commit, or push occurred.
+
 # PHASE8-UX-002-T007 Closeout + Owner Acceptance Harness Rerun
 
 - Result: PARTIAL for owner acceptance closeout; PASS for required roadmap/source/build/OMI evidence validation.

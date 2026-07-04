@@ -1,0 +1,199 @@
+{
+  "task_id": "PHASE8-UX-003",
+  "title": "Owner Acceptance Harness Route/Workflow Evidence Follow-up",
+  "status": "active",
+  "task_type": "docs-only UX follow-up parent with T001 publication complete",
+  "parent_title": "PHASE8-UX-003 - Owner Acceptance Harness Route/Workflow Evidence Follow-up",
+  "mvp_required": true,
+  "context_pack": ".codex-context/PHASE8-UX-003/",
+  "purpose": "Publish a separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, without reopening PHASE8-UX-002 and without adding product UI by default.",
+  "current_evidence_summary": [
+    "PHASE8-UX-002-T007 is complete/PARTIAL.",
+    "Owner acceptance harness exited 0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
+    "T007 gate classification identifies A manual review only blockers, B OMI evidence already PASS but not wired into owner harness, and C items needing owner harness route/workflow updates.",
+    "OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation browser evidence surfaces are PASS.",
+    "Owner acceptance remains pending.",
+    "MVP is not complete."
+  ],
+  "boundaries": [
+    "docs/status/planning only for T001",
+    "harness route/workflow evidence only",
+    "existing UI surfaces only",
+    "no new product UI by default",
+    "analysis-only",
+    "candidate-first",
+    "owner review required",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "owner-authored prose storage/editing is allowed",
+    "generated prose is permanently forbidden",
+    "no generated prose",
+    "no rewrite",
+    "no continue",
+    "no imitate",
+    "no polish",
+    "no improve",
+    "no expand",
+    "no outline",
+    "no draft",
+    "no story-prose-production controls",
+    "queue presence is not approval",
+    "confidence is not truth",
+    "candidate persistence is not canon",
+    "raw artifacts are support data only",
+    "apply-promotion remains guarded evidence UI unless separately authorized",
+    "no frontend implementation in T001",
+    "no backend implementation in T001",
+    "no tests in T001",
+    "no browser harness script edits in T001",
+    "no package/dependency changes",
+    "no model or Ollama calls",
+    "no extraction",
+    "no canon or memory mutation",
+    "no candidate creation",
+    "no apply-promotion execution",
+    "no training/JSONL/dataset/model artifacts"
+  ],
+  "target_b_blockers": [
+    "candidate_review_candidate_first_visible",
+    "candidate_review_queue_not_approval",
+    "candidate_review_read_only_state",
+    "candidate_review_owner_action_explicit",
+    "candidate_review_confidence_not_truth",
+    "candidate_review_persistence_not_canon",
+    "apply_promotion_requires_confirmation",
+    "apply_promotion_audit_details",
+    "apply_promotion_only_approved_workflow",
+    "apply_promotion_failed_rejected_unchanged",
+    "apply_promotion_no_bypass"
+  ],
+  "target_c_blockers": [
+    "manual_workspace_notes_project_scoped",
+    "manual_workspace_materials_project_scoped",
+    "model_assisted_ncp_structured_context_only",
+    "model_assisted_subtxt_rubric_only",
+    "model_assisted_dramatica_flow_analysis_only",
+    "cyber_fixture_story_check_selected_source_path",
+    "cyber_fixture_no_prose_prompt_path"
+  ],
+  "manual_review_only_a_blockers": [
+    "startup_owner_understands_analysis_boundaries",
+    "project_isolation_playwright_evidence_reviewed",
+    "runtime_extraction_unavailable_fail_closed",
+    "runtime_extraction_failures_no_success_claim",
+    "model_assisted_evidence_backed_only",
+    "model_assisted_confidence_not_truth",
+    "model_assisted_output_not_canon",
+    "final explicit owner Accepted/Blocked decision"
+  ],
+  "expected_outputs": [
+    "docs/roadmap/tasks/PHASE8-UX-003.md",
+    "docs/roadmap/inventory/PHASE8-UX-003.md",
+    "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
+    "roadmap/status/governance updates publishing PHASE8-UX-003 as the owner acceptance harness route/workflow evidence follow-up",
+    "PHASE8-UX-003-T001 recorded complete/PASS as docs/status/planning only",
+    "PHASE8-UX-003-T002 recorded as the next planned child",
+    "owner acceptance pending and MVP not complete recorded"
+  ],
+  "allowed_files": [
+    "docs/roadmap/tasks/PHASE8-UX-003.md",
+    "docs/roadmap/inventory/PHASE8-UX-003.md",
+    "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/phase_map.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/open_questions.md"
+  ],
+  "disallowed_files": [
+    "frontend/**",
+    "backend/**",
+    "tests/**",
+    "scripts/mvp-owner-acceptance-browser-smoke.mjs",
+    "scripts/omi-dashboard-browser-smoke.mjs",
+    "scripts/omi-candidate-detail-browser-smoke.mjs",
+    "scripts/omi-evidence-drawer-browser-smoke.mjs",
+    "scripts/omi-apply-promotion-browser-smoke.mjs",
+    "package.json",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "training/**",
+    ".external_sources/**",
+    ".codex-context/**",
+    "ai_context/**",
+    "graphify-out/**",
+    "projects/**"
+  ],
+  "validation_commands": [
+    "python3 scripts/check_enrichment.py",
+    "python3 scripts/validate_roadmap.py",
+    "python3 -m json.tool docs/roadmap/enrichment/PHASE8-UX-002.enrichment.json >/dev/null",
+    "git diff --check",
+    "git status --short --branch",
+    "git diff --name-only"
+  ],
+  "references": [
+    "docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "artifacts/mvp-readiness/owner-acceptance/evidence-report.md",
+    "artifacts/mvp-readiness/owner-acceptance/workflow-log.json",
+    "artifacts/mvp-readiness/owner-acceptance/checklist-results.json",
+    "scripts/mvp-owner-acceptance-browser-smoke.mjs",
+    "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+    "docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+    "docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
+    "docs/roadmap/validation/omi_apply_promotion_browser_evidence.md"
+  ],
+  "active_child_sequence": [
+    {
+      "task_id": "PHASE8-UX-003-T001",
+      "title": "Publish follow-up parent/task records only",
+      "status": "complete/PASS",
+      "scope": "docs/status/planning only"
+    },
+    {
+      "task_id": "PHASE8-UX-003-T002",
+      "title": "Decide harness route/workflow mapping for B/C blockers",
+      "status": "planned",
+      "scope": "docs/decision/planning only"
+    },
+    {
+      "task_id": "PHASE8-UX-003-T003",
+      "title": "Add expected-red harness coverage for target B/C blockers",
+      "status": "planned",
+      "scope": "expected-red harness coverage only when explicitly authorized"
+    },
+    {
+      "task_id": "PHASE8-UX-003-T004",
+      "title": "Wire owner harness to existing Notes/Materials, OMI review, OMI apply-promotion, and analysis-runtime label surfaces",
+      "status": "planned",
+      "scope": "browser harness route/workflow only; existing UI surfaces only"
+    },
+    {
+      "task_id": "PHASE8-UX-003-T005",
+      "title": "Wire Cyber fixture selected-source Story Check and no-prose evidence paths using existing owner-authored source UI only",
+      "status": "planned",
+      "scope": "browser harness route/workflow only"
+    },
+    {
+      "task_id": "PHASE8-UX-003-T006",
+      "title": "Rerun owner acceptance harness and classify remaining manual items",
+      "status": "planned",
+      "scope": "validation/evidence only"
+    },
+    {
+      "task_id": "PHASE8-UX-003-T007",
+      "title": "Closeout and owner Accepted/Blocked gate preparation",
+      "status": "planned",
+      "scope": "docs/status/governance only; do not mark owner acceptance PASS"
+    }
+  ],
+  "latest_child_task": "PHASE8-UX-003-T001",
+  "latest_child_status": "complete/PASS",
+  "next_child_task": "PHASE8-UX-003-T002",
+  "owner_acceptance_status": "pending",
+  "mvp_completion_status": "not_complete"
+}
