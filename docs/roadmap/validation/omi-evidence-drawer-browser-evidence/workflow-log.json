@@ -1,17 +1,17 @@
 {
-  "task": "OMI Candidate Detail Browser Evidence Only",
+  "task": "OMI Evidence Drawer Browser Evidence Only",
   "result": "PASS",
   "exitCode": 0,
-  "startedAt": "2026-07-04T05:04:24.311Z",
-  "finishedAt": "2026-07-04T05:04:27.490Z",
+  "startedAt": "2026-07-04T05:04:29.068Z",
+  "finishedAt": "2026-07-04T05:04:32.372Z",
   "appBaseUrl": "http://localhost:5173",
   "projectId": "example",
   "apiMode": "live-backend",
-  "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence",
-  "validationMarkdown": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+  "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence",
+  "validationMarkdown": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
   "screenshots": {
-    "desktop": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/01-desktop-omi-candidate-detail.png",
-    "mobile": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/02-mobile-omi-candidate-detail.png"
+    "desktop": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence/screenshots/01-desktop-omi-evidence-drawer.png",
+    "mobile": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence/screenshots/02-mobile-omi-evidence-drawer.png"
   },
   "beforeSnapshot": {
     "label": "before",
@@ -38,55 +38,55 @@
   "failures": [],
   "actions": [
     {
-      "ts": "2026-07-04T05:04:24.313Z",
+      "ts": "2026-07-04T05:04:29.069Z",
       "action": "ensure_evidence_dirs",
-      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence",
-      "screenshotDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots"
+      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence",
+      "screenshotDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence/screenshots"
     },
     {
-      "ts": "2026-07-04T05:04:24.638Z",
+      "ts": "2026-07-04T05:04:29.380Z",
       "action": "playwright_import_ok",
       "modulePath": "/home/tjrpirateking/projects/WritingAssistantApplication/frontend/node_modules/@playwright/test/index.js"
     },
     {
-      "ts": "2026-07-04T05:04:24.658Z",
+      "ts": "2026-07-04T05:04:29.398Z",
       "action": "start_vite_dev_server",
       "appBaseUrl": "http://localhost:5173"
     },
     {
-      "ts": "2026-07-04T05:04:24.771Z",
+      "ts": "2026-07-04T05:04:29.502Z",
       "action": "vite_stdout",
       "text": "> frontend@1.0.0 dev\n> vite --host 0.0.0.0"
     },
     {
-      "ts": "2026-07-04T05:04:24.993Z",
+      "ts": "2026-07-04T05:04:29.720Z",
       "action": "vite_stdout",
-      "text": "VITE v8.0.14  ready in 187 ms"
+      "text": "VITE v8.0.14  ready in 185 ms"
     },
     {
-      "ts": "2026-07-04T05:04:24.993Z",
+      "ts": "2026-07-04T05:04:29.720Z",
       "action": "vite_stdout",
       "text": "➜  Local:   http://localhost:5173/"
     },
     {
-      "ts": "2026-07-04T05:04:24.993Z",
+      "ts": "2026-07-04T05:04:29.721Z",
       "action": "vite_stdout",
       "text": "➜  Network: http://10.255.255.254:5173/\n  ➜  Network: http://172.25.159.75:5173/"
     },
     {
-      "ts": "2026-07-04T05:04:25.202Z",
+      "ts": "2026-07-04T05:04:29.931Z",
       "action": "app_reachable_started_server",
       "appBaseUrl": "http://localhost:5173"
     },
     {
-      "ts": "2026-07-04T05:04:25.202Z",
+      "ts": "2026-07-04T05:04:29.932Z",
       "action": "workflow_start",
       "appBaseUrl": "http://localhost:5173",
       "projectId": "example",
-      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence"
+      "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence"
     },
     {
-      "ts": "2026-07-04T05:04:25.257Z",
+      "ts": "2026-07-04T05:04:29.981Z",
       "action": "read_only_project_snapshot",
       "label": "before",
       "apiMode": "live-backend",
@@ -99,102 +99,176 @@
       "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
     },
     {
-      "ts": "2026-07-04T05:04:26.598Z",
-      "action": "omi_candidate_detail_opened"
+      "ts": "2026-07-04T05:04:30.066Z",
+      "action": "api_guard_installed",
+      "projectId": "example",
+      "apiMode": "live-backend"
     },
     {
-      "ts": "2026-07-04T05:04:26.603Z",
-      "action": "assert_pass",
-      "name": "desktop: Candidate Detail is reachable"
+      "ts": "2026-07-04T05:04:31.365Z",
+      "action": "omi_evidence_drawer_opened"
     },
     {
-      "ts": "2026-07-04T05:04:26.605Z",
+      "ts": "2026-07-04T05:04:31.372Z",
       "action": "assert_pass",
-      "name": "desktop: field table visible"
+      "name": "desktop: Evidence Drawer is visible"
     },
     {
-      "ts": "2026-07-04T05:04:26.607Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: readiness checklist visible"
+      "name": "desktop: drawer title includes evidence scope"
     },
     {
-      "ts": "2026-07-04T05:04:26.612Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: candidate approval disabled"
+      "name": "desktop: required drawer copy visible: Source type"
     },
     {
-      "ts": "2026-07-04T05:04:26.616Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: field approval disabled"
+      "name": "desktop: required drawer copy visible: Source location"
     },
     {
-      "ts": "2026-07-04T05:04:26.620Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: apply to Memory/Canon disabled"
+      "name": "desktop: required drawer copy visible: Quote exactness"
     },
     {
-      "ts": "2026-07-04T05:04:26.626Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: disabled candidate approval reason associated",
-      "candidateDescribedBy": "omi-candidate-approval-disabled-reason",
-      "candidateReasonId": "omi-candidate-approval-disabled-reason"
+      "name": "desktop: required drawer copy visible: Confidence/support"
     },
     {
-      "ts": "2026-07-04T05:04:26.633Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: disabled field approval reason associated",
-      "fieldDescribedBy": "omi-field-approval-disabled-missing-field-review-row",
-      "fieldReasonId": "omi-field-approval-disabled-missing-field-review-row"
+      "name": "desktop: required drawer copy visible: Original wording/excerpt"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: This remains a candidate until apply-promotion is separately confirmed and completed."
+      "name": "desktop: required drawer copy visible: Evidence summary"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: Ready means the handoff packet is complete. Memory/Canon has not changed."
+      "name": "desktop: required drawer copy visible: Supports claim"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
+      "name": "desktop: required drawer copy visible: Limitations / ambiguity"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: Confidence indicates support strength, not truth."
+      "name": "desktop: required drawer copy visible: Provenance chain"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: Promotion Audit Record"
+      "name": "desktop: required drawer copy visible: Related IDs"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: Not Applied to Memory/Canon"
+      "name": "desktop: required drawer copy visible: Timestamps"
     },
     {
-      "ts": "2026-07-04T05:04:26.635Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: required copy visible: No approved Memory/Canon links."
+      "name": "desktop: required drawer copy visible: Source hash"
     },
     {
-      "ts": "2026-07-04T05:04:26.663Z",
+      "ts": "2026-07-04T05:04:31.373Z",
       "action": "assert_pass",
-      "name": "desktop: no generated prose controls visible",
+      "name": "desktop: required drawer copy visible: Snapshot hash"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.373Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
+    },
+    {
+      "ts": "2026-07-04T05:04:31.374Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Viewing evidence does not copy source text into Memory/Canon."
+    },
+    {
+      "ts": "2026-07-04T05:04:31.374Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Confidence indicates support strength, not truth."
+    },
+    {
+      "ts": "2026-07-04T05:04:31.374Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Navigation / copy"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.374Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Review marking"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.374Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Owner note"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.374Z",
+      "action": "assert_pass",
+      "name": "desktop: required drawer copy visible: Close"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.379Z",
+      "action": "assert_pass",
+      "name": "desktop: Open source record disabled fail-closed"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.388Z",
+      "action": "assert_pass",
+      "name": "desktop: source open disabled reason associated",
+      "describedBy": "omi-source-open-disabled-reason",
+      "reasonId": "omi-source-open-disabled-reason",
+      "reasonText": "Source open action unavailable"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.395Z",
+      "action": "assert_pass",
+      "name": "desktop: Evidence Drawer has no apply to Memory/Canon action",
+      "pageApplyButtons": 1,
+      "drawerApplyButtons": 0
+    },
+    {
+      "ts": "2026-07-04T05:04:31.419Z",
+      "action": "assert_pass",
+      "name": "desktop: no generated prose controls visible in drawer",
       "matchedForbiddenControls": []
     },
     {
-      "ts": "2026-07-04T05:04:26.946Z",
-      "action": "screenshot",
-      "name": "01-desktop-omi-candidate-detail",
-      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/01-desktop-omi-candidate-detail.png"
+      "ts": "2026-07-04T05:04:31.421Z",
+      "action": "assert_pass",
+      "name": "desktop: drawer moves focus to labelled top close button",
+      "initiallyFocused": "omi-evidence-drawer-close-top"
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:04:31.428Z",
+      "action": "assert_pass",
+      "name": "desktop: focus trap wraps backward inside drawer",
+      "afterShiftTabText": "Close drawer"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.494Z",
+      "action": "assert_pass",
+      "name": "desktop: closing drawer returns focus to opener"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.834Z",
+      "action": "screenshot",
+      "name": "01-desktop-omi-evidence-drawer",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence/screenshots/01-desktop-omi-evidence-drawer.png"
+    },
+    {
+      "ts": "2026-07-04T05:04:31.851Z",
       "action": "read_only_project_snapshot",
       "label": "after",
       "apiMode": "live-backend",
@@ -207,16 +281,16 @@
       "storyformJson": "{\"schema_version\":\"1.3.0\",\"story\":{\"id\":\"story_princess_and_pea\",\"title\":\"The Princess and the Pea\",\"genre\":\"Fairy tale\",\"logline\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"created_at\":\"2026-05-31T00:00:00Z\",\"narratives\":[{\"id\":\"narrative_princess_and_pea_mvp_sample\",\"title\":\"The Princess and the Pea MVP sample\",\"status\":\"draft\",\"subtext\":{\"perspectives\":[{\"id\":\"persp_objective_story\",\"author_structural_pov\":\"they\",\"summary\":\"The source scene follows the shared question of whether the visitor is a real princess.\",\"storytelling\":\"The prince searches, the visitor arrives in a storm, the old queen arranges a test, and the household interprets the result.\"}],\"players\":[{\"id\":\"player_prince\",\"name\":\"prince\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"A prince who wants to marry a real princess.\",\"bio\":\"The source says he travels all over the world to find a real princess and comes home sad.\",\"storytelling\":\"He marries the princess after the pea test identifies her as real.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_princess\",\"name\":\"princess\",\"role\":\"source character\",\"visual\":\"rain-soaked from hair and clothes to shoes\",\"audio\":\"\",\"summary\":\"A visitor who arrives at the city gate during a terrible storm and says she is a real princess.\",\"bio\":\"The source gives no backstory beyond her arrival and claim.\",\"storytelling\":\"She sleeps on the prepared bed and reports feeling something hard through the bedding.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_queen\",\"name\":\"old queen\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old queen who tests whether the visitor is a real princess.\",\"bio\":\"The source identifies her as the old queen.\",\"storytelling\":\"She places a pea beneath twenty mattresses and twenty eider-down beds.\",\"motivations\":[],\"perspectives\":[]},{\"id\":\"player_old_king\",\"name\":\"old king\",\"role\":\"source character\",\"visual\":\"\",\"audio\":\"\",\"summary\":\"The old king who opens the city gate during the storm.\",\"bio\":\"The source identifies him as the old king.\",\"storytelling\":\"He opens the gate after a knocking is heard.\",\"motivations\":[],\"perspectives\":[]}],\"dynamics\":[],\"storypoints\":[{\"id\":\"sp_os_throughline\",\"appreciation\":\"Objective Story Throughline\",\"illustration\":\"The household needs to determine whether the storm-soaked visitor is a real princess.\",\"summary\":\"The shared source-level problem is testing the visitor's claim.\",\"storytelling\":\"The old queen creates the pea test and the result leads the household to accept the visitor as a real princess.\",\"throughline\":\"Objective Story\",\"perspectives\":[{\"perspective_id\":\"persp_objective_story\"}]}],\"storybeats\":[]},\"storytelling\":{\"overviews\":[{\"id\":\"overview_logline\",\"label\":\"Logline\",\"summary\":\"A prince seeks a real princess, and an old queen tests a storm-soaked visitor with a pea beneath many mattresses.\",\"storytelling\":\"Public-domain source-derived fixture context, not generated story prose.\"},{\"id\":\"overview_genre\",\"label\":\"Genre\",\"summary\":\"Fairy tale.\",\"storytelling\":\"Public-domain sample fixture.\"},{\"id\":\"overview_throughlines\",\"label\":\"Blended Throughlines\",\"summary\":\"Objective Story source-level context is present; Main Character, Influence Character, Relationship Story, CIPS, and dynamics remain unresolved.\",\"storytelling\":\"The fixture is intentionally conservative so missing evidence can be reported safely.\"}],\"moments\":[]}}]}}"
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:04:31.851Z",
       "action": "assert_pass",
-      "name": "opening candidate detail does not create candidates",
+      "name": "opening evidence drawer does not create candidates",
       "before": 2,
       "after": 2
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:04:31.851Z",
       "action": "assert_pass",
-      "name": "opening candidate detail does not mutate approved Memory/Canon snapshot",
+      "name": "opening evidence drawer does not mutate approved Memory/Canon snapshot",
       "before": {
         "label": "before",
         "apiMode": "live-backend",
@@ -241,113 +315,174 @@
       }
     },
     {
-      "ts": "2026-07-04T05:04:26.960Z",
+      "ts": "2026-07-04T05:04:31.851Z",
       "action": "assert_pass",
-      "name": "opening candidate detail performs no mutating API requests",
+      "name": "opening evidence drawer performs no mutating API requests",
       "mutatingApiRequests": [],
       "apiMode": "live-backend"
     },
     {
-      "ts": "2026-07-04T05:04:27.220Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: Candidate Detail is reachable"
+      "name": "mobile: Evidence Drawer is visible"
     },
     {
-      "ts": "2026-07-04T05:04:27.223Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: field table visible"
+      "name": "mobile: drawer title includes evidence scope"
     },
     {
-      "ts": "2026-07-04T05:04:27.225Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: readiness checklist visible"
+      "name": "mobile: required drawer copy visible: Source type"
     },
     {
-      "ts": "2026-07-04T05:04:27.230Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: candidate approval disabled"
+      "name": "mobile: required drawer copy visible: Source location"
     },
     {
-      "ts": "2026-07-04T05:04:27.234Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: field approval disabled"
+      "name": "mobile: required drawer copy visible: Quote exactness"
     },
     {
-      "ts": "2026-07-04T05:04:27.238Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: apply to Memory/Canon disabled"
+      "name": "mobile: required drawer copy visible: Confidence/support"
     },
     {
-      "ts": "2026-07-04T05:04:27.243Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: disabled candidate approval reason associated",
-      "candidateDescribedBy": "omi-candidate-approval-disabled-reason",
-      "candidateReasonId": "omi-candidate-approval-disabled-reason"
+      "name": "mobile: required drawer copy visible: Original wording/excerpt"
     },
     {
-      "ts": "2026-07-04T05:04:27.249Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: disabled field approval reason associated",
-      "fieldDescribedBy": "omi-field-approval-disabled-missing-field-review-row",
-      "fieldReasonId": "omi-field-approval-disabled-missing-field-review-row"
+      "name": "mobile: required drawer copy visible: Evidence summary"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: This remains a candidate until apply-promotion is separately confirmed and completed."
+      "name": "mobile: required drawer copy visible: Supports claim"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: Ready means the handoff packet is complete. Memory/Canon has not changed."
+      "name": "mobile: required drawer copy visible: Limitations / ambiguity"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.114Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
+      "name": "mobile: required drawer copy visible: Provenance chain"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.115Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: Confidence indicates support strength, not truth."
+      "name": "mobile: required drawer copy visible: Related IDs"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.115Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: Promotion Audit Record"
+      "name": "mobile: required drawer copy visible: Timestamps"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.115Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: Not Applied to Memory/Canon"
+      "name": "mobile: required drawer copy visible: Source hash"
     },
     {
-      "ts": "2026-07-04T05:04:27.251Z",
+      "ts": "2026-07-04T05:04:32.115Z",
       "action": "assert_pass",
-      "name": "mobile: required copy visible: No approved Memory/Canon links."
+      "name": "mobile: required drawer copy visible: Snapshot hash"
     },
     {
-      "ts": "2026-07-04T05:04:27.255Z",
+      "ts": "2026-07-04T05:04:32.115Z",
       "action": "assert_pass",
-      "name": "mobile: no generated prose controls visible",
+      "name": "mobile: required drawer copy visible: Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete."
+    },
+    {
+      "ts": "2026-07-04T05:04:32.115Z",
+      "action": "assert_pass",
+      "name": "mobile: required drawer copy visible: Viewing evidence does not copy source text into Memory/Canon."
+    },
+    {
+      "ts": "2026-07-04T05:04:32.115Z",
+      "action": "assert_pass",
+      "name": "mobile: required drawer copy visible: Confidence indicates support strength, not truth."
+    },
+    {
+      "ts": "2026-07-04T05:04:32.115Z",
+      "action": "assert_pass",
+      "name": "mobile: required drawer copy visible: Navigation / copy"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.115Z",
+      "action": "assert_pass",
+      "name": "mobile: required drawer copy visible: Review marking"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.115Z",
+      "action": "assert_pass",
+      "name": "mobile: required drawer copy visible: Owner note"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.115Z",
+      "action": "assert_pass",
+      "name": "mobile: required drawer copy visible: Close"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.120Z",
+      "action": "assert_pass",
+      "name": "mobile: Open source record disabled fail-closed"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.128Z",
+      "action": "assert_pass",
+      "name": "mobile: source open disabled reason associated",
+      "describedBy": "omi-source-open-disabled-reason",
+      "reasonId": "omi-source-open-disabled-reason",
+      "reasonText": "Source open action unavailable"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.135Z",
+      "action": "assert_pass",
+      "name": "mobile: Evidence Drawer has no apply to Memory/Canon action",
+      "pageApplyButtons": 1,
+      "drawerApplyButtons": 0
+    },
+    {
+      "ts": "2026-07-04T05:04:32.140Z",
+      "action": "assert_pass",
+      "name": "mobile: no generated prose controls visible in drawer",
       "matchedForbiddenControls": []
     },
     {
-      "ts": "2026-07-04T05:04:27.267Z",
+      "ts": "2026-07-04T05:04:32.147Z",
       "action": "assert_pass",
-      "name": "mobile: Candidate Detail uses exactly Fields, Evidence, Readiness tabs",
-      "labels": [
-        "Fields",
-        "Evidence",
-        "Readiness"
-      ],
-      "display": "flex"
+      "name": "mobile: Evidence Drawer is full-screen sheet width",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 900
+      }
     },
     {
-      "ts": "2026-07-04T05:04:27.483Z",
+      "ts": "2026-07-04T05:04:32.149Z",
+      "action": "assert_pass",
+      "name": "mobile: top close visible"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.151Z",
+      "action": "assert_pass",
+      "name": "mobile: bottom close visible"
+    },
+    {
+      "ts": "2026-07-04T05:04:32.365Z",
       "action": "screenshot",
-      "name": "02-mobile-omi-candidate-detail",
-      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-candidate-detail-browser-evidence/screenshots/02-mobile-omi-candidate-detail.png"
+      "name": "02-mobile-omi-evidence-drawer",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/docs/roadmap/validation/omi-evidence-drawer-browser-evidence/screenshots/02-mobile-omi-evidence-drawer.png"
     }
   ],
   "safety": {

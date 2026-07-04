@@ -1345,6 +1345,153 @@ h2 {
   overflow-wrap: anywhere;
 }
 
+.omi-evidence-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(16, 24, 40, 0.32);
+}
+
+.omi-evidence-drawer {
+  display: flex;
+  width: min(520px, calc(100vw - 48px));
+  max-height: 100vh;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding: 18px;
+  color: #172033;
+  background: #ffffff;
+  border-left: 1px solid #9fb3d4;
+  box-shadow: -18px 0 50px rgba(15, 23, 42, 0.18);
+}
+
+.omi-evidence-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dfe5ef;
+}
+
+.omi-evidence-header h2 {
+  margin-top: 4px;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.omi-evidence-boundary,
+.omi-evidence-section,
+.omi-evidence-footer {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-evidence-boundary {
+  border-color: #9fb3d4;
+}
+
+.omi-evidence-boundary p,
+.omi-evidence-section p {
+  margin: 0;
+  color: #46546c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.omi-evidence-section h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.omi-evidence-source-section {
+  border-color: #8ec79c;
+  background: #f8fcfa;
+}
+
+.omi-evidence-metadata {
+  display: grid;
+  grid-template-columns: minmax(128px, 0.42fr) minmax(0, 1fr);
+  gap: 10px 12px;
+  margin: 0;
+}
+
+.omi-evidence-metadata div {
+  display: contents;
+}
+
+.omi-evidence-metadata dt {
+  color: #637089;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.omi-evidence-metadata dd {
+  max-width: 62ch;
+  margin: 0;
+  color: #2c374c;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.omi-evidence-metadata .is-prominent dt {
+  color: #234a84;
+  font-size: 12px;
+}
+
+.omi-evidence-metadata .is-prominent dd {
+  color: #101828;
+  font-weight: 700;
+}
+
+.omi-evidence-state-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omi-evidence-state-list li {
+  padding: 6px 8px;
+  color: #46546c;
+  background: #ffffff;
+  border: 1px solid #e7ecf4;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.omi-evidence-action-group {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-evidence-action-group legend {
+  padding: 0 4px;
+  color: #46546c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     flex-direction: column;
@@ -1526,6 +1673,40 @@ h2 {
 
   .omi-candidate-field-table td:nth-child(8)::before {
     content: "Field action";
+  }
+
+  .omi-evidence-overlay {
+    justify-content: stretch;
+    background: #ffffff;
+  }
+
+  .omi-evidence-drawer {
+    width: 100vw;
+    min-height: 100vh;
+    border-left: 0;
+    box-shadow: none;
+  }
+
+  .omi-evidence-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #ffffff;
+  }
+
+  .omi-evidence-header,
+  .omi-evidence-metadata {
+    grid-template-columns: 1fr;
+  }
+
+  .omi-evidence-header {
+    flex-direction: column;
+  }
+
+  .omi-evidence-header .secondary-button,
+  .omi-evidence-action-group .primary-button,
+  .omi-evidence-action-group .secondary-button {
+    width: 100%;
   }
 
   .omi-health-panel .primary-button {

@@ -1,4 +1,7 @@
 import OMICandidateFieldTable from './OMICandidateFieldTable.jsx';
+import {
+  buildCandidateEvidenceScope,
+} from './OMIEvidenceDrawer.jsx';
 import OMIPromotionReadinessChecklist, {
   getPromotionReadinessItems,
 } from './OMIPromotionReadinessChecklist.jsx';
@@ -115,10 +118,21 @@ function ReadOnlyReferences({ candidate }) {
   );
 }
 
-function EvidenceProvenance({ candidate }) {
+function EvidenceProvenance({ candidate, onOpenEvidence = () => {} }) {
   return (
     <section className="omi-candidate-panel" aria-label="Evidence and provenance summary">
-      <h2>Evidence / Provenance</h2>
+      <div className="section-heading">
+        <h2>Evidence / Provenance</h2>
+        <button
+          className="secondary-button"
+          type="button"
+          data-testid="omi-evidence-drawer-trigger"
+          aria-haspopup="dialog"
+          onClick={(event) => onOpenEvidence(buildCandidateEvidenceScope(candidate), event.currentTarget)}
+        >
+          Open evidence drawer
+        </button>
+      </div>
       <dl className="omi-candidate-metadata">
         <div>
           <dt>Evidence</dt>
@@ -201,6 +215,7 @@ export default function OMICandidateDetail({
   isLoading = false,
   error = '',
   onBackToDashboard = () => {},
+  onOpenEvidence = () => {},
 }) {
   const storedCandidates = asArray(candidates);
   const candidate = findCandidate(storedCandidates, selectedCandidateId);
@@ -342,10 +357,10 @@ export default function OMICandidateDetail({
 
       <div className="omi-candidate-detail-layout">
         <div id="omi-candidate-fields">
-          <OMICandidateFieldTable candidate={candidate} />
+          <OMICandidateFieldTable candidate={candidate} onOpenEvidence={onOpenEvidence} />
         </div>
         <aside className="omi-candidate-side-rail" id="omi-candidate-evidence">
-          <EvidenceProvenance candidate={candidate} />
+          <EvidenceProvenance candidate={candidate} onOpenEvidence={onOpenEvidence} />
           <DuplicateDependencyPanel candidate={candidate} />
           <ReadOnlyReferences candidate={candidate} />
         </aside>

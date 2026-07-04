@@ -1,3 +1,5 @@
+import { buildFieldEvidenceScope } from './OMIEvidenceDrawer.jsx';
+
 function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -37,6 +39,7 @@ function normalizeFieldRows(candidate) {
       const fieldName = firstPresent(field?.field, field?.field_name, field?.name, field?.key);
       return {
         id: firstPresent(field?.id, field?.field_id, fieldName, `field-${index + 1}`),
+        storedField: field,
         field: formatStoredValue(fieldName, 'Missing'),
         proposedValue: formatStoredValue(
           firstPresent(
@@ -78,6 +81,7 @@ function normalizeFieldRows(candidate) {
   return [
     {
       id: 'missing-field-review-row',
+      storedField: {},
       field: 'Missing',
       proposedValue: 'Missing',
       decision: 'Required field decisions unresolved',
@@ -91,7 +95,7 @@ function normalizeFieldRows(candidate) {
   ];
 }
 
-export default function OMICandidateFieldTable({ candidate }) {
+export default function OMICandidateFieldTable({ candidate, onOpenEvidence = () => {} }) {
   const rows = normalizeFieldRows(candidate);
 
   return (
@@ -136,6 +140,19 @@ export default function OMICandidateFieldTable({ candidate }) {
                   <td>{row.duplicateDependency}</td>
                   <td>{row.ownerNote}</td>
                   <td>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      data-testid="omi-field-evidence-drawer-trigger"
+                      aria-label={`Open evidence drawer for field ${row.field}`}
+                      aria-haspopup="dialog"
+                      onClick={(event) => onOpenEvidence(
+                        buildFieldEvidenceScope(candidate, row.storedField),
+                        event.currentTarget,
+                      )}
+                    >
+                      Open evidence
+                    </button>
                     <button
                       className="secondary-button"
                       type="button"

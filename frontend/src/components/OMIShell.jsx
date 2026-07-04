@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import OMIBoundaryBanner from './OMIBoundaryBanner.jsx';
 import OMICandidateCanonStatusStrip from './OMICandidateCanonStatusStrip.jsx';
 import OMICandidateDetail from './OMICandidateDetail.jsx';
 import OMIDashboard, { getOMIDashboardSummary } from './OMIDashboard.jsx';
+import OMIEvidenceDrawer from './OMIEvidenceDrawer.jsx';
 
 function getCandidateId(candidate) {
   return candidate?.candidate_id ?? candidate?.candidateId ?? candidate?.id ?? '';
@@ -18,6 +19,8 @@ export default function OMIShell({
   const summary = getOMIDashboardSummary(omiData, { isLoading, error });
   const [omiView, setOmiView] = useState('dashboard');
   const [selectedCandidateId, setSelectedCandidateId] = useState('');
+  const [selectedEvidence, setSelectedEvidence] = useState(null);
+  const evidenceOpenerRef = useRef(null);
   const candidates = useMemo(() => (
     Array.isArray(omiData?.candidates) ? omiData.candidates : []
   ), [omiData]);
@@ -35,6 +38,15 @@ export default function OMIShell({
 
   function handleBackToDashboard() {
     setOmiView('dashboard');
+  }
+
+  function handleOpenEvidence(evidence, openerElement) {
+    evidenceOpenerRef.current = openerElement ?? null;
+    setSelectedEvidence(evidence);
+  }
+
+  function handleCloseEvidence() {
+    setSelectedEvidence(null);
   }
 
   return (
@@ -76,6 +88,7 @@ export default function OMIShell({
           isLoading={isLoading}
           error={error}
           onBackToDashboard={handleBackToDashboard}
+          onOpenEvidence={handleOpenEvidence}
         />
       ) : (
         <OMIDashboard
@@ -85,6 +98,12 @@ export default function OMIShell({
           onNavigate={handleNavigate}
         />
       )}
+      <OMIEvidenceDrawer
+        evidence={selectedEvidence}
+        isOpen={Boolean(selectedEvidence)}
+        openerRef={evidenceOpenerRef}
+        onClose={handleCloseEvidence}
+      />
     </section>
   );
 }

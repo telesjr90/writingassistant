@@ -41,6 +41,7 @@ OMI_CANDIDATE_FIELD_TABLE_JSX = (
 OMI_PROMOTION_READINESS_CHECKLIST_JSX = (
     FRONTEND_SRC / "components" / "OMIPromotionReadinessChecklist.jsx"
 )
+OMI_EVIDENCE_DRAWER_JSX = FRONTEND_SRC / "components" / "OMIEvidenceDrawer.jsx"
 
 SOURCE_PATHS = (
     APP_JSX,
@@ -59,6 +60,7 @@ SOURCE_PATHS = (
     OMI_CANDIDATE_DETAIL_JSX,
     OMI_CANDIDATE_FIELD_TABLE_JSX,
     OMI_PROMOTION_READINESS_CHECKLIST_JSX,
+    OMI_EVIDENCE_DRAWER_JSX,
 )
 
 FORBIDDEN_PROSE_INTENTS = (
@@ -460,3 +462,130 @@ def test_omi_candidate_detail_no_enabled_apply_or_generated_prose_controls() -> 
     assert not [
         label for label in forbidden_control_labels if label in lowered
     ], "OMI candidate detail source must not expose generated-prose controls."
+
+
+def test_omi_evidence_drawer_stored_review_metadata_only_contract() -> None:
+    """Third OMI slice requires a contextual stored-review-metadata-only evidence drawer."""
+
+    source = combined_source(
+        (
+            OMI_SHELL_JSX,
+            OMI_CANDIDATE_DETAIL_JSX,
+            OMI_CANDIDATE_FIELD_TABLE_JSX,
+            OMI_EVIDENCE_DRAWER_JSX,
+        )
+    )
+
+    assert_markers_present(
+        source,
+        (
+            "data-testid=\"omi-evidence-drawer\"",
+            "data-testid=\"omi-evidence-drawer-trigger\"",
+            "data-testid=\"omi-field-evidence-drawer-trigger\"",
+            "Evidence scope:",
+            "Scope",
+            "Source type",
+            "Source location",
+            "Quote exactness",
+            "Confidence/support",
+            "Original wording/excerpt",
+            "Evidence summary",
+            "Supports claim",
+            "Limitations / ambiguity",
+            "Provenance chain",
+            "Related IDs",
+            "Timestamps",
+            "Source hash",
+            "Snapshot hash",
+            "Stored source metadata only",
+            "Missing",
+            "Not linked",
+            "Unavailable",
+            "Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete.",
+            "Viewing evidence does not copy source text into Memory/Canon.",
+            "Confidence indicates support strength, not truth.",
+            "Source record loading",
+            "Source record missing",
+            "Source location unsafe",
+            "Source location out of range",
+            "Source record corrupt",
+            "Source record belongs to another project",
+            "Source open action unavailable",
+            "Source open action failed closed",
+            "Source-opening failures must not create fallback summaries or inferred evidence.",
+            "role=\"dialog\"",
+            "aria-modal=\"true\"",
+            "aria-labelledby={titleId}",
+            "data-testid=\"omi-evidence-drawer-close-top\"",
+            "data-testid=\"omi-evidence-drawer-close-bottom\"",
+            "document.addEventListener('keydown', handleKeyDown)",
+            "opener.focus()",
+            "buildCandidateEvidenceScope",
+            "buildFieldEvidenceScope",
+        ),
+        "OMI-EVIDENCE-DRAWER-STORED-METADATA",
+    )
+
+
+def test_omi_evidence_drawer_disabled_reason_associations_and_footer_groups() -> None:
+    """Evidence Drawer source opening and footer controls must be associated and grouped."""
+
+    source = combined_source((OMI_EVIDENCE_DRAWER_JSX,))
+
+    assert_markers_present(
+        source,
+        (
+            "data-testid=\"omi-source-open-disabled-reason\"",
+            "aria-describedby={sourceReasonId}",
+            "aria-describedby={copyDisabled ? copyReasonId : undefined}",
+            "Navigation / copy",
+            "Copy source location",
+            "Open source record",
+            "Review marking",
+            "Mark evidence accepted for review",
+            "Mark insufficient evidence",
+            "Owner note",
+            "Add owner note",
+            "Close",
+            "Close drawer",
+            "Disabled: evidence review marking is review metadata only and is not wired in this slice.",
+            "Disabled: owner note storage is future review metadata wiring only.",
+        ),
+        "OMI-EVIDENCE-DRAWER-FOOTER-ASSOCIATIONS",
+    )
+
+
+def test_omi_evidence_drawer_no_apply_promotion_or_generated_prose_controls() -> None:
+    """Evidence Drawer must not enable apply-promotion or expose story prose controls."""
+
+    source = combined_source(
+        (
+            OMI_EVIDENCE_DRAWER_JSX,
+            OMI_CANDIDATE_DETAIL_JSX,
+            OMI_CANDIDATE_FIELD_TABLE_JSX,
+        )
+    )
+    lowered = source.lower()
+
+    assert "submitApplyPromotion" not in source
+    assert "createOMIPromotion" not in source
+    assert "updateOMICandidateDecision" not in source
+    assert "apply to memory/canon" not in read_source(OMI_EVIDENCE_DRAWER_JSX).lower()
+
+    forbidden_control_labels = (
+        "rewrite",
+        "continue",
+        "outline",
+        "draft",
+        "polish",
+        "improve",
+        "expand",
+        "imitate",
+        "generate prose",
+        "generated prose",
+        "compose",
+    )
+
+    assert not [
+        label for label in forbidden_control_labels if label in lowered
+    ], "OMI evidence drawer source must not expose generated-prose controls."
