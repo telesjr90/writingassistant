@@ -1,3 +1,11 @@
+# PHASE8-UX-004 Owner Manual Test Approval
+
+- Owner manual test result: APPROVED for the PHASE8-UX-004 OMI manual workflow repair only.
+- Approval record: `docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md`.
+- Approved expected behavior: no extraction yet; empty/manual shell warning is correct; automatic extraction is unavailable from the OMI manual screen; approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
+- This does not mark final MVP owner acceptance PASS or MVP complete.
+- Next step remains explicit owner Accepted/Blocked gate decision unless another owner-requested repair comes first.
+
 # PHASE8-UX-003-T007 Closeout and Owner Accepted/Blocked Gate Preparation
 
 - `PHASE8-UX-003-T007` is complete/PARTIAL for docs/status/governance closeout and owner gate preparation.
