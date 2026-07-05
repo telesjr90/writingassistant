@@ -1,12 +1,12 @@
 {
   "task_id": "PHASE8-UX-003",
   "title": "Owner Acceptance Harness Route/Workflow Evidence Follow-up",
-  "status": "active",
-  "task_type": "UX follow-up parent with T006 owner harness rerun and manual classification",
+  "status": "complete/PARTIAL",
+  "task_type": "UX follow-up parent closed through T007 owner gate preparation",
   "parent_title": "PHASE8-UX-003 - Owner Acceptance Harness Route/Workflow Evidence Follow-up",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-003/",
-  "purpose": "Track the separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, including T006 owner acceptance harness rerun and remaining manual item classification without reopening PHASE8-UX-002 and without adding product UI by default.",
+  "purpose": "Track the separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, closed through T007 owner Accepted/Blocked gate preparation without reopening PHASE8-UX-002 and without adding product UI by default.",
   "current_evidence_summary": [
     "PHASE8-UX-002-T007 is complete/PARTIAL.",
     "Owner acceptance harness exited 0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
@@ -28,8 +28,11 @@
     "Cyber no-prose refusal/fail-closed evidence is covered for rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose without unsafe prompt submission.",
     "A-category blockers remain manual review only.",
     "No PHASE8-UX-003 B/C route category remains NOT_EXPOSED after T006 classification.",
-    "No follow-up implementation is needed before PHASE8-UX-003-T007.",
-    "PHASE8-UX-003-T007 is next for closeout and owner Accepted/Blocked gate preparation.",
+    "No follow-up implementation is needed before owner gate review.",
+    "PHASE8-UX-003-T007 is complete/PARTIAL for closeout and owner Accepted/Blocked gate preparation.",
+    "PHASE8-UX-003 is complete/PARTIAL as the owner acceptance harness route/workflow evidence follow-up.",
+    "No active child remains under PHASE8-UX-003 after T007.",
+    "The next step is explicit owner Accepted/Blocked decision.",
     "Owner acceptance remains pending.",
     "MVP is not complete."
   ],
@@ -105,10 +108,11 @@
     "final explicit owner Accepted/Blocked decision"
   ],
   "expected_outputs": [
-    "docs/roadmap/decisions/PHASE8-UX-003-T006-owner-acceptance-remaining-manual-classification.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T007-closeout-owner-gate-preparation.md",
     "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
-    "roadmap/status/governance updates recording PHASE8-UX-003-T006 complete/PASS for owner harness rerun and manual classification",
-    "PHASE8-UX-003-T007 recorded as the next planned child",
+    "roadmap/status/governance updates recording PHASE8-UX-003-T007 complete/PARTIAL and PHASE8-UX-003 parent complete/PARTIAL",
+    "no active child under PHASE8-UX-003 after T007",
+    "next step recorded as explicit owner Accepted/Blocked decision",
     "owner acceptance pending and MVP not complete recorded"
   ],
   "allowed_files": [
@@ -116,6 +120,7 @@
     "docs/roadmap/inventory/PHASE8-UX-003.md",
     "docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md",
     "docs/roadmap/decisions/PHASE8-UX-003-T006-owner-acceptance-remaining-manual-classification.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T007-closeout-owner-gate-preparation.md",
     "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/roadmap_index.yaml",
@@ -155,6 +160,8 @@
   ],
   "references": [
     "docs/roadmap/decisions/PHASE8-UX-002-T007-owner-acceptance-gate-decision.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T006-owner-acceptance-remaining-manual-classification.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T007-closeout-owner-gate-preparation.md",
     "docs/roadmap/validation/latest_roadmap_validation.md",
     "artifacts/mvp-readiness/owner-acceptance/evidence-report.md",
     "artifacts/mvp-readiness/owner-acceptance/workflow-log.json",
@@ -205,13 +212,23 @@
     {
       "task_id": "PHASE8-UX-003-T007",
       "title": "Closeout and owner Accepted/Blocked gate preparation",
-      "status": "planned",
+      "status": "complete/PARTIAL",
       "scope": "docs/status/governance only; do not mark owner acceptance PASS"
     }
   ],
-  "latest_child_task": "PHASE8-UX-003-T006",
-  "latest_child_status": "complete/PASS",
-  "next_child_task": "PHASE8-UX-003-T007",
+  "latest_child_task": "PHASE8-UX-003-T007",
+  "latest_child_status": "complete/PARTIAL",
+  "next_child_task": null,
+  "next_roadmap_step": "explicit owner Accepted/Blocked decision",
+  "parent_closeout_status": "complete/PARTIAL",
+  "owner_gate_package": [
+    "artifacts/mvp-readiness/owner-acceptance/evidence-report.md",
+    "artifacts/mvp-readiness/owner-acceptance/checklist-results.json",
+    "artifacts/mvp-readiness/owner-acceptance/workflow-log.json",
+    "docs/roadmap/decisions/PHASE8-UX-003-T006-owner-acceptance-remaining-manual-classification.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T007-closeout-owner-gate-preparation.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md"
+  ],
   "owner_acceptance_status": "pending",
   "mvp_completion_status": "not_complete"
 }
