@@ -1,3 +1,13 @@
+# PHASE8-UX-003-T006 Owner Acceptance Harness Rerun and Remaining Manual Classification
+
+- `PHASE8-UX-003-T006` is complete/PASS for validation/classification.
+- B route marker is PASS.
+- Non-Cyber C route marker is PASS.
+- Cyber C route marker remains `MANUAL_REVIEW_REQUIRED`: selected-source owner-authored source import/select is covered and no-prose refusal/fail-closed evidence is covered, but Story Check output was unavailable/fail-closed and no diagnostic model output was claimed.
+- A-category blockers remain manual owner review only.
+- `PHASE8-UX-003-T007` is next for closeout and owner Accepted/Blocked gate preparation.
+- Owner acceptance remains pending; MVP is not complete.
+
 # PHASE8-UX-003-T005 Cyber Fixture Route Evidence
 
 - `PHASE8-UX-003-T005` is complete/PARTIAL for Cyber selected-source Story Check and no-prose evidence routing.

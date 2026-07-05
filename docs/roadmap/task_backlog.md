@@ -1,3 +1,16 @@
+# PHASE8-UX-003-T006 Owner Acceptance Harness Rerun and Remaining Manual Classification
+
+- `PHASE8-UX-003-T006` is complete/PASS.
+- Owner acceptance harness rerun exited `0` with final automated decision `MANUAL_REVIEW_REQUIRED`.
+- `PHASE8-UX-003-B` is PASS.
+- `PHASE8-UX-003-C-NON-CYBER` is PASS.
+- `PHASE8-UX-003-C-CYBER` remains `MANUAL_REVIEW_REQUIRED`: selected-source import/select and no-prose refusal/fail-closed evidence are covered, but selected-source Story Check diagnostic output was unavailable/fail-closed on missing `storyform.json`.
+- A-category blockers and final owner Accepted/Blocked decision remain manual owner review only.
+- No PHASE8-UX-003 B/C route category remains `NOT_EXPOSED`.
+- No follow-up implementation is needed before `PHASE8-UX-003-T007`.
+- Next child: `PHASE8-UX-003-T007` closeout and owner Accepted/Blocked gate preparation.
+- Owner acceptance remains pending. MVP is not complete.
+
 # PHASE8-UX-003-T005 Cyber Selected-Source / No-Prose Evidence Routing
 
 - `PHASE8-UX-003-T005` is complete/PARTIAL.

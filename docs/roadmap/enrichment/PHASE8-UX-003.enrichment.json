@@ -2,11 +2,11 @@
   "task_id": "PHASE8-UX-003",
   "title": "Owner Acceptance Harness Route/Workflow Evidence Follow-up",
   "status": "active",
-  "task_type": "UX follow-up parent with T005 Cyber route evidence partial",
+  "task_type": "UX follow-up parent with T006 owner harness rerun and manual classification",
   "parent_title": "PHASE8-UX-003 - Owner Acceptance Harness Route/Workflow Evidence Follow-up",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-UX-003/",
-  "purpose": "Track the separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, including T005 Cyber selected-source and no-prose route evidence without reopening PHASE8-UX-002 and without adding product UI by default.",
+  "purpose": "Track the separate follow-up parent for owner acceptance harness route/workflow evidence coverage after PHASE8-UX-002-T007, including T006 owner acceptance harness rerun and remaining manual item classification without reopening PHASE8-UX-002 and without adding product UI by default.",
   "current_evidence_summary": [
     "PHASE8-UX-002-T007 is complete/PARTIAL.",
     "Owner acceptance harness exited 0 but final automated decision remains MANUAL_REVIEW_REQUIRED.",
@@ -17,15 +17,19 @@
     "PHASE8-UX-003-T003 is complete/PASS as tests-first expected-red coverage only through tests/test_phase8_ux003_owner_harness_expected_red.py.",
     "PHASE8-UX-003-T004 is complete/PASS for B and non-Cyber C owner harness route wiring.",
     "PHASE8-UX-003-T005 is complete/PARTIAL for Cyber selected-source Story Check and no-prose evidence routing.",
-    "T005 focused coverage .venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q returned 6 passed in 0.04s.",
-    "T005 owner harness source coverage .venv-unsloth-clean/bin/python -m pytest tests/test_mvp_owner_acceptance_browser_smoke_source.py -q returned 24 passed in 0.16s.",
-    "T005 owner acceptance harness node scripts/mvp-owner-acceptance-browser-smoke.mjs exited 0 with final automated decision MANUAL_REVIEW_REQUIRED.",
+    "PHASE8-UX-003-T006 is complete/PASS for owner acceptance harness rerun and remaining manual item classification.",
+    "T006 focused coverage .venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux003_owner_harness_expected_red.py -q returned 6 passed in 0.04s.",
+    "T006 owner harness source coverage .venv-unsloth-clean/bin/python -m pytest tests/test_mvp_owner_acceptance_browser_smoke_source.py -q returned 24 passed in 0.11s.",
+    "T006 owner acceptance harness node scripts/mvp-owner-acceptance-browser-smoke.mjs exited 0 with final automated decision MANUAL_REVIEW_REQUIRED.",
     "PHASE8-UX-003-B is PASS and wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence.",
     "PHASE8-UX-003-C-NON-CYBER is PASS and wired to existing Notes/Materials save/reload proof and analysis-runtime label/status evidence.",
-    "PHASE8-UX-003-C-CYBER remains MANUAL_REVIEW_REQUIRED after T005 because selected-source Story Check reached the safe route but model-backed diagnostic output was unavailable/fail-closed on missing storyform.json.",
+    "PHASE8-UX-003-C-CYBER remains MANUAL_REVIEW_REQUIRED after T006 because selected-source Story Check reached the safe route but model-backed diagnostic output was unavailable/fail-closed on missing storyform.json.",
     "Cyber selected-source owner-authored source import/select evidence is covered through existing UI.",
     "Cyber no-prose refusal/fail-closed evidence is covered for rewrite, continue, outline, draft, polish, improve, expand, imitate, and generate prose without unsafe prompt submission.",
     "A-category blockers remain manual review only.",
+    "No PHASE8-UX-003 B/C route category remains NOT_EXPOSED after T006 classification.",
+    "No follow-up implementation is needed before PHASE8-UX-003-T007.",
+    "PHASE8-UX-003-T007 is next for closeout and owner Accepted/Blocked gate preparation.",
     "Owner acceptance remains pending.",
     "MVP is not complete."
   ],
@@ -101,16 +105,17 @@
     "final explicit owner Accepted/Blocked decision"
   ],
   "expected_outputs": [
-    "docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T006-owner-acceptance-remaining-manual-classification.md",
     "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
-    "roadmap/status/governance updates recording PHASE8-UX-003-T005 complete/PARTIAL for Cyber route evidence",
-    "PHASE8-UX-003-T006 recorded as the next planned child",
+    "roadmap/status/governance updates recording PHASE8-UX-003-T006 complete/PASS for owner harness rerun and manual classification",
+    "PHASE8-UX-003-T007 recorded as the next planned child",
     "owner acceptance pending and MVP not complete recorded"
   ],
   "allowed_files": [
     "docs/roadmap/tasks/PHASE8-UX-003.md",
     "docs/roadmap/inventory/PHASE8-UX-003.md",
     "docs/roadmap/decisions/PHASE8-UX-003-harness-route-workflow-mapping-decision.md",
+    "docs/roadmap/decisions/PHASE8-UX-003-T006-owner-acceptance-remaining-manual-classification.md",
     "docs/roadmap/enrichment/PHASE8-UX-003.enrichment.json",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/roadmap_index.yaml",
@@ -194,7 +199,7 @@
     {
       "task_id": "PHASE8-UX-003-T006",
       "title": "Rerun owner acceptance harness and classify remaining manual items",
-      "status": "planned",
+      "status": "complete/PASS",
       "scope": "validation/evidence only"
     },
     {
@@ -204,9 +209,9 @@
       "scope": "docs/status/governance only; do not mark owner acceptance PASS"
     }
   ],
-  "latest_child_task": "PHASE8-UX-003-T005",
-  "latest_child_status": "complete/PARTIAL",
-  "next_child_task": "PHASE8-UX-003-T006",
+  "latest_child_task": "PHASE8-UX-003-T006",
+  "latest_child_status": "complete/PASS",
+  "next_child_task": "PHASE8-UX-003-T007",
   "owner_acceptance_status": "pending",
   "mvp_completion_status": "not_complete"
 }

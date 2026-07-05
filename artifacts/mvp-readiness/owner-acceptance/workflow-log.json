@@ -1,7 +1,7 @@
 {
   "task": "MVP-READINESS-OWNER-ACCEPTANCE-005",
-  "startedAt": "2026-07-04T22:28:24.728Z",
-  "finishedAt": "2026-07-04T22:28:25.949Z",
+  "startedAt": "2026-07-04T23:35:01.303Z",
+  "finishedAt": "2026-07-04T23:35:16.497Z",
   "appBaseUrl": "http://localhost:5173",
   "backendBaseUrl": "http://localhost:8000",
   "fixture": {
@@ -56,14 +56,14 @@
     }
   ],
   "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance",
-  "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783204105804",
-  "uniqueProjectId": "",
-  "finalDecision": "BLOCKED",
-  "exitCode": 2,
+  "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783208102825",
+  "uniqueProjectId": "cyber-detective-mvp-acceptance-1783208102825",
+  "finalDecision": "MANUAL_REVIEW_REQUIRED",
+  "exitCode": 0,
   "phase8Ux003OwnerHarnessRouteCoverage": {
     "b": {
       "marker": "PHASE8-UX-003-B",
-      "status": "MANUAL_REVIEW_REQUIRED",
+      "status": "PASS",
       "blockers": [
         "candidate_review_candidate_first_visible",
         "candidate_review_queue_not_approval",
@@ -88,11 +88,43 @@
         "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
         "owner_harness_assertion:apply_promotion_not_executed"
       ],
-      "notes": []
+      "notes": [
+        "B-category evidence is wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence."
+      ],
+      "evidence": {
+        "owner_harness_route:evidence:omi_dashboard": {
+          "marker": "owner_harness_route:evidence:omi_dashboard",
+          "reportPath": "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+          "status": "PASS",
+          "hasPassEvidence": true,
+          "bytesRead": 2898
+        },
+        "owner_harness_route:evidence:omi_candidate_detail": {
+          "marker": "owner_harness_route:evidence:omi_candidate_detail",
+          "reportPath": "docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+          "status": "PASS",
+          "hasPassEvidence": true,
+          "bytesRead": 3937
+        },
+        "owner_harness_route:evidence:omi_evidence_drawer": {
+          "marker": "owner_harness_route:evidence:omi_evidence_drawer",
+          "reportPath": "docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
+          "status": "PASS",
+          "hasPassEvidence": true,
+          "bytesRead": 5443
+        },
+        "owner_harness_route:evidence:omi_apply_promotion_confirmation": {
+          "marker": "owner_harness_route:evidence:omi_apply_promotion_confirmation",
+          "reportPath": "docs/roadmap/validation/omi_apply_promotion_browser_evidence.md",
+          "status": "PASS",
+          "hasPassEvidence": true,
+          "bytesRead": 6341
+        }
+      }
     },
     "cNonCyber": {
       "marker": "PHASE8-UX-003-C-NON-CYBER",
-      "status": "MANUAL_REVIEW_REQUIRED",
+      "status": "PASS",
       "blockers": [
         "manual_workspace_notes_project_scoped",
         "manual_workspace_materials_project_scoped",
@@ -110,7 +142,26 @@
         "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
         "owner_harness_assertion:apply_promotion_not_executed"
       ],
-      "notes": []
+      "notes": [
+        "Non-Cyber C-category evidence is wired to existing Notes/Materials save/reload proof and analysis-runtime label/status evidence."
+      ],
+      "evidence": {
+        "owner_harness_route_notes_project_scoped_save_reload": {
+          "marker": "owner_harness_route:notes_project_scoped_save_reload",
+          "status": "PASS",
+          "source": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A"
+        },
+        "owner_harness_route_materials_project_scoped_save_reload": {
+          "marker": "owner_harness_route:materials_project_scoped_save_reload",
+          "status": "PASS",
+          "source": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A"
+        },
+        "owner_harness_route_analysis_runtime_label_status": {
+          "marker": "owner_harness_route:analysis_runtime_label_status",
+          "status": "PASS",
+          "source": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006B"
+        }
+      }
     },
     "cCyber": {
       "marker": "PHASE8-UX-003-C-CYBER",
@@ -130,13 +181,91 @@
         "owner_harness_assertion:apply_promotion_not_executed"
       ],
       "notes": [
-        "Cyber selected-source Story Check and Cyber no-prose evidence are evaluated by PHASE8-UX-003-T005."
-      ]
+        "PHASE8-UX-003-T005 attempted Cyber selected-source Story Check and no-prose refusal/fail-closed evidence through existing owner-authored source UI.",
+        "Cyber C remains MANUAL_REVIEW_REQUIRED unless both Cyber selected-source Story Check route evidence and Cyber no-prose evidence are PASS."
+      ],
+      "evidence": {
+        "owner_harness_route_cyber_owner_authored_source_select": {
+          "marker": "owner_harness_route:cyber_owner_authored_source_select",
+          "status": "PASS",
+          "reason": "Existing owner-authored source UI imported and selected the Cyber fixture as the project-scoped Story Check source.",
+          "fixtureId": "cyber-detective",
+          "projectId": "cyber-detective-mvp-acceptance-1783208102825",
+          "sourceWorkflow": "safe_owner_authored_scene_selected",
+          "scenesNavText": "No scenes yet.",
+          "selectedSceneId": "cyber detective story check source",
+          "selectedSceneContainsFixture": true,
+          "storyCheckButtonVisible": true,
+          "storyCheckButtonEnabled": true,
+          "missingSurface": "",
+          "importedSourceId": "cyber-detective-story-check-source",
+          "selectedSourcePanelText": "Project-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.",
+          "didUseExistingOwnerAuthoredSourceUi": true,
+          "didGenerateStoryProseFromFixture": false,
+          "didMutateMemoryCanon": false,
+          "didRunApplyPromotion": false
+        },
+        "owner_harness_route_cyber_selected_source_story_check": {
+          "marker": "owner_harness_route:cyber_selected_source_story_check",
+          "status": "MANUAL_REVIEW_REQUIRED",
+          "reason": "Selected-source Story Check route was reached, but model-backed diagnostic output was unavailable and the UI recorded a fail-closed/manual-review error.",
+          "fixtureId": "cyber-detective",
+          "sourceDiagnostics": {
+            "fixtureId": "cyber-detective",
+            "projectId": "cyber-detective-mvp-acceptance-1783208102825",
+            "sourceWorkflow": "safe_owner_authored_scene_selected",
+            "scenesNavText": "No scenes yet.",
+            "selectedSceneId": "cyber detective story check source",
+            "selectedSceneContainsFixture": true,
+            "storyCheckButtonVisible": true,
+            "storyCheckButtonEnabled": true,
+            "missingSurface": "",
+            "importedSourceId": "cyber-detective-story-check-source",
+            "selectedSourcePanelText": "Project-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.",
+            "didUseExistingOwnerAuthoredSourceUi": true
+          },
+          "resultTextSnippet": "ANALYSIS\n\nStory Check\nProject-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.\n\nDiagnostic Result Boundary\n\nStory Check returns a diagnostic-only analysis-only result. model output is not canon, confidence is not truth, and output cannot become approved memory automatically.\n\nStory Check Error\n\n[Errno 2] No such file or directory: '/home/tjrpirateking/projects/WritingAssistantApplication/projects/cyber-detective-mvp-acceptance-1783208102825/storyform.json'\n\nStory Check is candidate analysis. It does not change project truth. The analysis-only result is diagnostic-only: model output is not canon, confidence is not truth, and output cannot become approved memory automatically.\n\nCoherence Score\nUnavailable\nWarnings\n\nNo warnings returned.\n\nDiagnostic Suggestions\n\nNo diagnostic suggestions returned.\n\nThroughline Alignment\n\nCandidate diagnostic. Evidence shown only when present.\n\nThroughline details were not returned.\n\nTheme Drift\n\nNo diagnostic status returned.\n\nCharacter Consistency\n\nNo diagnostic status returned.\n\nInsufficient Evidence\n\nNo insufficient-evidence notes returned.\n\nRaw JSON\nRaw Artifact Evidence\n\nruntime extraction unavailable.\n\nStatus\nread-only raw artifact evidence\nBoundary\nraw artifacts are support data only\nCanon\nraw artifacts are not canon\nMutation\nraw artifact inspec",
+          "forbiddenOutput": false,
+          "storyCheckError": true,
+          "analysisOnly": true,
+          "outputNotCanon": true,
+          "didGenerateStoryProseFromFixture": false,
+          "didMutateMemoryCanon": false,
+          "didRunApplyPromotion": false,
+          "didTreatOutputAsCanon": false
+        },
+        "owner_harness_route_cyber_no_prose_refusal_fail_closed": {
+          "marker": "owner_harness_route:cyber_no_prose_refusal_fail_closed",
+          "status": "PASS",
+          "reason": "Existing no-prose refusal/fail-closed UI covers all forbidden Cyber fixture prose intents without an arbitrary prompt route.",
+          "fixtureId": "cyber-detective",
+          "sourceWorkflow": "safe_owner_authored_scene_selected",
+          "hasSafeNoProseInput": false,
+          "noProseRefusalsCovered": true,
+          "noProsePanelTextSnippet": "No-Prose Boundary\n\nThis is an analysis-only no-prose boundary: no generated story prose.\n\narbitrary prompt route is unavailable.\n\nanalysis-only no-prose boundary\nforbidden intent: rewrite; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: continue; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: outline; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: draft; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: polish; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: improve; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: expand; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: imitate; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: generate prose; no generated story prose.",
+          "attemptedThrough": "browser UI refusal panel inspection only; no unsafe prompt submitted",
+          "forbiddenIntents": [
+            "rewrite",
+            "continue",
+            "outline",
+            "draft",
+            "polish",
+            "improve",
+            "imitate",
+            "expand",
+            "generate prose"
+          ],
+          "didSubmitUnsafePrompt": false,
+          "didGenerateStoryProseFromFixture": false,
+          "didMutateMemoryCanon": false,
+          "didRunApplyPromotion": false
+        }
+      }
     }
   },
-  "toolingBlocked": true,
-  "startupBlocked": true,
-  "appBlockerFound": true,
+  "toolingBlocked": false,
+  "startupBlocked": false,
+  "appBlockerFound": false,
   "ollamaHealth": {
     "version": {
       "ok": true,
@@ -275,18 +404,18 @@
   },
   "actions": [
     {
-      "ts": "2026-07-04T22:28:24.734Z",
+      "ts": "2026-07-04T23:35:01.304Z",
       "action": "section_start",
       "section": "Startup Requirements"
     },
     {
-      "ts": "2026-07-04T22:28:24.740Z",
+      "ts": "2026-07-04T23:35:01.311Z",
       "action": "ensure_evidence_dirs",
       "evidenceDir": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance",
       "screenshotDir": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots"
     },
     {
-      "ts": "2026-07-04T22:28:24.741Z",
+      "ts": "2026-07-04T23:35:01.311Z",
       "action": "fixture_selected",
       "fixtureId": "cyber-detective",
       "fixtureTitle": "Cyber detective",
@@ -315,28 +444,28 @@
       "didGenerateStoryProseFromFixture": false
     },
     {
-      "ts": "2026-07-04T22:28:24.798Z",
+      "ts": "2026-07-04T23:35:01.361Z",
       "action": "checklist_item",
       "id": "startup_backend_running",
-      "status": "BLOCKED",
-      "note": "Backend safe endpoint was not reachable."
+      "status": "PASS",
+      "note": "Backend reachable through safe /api/projects endpoint."
     },
     {
-      "ts": "2026-07-04T22:28:24.798Z",
+      "ts": "2026-07-04T23:35:01.362Z",
       "action": "checklist_item",
       "id": "startup_project_isolation_script_available",
       "status": "PASS",
       "note": "Existing project isolation browser smoke script exists."
     },
     {
-      "ts": "2026-07-04T22:28:24.798Z",
+      "ts": "2026-07-04T23:35:01.362Z",
       "action": "checklist_item",
       "id": "startup_owner_understands_analysis_boundaries",
       "status": "MANUAL_REVIEW_REQUIRED",
       "note": "Owner understanding remains a manual review item."
     },
     {
-      "ts": "2026-07-04T22:28:24.803Z",
+      "ts": "2026-07-04T23:35:01.367Z",
       "action": "ollama_health_candidate",
       "source": "localhost",
       "baseUrl": "http://localhost:11434",
@@ -348,7 +477,7 @@
       "errorSummary": "fetch failed | fetch failed"
     },
     {
-      "ts": "2026-07-04T22:28:24.827Z",
+      "ts": "2026-07-04T23:35:01.377Z",
       "action": "ollama_health_candidate",
       "source": "WSL Windows-host fallback",
       "baseUrl": "http://172.25.144.1:11434",
@@ -360,7 +489,7 @@
       "errorSummary": ""
     },
     {
-      "ts": "2026-07-04T22:28:24.828Z",
+      "ts": "2026-07-04T23:35:01.377Z",
       "action": "ollama_health",
       "ok": true,
       "selectedBaseUrl": "http://172.25.144.1:11434",
@@ -390,55 +519,61 @@
       "error": "http://localhost:11434: fetch failed | fetch failed"
     },
     {
-      "ts": "2026-07-04T22:28:24.828Z",
+      "ts": "2026-07-04T23:35:01.377Z",
       "action": "checklist_item",
       "id": "startup_ollama_reachable",
       "status": "PASS",
       "note": "Ollama /api/version and /api/tags are reachable."
     },
     {
-      "ts": "2026-07-04T22:28:24.828Z",
+      "ts": "2026-07-04T23:35:01.377Z",
       "action": "checklist_item",
       "id": "startup_ollama_unreachable",
       "status": "PASS",
       "note": "No Ollama unreachable blocker recorded."
     },
     {
-      "ts": "2026-07-04T22:28:25.285Z",
+      "ts": "2026-07-04T23:35:01.695Z",
       "action": "playwright_import_ok",
       "modulePath": "/home/tjrpirateking/projects/WritingAssistantApplication/frontend/node_modules/@playwright/test/index.js"
     },
     {
-      "ts": "2026-07-04T22:28:25.787Z",
+      "ts": "2026-07-04T23:35:01.804Z",
       "action": "navigate_frontend",
       "url": "http://localhost:5173"
     },
     {
-      "ts": "2026-07-04T22:28:25.803Z",
-      "action": "checklist_item",
-      "id": "startup_frontend_running",
-      "status": "BLOCKED",
-      "note": "Frontend was not reachable or app shell did not render."
+      "ts": "2026-07-04T23:35:02.824Z",
+      "action": "screenshot",
+      "stepName": "01-startup-frontend",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/01-startup-frontend.png"
     },
     {
-      "ts": "2026-07-04T22:28:25.804Z",
+      "ts": "2026-07-04T23:35:02.824Z",
+      "action": "checklist_item",
+      "id": "startup_frontend_running",
+      "status": "PASS",
+      "note": "Frontend reached and app shell rendered."
+    },
+    {
+      "ts": "2026-07-04T23:35:02.825Z",
       "action": "section_start",
       "section": "Project Isolation"
     },
     {
-      "ts": "2026-07-04T22:28:25.804Z",
+      "ts": "2026-07-04T23:35:02.825Z",
       "action": "checklist_item",
       "id": "project_isolation_playwright_evidence_reviewed",
       "status": "MANUAL_REVIEW_REQUIRED",
       "note": "Prior project isolation evidence review remains a manual review item."
     },
     {
-      "ts": "2026-07-04T22:28:25.804Z",
+      "ts": "2026-07-04T23:35:02.825Z",
       "action": "cyber_fixture_create_project_begin",
       "fixtureId": "cyber-detective",
       "fixtureTitle": "Cyber detective",
       "fixtureSlug": "cyber-detective",
-      "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783204105804",
+      "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783208102825",
       "contentLength": 1165,
       "ownerAuthored": true,
       "allowedIntent": "analysis/diagnostic only",
@@ -456,9 +591,1206 @@
       "didGenerateStoryProseFromFixture": false
     },
     {
-      "ts": "2026-07-04T22:28:25.903Z",
-      "action": "unhandled_error",
-      "error": "Error: Unable to fill any candidate: OMI-guided project title, Project title, Owner project title\n    at fillFirstMatching (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:595:9)\n    at async createUniqueProjectThroughUi (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:989:3)\n    at async runProjectIsolationChecks (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:1238:19)\n    at async main (file:///home/tjrpirateking/projects/WritingAssistantApplication/scripts/mvp-owner-acceptance-browser-smoke.mjs:2256:7)"
+      "ts": "2026-07-04T23:35:02.842Z",
+      "action": "fill_first_matching",
+      "candidate": "OMI-guided project title",
+      "strategy": "label",
+      "length": 44
+    },
+    {
+      "ts": "2026-07-04T23:35:02.860Z",
+      "action": "fill_first_matching",
+      "candidate": "Owner-authored setup idea",
+      "strategy": "label",
+      "length": 1165
+    },
+    {
+      "ts": "2026-07-04T23:35:02.871Z",
+      "action": "fill_first_matching",
+      "candidate": "Owner-authored setup notes",
+      "strategy": "label",
+      "length": 93
+    },
+    {
+      "ts": "2026-07-04T23:35:02.877Z",
+      "action": "get_scoped_text",
+      "scopeName": "omi-guided-project-setup",
+      "selector": "section[aria-label=\"OMI-guided project setup\"]",
+      "length": 333
+    },
+    {
+      "ts": "2026-07-04T23:35:02.877Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_omi_candidates_not_approved_memory",
+      "status": "PASS",
+      "note": "Setup candidate/planning labels are visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:02.877Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_omi_candidate_planning_only",
+      "status": "PASS",
+      "note": "Cyber detective setup is visibly labeled candidate/planning only."
+    },
+    {
+      "ts": "2026-07-04T23:35:02.923Z",
+      "action": "click_by_text",
+      "candidate": "Review before creating project",
+      "strategy": "button-exact"
+    },
+    {
+      "ts": "2026-07-04T23:35:02.923Z",
+      "action": "cyber_fixture_review_before_create",
+      "fixtureId": "cyber-detective",
+      "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783208102825",
+      "contentLength": 1165
+    },
+    {
+      "ts": "2026-07-04T23:35:03.091Z",
+      "action": "screenshot",
+      "stepName": "02-cyber-fixture-review-before-create",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/02-cyber-fixture-review-before-create.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:03.097Z",
+      "action": "get_scoped_text",
+      "scopeName": "cyber-fixture-review-setup-draft",
+      "selector": "form[aria-label=\"Review setup draft\"]",
+      "length": 1566
+    },
+    {
+      "ts": "2026-07-04T23:35:03.097Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_owner_source_visible_on_review",
+      "status": "PASS",
+      "note": "Cyber detective owner-authored source is visible in review as setup/candidate planning data."
+    },
+    {
+      "ts": "2026-07-04T23:35:03.133Z",
+      "action": "owner_action_test_fixture_confirmation_checked"
+    },
+    {
+      "ts": "2026-07-04T23:35:03.233Z",
+      "action": "click_by_text",
+      "candidate": "Create project",
+      "strategy": "button-exact"
+    },
+    {
+      "ts": "2026-07-04T23:35:04.240Z",
+      "action": "cyber_fixture_after_project_creation",
+      "fixtureId": "cyber-detective",
+      "uniqueProjectTitle": "Cyber detective MVP Acceptance 1783208102825"
+    },
+    {
+      "ts": "2026-07-04T23:35:04.380Z",
+      "action": "screenshot",
+      "stepName": "03-cyber-fixture-after-project-creation",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/03-cyber-fixture-after-project-creation.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:04.392Z",
+      "action": "active_project_snapshot",
+      "headerTitle": "Cyber detective MVP Acceptance 1783208102825",
+      "selectValue": "cyber-detective-mvp-acceptance-1783208102825",
+      "selectedOptionText": "Cyber detective MVP Acceptance 1783208102825 (cyber-detective-mvp-acceptance-1783208102825)",
+      "overviewProjectId": "cyber-detective-mvp-acceptance-1783208102825"
+    },
+    {
+      "ts": "2026-07-04T23:35:04.392Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_create_project",
+      "status": "PASS",
+      "note": "Created project through owner-confirmed UI fixture."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.392Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_project_created",
+      "status": "PASS",
+      "note": "Cyber detective fixture project was created through the browser UI."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.392Z",
+      "action": "checklist_item",
+      "id": "project_isolation_new_project_activated",
+      "status": "PASS",
+      "note": "Header, selector, and Overview reflect the created project."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.392Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_active_project_scoped",
+      "status": "PASS",
+      "note": "Cyber detective header, selector, and Overview reflect only the created project."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.392Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_overview_active_only",
+      "status": "PASS",
+      "note": "Overview reflects the active project."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.527Z",
+      "action": "screenshot",
+      "stepName": "04-project-overview",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/04-project-overview.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:04.532Z",
+      "action": "get_scoped_text",
+      "scopeName": "scoped-scenes-nav",
+      "selector": "nav[aria-label=\"Scenes\"]",
+      "length": 14
+    },
+    {
+      "ts": "2026-07-04T23:35:04.532Z",
+      "action": "checklist_item",
+      "id": "project_isolation_scenes_no_leakage",
+      "status": "PASS",
+      "note": "Scoped Scenes nav has no example, scene_001, or unrelated leakage."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.532Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_scenes_empty_new_project",
+      "status": "PASS",
+      "note": "Scenes show empty/new project behavior."
+    },
+    {
+      "ts": "2026-07-04T23:35:04.579Z",
+      "action": "click_by_text",
+      "candidate": "Memory / Canon",
+      "strategy": "button-regex"
+    },
+    {
+      "ts": "2026-07-04T23:35:05.293Z",
+      "action": "screenshot",
+      "stepName": "05-memory-canon",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/05-memory-canon.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:05.304Z",
+      "action": "get_scoped_text",
+      "scopeName": "scoped-memory-canon-shell",
+      "selector": "section.memory-canon-shell",
+      "length": 3233
+    },
+    {
+      "ts": "2026-07-04T23:35:05.304Z",
+      "action": "checklist_item",
+      "id": "project_isolation_memory_canon_no_leakage",
+      "status": "PASS",
+      "note": "Scoped Memory/Canon shell has no unrelated leakage."
+    },
+    {
+      "ts": "2026-07-04T23:35:05.304Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_memory_canon_approved_only",
+      "status": "PASS",
+      "note": "Memory/Canon approved-only boundary copy is visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:05.305Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_memory_canon_not_mutated",
+      "status": "PASS",
+      "note": "Cyber detective owner-authored fixture content is not displayed as approved Memory/Canon."
+    },
+    {
+      "ts": "2026-07-04T23:35:05.305Z",
+      "action": "checklist_item",
+      "id": "project_isolation_script_records_pass",
+      "status": "PASS",
+      "note": "Equivalent project isolation smoke path records PASS."
+    },
+    {
+      "ts": "2026-07-04T23:35:05.305Z",
+      "action": "checklist_item",
+      "id": "project_isolation_script_exit_zero",
+      "status": "PASS",
+      "note": "Equivalent SCRIPT_EXIT=0."
+    },
+    {
+      "ts": "2026-07-04T23:35:05.305Z",
+      "action": "checklist_item",
+      "id": "project_isolation_no_blockers",
+      "status": "PASS",
+      "note": "No project isolation blockers recorded."
+    },
+    {
+      "ts": "2026-07-04T23:35:05.305Z",
+      "action": "section_start",
+      "section": "Manual Workspace Checks"
+    },
+    {
+      "ts": "2026-07-04T23:35:06.773Z",
+      "action": "active_project_snapshot",
+      "headerTitle": "Cyber detective MVP Acceptance 1783208102825",
+      "selectValue": "cyber-detective-mvp-acceptance-1783208102825",
+      "selectedOptionText": "Cyber detective MVP Acceptance 1783208102825 (cyber-detective-mvp-acceptance-1783208102825)",
+      "overviewProjectId": "cyber-detective-mvp-acceptance-1783208102825"
+    },
+    {
+      "ts": "2026-07-04T23:35:06.773Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_select_existing_project",
+      "status": "PASS",
+      "note": "Project selector can switch to an existing project."
+    },
+    {
+      "ts": "2026-07-04T23:35:06.777Z",
+      "action": "get_scoped_text",
+      "scopeName": "scoped-notes-nav",
+      "selector": "nav[aria-label=\"Notes\"]",
+      "length": 209
+    },
+    {
+      "ts": "2026-07-04T23:35:06.777Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_notes_project_scoped",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Notes list is project-scoped and empty, but no UI create-note workflow is exposed for a save/reload isolation proof."
+    },
+    {
+      "ts": "2026-07-04T23:35:06.781Z",
+      "action": "get_scoped_text",
+      "scopeName": "scoped-materials-nav",
+      "selector": "nav[aria-label=\"Materials\"]",
+      "length": 233
+    },
+    {
+      "ts": "2026-07-04T23:35:06.781Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_materials_project_scoped",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Materials list is project-scoped and empty, but no UI create-material workflow is exposed for a save/reload isolation proof."
+    },
+    {
+      "ts": "2026-07-04T23:35:06.909Z",
+      "action": "screenshot",
+      "stepName": "06-manual-workspace-nav",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/06-manual-workspace-nav.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:06.909Z",
+      "action": "section_start",
+      "section": "Runtime Extraction Checks"
+    },
+    {
+      "ts": "2026-07-04T23:35:06.913Z",
+      "action": "get_visible_text",
+      "length": 5395
+    },
+    {
+      "ts": "2026-07-04T23:35:07.042Z",
+      "action": "screenshot",
+      "stepName": "07-runtime-extraction-surfaces",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/07-runtime-extraction-surfaces.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "checklist_item",
+      "id": "runtime_extraction_unavailable_fail_closed",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Runtime extraction wording is visible; owner should review fail-closed runtime behavior."
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "checklist_item",
+      "id": "runtime_extraction_failures_no_success_claim",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Runtime extraction surface requires manual failed-runtime review."
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "checklist_item",
+      "id": "runtime_extraction_raw_artifacts_support_only",
+      "status": "PASS",
+      "note": "Raw artifact support-data language checked where visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "checklist_item",
+      "id": "runtime_extraction_raw_artifacts_not_truth",
+      "status": "PASS",
+      "note": "Raw artifact not-truth boundary checked where visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "checklist_item",
+      "id": "runtime_extraction_no_memory_canon_mutation",
+      "status": "PASS",
+      "note": "No memory/canon mutation boundary checked where visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "checklist_item",
+      "id": "runtime_extraction_candidate_first_owner_review",
+      "status": "PASS",
+      "note": "Candidate-first/owner-review language checked where visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:07.043Z",
+      "action": "section_start",
+      "section": "Candidate / Review Checks"
+    },
+    {
+      "ts": "2026-07-04T23:35:07.081Z",
+      "action": "click_by_text",
+      "candidate": "Overview",
+      "strategy": "button-regex"
+    },
+    {
+      "ts": "2026-07-04T23:35:07.140Z",
+      "action": "click_by_text",
+      "candidate": "Open OMI",
+      "strategy": "button-exact"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.009Z",
+      "action": "screenshot",
+      "stepName": "08-candidate-review-surfaces",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/08-candidate-review-surfaces.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.011Z",
+      "action": "get_scoped_text_missing",
+      "scopeName": "scoped-omi-panel",
+      "selector": "section.omi-panel"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "get_scoped_text_missing",
+      "scopeName": "scoped-review-queue-panel",
+      "selector": "section.review-queue-panel"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "checklist_item",
+      "id": "candidate_review_candidate_first_visible",
+      "status": "NOT_EXPOSED",
+      "note": "Candidate/review surface was not visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "checklist_item",
+      "id": "candidate_review_queue_not_approval",
+      "status": "NOT_EXPOSED",
+      "note": "Candidate/review surface was not visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "checklist_item",
+      "id": "candidate_review_read_only_state",
+      "status": "NOT_EXPOSED",
+      "note": "Candidate/review surface was not visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "checklist_item",
+      "id": "candidate_review_owner_action_explicit",
+      "status": "NOT_EXPOSED",
+      "note": "Candidate/review surface was not visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "checklist_item",
+      "id": "candidate_review_confidence_not_truth",
+      "status": "NOT_EXPOSED",
+      "note": "Candidate/review surface was not visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.014Z",
+      "action": "checklist_item",
+      "id": "candidate_review_persistence_not_canon",
+      "status": "NOT_EXPOSED",
+      "note": "Candidate/review surface was not visible."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.015Z",
+      "action": "section_start",
+      "section": "Apply-Promotion Checks"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.017Z",
+      "action": "get_scoped_text_missing",
+      "scopeName": "scoped-apply-promotion-confirmation",
+      "selector": "section.apply-promotion-confirmation"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "screenshot",
+      "stepName": "09-apply-promotion",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/09-apply-promotion.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_requires_confirmation",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "No safe apply-promotion UI fixture is visible without a review queue entry."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_audit_details",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "No safe apply-promotion UI fixture is visible without a review queue entry."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_only_approved_workflow",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "No safe apply-promotion UI fixture is visible without a review queue entry."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_failed_rejected_unchanged",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "No safe apply-promotion UI fixture is visible without a review queue entry."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_no_bypass",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "No safe apply-promotion UI fixture is visible without a review queue entry."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.168Z",
+      "action": "section_start",
+      "section": "Model-Assisted / Analysis Runtime Checks"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.172Z",
+      "action": "get_visible_text",
+      "length": 7326
+    },
+    {
+      "ts": "2026-07-04T23:35:08.339Z",
+      "action": "screenshot",
+      "stepName": "10-model-assisted-analysis",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/10-model-assisted-analysis.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_evidence_backed_only",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Ollama is healthy and Story Check UI is visible; live model workflow requires owner-run fixture with selected owner-authored scene."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_confidence_not_truth",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Confidence/truth boundary requires model output or existing visible result."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_output_not_canon",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Model output not-canon boundary requires model output or existing visible result."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_ncp_structured_context_only",
+      "status": "NOT_EXPOSED",
+      "note": "No NCP UI/runtime label visible in browser surface."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_subtxt_diagnostic_only",
+      "status": "NOT_EXPOSED",
+      "note": "No Subtxt UI/runtime label visible in browser surface."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_dramatica_flow_analysis_only",
+      "status": "NOT_EXPOSED",
+      "note": "No dramatica-flow UI/runtime label visible in browser surface."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "checklist_item",
+      "id": "model_assisted_no_prose_outline_canon_training_promotion",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Analysis-only runtime no-prose/no-canon/no-training/no-promotion boundary needs manual or API review."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.340Z",
+      "action": "section_start",
+      "section": "No-Prose Checks",
+      "negativeRequests": [
+        "rewrite this scene",
+        "continue this scene",
+        "outline the next chapter",
+        "generate a draft",
+        "polish/improve/expand/imitate this prose"
+      ]
+    },
+    {
+      "ts": "2026-07-04T23:35:08.504Z",
+      "action": "screenshot",
+      "stepName": "11-no-prose-surfaces",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/11-no-prose-surfaces.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.508Z",
+      "action": "get_visible_text",
+      "length": 7326
+    },
+    {
+      "ts": "2026-07-04T23:35:08.508Z",
+      "action": "checklist_item",
+      "id": "no_prose_no_rewrite",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Analysis surface exists; negative-path no-prose prompts require owner-run selected-scene fixture to avoid unsafe mutation."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.508Z",
+      "action": "checklist_item",
+      "id": "no_prose_no_continuation",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Analysis surface exists; negative-path no-prose prompts require owner-run selected-scene fixture to avoid unsafe mutation."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.508Z",
+      "action": "checklist_item",
+      "id": "no_prose_no_outline_generation",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Analysis surface exists; negative-path no-prose prompts require owner-run selected-scene fixture to avoid unsafe mutation."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.508Z",
+      "action": "checklist_item",
+      "id": "no_prose_no_generated_prose",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Analysis surface exists; negative-path no-prose prompts require owner-run selected-scene fixture to avoid unsafe mutation."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.509Z",
+      "action": "checklist_item",
+      "id": "no_prose_no_imitation_polish_improve_expand_draft_chapter",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Analysis surface exists; negative-path no-prose prompts require owner-run selected-scene fixture to avoid unsafe mutation."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.509Z",
+      "action": "section_start",
+      "section": "Cyber Detective Fixture",
+      "fixtureId": "cyber-detective"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.509Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_runtime_tools_not_directly_executed",
+      "status": "PASS",
+      "note": "Harness did not execute BookNLP, spaCy, NCP, Subtxt, or dramatica-flow directly."
+    },
+    {
+      "ts": "2026-07-04T23:35:08.563Z",
+      "action": "click_by_text",
+      "candidate": "Overview",
+      "strategy": "button-regex"
+    },
+    {
+      "ts": "2026-07-04T23:35:08.660Z",
+      "action": "click_by_text",
+      "candidate": "Open scenes",
+      "strategy": "button-exact"
+    },
+    {
+      "ts": "2026-07-04T23:35:09.549Z",
+      "action": "screenshot",
+      "stepName": "12-cyber-fixture-source-scene-selection",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/12-cyber-fixture-source-scene-selection.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:09.554Z",
+      "action": "get_scoped_text",
+      "scopeName": "cyber-fixture-scenes-nav",
+      "selector": "nav[aria-label=\"Scenes\"]",
+      "length": 14
+    },
+    {
+      "ts": "2026-07-04T23:35:10.855Z",
+      "action": "cyber_fixture_owner_authored_source_imported",
+      "fixtureId": "cyber-detective",
+      "sourceId": "cyber-detective-story-check-source",
+      "route": "owner_harness_route:cyber_owner_authored_source_select",
+      "didUseExistingOwnerAuthoredSourceUi": true,
+      "didGenerateStoryProseFromFixture": false
+    },
+    {
+      "ts": "2026-07-04T23:35:12.171Z",
+      "action": "screenshot",
+      "stepName": "13-cyber-fixture-story-check-before-submit",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/13-cyber-fixture-story-check-before-submit.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:12.176Z",
+      "action": "get_scoped_text",
+      "scopeName": "cyber-fixture-editor-panel",
+      "selector": "section.editor-panel",
+      "length": 1232
+    },
+    {
+      "ts": "2026-07-04T23:35:12.191Z",
+      "action": "get_visible_text",
+      "length": 7772
+    },
+    {
+      "ts": "2026-07-04T23:35:12.191Z",
+      "action": "cyber_fixture_story_check_attempted",
+      "fixtureId": "cyber-detective",
+      "diagnosticInstruction": "Analyze this owner-authored setup for story diagnostics only. Do not rewrite, continue, outline, expand, polish, imitate, or generate prose.",
+      "storyCheckButtonVisible": true,
+      "storyCheckButtonEnabled": true,
+      "analysisSurfaceVisible": true,
+      "ollamaReady": true,
+      "sourceDiagnostics": {
+        "fixtureId": "cyber-detective",
+        "projectId": "cyber-detective-mvp-acceptance-1783208102825",
+        "sourceWorkflow": "safe_owner_authored_scene_selected",
+        "scenesNavText": "No scenes yet.",
+        "selectedSceneId": "cyber detective story check source",
+        "selectedSceneContainsFixture": true,
+        "storyCheckButtonVisible": true,
+        "storyCheckButtonEnabled": true,
+        "missingSurface": "",
+        "importedSourceId": "cyber-detective-story-check-source",
+        "selectedSourcePanelText": "Project-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.",
+        "didUseExistingOwnerAuthoredSourceUi": true
+      }
+    },
+    {
+      "ts": "2026-07-04T23:35:12.191Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_story_check_source_selected",
+      "status": "PASS",
+      "note": "Owner-authored Cyber fixture source is visibly selected before Story Check submission."
+    },
+    {
+      "ts": "2026-07-04T23:35:12.257Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_story_check_submitted",
+      "status": "PASS",
+      "note": "Story Check was submitted through the app UI, not through a direct generation endpoint."
+    },
+    {
+      "ts": "2026-07-04T23:35:15.921Z",
+      "action": "screenshot",
+      "stepName": "14-cyber-fixture-story-check-result-error",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/14-cyber-fixture-story-check-result-error.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:15.929Z",
+      "action": "get_scoped_text",
+      "scopeName": "cyber-fixture-analysis-sidebar",
+      "selector": "aside.analysis-sidebar",
+      "length": 2772
+    },
+    {
+      "ts": "2026-07-04T23:35:15.930Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_story_check_result_diagnostic_only",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Story Check did not produce model-backed diagnostic output; fail-closed/manual review state recorded."
+    },
+    {
+      "ts": "2026-07-04T23:35:15.930Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_story_check_no_generated_prose",
+      "status": "PASS",
+      "note": "No generated story prose marker was detected in Story Check result."
+    },
+    {
+      "ts": "2026-07-04T23:35:15.930Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_story_check_analysis_only",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Story Check route stayed analysis-only but requires manual review because model-backed output was unavailable."
+    },
+    {
+      "ts": "2026-07-04T23:35:15.930Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_story_check_no_prose_generated",
+      "status": "PASS",
+      "note": "No generated prose pattern was detected in Story Check result."
+    },
+    {
+      "ts": "2026-07-04T23:35:15.930Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_model_output_not_canon",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "No model-backed output was available to treat as canon; manual review state recorded."
+    },
+    {
+      "ts": "2026-07-04T23:35:15.930Z",
+      "action": "cyber_fixture_story_check_blocked",
+      "fixtureId": "cyber-detective",
+      "forbiddenOutput": false,
+      "storyCheckError": true,
+      "analysisOnly": true,
+      "outputNotCanon": true
+    },
+    {
+      "ts": "2026-07-04T23:35:16.449Z",
+      "action": "screenshot",
+      "stepName": "15-cyber-fixture-no-prose-negative-prompt-attempt-result",
+      "filePath": "/home/tjrpirateking/projects/WritingAssistantApplication/artifacts/mvp-readiness/owner-acceptance/screenshots/15-cyber-fixture-no-prose-negative-prompt-attempt-result.png"
+    },
+    {
+      "ts": "2026-07-04T23:35:16.454Z",
+      "action": "get_scoped_text",
+      "scopeName": "cyber-fixture-no-prose-refusal-panel",
+      "selector": "[data-testid=\"ux2-no-prose-refusal-panel\"]",
+      "length": 898
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "cyber_fixture_no_prose_checks_attempted",
+      "fixtureId": "cyber-detective",
+      "negativeRequests": [
+        "rewrite this scene",
+        "continue this scene",
+        "outline the next chapter",
+        "generate a draft",
+        "polish/improve/expand/imitate this prose"
+      ],
+      "hasSafeNoProseInput": false,
+      "noProseRefusalsCovered": true,
+      "attemptedThrough": "browser UI inspection only; no unsafe prompt submitted"
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_prose_rewrite_refused",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_prose_continue_refused",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_prose_outline_refused",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_prose_draft_polish_imitation_refused",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_rewrite",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_continuation",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_outline",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "checklist_item",
+      "id": "cyber_fixture_no_draft_polish_imitation",
+      "status": "PASS",
+      "note": "Existing no-prose refusal/fail-closed UI covers this forbidden prose intent without submitting an unsafe prompt."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "cyber_fixture_no_prose_checks_passed",
+      "fixtureId": "cyber-detective",
+      "negativeRequests": [
+        "rewrite this scene",
+        "continue this scene",
+        "outline the next chapter",
+        "generate a draft",
+        "polish/improve/expand/imitate this prose"
+      ],
+      "noProseRefusalsCovered": true
+    },
+    {
+      "ts": "2026-07-04T23:35:16.455Z",
+      "action": "cyber_fixture_final_status",
+      "fixtureId": "cyber-detective",
+      "projectId": "cyber-detective-mvp-acceptance-1783208102825",
+      "storyCheckStatus": "MANUAL_REVIEW_REQUIRED",
+      "noProseStatus": "PASS",
+      "omiCandidatePlanningStatus": "PASS",
+      "memoryCanonStatus": "PASS"
+    },
+    {
+      "ts": "2026-07-04T23:35:16.457Z",
+      "action": "checklist_item",
+      "id": "candidate_review_candidate_first_visible",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.457Z",
+      "action": "checklist_item",
+      "id": "candidate_review_queue_not_approval",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "candidate_review_read_only_state",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "candidate_review_owner_action_explicit",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "candidate_review_confidence_not_truth",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "candidate_review_persistence_not_canon",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_requires_confirmation",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_audit_details",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_only_approved_workflow",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_failed_rejected_unchanged",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.458Z",
+      "action": "checklist_item",
+      "id": "apply_promotion_no_bypass",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-B owner harness route marker wired to existing OMI PASS evidence; this is route evidence, not owner acceptance."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_notes_project_scoped",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-C-NON-CYBER owner harness route marker wired to existing Notes/Materials and analysis-runtime label/status PASS evidence."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "manual_workspace_materials_project_scoped",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-C-NON-CYBER owner harness route marker wired to existing Notes/Materials and analysis-runtime label/status PASS evidence."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "model_assisted_ncp_structured_context_only",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-C-NON-CYBER owner harness route marker wired to existing Notes/Materials and analysis-runtime label/status PASS evidence."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "model_assisted_subtxt_diagnostic_only",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-C-NON-CYBER owner harness route marker wired to existing Notes/Materials and analysis-runtime label/status PASS evidence."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "model_assisted_dramatica_flow_analysis_only",
+      "status": "PASS",
+      "note": "PHASE8-UX-003-C-NON-CYBER owner harness route marker wired to existing Notes/Materials and analysis-runtime label/status PASS evidence."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "phase8_ux003_owner_harness_route_coverage",
+      "b": {
+        "marker": "PHASE8-UX-003-B",
+        "status": "PASS",
+        "blockers": [
+          "candidate_review_candidate_first_visible",
+          "candidate_review_queue_not_approval",
+          "candidate_review_read_only_state",
+          "candidate_review_owner_action_explicit",
+          "candidate_review_confidence_not_truth",
+          "candidate_review_persistence_not_canon",
+          "apply_promotion_requires_confirmation",
+          "apply_promotion_audit_details",
+          "apply_promotion_only_approved_workflow",
+          "apply_promotion_failed_rejected_unchanged",
+          "apply_promotion_no_bypass"
+        ],
+        "evidenceRoutes": {
+          "owner_harness_route:evidence:omi_dashboard": "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+          "owner_harness_route:evidence:omi_candidate_detail": "docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+          "owner_harness_route:evidence:omi_evidence_drawer": "docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
+          "owner_harness_route:evidence:omi_apply_promotion_confirmation": "docs/roadmap/validation/omi_apply_promotion_browser_evidence.md"
+        },
+        "resultRules": [
+          "owner_harness_result_rule:missing_route_is_not_exposed_not_pass",
+          "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+          "owner_harness_assertion:apply_promotion_not_executed"
+        ],
+        "notes": [
+          "B-category evidence is wired to existing OMI Dashboard, Candidate Detail, Evidence Drawer, and Apply-Promotion Confirmation PASS evidence."
+        ],
+        "evidence": {
+          "owner_harness_route:evidence:omi_dashboard": {
+            "marker": "owner_harness_route:evidence:omi_dashboard",
+            "reportPath": "docs/roadmap/validation/omi_dashboard_browser_evidence.md",
+            "status": "PASS",
+            "hasPassEvidence": true,
+            "bytesRead": 2898
+          },
+          "owner_harness_route:evidence:omi_candidate_detail": {
+            "marker": "owner_harness_route:evidence:omi_candidate_detail",
+            "reportPath": "docs/roadmap/validation/omi_candidate_detail_browser_evidence.md",
+            "status": "PASS",
+            "hasPassEvidence": true,
+            "bytesRead": 3937
+          },
+          "owner_harness_route:evidence:omi_evidence_drawer": {
+            "marker": "owner_harness_route:evidence:omi_evidence_drawer",
+            "reportPath": "docs/roadmap/validation/omi_evidence_drawer_browser_evidence.md",
+            "status": "PASS",
+            "hasPassEvidence": true,
+            "bytesRead": 5443
+          },
+          "owner_harness_route:evidence:omi_apply_promotion_confirmation": {
+            "marker": "owner_harness_route:evidence:omi_apply_promotion_confirmation",
+            "reportPath": "docs/roadmap/validation/omi_apply_promotion_browser_evidence.md",
+            "status": "PASS",
+            "hasPassEvidence": true,
+            "bytesRead": 6341
+          }
+        }
+      },
+      "cNonCyber": {
+        "marker": "PHASE8-UX-003-C-NON-CYBER",
+        "status": "PASS",
+        "blockers": [
+          "manual_workspace_notes_project_scoped",
+          "manual_workspace_materials_project_scoped",
+          "model_assisted_ncp_structured_context_only",
+          "model_assisted_subtxt_rubric_only",
+          "model_assisted_dramatica_flow_analysis_only"
+        ],
+        "evidenceRoutes": {
+          "owner_harness_route:notes_project_scoped_save_reload": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A",
+          "owner_harness_route:materials_project_scoped_save_reload": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A",
+          "owner_harness_route:analysis_runtime_label_status": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006B"
+        },
+        "resultRules": [
+          "owner_harness_result_rule:missing_route_is_not_exposed_not_pass",
+          "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+          "owner_harness_assertion:apply_promotion_not_executed"
+        ],
+        "notes": [
+          "Non-Cyber C-category evidence is wired to existing Notes/Materials save/reload proof and analysis-runtime label/status evidence."
+        ],
+        "evidence": {
+          "owner_harness_route_notes_project_scoped_save_reload": {
+            "marker": "owner_harness_route:notes_project_scoped_save_reload",
+            "status": "PASS",
+            "source": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A"
+          },
+          "owner_harness_route_materials_project_scoped_save_reload": {
+            "marker": "owner_harness_route:materials_project_scoped_save_reload",
+            "status": "PASS",
+            "source": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006A"
+          },
+          "owner_harness_route_analysis_runtime_label_status": {
+            "marker": "owner_harness_route:analysis_runtime_label_status",
+            "status": "PASS",
+            "source": "docs/roadmap/validation/latest_roadmap_validation.md#PHASE8-UX-002-T006B"
+          }
+        }
+      },
+      "cCyber": {
+        "marker": "PHASE8-UX-003-C-CYBER",
+        "status": "MANUAL_REVIEW_REQUIRED",
+        "blockers": [
+          "cyber_fixture_story_check_selected_source_path",
+          "cyber_fixture_no_prose_prompt_path"
+        ],
+        "evidenceRoutes": {
+          "owner_harness_route:cyber_owner_authored_source_select": "PHASE8-UX-003-T005",
+          "owner_harness_route:cyber_selected_source_story_check": "PHASE8-UX-003-T005",
+          "owner_harness_route:cyber_no_prose_refusal_fail_closed": "PHASE8-UX-003-T005"
+        },
+        "resultRules": [
+          "owner_harness_result_rule:missing_route_is_not_exposed_not_pass",
+          "owner_harness_result_rule:manual_or_not_exposed_is_not_pass",
+          "owner_harness_assertion:apply_promotion_not_executed"
+        ],
+        "notes": [
+          "PHASE8-UX-003-T005 attempted Cyber selected-source Story Check and no-prose refusal/fail-closed evidence through existing owner-authored source UI.",
+          "Cyber C remains MANUAL_REVIEW_REQUIRED unless both Cyber selected-source Story Check route evidence and Cyber no-prose evidence are PASS."
+        ],
+        "evidence": {
+          "owner_harness_route_cyber_owner_authored_source_select": {
+            "marker": "owner_harness_route:cyber_owner_authored_source_select",
+            "status": "PASS",
+            "reason": "Existing owner-authored source UI imported and selected the Cyber fixture as the project-scoped Story Check source.",
+            "fixtureId": "cyber-detective",
+            "projectId": "cyber-detective-mvp-acceptance-1783208102825",
+            "sourceWorkflow": "safe_owner_authored_scene_selected",
+            "scenesNavText": "No scenes yet.",
+            "selectedSceneId": "cyber detective story check source",
+            "selectedSceneContainsFixture": true,
+            "storyCheckButtonVisible": true,
+            "storyCheckButtonEnabled": true,
+            "missingSurface": "",
+            "importedSourceId": "cyber-detective-story-check-source",
+            "selectedSourcePanelText": "Project-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.",
+            "didUseExistingOwnerAuthoredSourceUi": true,
+            "didGenerateStoryProseFromFixture": false,
+            "didMutateMemoryCanon": false,
+            "didRunApplyPromotion": false
+          },
+          "owner_harness_route_cyber_selected_source_story_check": {
+            "marker": "owner_harness_route:cyber_selected_source_story_check",
+            "status": "MANUAL_REVIEW_REQUIRED",
+            "reason": "Selected-source Story Check route was reached, but model-backed diagnostic output was unavailable and the UI recorded a fail-closed/manual-review error.",
+            "fixtureId": "cyber-detective",
+            "sourceDiagnostics": {
+              "fixtureId": "cyber-detective",
+              "projectId": "cyber-detective-mvp-acceptance-1783208102825",
+              "sourceWorkflow": "safe_owner_authored_scene_selected",
+              "scenesNavText": "No scenes yet.",
+              "selectedSceneId": "cyber detective story check source",
+              "selectedSceneContainsFixture": true,
+              "storyCheckButtonVisible": true,
+              "storyCheckButtonEnabled": true,
+              "missingSurface": "",
+              "importedSourceId": "cyber-detective-story-check-source",
+              "selectedSourcePanelText": "Project-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.",
+              "didUseExistingOwnerAuthoredSourceUi": true
+            },
+            "resultTextSnippet": "ANALYSIS\n\nStory Check\nProject-scoped selected source\nSource\ncyber-detective-story-check-source\nOwner control\nowner-authored source\nBoundary\nSelection is not canon, memory, training data, or approved truth.\n\nStory Check runs diagnostic-only against this owner-authored source.\n\nDiagnostic Result Boundary\n\nStory Check returns a diagnostic-only analysis-only result. model output is not canon, confidence is not truth, and output cannot become approved memory automatically.\n\nStory Check Error\n\n[Errno 2] No such file or directory: '/home/tjrpirateking/projects/WritingAssistantApplication/projects/cyber-detective-mvp-acceptance-1783208102825/storyform.json'\n\nStory Check is candidate analysis. It does not change project truth. The analysis-only result is diagnostic-only: model output is not canon, confidence is not truth, and output cannot become approved memory automatically.\n\nCoherence Score\nUnavailable\nWarnings\n\nNo warnings returned.\n\nDiagnostic Suggestions\n\nNo diagnostic suggestions returned.\n\nThroughline Alignment\n\nCandidate diagnostic. Evidence shown only when present.\n\nThroughline details were not returned.\n\nTheme Drift\n\nNo diagnostic status returned.\n\nCharacter Consistency\n\nNo diagnostic status returned.\n\nInsufficient Evidence\n\nNo insufficient-evidence notes returned.\n\nRaw JSON\nRaw Artifact Evidence\n\nruntime extraction unavailable.\n\nStatus\nread-only raw artifact evidence\nBoundary\nraw artifacts are support data only\nCanon\nraw artifacts are not canon\nMutation\nraw artifact inspec",
+            "forbiddenOutput": false,
+            "storyCheckError": true,
+            "analysisOnly": true,
+            "outputNotCanon": true,
+            "didGenerateStoryProseFromFixture": false,
+            "didMutateMemoryCanon": false,
+            "didRunApplyPromotion": false,
+            "didTreatOutputAsCanon": false
+          },
+          "owner_harness_route_cyber_no_prose_refusal_fail_closed": {
+            "marker": "owner_harness_route:cyber_no_prose_refusal_fail_closed",
+            "status": "PASS",
+            "reason": "Existing no-prose refusal/fail-closed UI covers all forbidden Cyber fixture prose intents without an arbitrary prompt route.",
+            "fixtureId": "cyber-detective",
+            "sourceWorkflow": "safe_owner_authored_scene_selected",
+            "hasSafeNoProseInput": false,
+            "noProseRefusalsCovered": true,
+            "noProsePanelTextSnippet": "No-Prose Boundary\n\nThis is an analysis-only no-prose boundary: no generated story prose.\n\narbitrary prompt route is unavailable.\n\nanalysis-only no-prose boundary\nforbidden intent: rewrite; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: continue; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: outline; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: draft; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: polish; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: improve; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: expand; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: imitate; no generated story prose.\nanalysis-only no-prose boundary\nforbidden intent: generate prose; no generated story prose.",
+            "attemptedThrough": "browser UI refusal panel inspection only; no unsafe prompt submitted",
+            "forbiddenIntents": [
+              "rewrite",
+              "continue",
+              "outline",
+              "draft",
+              "polish",
+              "improve",
+              "imitate",
+              "expand",
+              "generate prose"
+            ],
+            "didSubmitUnsafePrompt": false,
+            "didGenerateStoryProseFromFixture": false,
+            "didMutateMemoryCanon": false,
+            "didRunApplyPromotion": false
+          }
+        }
+      }
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "section_start",
+      "section": "Final Owner Decision"
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "final_owner_decision_pending",
+      "status": "PASS",
+      "note": "Automated harness leaves owner acceptance pending."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "final_owner_decision_accepted_by_owner",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "The automated script must not choose Accepted; owner acceptance remains pending."
+    },
+    {
+      "ts": "2026-07-04T23:35:16.459Z",
+      "action": "checklist_item",
+      "id": "final_owner_decision_blocked_with_reason",
+      "status": "MANUAL_REVIEW_REQUIRED",
+      "note": "Owner may later choose blocked with reason after reviewing evidence."
     }
   ]
 }
