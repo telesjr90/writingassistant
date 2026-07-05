@@ -12,7 +12,8 @@ function getErrorMessage(error) {
     const status = error.response?.status;
 
     if (detail) {
-      return status ? `Request failed (${status}): ${detail}` : `Request failed: ${detail}`;
+      const detailText = typeof detail === 'string' ? detail : JSON.stringify(detail);
+      return status ? `Request failed (${status}): ${detailText}` : `Request failed: ${detailText}`;
     }
 
     return status ? `Request failed (${status})` : error.message;

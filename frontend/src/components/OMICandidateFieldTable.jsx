@@ -26,6 +26,22 @@ function formatStoredValue(value, missingLabel = 'Missing') {
   return String(value);
 }
 
+function isBlankText(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
+function isEmptyManualCandidateShell(candidate) {
+  const candidateContent = candidate?.candidate_content;
+  const fields = candidateContent?.fields;
+  const evidence = candidate?.evidence;
+
+  return (
+    !Array.isArray(fields) || fields.length === 0
+  ) && isBlankText(candidateContent?.summary) && (
+    !Array.isArray(evidence) || evidence.length === 0
+  );
+}
+
 function normalizeFieldRows(candidate) {
   const storedRows = asArray(
     candidate?.field_review_rows
@@ -97,6 +113,7 @@ function normalizeFieldRows(candidate) {
 
 export default function OMICandidateFieldTable({ candidate, onOpenEvidence = () => {} }) {
   const rows = normalizeFieldRows(candidate);
+  const emptyManualShell = isEmptyManualCandidateShell(candidate);
 
   return (
     <section className="omi-candidate-panel" aria-label="Field review table">
@@ -105,10 +122,19 @@ export default function OMICandidateFieldTable({ candidate, onOpenEvidence = () 
           <h2>Field review table</h2>
           <p className="muted-copy">
             Stored review metadata only. Missing values show Missing / Not linked / Unavailable.
+            Approval does not extract new fields.
           </p>
         </div>
         <span className="omi-status-badge">Confidence indicates support strength, not truth.</span>
       </div>
+      {emptyManualShell && (
+        <p
+          className="omi-workflow-warning"
+          data-testid="omi-empty-candidate-shell-warning"
+        >
+          This is a manual candidate shell. No extraction has populated characters, locations, timeline, or story facts.
+        </p>
+      )}
       <div className="omi-field-table-wrap">
         <table
           className="omi-candidate-field-table"

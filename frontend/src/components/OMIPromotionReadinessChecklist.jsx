@@ -9,6 +9,22 @@ function hasValue(value) {
   return value !== null && value !== undefined && value !== '';
 }
 
+function isBlankText(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
+function isEmptyManualCandidateShell(candidate) {
+  const candidateContent = candidate?.candidate_content;
+  const fields = candidateContent?.fields;
+  const evidence = candidate?.evidence;
+
+  return (
+    !Array.isArray(fields) || fields.length === 0
+  ) && isBlankText(candidateContent?.summary) && (
+    !Array.isArray(evidence) || evidence.length === 0
+  );
+}
+
 function getStatusText(isMet, blockedText) {
   return isMet ? 'Complete' : blockedText;
 }
@@ -23,6 +39,7 @@ export function getPromotionReadinessItems(candidate) {
   const dependencyState = candidate?.dependency_state ?? candidate?.dependency_review;
   const schemaStatus = candidate?.schema_status ?? candidate?.candidate_schema_status;
   const promotionAudit = candidate?.promotion_audit_record ?? candidate?.promotion_record;
+  const emptyManualShell = isEmptyManualCandidateShell(candidate);
 
   return [
     {
@@ -40,8 +57,10 @@ export function getPromotionReadinessItems(candidate) {
     },
     {
       label: 'Evidence reviewed or insufficiency accepted',
-      isMet: hasValue(evidence),
-      detail: getStatusText(hasValue(evidence), 'Missing evidence'),
+      isMet: hasValue(evidence) && !emptyManualShell,
+      detail: emptyManualShell
+        ? 'Manual shell: no extracted fields, summary, or evidence.'
+        : getStatusText(hasValue(evidence), 'Missing evidence'),
     },
     {
       label: 'Provenance reviewed',
@@ -66,9 +85,13 @@ export function getPromotionReadinessItems(candidate) {
     },
     {
       label: 'Candidate schema supported',
-      isMet: !String(schemaStatus || '').toLowerCase().includes('unsupported') && blockers.length === 0,
+      isMet: !String(schemaStatus || '').toLowerCase().includes('unsupported')
+        && blockers.length === 0
+        && !emptyManualShell,
       detail: blockers.length > 0
         ? blockers.join('; ')
+        : emptyManualShell
+          ? 'Manual shell only; extraction is not available here yet.'
         : getStatusText(
           !String(schemaStatus || '').toLowerCase().includes('unsupported'),
           'Unsupported candidate schema',
@@ -107,6 +130,7 @@ export default function OMIPromotionReadinessChecklist({ candidate }) {
       </ul>
       <p className="review-boundary-note">
         Ready means the handoff packet is complete. Memory/Canon has not changed.
+        An empty approved candidate has not captured real story facts.
       </p>
     </section>
   );

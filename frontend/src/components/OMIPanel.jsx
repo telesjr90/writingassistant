@@ -48,6 +48,43 @@ const PROMOTION_TARGETS = [
   { value: 'owner_memory.json', label: 'owner_memory.json' },
 ];
 
+const EXTRACTION_UNAVAILABLE_NOTICE = (
+  'OMI raw idea capture currently saves owner-authored planning input and manual candidate shells. '
+  + 'Automatic extraction of characters, locations, timeline, and other story facts is not available from this screen yet.'
+);
+
+const EMPTY_CANDIDATE_SHELL_WARNING = (
+  'This is a manual candidate shell. No extraction has populated characters, locations, timeline, or story facts.'
+);
+
+const APPROVAL_LIFECYCLE_ONLY_NOTICE = (
+  'Owner decision approved. Approval does not extract new fields. Approval does not mutate Memory/Canon. '
+  + 'Promotion remains separate/guarded.'
+);
+
+const STORYFORM_CONTEXT_READINESS_NOTICE = (
+  'Missing storyform or storyform context is Story Check/context readiness. It is not OMI raw idea extraction failure.'
+);
+
+const DECISION_STATUS_RULES = {
+  approve: {
+    status: 'approved',
+    explanation: 'Approve always saves status as approved and requires confirmation. Approval is lifecycle metadata only.',
+  },
+  reject: {
+    status: 'rejected',
+    explanation: 'Reject always saves status as rejected.',
+  },
+  needs_revision: {
+    status: 'candidate',
+    explanation: 'Needs revision returns the record to candidate status for manual follow-up.',
+  },
+  pending: {
+    status: 'owner_review',
+    explanation: 'Pending keeps the record in owner review. It is not approval and does not extract story facts.',
+  },
+};
+
 function formatDate(value) {
   if (!value) {
     return 'No timestamp';
@@ -129,6 +166,22 @@ function evidenceSummary(evidence) {
   return formatCount(evidence.length, 'evidence item');
 }
 
+function isBlankText(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
+function isEmptyManualCandidateShell(candidate) {
+  const candidateContent = candidate?.candidate_content;
+  const fields = candidateContent?.fields;
+  const evidence = candidate?.evidence;
+
+  return (
+    !Array.isArray(fields) || fields.length === 0
+  ) && isBlankText(candidateContent?.summary) && (
+    !Array.isArray(evidence) || evidence.length === 0
+  );
+}
+
 function parseCandidateContent(text) {
   let parsed;
 
@@ -147,16 +200,7 @@ function parseCandidateContent(text) {
 }
 
 function statusForDecision(decision, fallbackStatus) {
-  if (decision === 'approve') {
-    return 'approved';
-  }
-  if (decision === 'reject') {
-    return 'rejected';
-  }
-  if (decision === 'needs_revision') {
-    return 'candidate';
-  }
-  return fallbackStatus;
+  return DECISION_STATUS_RULES[decision]?.status ?? fallbackStatus;
 }
 
 function promotionReadiness(candidate) {
@@ -187,6 +231,9 @@ function promotionReadiness(candidate) {
     || Array.isArray(candidate.candidate_content)
   ) {
     blockedReasons.push('Candidate content must be a JSON object.');
+  }
+  if (isEmptyManualCandidateShell(candidate)) {
+    blockedReasons.push('Manual candidate shell has no extracted fields, summary, or evidence.');
   }
 
   return {
@@ -222,8 +269,10 @@ function promotionRequirementRows(candidate, readiness) {
     },
     {
       label: 'Structured content',
-      met: hasObject(candidate.candidate_content),
-      detail: hasObject(candidate.candidate_content) ? 'JSON object' : 'missing',
+      met: hasObject(candidate.candidate_content) && !isEmptyManualCandidateShell(candidate),
+      detail: isEmptyManualCandidateShell(candidate)
+        ? 'manual shell; extraction unavailable here'
+        : hasObject(candidate.candidate_content) ? 'JSON object' : 'missing',
     },
     {
       label: 'Safe target label/path',
@@ -251,6 +300,9 @@ function OwnerDecisionForm({
   const [selectedDestination, setSelectedDestination] = useState(
     record.destination ?? 'planning_notes',
   );
+  const statusRule = DECISION_STATUS_RULES[decision];
+  const statusIsLocked = Boolean(statusRule);
+  const canSubmit = !isUpdating && (decision !== 'approve' || approvalConfirmed);
 
   useEffect(() => {
     setDecision(existingDecision.decision ?? 'pending');
@@ -270,6 +322,7 @@ function OwnerDecisionForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const nextStatus = statusForDecision(decision, status);
 
     try {
       await onSubmit(record, {
@@ -278,7 +331,7 @@ function OwnerDecisionForm({
           approval_confirmed: decision === 'approve' ? approvalConfirmed : false,
           notes,
         },
-        status,
+        status: nextStatus,
         ...(type === 'candidate' ? { destination: selectedDestination } : {}),
       });
     } catch (updateError) {
@@ -299,22 +352,6 @@ function OwnerDecisionForm({
     <form className="omi-decision-form" onSubmit={handleSubmit}>
       <div className="omi-decision-grid">
         <label className="field-label">
-          Status
-          <select
-            className="field-input"
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-            disabled={isUpdating}
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="field-label">
           Decision
           <select
             className="field-input"
@@ -323,6 +360,22 @@ function OwnerDecisionForm({
             disabled={isUpdating}
           >
             {DECISIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="field-label">
+          Status
+          <select
+            className="field-input"
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}
+            disabled={isUpdating || statusIsLocked}
+          >
+            {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -349,16 +402,27 @@ function OwnerDecisionForm({
         )}
       </div>
 
+      <p className="omi-decision-help" data-testid="omi-decision-status-mapping">
+        {statusRule?.explanation ?? 'Status is saved as owner review metadata only.'}
+      </p>
+
       {decision === 'approve' && (
-        <label className="omi-checkbox-row">
-          <input
-            type="checkbox"
-            checked={approvalConfirmed}
-            onChange={(event) => setApprovalConfirmed(event.target.checked)}
-            disabled={isUpdating}
-          />
-          Approval confirmed
-        </label>
+        <>
+          <label className="omi-checkbox-row">
+            <input
+              type="checkbox"
+              checked={approvalConfirmed}
+              onChange={(event) => setApprovalConfirmed(event.target.checked)}
+              disabled={isUpdating}
+            />
+            Approval confirmed; approval is status metadata only and does not extract story facts.
+          </label>
+          {!approvalConfirmed && (
+            <p className="omi-decision-help">
+              Approval cannot be saved until confirmation is checked.
+            </p>
+          )}
+        </>
       )}
 
       <label className="field-label">
@@ -371,7 +435,7 @@ function OwnerDecisionForm({
         />
       </label>
 
-      <button className="primary-button" type="submit" disabled={isUpdating}>
+      <button className="primary-button" type="submit" disabled={!canSubmit}>
         {isUpdating ? 'Saving...' : 'Save decision'}
       </button>
     </form>
@@ -416,6 +480,9 @@ function PromotionRecordForm({
     <div className="omi-promotion-panel">
       <div className="omi-readiness">
         <strong>{readiness.ready ? 'Promotion-ready' : 'Not promotion-ready'}</strong>
+        <p>
+          Promotion remains separate/guarded. Empty manual shells are not evidence that story facts were captured.
+        </p>
         {readiness.blockedReasons.length > 0 && (
           <ul>
             {readiness.blockedReasons.map((reason) => (
@@ -588,14 +655,22 @@ export default function OMIPanel({
       </div>
 
       {(error || formError) && (
-        <p className="error-copy" role="alert">
+        <p className="error-copy" role="alert" data-testid="omi-decision-error">
           {formError || error}
         </p>
       )}
 
+      <section className="omi-workflow-notice" data-testid="omi-extraction-unavailable-notice">
+        <p>{EXTRACTION_UNAVAILABLE_NOTICE}</p>
+        <p>{STORYFORM_CONTEXT_READINESS_NOTICE}</p>
+      </section>
+
       <div className="omi-grid">
         <form className="omi-form" onSubmit={handleCreateIdea}>
           <h3>Raw idea</h3>
+          <p className="muted-copy">
+            Raw idea capture stores owner-authored planning input only.
+          </p>
           <textarea
             className="context-textarea omi-textarea"
             value={rawIdea}
@@ -614,6 +689,9 @@ export default function OMIPanel({
 
         <form className="omi-form" onSubmit={handleCreateCandidate}>
           <h3>Candidate</h3>
+          <p className="muted-copy">
+            Candidate creation here creates a manual shell unless an already populated JSON object is supplied.
+          </p>
           <label className="field-label" htmlFor="omi-idea-select">
             Linked idea
           </label>
@@ -791,6 +869,19 @@ export default function OMIPanel({
                     <dd>{evidenceSummary(candidate.evidence)}</dd>
                   </div>
                 </dl>
+                {isEmptyManualCandidateShell(candidate) && (
+                  <p
+                    className="omi-workflow-warning"
+                    data-testid="omi-empty-candidate-shell-warning"
+                  >
+                    {EMPTY_CANDIDATE_SHELL_WARNING}
+                  </p>
+                )}
+                {candidate.owner_decision?.decision === 'approve' && (
+                  <p className="review-boundary-note">
+                    {APPROVAL_LIFECYCLE_ONLY_NOTICE}
+                  </p>
+                )}
                 <button
                   className="secondary-button"
                   type="button"
@@ -831,7 +922,8 @@ export default function OMIPanel({
             <h3>Candidate lifecycle</h3>
             <p className="muted-copy">
               Approval and promotion records are review metadata only. They do not apply candidate
-              content to project truth.
+              content to project truth. Approval does not extract characters, locations, timeline,
+              or other story facts.
             </p>
           </div>
           {selectedCandidate && (
@@ -845,6 +937,19 @@ export default function OMIPanel({
           <p className="muted-copy">Select or create a candidate to inspect lifecycle details.</p>
         ) : (
           <>
+            {isEmptyManualCandidateShell(selectedCandidate) && (
+              <p
+                className="omi-workflow-warning"
+                data-testid="omi-empty-candidate-shell-warning"
+              >
+                {EMPTY_CANDIDATE_SHELL_WARNING}
+              </p>
+            )}
+            {selectedCandidate.owner_decision?.decision === 'approve' && (
+              <p className="review-boundary-note">
+                {APPROVAL_LIFECYCLE_ONLY_NOTICE}
+              </p>
+            )}
             <div className="omi-detail-grid">
               <dl className="omi-metadata">
                 <div>

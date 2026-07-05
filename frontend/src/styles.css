@@ -482,6 +482,13 @@ h2 {
   font-weight: 700;
 }
 
+.omi-decision-help {
+  margin: 0;
+  color: #46546c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .omi-note-textarea {
   min-height: 72px;
   font-family:
@@ -640,6 +647,35 @@ h2 {
   border-radius: 8px;
   font-size: 13px;
   line-height: 1.45;
+}
+
+.omi-workflow-notice,
+.omi-workflow-warning {
+  margin: 0;
+  padding: 10px 12px;
+  color: #34415a;
+  background: #f8fbff;
+  border: 1px solid #9fb3d4;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.omi-workflow-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.omi-workflow-notice p,
+.omi-workflow-warning p {
+  margin: 0;
+}
+
+.omi-workflow-warning {
+  color: #6d4c13;
+  background: #fff9eb;
+  border-color: #d7b46a;
 }
 
 .owner-action-note {

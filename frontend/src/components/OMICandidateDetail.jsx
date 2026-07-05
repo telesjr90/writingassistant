@@ -32,6 +32,27 @@ function formatStoredValue(value, missingLabel = 'Unavailable') {
   return String(value);
 }
 
+function isBlankText(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
+function isEmptyManualCandidateShell(candidate) {
+  const candidateContent = candidate?.candidate_content;
+  const fields = candidateContent?.fields;
+  const evidence = candidate?.evidence;
+
+  return (
+    !Array.isArray(fields) || fields.length === 0
+  ) && isBlankText(candidateContent?.summary) && (
+    !Array.isArray(evidence) || evidence.length === 0
+  );
+}
+
+function isOwnerApproved(candidate) {
+  const ownerDecision = candidate?.owner_decision ?? {};
+  return ownerDecision.decision === 'approve' || ownerDecision.approved === true;
+}
+
 function getCandidateId(candidate) {
   return firstPresent(candidate?.candidate_id, candidate?.candidateId, candidate?.id);
 }
@@ -327,7 +348,29 @@ export default function OMICandidateDetail({
 
       <p className="review-boundary-note">
         This remains a candidate until apply-promotion is separately confirmed and completed.
+        Missing storyform or storyform context is Story Check/context readiness, not OMI raw idea extraction failure.
       </p>
+
+      <p className="omi-workflow-notice" data-testid="omi-extraction-unavailable-notice">
+        OMI raw idea capture currently saves owner-authored planning input and manual candidate shells.
+        Automatic extraction of characters, locations, timeline, and other story facts is not available from this screen yet.
+      </p>
+
+      {isEmptyManualCandidateShell(candidate) && (
+        <p
+          className="omi-workflow-warning"
+          data-testid="omi-empty-candidate-shell-warning"
+        >
+          This is a manual candidate shell. No extraction has populated characters, locations, timeline, or story facts.
+        </p>
+      )}
+
+      {isOwnerApproved(candidate) && (
+        <p className="review-boundary-note">
+          Owner decision approved. Approval does not extract new fields. Approval does not mutate Memory/Canon.
+          Promotion remains separate/guarded.
+        </p>
+      )}
 
       <section className="omi-candidate-actions" aria-label="Candidate actions">
         <button
@@ -347,6 +390,7 @@ export default function OMICandidateDetail({
           data-testid="omi-candidate-approval-disabled-reason"
         >
           {disabledReason} Owner approval prepares this candidate for a future handoff. It does not update Memory/Canon.
+          It also does not extract characters, locations, timeline, or story facts.
         </p>
       </section>
 

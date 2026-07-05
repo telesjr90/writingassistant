@@ -1,3 +1,17 @@
+# PHASE8-UX-004 OMI Manual Workflow Repair and Extraction Availability Labeling
+
+- Result: PASS for owner-test confusion repair; automatic extraction remains unavailable from the OMI manual screen.
+- Decision record: `docs/roadmap/decisions/PHASE8-UX-004-omi-manual-workflow-repair-decision.md`.
+- UI repair: raw idea capture is labeled as owner-authored planning input; empty OMI candidate shells are labeled as manual shells when fields, summary, and evidence are empty or missing.
+- Extraction labeling: the OMI screen states that automatic extraction of characters, locations, timeline, and other story facts is not available from this screen yet.
+- Decision/status behavior: decision changes map to backend-valid statuses (`approve` -> `approved`, `reject` -> `rejected`, `needs_revision` -> `candidate`, `pending` -> `owner_review`) and approve requires explicit confirmation.
+- Backend validation display: decision update errors render in the OMI panel via `data-testid="omi-decision-error"` and keep the form visible.
+- Promotion readiness: empty manual shells are not promotion-ready evidence of captured facts; promotion remains separate/guarded.
+- Storyform clarity: missing storyform/storyform context is labeled as Story Check/context readiness, not OMI raw idea extraction failure.
+- Source contract validation: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_manual_workflow_source.py -q` -> `7 passed in 0.05s`.
+- Owner acceptance was not marked PASS. MVP was not marked complete.
+- No automatic extraction was added, no runtime extraction was executed, no model/Ollama generation calls were added, no Story Check call was added to OMI decision routes, no Memory/Canon mutation occurred, apply-promotion was not enabled or run, no story prose was generated, and no context tools were run.
+
 # PHASE8-UX-003-T007 Closeout and Owner Accepted/Blocked Gate Preparation
 
 - Result: PARTIAL for parent closeout/gate preparation; PASS for docs/status/governance work.
