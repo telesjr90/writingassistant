@@ -1,3 +1,18 @@
+# PHASE8 Final Owner Accepted Gate Decision
+
+- Result: PASS by explicit owner decision.
+- Owner gate decision: ACCEPTED.
+- Decision record: `docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md`.
+- Owner acceptance: PASS by explicit owner decision.
+- MVP owner gate: accepted for the next manual-test/readiness step according to roadmap conventions.
+- `PHASE8-UX-003` remains complete/PARTIAL historically; its owner gate is now ACCEPTED by explicit owner decision.
+- `PHASE8-UX-004` remains complete/PASS for OMI manual workflow repair only, and its owner manual test is APPROVED.
+- `PHASE8-UX-003-C-CYBER` remains `MANUAL_REVIEW_REQUIRED` because selected-source Story Check diagnostic output was unavailable/fail-closed on missing `storyform.json`; this automated item was not converted into automated PASS.
+- Accepted limitations remain visible: A-category blockers were manual owner review only; OMI manual approval was only for the repair; OMI manual screen still does not automatically extract characters, locations, timeline, or story facts; OMI approval remains lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
+- This decision authorizes no automatic extraction, runtime extraction, model/Ollama generation, Story Check call from OMI decision routes, apply-promotion, or story prose generation.
+- Next roadmap step: proceed to the next manual-test/readiness step after accepted owner gate, preserving any roadmap distinction between MVP owner gate accepted and full MVP complete.
+- No product code, tests, browser harness scripts, product UI, Memory/Canon, candidates, extraction, models/Ollama, apply-promotion, Story Check OMI decision routes, story prose, or context tools changed or ran for this decision record.
+
 # PHASE8-UX-004 Owner Manual Test Approval
 
 - Result: APPROVED by owner for the PHASE8-UX-004 OMI manual workflow repair only.
