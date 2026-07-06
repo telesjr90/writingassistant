@@ -1,0 +1,200 @@
+{
+  "task_id": "PHASE8-IMPL-023",
+  "title": "OMI Raw Idea Extraction Candidate Review MVP",
+  "status": "published/active",
+  "task_type": "implementation parent",
+  "parent_title": "PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP",
+  "mvp_required": true,
+  "context_pack": ".codex-context/PHASE8-IMPL-023/",
+  "purpose": "Build the real MVP OMI path where raw idea input produces structured, evidence-backed review candidates for owner review.",
+  "owner_override": {
+    "decision_record": "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
+    "full_mvp_closeout_status": "blocked",
+    "supersedes": "docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md",
+    "historical_owner_gate": "docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md",
+    "historical_owner_gate_status": "accepted by explicit owner decision but not full MVP completion"
+  },
+  "current_gap": [
+    "OMI manual workflow creates empty/manual candidate shells.",
+    "OMI does not yet identify candidates from raw idea text.",
+    "PHASE8-UX-004 made the limitation visible but did not implement extraction."
+  ],
+  "mvp_behavior": [
+    "User enters or saves a raw idea in OMI.",
+    "The system analyzes the raw idea.",
+    "The system identifies review candidates from that raw idea.",
+    "The UI lists those candidates for owner review."
+  ],
+  "candidate_types": [
+    "characters",
+    "locations",
+    "timeline/events",
+    "relationships",
+    "organizations/groups",
+    "objects/items",
+    "plot threads or story facts",
+    "open questions / ambiguities",
+    "storyform/context candidates only when supportable"
+  ],
+  "required_candidate_fields": [
+    "type",
+    "label/name",
+    "extracted claim",
+    "evidence/source excerpt or locator",
+    "provenance",
+    "status",
+    "owner decision state"
+  ],
+  "acceptance_criteria": [
+    "Given raw idea text, OMI produces non-empty candidate records where evidence exists.",
+    "Candidate list is visible in UI.",
+    "Each candidate has type, label/name, extracted claim, evidence/source excerpt or locator, provenance, status, and owner decision state.",
+    "Empty extraction fails closed with a clear explanation and does not create misleading empty shells.",
+    "UI clearly separates extracted candidates from approved Memory/Canon.",
+    "No automatic Memory/Canon mutation.",
+    "No automatic apply-promotion.",
+    "No generated story prose."
+  ],
+  "ui_ux_scope": [
+    "Better raw idea intake state.",
+    "Clear extraction status/progress/result.",
+    "Clear candidate grouping by type.",
+    "Empty/fail-closed states.",
+    "Review queue clarity.",
+    "Better error messages.",
+    "Clear next action after candidate extraction."
+  ],
+  "boundaries": [
+    "analysis-only",
+    "candidate-first",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "no generated prose",
+    "confidence is not truth",
+    "candidate presence is not canon",
+    "candidate persistence is not canon",
+    "queue presence is not approval",
+    "candidate approval does not automatically mutate Memory/Canon",
+    "apply-promotion remains explicit/audited/owner-confirmed/separate",
+    "no model/Ollama calls in parent publication",
+    "no extraction run in parent publication",
+    "no candidates created in parent publication",
+    "no Memory/Canon mutation",
+    "no apply-promotion run",
+    "no training/JSONL/dataset/model artifacts",
+    "no staging/commit/push"
+  ],
+  "expected_outputs": [
+    "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-023.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-023.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
+    "roadmap/status/governance updates setting PHASE8-IMPL-023 active",
+    "next child recorded as PHASE8-IMPL-023-T001"
+  ],
+  "allowed_files": [
+    "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-023.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-023.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/open_questions.md",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/phase_map.md",
+    "docs/roadmap/roadmap_index.yaml"
+  ],
+  "disallowed_files": [
+    "frontend/**",
+    "backend/**",
+    "tests/**",
+    "scripts/omi-dashboard-browser-smoke.mjs",
+    "scripts/omi-candidate-detail-browser-smoke.mjs",
+    "scripts/omi-evidence-drawer-browser-smoke.mjs",
+    "scripts/omi-apply-promotion-browser-smoke.mjs",
+    "package.json",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "training/**",
+    ".external_sources/**",
+    ".codex-context/**",
+    "ai_context/**",
+    "graphify-out/**",
+    "projects/**"
+  ],
+  "validation_commands": [
+    "python3 scripts/check_enrichment.py",
+    "python3 scripts/validate_roadmap.py",
+    "python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null",
+    "git diff --check",
+    "git status --short --branch",
+    "git diff --name-only"
+  ],
+  "references": [
+    "docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md",
+    "docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md",
+    "docs/roadmap/decisions/PHASE8-UX-004-omi-manual-workflow-repair-decision.md",
+    "docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/validation/latest_roadmap_validation.md"
+  ],
+  "active_child_sequence": [
+    {
+      "task_id": "PHASE8-IMPL-023-T001",
+      "title": "Gap Audit and Architecture Decision",
+      "status": "ready/active",
+      "scope": "gap audit and architecture decision; no implementation"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T002",
+      "title": "Expected-red raw idea to candidate listing tests",
+      "status": "planned",
+      "scope": "tests-first expected-red only"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T003",
+      "title": "Backend extraction contract/schema",
+      "status": "planned",
+      "scope": "contract/schema implementation"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T004",
+      "title": "Deterministic/rule-based MVP extractor",
+      "status": "planned",
+      "scope": "safe deterministic/rule-based baseline first; optional model-assisted layer only if bounded and tested"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T005",
+      "title": "Candidate persistence with evidence/provenance/source spans",
+      "status": "planned",
+      "scope": "candidate-first persistence only; no Memory/Canon mutation"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T006",
+      "title": "Frontend OMI extracted-candidate review UI/UX",
+      "status": "planned",
+      "scope": "owner review UI for extracted candidates"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T007",
+      "title": "No-canon/no-apply-promotion safety validation",
+      "status": "planned",
+      "scope": "safety validation/hardening only"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T008",
+      "title": "Browser/manual evidence and closeout",
+      "status": "planned",
+      "scope": "browser/manual evidence and parent closeout"
+    }
+  ],
+  "latest_child_task": null,
+  "latest_child_status": null,
+  "next_child_task": "PHASE8-IMPL-023-T001",
+  "next_child_status": "ready/active",
+  "parent_status": "published/active",
+  "full_mvp_completion_status": "blocked",
+  "owner_gate_status": "accepted historically, not full MVP completion"
+}

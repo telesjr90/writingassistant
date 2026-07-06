@@ -1,3 +1,20 @@
+# PHASE8 OMI Extraction Parent ID Correction
+
+- Result: PASS for roadmap/status parent ID correction validation.
+- Owner override decision: `docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md`.
+- Full MVP completion closeout: BLOCKED.
+- Superseded readiness decision: `docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md`; it no longer selects `PHASE8-MVP-COMPLETE-CLOSEOUT-001` as the next step.
+- The invalid OMI-specific parent ID is no longer active roadmap truth.
+- New validator-compatible active parent: `PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP`.
+- New active parent records: `docs/roadmap/tasks/PHASE8-IMPL-023.md`, `docs/roadmap/inventory/PHASE8-IMPL-023.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json`.
+- Next child task: `PHASE8-IMPL-023-T001 - Gap Audit and Architecture Decision`.
+- Child sequence preserved: T001 gap audit and architecture decision; T002 expected-red raw idea to candidate listing tests; T003 backend extraction contract/schema; T004 deterministic/rule-based MVP extractor; T005 candidate persistence with evidence/provenance/source spans; T006 frontend OMI extracted-candidate review UI/UX; T007 no-canon/no-apply-promotion safety validation; T008 browser/manual evidence and closeout.
+- Required MVP OMI behavior: raw idea input must be analyzed into structured, evidence-backed review candidates for owner review, with candidate types including characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, and supportable storyform/context candidates.
+- Acceptance criteria: non-empty candidates where evidence exists; visible candidate list; type, label/name, extracted claim, evidence/source excerpt or locator, provenance, status, and owner decision state; fail-closed empty extraction; extracted candidates separated from approved Memory/Canon; no automatic Memory/Canon mutation; no automatic apply-promotion; no generated story prose.
+- UI/UX scope: raw idea intake state, extraction status/progress/result, grouping by type, empty/fail-closed states, review queue clarity, better error messages, and clear next action after extraction.
+- Validation results: `python3 scripts/check_enrichment.py` PASS; `python3 scripts/validate_roadmap.py` PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` PASS; `git diff --check` PASS.
+- No product code, tests, browser harness scripts, product UI, Memory/Canon, candidates, extraction, models/Ollama, apply-promotion, Story Check OMI decision routes, story prose, or context tools changed or ran for this decision record.
+
 # PHASE8 Final Owner Accepted Gate Decision
 
 - Result: PASS by explicit owner decision.
@@ -10,7 +27,7 @@
 - `PHASE8-UX-003-C-CYBER` remains `MANUAL_REVIEW_REQUIRED` because selected-source Story Check diagnostic output was unavailable/fail-closed on missing `storyform.json`; this automated item was not converted into automated PASS.
 - Accepted limitations remain visible: A-category blockers were manual owner review only; OMI manual approval was only for the repair; OMI manual screen still does not automatically extract characters, locations, timeline, or story facts; OMI approval remains lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
 - This decision authorizes no automatic extraction, runtime extraction, model/Ollama generation, Story Check call from OMI decision routes, apply-promotion, or story prose generation.
-- Next roadmap step: proceed to the next manual-test/readiness step after accepted owner gate, preserving any roadmap distinction between MVP owner gate accepted and full MVP complete.
+- Next roadmap step: `PHASE8-IMPL-023-T001`; accepted owner gate remains historical and does not complete MVP.
 - No product code, tests, browser harness scripts, product UI, Memory/Canon, candidates, extraction, models/Ollama, apply-promotion, Story Check OMI decision routes, story prose, or context tools changed or ran for this decision record.
 
 # PHASE8-UX-004 Owner Manual Test Approval
@@ -19,7 +36,7 @@
 - Approval record: `docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md`.
 - Approved expected behavior: no extraction yet; empty/manual shell warning is correct; automatic extraction is not available from the OMI manual screen yet; approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
 - This does not mark final MVP owner acceptance PASS. MVP is not complete.
-- Next roadmap step: explicit owner Accepted/Blocked gate decision, unless the owner asks for another repair first.
+- Historical next roadmap step was explicit owner Accepted/Blocked gate decision. Current next step is `PHASE8-IMPL-023-T001` by owner override.
 - No product code, tests, browser harness scripts, product UI, Memory/Canon, candidates, extraction, models/Ollama, apply-promotion, or story prose changed or ran for this approval record.
 
 # PHASE8-UX-004 OMI Manual Workflow Repair and Extraction Availability Labeling

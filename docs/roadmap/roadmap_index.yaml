@@ -2,15 +2,18 @@
   "schema_version": "1.0",
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
-    "current_track": "MVP Acceptance UI",
-    "current_parent_task_id": "PHASE8-UX-003",
-    "current_parent_task_title": "Owner Acceptance Harness Route/Workflow Evidence Follow-up",
-    "frontier_note": "PHASE8 final owner gate decision is ACCEPTED by explicit owner decision via docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md. Owner acceptance is PASS by explicit owner decision, and the MVP owner gate is accepted for the next manual-test/readiness step according to roadmap conventions. This does not retroactively convert MANUAL_REVIEW_REQUIRED automated items into automated PASS and does not collapse any roadmap distinction between MVP owner gate accepted and full MVP complete. PHASE8-UX-003 remains complete/PARTIAL historically as the separate owner acceptance harness route/workflow evidence follow-up after PHASE8-UX-002-T007, but its owner gate is now ACCEPTED by explicit owner decision. PHASE8-UX-003-C-CYBER remains MANUAL_REVIEW_REQUIRED because selected-source Story Check reached the safe route but diagnostic output was unavailable/fail-closed on missing storyform.json. A-category blockers were manual owner review only. PHASE8-UX-004 remains complete/PASS for OMI manual owner-test workflow confusion repair only via docs/roadmap/decisions/PHASE8-UX-004-omi-manual-workflow-repair-decision.md, and owner manual test result remains APPROVED via docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md for that repair only. Approved expected behavior remains no extraction yet; empty/manual shell warning is correct; automatic extraction is not available from the OMI manual screen yet; approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded. No automatic extraction, runtime extraction, model/Ollama generation call, Story Check call in OMI decision routes, Memory/Canon mutation, apply-promotion execution, generated prose, or context tool run was added or authorized. Next roadmap step is the next manual-test/readiness step after accepted owner gate unless the owner asks for another repair or closeout first. PHASE8-UX-002 is not reopened. Generated prose/prose-production remains permanently forbidden. Apply-promotion remains guarded/disabled unless separately authorized."
+    "current_track": "MVP OMI Raw Idea Extraction / Candidate Review",
+    "current_parent_task_id": "PHASE8-IMPL-023",
+    "current_parent_task_title": "OMI Raw Idea Extraction Candidate Review MVP",
+    "next_readiness_task_id": "PHASE8-IMPL-023-T001",
+    "next_readiness_task_title": "Gap Audit and Architecture Decision",
+    "next_readiness_task_type": "implementation parent child / audit and architecture decision",
+    "frontier_note": "PHASE8 owner override is recorded at docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md. Full MVP completion closeout is BLOCKED because OMI still does not meet required MVP behavior: the current manual workflow only creates empty/manual candidate shells and does not identify candidates from raw idea text for owner review. The prior PHASE8 final owner gate remains ACCEPTED by explicit owner decision via docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md, but owner-gate acceptance is distinct from full MVP completion. docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md is superseded and no longer selects PHASE8-MVP-COMPLETE-CLOSEOUT-001 as the next step. The active implementation parent is PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP. The next child is PHASE8-IMPL-023-T001 - Gap Audit and Architecture Decision. Required MVP behavior is raw idea input analyzed into structured, evidence/provenance-backed review candidates for owner review. Candidate types include characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, and supportable storyform/context candidates. UI/UX improvement scope includes raw idea intake state, extraction status/progress/result, candidate grouping by type, empty/fail-closed states, review queue clarity, better error messages, and clear next action after extraction. Boundaries remain analysis-only, candidate-first, owner-controlled, confidence is not truth, candidate persistence is not canon, queue presence is not approval, candidate approval does not automatically mutate Memory/Canon, apply-promotion remains explicit/audited/owner-confirmed/separate, no generated prose, no model/Ollama calls in parent publication, no extraction run in parent publication, no candidate creation in parent publication, no Memory/Canon mutation, no apply-promotion run, no training artifacts, no staging, commit, or push."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
-    "parent_task_pattern": "PHASE[0-9]+-IMPL-[0-9]{3}",
-    "child_task_pattern": "PHASE[0-9]+-IMPL-[0-9]{3}-T[0-9]{3}",
+    "parent_task_pattern": "PHASE[0-9]+-(IMPL|UX)-[0-9]{3}",
+    "child_task_pattern": "PHASE[0-9]+-(IMPL|UX)-[0-9]{3}-T[0-9]{3}",
     "rules": [
       "Never reuse a parent implementation ID for validation work.",
       "Never renumber parent IDs after publication.",
@@ -5451,6 +5454,38 @@
       "latest_child_status": "complete/PARTIAL",
       "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-UX-003-T007-closeout-owner-gate-preparation.md"
+    },
+    {
+      "id": "PHASE8-IMPL-023",
+      "title": "OMI Raw Idea Extraction Candidate Review MVP",
+      "type": "runtime",
+      "status": "active",
+      "parent": null,
+      "depends_on": [
+        "PHASE8-UX-003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_apply_promotion",
+        "no_model_calls",
+        "no_generated_prose",
+        "generated_prose_permanently_forbidden",
+        "no_rewrite",
+        "no_continuation",
+        "local_first"
+      ],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-023.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-023.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
+      "context_pack": ".codex-context/PHASE8-IMPL-023/",
+      "latest_child_task": null,
+      "latest_child_status": null,
+      "next_child_task": "PHASE8-IMPL-023-T001",
+      "decision_record": "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md"
     }
   ]
 }
