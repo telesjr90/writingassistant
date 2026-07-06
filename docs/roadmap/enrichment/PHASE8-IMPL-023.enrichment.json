@@ -90,7 +90,8 @@
     "docs/roadmap/inventory/PHASE8-IMPL-023.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
     "roadmap/status/governance updates setting PHASE8-IMPL-023 active",
-    "next child recorded as PHASE8-IMPL-023-T001"
+    "latest child recorded as PHASE8-IMPL-023-T001 complete/PASS",
+    "next child recorded as PHASE8-IMPL-023-T002"
   ],
   "allowed_files": [
     "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
@@ -144,13 +145,13 @@
     {
       "task_id": "PHASE8-IMPL-023-T001",
       "title": "Gap Audit and Architecture Decision",
-      "status": "ready/active",
+      "status": "complete/PASS",
       "scope": "gap audit and architecture decision; no implementation"
     },
     {
       "task_id": "PHASE8-IMPL-023-T002",
       "title": "Expected-red raw idea to candidate listing tests",
-      "status": "planned",
+      "status": "ready/active",
       "scope": "tests-first expected-red only"
     },
     {
@@ -190,9 +191,10 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": null,
-  "latest_child_status": null,
-  "next_child_task": "PHASE8-IMPL-023-T001",
+  "latest_child_task": "PHASE8-IMPL-023-T001",
+  "latest_child_status": "complete/PASS",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md",
+  "next_child_task": "PHASE8-IMPL-023-T002",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked",

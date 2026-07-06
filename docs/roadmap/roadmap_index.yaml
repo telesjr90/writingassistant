@@ -5,10 +5,10 @@
     "current_track": "MVP OMI Raw Idea Extraction / Candidate Review",
     "current_parent_task_id": "PHASE8-IMPL-023",
     "current_parent_task_title": "OMI Raw Idea Extraction Candidate Review MVP",
-    "next_readiness_task_id": "PHASE8-IMPL-023-T001",
-    "next_readiness_task_title": "Gap Audit and Architecture Decision",
-    "next_readiness_task_type": "implementation parent child / audit and architecture decision",
-    "frontier_note": "PHASE8 owner override is recorded at docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md. Full MVP completion closeout is BLOCKED because OMI still does not meet required MVP behavior: the current manual workflow only creates empty/manual candidate shells and does not identify candidates from raw idea text for owner review. The prior PHASE8 final owner gate remains ACCEPTED by explicit owner decision via docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md, but owner-gate acceptance is distinct from full MVP completion. docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md is superseded and no longer selects PHASE8-MVP-COMPLETE-CLOSEOUT-001 as the next step. The active implementation parent is PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP. The next child is PHASE8-IMPL-023-T001 - Gap Audit and Architecture Decision. Required MVP behavior is raw idea input analyzed into structured, evidence/provenance-backed review candidates for owner review. Candidate types include characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, and supportable storyform/context candidates. UI/UX improvement scope includes raw idea intake state, extraction status/progress/result, candidate grouping by type, empty/fail-closed states, review queue clarity, better error messages, and clear next action after extraction. Boundaries remain analysis-only, candidate-first, owner-controlled, confidence is not truth, candidate persistence is not canon, queue presence is not approval, candidate approval does not automatically mutate Memory/Canon, apply-promotion remains explicit/audited/owner-confirmed/separate, no generated prose, no model/Ollama calls in parent publication, no extraction run in parent publication, no candidate creation in parent publication, no Memory/Canon mutation, no apply-promotion run, no training artifacts, no staging, commit, or push."
+    "next_readiness_task_id": "PHASE8-IMPL-023-T002",
+    "next_readiness_task_title": "Expected-red raw idea to candidate listing tests",
+    "next_readiness_task_type": "implementation parent child / tests-first expected-red",
+    "frontier_note": "PHASE8 owner override is recorded at docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md. Full MVP completion closeout is BLOCKED because OMI still does not meet required MVP behavior: the current manual workflow only creates empty/manual candidate shells and does not identify candidates from raw idea text for owner review. PHASE8-IMPL-023-T001 is complete/PASS via docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md. T001 found that current OMI stores raw ideas and manual candidate JSON only, with no extraction route/helper, no extraction result contract, no evidence-span-backed candidate output, and no fail-closed empty extraction result. The accepted MVP architecture is deterministic/rule-based baseline first, evidence/provenance-backed candidate schema, fail-closed empty extraction, no model/Ollama dependency for the first extractor unless separately authorized later, no generated prose, no automatic Memory/Canon mutation, and no automatic apply-promotion. The active implementation parent is PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP. The next child is PHASE8-IMPL-023-T002 - Expected-red raw idea to candidate listing tests. Required MVP behavior is raw idea input analyzed into structured, evidence/provenance-backed review candidates for owner review. Candidate types include characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, and supportable storyform/context candidates. UI/UX improvement scope includes raw idea intake state, extraction status/progress/result, candidate grouping by type, empty/fail-closed states, review queue clarity, better error messages, and clear next action after extraction. Boundaries remain analysis-only, candidate-first, owner-controlled, confidence is not truth, candidate persistence is not canon, queue presence is not approval, candidate approval does not automatically mutate Memory/Canon, apply-promotion remains explicit/audited/owner-confirmed/separate, no generated prose, no model/Ollama calls, no Memory/Canon mutation, no apply-promotion run, no training artifacts, no staging, commit, or push."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5482,10 +5482,10 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-023.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
-      "latest_child_task": null,
-      "latest_child_status": null,
-      "next_child_task": "PHASE8-IMPL-023-T001",
-      "decision_record": "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md"
+      "latest_child_task": "PHASE8-IMPL-023-T001",
+      "latest_child_status": "complete/PASS",
+      "next_child_task": "PHASE8-IMPL-023-T002",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md"
     }
   ]
 }

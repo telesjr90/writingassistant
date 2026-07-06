@@ -1,3 +1,18 @@
+# PHASE8-IMPL-023-T001 OMI Extraction Gap Audit and Architecture Decision
+
+- Result: PASS for audit and architecture decision only.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md`.
+- Current OMI gap: raw ideas are stored as owner-authored planning input, and candidates are created only by a separate manual candidate form. The current workflow can create empty/manual shells because no extractor reads raw idea text, no extraction route or helper exists, no extraction result contract exists, and no evidence/source-span-backed candidate schema is enforced.
+- Current backend touchpoints audited: `backend/main.py` OMI routes and request models; `backend/project_manager.py` OMI storage/index helpers, manual candidate creation, decision updates, promotion-record helpers, statuses, candidate type/destination allowlists, provenance, evidence, and owner decision validation.
+- Current frontend touchpoints audited: `frontend/src/api.js`, `frontend/src/components/OMIPanel.jsx`, `frontend/src/components/OMICandidateDetail.jsx`, `frontend/src/components/OMICandidateFieldTable.jsx`, and `frontend/src/components/OMIPromotionReadinessChecklist.jsx`.
+- Current tests audited: `tests/test_omi_routes.py`, `tests/test_project_manager.py`, `tests/test_omi_boundaries.py`, and `tests/test_omi_manual_workflow_source.py`.
+- Architecture decision: deterministic/rule-based MVP extractor first; evidence/provenance-backed candidate schema; fail-closed empty extraction; no model/Ollama dependency for the first extractor unless separately authorized later; no generated prose; no automatic Memory/Canon mutation; no automatic apply-promotion.
+- Candidate output contract for T002/T003 must include extraction status/result, candidate type, label/name, extracted claim, evidence/source excerpt or locator, provenance, confidence/support strength only as non-truth support if present, owner decision state, candidate status, and fail-closed empty extraction with no placeholder writes.
+- UI/UX requirements for T006: extraction status/progress/result, grouped candidate list by type, empty/fail-closed state, candidate detail with evidence/provenance, owner review actions, and clear separation from Memory/Canon and apply-promotion.
+- Safety invariants: candidate persistence is not canon; queue presence is not approval; approval does not mutate Memory/Canon; apply-promotion remains separate/guarded; no generated story prose; extraction output/confidence is not truth.
+- Next child task: `PHASE8-IMPL-023-T002 - Expected-red raw idea to candidate listing tests`.
+- No product code, tests, browser harness scripts, product UI, Memory/Canon, candidates, extraction, models/Ollama, apply-promotion, Story Check OMI decision routes, story prose, context tools, staging, commit, or push changed or ran for this decision record.
+
 # PHASE8 OMI Extraction Parent ID Correction
 
 - Result: PASS for roadmap/status parent ID correction validation.
