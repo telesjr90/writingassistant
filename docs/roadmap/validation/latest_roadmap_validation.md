@@ -1,3 +1,19 @@
+# PHASE8-IMPL-023-T002 OMI Extraction Expected-Red Tests
+
+- Result: PASS for tests-first expected-red coverage only.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md`.
+- Backend expected-red tests added: `tests/test_omi_extraction_expected_red.py`.
+- Frontend/source expected-red tests added: `tests/test_omi_extraction_ui_source_expected_red.py`.
+- Backend expected-red command: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_expected_red.py -q` -> `4 failed in 0.25s`.
+- Backend failure reasons: missing `OMIExtractionRequest`, missing `POST /api/projects/{project_name}/omi/extractions`, missing `extract_omi_candidates`, and missing `project_manager.extract_omi_candidates_from_raw_idea`.
+- Frontend/source expected-red command: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_ui_source_expected_red.py -q` -> `5 failed, 1 passed in 0.08s`.
+- Frontend/source failure reasons: missing `extractOMICandidates`, missing extraction action/status/result surface, missing grouped extracted-candidate list, missing extracted claim/evidence/provenance detail markers, and missing empty/fail-closed extraction state markers.
+- Safety coverage added: fail-closed empty extraction with no shells, candidate-first/non-canon persistence boundary, queue presence not approval, owner decision pending, no automatic Memory/Canon mutation, no automatic apply-promotion, no model/Story Check call, support strength not truth, and no generated prose controls.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS.
+- Existing OMI regressions: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_routes.py -q` -> `20 passed in 0.38s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py -q -k omi` -> `18 passed, 51 deselected in 0.24s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py -q` -> `21 passed in 0.34s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_manual_workflow_source.py -q` -> `7 passed in 0.07s`.
+- Next child task: `PHASE8-IMPL-023-T003 - Backend extraction contract and deterministic candidate schema`.
+- No product code, product UI, browser harness scripts, extractor, runtime extraction, real project candidates, model/Ollama call, Memory/Canon mutation, apply-promotion run or enablement, story prose, context tools, staging, commit, or push occurred for T002.
+
 # PHASE8-IMPL-023-T001 OMI Extraction Gap Audit and Architecture Decision
 
 - Result: PASS for audit and architecture decision only.
