@@ -45,6 +45,7 @@ class OMIExtractedCandidate(BaseModel):
     status: str
     owner_decision: dict
     support_strength: str | float | None = None
+    support_label: str | None = None
     confidence: str | float | None = None
 
     class Config:

@@ -1,19 +1,18 @@
-# PHASE8-IMPL-023-T003 Backend Extraction Contract and Deterministic Candidate Schema
+# PHASE8-IMPL-023-T004 Deterministic Rule-Based MVP Extractor
 
-- Result: PASS for backend contract/schema implementation only.
-- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md`.
-- Backend contract added: `OMIExtractionRequest`, `OMIExtractionResponse`, `OMIExtractedCandidate`, `POST /api/projects/{project_name}/omi/extractions`, `extract_omi_candidates`, and `project_manager.extract_omi_candidates_from_raw_idea`.
-- Candidate schema added in `backend/project_manager.py`: extracted candidate types `character`, `location`, `timeline_event`, `relationship`, `organization`, `object`, `plot_thread`, `story_fact`, `open_question`, and `storyform_context`; evidence/source excerpt or locator required for future extracted candidates; owner decision must remain pending; status must not imply approval/canon; support strength/confidence is support only.
-- Fail-closed behavior: empty raw idea returns `empty` with explanation and no candidates; non-empty raw idea returns `fail_closed` until T004 implements the deterministic extractor; `persist_candidates=true` with no evidence-backed candidates writes no candidates.
-- Contract tests: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_contract.py -q` -> `4 passed in 0.21s`.
-- Backend expected-red extraction tests: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_expected_red.py -q` -> `2 failed, 2 passed in 0.21s`.
-- Frontend/source expected-red extraction tests: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_ui_source_expected_red.py -q` -> `5 failed, 1 passed in 0.07s`.
-- T002 failures turned green: missing `OMIExtractionRequest`, missing extraction route/helper, missing project-manager helper, and fail-closed empty extraction contract.
-- Remaining expected-red failures: non-empty raw idea input still returns `fail_closed` instead of `succeeded` with rich evidence-backed candidates; frontend API/helper, extraction action/status/result UI, grouped candidate UI, detail evidence/provenance UI, and empty/fail-closed UI remain absent. These are deferred to `PHASE8-IMPL-023-T004` and `PHASE8-IMPL-023-T006`.
-- Existing OMI regressions: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_routes.py -q` -> `20 passed in 0.26s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py -q -k omi` -> `18 passed, 51 deselected in 0.26s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py -q` -> `21 passed in 0.41s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_manual_workflow_source.py -q` -> `7 passed in 0.07s`.
+- Result: PASS for backend deterministic marker extraction.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md`.
+- Extractor implemented in `backend/project_manager.py`: explicit owner-authored markers produce evidence-backed extracted candidates for `character`, `location`, `timeline_event`, `relationship`, `organization`, `object`, `plot_thread`, `story_fact`, `open_question`, and `storyform_context`.
+- Candidate fields: `candidate_type`, `label` or `name`, owner-authored `extracted_claim`, evidence source excerpt, source locator, line number, character offsets, deterministic provenance, candidate-review status, pending owner decision, and support-strength metadata labeled as support only.
+- Empty/fail-closed behavior: empty raw idea returns `empty`; unsupported non-empty input with no supported explicit markers returns `fail_closed`; both paths write no candidates.
+- Persistence behavior: `persist_candidates=true` with a source OMI idea persists only evidence-backed extracted candidates through the existing candidate-first OMI queue with pending owner decision and `promotion_status.eligible=false`; no canon, approval, promotion record, or apply-promotion occurs.
+- Contract tests: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_contract.py -q` -> `5 passed in 0.27s`.
+- Backend expected-red extraction tests: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_expected_red.py -q` -> `4 passed in 0.24s`.
+- Existing OMI regressions: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_routes.py -q` -> `20 passed in 0.34s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py -q -k omi` -> `18 passed, 51 deselected in 0.22s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py -q` -> `21 passed in 0.36s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_manual_workflow_source.py -q` -> `7 passed in 0.05s`.
+- Frontend/source expected-red extraction tests remain deferred to T006: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_ui_source_expected_red.py -q` -> `5 failed, 1 passed in 0.06s`, limited to missing frontend API/helper, extraction action/status/result UI, grouped candidate UI, detail evidence/provenance UI, and empty/fail-closed UI surfaces.
 - Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS.
-- Next child task: `PHASE8-IMPL-023-T004 - Deterministic/rule-based MVP extractor`.
-- No frontend UI, browser harness scripts, full deterministic extractor, runtime extraction, model/Ollama call, Story Check call, BookNLP/spaCy/NCP/Subtxt/dramatica-flow run, Memory/Canon mutation, promotion record, apply-promotion run/enablement, story prose, training artifact, context tool, staging, commit, or push occurred for T003.
+- Next child task: `PHASE8-IMPL-023-T005 - Candidate persistence with evidence/provenance/source spans`.
+- No frontend UI, browser harness scripts, model/Ollama call, Story Check call, BookNLP/spaCy/NCP/Subtxt/dramatica-flow run, external service call, Memory/Canon mutation, promotion record, apply-promotion run/enablement, story prose, training artifact, context tool, staging, commit, or push occurred for T004.
 
 # PHASE8-IMPL-023-T002 OMI Extraction Expected-Red Tests
 

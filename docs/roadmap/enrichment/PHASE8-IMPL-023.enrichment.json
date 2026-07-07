@@ -15,9 +15,9 @@
     "historical_owner_gate_status": "accepted by explicit owner decision but not full MVP completion"
   },
   "current_gap": [
-    "OMI manual workflow creates empty/manual candidate shells.",
-    "OMI does not yet identify candidates from raw idea text.",
-    "PHASE8-UX-004 made the limitation visible but did not implement extraction."
+    "Backend deterministic marker extraction now identifies evidence-backed candidates from explicit raw idea markers.",
+    "Frontend OMI API/UI surfaces do not yet trigger extraction or list extracted candidates for owner review.",
+    "Dedicated T005 persistence hardening remains next for evidence/provenance/source-span persistence boundaries."
   ],
   "mvp_behavior": [
     "User enters or saves a raw idea in OMI.",
@@ -96,7 +96,9 @@
     "T002 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
     "T003 backend extraction contract and deterministic candidate schema implemented",
     "T003 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
-    "next child recorded as PHASE8-IMPL-023-T004"
+    "T004 deterministic/rule-based MVP extractor implemented",
+    "T004 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
+    "next child recorded as PHASE8-IMPL-023-T005"
   ],
   "allowed_files": [
     "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
@@ -106,8 +108,11 @@
     "tests/test_omi_extraction_expected_red.py",
     "tests/test_omi_extraction_contract.py",
     "tests/test_omi_extraction_ui_source_expected_red.py",
+    "backend/project_manager.py",
+    "backend/main.py",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/validation/latest_roadmap_validation.md",
     "docs/roadmap/decision_log.md",
@@ -119,8 +124,8 @@
   ],
   "disallowed_files": [
     "frontend/**",
-    "backend/**",
-    "tests/** except PHASE8-IMPL-023-T002 expected-red extraction contract/source tests",
+    "backend/** except backend/project_manager.py and backend/main.py for T004 backend extractor work",
+    "tests/** except focused PHASE8-IMPL-023 extraction contract/source/backend regression tests",
     "scripts/omi-dashboard-browser-smoke.mjs",
     "scripts/omi-candidate-detail-browser-smoke.mjs",
     "scripts/omi-evidence-drawer-browser-smoke.mjs",
@@ -173,13 +178,13 @@
     {
       "task_id": "PHASE8-IMPL-023-T004",
       "title": "Deterministic/rule-based MVP extractor",
-      "status": "ready/active",
-      "scope": "safe deterministic/rule-based baseline first; optional model-assisted layer only if bounded and tested"
+      "status": "complete/PASS",
+      "scope": "safe deterministic/rule-based marker extractor; no model/Ollama/NLP dependency and no generated prose"
     },
     {
       "task_id": "PHASE8-IMPL-023-T005",
       "title": "Candidate persistence with evidence/provenance/source spans",
-      "status": "planned",
+      "status": "ready/active",
       "scope": "candidate-first persistence only; no Memory/Canon mutation"
     },
     {
@@ -201,10 +206,10 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T003",
+  "latest_child_task": "PHASE8-IMPL-023-T004",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
-  "next_child_task": "PHASE8-IMPL-023-T004",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
+  "next_child_task": "PHASE8-IMPL-023-T005",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked",

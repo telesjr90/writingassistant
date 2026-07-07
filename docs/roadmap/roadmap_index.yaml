@@ -5482,10 +5482,10 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-023.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
-      "latest_child_task": "PHASE8-IMPL-023-T003",
+      "latest_child_task": "PHASE8-IMPL-023-T004",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-023-T004",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md"
+      "next_child_task": "PHASE8-IMPL-023-T005",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md"
     }
   ]
 }

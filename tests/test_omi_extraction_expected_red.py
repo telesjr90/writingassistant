@@ -133,6 +133,7 @@ def _assert_candidate_contract(candidate: dict) -> None:
         "candidate_review_pending",
     }
     assert candidate.get("owner_decision", {}).get("decision") == "pending"
+    assert candidate["extracted_claim"] in RAW_IDEA_WITH_EVIDENCE
 
     provenance = candidate["provenance"]
     assert provenance.get("source_type") in {
@@ -154,6 +155,15 @@ def _assert_candidate_contract(candidate: dict) -> None:
         ).lower()
         assert "support" in support_label
         assert "truth" not in support_label
+
+    evidence = candidate["evidence"][0]
+    assert evidence.get("source_excerpt")
+    assert evidence.get("source_locator")
+    assert evidence.get("source_type") == "omi_raw_idea"
+    assert isinstance(evidence.get("line_number"), int)
+    assert isinstance(evidence.get("char_start"), int)
+    assert isinstance(evidence.get("char_end"), int)
+    assert evidence["source_excerpt"] in RAW_IDEA_WITH_EVIDENCE
 
 
 def _assert_extraction_result_contract(result: dict) -> None:
@@ -262,12 +272,20 @@ def test_persisted_extracted_candidates_remain_candidate_first_expected_red(
     _assert_extraction_result_contract(result)
     summary = main.get_omi("example")
     assert len(summary["candidates"]) == len(result["candidates"])
+    assert result["persistence_status"] == "persisted"
+    assert len(result["persisted_candidate_ids"]) == len(result["candidates"])
     assert summary["promotions"] == []
 
     for candidate in summary["candidates"]:
         assert candidate["status"] not in {"approved", "promoted", "canon"}
         assert candidate.get("owner_decision", {}).get("decision") == "pending"
         assert candidate.get("promotion_status", {}).get("eligible") is False
+        content = candidate["candidate_content"]
+        assert content["candidate_first"] is True
+        assert content["canon"] is False
+        assert content["approved"] is False
+        assert content["extracted_candidate_type"] in EXPECTED_TYPES
+        assert content["extracted_claim"] in RAW_IDEA_WITH_EVIDENCE
 
     for path, content in truth_files.items():
         assert path.read_text(encoding="utf-8") == content

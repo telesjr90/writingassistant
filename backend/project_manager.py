@@ -680,6 +680,29 @@ OMI_EXTRACTED_CANDIDATE_STATUSES = frozenset(
 )
 OMI_EXTRACTED_CANDIDATE_DEFAULT_STATUS = "candidate_review_pending"
 OMI_EXTRACTION_SUPPORT_LABEL = "support strength only"
+OMI_DETERMINISTIC_EXTRACTOR_NAME = "omi_deterministic_marker_extractor"
+OMI_DETERMINISTIC_EXTRACTOR_VERSION = "phase8-impl-023-t004"
+OMI_EXPLICIT_MARKER_CANDIDATE_TYPES = {
+    "character": "character",
+    "location": "location",
+    "organization": "organization",
+    "object": "object",
+    "timeline event": "timeline_event",
+    "relationship": "relationship",
+    "plot thread": "plot_thread",
+    "story fact": "story_fact",
+    "open question": "open_question",
+    "storyform context": "storyform_context",
+}
+OMI_EXPLICIT_MARKER_PATTERN = re.compile(
+    r"^\s*(?P<marker>"
+    + "|".join(re.escape(marker) for marker in OMI_EXPLICIT_MARKER_CANDIDATE_TYPES)
+    + r")\s*:\s*(?P<claim>.+?)\s*$",
+    re.IGNORECASE,
+)
+OMI_EXTRACTED_ENTITY_NAME_TYPES = frozenset(
+    {"character", "location", "organization", "object"}
+)
 
 
 def _safe_path_component(value: str, label: str) -> str:
@@ -2141,20 +2164,26 @@ def _omi_extraction_provenance(
     *,
     raw_idea: str,
     source_idea_id: str | None,
+    request_provenance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    return {
+    extraction_provenance = {
         "source_type": "omi_raw_idea",
         "source_idea_id": source_idea_id,
         "source_locator": _omi_raw_idea_source_locator(source_idea_id),
-        "extractor_name": "omi_contract_fail_closed",
-        "extractor_version": "phase8-impl-023-t003",
-        "tool": "deterministic_contract",
+        "source_author": "owner",
+        "owner_authored": True,
+        "extractor_name": OMI_DETERMINISTIC_EXTRACTOR_NAME,
+        "extractor_version": OMI_DETERMINISTIC_EXTRACTOR_VERSION,
+        "tool": "deterministic_marker_rules",
         "model": None,
         "prompt_id": None,
         "timestamp": _utc_now(),
         "source_hash": _raw_idea_sha256(raw_idea),
         "snapshot_hash": _raw_idea_sha256(raw_idea),
     }
+    if request_provenance:
+        extraction_provenance["request_provenance"] = dict(request_provenance)
+    return extraction_provenance
 
 
 def _omi_empty_extraction_result(
@@ -2165,6 +2194,7 @@ def _omi_empty_extraction_result(
     extraction_status: str,
     explanation: str,
     persist_candidates: bool,
+    request_provenance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if extraction_status not in OMI_EXTRACTION_STATUSES - {"succeeded"}:
         raise ValueError(f"Unsupported empty OMI extraction status: {extraction_status}")
@@ -2191,6 +2221,7 @@ def _omi_empty_extraction_result(
         "provenance": _omi_extraction_provenance(
             raw_idea=raw_idea,
             source_idea_id=source_idea_id,
+            request_provenance=request_provenance,
         ),
         "safety": {
             "candidate_persistence_is_not_canon": True,
@@ -2203,6 +2234,247 @@ def _omi_empty_extraction_result(
             "no_story_check_call": True,
             "no_generated_prose": True,
         },
+    }
+
+
+def _omi_extraction_safety_flags() -> dict[str, bool]:
+    return {
+        "candidate_persistence_is_not_canon": True,
+        "queue_presence_is_not_approval": True,
+        "confidence_is_not_truth": True,
+        "no_memory_canon_mutation": True,
+        "no_promotion_records_created": True,
+        "no_apply_promotion": True,
+        "no_model_call": True,
+        "no_story_check_call": True,
+        "no_generated_prose": True,
+    }
+
+
+def _omi_marker_label_from_claim(claim: str) -> str:
+    label = claim.strip()
+    if len(label) > 1:
+        label = label.rstrip(".")
+    return label.strip()
+
+
+def _omi_extracted_candidate_destination(candidate_type: str) -> str:
+    if candidate_type == "storyform_context":
+        return "storyform_context_candidate"
+    if candidate_type in {"character", "location", "organization", "object", "story_fact"}:
+        return "project_bible_candidate"
+    return "planning_notes"
+
+
+def _omi_extracted_candidate_container_type(candidate_type: str) -> str:
+    if candidate_type == "storyform_context":
+        return "storyform_context_candidate"
+    if candidate_type in {"character", "location", "organization", "object", "story_fact"}:
+        return "project_bible_candidate"
+    return "planning_note"
+
+
+def _build_omi_marker_candidate(
+    *,
+    candidate_type: str,
+    marker_label: str,
+    claim: str,
+    source_excerpt: str,
+    source_locator: str,
+    line_number: int,
+    char_start: int,
+    char_end: int,
+    line_char_start: int,
+    line_char_end: int,
+    raw_idea: str,
+    source_idea_id: str | None,
+    base_provenance: dict[str, Any],
+) -> dict[str, Any] | None:
+    label = _omi_marker_label_from_claim(claim)
+    if not label:
+        return None
+
+    evidence = [
+        {
+            "source_type": "omi_raw_idea",
+            "source_idea_id": source_idea_id,
+            "source_excerpt": source_excerpt,
+            "source_locator": source_locator,
+            "line_number": line_number,
+            "char_start": char_start,
+            "char_end": char_end,
+            "line_char_start": line_char_start,
+            "line_char_end": line_char_end,
+            "source_hash": _raw_idea_sha256(raw_idea),
+            "owner_authored": True,
+        }
+    ]
+    candidate_provenance = dict(base_provenance)
+    candidate_provenance.update(
+        {
+            "candidate_type": candidate_type,
+            "marker": marker_label,
+            "line_number": line_number,
+            "char_start": char_start,
+            "char_end": char_end,
+        }
+    )
+    candidate = {
+        "candidate_type": candidate_type,
+        "label": label,
+        "extracted_claim": claim.strip(),
+        "evidence": evidence,
+        "provenance": candidate_provenance,
+        "status": OMI_EXTRACTED_CANDIDATE_DEFAULT_STATUS,
+        "owner_decision": _default_owner_decision(),
+        "support_strength": "explicit_owner_marker",
+        "support_label": OMI_EXTRACTION_SUPPORT_LABEL,
+    }
+    if candidate_type in OMI_EXTRACTED_ENTITY_NAME_TYPES:
+        candidate["name"] = label
+    return validate_omi_extracted_candidate(candidate)
+
+
+def _extract_omi_candidates_by_markers(
+    raw_idea: str,
+    *,
+    source_idea_id: str | None,
+    request_provenance: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    base_provenance = _omi_extraction_provenance(
+        raw_idea=raw_idea,
+        source_idea_id=source_idea_id,
+        request_provenance=request_provenance,
+    )
+    base_locator = _omi_raw_idea_source_locator(source_idea_id)
+    candidates: list[dict[str, Any]] = []
+    offset = 0
+
+    for line_number, raw_line in enumerate(raw_idea.splitlines(keepends=True), start=1):
+        line_text = raw_line.rstrip("\r\n")
+        stripped_line = line_text.strip()
+        line_start = offset
+        offset += len(raw_line)
+        if not stripped_line:
+            continue
+
+        match = OMI_EXPLICIT_MARKER_PATTERN.match(line_text)
+        if match is None:
+            continue
+
+        claim = match.group("claim").strip()
+        if not claim:
+            continue
+
+        marker = match.group("marker").casefold()
+        candidate_type = OMI_EXPLICIT_MARKER_CANDIDATE_TYPES[marker]
+        leading_ws = len(line_text) - len(line_text.lstrip())
+        trailing_ws_end = len(line_text.rstrip())
+        char_start = line_start + leading_ws
+        char_end = line_start + trailing_ws_end
+        source_locator = f"{base_locator}:L{line_number}:C{char_start}-{char_end}"
+        candidate = _build_omi_marker_candidate(
+            candidate_type=candidate_type,
+            marker_label=match.group("marker"),
+            claim=claim,
+            source_excerpt=stripped_line,
+            source_locator=source_locator,
+            line_number=line_number,
+            char_start=char_start,
+            char_end=char_end,
+            line_char_start=leading_ws,
+            line_char_end=trailing_ws_end,
+            raw_idea=raw_idea,
+            source_idea_id=source_idea_id,
+            base_provenance=base_provenance,
+        )
+        if candidate is not None:
+            candidates.append(candidate)
+
+    return candidates
+
+
+def _omi_extracted_candidate_content(candidate: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "source": "deterministic_omi_extraction",
+        "extracted_candidate_type": candidate["candidate_type"],
+        "label": candidate["label"],
+        "extracted_claim": candidate["extracted_claim"],
+        "evidence": candidate["evidence"],
+        "provenance": candidate["provenance"],
+        "owner_decision": candidate["owner_decision"],
+        "status": candidate["status"],
+        "support_strength": candidate.get("support_strength"),
+        "support_label": candidate.get("support_label"),
+        "candidate_first": True,
+        "canon": False,
+        "approved": False,
+    }
+
+
+def _persist_omi_extracted_candidates(
+    project_name: str,
+    *,
+    source_idea_id: str | None,
+    candidates: list[dict[str, Any]],
+) -> tuple[list[str], str]:
+    if not candidates:
+        return [], "no_candidates_persisted"
+    if source_idea_id is None:
+        return [], "source_idea_required"
+
+    persisted_candidate_ids: list[str] = []
+    for candidate in candidates:
+        persisted = create_omi_candidate(
+            project_name,
+            source_idea_id,
+            _omi_extracted_candidate_container_type(candidate["candidate_type"]),
+            _omi_extracted_candidate_content(candidate),
+            _omi_extracted_candidate_destination(candidate["candidate_type"]),
+            provenance=candidate["provenance"],
+            evidence=candidate["evidence"],
+        )
+        persisted_candidate_ids.append(persisted["candidate_id"])
+
+    return persisted_candidate_ids, "persisted"
+
+
+def _omi_success_extraction_result(
+    project_name: str,
+    *,
+    raw_idea: str,
+    source_idea_id: str | None,
+    candidates: list[dict[str, Any]],
+    persist_candidates: bool,
+    persisted_candidate_ids: list[str],
+    persistence_status: str,
+    request_provenance: dict[str, Any] | None,
+) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "project_id": project_name,
+        "extraction_status": "succeeded",
+        "status": "succeeded",
+        "explanation": (
+            "Deterministic marker extraction found evidence-backed candidates "
+            "for owner review."
+        ),
+        "source_idea_id": source_idea_id,
+        "source_locator": _omi_raw_idea_source_locator(source_idea_id),
+        "raw_idea_hash": _raw_idea_sha256(raw_idea),
+        "candidate_types": sorted(OMI_EXTRACTED_CANDIDATE_TYPES),
+        "candidates": candidates,
+        "candidate_count": len(candidates),
+        "persist_candidates": persist_candidates,
+        "persisted_candidate_ids": persisted_candidate_ids,
+        "persistence_status": persistence_status,
+        "provenance": _omi_extraction_provenance(
+            raw_idea=raw_idea,
+            source_idea_id=source_idea_id,
+            request_provenance=request_provenance,
+        ),
+        "safety": _omi_extraction_safety_flags(),
     }
 
 
@@ -2239,6 +2511,7 @@ def extract_omi_candidates_from_raw_idea(
                     "no evidence-backed candidates were extracted or persisted."
                 ),
                 persist_candidates=persist_candidates,
+                request_provenance=provenance,
             )
         if submitted_raw_idea and submitted_raw_idea != source_raw_idea.strip():
             return _omi_empty_extraction_result(
@@ -2251,6 +2524,7 @@ def extract_omi_candidates_from_raw_idea(
                     "snapshot; no candidates were extracted or persisted."
                 ),
                 persist_candidates=persist_candidates,
+                request_provenance=provenance,
             )
         submitted_raw_idea = source_raw_idea.strip()
 
@@ -2265,18 +2539,47 @@ def extract_omi_candidates_from_raw_idea(
                 "were extracted or persisted."
             ),
             persist_candidates=persist_candidates,
+            request_provenance=provenance,
         )
 
-    return _omi_empty_extraction_result(
+    candidates = _extract_omi_candidates_by_markers(
+        submitted_raw_idea,
+        source_idea_id=source_idea_id,
+        request_provenance=provenance,
+    )
+    if not candidates:
+        return _omi_empty_extraction_result(
+            project_name,
+            raw_idea=submitted_raw_idea,
+            source_idea_id=source_idea_id,
+            extraction_status="fail_closed",
+            explanation=(
+                "No supported explicit OMI extraction markers with evidence were "
+                "found; no candidates were extracted or persisted."
+            ),
+            persist_candidates=persist_candidates,
+            request_provenance=provenance,
+        )
+
+    if persist_candidates:
+        persisted_candidate_ids, persistence_status = _persist_omi_extracted_candidates(
+            project_name,
+            source_idea_id=source_idea_id,
+            candidates=candidates,
+        )
+    else:
+        persisted_candidate_ids = []
+        persistence_status = "not_requested"
+
+    return _omi_success_extraction_result(
         project_name,
         raw_idea=submitted_raw_idea,
         source_idea_id=source_idea_id,
-        extraction_status="fail_closed",
-        explanation=(
-            "The deterministic OMI extractor is not implemented in this contract "
-            "slice; no evidence-backed candidates were extracted or persisted."
-        ),
+        candidates=candidates,
         persist_candidates=persist_candidates,
+        persisted_candidate_ids=persisted_candidate_ids,
+        persistence_status=persistence_status,
+        request_provenance=provenance,
     )
 
 
