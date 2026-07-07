@@ -1,29 +1,36 @@
 {
   "task_id": "PHASE8-IMPL-023",
-  "title": "OMI Raw Idea Extraction Candidate Review MVP",
+  "title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
   "status": "published/active",
   "task_type": "implementation parent",
-  "parent_title": "PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP",
+  "parent_title": "PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP",
   "mvp_required": true,
   "context_pack": ".codex-context/PHASE8-IMPL-023/",
-  "purpose": "Build the real MVP OMI path where raw idea input produces structured, evidence-backed review candidates for owner review.",
+  "purpose": "Build the real MVP OMI path where raw idea input is analyzed by an AI/tool-assisted analysis orchestrator and converted into structured, evidence-backed review candidates for owner review.",
   "owner_override": {
-    "decision_record": "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
+    "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md",
+    "prior_owner_override_record": "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
     "full_mvp_closeout_status": "blocked",
-    "supersedes": "docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md",
+    "supersedes": [
+      "deterministic-marker-only MVP extraction direction",
+      "docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md where it selected deterministic/rule-based extraction as the first MVP target"
+    ],
     "historical_owner_gate": "docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md",
     "historical_owner_gate_status": "accepted by explicit owner decision but not full MVP completion"
   },
   "current_gap": [
-    "Backend deterministic marker extraction now identifies evidence-backed candidates from explicit raw idea markers.",
-    "Frontend OMI API/UI surfaces do not yet trigger extraction or list extracted candidates for owner review.",
-    "Dedicated T005 persistence hardening remains next for evidence/provenance/source-span persistence boundaries."
+    "Backend deterministic marker extraction exists for explicit owner-authored markers but is now fallback/safety baseline only.",
+    "The corrected MVP requires AI/tool-assisted OMI analysis using Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.",
+    "The orchestrator, adapter boundaries, normalization layer, fusion/dedupe layer, evidence/provenance normalization, persistence of fused findings, and frontend analysis-results UI remain unimplemented in this corrected path."
   ],
   "mvp_behavior": [
-    "User enters or saves a raw idea in OMI.",
-    "The system analyzes the raw idea.",
-    "The system identifies review candidates from that raw idea.",
-    "The UI lists those candidates for owner review."
+    "User enters or saves raw idea text in OMI.",
+    "OMI runs tool-assisted analysis through an orchestrator.",
+    "Adapters return candidate findings, diagnostics, evidence, provenance, source locators, and support labels.",
+    "A normalization layer converts all outputs to a common OMI candidate schema.",
+    "A fusion/dedupe layer groups equivalent findings and preserves conflicts or uncertainty.",
+    "The UI lists findings grouped by type, tool/provenance, and evidence.",
+    "The owner confirms, rejects, or revises findings."
   ],
   "candidate_types": [
     "characters",
@@ -34,35 +41,61 @@
     "objects/items",
     "plot threads or story facts",
     "open questions / ambiguities",
-    "storyform/context candidates only when supportable"
+    "storyform/context candidates only when supportable",
+    "diagnostics/questions where appropriate"
   ],
   "required_candidate_fields": [
-    "type",
+    "candidate_type",
     "label/name",
-    "extracted claim",
-    "evidence/source excerpt or locator",
-    "provenance",
-    "status",
-    "owner decision state"
+    "extracted_claim",
+    "evidence/source excerpt",
+    "source_locator",
+    "provenance/tool source",
+    "support/confidence as support only, not truth",
+    "owner_decision pending",
+    "candidate/review status",
+    "diagnostics/questions where appropriate"
   ],
   "acceptance_criteria": [
-    "Given raw idea text, OMI produces non-empty candidate records where evidence exists.",
-    "Candidate list is visible in UI.",
-    "Each candidate has type, label/name, extracted claim, evidence/source excerpt or locator, provenance, status, and owner decision state.",
-    "Empty extraction fails closed with a clear explanation and does not create misleading empty shells.",
+    "Given raw idea text, OMI can produce non-empty tool-assisted candidate findings where evidence exists.",
+    "Candidate list is visible in UI and grouped by type.",
+    "Each candidate has candidate type, label/name, extracted claim, evidence/source excerpt, source locator, provenance/tool source, support label, status, and owner decision state.",
+    "Diagnostics/questions are shown where appropriate without writing or suggesting story prose.",
+    "Empty or unsupported analysis fails closed with a clear explanation and does not create misleading empty shells.",
     "UI clearly separates extracted candidates from approved Memory/Canon.",
     "No automatic Memory/Canon mutation.",
     "No automatic apply-promotion.",
-    "No generated story prose."
+    "No generated story prose.",
+    "Tool/model output is never treated as canon or truth."
   ],
   "ui_ux_scope": [
     "Better raw idea intake state.",
-    "Clear extraction status/progress/result.",
+    "Clear analysis status/progress/result.",
     "Clear candidate grouping by type.",
+    "Tool/provenance grouping and display.",
+    "Evidence/source locator display.",
+    "Conflict and uncertainty display.",
     "Empty/fail-closed states.",
     "Review queue clarity.",
     "Better error messages.",
-    "Clear next action after candidate extraction."
+    "Clear next action after candidate analysis."
+  ],
+  "architecture": {
+    "orchestrator": "OMI analysis orchestrator receives raw idea text and coordinates bounded analysis adapters.",
+    "adapters": "Each adapter returns candidate findings, diagnostics, evidence, provenance, and support labels.",
+    "normalization": "All adapter outputs are converted to the common OMI candidate schema.",
+    "fusion_dedupe": "Equivalent findings are grouped while conflicts and uncertainty remain visible.",
+    "persistence": "Fused evidence-backed candidates are stored as candidate/review material only.",
+    "ui": "The UI lists what was found, grouped by type/tool/evidence, and asks the owner to confirm, reject, or revise."
+  },
+  "tool_boundaries": [
+    "Ollama/model: structured extraction only, schema-bound JSON, no prose, no rewriting.",
+    "Story Check: diagnostic-only observations, no prose suggestions.",
+    "BookNLP/spaCy: entities/events/relationships/mentions as evidence-backed candidate sources.",
+    "NCP: structural context candidate mapping, not truth export.",
+    "Subtxt: rubric/diagnostic interpretation, not automatic Dramatica truth.",
+    "dramatica-flow: analysis-pattern reference only; generation/revision/continuation disabled.",
+    "All tools must fail closed."
   ],
   "boundaries": [
     "analysis-only",
@@ -70,49 +103,41 @@
     "evidence/provenance-backed",
     "owner-controlled",
     "no generated prose",
-    "confidence is not truth",
+    "no rewrite",
+    "no continuation",
+    "no outline",
+    "no draft",
+    "no polish",
+    "no improvement",
+    "no expansion",
+    "no imitation",
+    "no revision",
+    "no writing suggestion",
+    "confidence/support is not truth",
     "candidate presence is not canon",
     "candidate persistence is not canon",
     "queue presence is not approval",
+    "tool/model output is not canon",
     "candidate approval does not automatically mutate Memory/Canon",
     "apply-promotion remains explicit/audited/owner-confirmed/separate",
-    "no model/Ollama calls in parent publication",
-    "no extraction run in parent publication",
-    "no candidates created in parent publication",
-    "no Memory/Canon mutation",
-    "no apply-promotion run",
+    "no automatic apply-promotion",
     "no training/JSONL/dataset/model artifacts",
     "no staging/commit/push"
   ],
   "expected_outputs": [
-    "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md",
     "docs/roadmap/tasks/PHASE8-IMPL-023.md",
     "docs/roadmap/inventory/PHASE8-IMPL-023.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
-    "roadmap/status/governance updates setting PHASE8-IMPL-023 active",
-    "latest child recorded as PHASE8-IMPL-023-T003 complete/PASS",
-    "expected-red backend extraction tests recorded at tests/test_omi_extraction_expected_red.py",
-    "expected-red frontend/source extraction tests recorded at tests/test_omi_extraction_ui_source_expected_red.py",
-    "T002 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
-    "T003 backend extraction contract and deterministic candidate schema implemented",
-    "T003 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
-    "T004 deterministic/rule-based MVP extractor implemented",
-    "T004 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
-    "next child recorded as PHASE8-IMPL-023-T005"
+    "roadmap/status/governance updates keeping PHASE8-IMPL-023 active with corrected AI/tool-assisted OMI scope",
+    "T004 deterministic work recorded as superseded/re-scoped fallback-only",
+    "next child recorded as PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries"
   ],
   "allowed_files": [
-    "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md",
     "docs/roadmap/tasks/PHASE8-IMPL-023.md",
     "docs/roadmap/inventory/PHASE8-IMPL-023.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
-    "tests/test_omi_extraction_expected_red.py",
-    "tests/test_omi_extraction_contract.py",
-    "tests/test_omi_extraction_ui_source_expected_red.py",
-    "backend/project_manager.py",
-    "backend/main.py",
-    "docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
-    "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
-    "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/validation/latest_roadmap_validation.md",
     "docs/roadmap/decision_log.md",
@@ -123,16 +148,10 @@
     "docs/roadmap/roadmap_index.yaml"
   ],
   "disallowed_files": [
+    "backend/**",
     "frontend/**",
-    "backend/** except backend/project_manager.py and backend/main.py for T004 backend extractor work",
-    "tests/** except focused PHASE8-IMPL-023 extraction contract/source/backend regression tests",
-    "scripts/omi-dashboard-browser-smoke.mjs",
-    "scripts/omi-candidate-detail-browser-smoke.mjs",
-    "scripts/omi-evidence-drawer-browser-smoke.mjs",
-    "scripts/omi-apply-promotion-browser-smoke.mjs",
-    "package.json",
-    "frontend/package.json",
-    "frontend/package-lock.json",
+    "tests/**",
+    "scripts/** except validation commands",
     "training/**",
     ".external_sources/**",
     ".codex-context/**",
@@ -149,69 +168,113 @@
     "git diff --name-only"
   ],
   "references": [
-    "docs/roadmap/decisions/PHASE8-final-owner-accepted-gate-decision.md",
-    "docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md",
-    "docs/roadmap/decisions/PHASE8-UX-004-omi-manual-workflow-repair-decision.md",
-    "docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
+    "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/validation/latest_roadmap_validation.md"
   ],
   "active_child_sequence": [
     {
       "task_id": "PHASE8-IMPL-023-T001",
-      "title": "Gap Audit and Architecture Decision",
-      "status": "complete/PASS",
-      "scope": "gap audit and architecture decision; no implementation"
+      "title": "Historical gap audit and architecture decision",
+      "status": "complete/PASS; partially superseded",
+      "scope": "superseded only where it selected deterministic-only MVP extraction"
     },
     {
       "task_id": "PHASE8-IMPL-023-T002",
-      "title": "Expected-red raw idea to candidate listing tests",
+      "title": "Historical expected-red raw idea to candidate listing tests",
       "status": "complete/PASS",
-      "scope": "tests-first expected-red only; no extractor/backend/frontend implementation"
+      "scope": "tests-first expected-red under previous path"
     },
     {
       "task_id": "PHASE8-IMPL-023-T003",
-      "title": "Backend extraction contract/schema",
+      "title": "Historical backend extraction contract/schema",
       "status": "complete/PASS",
-      "scope": "contract/schema implementation"
+      "scope": "contract/schema under previous path"
     },
     {
       "task_id": "PHASE8-IMPL-023-T004",
-      "title": "Deterministic/rule-based MVP extractor",
+      "title": "Historical deterministic/rule-based backend extractor",
+      "status": "complete/PASS; superseded fallback-only",
+      "scope": "fallback/safety baseline only; not sufficient MVP completion"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T004A",
+      "title": "Owner override and AI/tool-assisted OMI architecture reset",
       "status": "complete/PASS",
-      "scope": "safe deterministic/rule-based marker extractor; no model/Ollama/NLP dependency and no generated prose"
+      "scope": "docs/status/architecture correction only"
     },
     {
       "task_id": "PHASE8-IMPL-023-T005",
-      "title": "Candidate persistence with evidence/provenance/source spans",
+      "title": "Tool-assisted extraction orchestrator contract and adapter boundaries",
       "status": "ready/active",
-      "scope": "candidate-first persistence only; no Memory/Canon mutation"
+      "scope": "corrected orchestrator contract and adapter boundaries"
     },
     {
       "task_id": "PHASE8-IMPL-023-T006",
-      "title": "Frontend OMI extracted-candidate review UI/UX",
+      "title": "Ollama/model-assisted structured extraction contract",
       "status": "planned",
-      "scope": "owner review UI for extracted candidates"
+      "scope": "JSON/schema validation and no-prose tests"
     },
     {
       "task_id": "PHASE8-IMPL-023-T007",
-      "title": "No-canon/no-apply-promotion safety validation",
+      "title": "spaCy/BookNLP local NLP candidate extraction adapters",
       "status": "planned",
-      "scope": "safety validation/hardening only"
+      "scope": "local NLP candidate extraction adapters"
     },
     {
       "task_id": "PHASE8-IMPL-023-T008",
-      "title": "Browser/manual evidence and closeout",
+      "title": "Story Check diagnostic-only OMI handoff",
+      "status": "planned",
+      "scope": "diagnostic-only OMI handoff"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T009",
+      "title": "NCP/Subtxt/dramatica-flow analysis-only candidate mapping",
+      "status": "planned",
+      "scope": "analysis-only candidate mapping"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T010",
+      "title": "Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization",
+      "status": "planned",
+      "scope": "fusion/dedupe/conflict/evidence normalization"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T011",
+      "title": "Persistence of fused evidence-backed candidates",
+      "status": "planned",
+      "scope": "candidate-first persistence only; no Memory/Canon mutation"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T012",
+      "title": "Frontend OMI analysis results UI/UX",
+      "status": "planned",
+      "scope": "owner review UI for AI/tool-assisted findings"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T013",
+      "title": "Safety validation",
+      "status": "planned",
+      "scope": "no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T014",
+      "title": "Browser/manual evidence closeout",
       "status": "planned",
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T004",
+  "latest_child_task": "PHASE8-IMPL-023-T004A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md",
   "next_child_task": "PHASE8-IMPL-023-T005",
+  "next_child_title": "Tool-assisted extraction orchestrator contract and adapter boundaries",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
-  "full_mvp_completion_status": "blocked",
+  "full_mvp_completion_status": "blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable",
   "owner_gate_status": "accepted historically, not full MVP completion"
 }

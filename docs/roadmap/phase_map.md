@@ -1,18 +1,21 @@
-# PHASE8 Owner Override: OMI Extraction Required Before MVP Closeout
+# PHASE8 Owner Override: AI Tool-Assisted OMI Analysis Required Before MVP Closeout
 
-- Decision record: `docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md`.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md`.
+- Prior owner override record: `docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md`.
 - Full MVP completion closeout: BLOCKED.
 - Superseded decision: `docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md`.
 - Blocked/superseded closeout task: `PHASE8-MVP-COMPLETE-CLOSEOUT-001 - Full MVP completion closeout and post-MVP readiness publication`.
-- Active parent: `PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP`.
-- Latest completed phase-map step: `PHASE8-IMPL-023-T004 - Deterministic/rule-based MVP extractor`.
-- Next phase-map step: `PHASE8-IMPL-023-T005 - Candidate persistence with evidence/provenance/source spans`.
-- Required path: OMI raw idea input must produce structured, evidence/provenance-backed review candidates for owner review before full MVP closeout can proceed.
-- Boundary: analysis-only, candidate-first, owner-controlled, no automatic Memory/Canon mutation, no automatic apply-promotion, and no generated story prose.
-- T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md` selects deterministic/rule-based MVP extraction first, evidence/provenance-backed output, fail-closed empty extraction, no first-MVP model/Ollama dependency, and no generated prose.
+- Active parent: `PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP`.
+- Latest completed phase-map correction: `PHASE8-IMPL-023-T004A - Owner override and AI/tool-assisted OMI architecture reset`.
+- T004 deterministic status: `PHASE8-IMPL-023-T004 - Deterministic/rule-based MVP extractor` remains historically complete/PASS but is fallback/safety baseline only.
+- Next phase-map step: `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`.
+- Required path: OMI raw idea input must flow through an AI/tool-assisted analysis orchestrator and produce structured, evidence/provenance-backed review candidates before full MVP closeout can proceed.
+- Boundary: analysis-only, candidate-first, owner-controlled, no automatic Memory/Canon mutation, no automatic apply-promotion, no generated story prose, confidence/support is not truth, and tool/model output is not canon.
+- T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md` is superseded only where it selected deterministic/rule-based extraction as the first MVP target; safety boundaries remain valid.
 - T002 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md` adds expected-red backend and frontend/source tests for the future extraction contract and UI surfaces.
 - T003 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md` adds the backend extraction contract/schema and fail-closed result behavior.
-- T004 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md` adds backend deterministic marker extraction for explicit owner-authored raw idea markers; frontend extracted-candidate review UI remains deferred to T006.
+- T004 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md` adds backend deterministic marker extraction for explicit owner-authored raw idea markers; now fallback/safety baseline only.
+- T004A decision: `docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md` records the corrected AI/tool-assisted OMI architecture.
 
 # PHASE8 Post-Accepted Owner Gate Next Readiness Step Decision
 
@@ -21,9 +24,9 @@
 - Historical phase-map step: `PHASE8-MVP-COMPLETE-CLOSEOUT-001 - Full MVP completion closeout and post-MVP readiness publication`.
 - Task type: docs/status/readiness only.
 - Full MVP completion closeout required separately: yes, because the roadmap distinguishes MVP owner gate accepted from full MVP complete.
-- New implementation parent/task selected now: `PHASE8-IMPL-023`; T004 is complete/PASS and T005 is ready/active.
-- Runtime extraction, candidate extraction, OMI automatic extraction, Memory/Canon workflow implementation, apply-promotion implementation, Story Check route work, model/Ollama work, product UI work, tests, and browser harness scripts remain unselected.
-- Accepted limitations remain visible: Cyber Story Check diagnostic output remains `MANUAL_REVIEW_REQUIRED` on missing `storyform.json`; OMI manual screen still has no automatic extraction of characters, locations, timeline, or story facts; OMI approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
+- New implementation parent/task selected now: `PHASE8-IMPL-023`; T004A is complete/PASS and T005 is ready/active.
+- Corrected next implementation work is orchestrator/adapter contract planning. Memory/Canon workflow implementation, apply-promotion implementation, product UI work, tests, browser harness scripts, and actual model/tool runs remain unselected until their corrected child tasks authorize them.
+- Accepted limitations remain visible: Cyber Story Check diagnostic output remains `MANUAL_REVIEW_REQUIRED` on missing `storyform.json`; deterministic-marker-only OMI extraction is fallback-only; OMI approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
 
 # PHASE8 Final Owner Accepted Gate Decision
 
@@ -33,7 +36,7 @@
 - MVP owner gate is accepted for the next manual-test/readiness step according to roadmap conventions.
 - `PHASE8-UX-003` remains complete/PARTIAL historically, with `PHASE8-UX-003-C-CYBER` still `MANUAL_REVIEW_REQUIRED` because selected-source Story Check diagnostic output was unavailable/fail-closed on missing `storyform.json`.
 - `PHASE8-UX-004` remains complete/PASS for OMI manual workflow repair only; OMI manual screen still does not automatically extract characters, locations, timeline, or story facts; OMI approval remains lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
-- Next phase-map step: `PHASE8-IMPL-023-T005`, while preserving the distinction between accepted owner gate and full MVP completion closeout.
+- Next phase-map step: `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`, while preserving the distinction between accepted owner gate and full MVP completion closeout.
 
 # PHASE8-UX-004 Owner Manual Test Approval
 
@@ -41,7 +44,7 @@
 - Approval record: `docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md`.
 - Approved expected behavior: no extraction yet; empty/manual shell warning is correct; automatic extraction is unavailable from the OMI manual screen; approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
 - This does not mark final MVP owner acceptance PASS or MVP complete.
-- Historical next step was explicit owner Accepted/Blocked gate decision. Current next step is `PHASE8-IMPL-023-T005` after the T004 deterministic extractor work under the owner override.
+- Historical next step was explicit owner Accepted/Blocked gate decision. Current next step is `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries` after the T004A AI/tool-assisted owner override.
 
 # PHASE8-UX-003-T007 Closeout and Owner Accepted/Blocked Gate Preparation
 

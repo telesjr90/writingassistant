@@ -1,58 +1,117 @@
-# PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP
+# PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP
 
 ## Status
 
 Published and active.
 
-Next child task: `PHASE8-IMPL-023-T001 - Gap Audit and Architecture Decision`.
+Latest correction: `PHASE8-IMPL-023-T004A - Owner override and AI/tool-assisted OMI architecture reset`.
 
-Full MVP completion closeout is blocked until this parent, or an equivalent MVP-required OMI extraction path, is complete and validated.
+Next child task: `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`.
+
+Full MVP completion closeout is blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
 
 ## Goal
 
-Build the real MVP OMI path where raw idea input produces structured, evidence-backed review candidates for owner review.
+Build the real MVP OMI path where raw idea input is analyzed by an AI/tool-assisted analysis orchestrator and converted into structured, evidence-backed review candidates for owner review.
+
+## Owner Override
+
+Deterministic-marker-only extraction is not the MVP OMI target.
+
+MVP OMI requires tool-assisted analysis that can use Ollama/local AI models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow. Tool output must become evidence-backed candidates only.
+
+`PHASE8-IMPL-023-T004` remains historically complete/PASS as backend deterministic marker extraction, but it is superseded and re-scoped as a fallback/safety baseline only. It is not sufficient for MVP completion by itself.
 
 ## Current Gap
 
-The current manual OMI workflow can create empty/manual candidate shells and can make that limitation visible. It does not identify candidates from raw idea text for owner review. That means OMI is not yet MVP-complete.
+The current OMI path has a backend deterministic marker extractor for explicit owner-authored markers, but the corrected MVP requires analysis of raw idea text through AI/tool-assisted adapters.
+
+The missing MVP behavior is an orchestrator that can call bounded analysis tools, normalize their outputs into a common OMI candidate schema, fuse and dedupe overlapping findings, preserve evidence/provenance/support, and surface grouped findings for owner review without treating any tool output as truth.
 
 ## MVP Behavior
 
-- User enters or saves a raw idea in OMI.
-- The system analyzes the raw idea.
-- The system identifies review candidates from that raw idea.
-- The UI lists those candidates for owner review.
-- Candidate types include, where evidence exists:
-  - characters
-  - locations
-  - timeline/events
-  - relationships
-  - organizations/groups
-  - objects/items
-  - plot threads or story facts
-  - open questions / ambiguities
-  - storyform/context candidates only when supportable
+- User enters or saves raw idea text in OMI.
+- OMI runs tool-assisted analysis through the orchestrator.
+- Adapters return candidate findings, diagnostics, evidence, provenance, source locators, and support labels.
+- The normalization layer converts all outputs to the common OMI candidate schema.
+- The fusion/dedupe layer groups equivalent findings and keeps conflicts or uncertainty visible.
+- The UI lists findings grouped by type, tool/provenance, and evidence.
+- The owner confirms, rejects, or revises findings.
+- Candidate presence is not canon, confidence is not truth, queue presence is not approval, and tool/model output is not canon.
+
+## Candidate Types
+
+Candidate types include, where evidence exists:
+
+- characters
+- locations
+- timeline/events
+- relationships
+- organizations/groups
+- objects/items
+- plot threads or story facts
+- open questions / ambiguities
+- storyform/context candidates only when supportable
+- diagnostics/questions where appropriate
+
+## Required Candidate Fields
+
+Each finding must carry:
+
+- candidate type
+- label/name
+- extracted claim
+- evidence/source excerpt
+- source locator
+- provenance/tool source
+- support/confidence as support only, not truth
+- owner decision state, default pending
+- candidate/review status
+- diagnostics/questions where appropriate
+
+## Architecture
+
+- OMI analysis orchestrator receives raw idea text.
+- Tool adapters perform bounded analysis and return candidate findings only.
+- Normalization converts every adapter output to the common OMI candidate schema.
+- Fusion/dedupe groups equivalent findings, preserves conflicts, and shows uncertainty.
+- Persistence stores fused evidence-backed candidates as candidate/review material only.
+- UI lists what was found and lets the owner confirm, reject, or revise.
+
+## Tool Boundaries
+
+- Ollama/model: structured extraction only, schema-bound JSON only, no prose, no rewriting, no continuation, no outline, no drafting, no improvement suggestions.
+- Story Check: diagnostic-only observations/questions, no prose suggestions.
+- BookNLP/spaCy: entities, entity-like mentions, sentence segmentation, events, relationships, mentions, and coreference-style support where applicable.
+- NCP: structural context candidate mapping and import/export candidate representation, not truth export.
+- Subtxt: rubric/reference guidance for diagnostic structural interpretation, not automatic Dramatica truth.
+- dramatica-flow: analysis-pattern reference/integration for narrative-state patterns, promises, mysteries, causal chains, thread activity, and relationship shifts; generation/revision/continuation disabled.
+- All tools fail closed.
 
 ## Acceptance Criteria
 
-- Given raw idea text, OMI produces non-empty candidate records where evidence exists.
-- Candidate list is visible in the UI.
-- Each candidate has type, label/name, extracted claim, evidence/source excerpt or locator, provenance, status, and owner decision state.
-- Empty extraction fails closed with a clear explanation and does not create misleading empty shells.
+- Given raw idea text, OMI can produce non-empty tool-assisted candidate findings where evidence exists.
+- Candidate list is visible in the UI and grouped by type.
+- Each candidate has candidate type, label/name, extracted claim, evidence/source excerpt, source locator, provenance/tool source, support label, status, and owner decision state.
+- Diagnostics/questions are shown where appropriate without writing or suggesting story prose.
+- Empty or unsupported analysis fails closed with a clear explanation and does not create misleading empty shells.
 - UI clearly separates extracted candidates from approved Memory/Canon.
 - No automatic Memory/Canon mutation occurs.
 - No automatic apply-promotion occurs.
 - No generated story prose is produced.
+- Tool/model output is never treated as canon or truth.
 
 ## UI/UX Improvement Scope
 
 - Better raw idea intake state.
-- Clear extraction status, progress, and result.
+- Clear analysis status, progress, and result.
 - Clear candidate grouping by type.
 - Empty and fail-closed states.
 - Review queue clarity.
+- Evidence/provenance/source locator display.
+- Conflict/uncertainty display.
 - Better error messages.
-- Clear next action after candidate extraction.
+- Clear next action after candidate analysis.
 
 ## Boundaries
 
@@ -61,40 +120,49 @@ The current manual OMI workflow can create empty/manual candidate shells and can
 - Evidence/provenance-backed.
 - Owner-controlled.
 - No generated prose.
-- Confidence is not truth.
+- No rewrite, continuation, outline, draft, polish, improvement, expansion, imitation, revision, or writing suggestion.
+- Confidence/support is not truth.
 - Candidate presence is not canon.
 - Candidate persistence is not canon.
 - Queue presence is not approval.
+- Tool/model output is not canon.
 - Candidate approval does not automatically mutate Memory/Canon.
 - Apply-promotion remains explicit, audited, owner-confirmed, and separate.
-- Raw idea extraction must not write, rewrite, continue, outline, draft, polish, improve, expand, imitate, revise, or produce story prose.
+- Raw idea analysis must not write, rewrite, continue, outline, draft, polish, improve, expand, imitate, revise, suggest, or produce story prose.
 
 ## Child Task Sequence
 
-- `PHASE8-IMPL-023-T001` - Gap Audit and Architecture Decision. Scope: docs/decision and narrow source audit only; no implementation.
-- `PHASE8-IMPL-023-T002` - Expected-red raw idea to candidate listing tests. Scope: tests-first expected-red only.
-- `PHASE8-IMPL-023-T003` - Backend extraction contract/schema. Scope: contract/schema implementation only.
-- `PHASE8-IMPL-023-T004` - Deterministic/rule-based MVP extractor. Scope: implementation only after tests/contract.
-- `PHASE8-IMPL-023-T005` - Candidate persistence with evidence/provenance/source spans. Scope: candidate-first persistence only; no Memory/Canon mutation.
-- `PHASE8-IMPL-023-T006` - Frontend OMI extracted-candidate review UI/UX. Scope: owner review UI for extracted candidates.
-- `PHASE8-IMPL-023-T007` - No-canon/no-apply-promotion safety validation. Scope: safety validation/hardening only.
-- `PHASE8-IMPL-023-T008` - Browser/manual evidence and closeout. Scope: evidence, validation, and closeout.
+- `PHASE8-IMPL-023-T001` - Historical gap audit and architecture decision. Scope: docs/decision and narrow source audit only; superseded only where it selected deterministic-only MVP extraction.
+- `PHASE8-IMPL-023-T002` - Historical expected-red raw idea to candidate listing tests. Scope: tests-first expected-red only under the previous path.
+- `PHASE8-IMPL-023-T003` - Historical backend extraction contract/schema. Scope: contract/schema implementation under the previous path.
+- `PHASE8-IMPL-023-T004` - Historical deterministic/rule-based backend extractor. Scope: fallback/safety baseline only; not sufficient for MVP completion.
+- `PHASE8-IMPL-023-T004A` - Owner override and AI/tool-assisted OMI architecture reset. Scope: docs/status/architecture correction only; complete/PASS.
+- `PHASE8-IMPL-023-T005` - Tool-assisted extraction orchestrator contract and adapter boundaries. Scope: corrected orchestrator contract and adapter boundaries.
+- `PHASE8-IMPL-023-T006` - Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests.
+- `PHASE8-IMPL-023-T007` - spaCy/BookNLP local NLP candidate extraction adapters.
+- `PHASE8-IMPL-023-T008` - Story Check diagnostic-only OMI handoff.
+- `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow analysis-only candidate mapping.
+- `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization.
+- `PHASE8-IMPL-023-T011` - Persistence of fused evidence-backed candidates.
+- `PHASE8-IMPL-023-T012` - Frontend OMI analysis results UI/UX.
+- `PHASE8-IMPL-023-T013` - Safety validation: no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth.
+- `PHASE8-IMPL-023-T014` - Browser/manual evidence closeout.
 
 ## Non-Goals
 
-- Do not mark full MVP complete in this parent publication.
-- Do not run extraction in this parent publication.
-- Do not create candidates in this parent publication.
+- Do not mark full MVP complete in this parent reset.
+- Do not run extraction in this parent reset.
+- Do not create candidates in this parent reset.
 - Do not mutate Memory/Canon.
 - Do not run apply-promotion.
-- Do not call models/Ollama.
-- Do not generate, rewrite, continue, outline, draft, polish, improve, expand, imitate, revise, or produce story prose.
+- Do not run Ollama/models, Story Check, BookNLP, spaCy, NCP, Subtxt, or dramatica-flow in this parent reset.
+- Do not generate, rewrite, continue, outline, draft, polish, improve, expand, imitate, revise, suggest, or produce story prose.
 - Do not create training data, JSONL records, datasets, model artifacts, or fine-tuning configs.
 - Do not stage, commit, or push unless explicitly requested.
 
 ## Validation Commands
 
-Parent publication validation:
+Parent reset validation:
 
 ```bash
 python3 scripts/check_enrichment.py

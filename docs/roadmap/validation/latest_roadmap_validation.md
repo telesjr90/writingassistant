@@ -1,7 +1,22 @@
+# PHASE8-IMPL-023-T004A Owner Override AI Tool-Assisted OMI Analysis Required
+
+- Result: PASS for roadmap correction and architecture reset only.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md`.
+- Owner override recorded: deterministic-marker-only extraction is not the MVP OMI target.
+- Corrected MVP target: OMI raw idea input flows through an AI/tool-assisted analysis orchestrator that can use Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.
+- Corrected output: evidence-backed candidates only, with candidate type, label/name, extracted claim, evidence/source excerpt, source locator, provenance/tool source, support/confidence as support only, pending owner decision, candidate/review status, and diagnostics/questions where appropriate.
+- T004 re-scope: `PHASE8-IMPL-023-T004` remains historically complete/PASS as backend deterministic marker extraction, but is superseded and fallback/safety baseline only.
+- Corrected architecture: OMI analysis orchestrator receives raw idea text; adapters return findings/diagnostics/evidence/provenance/support; normalization converts outputs to a common OMI candidate schema; fusion/dedupe groups equivalents and preserves conflicts/uncertainty; persistence stores candidate-only records; UI lists findings for owner confirm/reject/revise.
+- Tool boundaries: Ollama/model structured JSON extraction only; Story Check diagnostic-only; BookNLP/spaCy candidate evidence sources; NCP structural context candidate mapping only; Subtxt rubric/diagnostic guidance only; dramatica-flow analysis-pattern reference only; all tools fail closed.
+- Next child task: `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
+- No backend product code, frontend product code, tests, browser harness scripts, model/Ollama call, Story Check call, BookNLP/spaCy/NCP/Subtxt/dramatica-flow run, Memory/Canon mutation, apply-promotion run/enablement, promotion record, training artifact, context tool, staging, commit, push, or story prose occurred for T004A.
+
 # PHASE8-IMPL-023-T004 Deterministic Rule-Based MVP Extractor
 
 - Result: PASS for backend deterministic marker extraction.
 - Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md`.
+- Supersession note: this deterministic marker extractor is now fallback/safety baseline only and is not sufficient for corrected MVP OMI completion by itself.
 - Extractor implemented in `backend/project_manager.py`: explicit owner-authored markers produce evidence-backed extracted candidates for `character`, `location`, `timeline_event`, `relationship`, `organization`, `object`, `plot_thread`, `story_fact`, `open_question`, and `storyform_context`.
 - Candidate fields: `candidate_type`, `label` or `name`, owner-authored `extracted_claim`, evidence source excerpt, source locator, line number, character offsets, deterministic provenance, candidate-review status, pending owner decision, and support-strength metadata labeled as support only.
 - Empty/fail-closed behavior: empty raw idea returns `empty`; unsupported non-empty input with no supported explicit markers returns `fail_closed`; both paths write no candidates.
@@ -11,7 +26,7 @@
 - Existing OMI regressions: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_routes.py -q` -> `20 passed in 0.34s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_project_manager.py -q -k omi` -> `18 passed, 51 deselected in 0.22s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_boundaries.py -q` -> `21 passed in 0.36s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_manual_workflow_source.py -q` -> `7 passed in 0.05s`.
 - Frontend/source expected-red extraction tests remain deferred to T006: `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_extraction_ui_source_expected_red.py -q` -> `5 failed, 1 passed in 0.06s`, limited to missing frontend API/helper, extraction action/status/result UI, grouped candidate UI, detail evidence/provenance UI, and empty/fail-closed UI surfaces.
 - Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS.
-- Next child task: `PHASE8-IMPL-023-T005 - Candidate persistence with evidence/provenance/source spans`.
+- Historical next child at T004 closeout: `PHASE8-IMPL-023-T005 - Candidate persistence with evidence/provenance/source spans`; superseded by the T004A owner override. Corrected next child is `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`.
 - No frontend UI, browser harness scripts, model/Ollama call, Story Check call, BookNLP/spaCy/NCP/Subtxt/dramatica-flow run, external service call, Memory/Canon mutation, promotion record, apply-promotion run/enablement, story prose, training artifact, context tool, staging, commit, or push occurred for T004.
 
 # PHASE8-IMPL-023-T002 OMI Extraction Expected-Red Tests
@@ -52,11 +67,11 @@
 - Full MVP completion closeout: BLOCKED.
 - Superseded readiness decision: `docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md`; it no longer selects `PHASE8-MVP-COMPLETE-CLOSEOUT-001` as the next step.
 - The invalid OMI-specific parent ID is no longer active roadmap truth.
-- New validator-compatible active parent: `PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP`.
+- Corrected validator-compatible active parent: `PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP`.
 - New active parent records: `docs/roadmap/tasks/PHASE8-IMPL-023.md`, `docs/roadmap/inventory/PHASE8-IMPL-023.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json`.
-- Next child task: `PHASE8-IMPL-023-T001 - Gap Audit and Architecture Decision`.
-- Child sequence preserved: T001 gap audit and architecture decision; T002 expected-red raw idea to candidate listing tests; T003 backend extraction contract/schema; T004 deterministic/rule-based MVP extractor; T005 candidate persistence with evidence/provenance/source spans; T006 frontend OMI extracted-candidate review UI/UX; T007 no-canon/no-apply-promotion safety validation; T008 browser/manual evidence and closeout.
-- Required MVP OMI behavior: raw idea input must be analyzed into structured, evidence-backed review candidates for owner review, with candidate types including characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, and supportable storyform/context candidates.
+- Historical next child at parent-ID correction: `PHASE8-IMPL-023-T001 - Gap Audit and Architecture Decision`; superseded by the T004A owner override. Corrected next child is `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`.
+- Corrected child sequence: T001 historical gap audit and architecture decision; T002 historical expected-red raw idea to candidate listing tests; T003 historical backend extraction contract/schema; T004 historical deterministic/rule-based backend extractor as fallback/safety baseline only; T004A owner override and AI/tool-assisted OMI architecture reset; T005 tool-assisted extraction orchestrator contract and adapter boundaries; T006 Ollama/model-assisted structured extraction contract; T007 spaCy/BookNLP adapters; T008 Story Check handoff; T009 NCP/Subtxt/dramatica-flow mapping; T010 fusion/dedupe/conflict handling; T011 persistence; T012 frontend analysis results UI; T013 safety validation; T014 browser/manual evidence closeout.
+- Required MVP OMI behavior: raw idea input must be analyzed by an AI/tool-assisted orchestrator into structured, evidence-backed review candidates for owner review, with candidate types including characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, supportable storyform/context candidates, and diagnostics/questions.
 - Acceptance criteria: non-empty candidates where evidence exists; visible candidate list; type, label/name, extracted claim, evidence/source excerpt or locator, provenance, status, and owner decision state; fail-closed empty extraction; extracted candidates separated from approved Memory/Canon; no automatic Memory/Canon mutation; no automatic apply-promotion; no generated story prose.
 - UI/UX scope: raw idea intake state, extraction status/progress/result, grouping by type, empty/fail-closed states, review queue clarity, better error messages, and clear next action after extraction.
 - Validation results: `python3 scripts/check_enrichment.py` PASS; `python3 scripts/validate_roadmap.py` PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` PASS; `git diff --check` PASS.

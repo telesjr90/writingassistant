@@ -2,13 +2,13 @@
   "schema_version": "1.0",
   "format_note": "JSON-compatible YAML for dependency-free validation with the Python standard library.",
   "active_frontier": {
-    "current_track": "MVP OMI Raw Idea Extraction / Candidate Review",
+    "current_track": "MVP OMI AI Tool-Assisted Analysis / Candidate Review",
     "current_parent_task_id": "PHASE8-IMPL-023",
-    "current_parent_task_title": "OMI Raw Idea Extraction Candidate Review MVP",
-    "next_readiness_task_id": "PHASE8-IMPL-023-T004",
-    "next_readiness_task_title": "Deterministic/rule-based MVP extractor",
-    "next_readiness_task_type": "implementation parent child / deterministic extractor",
-    "frontier_note": "PHASE8 owner override is recorded at docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md. Full MVP completion closeout is BLOCKED because OMI still does not meet required MVP behavior: the current manual workflow only creates empty/manual candidate shells and does not identify candidates from raw idea text for owner review. PHASE8-IMPL-023-T001 is complete/PASS via docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md. PHASE8-IMPL-023-T002 is complete/PASS via docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md as tests-first expected-red coverage only. PHASE8-IMPL-023-T003 is complete/PASS via docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md as backend contract/schema implementation only. T003 added OMIExtractionRequest/Response candidate models, POST /api/projects/{project_name}/omi/extractions, extract_omi_candidates, project_manager.extract_omi_candidates_from_raw_idea, extracted candidate type/schema validation, and fail-closed empty extraction behavior. The rich raw idea extraction tests remain expected-red only for deterministic non-empty candidate parsing, not missing contract surfaces. The accepted MVP architecture remains deterministic/rule-based baseline first, evidence/provenance-backed candidate schema, fail-closed empty extraction, no model/Ollama dependency for the first extractor unless separately authorized later, no generated prose, no automatic Memory/Canon mutation, and no automatic apply-promotion. The active implementation parent is PHASE8-IMPL-023 - OMI Raw Idea Extraction Candidate Review MVP. The next child is PHASE8-IMPL-023-T004 - Deterministic/rule-based MVP extractor. Required MVP behavior is raw idea input analyzed into structured, evidence/provenance-backed review candidates for owner review. Candidate types include characters, locations, timeline/events, relationships, organizations/groups, objects/items, plot threads or story facts, open questions/ambiguities, and supportable storyform/context candidates. UI/UX improvement scope includes raw idea intake state, extraction status/progress/result, candidate grouping by type, empty/fail-closed states, review queue clarity, better error messages, and clear next action after extraction. Boundaries remain analysis-only, candidate-first, owner-controlled, confidence is not truth, candidate persistence is not canon, queue presence is not approval, candidate approval does not automatically mutate Memory/Canon, apply-promotion remains explicit/audited/owner-confirmed/separate, no generated prose, no model/Ollama calls, no Memory/Canon mutation, no apply-promotion run, no training artifacts, no staging, commit, or push."
+    "current_parent_task_title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
+    "next_readiness_task_id": "PHASE8-IMPL-023-T005",
+    "next_readiness_task_title": "Tool-assisted extraction orchestrator contract and adapter boundaries",
+    "next_readiness_task_type": "implementation parent child / orchestrator contract",
+    "frontier_note": "PHASE8-IMPL-023 owner override is recorded at docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md. Deterministic-marker-only extraction is not the MVP OMI target. The corrected MVP requires an AI/tool-assisted OMI analysis orchestrator that can use Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow to analyze raw idea text and present evidence-backed candidate findings for owner review. PHASE8-IMPL-023-T004 remains historically complete/PASS as backend deterministic marker extraction, but is superseded/re-scoped as fallback/safety baseline only and is not sufficient for MVP completion. The corrected next child is PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries. Full MVP completion remains BLOCKED until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, no generated prose, no rewrite/continuation/outline/draft/polish/improvement/expansion/imitation/revision/writing suggestion, confidence/support is not truth, candidate presence is not canon, candidate persistence is not canon, queue presence is not approval, tool/model output is not canon, no automatic Memory/Canon mutation, and no automatic apply-promotion."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5457,7 +5457,7 @@
     },
     {
       "id": "PHASE8-IMPL-023",
-      "title": "OMI Raw Idea Extraction Candidate Review MVP",
+      "title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
       "type": "runtime",
       "status": "active",
       "parent": null,
@@ -5471,7 +5471,6 @@
         "no_auto_promotion",
         "no_memory_canon_mutation",
         "no_apply_promotion",
-        "no_model_calls",
         "no_generated_prose",
         "generated_prose_permanently_forbidden",
         "no_rewrite",
@@ -5482,10 +5481,10 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-023.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
-      "latest_child_task": "PHASE8-IMPL-023-T004",
+      "latest_child_task": "PHASE8-IMPL-023-T004A",
       "latest_child_status": "complete/PASS",
       "next_child_task": "PHASE8-IMPL-023-T005",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md"
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md"
     }
   ]
 }
