@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import unicodedata
@@ -653,6 +654,33 @@ OMI_STATUS_TRANSITIONS = {
     "archived": set(),
 }
 
+OMI_EXTRACTED_CANDIDATE_TYPES = frozenset(
+    {
+        "character",
+        "location",
+        "timeline_event",
+        "relationship",
+        "organization",
+        "object",
+        "plot_thread",
+        "story_fact",
+        "open_question",
+        "storyform_context",
+    }
+)
+
+OMI_EXTRACTION_STATUSES = frozenset({"succeeded", "empty", "fail_closed"})
+OMI_EXTRACTED_CANDIDATE_STATUSES = frozenset(
+    {
+        "candidate",
+        "review_pending",
+        "owner_review",
+        "candidate_review_pending",
+    }
+)
+OMI_EXTRACTED_CANDIDATE_DEFAULT_STATUS = "candidate_review_pending"
+OMI_EXTRACTION_SUPPORT_LABEL = "support strength only"
+
 
 def _safe_path_component(value: str, label: str) -> str:
     if not value:
@@ -978,6 +1006,99 @@ def validate_omi_status_transition(current_status: str, next_status: str) -> str
 
 def validate_omi_destination(destination: str) -> str:
     return _validate_omi_destination(destination)
+
+
+def validate_omi_extracted_candidate_type(candidate_type: str) -> str:
+    if candidate_type not in OMI_EXTRACTED_CANDIDATE_TYPES:
+        raise ValueError(f"Unsupported OMI extracted candidate_type: {candidate_type}")
+    return candidate_type
+
+
+def _require_non_empty_string(value: Any, label: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{label} must be a non-empty string")
+    return value.strip()
+
+
+def _validate_omi_extracted_candidate_evidence(evidence: Any) -> list[dict[str, Any]]:
+    if not isinstance(evidence, list) or not evidence:
+        raise ValueError("OMI extracted candidate evidence must be a non-empty array")
+
+    normalized: list[dict[str, Any]] = []
+    for item in evidence:
+        if not isinstance(item, dict):
+            raise ValueError("OMI extracted candidate evidence items must be JSON objects")
+        source_excerpt = item.get("source_excerpt", item.get("excerpt"))
+        source_locator = item.get("source_locator", item.get("locator"))
+        if not (
+            isinstance(source_excerpt, str)
+            and source_excerpt.strip()
+            or isinstance(source_locator, str)
+            and source_locator.strip()
+        ):
+            raise ValueError(
+                "OMI extracted candidate evidence requires source_excerpt or source_locator"
+            )
+        normalized.append(dict(item))
+    return normalized
+
+
+def validate_omi_extracted_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(candidate, dict):
+        raise ValueError("OMI extracted candidate must be a JSON object")
+
+    normalized = dict(candidate)
+    normalized["candidate_type"] = validate_omi_extracted_candidate_type(
+        normalized.get("candidate_type")
+    )
+
+    label = normalized.get("label") or normalized.get("name")
+    normalized["label"] = _require_non_empty_string(label, "OMI extracted candidate label")
+    normalized["extracted_claim"] = _require_non_empty_string(
+        normalized.get("extracted_claim"),
+        "OMI extracted candidate extracted_claim",
+    )
+    normalized["evidence"] = _validate_omi_extracted_candidate_evidence(
+        normalized.get("evidence")
+    )
+
+    provenance = normalized.get("provenance")
+    if not isinstance(provenance, dict) or not provenance:
+        raise ValueError("OMI extracted candidate provenance must be a non-empty JSON object")
+    if provenance.get("model") is not None:
+        raise ValueError("OMI extraction provenance model must be null for deterministic MVP")
+    if provenance.get("prompt_id") is not None:
+        raise ValueError("OMI extraction provenance prompt_id must be null")
+    normalized["provenance"] = dict(provenance)
+
+    status = normalized.get("status", OMI_EXTRACTED_CANDIDATE_DEFAULT_STATUS)
+    if status in {"approved", "promoted", "canon"}:
+        raise ValueError("OMI extracted candidate status must not imply approval or canon")
+    if status not in OMI_EXTRACTED_CANDIDATE_STATUSES:
+        raise ValueError(f"Unsupported OMI extracted candidate status: {status}")
+    normalized["status"] = status
+
+    owner_decision = normalized.get("owner_decision") or _default_owner_decision()
+    owner_decision = validate_omi_owner_decision(owner_decision)
+    if owner_decision.get("decision") != "pending" or owner_decision.get("approved"):
+        raise ValueError("OMI extracted candidate owner_decision must remain pending")
+    normalized["owner_decision"] = owner_decision
+
+    for support_key in ("support_strength", "confidence"):
+        if support_key not in normalized:
+            continue
+        support_label = str(
+            normalized.get("support_label")
+            or normalized.get("support_strength_label")
+            or normalized.get("confidence_label")
+            or ""
+        ).lower()
+        if "support" not in support_label or "truth" in support_label:
+            raise ValueError(
+                "OMI extracted candidate support/confidence must be labeled as support, not truth"
+            )
+
+    return normalized
 
 
 def _validate_omi_promotion_target(value: str | None, label: str) -> str | None:
@@ -2003,6 +2124,159 @@ def load_omi_idea(project_name: str, idea_id: str) -> dict[str, Any]:
     return _load_json_object_from_path(
         _omi_record_path(project_name, "ideas", idea_id, "idea_id"),
         "OMI idea",
+    )
+
+
+def _omi_raw_idea_source_locator(source_idea_id: str | None) -> str:
+    if source_idea_id:
+        return f"omi/ideas/{source_idea_id}.json#raw_idea"
+    return "request.raw_idea"
+
+
+def _raw_idea_sha256(raw_idea: str) -> str:
+    return hashlib.sha256(raw_idea.encode("utf-8")).hexdigest()
+
+
+def _omi_extraction_provenance(
+    *,
+    raw_idea: str,
+    source_idea_id: str | None,
+) -> dict[str, Any]:
+    return {
+        "source_type": "omi_raw_idea",
+        "source_idea_id": source_idea_id,
+        "source_locator": _omi_raw_idea_source_locator(source_idea_id),
+        "extractor_name": "omi_contract_fail_closed",
+        "extractor_version": "phase8-impl-023-t003",
+        "tool": "deterministic_contract",
+        "model": None,
+        "prompt_id": None,
+        "timestamp": _utc_now(),
+        "source_hash": _raw_idea_sha256(raw_idea),
+        "snapshot_hash": _raw_idea_sha256(raw_idea),
+    }
+
+
+def _omi_empty_extraction_result(
+    project_name: str,
+    *,
+    raw_idea: str,
+    source_idea_id: str | None,
+    extraction_status: str,
+    explanation: str,
+    persist_candidates: bool,
+) -> dict[str, Any]:
+    if extraction_status not in OMI_EXTRACTION_STATUSES - {"succeeded"}:
+        raise ValueError(f"Unsupported empty OMI extraction status: {extraction_status}")
+
+    return {
+        "schema_version": 1,
+        "project_id": project_name,
+        "extraction_status": extraction_status,
+        "status": extraction_status,
+        "explanation": explanation,
+        "source_idea_id": source_idea_id,
+        "source_locator": _omi_raw_idea_source_locator(source_idea_id),
+        "raw_idea_hash": _raw_idea_sha256(raw_idea),
+        "candidate_types": sorted(OMI_EXTRACTED_CANDIDATE_TYPES),
+        "candidates": [],
+        "candidate_count": 0,
+        "persist_candidates": persist_candidates,
+        "persisted_candidate_ids": [],
+        "persistence_status": (
+            "no_candidates_persisted"
+            if persist_candidates
+            else "not_requested"
+        ),
+        "provenance": _omi_extraction_provenance(
+            raw_idea=raw_idea,
+            source_idea_id=source_idea_id,
+        ),
+        "safety": {
+            "candidate_persistence_is_not_canon": True,
+            "queue_presence_is_not_approval": True,
+            "confidence_is_not_truth": True,
+            "no_memory_canon_mutation": True,
+            "no_promotion_records_created": True,
+            "no_apply_promotion": True,
+            "no_model_call": True,
+            "no_story_check_call": True,
+            "no_generated_prose": True,
+        },
+    }
+
+
+def extract_omi_candidates_from_raw_idea(
+    project_name: str,
+    raw_idea: str,
+    *,
+    source_idea_id: str | None = None,
+    persist_candidates: bool = False,
+    provenance: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    _safe_path_component(project_name, "project_name")
+    if not isinstance(raw_idea, str):
+        raise ValueError("OMI extraction raw_idea must be a string")
+    if provenance is not None and not isinstance(provenance, dict):
+        raise ValueError("OMI extraction provenance must be a JSON object")
+
+    source_idea: dict[str, Any] | None = None
+    if source_idea_id is not None:
+        _safe_path_component(source_idea_id, "source_idea_id")
+        source_idea = load_omi_idea(project_name, source_idea_id)
+
+    submitted_raw_idea = raw_idea.strip()
+    if source_idea is not None:
+        source_raw_idea = source_idea.get("raw_idea")
+        if not isinstance(source_raw_idea, str) or not source_raw_idea.strip():
+            return _omi_empty_extraction_result(
+                project_name,
+                raw_idea="",
+                source_idea_id=source_idea_id,
+                extraction_status="fail_closed",
+                explanation=(
+                    "The referenced OMI idea has no usable raw idea text; "
+                    "no evidence-backed candidates were extracted or persisted."
+                ),
+                persist_candidates=persist_candidates,
+            )
+        if submitted_raw_idea and submitted_raw_idea != source_raw_idea.strip():
+            return _omi_empty_extraction_result(
+                project_name,
+                raw_idea=submitted_raw_idea,
+                source_idea_id=source_idea_id,
+                extraction_status="fail_closed",
+                explanation=(
+                    "The submitted raw idea does not match the referenced OMI idea "
+                    "snapshot; no candidates were extracted or persisted."
+                ),
+                persist_candidates=persist_candidates,
+            )
+        submitted_raw_idea = source_raw_idea.strip()
+
+    if not submitted_raw_idea:
+        return _omi_empty_extraction_result(
+            project_name,
+            raw_idea="",
+            source_idea_id=source_idea_id,
+            extraction_status="empty",
+            explanation=(
+                "No raw idea text was provided; no evidence-backed candidates "
+                "were extracted or persisted."
+            ),
+            persist_candidates=persist_candidates,
+        )
+
+    return _omi_empty_extraction_result(
+        project_name,
+        raw_idea=submitted_raw_idea,
+        source_idea_id=source_idea_id,
+        extraction_status="fail_closed",
+        explanation=(
+            "The deterministic OMI extractor is not implemented in this contract "
+            "slice; no evidence-backed candidates were extracted or persisted."
+        ),
+        persist_candidates=persist_candidates,
     )
 
 

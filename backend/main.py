@@ -35,6 +35,47 @@ class OMIIdeaCreate(BaseModel):
     provenance: dict | None = None
 
 
+class OMIExtractedCandidate(BaseModel):
+    candidate_type: str
+    label: str | None = None
+    name: str | None = None
+    extracted_claim: str
+    evidence: list
+    provenance: dict
+    status: str
+    owner_decision: dict
+    support_strength: str | float | None = None
+    confidence: str | float | None = None
+
+    class Config:
+        extra = "forbid"
+
+
+class OMIExtractionRequest(BaseModel):
+    raw_idea: str = ""
+    source_idea_id: str | None = None
+    persist_candidates: bool = False
+    provenance: dict | None = None
+
+    class Config:
+        extra = "forbid"
+
+
+class OMIExtractionResponse(BaseModel):
+    extraction_status: str
+    explanation: str
+    source_idea_id: str | None = None
+    source_locator: str
+    candidates: list[OMIExtractedCandidate]
+    persist_candidates: bool = False
+    persisted_candidate_ids: list[str]
+    provenance: dict
+    safety: dict
+
+    class Config:
+        extra = "allow"
+
+
 class OMICandidateCreate(BaseModel):
     idea_id: str
     candidate_type: str
@@ -320,6 +361,22 @@ def create_omi_idea(project_name: str, payload: OMIIdeaCreate) -> dict:
             payload.raw_idea,
             provenance=payload.provenance,
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/projects/{project_name}/omi/extractions")
+def extract_omi_candidates(project_name: str, payload: OMIExtractionRequest) -> dict:
+    try:
+        return project_manager.extract_omi_candidates_from_raw_idea(
+            project_name,
+            getattr(payload, "raw_idea", ""),
+            source_idea_id=getattr(payload, "source_idea_id", None),
+            persist_candidates=getattr(payload, "persist_candidates", False),
+            provenance=getattr(payload, "provenance", None),
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="OMI idea not found") from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

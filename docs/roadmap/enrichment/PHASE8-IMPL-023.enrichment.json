@@ -90,11 +90,13 @@
     "docs/roadmap/inventory/PHASE8-IMPL-023.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
     "roadmap/status/governance updates setting PHASE8-IMPL-023 active",
-    "latest child recorded as PHASE8-IMPL-023-T002 complete/PASS",
+    "latest child recorded as PHASE8-IMPL-023-T003 complete/PASS",
     "expected-red backend extraction tests recorded at tests/test_omi_extraction_expected_red.py",
     "expected-red frontend/source extraction tests recorded at tests/test_omi_extraction_ui_source_expected_red.py",
     "T002 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
-    "next child recorded as PHASE8-IMPL-023-T003"
+    "T003 backend extraction contract and deterministic candidate schema implemented",
+    "T003 decision record at docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
+    "next child recorded as PHASE8-IMPL-023-T004"
   ],
   "allowed_files": [
     "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
@@ -102,8 +104,10 @@
     "docs/roadmap/inventory/PHASE8-IMPL-023.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
     "tests/test_omi_extraction_expected_red.py",
+    "tests/test_omi_extraction_contract.py",
     "tests/test_omi_extraction_ui_source_expected_red.py",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/validation/latest_roadmap_validation.md",
     "docs/roadmap/decision_log.md",
@@ -163,13 +167,13 @@
     {
       "task_id": "PHASE8-IMPL-023-T003",
       "title": "Backend extraction contract/schema",
-      "status": "ready/active",
+      "status": "complete/PASS",
       "scope": "contract/schema implementation"
     },
     {
       "task_id": "PHASE8-IMPL-023-T004",
       "title": "Deterministic/rule-based MVP extractor",
-      "status": "planned",
+      "status": "ready/active",
       "scope": "safe deterministic/rule-based baseline first; optional model-assisted layer only if bounded and tested"
     },
     {
@@ -197,10 +201,10 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T002",
+  "latest_child_task": "PHASE8-IMPL-023-T003",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
-  "next_child_task": "PHASE8-IMPL-023-T003",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
+  "next_child_task": "PHASE8-IMPL-023-T004",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked",
