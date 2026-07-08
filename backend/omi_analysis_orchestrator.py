@@ -18,9 +18,13 @@ T005 scope (PHASE8-IMPL-023):
   - Wires ``story_check`` through a fixture-only diagnostic handoff contract
     that normalizes evidence-backed structural diagnostics/questions into
     candidate-review support without importing or running Story Check.
-  - Stubs every other adapter as fail-closed: unimplemented adapters return
-    ``unavailable`` / ``skipped`` / ``failed_closed`` with an explanation and
-    never fabricate candidates.
+  - Wires ``ncp``, ``subtxt``, and ``dramatica_flow`` through fixture-only
+    diagnostic/context handoff contracts that normalize evidence-backed
+    support into candidate-review material without importing or running any
+    live NCP, Subtxt, or dramatica-flow runtime.
+  - Stubs every adapter without a fixture/runner as fail-closed: unavailable
+    adapters return ``unavailable`` / ``skipped`` / ``failed_closed`` with an
+    explanation and never fabricate candidates.
   - Enforces a no-prose guard against adapter outputs: any prose-like,
     continuation-like, rewrite-like, or draft-like free-text output that could
     be confused with story prose is rejected as ``failed_closed`` with no
@@ -201,37 +205,54 @@ OMI_ADAPTER_CONTRACTS: dict[str, dict[str, Any]] = {
     },
     "ncp": {
         "behavior": (
-            "structural context candidate mapping and import/export candidate "
-            "representation only; NOT a truth export; fails closed on missing "
-            "NCP storyform context."
+            "fixture-only structural/context handoff support; project/story, "
+            "storyform, scene/moment, throughline, authorial-intent, "
+            "relationship, open-question/ambiguity, and source-mapping "
+            "support only; NOT a truth export; fails closed on missing fixture "
+            "or invalid/unsafe output. No live NCP runtime calls in T009."
         ),
         "produces_candidates": True,
         "supports_finding_types": (
+            "story_fact",
             "storyform_context",
-            "world_rule",
+            "throughline_context",
+            "relationship",
             "open_question",
+            "ambiguity",
             "diagnostic_question",
+            "evidence_note",
         ),
     },
     "subtxt": {
         "behavior": (
-            "rubric/reference guidance for diagnostic structural interpretation "
-            "only; NOT automatic Dramatica truth; fails closed if Subtxt "
-            "context is unavailable."
+            "fixture-only diagnostic/rubric handoff support; structural, "
+            "conflict, throughline, story-point/context, source-of-conflict, "
+            "subject-vs-conflict, uncertainty/insufficient-evidence, and "
+            "owner-review diagnostic questions only; NOT automatic Dramatica "
+            "truth; fails closed on missing fixture or invalid/unsafe output. "
+            "No live Subtxt runtime calls in T009."
         ),
         "produces_candidates": True,
         "supports_finding_types": (
+            "structural_diagnostic",
+            "conflict_diagnostic",
+            "throughline_context",
             "storyform_context",
-            "world_rule",
+            "open_question",
+            "ambiguity",
             "diagnostic_question",
+            "evidence_note",
         ),
     },
     "dramatica_flow": {
         "behavior": (
-            "analysis-pattern reference only for narrative-state patterns, "
-            "promises, mysteries, causal chains, thread activity, relationship "
-            "shifts; generation/revision/continuation remain disabled; no "
-            "outlines or story text."
+            "fixture-only analysis-pattern handoff support for causal chains, "
+            "promise/payoff and setup/payoff support, foreshadowing/mystery/"
+            "question support, conflict threads, emotional arcs, relationship "
+            "networks, timeline/thread activity, information boundaries, and "
+            "uncertainty/conflict-group diagnostics; generation/revision/"
+            "continuation remain disabled; no outlines or story text. No live "
+            "dramatica-flow runtime calls in T009."
         ),
         "produces_candidates": True,
         "supports_finding_types": (
@@ -240,6 +261,11 @@ OMI_ADAPTER_CONTRACTS: dict[str, dict[str, Any]] = {
             "open_question",
             "diagnostic_question",
             "continuity_warning",
+            "conflict_diagnostic",
+            "relationship",
+            "timeline_event",
+            "evidence_note",
+            "ambiguity",
         ),
     },
     "deterministic_fallback": {
@@ -2879,6 +2905,914 @@ def _build_story_check_fixture_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# NCP / Subtxt / dramatica-flow diagnostic/context fixture contracts (T009)
+# ---------------------------------------------------------------------------
+
+OMI_NCP_SCHEMA_VERSION = "omi_ncp_context_handoff.v1"
+OMI_SUBTXT_SCHEMA_VERSION = "omi_subtxt_diagnostic_handoff.v1"
+OMI_DRAMATICA_FLOW_SCHEMA_VERSION = "omi_dramatica_flow_analysis_handoff.v1"
+OMI_CONTEXT_ADAPTER_NAMES: frozenset[str] = frozenset(
+    {"ncp", "subtxt", "dramatica_flow"}
+)
+OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER: dict[str, str] = {
+    "ncp": OMI_NCP_SCHEMA_VERSION,
+    "subtxt": OMI_SUBTXT_SCHEMA_VERSION,
+    "dramatica_flow": OMI_DRAMATICA_FLOW_SCHEMA_VERSION,
+}
+OMI_CONTEXT_SUPPORT_LABEL_BY_ADAPTER: dict[str, str] = {
+    "ncp": "NCP context support only",
+    "subtxt": "Subtxt diagnostic support only",
+    "dramatica_flow": "dramatica-flow analysis support only",
+}
+OMI_CONTEXT_ALLOWED_STATUSES: frozenset[str] = frozenset(
+    {"succeeded", "empty", "failed_closed", "error"}
+)
+OMI_CONTEXT_ENVELOPE_REQUIRED_FIELDS: tuple[str, ...] = (
+    "schema_version",
+    "adapter",
+    "status",
+    "provenance",
+    "findings",
+)
+OMI_CONTEXT_ALLOWED_NORMALIZED_TYPES_BY_ADAPTER: dict[str, frozenset[str]] = {
+    "ncp": frozenset(
+        {
+            "story_fact",
+            "storyform_context",
+            "throughline_context",
+            "relationship",
+            "open_question",
+            "ambiguity",
+            "diagnostic_question",
+            "evidence_note",
+        }
+    ),
+    "subtxt": frozenset(
+        {
+            "structural_diagnostic",
+            "conflict_diagnostic",
+            "throughline_context",
+            "storyform_context",
+            "open_question",
+            "ambiguity",
+            "diagnostic_question",
+            "evidence_note",
+        }
+    ),
+    "dramatica_flow": frozenset(
+        {
+            "plot_thread",
+            "story_fact",
+            "open_question",
+            "diagnostic_question",
+            "continuity_warning",
+            "conflict_diagnostic",
+            "relationship",
+            "timeline_event",
+            "evidence_note",
+            "ambiguity",
+        }
+    ),
+}
+
+_OMI_CONTEXT_TYPE_FIELD_NAMES: tuple[str, ...] = (
+    "candidate_type",
+    "finding_type",
+    "diagnostic_type",
+    "context_type",
+    "analysis_type",
+    "support_type",
+    "type",
+    "kind",
+    "category",
+)
+_OMI_CONTEXT_LABEL_FIELD_NAMES: tuple[str, ...] = (
+    "label",
+    "name",
+    "title",
+    "question_label",
+)
+_OMI_CONTEXT_CLAIM_FIELD_NAMES: tuple[str, ...] = (
+    "diagnostic_claim",
+    "context_claim",
+    "analysis_claim",
+    "extracted_claim",
+    "claim",
+    "support_claim",
+    "observation",
+    "diagnostic",
+    "question",
+    "diagnostic_question",
+)
+_OMI_CONTEXT_QUESTION_CLAIM_FIELD_NAMES: tuple[str, ...] = (
+    "question",
+    "diagnostic_question",
+    "diagnostic_claim",
+    "context_claim",
+    "analysis_claim",
+    "extracted_claim",
+    "claim",
+    "support_claim",
+    "observation",
+    "diagnostic",
+)
+_OMI_CONTEXT_EVIDENCE_EXCERPT_FIELD_NAMES: tuple[str, ...] = (
+    "source_excerpt",
+    "evidence_excerpt",
+    "excerpt",
+    "source_text",
+    "owner_authored_excerpt",
+    "quote",
+    "quote_text",
+    "sentence",
+    "sentence_text",
+)
+_OMI_CONTEXT_EVIDENCE_VALUE_KEYS: frozenset[str] = frozenset(
+    {
+        "source_excerpt",
+        "evidence_excerpt",
+        "excerpt",
+        "source_text",
+        "owner_authored_excerpt",
+        "quote",
+        "quote_text",
+        "sentence",
+        "sentence_text",
+        "source_locator",
+        "locator",
+    }
+)
+_OMI_CONTEXT_FORBIDDEN_OPERATION_FIELD_NAME_SUBSTRINGS: tuple[str, ...] = (
+    "operation",
+    "action",
+    "command",
+    "persist candidate",
+    "persist candidates",
+    "candidate persistence",
+    "persisted candidate",
+    "save candidate",
+    "operation request",
+    "tool operation",
+    "write request",
+    "memory mutation",
+    "canon mutation",
+    "promotion record",
+    "apply promotion",
+    "promote to canon",
+)
+_OMI_CONTEXT_FORBIDDEN_OPERATION_VALUE_RE = re.compile(
+    r"(persist(?:ed)?\s+candidates?|save\s+candidates?|"
+    r"candidate\s+persistence|apply[-_\s]?promotion|promotion\s+record|"
+    r"promote\s+to\s+canon|mutat(?:e|ion)\s+(?:memory|canon)|"
+    r"write\s+(?:candidate|memory|canon)|"
+    r"perform(?:ing)?\s+(?:an\s+)?operation)",
+    re.IGNORECASE,
+)
+_OMI_CONTEXT_FORBIDDEN_GENERATION_VALUE_RE = re.compile(
+    r"\b("
+    r"rewrite|rewritten|continue|continuation|expand|expanded|polish|"
+    r"polished|outline|draft|revise|revised|improve|improved|"
+    r"improvement|suggest(?:ion)?\s+(?:for\s+)?(?:the\s+)?"
+    r"(?:story|scene|chapter|prose|outline|draft)|"
+    r"write\s+(?:the\s+)?(?:story|scene|chapter|prose)|"
+    r"generate\s+(?:a\s+)?(?:story|scene|chapter|outline|draft|prose)|"
+    r"what\s+happens\s+next|what\s+should\s+happen\s+next|"
+    r"next\s+scene\s+should|next\s+chapter\s+should|make\s+it\s+better"
+    r")\b",
+    re.IGNORECASE,
+)
+_OMI_CONTEXT_TYPE_ALIASES_BY_ADAPTER: dict[str, dict[str, str]] = {
+    "ncp": {
+        "project_context": "story_fact",
+        "project_story_context": "story_fact",
+        "project_story_context_support": "story_fact",
+        "story_context": "story_fact",
+        "story_context_support": "story_fact",
+        "context_support": "story_fact",
+        "storyform": "storyform_context",
+        "storyform_support": "storyform_context",
+        "storyform_context_support": "storyform_context",
+        "moment_context": "evidence_note",
+        "moment_scene_context": "evidence_note",
+        "moment_scene_context_support": "evidence_note",
+        "scene_context": "evidence_note",
+        "scene_context_support": "evidence_note",
+        "throughline": "throughline_context",
+        "throughline_support": "throughline_context",
+        "throughline_context_support": "throughline_context",
+        "authorial_intent": "evidence_note",
+        "authorial_intent_context": "evidence_note",
+        "authorial_intent_support": "evidence_note",
+        "relationship_context": "relationship",
+        "relationship_support": "relationship",
+        "open_question_support": "open_question",
+        "question": "open_question",
+        "ambiguity_support": "ambiguity",
+        "source_mapping": "evidence_note",
+        "source_map": "evidence_note",
+        "source_mapping_support": "evidence_note",
+        "review_question": "diagnostic_question",
+        "owner_review_question": "diagnostic_question",
+    },
+    "subtxt": {
+        "structural": "structural_diagnostic",
+        "structure": "structural_diagnostic",
+        "structure_diagnostic": "structural_diagnostic",
+        "structural_observation": "structural_diagnostic",
+        "conflict": "conflict_diagnostic",
+        "source_of_conflict": "conflict_diagnostic",
+        "source_of_conflict_diagnostic": "conflict_diagnostic",
+        "subject_vs_conflict": "conflict_diagnostic",
+        "subject_vs_conflict_diagnostic": "conflict_diagnostic",
+        "throughline": "throughline_context",
+        "throughline_diagnostic": "throughline_context",
+        "throughline_support": "throughline_context",
+        "story_point": "storyform_context",
+        "story_point_context": "storyform_context",
+        "story_point_support": "storyform_context",
+        "storyform": "storyform_context",
+        "context_support": "evidence_note",
+        "uncertainty": "ambiguity",
+        "uncertainty_diagnostic": "ambiguity",
+        "insufficient_evidence": "ambiguity",
+        "insufficient_evidence_diagnostic": "ambiguity",
+        "review_question": "diagnostic_question",
+        "owner_review_question": "diagnostic_question",
+        "question": "diagnostic_question",
+        "evidence_support": "evidence_note",
+    },
+    "dramatica_flow": {
+        "causal_chain": "plot_thread",
+        "causal_chain_support": "plot_thread",
+        "cause_effect": "plot_thread",
+        "promise_payoff": "plot_thread",
+        "promise_payoff_support": "plot_thread",
+        "setup_payoff": "plot_thread",
+        "setup_payoff_support": "plot_thread",
+        "foreshadowing": "open_question",
+        "foreshadowing_support": "open_question",
+        "mystery": "open_question",
+        "mystery_question": "open_question",
+        "question": "open_question",
+        "conflict_thread": "conflict_diagnostic",
+        "conflict_thread_support": "conflict_diagnostic",
+        "conflict_group": "conflict_diagnostic",
+        "conflict_group_diagnostic": "conflict_diagnostic",
+        "uncertainty_conflict_group": "conflict_diagnostic",
+        "emotional_arc": "plot_thread",
+        "emotional_arc_support": "plot_thread",
+        "arc": "plot_thread",
+        "relationship_network": "relationship",
+        "relationship_network_support": "relationship",
+        "relationship_support": "relationship",
+        "timeline_activity": "timeline_event",
+        "timeline_thread_activity": "timeline_event",
+        "thread_activity": "timeline_event",
+        "information_boundary": "evidence_note",
+        "information_boundary_support": "evidence_note",
+        "uncertainty": "ambiguity",
+        "uncertainty_support": "ambiguity",
+        "review_question": "diagnostic_question",
+        "owner_review_question": "diagnostic_question",
+        "warning": "continuity_warning",
+    },
+}
+
+
+def _context_adapter_display_name(adapter_name: str) -> str:
+    return {
+        "ncp": "NCP",
+        "subtxt": "Subtxt",
+        "dramatica_flow": "dramatica-flow",
+    }.get(adapter_name, adapter_name)
+
+
+def _coerce_context_adapter_candidate_type(
+    adapter_name: str,
+    finding: dict[str, Any],
+) -> str:
+    raw_type = _first_non_empty_string(finding, _OMI_CONTEXT_TYPE_FIELD_NAMES)
+    allowed_types = OMI_CONTEXT_ALLOWED_NORMALIZED_TYPES_BY_ADAPTER[adapter_name]
+    if raw_type in allowed_types:
+        return raw_type
+    if raw_type in OMI_ORCHESTRATOR_FINDING_TYPES:
+        raise ValueError(
+            f"{_context_adapter_display_name(adapter_name)} finding type "
+            f"{raw_type!r} is not allowed for this adapter contract."
+        )
+
+    token = _normalize_local_nlp_type_token(raw_type)
+    mapped_type = _OMI_CONTEXT_TYPE_ALIASES_BY_ADAPTER[adapter_name].get(token)
+    if mapped_type and mapped_type in allowed_types:
+        return mapped_type
+
+    raise ValueError(
+        f"{_context_adapter_display_name(adapter_name)} finding unknown "
+        f"candidate/finding type {raw_type!r}; fixture outputs must map to "
+        f"one of {sorted(allowed_types)}."
+    )
+
+
+def _context_adapter_string_has_truth_final_label(value: str) -> bool:
+    return _story_check_string_has_truth_final_label(value)
+
+
+def _validate_context_adapter_no_truth_final_label_in_value(
+    value: Any,
+    *,
+    adapter_name: str,
+    path: str,
+    current_key: str = "",
+) -> None:
+    key_token = current_key.strip().lower()
+    if isinstance(value, dict):
+        for key, child in value.items():
+            _validate_context_adapter_no_truth_final_label_in_value(
+                child,
+                adapter_name=adapter_name,
+                path=f"{path}.{key}",
+                current_key=str(key),
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_context_adapter_no_truth_final_label_in_value(
+                child,
+                adapter_name=adapter_name,
+                path=f"{path}[{idx}]",
+                current_key=current_key,
+            )
+        return
+    if key_token in _OMI_CONTEXT_EVIDENCE_VALUE_KEYS:
+        return
+    if isinstance(value, str) and _context_adapter_string_has_truth_final_label(value):
+        display_name = _context_adapter_display_name(adapter_name)
+        raise ValueError(
+            f"{display_name} envelope contains truth/canon/final/approval "
+            f"label at {path!r}: {value!r}; {display_name} output is "
+            f"support only and must never be canon, final, or approved."
+        )
+
+
+def _validate_context_adapter_payload_no_forbidden_operations(
+    value: Any,
+    *,
+    adapter_name: str,
+    path: str,
+    current_key: str = "",
+) -> None:
+    key_token = current_key.strip().lower().replace("-", " ").replace("_", " ")
+    if isinstance(value, dict):
+        for key, child in value.items():
+            normalized_key = str(key).strip().lower().replace("-", " ").replace("_", " ")
+            for forbidden in _OMI_CONTEXT_FORBIDDEN_OPERATION_FIELD_NAME_SUBSTRINGS:
+                if forbidden in normalized_key:
+                    display_name = _context_adapter_display_name(adapter_name)
+                    raise ValueError(
+                        f"{display_name} output contains forbidden operation "
+                        f"field {path}.{key}; diagnostic/context adapters "
+                        f"must not persist candidates, mutate Memory/Canon, "
+                        f"create promotion records, or run/enable "
+                        f"apply-promotion."
+                    )
+            _validate_context_adapter_payload_no_forbidden_operations(
+                child,
+                adapter_name=adapter_name,
+                path=f"{path}.{key}",
+                current_key=str(key),
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_context_adapter_payload_no_forbidden_operations(
+                child,
+                adapter_name=adapter_name,
+                path=f"{path}[{idx}]",
+                current_key=current_key,
+            )
+        return
+    if key_token in _OMI_CONTEXT_EVIDENCE_VALUE_KEYS:
+        return
+    if isinstance(value, str) and _OMI_CONTEXT_FORBIDDEN_OPERATION_VALUE_RE.search(value):
+        display_name = _context_adapter_display_name(adapter_name)
+        raise ValueError(
+            f"{display_name} output contains forbidden operation text at "
+            f"{path}; diagnostic/context adapters must return support only, "
+            f"not perform candidate persistence, Memory/Canon mutation, "
+            f"promotion, or apply-promotion operations."
+        )
+
+
+def _validate_context_adapter_payload_no_generation_language(
+    value: Any,
+    *,
+    adapter_name: str,
+    path: str,
+    current_key: str = "",
+) -> None:
+    key_token = current_key.strip().lower()
+    if isinstance(value, dict):
+        for key, child in value.items():
+            _validate_context_adapter_payload_no_generation_language(
+                child,
+                adapter_name=adapter_name,
+                path=f"{path}.{key}",
+                current_key=str(key),
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_context_adapter_payload_no_generation_language(
+                child,
+                adapter_name=adapter_name,
+                path=f"{path}[{idx}]",
+                current_key=current_key,
+            )
+        return
+    if key_token in _OMI_CONTEXT_EVIDENCE_VALUE_KEYS:
+        return
+    if isinstance(value, str) and _OMI_CONTEXT_FORBIDDEN_GENERATION_VALUE_RE.search(value):
+        display_name = _context_adapter_display_name(adapter_name)
+        raise ValueError(
+            f"{display_name} output contains prose-generation/revision "
+            f"language at {path}; diagnostic questions may only support "
+            f"review and must not ask for rewriting, continuation, "
+            f"outlining, drafting, polishing, expansion, improvement, or "
+            f"revision."
+        )
+
+
+def _validate_context_adapter_review_status_fields(
+    adapter_name: str,
+    finding: dict[str, Any],
+) -> None:
+    display_name = _context_adapter_display_name(adapter_name)
+    for status_key in ("review_status", "candidate_status"):
+        if status_key not in finding:
+            continue
+        status_value = _require_non_empty_string(
+            finding[status_key], f"{display_name} finding {status_key}"
+        )
+        if status_value not in OMI_FINDING_REVIEW_STATUSES:
+            raise ValueError(
+                f"{display_name} finding {status_key}={status_value!r} is "
+                f"not a review-pending candidate status; adapter output must "
+                f"not imply approval, finality, canon, or truth."
+            )
+
+
+def _validate_context_adapter_provenance(
+    provenance: Any,
+    *,
+    adapter_name: str,
+) -> dict[str, str]:
+    normalized = _validate_finding_provenance(provenance)
+    display_name = _context_adapter_display_name(adapter_name)
+    if normalized["adapter"] != adapter_name:
+        raise ValueError(
+            f"{display_name} provenance.adapter must match the "
+            f"{adapter_name} identity"
+        )
+    if normalized["tool_source"] != adapter_name:
+        raise ValueError(
+            f"{display_name} provenance.tool_source must match the "
+            f"{adapter_name} identity"
+        )
+    return normalized
+
+
+def _normalize_context_adapter_evidence(
+    adapter_name: str,
+    finding: dict[str, Any],
+    *,
+    source_locator: str,
+) -> list[dict[str, Any]]:
+    raw_evidence = finding.get("evidence")
+    evidence_items: list[Any] = []
+    if isinstance(raw_evidence, list):
+        evidence_items = list(raw_evidence)
+    elif isinstance(raw_evidence, dict):
+        evidence_items = [dict(raw_evidence)]
+    else:
+        excerpt = _first_non_empty_string(
+            finding, _OMI_CONTEXT_EVIDENCE_EXCERPT_FIELD_NAMES
+        )
+        if excerpt:
+            evidence_items = [
+                {
+                    "source_excerpt": excerpt,
+                    "source_locator": source_locator,
+                }
+            ]
+
+    display_name = _context_adapter_display_name(adapter_name)
+    if not evidence_items:
+        raise ValueError(
+            f"{display_name} finding requires evidence with source_excerpt "
+            f"and source_locator"
+        )
+
+    normalized: list[dict[str, Any]] = []
+    for idx, item in enumerate(evidence_items):
+        if not isinstance(item, dict):
+            raise ValueError(f"{display_name} evidence item {idx} must be an object")
+        item_copy = dict(item)
+        excerpt = _first_non_empty_string(
+            item_copy, _OMI_CONTEXT_EVIDENCE_EXCERPT_FIELD_NAMES
+        )
+        locator = _first_non_empty_string(
+            item_copy, ("source_locator", "locator")
+        ) or source_locator
+        if not excerpt:
+            raise ValueError(
+                f"{display_name} evidence item {idx} requires source_excerpt"
+            )
+        if not locator:
+            raise ValueError(
+                f"{display_name} evidence item {idx} requires source_locator"
+            )
+        item_copy["source_excerpt"] = excerpt
+        item_copy["source_locator"] = locator
+        normalized.append(item_copy)
+    return normalized
+
+
+def _validate_context_adapter_owner_decision(
+    owner_decision: Any,
+    *,
+    adapter_name: str,
+) -> dict[str, Any]:
+    display_name = _context_adapter_display_name(adapter_name)
+    if owner_decision is None:
+        return {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        }
+    if not isinstance(owner_decision, dict):
+        raise ValueError(f"{display_name} owner_decision must be an object")
+    decision = owner_decision.get("decision")
+    if decision is not None and decision not in {"pending", "needs_review"}:
+        raise ValueError(
+            f"{display_name} finding carries a non-pending owner_decision; "
+            f"diagnostic/context output is support only and must never "
+            f"approve, reject, promote, or finalize findings."
+        )
+    if owner_decision.get("approved") is True:
+        raise ValueError(
+            f"{display_name} finding owner_decision.approved=true; adapters "
+            f"must not auto-approve findings."
+        )
+    return {
+        "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+        "approved": False,
+    }
+
+
+def _normalize_context_adapter_support_label(
+    adapter_name: str,
+    finding: dict[str, Any],
+    provenance: dict[str, str],
+) -> str:
+    support_value = (
+        finding.get("support_label")
+        or finding.get("confidence")
+        or finding.get("support")
+        or provenance.get("support")
+        or OMI_CONTEXT_SUPPORT_LABEL_BY_ADAPTER[adapter_name]
+    )
+    if isinstance(support_value, (int, float)):
+        support_label = f"{adapter_name} support metadata: {support_value}"
+    elif isinstance(support_value, str) and support_value.strip():
+        support_label = support_value.strip()
+        if "support" not in support_label.lower():
+            support_label = f"{adapter_name} support metadata: {support_label}"
+    else:
+        support_label = OMI_CONTEXT_SUPPORT_LABEL_BY_ADAPTER[adapter_name]
+    if _context_adapter_string_has_truth_final_label(support_label):
+        display_name = _context_adapter_display_name(adapter_name)
+        raise ValueError(
+            f"{display_name} support/confidence implies truth/canon/final/"
+            f"approval; must remain support metadata only."
+        )
+    return support_label
+
+
+def _validate_context_adapter_finding(
+    finding: Any,
+    *,
+    adapter_name: str,
+    envelope_provenance: dict[str, str],
+) -> dict[str, Any]:
+    display_name = _context_adapter_display_name(adapter_name)
+    finding = _require_dict(finding, f"{display_name} finding")
+    _validate_ollama_field_names_no_prose(
+        finding, path=f"{adapter_name}_finding"
+    )
+    _validate_context_adapter_payload_no_forbidden_operations(
+        finding,
+        adapter_name=adapter_name,
+        path=f"{adapter_name}_finding",
+    )
+    _validate_context_adapter_no_truth_final_label_in_value(
+        finding,
+        adapter_name=adapter_name,
+        path=f"{adapter_name}_finding",
+    )
+    _validate_context_adapter_payload_no_generation_language(
+        finding,
+        adapter_name=adapter_name,
+        path=f"{adapter_name}_finding",
+    )
+    _validate_context_adapter_review_status_fields(adapter_name, finding)
+
+    candidate_type = _coerce_context_adapter_candidate_type(
+        adapter_name, finding
+    )
+    label = _first_non_empty_string(finding, _OMI_CONTEXT_LABEL_FIELD_NAMES)
+    if candidate_type in {"diagnostic_question", "open_question"}:
+        extracted_claim = _first_non_empty_string(
+            finding, _OMI_CONTEXT_QUESTION_CLAIM_FIELD_NAMES
+        )
+    else:
+        extracted_claim = _first_non_empty_string(
+            finding, _OMI_CONTEXT_CLAIM_FIELD_NAMES
+        )
+    if not label and candidate_type in {
+        "diagnostic_question",
+        "open_question",
+        "ambiguity",
+    }:
+        label = extracted_claim
+    if not label:
+        raise ValueError(f"{display_name} finding requires label/name/title")
+    if not extracted_claim:
+        raise ValueError(
+            f"{display_name} finding requires diagnostic_claim, "
+            f"context_claim, analysis_claim, extracted_claim, support_claim, "
+            f"observation, or diagnostic question"
+        )
+    if is_prose_like_text(extracted_claim):
+        raise ValueError(
+            f"{display_name} finding extracted_claim looks like story prose / "
+            f"rewrite / polish / continuation / draft; OMI must analyze, not "
+            f"write. Rejecting as failed_closed."
+        )
+
+    source_locator = _require_non_empty_string(
+        finding.get("source_locator"),
+        f"{display_name} finding source_locator",
+    )
+    evidence = _normalize_context_adapter_evidence(
+        adapter_name,
+        finding,
+        source_locator=source_locator,
+    )
+
+    finding_provenance = finding.get("provenance", envelope_provenance)
+    provenance = _validate_context_adapter_provenance(
+        finding_provenance,
+        adapter_name=adapter_name,
+    )
+    support_label = _normalize_context_adapter_support_label(
+        adapter_name,
+        finding,
+        provenance,
+    )
+    owner_decision = _validate_context_adapter_owner_decision(
+        finding.get("owner_decision"),
+        adapter_name=adapter_name,
+    )
+    raw_finding_id = finding.get("raw_finding_id") or (
+        f"{adapter_name}::{label}::{source_locator}"
+    )
+    if not isinstance(raw_finding_id, str) or not raw_finding_id.strip():
+        raw_finding_id = f"{adapter_name}::fixture::{source_locator}"
+
+    return {
+        "candidate_type": candidate_type,
+        "label": label,
+        "extracted_claim": extracted_claim,
+        "evidence": evidence,
+        "source_locator": source_locator,
+        "provenance": {
+            "tool_source": adapter_name,
+            "adapter": adapter_name,
+            "support": support_label,
+        },
+        "source_adapter": adapter_name,
+        "support_label": support_label,
+        "owner_decision": owner_decision,
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+        "raw_finding_id": raw_finding_id,
+        "candidate_fingerprint": candidate_fingerprint(
+            candidate_type,
+            label,
+            extracted_claim,
+        ),
+    }
+
+
+def validate_context_adapter_fixture_envelope(
+    payload: Any,
+    *,
+    adapter_name: str,
+) -> dict[str, Any]:
+    """Validate a T009 diagnostic/context fixture envelope and findings.
+
+    This contract is fixture/mock output only. It never imports or runs NCP,
+    Subtxt, or dramatica-flow and rejects invalid schemas, missing evidence,
+    missing source locators, missing provenance, unsafe prose/revision
+    language, truth/canon/final/approved labels, Memory/Canon mutation,
+    candidate persistence requests, promotion records, and apply-promotion
+    requests.
+    """
+    if adapter_name not in OMI_CONTEXT_ADAPTER_NAMES:
+        raise ValueError(f"Unsupported diagnostic/context adapter: {adapter_name}")
+    display_name = _context_adapter_display_name(adapter_name)
+    if isinstance(payload, str):
+        try:
+            parsed = json.loads(payload)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"{display_name} envelope must be a JSON object; could not "
+                f"parse string payload as JSON: {exc}"
+            ) from exc
+        payload = parsed
+
+    envelope = _require_dict(payload, f"{display_name} envelope")
+    _validate_ollama_field_names_no_prose(
+        envelope, path=f"{adapter_name}_envelope"
+    )
+    _validate_context_adapter_payload_no_forbidden_operations(
+        envelope,
+        adapter_name=adapter_name,
+        path=f"{adapter_name}_envelope",
+    )
+    _validate_context_adapter_no_truth_final_label_in_value(
+        envelope,
+        adapter_name=adapter_name,
+        path=f"{adapter_name}_envelope",
+    )
+    _validate_context_adapter_payload_no_generation_language(
+        envelope,
+        adapter_name=adapter_name,
+        path=f"{adapter_name}_envelope",
+    )
+
+    missing = [
+        field for field in OMI_CONTEXT_ENVELOPE_REQUIRED_FIELDS
+        if field not in envelope
+    ]
+    if missing:
+        raise ValueError(
+            f"{display_name} envelope missing required fields: {missing}; "
+            f"T009 fixtures require schema_version, adapter, status, "
+            f"provenance, and findings."
+        )
+
+    schema_version = _require_non_empty_string(
+        envelope["schema_version"], f"{display_name} envelope schema_version"
+    )
+    expected_schema = OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER[adapter_name]
+    if schema_version != expected_schema:
+        raise ValueError(
+            f"{display_name} envelope schema_version={schema_version!r} is "
+            f"not supported; only {expected_schema!r} is accepted."
+        )
+    envelope_adapter = _require_non_empty_string(
+        envelope["adapter"], f"{display_name} envelope adapter"
+    )
+    if envelope_adapter != adapter_name:
+        raise ValueError(
+            f"{display_name} envelope adapter={envelope_adapter!r} must be "
+            f"{adapter_name!r}; mismatched adapter identities fail closed."
+        )
+    status = _require_non_empty_string(
+        envelope["status"], f"{display_name} envelope status"
+    )
+    if status not in OMI_CONTEXT_ALLOWED_STATUSES:
+        raise ValueError(
+            f"{display_name} envelope status={status!r} is not allowed; "
+            f"must be one of {sorted(OMI_CONTEXT_ALLOWED_STATUSES)}."
+        )
+    findings_value = envelope["findings"]
+    if not isinstance(findings_value, list):
+        raise ValueError(f"{display_name} envelope findings must be an array")
+    if status != "succeeded" and findings_value:
+        raise ValueError(
+            f"{display_name} envelope carries findings in status={status!r}; "
+            f"only 'succeeded' may carry findings."
+        )
+
+    envelope_provenance = _validate_context_adapter_provenance(
+        envelope["provenance"],
+        adapter_name=adapter_name,
+    )
+    normalized_findings = [
+        _validate_context_adapter_finding(
+            finding,
+            adapter_name=adapter_name,
+            envelope_provenance=envelope_provenance,
+        )
+        for finding in findings_value
+    ]
+    return {
+        "schema_version": schema_version,
+        "adapter": adapter_name,
+        "status": status,
+        "explanation": (
+            envelope["explanation"]
+            if isinstance(envelope.get("explanation"), str)
+            else ""
+        ),
+        "diagnostics": (
+            list(envelope["diagnostics"])
+            if isinstance(envelope.get("diagnostics"), list)
+            else []
+        ),
+        "findings": normalized_findings,
+    }
+
+
+def _build_context_adapter_fixture_runner(
+    adapter_name: str,
+    fixture: Any,
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a safe fixture-only runner for a T009 context adapter."""
+    if adapter_name not in OMI_CONTEXT_ADAPTER_NAMES:
+        raise ValueError(f"Unsupported diagnostic/context adapter: {adapter_name}")
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+    cached_envelope: dict[str, Any] | None = None
+    cached_error: str | None = None
+
+    def _try_validate() -> dict[str, Any]:
+        try:
+            return validate_context_adapter_fixture_envelope(
+                fixture,
+                adapter_name=adapter_name,
+            )
+        except ValueError as exc:
+            display_name = _context_adapter_display_name(adapter_name)
+            raise ValueError(
+                f"{display_name} fixture failed strict validation: {exc}"
+            ) from exc
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        nonlocal cached_envelope, cached_error
+        _ = project_name
+        _ = raw_idea
+        _ = source_idea_id
+        if cached_error is not None:
+            return {
+                "adapter": adapter_name,
+                "state": "failed_closed",
+                "explanation": cached_error,
+                "candidates": [],
+            }
+        if cached_envelope is None:
+            try:
+                cached_envelope = _try_validate()
+            except ValueError as exc:
+                cached_error = str(exc)
+                return {
+                    "adapter": adapter_name,
+                    "state": "failed_closed",
+                    "explanation": cached_error,
+                    "candidates": [],
+                }
+        envelope = cached_envelope
+        env_status = envelope["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if envelope["findings"] else "empty"
+        else:
+            state = env_status
+        return {
+            "adapter": adapter_name,
+            "state": state,
+            "explanation": (
+                envelope["explanation"]
+                or (
+                    f"{_context_adapter_display_name(adapter_name)} fixture "
+                    f"envelope validated against "
+                    f"{OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER[adapter_name]}; "
+                    f"orchestrator never performs live {adapter_name} calls."
+                )
+            ),
+            "candidates": envelope["findings"],
+        }
+
+    return _runner
+
+
 def _resolve_adapter_runner(
     adapter: str,
     *,
@@ -2892,19 +3826,20 @@ def _resolve_adapter_runner(
     to the deterministic marker extractor at the orchestrator-call layer, not
     here.
 
-    T006/T007 extension-point behavior:
+    T006/T007/T008/T009 extension-point behavior:
 
     - If an explicit ``adapter_runners[adapter]`` callable was supplied by
       the caller, return it. The caller is responsible for honoring the
       no-live-call safety contract (T006 callers pass mock/fixture runners
       only; the orchestrator never imports or invokes a live Ollama client).
-    - If ``adapter`` is ``ollama_model``, ``story_check``, ``booknlp``, or
-      ``spacy`` AND ``adapter_fixture_outputs`` carries a matching entry,
-      return a runner that produces a validated adapter envelope from that
-      fixture. The fixture may be either a parsed JSON object (dict) or a JSON
-      string; both forms go through the strict envelope validator and fail
-      closed on any invalid or unsafe output. Fixture paths are the only paths
-      that let these adapters succeed in tests.
+    - If ``adapter`` is ``ollama_model``, ``story_check``, ``booknlp``,
+      ``spacy``, ``ncp``, ``subtxt``, or ``dramatica_flow`` AND
+      ``adapter_fixture_outputs`` carries a matching entry, return a runner
+      that produces a validated adapter envelope from that fixture. The
+      fixture may be either a parsed JSON object (dict) or a JSON string; both
+      forms go through the strict envelope validator and fail closed on any
+      invalid or unsafe output. Fixture paths are the only paths that let
+      these adapters succeed in tests.
     - Otherwise return ``None`` so the existing T005 stub/unavailable path
       runs unchanged.
     """
@@ -2918,7 +3853,15 @@ def _resolve_adapter_runner(
                     f"adapter_runners[{adapter!r}] must be callable"
                 )
             return runner
-    if adapter in {"ollama_model", "story_check", "booknlp", "spacy"}:
+    if adapter in {
+        "ollama_model",
+        "story_check",
+        "booknlp",
+        "spacy",
+        "ncp",
+        "subtxt",
+        "dramatica_flow",
+    }:
         if adapter_fixture_outputs is None:
             return None
         if not isinstance(adapter_fixture_outputs, dict):
@@ -2934,6 +3877,12 @@ def _resolve_adapter_runner(
             )
         if adapter == "story_check":
             return _build_story_check_fixture_runner(
+                adapter_fixture_outputs[adapter],
+                adapter_config=adapter_config,
+            )
+        if adapter in OMI_CONTEXT_ADAPTER_NAMES:
+            return _build_context_adapter_fixture_runner(
+                adapter,
                 adapter_fixture_outputs[adapter],
                 adapter_config=adapter_config,
             )
@@ -2985,12 +3934,14 @@ def analyze_omi_raw_idea_with_tools(
         Optional ``dict[str, Any]`` keyed by adapter name. T006 honors
         ``"ollama_model"`` fixtures; T007 honors ``"booknlp"`` and
         ``"spacy"`` fixtures; T008 honors ``"story_check"`` diagnostic
-        fixtures. Strict schema validation, no-prose guard, no-truth-label
-        guard, evidence/source-locator/provenance requirements, no
-        Memory/Canon mutation, no promotion/apply-promotion, and fail-closed
-        behavior all apply. The orchestrator never calls a live Ollama, Story
-        Check, BookNLP, or spaCy runtime and never reads environment variables
-        to silently enable live calls.
+        fixtures; T009 honors ``"ncp"``, ``"subtxt"``, and
+        ``"dramatica_flow"`` diagnostic/context fixtures. Strict schema
+        validation, no-prose guard, no-truth-label guard, evidence/
+        source-locator/provenance requirements, no Memory/Canon mutation, no
+        promotion/apply-promotion, and fail-closed behavior all apply. The
+        orchestrator never calls a live Ollama, Story Check, BookNLP, spaCy,
+        NCP, Subtxt, or dramatica-flow runtime and never reads environment
+        variables to silently enable live calls.
     adapter_runners:
         Optional ``dict[str, Callable[..., dict[str, Any]]]`` keyed by
         adapter name. Test-only extension point that lets callers inject
@@ -3155,9 +4106,8 @@ def analyze_omi_raw_idea_with_tools(
                     findings.append(validate_normalized_finding(finding))
             continue
 
-        # All other adapters are stubbed by default. Real implementations
-        # are deferred to T006 (Ollama/local model), T007 (spaCy/BookNLP),
-        # T008 (Story Check), T009 (NCP/Subtxt/dramatica-flow).
+        # All other adapters are stubbed by default unless a fixture/mock
+        # runner is supplied. Live implementations remain out of scope here.
         runner = _resolve_adapter_runner(
             adapter,
             adapter_runners=adapter_runners,
@@ -3196,6 +4146,18 @@ def analyze_omi_raw_idea_with_tools(
                     f"orchestrator does not perform live {runtime_name} calls "
                     f"and does not import or install {runtime_name}. "
                     f"Returning 'unavailable' with no candidates."
+                )
+            elif adapter in OMI_CONTEXT_ADAPTER_NAMES:
+                runtime_name = _context_adapter_display_name(adapter)
+                unavailable_explanation = (
+                    f"Adapter '{adapter}' is available through the T009 "
+                    f"{OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER[adapter]} "
+                    f"fixture/mock diagnostic/context handoff contract only; "
+                    f"no fixture was supplied via ``adapter_fixture_outputs``. "
+                    f"The orchestrator does not perform live {runtime_name} "
+                    f"calls, does not import {runtime_name} runtime code, and "
+                    f"does not write {runtime_name} output. Returning "
+                    f"'unavailable' with no candidates."
                 )
             else:
                 unavailable_explanation = (

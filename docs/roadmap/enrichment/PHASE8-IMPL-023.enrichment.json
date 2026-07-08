@@ -21,7 +21,7 @@
   "current_gap": [
     "Backend deterministic marker extraction exists for explicit owner-authored markers but is now fallback/safety baseline only.",
     "The corrected MVP requires AI/tool-assisted OMI analysis using Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.",
-    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, and Story Check fixture-only diagnostic handoff contract now exist; NCP/Subtxt/dramatica-flow, fusion/dedupe, fused persistence, and frontend analysis-results UI remain planned."
+    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, and NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts now exist; fusion/dedupe, fused persistence, and frontend analysis-results UI remain planned."
   ],
   "mvp_behavior": [
     "User enters or saves raw idea text in OMI.",
@@ -92,9 +92,9 @@
     "Ollama/model: structured extraction only, schema-bound JSON, no prose, no rewriting.",
     "Story Check: diagnostic-only observations, no prose suggestions.",
     "BookNLP/spaCy: entities/events/relationships/mentions as evidence-backed candidate sources.",
-    "NCP: structural context candidate mapping, not truth export.",
-    "Subtxt: rubric/diagnostic interpretation, not automatic Dramatica truth.",
-    "dramatica-flow: analysis-pattern reference only; generation/revision/continuation disabled.",
+    "NCP: fixture-only structural context candidate mapping, not truth export.",
+    "Subtxt: fixture-only rubric/diagnostic interpretation, not automatic Dramatica truth.",
+    "dramatica-flow: fixture-only analysis-pattern reference only; generation/revision/continuation disabled.",
     "All tools must fail closed."
   ],
   "boundaries": [
@@ -132,14 +132,17 @@
     "roadmap/status/governance updates keeping PHASE8-IMPL-023 active with corrected AI/tool-assisted OMI scope",
     "T004 deterministic work recorded as superseded/re-scoped fallback-only",
     "PHASE8-IMPL-023-T008 recorded complete/PASS as fixture-only Story Check diagnostic handoff",
-    "next child recorded as PHASE8-IMPL-023-T009 - NCP/Subtxt/dramatica-flow analysis-only candidate mapping"
+    "PHASE8-IMPL-023-T009 recorded complete/PASS as fixture-only NCP/Subtxt/dramatica-flow diagnostic/context handoff",
+    "next child recorded as PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization"
   ],
   "allowed_files": [
     "backend/omi_analysis_orchestrator.py",
+    "tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py",
     "tests/test_omi_story_check_adapter_contract.py",
     "tests/test_omi_booknlp_spacy_adapter_contract.py",
     "tests/test_omi_ollama_model_adapter_contract.py",
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T008-story-check-diagnostic-only-omi-handoff.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T006-ollama-model-structured-extraction-contract.md",
@@ -264,14 +267,20 @@
     },
     {
       "task_id": "PHASE8-IMPL-023-T009",
-      "title": "NCP/Subtxt/dramatica-flow analysis-only candidate mapping",
-      "status": "ready/active",
-      "scope": "analysis-only candidate mapping"
+      "title": "NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts",
+      "status": "complete/PASS",
+      "scope": "fixture-only diagnostic/context adapter contracts; no live NCP/Subtxt/dramatica-flow runtime calls; no AI/tool persistence",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py"
+      ],
+      "result": "complete; tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py -> 31 passed"
     },
     {
       "task_id": "PHASE8-IMPL-023-T010",
       "title": "Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization",
-      "status": "planned",
+      "status": "ready/active",
       "scope": "fusion/dedupe/conflict/evidence normalization"
     },
     {
@@ -299,11 +308,11 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T008",
+  "latest_child_task": "PHASE8-IMPL-023-T009",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T008-story-check-diagnostic-only-omi-handoff.md",
-  "next_child_task": "PHASE8-IMPL-023-T009",
-  "next_child_title": "NCP/Subtxt/dramatica-flow analysis-only candidate mapping",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
+  "next_child_task": "PHASE8-IMPL-023-T010",
+  "next_child_title": "Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable",

@@ -4,9 +4,9 @@
 
 Published and active.
 
-Latest completed child: `PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff`.
+Latest completed child: `PHASE8-IMPL-023-T009 - NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts`.
 
-Next child task: `PHASE8-IMPL-023-T009 - NCP/Subtxt/dramatica-flow analysis-only candidate mapping`.
+Next child task: `PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization`.
 
 Full MVP completion closeout is blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
 
@@ -141,8 +141,8 @@ Each finding must carry:
 - `PHASE8-IMPL-023-T006` - Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests. Scope: fixture-only; complete/PASS.
 - `PHASE8-IMPL-023-T007` - BookNLP/spaCy local NLP candidate extraction adapters. Scope: fixture-only; complete/PASS.
 - `PHASE8-IMPL-023-T008` - Story Check diagnostic-only OMI handoff. Scope: fixture-only; complete/PASS.
-- `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow analysis-only candidate mapping. Scope: ready/active next.
-- `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization.
+- `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts. Scope: fixture-only; complete/PASS.
+- `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization. Scope: ready/active next.
 - `PHASE8-IMPL-023-T011` - Persistence of fused evidence-backed candidates.
 - `PHASE8-IMPL-023-T012` - Frontend OMI analysis results UI/UX.
 - `PHASE8-IMPL-023-T013` - Safety validation: no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth.

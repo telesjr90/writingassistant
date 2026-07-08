@@ -1,3 +1,18 @@
+# PHASE8-IMPL-023-T009 NCP/Subtxt/dramatica-flow Diagnostic Context Adapters
+
+- Result: PASS for fixture-only NCP/Subtxt/dramatica-flow diagnostic/context adapter contracts.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md`.
+- Scope: strict `ncp`, `subtxt`, and `dramatica_flow` JSON/dict fixture validation and normalization only. No live NCP/Subtxt/dramatica-flow runtime call; no frontend UI; no live Story Check, Ollama/model, or BookNLP/spaCy run; no Memory/Canon mutation; no apply-promotion; no story prose.
+- Module updated: `backend/omi_analysis_orchestrator.py`.
+- Test added: `tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py`.
+- Contract behavior: no fixture returns `unavailable`; valid `omi_ncp_context_handoff.v1`, `omi_subtxt_diagnostic_handoff.v1`, and `omi_dramatica_flow_analysis_handoff.v1` fixtures normalize to candidate-only diagnostic/context findings/questions; invalid JSON/schema/status/adapter/finding type/missing evidence/source locator/provenance/unsafe/no-prose/truth/final/auto-approval/review-approved/Memory-Canon-mutation/candidate-persistence/promotion/apply-promotion output fails closed with no findings and no persistence.
+- Persistence: `ncp`, `subtxt`, and `dramatica_flow` findings are never persisted in T009, even when `persist_candidates=True`.
+- Deterministic fallback status: still off by default, opt-in only, and `fallback_only`.
+- Next child task: `PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization`.
+- Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py -q` -> `31 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_story_check_adapter_contract.py -q` -> `11 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_booknlp_spacy_adapter_contract.py -q` -> `10 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_ollama_model_adapter_contract.py -q` -> `19 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_orchestrator_contract.py -q` -> `26 passed`; focused OMI regressions passed: extraction contract `5 passed`, expected-red backend extraction `4 passed`, routes `20 passed`, project manager OMI subset `18 passed, 51 deselected`, boundaries `21 passed`, manual workflow source `7 passed`.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
+- Safety confirmations: no live NCP runtime call, no live Subtxt runtime call, no live dramatica-flow runtime call, no live Story Check call, no live Ollama/model call, no live BookNLP/spaCy call, no dependency installation, no Memory/Canon mutation, no promotion/apply-promotion, no frontend UI change, no story prose, no staging/commit/push.
+
 # PHASE8-IMPL-023-T008 Story Check Diagnostic-Only OMI Handoff
 
 - Result: PASS for fixture-only Story Check diagnostic adapter contract.
@@ -12,7 +27,7 @@
 - Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_story_check_adapter_contract.py -q` -> `11 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_booknlp_spacy_adapter_contract.py -q` -> `10 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_ollama_model_adapter_contract.py -q` -> `19 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_orchestrator_contract.py -q` -> `26 passed`; focused OMI regressions passed: extraction contract `5 passed`, expected-red backend extraction `4 passed`, routes `20 passed`, project manager OMI subset `18 passed, 51 deselected`, boundaries `21 passed`, manual workflow source `7 passed`.
 - Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
 - Safety confirmations: no live Story Check call, no live Ollama/model call, no live BookNLP/spaCy call, no NCP/Subtxt/dramatica-flow run, no dependency installation, no Memory/Canon mutation, no promotion/apply-promotion, no frontend UI change, no story prose, no staging/commit/push.
-- Next child task: `PHASE8-IMPL-023-T009 - NCP/Subtxt/dramatica-flow analysis-only candidate mapping`.
+- Historical next child task at T008 closeout: `PHASE8-IMPL-023-T009 - NCP/Subtxt/dramatica-flow analysis-only candidate mapping`; T009 is now complete/PASS and current next child is `PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization`.
 
 # PHASE8-IMPL-023-T007 BookNLP/spaCy Local NLP Candidate Extraction Adapters
 
