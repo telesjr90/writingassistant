@@ -5,8 +5,8 @@
 - ID: `PHASE8-IMPL-023`
 - Title: OMI AI Tool-Assisted Analysis Candidate Review MVP
 - Status: published/active
-- Latest completed child: `PHASE8-IMPL-023-T007`
-- Next child: `PHASE8-IMPL-023-T008`
+- Latest completed child: `PHASE8-IMPL-023-T008`
+- Next child: `PHASE8-IMPL-023-T009`
 
 ## Owner Override Sources
 
@@ -36,7 +36,7 @@ The MVP target is not deterministic-marker-only extraction. `PHASE8-IMPL-023-T00
 The corrected OMI path can use:
 
 - Ollama / local AI model for structured candidate extraction and validation.
-- Story Check for diagnostic-only structural observations.
+- Story Check for fixture-only diagnostic structural observations/questions.
 - BookNLP for narrative/entity/event/coreference-style extraction where applicable.
 - spaCy for local entity/entity-like extraction, sentence segmentation, and rule-assisted NLP.
 - NCP for structural context mapping/import-export candidate representation.
@@ -86,7 +86,7 @@ Each extracted review candidate or diagnostic finding must carry:
 ## Tool Boundary Inventory
 
 - Ollama/model: structured extraction only, schema-bound JSON, no prose, no rewriting.
-- Story Check: diagnostic-only observations, no prose suggestions.
+- Story Check: fixture-only diagnostic observations/questions in T008, no live runtime calls, no prose suggestions, no candidate persistence.
 - BookNLP/spaCy: entities/events/relationships/mentions as evidence-backed candidate sources.
 - NCP: structural context candidate mapping, not truth export.
 - Subtxt: rubric/diagnostic interpretation, not automatic Dramatica truth.
@@ -119,8 +119,8 @@ Each extracted review candidate or diagnostic finding must carry:
 - `PHASE8-IMPL-023-T005`: tool-assisted extraction orchestrator contract and adapter boundaries.
 - `PHASE8-IMPL-023-T006`: Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests.
 - `PHASE8-IMPL-023-T007`: BookNLP/spaCy local NLP candidate extraction adapters; complete/PASS as fixture-only local NLP normalization.
-- `PHASE8-IMPL-023-T008`: Story Check diagnostic-only OMI handoff.
-- `PHASE8-IMPL-023-T009`: NCP/Subtxt/dramatica-flow analysis-only candidate mapping.
+- `PHASE8-IMPL-023-T008`: Story Check diagnostic-only OMI handoff; complete/PASS as fixture-only diagnostic handoff normalization.
+- `PHASE8-IMPL-023-T009`: NCP/Subtxt/dramatica-flow analysis-only candidate mapping; ready/active next.
 - `PHASE8-IMPL-023-T010`: candidate fusion, dedupe, conflict handling, and evidence/provenance normalization.
 - `PHASE8-IMPL-023-T011`: persistence of fused evidence-backed candidates.
 - `PHASE8-IMPL-023-T012`: frontend OMI analysis results UI/UX.

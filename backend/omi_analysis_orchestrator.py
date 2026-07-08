@@ -15,6 +15,9 @@ T005 scope (PHASE8-IMPL-023):
     that normalize evidence-backed entity/event/object/relationship-style
     support into candidate-only OMI findings without importing or running
     live runtimes.
+  - Wires ``story_check`` through a fixture-only diagnostic handoff contract
+    that normalizes evidence-backed structural diagnostics/questions into
+    candidate-review support without importing or running Story Check.
   - Stubs every other adapter as fail-closed: unimplemented adapters return
     ``unavailable`` / ``skipped`` / ``failed_closed`` with an explanation and
     never fabricate candidates.
@@ -143,16 +146,24 @@ OMI_ADAPTER_CONTRACTS: dict[str, dict[str, Any]] = {
     "story_check": {
         "behavior": (
             "diagnostic-only structural observations and questions; no prose "
-            "suggestions; requires storyform/context to be available; fails "
-            "closed if storyform context is missing."
+            "suggestions, no story text, no Memory/Canon mutation, and no "
+            "promotion/apply-promotion operations. Fixture/mock diagnostic "
+            "handoff only in T008; live Story Check remains unavailable."
         ),
         "produces_candidates": True,
         "supports_finding_types": (
+            "structural_diagnostic",
             "storyform_context",
+            "throughline_context",
+            "plot_thread",
+            "relationship",
+            "conflict_diagnostic",
             "diagnostic_question",
             "continuity_warning",
             "open_question",
+            "ambiguity",
             "world_rule",
+            "evidence_note",
         ),
     },
     "booknlp": {
@@ -275,6 +286,10 @@ OMI_ORCHESTRATOR_FINDING_TYPES: frozenset[str] = frozenset(
         "story_fact",
         "open_question",
         "storyform_context",
+        "structural_diagnostic",
+        "throughline_context",
+        "conflict_diagnostic",
+        "ambiguity",
         "diagnostic_question",
         "continuity_warning",
         "world_rule",
@@ -2148,6 +2163,722 @@ def _build_local_nlp_fixture_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# Story Check diagnostic-only fixture handoff contract (T008)
+# ---------------------------------------------------------------------------
+
+OMI_STORY_CHECK_SCHEMA_VERSION = "omi_story_check_diagnostic_handoff.v1"
+OMI_STORY_CHECK_ADAPTER_NAME = "story_check"
+OMI_STORY_CHECK_SUPPORT_LABEL = "Story Check diagnostic support only"
+OMI_STORY_CHECK_ALLOWED_STATUSES: frozenset[str] = frozenset(
+    {"succeeded", "empty", "failed_closed", "error"}
+)
+OMI_STORY_CHECK_ENVELOPE_REQUIRED_FIELDS: tuple[str, ...] = (
+    "schema_version",
+    "adapter",
+    "status",
+    "provenance",
+    "findings",
+)
+
+_OMI_STORY_CHECK_TYPE_FIELD_NAMES: tuple[str, ...] = (
+    "candidate_type",
+    "finding_type",
+    "diagnostic_type",
+    "type",
+    "kind",
+    "category",
+)
+_OMI_STORY_CHECK_LABEL_FIELD_NAMES: tuple[str, ...] = (
+    "label",
+    "name",
+    "title",
+    "question_label",
+)
+_OMI_STORY_CHECK_CLAIM_FIELD_NAMES: tuple[str, ...] = (
+    "diagnostic_claim",
+    "extracted_claim",
+    "claim",
+    "support_claim",
+    "observation",
+    "diagnostic",
+    "question",
+    "diagnostic_question",
+)
+_OMI_STORY_CHECK_EVIDENCE_EXCERPT_FIELD_NAMES: tuple[str, ...] = (
+    "source_excerpt",
+    "evidence_excerpt",
+    "excerpt",
+    "source_text",
+    "owner_authored_excerpt",
+    "quote",
+    "quote_text",
+)
+_OMI_STORY_CHECK_EVIDENCE_VALUE_KEYS: frozenset[str] = frozenset(
+    {
+        "source_excerpt",
+        "evidence_excerpt",
+        "excerpt",
+        "source_text",
+        "owner_authored_excerpt",
+        "quote",
+        "quote_text",
+        "sentence",
+        "sentence_text",
+        "source_locator",
+        "locator",
+    }
+)
+_OMI_STORY_CHECK_FORBIDDEN_OPERATION_FIELD_NAME_SUBSTRINGS: tuple[str, ...] = (
+    "operation",
+    "action",
+    "command",
+    "persist candidate",
+    "persist candidates",
+    "candidate persistence",
+    "persisted candidate",
+    "save candidate",
+    "operation request",
+    "tool operation",
+    "write request",
+    "memory mutation",
+    "canon mutation",
+    "promotion record",
+    "apply promotion",
+    "promote to canon",
+)
+_OMI_STORY_CHECK_FORBIDDEN_OPERATION_VALUE_RE = re.compile(
+    r"(persist(?:ed)?\s+candidates?|save\s+candidates?|"
+    r"candidate\s+persistence|apply[-_\s]?promotion|promotion\s+record|"
+    r"promote\s+to\s+canon|mutat(?:e|ion)\s+(?:memory|canon)|"
+    r"write\s+(?:candidate|memory|canon)|"
+    r"perform(?:ing)?\s+(?:an\s+)?operation)",
+    re.IGNORECASE,
+)
+_OMI_STORY_CHECK_FORBIDDEN_GENERATION_VALUE_RE = re.compile(
+    r"\b("
+    r"rewrite|rewritten|continue|continuation|expand|expanded|polish|"
+    r"polished|outline|draft|revise|revised|write\s+(?:the\s+)?"
+    r"(?:story|scene|chapter|prose)|generate\s+(?:a\s+)?"
+    r"(?:story|scene|chapter|outline|draft|prose)|what\s+happens\s+next|"
+    r"what\s+should\s+happen\s+next|next\s+scene\s+should|"
+    r"next\s+chapter\s+should"
+    r")\b",
+    re.IGNORECASE,
+)
+_OMI_STORY_CHECK_FINAL_TRUTH_LABEL_RE = re.compile(
+    r"\b(final|finalized|finalised|definitive|accepted|locked|"
+    r"canon|canonical|truth|approved|promoted|confirmed_fact)\b",
+    re.IGNORECASE,
+)
+
+
+def _coerce_story_check_candidate_type(finding: dict[str, Any]) -> str:
+    raw_type = _first_non_empty_string(
+        finding, _OMI_STORY_CHECK_TYPE_FIELD_NAMES
+    )
+    if raw_type in OMI_ORCHESTRATOR_FINDING_TYPES:
+        return raw_type
+
+    token = _normalize_local_nlp_type_token(raw_type)
+    if token in {
+        "structural_diagnostic",
+        "structural_observation",
+        "structure",
+        "structure_diagnostic",
+        "diagnostic",
+        "diagnostic_observation",
+    }:
+        return "structural_diagnostic"
+    if token in {
+        "storyform",
+        "storyform_context",
+        "storyform_support",
+        "context_support",
+        "storyform_context_support",
+    }:
+        return "storyform_context"
+    if token in {
+        "throughline",
+        "throughline_context",
+        "throughline_support",
+        "throughline_context_support",
+    }:
+        return "throughline_context"
+    if token in {
+        "conflict",
+        "conflict_diagnostic",
+        "uncertainty",
+        "uncertainty_diagnostic",
+    }:
+        return "conflict_diagnostic"
+    if token in {
+        "question",
+        "diagnostic_question",
+        "review_question",
+        "owner_question",
+    }:
+        return "diagnostic_question"
+    if token in {"open_question", "ambiguity", "ambiguous_support"}:
+        return "open_question"
+    if token in {"plot", "plot_thread", "plot_thread_diagnostic", "thread"}:
+        return "plot_thread"
+    if token in {
+        "relationship",
+        "relationship_diagnostic",
+        "relationship_support",
+    }:
+        return "relationship"
+    if token in {"warning", "continuity_warning", "continuity"}:
+        return "continuity_warning"
+    if token in {"world_rule", "rule"}:
+        return "world_rule"
+    if token in {"candidate_support", "evidence_support", "evidence_note"}:
+        return "evidence_note"
+
+    raise ValueError(
+        f"Story Check finding unknown candidate/finding type {raw_type!r}; "
+        f"fixture outputs must map to one of "
+        f"{sorted(OMI_ORCHESTRATOR_FINDING_TYPES)}."
+    )
+
+
+def _story_check_string_has_truth_final_label(value: str) -> bool:
+    if not isinstance(value, str):
+        return False
+    return is_truth_label(value) or bool(
+        _OMI_STORY_CHECK_FINAL_TRUTH_LABEL_RE.search(value)
+    )
+
+
+def _validate_story_check_no_truth_final_label_in_value(
+    value: Any,
+    *,
+    path: str,
+    current_key: str = "",
+) -> None:
+    key_token = current_key.strip().lower()
+    if isinstance(value, dict):
+        for key, child in value.items():
+            _validate_story_check_no_truth_final_label_in_value(
+                child,
+                path=f"{path}.{key}",
+                current_key=str(key),
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_story_check_no_truth_final_label_in_value(
+                child,
+                path=f"{path}[{idx}]",
+                current_key=current_key,
+            )
+        return
+    if key_token in _OMI_STORY_CHECK_EVIDENCE_VALUE_KEYS:
+        return
+    if isinstance(value, str) and _story_check_string_has_truth_final_label(value):
+        raise ValueError(
+            f"Story Check envelope contains truth/canon/final/approval label "
+            f"at {path!r}: {value!r}; Story Check output is diagnostic "
+            f"support only and must never be canon, final, or approved."
+        )
+
+
+def _validate_story_check_payload_no_forbidden_operations(
+    value: Any,
+    *,
+    path: str,
+    current_key: str = "",
+) -> None:
+    key_token = current_key.strip().lower().replace("-", " ").replace("_", " ")
+    if isinstance(value, dict):
+        for key, child in value.items():
+            normalized_key = str(key).strip().lower().replace("-", " ").replace("_", " ")
+            for forbidden in _OMI_STORY_CHECK_FORBIDDEN_OPERATION_FIELD_NAME_SUBSTRINGS:
+                if forbidden in normalized_key:
+                    raise ValueError(
+                        f"Story Check output contains forbidden operation "
+                        f"field {path}.{key}; Story Check diagnostics must "
+                        f"not persist candidates, mutate Memory/Canon, create "
+                        f"promotion records, or run/enable apply-promotion."
+                    )
+            _validate_story_check_payload_no_forbidden_operations(
+                child,
+                path=f"{path}.{key}",
+                current_key=str(key),
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_story_check_payload_no_forbidden_operations(
+                child,
+                path=f"{path}[{idx}]",
+                current_key=current_key,
+            )
+        return
+    if key_token in _OMI_STORY_CHECK_EVIDENCE_VALUE_KEYS:
+        return
+    if isinstance(value, str) and _OMI_STORY_CHECK_FORBIDDEN_OPERATION_VALUE_RE.search(value):
+        raise ValueError(
+            f"Story Check output contains forbidden operation text at {path}; "
+            f"Story Check diagnostics must return support only, not perform "
+            f"candidate persistence, Memory/Canon mutation, promotion, or "
+            f"apply-promotion operations."
+        )
+
+
+def _validate_story_check_payload_no_generation_language(
+    value: Any,
+    *,
+    path: str,
+    current_key: str = "",
+) -> None:
+    key_token = current_key.strip().lower()
+    if isinstance(value, dict):
+        for key, child in value.items():
+            _validate_story_check_payload_no_generation_language(
+                child,
+                path=f"{path}.{key}",
+                current_key=str(key),
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_story_check_payload_no_generation_language(
+                child,
+                path=f"{path}[{idx}]",
+                current_key=current_key,
+            )
+        return
+    if key_token in _OMI_STORY_CHECK_EVIDENCE_VALUE_KEYS:
+        return
+    if isinstance(value, str) and _OMI_STORY_CHECK_FORBIDDEN_GENERATION_VALUE_RE.search(value):
+        raise ValueError(
+            f"Story Check output contains prose-generation/revision language "
+            f"at {path}; diagnostic questions may only support review and "
+            f"must not ask for rewriting, continuation, outlining, drafting, "
+            f"polishing, expansion, or revision."
+        )
+
+
+def _validate_story_check_review_status_fields(
+    finding: dict[str, Any],
+) -> None:
+    for status_key in ("review_status", "candidate_status"):
+        if status_key not in finding:
+            continue
+        status_value = _require_non_empty_string(
+            finding[status_key], f"Story Check finding {status_key}"
+        )
+        if status_value not in OMI_FINDING_REVIEW_STATUSES:
+            raise ValueError(
+                f"Story Check finding {status_key}={status_value!r} is not "
+                f"a review-pending candidate status; Story Check output must "
+                f"not imply approval, finality, canon, or truth."
+            )
+
+
+def _validate_story_check_provenance(provenance: Any) -> dict[str, str]:
+    normalized = _validate_finding_provenance(provenance)
+    if normalized["adapter"] != OMI_STORY_CHECK_ADAPTER_NAME:
+        raise ValueError(
+            "Story Check provenance.adapter must match the story_check identity"
+        )
+    if normalized["tool_source"] != OMI_STORY_CHECK_ADAPTER_NAME:
+        raise ValueError(
+            "Story Check provenance.tool_source must match the story_check identity"
+        )
+    return normalized
+
+
+def _normalize_story_check_evidence(
+    finding: dict[str, Any],
+    *,
+    source_locator: str,
+) -> list[dict[str, Any]]:
+    raw_evidence = finding.get("evidence")
+    evidence_items: list[Any] = []
+    if isinstance(raw_evidence, list):
+        evidence_items = list(raw_evidence)
+    elif isinstance(raw_evidence, dict):
+        evidence_items = [dict(raw_evidence)]
+    else:
+        excerpt = _first_non_empty_string(
+            finding, _OMI_STORY_CHECK_EVIDENCE_EXCERPT_FIELD_NAMES
+        )
+        if excerpt:
+            evidence_items = [
+                {
+                    "source_excerpt": excerpt,
+                    "source_locator": source_locator,
+                }
+            ]
+
+    if not evidence_items:
+        raise ValueError(
+            "Story Check finding requires evidence with source_excerpt and "
+            "source_locator"
+        )
+
+    normalized: list[dict[str, Any]] = []
+    for idx, item in enumerate(evidence_items):
+        if not isinstance(item, dict):
+            raise ValueError(f"Story Check evidence item {idx} must be an object")
+        item_copy = dict(item)
+        excerpt = _first_non_empty_string(
+            item_copy, _OMI_STORY_CHECK_EVIDENCE_EXCERPT_FIELD_NAMES
+        )
+        locator = _first_non_empty_string(
+            item_copy, ("source_locator", "locator")
+        ) or source_locator
+        if not excerpt:
+            raise ValueError(
+                f"Story Check evidence item {idx} requires source_excerpt"
+            )
+        if not locator:
+            raise ValueError(
+                f"Story Check evidence item {idx} requires source_locator"
+            )
+        item_copy["source_excerpt"] = excerpt
+        item_copy["source_locator"] = locator
+        normalized.append(item_copy)
+    return normalized
+
+
+def _validate_story_check_owner_decision(
+    owner_decision: Any,
+) -> dict[str, Any]:
+    if owner_decision is None:
+        return {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        }
+    if not isinstance(owner_decision, dict):
+        raise ValueError("Story Check owner_decision must be an object")
+    decision = owner_decision.get("decision")
+    if decision is not None and decision not in {"pending", "needs_review"}:
+        raise ValueError(
+            "Story Check finding carries a non-pending owner_decision; "
+            "diagnostic output is support only and must never approve, reject, "
+            "promote, or finalize findings."
+        )
+    if owner_decision.get("approved") is True:
+        raise ValueError(
+            "Story Check finding owner_decision.approved=true; adapters must "
+            "not auto-approve findings."
+        )
+    return {
+        "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+        "approved": False,
+    }
+
+
+def _normalize_story_check_support_label(
+    finding: dict[str, Any],
+    provenance: dict[str, str],
+) -> str:
+    support_value = (
+        finding.get("support_label")
+        or finding.get("confidence")
+        or finding.get("support")
+        or provenance.get("support")
+        or OMI_STORY_CHECK_SUPPORT_LABEL
+    )
+    if isinstance(support_value, (int, float)):
+        support_label = f"Story Check support metadata: {support_value}"
+    elif isinstance(support_value, str) and support_value.strip():
+        support_label = support_value.strip()
+        if "support" not in support_label.lower():
+            support_label = f"Story Check support metadata: {support_label}"
+    else:
+        support_label = OMI_STORY_CHECK_SUPPORT_LABEL
+    if _story_check_string_has_truth_final_label(support_label):
+        raise ValueError(
+            "Story Check support/confidence implies truth/canon/final/"
+            "approval; must remain support metadata only."
+        )
+    return support_label
+
+
+def _validate_story_check_finding(
+    finding: Any,
+    *,
+    envelope_provenance: dict[str, str],
+) -> dict[str, Any]:
+    finding = _require_dict(finding, "Story Check finding")
+    _validate_ollama_field_names_no_prose(
+        finding, path="story_check_finding"
+    )
+    _validate_story_check_payload_no_forbidden_operations(
+        finding, path="story_check_finding"
+    )
+    _validate_story_check_no_truth_final_label_in_value(
+        finding, path="story_check_finding"
+    )
+    _validate_story_check_payload_no_generation_language(
+        finding, path="story_check_finding"
+    )
+    _validate_story_check_review_status_fields(finding)
+
+    candidate_type = _coerce_story_check_candidate_type(finding)
+    label = _first_non_empty_string(finding, _OMI_STORY_CHECK_LABEL_FIELD_NAMES)
+    if candidate_type == "diagnostic_question":
+        extracted_claim = _first_non_empty_string(
+            finding,
+            (
+                "question",
+                "diagnostic_question",
+                "diagnostic_claim",
+                "extracted_claim",
+                "claim",
+                "support_claim",
+                "observation",
+                "diagnostic",
+            ),
+        )
+    else:
+        extracted_claim = _first_non_empty_string(
+            finding, _OMI_STORY_CHECK_CLAIM_FIELD_NAMES
+        )
+    if not label and candidate_type in {"diagnostic_question", "open_question"}:
+        label = extracted_claim
+    if not label:
+        raise ValueError("Story Check finding requires label/name/title")
+    if not extracted_claim:
+        raise ValueError(
+            "Story Check finding requires diagnostic_claim, extracted_claim, "
+            "support_claim, observation, or diagnostic question"
+        )
+    if is_prose_like_text(extracted_claim):
+        raise ValueError(
+            "Story Check finding extracted_claim looks like story prose / "
+            "rewrite / polish / continuation / draft; OMI must analyze, not "
+            "write. Rejecting as failed_closed."
+        )
+
+    source_locator = _require_non_empty_string(
+        finding.get("source_locator"),
+        "Story Check finding source_locator",
+    )
+    evidence = _normalize_story_check_evidence(
+        finding,
+        source_locator=source_locator,
+    )
+
+    finding_provenance = finding.get("provenance", envelope_provenance)
+    provenance = _validate_story_check_provenance(finding_provenance)
+    support_label = _normalize_story_check_support_label(finding, provenance)
+    owner_decision = _validate_story_check_owner_decision(
+        finding.get("owner_decision")
+    )
+    raw_finding_id = finding.get("raw_finding_id") or (
+        f"{OMI_STORY_CHECK_ADAPTER_NAME}::{label}::{source_locator}"
+    )
+    if not isinstance(raw_finding_id, str) or not raw_finding_id.strip():
+        raw_finding_id = (
+            f"{OMI_STORY_CHECK_ADAPTER_NAME}::fixture::{source_locator}"
+        )
+
+    return {
+        "candidate_type": candidate_type,
+        "label": label,
+        "extracted_claim": extracted_claim,
+        "evidence": evidence,
+        "source_locator": source_locator,
+        "provenance": {
+            "tool_source": OMI_STORY_CHECK_ADAPTER_NAME,
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "support": support_label,
+        },
+        "source_adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+        "support_label": support_label,
+        "owner_decision": owner_decision,
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+        "raw_finding_id": raw_finding_id,
+        "candidate_fingerprint": candidate_fingerprint(
+            candidate_type,
+            label,
+            extracted_claim,
+        ),
+    }
+
+
+def validate_story_check_fixture_envelope(payload: Any) -> dict[str, Any]:
+    """Validate a Story Check diagnostic fixture envelope and normalize findings.
+
+    T008 is fixture/mock handoff only. This function never imports or runs
+    Story Check and rejects invalid schemas, missing evidence/source locators,
+    missing provenance, unsafe prose/revision language, truth/canon/final/
+    approved labels, Memory/Canon mutation, candidate persistence requests,
+    promotion records, and apply-promotion requests.
+    """
+    if isinstance(payload, str):
+        try:
+            parsed = json.loads(payload)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                "Story Check envelope must be a JSON object; could not parse "
+                f"string payload as JSON: {exc}"
+            ) from exc
+        payload = parsed
+
+    envelope = _require_dict(payload, "Story Check envelope")
+    _validate_ollama_field_names_no_prose(
+        envelope, path="story_check_envelope"
+    )
+    _validate_story_check_payload_no_forbidden_operations(
+        envelope, path="story_check_envelope"
+    )
+    _validate_story_check_no_truth_final_label_in_value(
+        envelope, path="story_check_envelope"
+    )
+    _validate_story_check_payload_no_generation_language(
+        envelope, path="story_check_envelope"
+    )
+
+    missing = [
+        field for field in OMI_STORY_CHECK_ENVELOPE_REQUIRED_FIELDS
+        if field not in envelope
+    ]
+    if missing:
+        raise ValueError(
+            f"Story Check envelope missing required fields: {missing}; "
+            f"Story Check fixtures require schema_version, adapter, status, "
+            f"provenance, and findings."
+        )
+
+    schema_version = _require_non_empty_string(
+        envelope["schema_version"], "Story Check envelope schema_version"
+    )
+    if schema_version != OMI_STORY_CHECK_SCHEMA_VERSION:
+        raise ValueError(
+            f"Story Check envelope schema_version={schema_version!r} is not "
+            f"supported; only {OMI_STORY_CHECK_SCHEMA_VERSION!r} is accepted."
+        )
+    adapter = _require_non_empty_string(
+        envelope["adapter"], "Story Check envelope adapter"
+    )
+    if adapter != OMI_STORY_CHECK_ADAPTER_NAME:
+        raise ValueError(
+            f"Story Check envelope adapter={adapter!r} must be "
+            f"{OMI_STORY_CHECK_ADAPTER_NAME!r}; mismatched adapter "
+            f"identities fail closed."
+        )
+    status = _require_non_empty_string(
+        envelope["status"], "Story Check envelope status"
+    )
+    if status not in OMI_STORY_CHECK_ALLOWED_STATUSES:
+        raise ValueError(
+            f"Story Check envelope status={status!r} is not allowed; must be "
+            f"one of {sorted(OMI_STORY_CHECK_ALLOWED_STATUSES)}."
+        )
+    findings_value = envelope["findings"]
+    if not isinstance(findings_value, list):
+        raise ValueError("Story Check envelope findings must be an array")
+    if status != "succeeded" and findings_value:
+        raise ValueError(
+            f"Story Check envelope carries findings in status={status!r}; "
+            f"only 'succeeded' may carry findings."
+        )
+
+    envelope_provenance = _validate_story_check_provenance(
+        envelope["provenance"]
+    )
+    normalized_findings = [
+        _validate_story_check_finding(
+            finding,
+            envelope_provenance=envelope_provenance,
+        )
+        for finding in findings_value
+    ]
+    return {
+        "schema_version": schema_version,
+        "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+        "status": status,
+        "explanation": (
+            envelope["explanation"]
+            if isinstance(envelope.get("explanation"), str)
+            else ""
+        ),
+        "diagnostics": (
+            list(envelope["diagnostics"])
+            if isinstance(envelope.get("diagnostics"), list)
+            else []
+        ),
+        "findings": normalized_findings,
+    }
+
+
+def _build_story_check_fixture_runner(
+    fixture: Any,
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a safe fixture-only runner for Story Check diagnostic handoff."""
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+    cached_envelope: dict[str, Any] | None = None
+    cached_error: str | None = None
+
+    def _try_validate() -> dict[str, Any]:
+        try:
+            return validate_story_check_fixture_envelope(fixture)
+        except ValueError as exc:
+            raise ValueError(
+                f"Story Check fixture failed strict validation: {exc}"
+            ) from exc
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        nonlocal cached_envelope, cached_error
+        _ = project_name
+        _ = raw_idea
+        _ = source_idea_id
+        if cached_error is not None:
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": cached_error,
+                "candidates": [],
+            }
+        if cached_envelope is None:
+            try:
+                cached_envelope = _try_validate()
+            except ValueError as exc:
+                cached_error = str(exc)
+                return {
+                    "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                    "state": "failed_closed",
+                    "explanation": cached_error,
+                    "candidates": [],
+                }
+        envelope = cached_envelope
+        env_status = envelope["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if envelope["findings"] else "empty"
+        else:
+            state = env_status
+        return {
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "state": state,
+            "explanation": (
+                envelope["explanation"]
+                or (
+                    "Story Check fixture envelope validated against "
+                    f"{OMI_STORY_CHECK_SCHEMA_VERSION}; orchestrator never "
+                    f"performs live Story Check calls."
+                )
+            ),
+            "candidates": envelope["findings"],
+        }
+
+    return _runner
+
+
 def _resolve_adapter_runner(
     adapter: str,
     *,
@@ -2167,13 +2898,13 @@ def _resolve_adapter_runner(
       the caller, return it. The caller is responsible for honoring the
       no-live-call safety contract (T006 callers pass mock/fixture runners
       only; the orchestrator never imports or invokes a live Ollama client).
-    - If ``adapter`` is ``ollama_model``, ``booknlp``, or ``spacy`` AND
-      ``adapter_fixture_outputs`` carries a matching entry, return a runner
-      that produces a validated adapter envelope from that fixture. The fixture
-      may be either a parsed JSON object (dict) or a JSON string; both forms go
-      through the strict envelope validator and fail closed on any invalid or
-      unsafe output. Fixture paths are the only paths that let these adapters
-      succeed in tests.
+    - If ``adapter`` is ``ollama_model``, ``story_check``, ``booknlp``, or
+      ``spacy`` AND ``adapter_fixture_outputs`` carries a matching entry,
+      return a runner that produces a validated adapter envelope from that
+      fixture. The fixture may be either a parsed JSON object (dict) or a JSON
+      string; both forms go through the strict envelope validator and fail
+      closed on any invalid or unsafe output. Fixture paths are the only paths
+      that let these adapters succeed in tests.
     - Otherwise return ``None`` so the existing T005 stub/unavailable path
       runs unchanged.
     """
@@ -2187,7 +2918,7 @@ def _resolve_adapter_runner(
                     f"adapter_runners[{adapter!r}] must be callable"
                 )
             return runner
-    if adapter in {"ollama_model", "booknlp", "spacy"}:
+    if adapter in {"ollama_model", "story_check", "booknlp", "spacy"}:
         if adapter_fixture_outputs is None:
             return None
         if not isinstance(adapter_fixture_outputs, dict):
@@ -2198,6 +2929,11 @@ def _resolve_adapter_runner(
             return None
         if adapter == "ollama_model":
             return _build_ollama_model_fixture_runner(
+                adapter_fixture_outputs[adapter],
+                adapter_config=adapter_config,
+            )
+        if adapter == "story_check":
+            return _build_story_check_fixture_runner(
                 adapter_fixture_outputs[adapter],
                 adapter_config=adapter_config,
             )
@@ -2248,12 +2984,13 @@ def analyze_omi_raw_idea_with_tools(
     adapter_fixture_outputs:
         Optional ``dict[str, Any]`` keyed by adapter name. T006 honors
         ``"ollama_model"`` fixtures; T007 honors ``"booknlp"`` and
-        ``"spacy"`` fixtures. Strict schema validation, no-prose guard,
-        no-truth-label guard, evidence/source-locator/provenance
-        requirements, no Memory/Canon mutation, no promotion/apply-promotion,
-        and fail-closed behavior all apply. The orchestrator never calls a
-        live Ollama, BookNLP, or spaCy runtime and never reads environment
-        variables to silently enable live calls.
+        ``"spacy"`` fixtures; T008 honors ``"story_check"`` diagnostic
+        fixtures. Strict schema validation, no-prose guard, no-truth-label
+        guard, evidence/source-locator/provenance requirements, no
+        Memory/Canon mutation, no promotion/apply-promotion, and fail-closed
+        behavior all apply. The orchestrator never calls a live Ollama, Story
+        Check, BookNLP, or spaCy runtime and never reads environment variables
+        to silently enable live calls.
     adapter_runners:
         Optional ``dict[str, Callable[..., dict[str, Any]]]`` keyed by
         adapter name. Test-only extension point that lets callers inject
@@ -2438,6 +3175,17 @@ def analyze_omi_raw_idea_with_tools(
                     f"not perform live Ollama calls and does not read "
                     f"environment variables to enable them. Returning "
                     f"'unavailable' with no candidates."
+                )
+            elif adapter == "story_check":
+                unavailable_explanation = (
+                    f"Adapter '{adapter}' is available through the T008 "
+                    f"{OMI_STORY_CHECK_SCHEMA_VERSION} fixture/mock "
+                    f"diagnostic handoff contract only; no fixture was "
+                    f"supplied via ``adapter_fixture_outputs``. The "
+                    f"orchestrator does not perform live Story Check calls, "
+                    f"does not import Story Check runtime code, and does not "
+                    f"write Story Check output. Returning 'unavailable' with "
+                    f"no candidates."
                 )
             elif adapter in {"booknlp", "spacy"}:
                 runtime_name = "BookNLP" if adapter == "booknlp" else "spaCy"
