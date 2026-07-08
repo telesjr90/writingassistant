@@ -5,8 +5,8 @@
 - ID: `PHASE8-IMPL-023`
 - Title: OMI AI Tool-Assisted Analysis Candidate Review MVP
 - Status: published/active
-- Latest completed child: `PHASE8-IMPL-023-T009`
-- Next child: `PHASE8-IMPL-023-T010`
+- Latest completed child: `PHASE8-IMPL-023-T010`
+- Next child: `PHASE8-IMPL-023-T011`
 
 ## Owner Override Sources
 
@@ -28,7 +28,7 @@ The MVP target is not deterministic-marker-only extraction. `PHASE8-IMPL-023-T00
 - The current OMI path can store owner-authored raw ideas and candidate records.
 - A deterministic marker extractor exists for explicit owner-authored markers.
 - That deterministic extractor does not satisfy the corrected MVP target by itself.
-- The corrected path requires orchestrated analysis using AI/tool adapters, output normalization, fusion/dedupe, evidence/provenance preservation, conflict/uncertainty display, and owner-reviewable UI.
+- The corrected path now has orchestrated fixture-only adapter normalization and backend fusion/dedupe/conflict/uncertainty annotations; candidate-only persistence and owner-reviewable UI remain.
 - Full MVP completion remains blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
 
 ## Required Tool-Assisted Sources
@@ -121,8 +121,8 @@ Each extracted review candidate or diagnostic finding must carry:
 - `PHASE8-IMPL-023-T007`: BookNLP/spaCy local NLP candidate extraction adapters; complete/PASS as fixture-only local NLP normalization.
 - `PHASE8-IMPL-023-T008`: Story Check diagnostic-only OMI handoff; complete/PASS as fixture-only diagnostic handoff normalization.
 - `PHASE8-IMPL-023-T009`: NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts; complete/PASS as fixture-only handoff normalization.
-- `PHASE8-IMPL-023-T010`: candidate fusion, dedupe, conflict handling, and evidence/provenance normalization; ready/active next.
-- `PHASE8-IMPL-023-T011`: persistence of fused evidence-backed candidates.
+- `PHASE8-IMPL-023-T010`: candidate fusion, dedupe, conflict handling, and evidence/provenance normalization; complete/PASS as backend-only fusion contract.
+- `PHASE8-IMPL-023-T011`: candidate-only persistence for fused AI/tool-assisted findings; ready/active next.
 - `PHASE8-IMPL-023-T012`: frontend OMI analysis results UI/UX.
 - `PHASE8-IMPL-023-T013`: safety validation: no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth.
 - `PHASE8-IMPL-023-T014`: browser/manual evidence closeout.

@@ -29,9 +29,11 @@ T005 scope (PHASE8-IMPL-023):
     continuation-like, rewrite-like, or draft-like free-text output that could
     be confused with story prose is rejected as ``failed_closed`` with no
     persisted candidates.
-  - Defines fusion/dedupe contract fields even though full fusion is deferred
-    to T010 (T005 ships the field contract and a deterministic fingerprint
-    helper only).
+  - Defines and implements the T010 fixture-only fusion/dedupe/conflict/
+    uncertainty pass over normalized findings. The pass groups equivalent
+    candidates, marks duplicates, assigns deterministic conflict groups, and
+    labels uncertainty without deleting evidence, deciding truth, persisting
+    candidates, or mutating Memory/Canon.
 
 Boundaries (non-negotiable):
 
@@ -47,7 +49,8 @@ Boundaries (non-negotiable):
 
 All helpers are pure (standard library only, deterministic, no side effects
 beyond what ``extract_omi_candidates_from_raw_idea`` already performs through
-``project_manager`` when ``persist_candidates=True``).
+``project_manager`` when ``persist_candidates=True`` for deterministic
+fallback only).
 """
 
 from __future__ import annotations
@@ -544,6 +547,7 @@ def evidence_fingerprint(evidence_items: list[dict[str, Any]]) -> str:
                 "evidence items require source_excerpt or source_locator"
             )
         normalized.append({"excerpt": excerpt.lower(), "locator": locator})
+    normalized.sort(key=lambda item: (item["excerpt"], item["locator"]))
     payload = json.dumps(normalized, sort_keys=True, ensure_ascii=False)
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
     return f"omi-evid-{digest[:16]}"
@@ -601,6 +605,295 @@ def normalized_finding_id(
     )
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
     return f"omi-find-{adapter_name.strip().lower()}-{digest[:16]}"
+
+
+_OMI_FUSION_CLAIM_STOPWORDS: frozenset[str] = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "appear",
+        "appears",
+        "as",
+        "candidate",
+        "candidates",
+        "context",
+        "diagnostic",
+        "entity",
+        "evidence",
+        "finding",
+        "for",
+        "flagged",
+        "identified",
+        "in",
+        "is",
+        "mention",
+        "mentions",
+        "of",
+        "only",
+        "or",
+        "review",
+        "source",
+        "strength",
+        "support",
+        "supported",
+        "supporting",
+        "supports",
+        "the",
+        "to",
+    }
+)
+
+_OMI_FUSION_TOKEN_SYNONYMS: dict[str, str] = {
+    "event": "timeline_event",
+    "events": "timeline_event",
+    "group": "organization",
+    "groups": "organization",
+    "item": "object",
+    "items": "object",
+    "loc": "location",
+    "org": "organization",
+    "per": "character",
+    "person": "character",
+    "people": "character",
+    "place": "location",
+    "places": "location",
+    "thing": "object",
+    "things": "object",
+}
+
+
+def _fusion_zero_summary() -> dict[str, Any]:
+    return {
+        "total_input_findings": 0,
+        "total_output_findings": 0,
+        "duplicate_group_count": 0,
+        "duplicate_finding_count": 0,
+        "conflict_group_count": 0,
+        "uncertain_finding_count": 0,
+        "adapters_contributing_findings": [],
+    }
+
+
+def _fusion_tokens(value: Any) -> list[str]:
+    text = str(value or "").strip().lower()
+    if not text:
+        return []
+    return re.sub(r"[^a-z0-9]+", " ", text).split()
+
+
+def _normalize_fusion_label(value: Any) -> str:
+    return "".join(_fusion_tokens(value))
+
+
+def _normalize_fusion_candidate_type(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def _fusion_identity_key(finding: dict[str, Any]) -> tuple[str, str]:
+    return (
+        _normalize_fusion_candidate_type(finding.get("candidate_type")),
+        _normalize_fusion_label(finding.get("label")),
+    )
+
+
+def _fusion_claim_signature(finding: dict[str, Any]) -> str:
+    """Return a deterministic support-claim signature for grouping.
+
+    This is intentionally shallow: it only normalizes punctuation/case,
+    removes adapter boilerplate and the label tokens, and folds a tiny set of
+    type synonyms. It is not semantic similarity and never resolves truth.
+    """
+    label_tokens = set(_fusion_tokens(finding.get("label")))
+    kept: list[str] = []
+    for token in _fusion_tokens(finding.get("extracted_claim")):
+        if token in label_tokens or token in _OMI_FUSION_CLAIM_STOPWORDS:
+            continue
+        kept.append(_OMI_FUSION_TOKEN_SYNONYMS.get(token, token))
+    if not kept:
+        identity = _fusion_identity_key(finding)
+        return "|".join(part for part in identity if part) or "support"
+    return " ".join(kept)
+
+
+def _fusion_candidate_fingerprint(finding: dict[str, Any]) -> str:
+    return candidate_fingerprint(
+        str(finding["candidate_type"]),
+        str(finding["label"]),
+        _fusion_claim_signature(finding),
+    )
+
+
+def _fusion_conflict_group_id(
+    identity_key: tuple[str, str],
+    claim_signatures: list[str],
+) -> str:
+    payload = json.dumps(
+        {
+            "candidate_type": identity_key[0],
+            "label": identity_key[1],
+            "claim_signatures": sorted(set(claim_signatures)),
+        },
+        sort_keys=True,
+        ensure_ascii=False,
+    )
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return f"omi-conflict-{digest[:16]}"
+
+
+def _fusion_uncertainty_label_for_finding(
+    finding: dict[str, Any],
+) -> str | None:
+    candidate_type = str(finding.get("candidate_type", "")).strip().lower()
+    support_values = [
+        finding.get("support_label"),
+        finding.get("support"),
+        finding.get("confidence"),
+        finding.get("extracted_claim"),
+        finding.get("label"),
+    ]
+    provenance = finding.get("provenance")
+    if isinstance(provenance, dict):
+        support_values.append(provenance.get("support"))
+    text = " ".join(str(value or "") for value in support_values).lower()
+    claim = str(finding.get("extracted_claim", "")).strip()
+
+    if "conflict" in text or "contradiction" in text or "contradict" in text:
+        return "conflict_support"
+    if (
+        "insufficient" in text
+        or "weak support" in text
+        or "weak evidence" in text
+        or "limited evidence" in text
+        or "not enough evidence" in text
+    ):
+        return "insufficient_evidence_support"
+    if "low support" in text or "low confidence" in text:
+        return "low_support"
+    if (
+        candidate_type == "diagnostic_question"
+        or claim.endswith("?")
+        or "diagnostic question" in text
+    ):
+        return "diagnostic_question_support"
+    if candidate_type == "open_question" or "open question" in text:
+        return "open_question_support"
+    if (
+        candidate_type == "ambiguity"
+        or "ambiguous" in text
+        or "ambiguity" in text
+        or "unresolved" in text
+    ):
+        return "ambiguous_source_support"
+    if (
+        "possible" in text
+        or "context-only" in text
+        or "context only" in text
+    ):
+        return "possible_context_only_support"
+    return None
+
+
+def fuse_normalized_findings(
+    findings: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Annotate normalized findings with deterministic fusion metadata.
+
+    The pass preserves every input finding. It never decides truth, never
+    deletes evidence, and never mutates/persists candidates. Duplicate and
+    conflict IDs are derived only from normalized finding fields, so adapter
+    ordering cannot change grouping metadata.
+    """
+    findings = _require_list(findings, "normalized findings")
+    if not findings:
+        return [], _fusion_zero_summary()
+
+    fused: list[dict[str, Any]] = []
+    duplicate_groups: dict[tuple[tuple[str, str], str], list[str]] = {}
+    identity_groups: dict[tuple[str, str], list[str]] = {}
+    signature_by_id: dict[str, str] = {}
+    by_id: dict[str, dict[str, Any]] = {}
+
+    for original in findings:
+        finding = _require_dict(original, "normalized finding")
+        item = dict(finding)
+        item["candidate_fingerprint"] = _fusion_candidate_fingerprint(item)
+        item["evidence_fingerprint"] = evidence_fingerprint(item["evidence"])
+        item["normalized_finding_id"] = normalized_finding_id(
+            str(item["source_adapter"]),
+            str(item["raw_finding_id"]),
+            item["candidate_fingerprint"],
+        )
+        item["duplicate_of"] = list(item.get("duplicate_of") or [])
+        item["related_finding_ids"] = list(item.get("related_finding_ids") or [])
+        item["conflict_group_id"] = None
+        item["uncertainty_label"] = _fusion_uncertainty_label_for_finding(item)
+
+        finding_id = item["normalized_finding_id"]
+        identity_key = _fusion_identity_key(item)
+        claim_signature = _fusion_claim_signature(item)
+        duplicate_key = (identity_key, claim_signature)
+        duplicate_groups.setdefault(duplicate_key, []).append(finding_id)
+        identity_groups.setdefault(identity_key, []).append(finding_id)
+        signature_by_id[finding_id] = claim_signature
+        by_id[finding_id] = item
+        fused.append(item)
+
+    duplicate_group_count = 0
+    duplicate_finding_count = 0
+    for group_ids in duplicate_groups.values():
+        if len(group_ids) < 2:
+            continue
+        duplicate_group_count += 1
+        ordered_ids = sorted(group_ids)
+        canonical_id = ordered_ids[0]
+        duplicate_finding_count += len(ordered_ids) - 1
+        for finding_id in ordered_ids:
+            related = set(by_id[finding_id].get("related_finding_ids") or [])
+            related.update(other_id for other_id in ordered_ids if other_id != finding_id)
+            by_id[finding_id]["related_finding_ids"] = sorted(related)
+            if finding_id != canonical_id:
+                duplicate_of = set(by_id[finding_id].get("duplicate_of") or [])
+                duplicate_of.add(canonical_id)
+                by_id[finding_id]["duplicate_of"] = sorted(duplicate_of)
+
+    conflict_group_ids: set[str] = set()
+    for identity_key, group_ids in identity_groups.items():
+        claim_signatures = sorted({signature_by_id[finding_id] for finding_id in group_ids})
+        if len(claim_signatures) < 2:
+            continue
+        conflict_id = _fusion_conflict_group_id(identity_key, claim_signatures)
+        conflict_group_ids.add(conflict_id)
+        ordered_ids = sorted(group_ids)
+        for finding_id in ordered_ids:
+            related = set(by_id[finding_id].get("related_finding_ids") or [])
+            related.update(other_id for other_id in ordered_ids if other_id != finding_id)
+            by_id[finding_id]["related_finding_ids"] = sorted(related)
+            by_id[finding_id]["conflict_group_id"] = conflict_id
+            by_id[finding_id]["uncertainty_label"] = "conflict_support"
+
+    for item in fused:
+        item["duplicate_of"] = sorted(set(item.get("duplicate_of") or []))
+        item["related_finding_ids"] = sorted(set(item.get("related_finding_ids") or []))
+
+    summary = {
+        "total_input_findings": len(findings),
+        "total_output_findings": len(fused),
+        "duplicate_group_count": duplicate_group_count,
+        "duplicate_finding_count": duplicate_finding_count,
+        "conflict_group_count": len(conflict_group_ids),
+        "uncertain_finding_count": sum(
+            1 for item in fused if item.get("uncertainty_label")
+        ),
+        "adapters_contributing_findings": sorted(
+            {
+                str(item.get("source_adapter"))
+                for item in fused
+                if item.get("source_adapter")
+            }
+        ),
+    }
+    return fused, summary
 
 
 def stub_adapter_result(
@@ -833,6 +1126,9 @@ def validate_normalized_finding(finding: Any) -> dict[str, Any]:
                 isinstance(item, str) for item in value
             ):
                 raise ValueError(f"normalized finding {field} must be a list[str]")
+        elif field in {"conflict_group_id", "uncertainty_label"} and value is None:
+            fusion_fields[field] = value
+            continue
         elif field in {"normalized_finding_id", "evidence_fingerprint",
                        "candidate_fingerprint", "conflict_group_id",
                        "uncertainty_label"}:
@@ -866,6 +1162,21 @@ def validate_normalized_finding(finding: Any) -> dict[str, Any]:
             candidate_type, label, extracted_claim
         ),
     }
+    for optional_metadata_field in (
+        "support",
+        "confidence",
+        "support_score",
+        "support_metadata",
+    ):
+        if optional_metadata_field not in finding:
+            continue
+        optional_value = finding[optional_metadata_field]
+        if isinstance(optional_value, str) and is_truth_label(optional_value):
+            raise ValueError(
+                f"normalized finding {optional_metadata_field} implies "
+                "truth/canon/approval; must remain support only"
+            )
+        normalized[optional_metadata_field] = optional_value
     if "evidence_fingerprint" not in normalized:
         normalized["evidence_fingerprint"] = evidence_fingerprint(evidence)
     if "normalized_finding_id" not in normalized:
@@ -1427,6 +1738,7 @@ def validate_ollama_model_envelope(payload: Any) -> dict[str, Any]:
                 "source_adapter": OMI_OLLAMA_ADAPTER_NAME,
                 "support_label": support_label_value,
                 "support": confidence_text,
+                "confidence": confidence_text,
                 "owner_decision": owner_decision,
                 "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
                 "raw_finding_id": raw_finding_id,
@@ -1991,6 +2303,7 @@ def _validate_local_nlp_finding(
         },
         "source_adapter": adapter_name,
         "support_label": support_label,
+        "confidence": finding.get("confidence", support_label),
         "owner_decision": owner_decision,
         "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
         "raw_finding_id": raw_finding_id,
@@ -2718,6 +3031,7 @@ def _validate_story_check_finding(
         },
         "source_adapter": OMI_STORY_CHECK_ADAPTER_NAME,
         "support_label": support_label,
+        "confidence": finding.get("confidence", support_label),
         "owner_decision": owner_decision,
         "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
         "raw_finding_id": raw_finding_id,
@@ -3602,6 +3916,7 @@ def _validate_context_adapter_finding(
         },
         "source_adapter": adapter_name,
         "support_label": support_label,
+        "confidence": finding.get("confidence", support_label),
         "owner_decision": owner_decision,
         "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
         "raw_finding_id": raw_finding_id,
@@ -3965,7 +4280,9 @@ def analyze_omi_raw_idea_with_tools(
         - ``source_idea_id``: str | None.
         - ``adapter_results``: list of validated adapter envelopes.
         - ``findings``: list of validated normalized findings (may be empty).
-        - ``fusion_contract``: dict of fusion field names -> null (T010 fills).
+        - ``fusion_contract``: dict of fusion field names -> null.
+        - ``fusion_summary``: deterministic counts for T010 fusion/dedupe/
+          conflict/uncertainty annotations.
         - ``persisted_candidate_ids``: list[str] (empty unless persistence ran).
         - ``safety``: static orchestrator safety envelope.
 
@@ -4028,6 +4345,7 @@ def analyze_omi_raw_idea_with_tools(
             "adapter_results": adapter_results,
             "findings": [],
             "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
+            "fusion_summary": _fusion_zero_summary(),
             "persisted_candidate_ids": [],
             "safety": safety,
         }
@@ -4059,6 +4377,7 @@ def analyze_omi_raw_idea_with_tools(
             "adapter_results": adapter_results,
             "findings": [],
             "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
+            "fusion_summary": _fusion_zero_summary(),
             "persisted_candidate_ids": [],
             "safety": safety,
         }
@@ -4191,6 +4510,8 @@ def analyze_omi_raw_idea_with_tools(
             for finding in envelope["candidates"]:
                 findings.append(validate_normalized_finding(finding))
 
+    findings, fusion_summary = fuse_normalized_findings(findings)
+
     # Persistence: only deterministic_fallback may persist, only when
     # explicitly enabled, and only if it produced findings.
     if (
@@ -4260,6 +4581,7 @@ def analyze_omi_raw_idea_with_tools(
         "adapter_results": adapter_results,
         "findings": findings,
         "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
+        "fusion_summary": fusion_summary,
         "persisted_candidate_ids": persisted_candidate_ids,
         "safety": safety,
     }

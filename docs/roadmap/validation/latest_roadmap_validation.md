@@ -1,3 +1,17 @@
+# PHASE8-IMPL-023-T010 Fusion, Dedupe, Conflict, and Uncertainty Contract
+
+- Result: PASS for backend/orchestrator-contract fusion, dedupe, conflict, and uncertainty handling.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md`.
+- Scope: deterministic post-normalization annotations over fixture-only adapter findings only. No candidate persistence; no frontend UI; no live Ollama/model, Story Check, BookNLP/spaCy, NCP/Subtxt/dramatica-flow run; no Memory/Canon mutation; no apply-promotion; no story prose.
+- Module updated: `backend/omi_analysis_orchestrator.py`.
+- Test added: `tests/test_omi_tool_assisted_fusion_dedupe_contract.py`.
+- Contract behavior: equivalent findings receive stable fingerprints and duplicate/related links without deleting evidence; conflicts receive deterministic `conflict_group_id` metadata without truth resolution; weak/question/ambiguous/insufficient/conflicting support receives support-only `uncertainty_label`; `fusion_summary` reports deterministic counts.
+- Persistence: AI/tool findings are never persisted in T010, even when `persist_candidates=True`.
+- Next child task: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`.
+- Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_fusion_dedupe_contract.py -q` -> `5 passed`; T005-T009 adapter contract tests and focused OMI regressions passed.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
+- Safety confirmations: no live tool/model/runtime call, no dependency installation, no Memory/Canon mutation, no promotion/apply-promotion, no candidate persistence, no frontend UI change, no story prose, no staging/commit/push.
+
 # PHASE8-IMPL-023-T009 NCP/Subtxt/dramatica-flow Diagnostic Context Adapters
 
 - Result: PASS for fixture-only NCP/Subtxt/dramatica-flow diagnostic/context adapter contracts.

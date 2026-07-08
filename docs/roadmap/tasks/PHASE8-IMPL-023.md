@@ -4,9 +4,9 @@
 
 Published and active.
 
-Latest completed child: `PHASE8-IMPL-023-T009 - NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts`.
+Latest completed child: `PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization`.
 
-Next child task: `PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization`.
+Next child task: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`.
 
 Full MVP completion closeout is blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
 
@@ -26,7 +26,7 @@ MVP OMI requires tool-assisted analysis that can use Ollama/local AI models, Sto
 
 The current OMI path has a backend deterministic marker extractor for explicit owner-authored markers, but the corrected MVP requires analysis of raw idea text through AI/tool-assisted adapters.
 
-The missing MVP behavior is an orchestrator that can call bounded analysis tools, normalize their outputs into a common OMI candidate schema, fuse and dedupe overlapping findings, preserve evidence/provenance/support, and surface grouped findings for owner review without treating any tool output as truth.
+The orchestrator can now normalize fixture-only adapter outputs and annotate deterministic fusion/dedupe/conflict/uncertainty metadata. Remaining MVP behavior is candidate-only persistence of fused AI/tool findings and grouped owner-review UI without treating any tool output as truth.
 
 ## MVP Behavior
 
@@ -142,8 +142,8 @@ Each finding must carry:
 - `PHASE8-IMPL-023-T007` - BookNLP/spaCy local NLP candidate extraction adapters. Scope: fixture-only; complete/PASS.
 - `PHASE8-IMPL-023-T008` - Story Check diagnostic-only OMI handoff. Scope: fixture-only; complete/PASS.
 - `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts. Scope: fixture-only; complete/PASS.
-- `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization. Scope: ready/active next.
-- `PHASE8-IMPL-023-T011` - Persistence of fused evidence-backed candidates.
+- `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization. Scope: backend-only contract; complete/PASS.
+- `PHASE8-IMPL-023-T011` - Candidate-only persistence for fused AI/tool-assisted findings. Scope: ready/active next.
 - `PHASE8-IMPL-023-T012` - Frontend OMI analysis results UI/UX.
 - `PHASE8-IMPL-023-T013` - Safety validation: no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth.
 - `PHASE8-IMPL-023-T014` - Browser/manual evidence closeout.

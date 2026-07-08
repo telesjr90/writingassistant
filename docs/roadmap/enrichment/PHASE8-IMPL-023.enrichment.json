@@ -21,7 +21,7 @@
   "current_gap": [
     "Backend deterministic marker extraction exists for explicit owner-authored markers but is now fallback/safety baseline only.",
     "The corrected MVP requires AI/tool-assisted OMI analysis using Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.",
-    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, and NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts now exist; fusion/dedupe, fused persistence, and frontend analysis-results UI remain planned."
+    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts, and deterministic fusion/dedupe/conflict/uncertainty contract now exist; fused persistence and frontend analysis-results UI remain planned."
   ],
   "mvp_behavior": [
     "User enters or saves raw idea text in OMI.",
@@ -133,15 +133,18 @@
     "T004 deterministic work recorded as superseded/re-scoped fallback-only",
     "PHASE8-IMPL-023-T008 recorded complete/PASS as fixture-only Story Check diagnostic handoff",
     "PHASE8-IMPL-023-T009 recorded complete/PASS as fixture-only NCP/Subtxt/dramatica-flow diagnostic/context handoff",
-    "next child recorded as PHASE8-IMPL-023-T010 - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization"
+    "PHASE8-IMPL-023-T010 recorded complete/PASS as backend-only fusion/dedupe/conflict/uncertainty handling",
+    "next child recorded as PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings"
   ],
   "allowed_files": [
     "backend/omi_analysis_orchestrator.py",
+    "tests/test_omi_tool_assisted_fusion_dedupe_contract.py",
     "tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py",
     "tests/test_omi_story_check_adapter_contract.py",
     "tests/test_omi_booknlp_spacy_adapter_contract.py",
     "tests/test_omi_ollama_model_adapter_contract.py",
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T008-story-check-diagnostic-only-omi-handoff.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md",
@@ -280,13 +283,19 @@
     {
       "task_id": "PHASE8-IMPL-023-T010",
       "title": "Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization",
-      "status": "ready/active",
-      "scope": "fusion/dedupe/conflict/evidence normalization"
+      "status": "complete/PASS",
+      "scope": "backend-only deterministic fusion/dedupe/conflict/uncertainty annotations over normalized findings; no persistence or UI",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_tool_assisted_fusion_dedupe_contract.py"
+      ],
+      "result": "complete; tests/test_omi_tool_assisted_fusion_dedupe_contract.py -> 5 passed"
     },
     {
       "task_id": "PHASE8-IMPL-023-T011",
       "title": "Persistence of fused evidence-backed candidates",
-      "status": "planned",
+      "status": "ready/active",
       "scope": "candidate-first persistence only; no Memory/Canon mutation"
     },
     {
@@ -308,11 +317,11 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T009",
+  "latest_child_task": "PHASE8-IMPL-023-T010",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
-  "next_child_task": "PHASE8-IMPL-023-T010",
-  "next_child_title": "Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
+  "next_child_task": "PHASE8-IMPL-023-T011",
+  "next_child_title": "Candidate-only persistence for fused AI/tool-assisted findings",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable",
