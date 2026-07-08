@@ -6,7 +6,7 @@
 - Title: OMI AI Tool-Assisted Analysis Candidate Review MVP
 - Status: published/active
 - Latest completed child: `PHASE8-IMPL-023-T011`
-- Next child: `PHASE8-IMPL-023-T012`
+- Next child: `PHASE8-IMPL-023-T012A`
 
 ## Owner Override Sources
 
@@ -28,8 +28,8 @@ The MVP target is not deterministic-marker-only extraction. `PHASE8-IMPL-023-T00
 - The current OMI path can store owner-authored raw ideas and candidate records.
 - A deterministic marker extractor exists for explicit owner-authored markers.
 - That deterministic extractor does not satisfy the corrected MVP target by itself.
-- The corrected path now has orchestrated fixture-only adapter normalization, backend fusion/dedupe/conflict/uncertainty annotations, and candidate-only persistence for safe source-bound fused findings; owner-reviewable UI remains.
-- Full MVP completion remains blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
+- The corrected path now has orchestrated fixture-only adapter normalization, backend fusion/dedupe/conflict/uncertainty annotations, and candidate-only persistence for safe source-bound fused findings. Those fixture/mock adapter contracts prove safety/schema compatibility only; they do not prove live analysis and do not count as MVP completion.
+- Full MVP completion remains blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, and real runtime outputs are fused, persisted as candidates only, visible for grouped owner review, and validated end to end.
 
 ## Required Tool-Assisted Sources
 
@@ -123,9 +123,21 @@ Each extracted review candidate or diagnostic finding must carry:
 - `PHASE8-IMPL-023-T009`: NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts; complete/PASS as fixture-only handoff normalization.
 - `PHASE8-IMPL-023-T010`: candidate fusion, dedupe, conflict handling, and evidence/provenance normalization; complete/PASS as backend-only fusion contract.
 - `PHASE8-IMPL-023-T011`: candidate-only persistence for fused AI/tool-assisted findings; complete/PASS as backend-only persistence.
-- `PHASE8-IMPL-023-T012`: frontend OMI analysis results UI/UX; ready/active next.
-- `PHASE8-IMPL-023-T013`: safety validation: no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth.
-- `PHASE8-IMPL-023-T014`: browser/manual evidence closeout.
+- `PHASE8-IMPL-023-T012A`: real local/runtime tools required for OMI MVP roadmap reset; ready/active next as docs/status reset only.
+- `PHASE8-IMPL-023-T013`: runtime configuration, preflight, health checks, and feature flags.
+- `PHASE8-IMPL-023-T014`: live spaCy integration in OMI and analysis.
+- `PHASE8-IMPL-023-T015`: live Ollama/local model integration in OMI and analysis.
+- `PHASE8-IMPL-023-T016`: live Story Check integration in OMI and analysis.
+- `PHASE8-IMPL-023-T017`: live BookNLP integration in OMI and analysis.
+- `PHASE8-IMPL-023-T018`: live NCP integration in OMI and analysis.
+- `PHASE8-IMPL-023-T019`: live Subtxt integration in OMI and analysis.
+- `PHASE8-IMPL-023-T020`: live dramatica-flow integration in OMI and analysis.
+- `PHASE8-IMPL-023-T021`: cross-tool fusion validation using real runtime outputs.
+- `PHASE8-IMPL-023-T022`: candidate-only persistence validation using real runtime outputs.
+- `PHASE8-IMPL-023-T023`: grouped owner-review UI for real runtime findings.
+- `PHASE8-IMPL-023-T024`: automated end-to-end live OMI test.
+- `PHASE8-IMPL-023-T025`: manual Cyber Detective Story live OMI test.
+- `PHASE8-IMPL-023-T026`: PHASE8-IMPL-023 closeout only after live runtime tools are connected/tested or explicitly owner-blocked.
 
 ## UI/UX Inventory
 

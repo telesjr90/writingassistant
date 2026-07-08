@@ -17,3 +17,7 @@ Do not stage, commit, or push unless the user explicitly asks.
 Run required Git/preflight/validation commands directly in the WSL shell; do not route them through LeanCTX or MCP tooling.
 
 Use Graphify and Repomix context before broad raw search or large edits. Use LeanCTX where available for context-efficient navigation.
+
+Do not run CCE, Graphify, Repomix, LeanCTX, MCP, or broad context collection inside normal implementation prompts unless the task is explicitly a context collection task.
+
+OMI MVP live-runtime rule: fixture/mock adapter contracts are scaffolding only. They validate schema, safety, no-prose boundaries, and candidate normalization, but they do not prove that the application can run real analysis. Do not describe fixture-only adapter contracts as live integration, do not describe UI display of fixture outputs as MVP completion, and do not mark PHASE8-IMPL-023 complete until selected live tools are connected/tested or explicitly owner-blocked.

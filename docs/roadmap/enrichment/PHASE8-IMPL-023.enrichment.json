@@ -21,7 +21,9 @@
   "current_gap": [
     "Backend deterministic marker extraction exists for explicit owner-authored markers but is now fallback/safety baseline only.",
     "The corrected MVP requires AI/tool-assisted OMI analysis using Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.",
-    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts, deterministic fusion/dedupe/conflict/uncertainty contract, and candidate-only fused finding persistence now exist; frontend analysis-results UI remains planned."
+    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts, deterministic fusion/dedupe/conflict/uncertainty contract, and candidate-only fused finding persistence now exist as useful scaffolding.",
+    "Fixture/mock adapter contracts prove safety/schema compatibility only. They do not prove live analysis and do not count as MVP completion.",
+    "MVP closeout remains blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision."
   ],
   "mvp_behavior": [
     "User enters or saves raw idea text in OMI.",
@@ -135,7 +137,9 @@
     "PHASE8-IMPL-023-T009 recorded complete/PASS as fixture-only NCP/Subtxt/dramatica-flow diagnostic/context handoff",
     "PHASE8-IMPL-023-T010 recorded complete/PASS as backend-only fusion/dedupe/conflict/uncertainty handling",
     "PHASE8-IMPL-023-T011 recorded complete/PASS as backend-only candidate-only persistence for fused AI/tool-assisted findings",
-    "next child recorded as PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX"
+    "T012A recorded as live local/runtime integration reset",
+    "T013 onward recorded as real runtime connection and validation tasks",
+    "MVP closeout blocked until live OMI/analysis runtime validation passes or selected unavailable tools are explicitly owner-blocked"
   ],
   "allowed_files": [
     "backend/omi_analysis_orchestrator.py",
@@ -147,6 +151,7 @@
     "tests/test_omi_booknlp_spacy_adapter_contract.py",
     "tests/test_omi_ollama_model_adapter_contract.py",
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
@@ -313,29 +318,108 @@
     {
       "task_id": "PHASE8-IMPL-023-T012",
       "title": "Frontend OMI analysis results UI/UX",
+      "status": "superseded/deferred",
+      "scope": "prior fixture-output UI task superseded by T012A live-runtime reset; grouped UI intent preserved in T023 for real runtime findings"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T012A",
+      "title": "Real local/runtime tools required for OMI MVP roadmap reset",
       "status": "ready/active next",
-      "scope": "owner review UI for AI/tool-assisted findings"
+      "scope": "docs/status reset only; fixture/mock adapter contracts prove safety/schema compatibility only and do not count as MVP completion",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T013",
-      "title": "Safety validation",
+      "title": "Runtime configuration, preflight, health checks, and feature flags",
       "status": "planned",
-      "scope": "no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth"
+      "scope": "runtime configuration, preflight, health checks, feature flags, and unavailable/BLOCKED status vocabulary for live local/runtime OMI and analysis tools"
     },
     {
       "task_id": "PHASE8-IMPL-023-T014",
-      "title": "Browser/manual evidence closeout",
+      "title": "Live spaCy integration in OMI and analysis",
       "status": "planned",
-      "scope": "browser/manual evidence and parent closeout"
+      "scope": "live spaCy integration in OMI and analysis with candidate-only, evidence/provenance-backed output"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T015",
+      "title": "Live Ollama/local model integration in OMI and analysis",
+      "status": "planned",
+      "scope": "live Ollama/local model integration in OMI and analysis with schema-bound no-prose candidate output"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T016",
+      "title": "Live Story Check integration in OMI and analysis",
+      "status": "planned",
+      "scope": "live Story Check integration in OMI and analysis with diagnostic-only candidate support"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T017",
+      "title": "Live BookNLP integration in OMI and analysis",
+      "status": "planned",
+      "scope": "live BookNLP integration in OMI and analysis with candidate-only entity/event/relationship support"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T018",
+      "title": "Live NCP integration in OMI and analysis",
+      "status": "planned",
+      "scope": "live NCP integration in OMI and analysis or explicit owner-blocked status"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T019",
+      "title": "Live Subtxt integration in OMI and analysis",
+      "status": "planned",
+      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T020",
+      "title": "Live dramatica-flow integration in OMI and analysis",
+      "status": "planned",
+      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T021",
+      "title": "Cross-tool fusion validation using real runtime outputs",
+      "status": "planned",
+      "scope": "fusion/dedupe/conflict/uncertainty validation against real runtime outputs"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T022",
+      "title": "Candidate-only persistence validation using real runtime outputs",
+      "status": "planned",
+      "scope": "candidate-only persistence validation against real runtime outputs; no canon, no promotion records, no apply-promotion"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T023",
+      "title": "Grouped owner-review UI for real runtime findings",
+      "status": "planned",
+      "scope": "grouped owner-review UI for real runtime findings"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T024",
+      "title": "Automated end-to-end live OMI test",
+      "status": "planned",
+      "scope": "automated end-to-end live OMI validation using real runtime outputs where tools are not owner-blocked"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T025",
+      "title": "Manual Cyber Detective Story live OMI test",
+      "status": "planned",
+      "scope": "manual Cyber Detective Story live OMI validation using real runtime outputs where tools are not owner-blocked"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T026",
+      "title": "PHASE8-IMPL-023 closeout only after live runtime tools are connected/tested or explicitly owner-blocked",
+      "status": "planned",
+      "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
   "latest_child_task": "PHASE8-IMPL-023-T011",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
-  "next_child_task": "PHASE8-IMPL-023-T012",
-  "next_child_title": "Frontend OMI analysis results UI/UX",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md",
+  "next_child_task": "PHASE8-IMPL-023-T012A",
+  "next_child_title": "Real local/runtime tools required for OMI MVP roadmap reset",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
-  "full_mvp_completion_status": "blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable",
+  "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"
 }

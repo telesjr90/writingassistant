@@ -13,7 +13,44 @@ The MVP foundation will:
 
 OMI is part of the App MVP, but it is analysis/planning only. It must not write, rewrite, continue, imitate, polish, or improve story prose, and it must not silently promote ideas, candidates, model output, or NotebookLM output into durable project truth. OMI MVP fields are `raw_idea`, `candidates`, `owner_decision`, `destination`, `provenance`, and `status`; the current runtime slice captures owner-authored raw ideas and structured candidate planning records, supports owner review decisions, creates promotion audit records without mutating durable truth, and shows lifecycle/status/provenance details in the OMI panel.
 
-MVP completion is governed by `docs/roadmap/mvp_completion_test_matrix.md`. The next product milestone is the Project Workspace Foundation, not Dramatica-specific implementation, advanced extractor dependency work, RunPod, Books 4-5, or fine-tuning. Optional analysis extractors are future Writer Assistant Core research, not MVP blockers and not dependencies to install now. Extractor output must route through OMI as candidate-only records before any owner-approved promotion.
+MVP completion is governed by `docs/roadmap/mvp_completion_test_matrix.md`. The next product milestone is the Project Workspace Foundation, not Dramatica-specific implementation, advanced extractor dependency work, RunPod, Books 4-5, or fine-tuning. Analysis extractors and analysis runtimes are MVP-required when bounded by evidence/candidate-first behavior, owner review, path safety, environment guards, and no automatic canon. Extractor output must route through OMI as candidate-only records before any owner-approved promotion.
+
+MVP now explicitly requires real local/runtime tool integration in OMI and analysis. Fixture-only adapter contracts are scaffolding only and cannot satisfy MVP completion.
+
+`PHASE8-IMPL-023` cannot close as MVP-complete until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision.
+
+Fixture/mock adapter contracts prove safety/schema compatibility only. They do not prove live analysis and do not count as MVP completion.
+
+### MVP tool integration completion rule
+
+A tool is not complete for MVP when its fixture contract passes.
+
+A tool is complete for MVP only when:
+
+1. the real local/runtime adapter is connected,
+2. automated tests prove the connection works,
+3. manual testing confirms useful candidate findings or valid fail-closed behavior,
+4. results flow through OMI and analysis,
+5. outputs remain evidence/provenance-backed candidate-only review material,
+6. no Memory/Canon mutation occurs,
+7. no promotion/apply-promotion occurs,
+8. no story prose is generated.
+
+Preserved product boundaries:
+
+- Analysis-only.
+- Candidate-first.
+- Evidence/provenance-backed.
+- Owner-controlled.
+- Owner-authored prose storage/editing is allowed.
+- AI must never write, rewrite, continue, imitate, polish, improve, expand, outline, draft, revise, or produce story prose.
+- Queue presence is not approval.
+- Confidence/support is not truth.
+- Candidate persistence is not canon.
+- Tool/model output is not canon.
+- No Memory/Canon mutation.
+- No promotion records.
+- No apply-promotion.
 
 Product layers:
 
@@ -127,7 +164,7 @@ Dataset, book-backed, RunPod, and fine-tuning work remains outside the App MVP c
 After owner acceptance of the Phase 6 MVP foundation, the next implementation priority order is:
 
 - Phase 7: Project Workspace Foundation: project creation, project library/selector, OMI-guided project creation, chapters/scenes/notes/materials, owner-authored prose editor, project overview, and initial workspace pages.
-- Phase 8: Writer Assistant Core candidate schemas, OMI story-knowledge expansion, and adapter contracts.
+- Phase 8: Writer Assistant Core candidate schemas, OMI story-knowledge expansion, adapter contracts, and real local/runtime tool integration through OMI and analysis (fixture-only adapter contracts are scaffolding only).
 - Phase 9: Candidate extraction from owner-authored material through normalized CORE schemas and OMI candidates.
 - Phase 10: Owner approval, evidence/review UI, project-memory/canon pages, and no-silent-promotion gates.
 - Phase 11: Continuity, relationship, timeline, and plot assistance.

@@ -14,6 +14,25 @@ The MVP goal is a usable local app that can create/load a project, edit and save
 
 MVP completion is gated by the formal matrix in `docs/roadmap/mvp_completion_test_matrix.md` plus the Phase 8 MVP-required parent sequence. Analysis extractors and analysis runtimes are no longer optional non-blockers: they are MVP-required milestones when bounded by evidence/candidate-first behavior, owner review, path safety, environment guards, and no automatic canon. Generated prose, rewrite, continuation, imitation, polish, improvement, and expansion are permanently forbidden and are not deferred future features.
 
+`PHASE8-IMPL-023` cannot close as MVP-complete until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision.
+
+Fixture/mock adapter contracts prove safety/schema compatibility only. They do not prove live analysis and do not count as MVP completion.
+
+### MVP tool integration completion rule
+
+A tool is not complete for MVP when its fixture contract passes.
+
+A tool is complete for MVP only when:
+
+1. the real local/runtime adapter is connected,
+2. automated tests prove the connection works,
+3. manual testing confirms useful candidate findings or valid fail-closed behavior,
+4. results flow through OMI and analysis,
+5. outputs remain evidence/provenance-backed candidate-only review material,
+6. no Memory/Canon mutation occurs,
+7. no promotion/apply-promotion occurs,
+8. no story prose is generated.
+
 Current MVP readiness after `PHASE8-IMPL-022`: latest owner acceptance evidence reached `SCRIPT_EXIT=0`, but the final automated decision remains `MANUAL_REVIEW_REQUIRED`. Owner acceptance remains pending and MVP is not complete. The blocker is missing safe UI/workflow surfaces in our own app, not external SaaS research. `PHASE8-UX-002-T001` is complete/PASS as docs/status/planning parent publication only. `PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only and created `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md` plus `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`. `PHASE8-UX-002-T003` is complete/PASS as tests-first expected-red only at `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py`. `PHASE8-UX-002-T004` is complete/PASS as frontend owner-authored source/scene create/import/select UI. `PHASE8-UX-002-T005` is complete/PASS as frontend Story Check diagnostic-only/no-prose evidence UI. `PHASE8-UX-002-T006A` is complete/PASS for `UX2-NOTES-MATERIALS-001`, `PHASE8-UX-002-T006B` is complete/PASS for `UX2-RAW-ARTIFACT-001` and `UX2-ANALYSIS-RUNTIME-001`, and `PHASE8-UX-002-T006C` is complete/PASS for `UX2-REVIEW-PROMOTION-001`. Focused review/promotion validation passes with `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001` -> `1 passed, 6 deselected in 0.03s`. The full UX2 expected-red acceptance file passes with `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`. `PHASE8-UX-002-T006` is complete/PASS, and `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun. The active `PHASE8-UX-002` child sequence is:
 
 - `PHASE8-UX-002-T001` - Parent publication.
@@ -92,6 +111,22 @@ Future extraction tooling must wrap around the app's own Writer Assistant Core p
 Dramatica remains valuable as a later advanced analysis layer for storyform analysis, throughline classification, CIPS/dynamics, RS/IC analysis, and possible fine-tuned analyst models. It is no longer the next implementation priority.
 
 ## 2. Product Boundaries
+
+Preserved core boundaries:
+
+- Analysis-only.
+- Candidate-first.
+- Evidence/provenance-backed.
+- Owner-controlled.
+- Owner-authored prose storage/editing is allowed.
+- AI must never write, rewrite, continue, imitate, polish, improve, expand, outline, draft, revise, or produce story prose.
+- Queue presence is not approval.
+- Confidence/support is not truth.
+- Candidate persistence is not canon.
+- Tool/model output is not canon.
+- No Memory/Canon mutation.
+- No promotion records.
+- No apply-promotion.
 
 Hard prohibitions:
 
@@ -416,6 +451,8 @@ MVP completion requires:
 - OMI can create or display structured candidate planning material without generating story prose.
 - OMI can track owner decision, destination, provenance, and status.
 - OMI cannot promote output into bible, storyform, planning notes, or other durable project truth without explicit owner approval.
+- OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision; fixture/mock adapter contracts alone do not satisfy this requirement.
+- Each selected analysis/extraction tool satisfies the MVP tool integration completion rule above.
 - The MVP exit criteria in `docs/roadmap/mvp_completion_test_matrix.md` pass or have documented owner-approved exceptions.
 
 ## 6.1 App MVP Phases

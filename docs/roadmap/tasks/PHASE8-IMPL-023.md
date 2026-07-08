@@ -6,9 +6,9 @@ Published and active.
 
 Latest completed child: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`.
 
-Next child task: `PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX`.
+Next child task: `PHASE8-IMPL-023-T012A - Real local/runtime tools required for OMI MVP roadmap reset`.
 
-Full MVP completion closeout is blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
+Full MVP completion closeout is blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, and the resulting real runtime outputs are fused, persisted as candidates only, visible for grouped owner review, and validated end to end.
 
 ## Goal
 
@@ -26,7 +26,9 @@ MVP OMI requires tool-assisted analysis that can use Ollama/local AI models, Sto
 
 The current OMI path has a backend deterministic marker extractor for explicit owner-authored markers, but the corrected MVP requires analysis of raw idea text through AI/tool-assisted adapters.
 
-The orchestrator can now normalize fixture-only adapter outputs, annotate deterministic fusion/dedupe/conflict/uncertainty metadata, and persist fused findings as candidate-only OMI review records when explicitly requested and source context is safe. Remaining MVP behavior is grouped owner-review UI without treating any tool output as truth.
+The orchestrator can now normalize fixture-only adapter outputs, annotate deterministic fusion/dedupe/conflict/uncertainty metadata, and persist fused findings as candidate-only OMI review records when explicitly requested and source context is safe. That work is useful scaffolding only. Fixture/mock adapter contracts prove safety/schema compatibility; they do not prove live analysis and do not count as MVP completion.
+
+Remaining MVP behavior requires live local/runtime OMI and analysis integration for each selected tool, explicit owner-blocked status for unavailable tools, cross-tool validation using real runtime outputs, candidate-only persistence validation using real runtime outputs, grouped owner-review UI for real runtime findings, automated live OMI validation, manual Cyber Detective Story live OMI validation, and parent closeout only after those gates pass or are explicitly owner-blocked.
 
 ## MVP Behavior
 
@@ -144,9 +146,21 @@ Each finding must carry:
 - `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts. Scope: fixture-only; complete/PASS.
 - `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization. Scope: backend-only contract; complete/PASS.
 - `PHASE8-IMPL-023-T011` - Candidate-only persistence for fused AI/tool-assisted findings. Scope: backend-only; complete/PASS.
-- `PHASE8-IMPL-023-T012` - Frontend OMI analysis results UI/UX. Scope: ready/active next.
-- `PHASE8-IMPL-023-T013` - Safety validation: no prose, no Memory/Canon mutation, no apply-promotion, no tool output as truth.
-- `PHASE8-IMPL-023-T014` - Browser/manual evidence closeout.
+- `PHASE8-IMPL-023-T012A` - Real local/runtime tools required for OMI MVP roadmap reset. Scope: ready/active next; docs/status reset only.
+- `PHASE8-IMPL-023-T013` - Runtime configuration, preflight, health checks, and feature flags.
+- `PHASE8-IMPL-023-T014` - Live spaCy integration in OMI and analysis.
+- `PHASE8-IMPL-023-T015` - Live Ollama/local model integration in OMI and analysis.
+- `PHASE8-IMPL-023-T016` - Live Story Check integration in OMI and analysis.
+- `PHASE8-IMPL-023-T017` - Live BookNLP integration in OMI and analysis.
+- `PHASE8-IMPL-023-T018` - Live NCP integration in OMI and analysis.
+- `PHASE8-IMPL-023-T019` - Live Subtxt integration in OMI and analysis.
+- `PHASE8-IMPL-023-T020` - Live dramatica-flow integration in OMI and analysis.
+- `PHASE8-IMPL-023-T021` - Cross-tool fusion validation using real runtime outputs.
+- `PHASE8-IMPL-023-T022` - Candidate-only persistence validation using real runtime outputs.
+- `PHASE8-IMPL-023-T023` - Grouped owner-review UI for real runtime findings.
+- `PHASE8-IMPL-023-T024` - Automated end-to-end live OMI test.
+- `PHASE8-IMPL-023-T025` - Manual Cyber Detective Story live OMI test.
+- `PHASE8-IMPL-023-T026` - PHASE8-IMPL-023 closeout only after live runtime tools are connected/tested or explicitly owner-blocked.
 
 ## Non-Goals
 
@@ -154,6 +168,7 @@ Each finding must carry:
 - Do not run extraction in this parent reset.
 - Do not create candidates in this parent reset.
 - Do not mutate Memory/Canon.
+- Do not create promotion records.
 - Do not run apply-promotion.
 - Do not run Ollama/models, Story Check, BookNLP, spaCy, NCP, Subtxt, or dramatica-flow in this parent reset.
 - Do not generate, rewrite, continue, outline, draft, polish, improve, expand, imitate, revise, suggest, or produce story prose.

@@ -82,6 +82,38 @@ They must not run inside normal implementation micro-task prompts.
 
 Implementation prompts may reference already-created context artifacts, but must not run context tooling unless the task is explicitly a context collection or validation task.
 
+Do not run CCE, Graphify, Repomix, LeanCTX, MCP, or broad context collection inside normal implementation prompts unless the task is explicitly a context collection task.
+
+## OMI MVP Live-Runtime Rule
+
+Fixture/mock adapter contracts are scaffolding only. They validate schema, safety, no-prose boundaries, and candidate normalization, but they do not prove that the application can run real analysis.
+
+For PHASE8-IMPL-023 MVP completion, OMI and analysis must connect to real local/runtime tools and validate them through automated and manual tests.
+
+A tool is MVP-complete only after:
+
+* real local/runtime adapter connection,
+* runtime preflight or health check,
+* automated adapter/orchestrator test,
+* manual OMI test on real raw idea text,
+* evidence-backed candidate output or explicit safe fail-closed behavior,
+* no Memory/Canon mutation,
+* no promotion/apply-promotion,
+* no generated story prose.
+
+Implementation prompts must distinguish:
+
+1. fixture/mock adapter contract validation,
+2. real live/runtime integration,
+3. automated runtime testing,
+4. manual OMI validation,
+5. owner-review UI,
+6. MVP closeout.
+
+Do not describe fixture-only adapter contracts as live integration.
+Do not describe UI display of fixture outputs as MVP completion.
+Do not mark PHASE8-IMPL-023 complete until selected live tools are connected/tested or explicitly owner-blocked.
+
 ## Standard Context Artifacts
 
 Parent-level context artifacts should use:

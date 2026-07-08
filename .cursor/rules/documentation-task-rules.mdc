@@ -23,6 +23,34 @@ Documentation specs must clearly separate:
 
 Specs must not imply that planned routes, UI, extractors, memory files, or apply-promotion already exist. If a route, UI page, storage file, extractor, model path, or mutation behavior is only planned, label it as future-only or documentation-only.
 
+OMI MVP live-runtime rule: fixture/mock adapter contracts are scaffolding only. They validate schema, safety, no-prose boundaries, and candidate normalization, but they do not prove that the application can run real analysis.
+
+For PHASE8-IMPL-023 MVP completion, OMI and analysis must connect to real local/runtime tools and validate them through automated and manual tests.
+
+A tool is MVP-complete only after:
+
+- real local/runtime adapter connection,
+- runtime preflight or health check,
+- automated adapter/orchestrator test,
+- manual OMI test on real raw idea text,
+- evidence-backed candidate output or explicit safe fail-closed behavior,
+- no Memory/Canon mutation,
+- no promotion/apply-promotion,
+- no generated story prose.
+
+Implementation prompts must distinguish:
+
+1. fixture/mock adapter contract validation,
+2. real live/runtime integration,
+3. automated runtime testing,
+4. manual OMI validation,
+5. owner-review UI,
+6. MVP closeout.
+
+Do not describe fixture-only adapter contracts as live integration.
+Do not describe UI display of fixture outputs as MVP completion.
+Do not mark PHASE8-IMPL-023 complete until selected live tools are connected/tested or explicitly owner-blocked.
+
 Missing, unknown, unsupported, unresolved, insufficient-evidence, and unapproved fields must be labeled honestly. Do not invent project truth, Dramatica truth, approved memory, evidence, or runtime status.
 
 Avoid Dramatica-specific claims unless the task explicitly calls for them and the claim is evidence-backed and owner-approved. General relationship, timeline, plot, continuity, and story-knowledge claims are not Dramatica Relationship Story, Signpost, Concern, Issue, Problem/Solution, CIPS, dynamics, or throughline proof.

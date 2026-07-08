@@ -6,10 +6,10 @@
 - Superseded decision: `docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md`.
 - Blocked/superseded closeout task: `PHASE8-MVP-COMPLETE-CLOSEOUT-001 - Full MVP completion closeout and post-MVP readiness publication`.
 - Active parent: `PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP`.
-- Latest completed phase-map correction: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`.
+- Latest completed phase-map correction: `PHASE8-IMPL-023-T012A - Real local/runtime tools required for OMI MVP roadmap reset`.
 - T004 deterministic status: `PHASE8-IMPL-023-T004 - Deterministic/rule-based MVP extractor` remains historically complete/PASS but is fallback/safety baseline only.
-- Next phase-map step: `PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX`.
-- Required path: OMI raw idea input must flow through an AI/tool-assisted analysis orchestrator and produce structured, evidence/provenance-backed review candidates before full MVP closeout can proceed.
+- Next phase-map step: `PHASE8-IMPL-023-T012A - Real local/runtime tools required for OMI MVP roadmap reset`.
+- Required path: OMI raw idea input must flow through real local/runtime AI/tool-assisted analysis in OMI and analysis for every selected tool unless a tool is explicitly documented as BLOCKED by owner decision, and produce structured, evidence/provenance-backed review candidates before full MVP closeout can proceed.
 - Boundary: analysis-only, candidate-first, owner-controlled, no automatic Memory/Canon mutation, no automatic apply-promotion, no generated story prose, confidence/support is not truth, and tool/model output is not canon.
 - T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md` is superseded only where it selected deterministic/rule-based extraction as the first MVP target; safety boundaries remain valid.
 - T002 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md` adds expected-red backend and frontend/source tests for the future extraction contract and UI surfaces.
@@ -23,6 +23,8 @@
 - T009 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md` records fixture-only NCP/Subtxt/dramatica-flow diagnostic/context validation with no live runtime calls, no candidate persistence, no Memory/Canon mutation, no promotion/apply-promotion, and no story prose.
 - T010 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md` records deterministic backend-only fusion/dedupe/conflict/uncertainty annotations with no candidate persistence, no Memory/Canon mutation, no promotion/apply-promotion, no live runtime calls, no frontend UI, and no story prose.
 - T011 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md` records candidate-only persistence for fused AI/tool findings with safe source context requirements, duplicate-safe reruns, pending owner decisions, no Memory/Canon mutation, no promotion/apply-promotion, no live runtime calls, no frontend UI, and no story prose.
+- T012A decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md` records that fixture/mock adapter contracts prove safety/schema compatibility only, do not prove live analysis, and do not count as MVP completion.
+- Corrected next sequence: `PHASE8-IMPL-023-T012A` real local/runtime tools required for OMI MVP roadmap reset; `PHASE8-IMPL-023-T013` runtime configuration, preflight, health checks, and feature flags; `PHASE8-IMPL-023-T014` live spaCy integration in OMI and analysis; `PHASE8-IMPL-023-T015` live Ollama/local model integration in OMI and analysis; `PHASE8-IMPL-023-T016` live Story Check integration in OMI and analysis; `PHASE8-IMPL-023-T017` live BookNLP integration in OMI and analysis; `PHASE8-IMPL-023-T018` live NCP integration in OMI and analysis; `PHASE8-IMPL-023-T019` live Subtxt integration in OMI and analysis; `PHASE8-IMPL-023-T020` live dramatica-flow integration in OMI and analysis; `PHASE8-IMPL-023-T021` cross-tool fusion validation using real runtime outputs; `PHASE8-IMPL-023-T022` candidate-only persistence validation using real runtime outputs; `PHASE8-IMPL-023-T023` grouped owner-review UI for real runtime findings; `PHASE8-IMPL-023-T024` automated end-to-end live OMI test; `PHASE8-IMPL-023-T025` manual Cyber Detective Story live OMI test; `PHASE8-IMPL-023-T026` closeout only after live runtime tools are connected/tested or explicitly owner-blocked.
 
 # PHASE8 Post-Accepted Owner Gate Next Readiness Step Decision
 
@@ -31,8 +33,8 @@
 - Historical phase-map step: `PHASE8-MVP-COMPLETE-CLOSEOUT-001 - Full MVP completion closeout and post-MVP readiness publication`.
 - Task type: docs/status/readiness only.
 - Full MVP completion closeout required separately: yes, because the roadmap distinguishes MVP owner gate accepted from full MVP complete.
-- New implementation parent/task selected now: `PHASE8-IMPL-023`; T005, T006, T007, T008, T009, T010, and T011 are complete/PASS and T012 is ready/active.
-- Corrected next implementation work is orchestrator/adapter contract planning. Memory/Canon workflow implementation, apply-promotion implementation, product UI work, tests, browser harness scripts, and actual model/tool runs remain unselected until their corrected child tasks authorize them.
+- New implementation parent/task selected now: `PHASE8-IMPL-023`; T005, T006, T007, T008, T009, T010, and T011 are complete/PASS as scaffolding and T012A is ready/active.
+- Corrected next implementation work is the live local/runtime integration reset followed by runtime configuration, live tool connection, real-output fusion/persistence validation, grouped owner-review UI, and automated/manual live OMI validation. Memory/Canon mutation, apply-promotion implementation, promotion records, and story prose remain forbidden unless a separate owner-approved task explicitly authorizes a future audited path.
 - Accepted limitations remain visible: Cyber Story Check diagnostic output remains `MANUAL_REVIEW_REQUIRED` on missing `storyform.json`; deterministic-marker-only OMI extraction is fallback-only; OMI approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
 
 # PHASE8 Final Owner Accepted Gate Decision
@@ -43,7 +45,7 @@
 - MVP owner gate is accepted for the next manual-test/readiness step according to roadmap conventions.
 - `PHASE8-UX-003` remains complete/PARTIAL historically, with `PHASE8-UX-003-C-CYBER` still `MANUAL_REVIEW_REQUIRED` because selected-source Story Check diagnostic output was unavailable/fail-closed on missing `storyform.json`.
 - `PHASE8-UX-004` remains complete/PASS for OMI manual workflow repair only; OMI manual screen still does not automatically extract characters, locations, timeline, or story facts; OMI approval remains lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
-- Next phase-map step: `PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX`, while preserving the distinction between accepted owner gate and full MVP completion closeout.
+- Next phase-map step: `PHASE8-IMPL-023-T012A - Real local/runtime tools required for OMI MVP roadmap reset`, while preserving the distinction between accepted owner gate and full MVP completion closeout.
 
 # PHASE8-UX-004 Owner Manual Test Approval
 
@@ -51,7 +53,7 @@
 - Approval record: `docs/roadmap/decisions/PHASE8-UX-004-owner-manual-test-approval.md`.
 - Approved expected behavior: no extraction yet; empty/manual shell warning is correct; automatic extraction is unavailable from the OMI manual screen; approval is lifecycle/status metadata only; approval does not mutate Memory/Canon; promotion remains separate/guarded.
 - This does not mark final MVP owner acceptance PASS or MVP complete.
-- Historical next step was explicit owner Accepted/Blocked gate decision. Current next step is `PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX` after the T005 orchestrator scaffold, T006 Ollama fixture contract, T007 BookNLP/spaCy fixture contract, T008 Story Check diagnostic handoff contract, T009 NCP/Subtxt/dramatica-flow fixture contract, T010 fusion/dedupe/conflict/uncertainty contract, and T011 candidate-only persistence contract.
+- Historical next step was explicit owner Accepted/Blocked gate decision. Current next step is `PHASE8-IMPL-023-T012A - Real local/runtime tools required for OMI MVP roadmap reset` after the T005 orchestrator scaffold, T006 Ollama fixture contract, T007 BookNLP/spaCy fixture contract, T008 Story Check diagnostic handoff contract, T009 NCP/Subtxt/dramatica-flow fixture contract, T010 fusion/dedupe/conflict/uncertainty contract, and T011 candidate-only persistence contract.
 
 # PHASE8-UX-003-T007 Closeout and Owner Accepted/Blocked Gate Preparation
 
