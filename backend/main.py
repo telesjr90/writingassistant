@@ -9,10 +9,11 @@ from pydantic import BaseModel
 from urllib.parse import unquote
 
 try:
-    from . import project_manager, storyform
+    from . import omi_runtime_preflight, project_manager, storyform
     from .routes import apply_promotion, review_queue
     _analysis_module = importlib.import_module(__package__ + ".analysis_" + "engine")
 except ImportError:  # pragma: no cover - supports uvicorn main:app from backend/
+    import omi_runtime_preflight
     import project_manager
     import storyform
     from routes import apply_promotion, review_queue
@@ -352,6 +353,11 @@ def get_omi(project_name: str) -> dict:
         return project_manager.get_omi_summary(project_name)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/projects/{project_name}/omi/runtime-preflight")
+def get_omi_runtime_preflight(project_name: str) -> dict:
+    return omi_runtime_preflight.build_omi_runtime_preflight_report(project_name)
 
 
 @app.post("/api/projects/{project_name}/omi/ideas")

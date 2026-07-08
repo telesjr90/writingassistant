@@ -1,10 +1,12 @@
-108. Which exact local/runtime surfaces exist for NCP, Subtxt, and dramatica-flow?
+109. What owner-blocked documentation format should T014-T020 use when a selected live tool remains unavailable after preflight?
+
+108. Which exact local/runtime surfaces exist for NCP, Subtxt, and dramatica-flow? T013 can report configured command/path or existing repo source surfaces, but live integration remains open for T018-T020.
 
 107. What runtime dependencies are required for BookNLP and spaCy?
 
 106. What Ollama model/config is selected for MVP live analysis?
 
-105. What automated tests should run by default versus manual/local-only?
+105. ~~What automated tests should run by default versus manual/local-only?~~ **Partially resolved in PHASE8-IMPL-023-T013:** default CI tests cover read-only preflight and feature-flag contracts without requiring heavy local runtimes. `OMI_LIVE_RUNTIME_TESTS` is reserved for future explicit local/manual runtime tests. T014-T020 must define per-tool live/manual validation commands.
 
 104. What evidence artifact format should manual live OMI validation use?
 

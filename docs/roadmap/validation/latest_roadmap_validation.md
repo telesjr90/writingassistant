@@ -1,3 +1,16 @@
+# PHASE8-IMPL-023-T013 Runtime Preflight, Health Checks, and Feature Flags
+
+- Result: PASS for backend/runtime preflight foundation.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T013-runtime-preflight-health-checks-and-feature-flags.md`.
+- Scope: read-only runtime configuration/preflight only; no live tool integration.
+- Modules added/updated: `backend/omi_runtime_preflight.py`, `backend/main.py`.
+- Test added: `tests/test_omi_live_runtime_preflight_contract.py`.
+- Status vocabulary: `enabled`, `disabled`, `available`, `unavailable`, `blocked`, `error`, `not_configured`.
+- Feature flags: `OMI_LIVE_TOOLS_ENABLED`, per-tool `OMI_LIVE_*_ENABLED`, per-tool `OMI_LIVE_*_BLOCKED`, per-tool blocked reason flags, and `OMI_LIVE_RUNTIME_TESTS`.
+- Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `python3 -m py_compile backend/project_manager.py` -> PASS; `python3 -m py_compile backend/main.py` -> PASS; `python3 -m py_compile backend/omi_runtime_preflight.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_live_runtime_preflight_contract.py -q` -> `8 passed`.
+- Safety confirmations: no live tool/model/runtime analysis, no external services, no dependency installation, no Memory/Canon mutation, no candidate persistence, no promotion/apply-promotion, no frontend UI, no story prose, no staging/commit/push.
+- Next child task: `PHASE8-IMPL-023-T014 - Live spaCy integration in OMI and analysis`.
+
 # PHASE8-IMPL-023-T012A Real Local/Runtime Tools Required for OMI MVP
 
 - Result: PASS for docs-only roadmap correction.

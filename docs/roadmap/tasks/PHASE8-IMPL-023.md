@@ -4,9 +4,9 @@
 
 Published and active.
 
-Latest completed child: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`.
+Latest completed child: `PHASE8-IMPL-023-T013 - Runtime configuration, preflight, health checks, and feature flags`.
 
-Next child task: `PHASE8-IMPL-023-T012A - Real local/runtime tools required for OMI MVP roadmap reset`.
+Next child task: `PHASE8-IMPL-023-T014 - Live spaCy integration in OMI and analysis`.
 
 Full MVP completion closeout is blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, and the resulting real runtime outputs are fused, persisted as candidates only, visible for grouped owner review, and validated end to end.
 
@@ -146,9 +146,9 @@ Each finding must carry:
 - `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts. Scope: fixture-only; complete/PASS.
 - `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization. Scope: backend-only contract; complete/PASS.
 - `PHASE8-IMPL-023-T011` - Candidate-only persistence for fused AI/tool-assisted findings. Scope: backend-only; complete/PASS.
-- `PHASE8-IMPL-023-T012A` - Real local/runtime tools required for OMI MVP roadmap reset. Scope: ready/active next; docs/status reset only.
-- `PHASE8-IMPL-023-T013` - Runtime configuration, preflight, health checks, and feature flags.
-- `PHASE8-IMPL-023-T014` - Live spaCy integration in OMI and analysis.
+- `PHASE8-IMPL-023-T012A` - Real local/runtime tools required for OMI MVP roadmap reset. Scope: complete/PASS; docs/status reset only.
+- `PHASE8-IMPL-023-T013` - Runtime configuration, preflight, health checks, and feature flags. Scope: complete/PASS; read-only backend/runtime preflight foundation only; no live tool/model analysis.
+- `PHASE8-IMPL-023-T014` - Live spaCy integration in OMI and analysis. Scope: ready/active next.
 - `PHASE8-IMPL-023-T015` - Live Ollama/local model integration in OMI and analysis.
 - `PHASE8-IMPL-023-T016` - Live Story Check integration in OMI and analysis.
 - `PHASE8-IMPL-023-T017` - Live BookNLP integration in OMI and analysis.

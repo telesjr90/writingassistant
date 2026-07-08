@@ -123,9 +123,9 @@ Each extracted review candidate or diagnostic finding must carry:
 - `PHASE8-IMPL-023-T009`: NCP/Subtxt/dramatica-flow diagnostic and context adapter contracts; complete/PASS as fixture-only handoff normalization.
 - `PHASE8-IMPL-023-T010`: candidate fusion, dedupe, conflict handling, and evidence/provenance normalization; complete/PASS as backend-only fusion contract.
 - `PHASE8-IMPL-023-T011`: candidate-only persistence for fused AI/tool-assisted findings; complete/PASS as backend-only persistence.
-- `PHASE8-IMPL-023-T012A`: real local/runtime tools required for OMI MVP roadmap reset; ready/active next as docs/status reset only.
-- `PHASE8-IMPL-023-T013`: runtime configuration, preflight, health checks, and feature flags.
-- `PHASE8-IMPL-023-T014`: live spaCy integration in OMI and analysis.
+- `PHASE8-IMPL-023-T012A`: real local/runtime tools required for OMI MVP roadmap reset; complete/PASS as docs/status reset only.
+- `PHASE8-IMPL-023-T013`: runtime configuration, preflight, health checks, and feature flags; complete/PASS as read-only backend/runtime preflight foundation only.
+- `PHASE8-IMPL-023-T014`: live spaCy integration in OMI and analysis; ready/active next.
 - `PHASE8-IMPL-023-T015`: live Ollama/local model integration in OMI and analysis.
 - `PHASE8-IMPL-023-T016`: live Story Check integration in OMI and analysis.
 - `PHASE8-IMPL-023-T017`: live BookNLP integration in OMI and analysis.

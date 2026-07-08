@@ -138,12 +138,16 @@
     "PHASE8-IMPL-023-T010 recorded complete/PASS as backend-only fusion/dedupe/conflict/uncertainty handling",
     "PHASE8-IMPL-023-T011 recorded complete/PASS as backend-only candidate-only persistence for fused AI/tool-assisted findings",
     "T012A recorded as live local/runtime integration reset",
-    "T013 onward recorded as real runtime connection and validation tasks",
+    "T013 recorded as read-only runtime preflight/health checks/feature flags",
+    "T014 onward recorded as real runtime connection and validation tasks",
     "MVP closeout blocked until live OMI/analysis runtime validation passes or selected unavailable tools are explicitly owner-blocked"
   ],
   "allowed_files": [
     "backend/omi_analysis_orchestrator.py",
+    "backend/omi_runtime_preflight.py",
     "backend/project_manager.py",
+    "backend/main.py",
+    "tests/test_omi_live_runtime_preflight_contract.py",
     "tests/test_omi_tool_assisted_persistence_contract.py",
     "tests/test_omi_tool_assisted_fusion_dedupe_contract.py",
     "tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py",
@@ -152,6 +156,7 @@
     "tests/test_omi_ollama_model_adapter_contract.py",
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T013-runtime-preflight-health-checks-and-feature-flags.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
@@ -324,20 +329,27 @@
     {
       "task_id": "PHASE8-IMPL-023-T012A",
       "title": "Real local/runtime tools required for OMI MVP roadmap reset",
-      "status": "ready/active next",
+      "status": "complete/PASS",
       "scope": "docs/status reset only; fixture/mock adapter contracts prove safety/schema compatibility only and do not count as MVP completion",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T013",
       "title": "Runtime configuration, preflight, health checks, and feature flags",
-      "status": "planned",
-      "scope": "runtime configuration, preflight, health checks, feature flags, and unavailable/BLOCKED status vocabulary for live local/runtime OMI and analysis tools"
+      "status": "complete/PASS",
+      "scope": "read-only runtime configuration, preflight, health checks, feature flags, and unavailable/BLOCKED status vocabulary for live local/runtime OMI and analysis tools; no live analysis",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T013-runtime-preflight-health-checks-and-feature-flags.md",
+      "artifacts": [
+        "backend/omi_runtime_preflight.py",
+        "backend/main.py",
+        "tests/test_omi_live_runtime_preflight_contract.py"
+      ],
+      "result": "complete; tests/test_omi_live_runtime_preflight_contract.py -> 8 passed"
     },
     {
       "task_id": "PHASE8-IMPL-023-T014",
       "title": "Live spaCy integration in OMI and analysis",
-      "status": "planned",
+      "status": "ready/active next",
       "scope": "live spaCy integration in OMI and analysis with candidate-only, evidence/provenance-backed output"
     },
     {
@@ -413,11 +425,11 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T011",
+  "latest_child_task": "PHASE8-IMPL-023-T013",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md",
-  "next_child_task": "PHASE8-IMPL-023-T012A",
-  "next_child_title": "Real local/runtime tools required for OMI MVP roadmap reset",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T013-runtime-preflight-health-checks-and-feature-flags.md",
+  "next_child_task": "PHASE8-IMPL-023-T014",
+  "next_child_title": "Live spaCy integration in OMI and analysis",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
