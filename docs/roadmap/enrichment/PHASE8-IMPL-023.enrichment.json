@@ -21,7 +21,7 @@
   "current_gap": [
     "Backend deterministic marker extraction exists for explicit owner-authored markers but is now fallback/safety baseline only.",
     "The corrected MVP requires AI/tool-assisted OMI analysis using Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.",
-    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts, and deterministic fusion/dedupe/conflict/uncertainty contract now exist; fused persistence and frontend analysis-results UI remain planned."
+    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, BookNLP/spaCy fixture-only local NLP contract, Story Check fixture-only diagnostic handoff contract, NCP/Subtxt/dramatica-flow fixture-only diagnostic/context contracts, deterministic fusion/dedupe/conflict/uncertainty contract, and candidate-only fused finding persistence now exist; frontend analysis-results UI remains planned."
   ],
   "mvp_behavior": [
     "User enters or saves raw idea text in OMI.",
@@ -134,16 +134,20 @@
     "PHASE8-IMPL-023-T008 recorded complete/PASS as fixture-only Story Check diagnostic handoff",
     "PHASE8-IMPL-023-T009 recorded complete/PASS as fixture-only NCP/Subtxt/dramatica-flow diagnostic/context handoff",
     "PHASE8-IMPL-023-T010 recorded complete/PASS as backend-only fusion/dedupe/conflict/uncertainty handling",
-    "next child recorded as PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings"
+    "PHASE8-IMPL-023-T011 recorded complete/PASS as backend-only candidate-only persistence for fused AI/tool-assisted findings",
+    "next child recorded as PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX"
   ],
   "allowed_files": [
     "backend/omi_analysis_orchestrator.py",
+    "backend/project_manager.py",
+    "tests/test_omi_tool_assisted_persistence_contract.py",
     "tests/test_omi_tool_assisted_fusion_dedupe_contract.py",
     "tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py",
     "tests/test_omi_story_check_adapter_contract.py",
     "tests/test_omi_booknlp_spacy_adapter_contract.py",
     "tests/test_omi_ollama_model_adapter_contract.py",
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T008-story-check-diagnostic-only-omi-handoff.md",
@@ -185,6 +189,7 @@
     "docs/roadmap/decisions/PHASE8-IMPL-023-T002-omi-extraction-expected-red-tests.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
     "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/validation/latest_roadmap_validation.md"
@@ -295,13 +300,20 @@
     {
       "task_id": "PHASE8-IMPL-023-T011",
       "title": "Persistence of fused evidence-backed candidates",
-      "status": "ready/active",
-      "scope": "candidate-first persistence only; no Memory/Canon mutation"
+      "status": "complete/PASS",
+      "scope": "backend-only candidate-first persistence; no Memory/Canon mutation",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
+      "artifacts": [
+        "backend/project_manager.py",
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_tool_assisted_persistence_contract.py"
+      ],
+      "result": "complete; tests/test_omi_tool_assisted_persistence_contract.py -> 5 passed"
     },
     {
       "task_id": "PHASE8-IMPL-023-T012",
       "title": "Frontend OMI analysis results UI/UX",
-      "status": "planned",
+      "status": "ready/active next",
       "scope": "owner review UI for AI/tool-assisted findings"
     },
     {
@@ -317,11 +329,11 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T010",
+  "latest_child_task": "PHASE8-IMPL-023-T011",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
-  "next_child_task": "PHASE8-IMPL-023-T011",
-  "next_child_title": "Candidate-only persistence for fused AI/tool-assisted findings",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
+  "next_child_task": "PHASE8-IMPL-023-T012",
+  "next_child_title": "Frontend OMI analysis results UI/UX",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable",

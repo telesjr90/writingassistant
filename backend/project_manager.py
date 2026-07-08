@@ -682,6 +682,87 @@ OMI_EXTRACTED_CANDIDATE_DEFAULT_STATUS = "candidate_review_pending"
 OMI_EXTRACTION_SUPPORT_LABEL = "support strength only"
 OMI_DETERMINISTIC_EXTRACTOR_NAME = "omi_deterministic_marker_extractor"
 OMI_DETERMINISTIC_EXTRACTOR_VERSION = "phase8-impl-023-t004"
+OMI_TOOL_ASSISTED_CANDIDATE_SOURCE = "omi_tool_assisted_fused_analysis"
+OMI_TOOL_ASSISTED_CANDIDATE_VERSION = "phase8-impl-023-t011"
+OMI_TOOL_ASSISTED_FINDING_TYPES = frozenset(
+    {
+        "character",
+        "location",
+        "organization",
+        "object",
+        "timeline_event",
+        "relationship",
+        "plot_thread",
+        "story_fact",
+        "open_question",
+        "storyform_context",
+        "structural_diagnostic",
+        "throughline_context",
+        "conflict_diagnostic",
+        "ambiguity",
+        "diagnostic_question",
+        "continuity_warning",
+        "world_rule",
+        "evidence_note",
+    }
+)
+OMI_TOOL_ASSISTED_ADAPTER_IDENTITIES = frozenset(
+    {
+        "ollama_model",
+        "story_check",
+        "booknlp",
+        "spacy",
+        "ncp",
+        "subtxt",
+        "dramatica_flow",
+        "deterministic_fallback",
+    }
+)
+OMI_TOOL_ASSISTED_REVIEW_STATUSES = frozenset(
+    {"candidate", "review_pending", "candidate_review_pending"}
+)
+OMI_TOOL_ASSISTED_REQUIRED_FIELDS = (
+    "candidate_type",
+    "label",
+    "extracted_claim",
+    "evidence",
+    "source_locator",
+    "provenance",
+    "source_adapter",
+    "support_label",
+    "owner_decision",
+    "review_status",
+    "raw_finding_id",
+    "candidate_fingerprint",
+    "evidence_fingerprint",
+    "normalized_finding_id",
+)
+OMI_TOOL_ASSISTED_FORBIDDEN_LABELS = (
+    "truth",
+    "canon",
+    "canonical",
+    "approved",
+    "promoted",
+    "confirmed_fact",
+)
+OMI_TOOL_ASSISTED_PROSE_INTENT_RE = re.compile(
+    r"^\s*("
+    r"here\s+is\s+a\s+(better|polished|revised|improved|expanded|cleaner)\s+version"
+    r"|here'?s\s+a\s+(better|polished|revised|improved|expanded|cleaner)\s+version"
+    r"|polished\s+(version|scene|chapter|draft|passage)"
+    r"|revised\s+(version|scene|chapter|draft|passage)"
+    r"|rewritten\s+(version|scene|chapter|draft|passage)"
+    r"|improved\s+(version|scene|chapter|draft|passage)"
+    r"|expanded\s+(version|scene|chapter|draft|passage)"
+    r"|continuation\s*:"
+    r"|rewrite\s*:"
+    r"|outline\s*:"
+    r"|draft\s*:"
+    r"|chapter\s+\d+\s*[:\-]"
+    r"|scene\s+\d+\s*[:\-]"
+    r")",
+    re.IGNORECASE,
+)
 OMI_EXPLICIT_MARKER_CANDIDATE_TYPES = {
     "character": "character",
     "location": "location",
@@ -2438,6 +2519,462 @@ def _persist_omi_extracted_candidates(
         persisted_candidate_ids.append(persisted["candidate_id"])
 
     return persisted_candidate_ids, "persisted"
+
+
+def _omi_tool_assisted_string_has_forbidden_label(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    lowered = value.strip().lower()
+    return any(label in lowered for label in OMI_TOOL_ASSISTED_FORBIDDEN_LABELS)
+
+
+def _omi_tool_assisted_value_has_forbidden_label(value: Any) -> bool:
+    if isinstance(value, str):
+        return _omi_tool_assisted_string_has_forbidden_label(value)
+    if isinstance(value, dict):
+        return any(_omi_tool_assisted_value_has_forbidden_label(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_omi_tool_assisted_value_has_forbidden_label(item) for item in value)
+    return False
+
+
+def _omi_tool_assisted_claim_is_unsafe(value: str) -> bool:
+    if OMI_TOOL_ASSISTED_PROSE_INTENT_RE.match(value):
+        return True
+    return any(quote in value for quote in ('"', "\u201c", "\u201d", "\u2018", "\u2019"))
+
+
+def _json_safe_copy(value: Any, label: str) -> Any:
+    try:
+        return json.loads(json.dumps(value, ensure_ascii=False))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be JSON-serializable") from exc
+
+
+def _validate_omi_tool_assisted_owner_decision(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError("OMI tool-assisted finding owner_decision must be a JSON object")
+    normalized = validate_omi_owner_decision(value)
+    if normalized.get("decision") != "pending" or normalized.get("approved"):
+        raise ValueError(
+            "OMI tool-assisted finding owner_decision must remain pending"
+        )
+    return normalized
+
+
+def _validate_omi_tool_assisted_provenance(
+    provenance: Any,
+    *,
+    source_adapter: str,
+) -> dict[str, Any]:
+    if not isinstance(provenance, dict) or not provenance:
+        raise ValueError("OMI tool-assisted finding provenance must be a non-empty JSON object")
+    normalized = _json_safe_copy(provenance, "OMI tool-assisted provenance")
+    adapter = _require_non_empty_string(
+        normalized.get("adapter"), "OMI tool-assisted provenance.adapter"
+    )
+    tool_source = _require_non_empty_string(
+        normalized.get("tool_source"), "OMI tool-assisted provenance.tool_source"
+    )
+    support = _require_non_empty_string(
+        normalized.get("support"), "OMI tool-assisted provenance.support"
+    )
+    if adapter != source_adapter or tool_source != source_adapter:
+        raise ValueError(
+            "OMI tool-assisted provenance adapter/tool_source must match source_adapter"
+        )
+    if "support" not in support.lower() or _omi_tool_assisted_string_has_forbidden_label(support):
+        raise ValueError(
+            "OMI tool-assisted provenance support must be support only, not truth/canon"
+        )
+    return normalized
+
+
+def validate_omi_tool_assisted_finding(finding: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(finding, dict):
+        raise ValueError("OMI tool-assisted finding must be a JSON object")
+
+    missing = [
+        field for field in OMI_TOOL_ASSISTED_REQUIRED_FIELDS
+        if field not in finding
+    ]
+    if missing:
+        raise ValueError(f"OMI tool-assisted finding missing required fields: {missing}")
+
+    normalized = _json_safe_copy(finding, "OMI tool-assisted finding")
+    candidate_type = _require_non_empty_string(
+        normalized.get("candidate_type"),
+        "OMI tool-assisted finding candidate_type",
+    )
+    if candidate_type not in OMI_TOOL_ASSISTED_FINDING_TYPES:
+        raise ValueError(f"Unsupported OMI tool-assisted finding candidate_type: {candidate_type}")
+    normalized["candidate_type"] = candidate_type
+
+    label = _require_non_empty_string(
+        normalized.get("label"), "OMI tool-assisted finding label"
+    )
+    extracted_claim = _require_non_empty_string(
+        normalized.get("extracted_claim"),
+        "OMI tool-assisted finding extracted_claim",
+    )
+    if _omi_tool_assisted_claim_is_unsafe(extracted_claim):
+        raise ValueError(
+            "OMI tool-assisted finding extracted_claim looks like story prose or prose intent"
+        )
+    normalized["label"] = label
+    normalized["extracted_claim"] = extracted_claim
+    normalized["evidence"] = _validate_omi_extracted_candidate_evidence(
+        normalized.get("evidence")
+    )
+    normalized["source_locator"] = _require_non_empty_string(
+        normalized.get("source_locator"),
+        "OMI tool-assisted finding source_locator",
+    )
+
+    source_adapter = _require_non_empty_string(
+        normalized.get("source_adapter"),
+        "OMI tool-assisted finding source_adapter",
+    )
+    if source_adapter not in OMI_TOOL_ASSISTED_ADAPTER_IDENTITIES:
+        raise ValueError(f"Unknown OMI tool-assisted source_adapter: {source_adapter}")
+    normalized["source_adapter"] = source_adapter
+    normalized["provenance"] = _validate_omi_tool_assisted_provenance(
+        normalized.get("provenance"),
+        source_adapter=source_adapter,
+    )
+
+    support_label = _require_non_empty_string(
+        normalized.get("support_label"),
+        "OMI tool-assisted finding support_label",
+    )
+    if "support" not in support_label.lower() or _omi_tool_assisted_string_has_forbidden_label(support_label):
+        raise ValueError(
+            "OMI tool-assisted finding support_label must be support only, not truth/canon"
+        )
+    normalized["support_label"] = support_label
+    for support_key in ("support", "confidence", "support_score", "support_metadata"):
+        if support_key in normalized and _omi_tool_assisted_value_has_forbidden_label(
+            normalized[support_key]
+        ):
+            raise ValueError(
+                f"OMI tool-assisted finding {support_key} implies truth/canon/approval"
+            )
+
+    normalized["owner_decision"] = _validate_omi_tool_assisted_owner_decision(
+        normalized.get("owner_decision")
+    )
+    review_status = _require_non_empty_string(
+        normalized.get("review_status"),
+        "OMI tool-assisted finding review_status",
+    )
+    if review_status not in OMI_TOOL_ASSISTED_REVIEW_STATUSES:
+        raise ValueError(f"Unsupported OMI tool-assisted review_status: {review_status}")
+    normalized["review_status"] = review_status
+
+    for field in (
+        "raw_finding_id",
+        "candidate_fingerprint",
+        "evidence_fingerprint",
+        "normalized_finding_id",
+    ):
+        normalized[field] = _require_non_empty_string(
+            normalized.get(field),
+            f"OMI tool-assisted finding {field}",
+        )
+
+    for field in ("duplicate_of", "related_finding_ids"):
+        value = normalized.get(field, [])
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            raise ValueError(f"OMI tool-assisted finding {field} must be a list[str]")
+        normalized[field] = sorted(set(value))
+
+    for field in ("conflict_group_id", "uncertainty_label"):
+        value = normalized.get(field)
+        if value is not None:
+            normalized[field] = _require_non_empty_string(
+                value,
+                f"OMI tool-assisted finding {field}",
+            )
+
+    return normalized
+
+
+def _omi_tool_assisted_candidate_container_type(candidate_type: str) -> str:
+    if candidate_type == "storyform_context":
+        return "storyform_context_candidate"
+    if candidate_type in {
+        "character",
+        "location",
+        "organization",
+        "object",
+        "story_fact",
+        "world_rule",
+    }:
+        return "project_bible_candidate"
+    return "planning_note"
+
+
+def _omi_tool_assisted_candidate_destination(candidate_type: str) -> str:
+    if candidate_type == "storyform_context":
+        return "storyform_context_candidate"
+    if candidate_type in {
+        "character",
+        "location",
+        "organization",
+        "object",
+        "story_fact",
+        "world_rule",
+    }:
+        return "project_bible_candidate"
+    return "planning_notes"
+
+
+def _omi_tool_assisted_candidate_key(source_idea_id: str, finding: dict[str, Any]) -> str:
+    payload = {
+        "source_idea_id": source_idea_id,
+        "normalized_finding_id": finding["normalized_finding_id"],
+        "candidate_fingerprint": finding["candidate_fingerprint"],
+        "evidence_fingerprint": finding["evidence_fingerprint"],
+    }
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    return f"omi-tool-candidate-{digest[:16]}"
+
+
+def _omi_tool_assisted_candidate_content(
+    finding: dict[str, Any],
+    *,
+    source_idea_id: str,
+    persistence_key: str,
+) -> dict[str, Any]:
+    content = {
+        "schema_version": 1,
+        "source": OMI_TOOL_ASSISTED_CANDIDATE_SOURCE,
+        "tool_assisted_candidate_version": OMI_TOOL_ASSISTED_CANDIDATE_VERSION,
+        "tool_assisted_candidate_key": persistence_key,
+        "source_idea_id": source_idea_id,
+        "candidate_first": True,
+        "review_material_only": True,
+        "queue_presence_is_not_approval": True,
+        "support_only": True,
+        "candidate_type": finding["candidate_type"],
+        "label": finding["label"],
+        "name": finding["label"],
+        "extracted_claim": finding["extracted_claim"],
+        "diagnostic_claim": finding["extracted_claim"],
+        "evidence": finding["evidence"],
+        "source_locator": finding["source_locator"],
+        "provenance": finding["provenance"],
+        "source_adapter": finding["source_adapter"],
+        "tool_source": finding["source_adapter"],
+        "support_label": finding["support_label"],
+        "owner_decision": _default_owner_decision(),
+        "review_status": finding["review_status"],
+        "candidate_fingerprint": finding["candidate_fingerprint"],
+        "evidence_fingerprint": finding["evidence_fingerprint"],
+        "normalized_finding_id": finding["normalized_finding_id"],
+        "raw_finding_id": finding["raw_finding_id"],
+        "duplicate_metadata": {
+            "duplicate_of": finding.get("duplicate_of", []),
+            "related_finding_ids": finding.get("related_finding_ids", []),
+        },
+        "conflict_group_id": finding.get("conflict_group_id"),
+        "uncertainty_label": finding.get("uncertainty_label"),
+    }
+    for support_key in ("support", "confidence", "support_score", "support_metadata"):
+        if support_key in finding:
+            content[support_key] = finding[support_key]
+    return content
+
+
+def _omi_tool_assisted_candidate_provenance(
+    finding: dict[str, Any],
+    *,
+    source_idea_id: str,
+    persistence_key: str,
+) -> dict[str, Any]:
+    provenance = dict(finding["provenance"])
+    provenance.update(
+        {
+            "source_type": OMI_TOOL_ASSISTED_CANDIDATE_SOURCE,
+            "source_idea_id": source_idea_id,
+            "source_locator": finding["source_locator"],
+            "source_label": "Fused AI/tool OMI candidate review material",
+            "created_by": "tool_adapter",
+            "adapter": finding["source_adapter"],
+            "tool_source": finding["source_adapter"],
+            "tool": finding["source_adapter"],
+            "support": provenance.get("support") or finding["support_label"],
+            "model": provenance.get("model"),
+            "prompt_id": provenance.get("prompt_id"),
+            "candidate_fingerprint": finding["candidate_fingerprint"],
+            "evidence_fingerprint": finding["evidence_fingerprint"],
+            "normalized_finding_id": finding["normalized_finding_id"],
+            "tool_assisted_candidate_key": persistence_key,
+            "tool_assisted_candidate_version": OMI_TOOL_ASSISTED_CANDIDATE_VERSION,
+        }
+    )
+    return provenance
+
+
+def _existing_omi_tool_assisted_candidate_ids_by_key(
+    project_name: str,
+    source_idea_id: str,
+) -> dict[str, str]:
+    existing: dict[str, str] = {}
+    for candidate in list_omi_candidates(project_name, source_idea_id):
+        content = candidate.get("candidate_content")
+        if not isinstance(content, dict):
+            continue
+        key = content.get("tool_assisted_candidate_key")
+        candidate_id = candidate.get("candidate_id")
+        if isinstance(key, str) and key and isinstance(candidate_id, str):
+            existing.setdefault(key, candidate_id)
+    return existing
+
+
+def persist_omi_tool_assisted_findings_as_candidates(
+    project_name: str,
+    *,
+    raw_idea: str,
+    source_idea_id: str | None,
+    findings: list[dict[str, Any]],
+) -> dict[str, Any]:
+    _safe_path_component(project_name, "project_name")
+    if not isinstance(raw_idea, str):
+        raise ValueError("OMI tool-assisted persistence raw_idea must be a string")
+    if not isinstance(findings, list):
+        raise ValueError("OMI tool-assisted findings must be a JSON array")
+    if not findings:
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "no_candidates_persisted",
+            "persistence_explanation": "No fused findings were supplied for persistence.",
+        }
+    if source_idea_id is None:
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "source_idea_required",
+            "persistence_explanation": (
+                "Fused AI/tool findings require a source OMI idea before "
+                "candidate-only persistence can run."
+            ),
+        }
+
+    try:
+        _safe_path_component(source_idea_id, "source_idea_id")
+        source_idea = load_omi_idea(project_name, source_idea_id)
+    except (FileNotFoundError, ValueError):
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "source_idea_not_found",
+            "persistence_explanation": (
+                "The requested source OMI idea could not be loaded; no "
+                "AI/tool candidates were persisted."
+            ),
+        }
+
+    source_raw_idea = source_idea.get("raw_idea")
+    if not isinstance(source_raw_idea, str) or not source_raw_idea.strip():
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "source_idea_missing_raw_text",
+            "persistence_explanation": (
+                "The source OMI idea has no raw idea text; no AI/tool "
+                "candidates were persisted."
+            ),
+        }
+    if raw_idea.strip() != source_raw_idea.strip():
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "source_idea_mismatch",
+            "persistence_explanation": (
+                "The submitted raw idea does not match the source OMI idea "
+                "snapshot; no AI/tool candidates were persisted."
+            ),
+        }
+
+    try:
+        validated_findings = [
+            validate_omi_tool_assisted_finding(finding) for finding in findings
+        ]
+    except ValueError as exc:
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "invalid_finding_failed_closed",
+            "persistence_explanation": (
+                f"Invalid fused AI/tool finding rejected before persistence: {exc}"
+            ),
+        }
+
+    existing_by_key = _existing_omi_tool_assisted_candidate_ids_by_key(
+        project_name,
+        source_idea_id,
+    )
+    persisted_candidate_ids: list[str] = []
+    new_candidate_ids: list[str] = []
+    reused_candidate_ids: list[str] = []
+
+    for finding in validated_findings:
+        persistence_key = _omi_tool_assisted_candidate_key(source_idea_id, finding)
+        existing_candidate_id = existing_by_key.get(persistence_key)
+        if existing_candidate_id is not None:
+            persisted_candidate_ids.append(existing_candidate_id)
+            reused_candidate_ids.append(existing_candidate_id)
+            continue
+
+        persisted = create_omi_candidate(
+            project_name,
+            source_idea_id,
+            _omi_tool_assisted_candidate_container_type(finding["candidate_type"]),
+            _omi_tool_assisted_candidate_content(
+                finding,
+                source_idea_id=source_idea_id,
+                persistence_key=persistence_key,
+            ),
+            _omi_tool_assisted_candidate_destination(finding["candidate_type"]),
+            provenance=_omi_tool_assisted_candidate_provenance(
+                finding,
+                source_idea_id=source_idea_id,
+                persistence_key=persistence_key,
+            ),
+            evidence=finding["evidence"],
+        )
+        candidate_id = persisted["candidate_id"]
+        persisted_candidate_ids.append(candidate_id)
+        new_candidate_ids.append(candidate_id)
+        existing_by_key[persistence_key] = candidate_id
+
+    if new_candidate_ids:
+        persistence_status = "persisted"
+        explanation = "Fused AI/tool findings were persisted as pending OMI candidates."
+    elif reused_candidate_ids:
+        persistence_status = "already_persisted"
+        explanation = "Existing pending OMI candidate records matched the fused findings."
+    else:
+        persistence_status = "no_candidates_persisted"
+        explanation = "No fused AI/tool findings were persisted."
+
+    return {
+        "persisted_candidate_ids": persisted_candidate_ids,
+        "new_candidate_ids": new_candidate_ids,
+        "reused_candidate_ids": reused_candidate_ids,
+        "persistence_status": persistence_status,
+        "persistence_explanation": explanation,
+    }
 
 
 def _omi_success_extraction_result(

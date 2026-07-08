@@ -45,12 +45,12 @@ Boundaries (non-negotiable):
     improvement, expansion, or imitation.
   - No package installs, no new external dependencies.
   - No filesystem writes beyond existing project_manager helpers when the
-    caller opts into persistence via ``project_manager.extract_omi_candidates_from_raw_idea``.
+    caller opts into candidate-only OMI persistence.
 
 All helpers are pure (standard library only, deterministic, no side effects
-beyond what ``extract_omi_candidates_from_raw_idea`` already performs through
-``project_manager`` when ``persist_candidates=True`` for deterministic
-fallback only).
+beyond what ``project_manager`` performs through the existing OMI
+candidate-first storage path when ``persist_candidates=True`` and source
+context is sufficient.
 """
 
 from __future__ import annotations
@@ -4232,10 +4232,11 @@ def analyze_omi_raw_idea_with_tools(
     source_idea_id:
         Optional OMI idea id to use as the canonical raw_idea source.
     persist_candidates:
-        When True and the deterministic_fallback adapter is allowed AND
-        produces findings, candidates are persisted via the existing
-        ``project_manager.extract_omi_candidates_from_raw_idea`` helper
-        with ``persist_candidates=True``. Other adapters never persist.
+        When True, fused evidence-backed findings may be persisted as
+        pending OMI candidate records through the existing candidate-first
+        storage path. Persistence requires a valid source OMI idea and raw
+        idea snapshot match; otherwise the orchestrator returns a
+        non-persistence status with zero writes.
     requested_adapters:
         Optional list of adapter names to run. Defaults to the AI/tool
         adapters (deterministic_fallback is opt-in via
@@ -4284,14 +4285,16 @@ def analyze_omi_raw_idea_with_tools(
         - ``fusion_summary``: deterministic counts for T010 fusion/dedupe/
           conflict/uncertainty annotations.
         - ``persisted_candidate_ids``: list[str] (empty unless persistence ran).
+        - ``persistence_status``: persistence boundary outcome.
+        - ``persistence_explanation``: non-empty persistence explanation.
         - ``safety``: static orchestrator safety envelope.
 
     Persistence boundary:
-      Only deterministic_fallback may persist candidates, and only when
-      ``allow_deterministic_fallback`` AND ``persist_candidates`` are both
-      True. AI/tool adapter outputs are candidate-only evidence and never
-      mutate Memory/Canon, create promotion records, call apply-promotion,
-      or write canon. No real model/tool calls occur.
+      Fused findings may persist only as candidate-only OMI review records
+      when ``persist_candidates`` is True and source context is sufficient.
+      AI/tool adapter outputs are candidate-only evidence and never mutate
+      Memory/Canon, create promotion records, call apply-promotion, or write
+      canon. No real model/tool calls occur.
 
     Fail-closed behavior:
       Empty / unsupported / unsafe-prose input -> ``empty`` / ``fail_closed``
@@ -4326,6 +4329,13 @@ def analyze_omi_raw_idea_with_tools(
     any_succeeded_real = False
     deterministic_fallback_produced = False
     persisted_candidate_ids: list[str] = []
+    persistence_status = "not_requested"
+    persistence_explanation = (
+        "persist_candidates=False; fused findings were returned without "
+        "candidate persistence."
+    )
+    new_candidate_ids: list[str] = []
+    reused_candidate_ids: list[str] = []
 
     if not raw_idea_text:
         # Short-circuit empty raw idea -> empty result with zero writes.
@@ -4347,6 +4357,16 @@ def analyze_omi_raw_idea_with_tools(
             "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
             "fusion_summary": _fusion_zero_summary(),
             "persisted_candidate_ids": [],
+            "persistence_status": (
+                "no_candidates_persisted"
+                if persist_candidates
+                else "not_requested"
+            ),
+            "persistence_explanation": (
+                "Empty raw idea; no findings or OMI candidates were persisted."
+            ),
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
             "safety": safety,
         }
 
@@ -4379,6 +4399,16 @@ def analyze_omi_raw_idea_with_tools(
             "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
             "fusion_summary": _fusion_zero_summary(),
             "persisted_candidate_ids": [],
+            "persistence_status": (
+                "no_candidates_persisted"
+                if persist_candidates
+                else "not_requested"
+            ),
+            "persistence_explanation": (
+                "Unsafe prose-like raw idea failed closed before persistence."
+            ),
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
             "safety": safety,
         }
 
@@ -4512,38 +4542,40 @@ def analyze_omi_raw_idea_with_tools(
 
     findings, fusion_summary = fuse_normalized_findings(findings)
 
-    # Persistence: only deterministic_fallback may persist, only when
-    # explicitly enabled, and only if it produced findings.
-    if (
-        allow_deterministic_fallback
-        and persist_candidates
-        and deterministic_fallback_produced
-    ):
-        # Re-run the deterministic extractor with persist_candidates=True;
-        # this is the canonical T004 path. We do NOT persist fused AI/tool
-        # adapter findings at T005; that is deferred to T011.
-        from backend import project_manager  # local import
+    if persist_candidates:
+        if findings:
+            # T011 persistence: fused AI/tool findings can be written only as
+            # pending OMI candidate records tied to an existing source idea.
+            from backend import project_manager  # local import
 
-        extraction = project_manager.extract_omi_candidates_from_raw_idea(
-            project_name,
-            raw_idea_text,
-            source_idea_id=source_idea_id,
-            persist_candidates=True,
-            provenance={
-                "adapter": OMI_DETERMINISTIC_FALLBACK_ADAPTER_NAME,
-                "tool_source": OMI_DETERMINISTIC_FALLBACK_ADAPTER_NAME,
-                "support": "deterministic-fallback support strength only",
-                "fallback_only": True,
-                "orchestrator": "analyze_omi_raw_idea_with_tools",
-                "extractor": project_manager.OMI_DETERMINISTIC_EXTRACTOR_NAME,
-                "extractor_version": project_manager.OMI_DETERMINISTIC_EXTRACTOR_VERSION,
-            },
-        )
-        persisted_candidate_ids = list(
-            extraction.get("persisted_candidate_ids", []) or []
-        )
+            persistence = project_manager.persist_omi_tool_assisted_findings_as_candidates(
+                project_name,
+                raw_idea=raw_idea_text,
+                source_idea_id=source_idea_id,
+                findings=findings,
+            )
+            persisted_candidate_ids = list(
+                persistence.get("persisted_candidate_ids", []) or []
+            )
+            new_candidate_ids = list(persistence.get("new_candidate_ids", []) or [])
+            reused_candidate_ids = list(
+                persistence.get("reused_candidate_ids", []) or []
+            )
+            persistence_status = str(
+                persistence.get("persistence_status") or "no_candidates_persisted"
+            )
+            persistence_explanation = str(
+                persistence.get("persistence_explanation")
+                or "No AI/tool candidates were persisted."
+            )
+        else:
+            persistence_status = "no_candidates_persisted"
+            persistence_explanation = (
+                "persist_candidates=True but no fused findings were available "
+                "for candidate persistence."
+            )
         explanation_parts.append(
-            f"deterministic_fallback persistence: "
+            f"candidate persistence: status={persistence_status}; "
             f"persisted_candidate_ids={persisted_candidate_ids}"
         )
 
@@ -4583,5 +4615,9 @@ def analyze_omi_raw_idea_with_tools(
         "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
         "fusion_summary": fusion_summary,
         "persisted_candidate_ids": persisted_candidate_ids,
+        "persistence_status": persistence_status,
+        "persistence_explanation": persistence_explanation,
+        "new_candidate_ids": new_candidate_ids,
+        "reused_candidate_ids": reused_candidate_ids,
         "safety": safety,
     }

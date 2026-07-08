@@ -1,3 +1,17 @@
+# PHASE8-IMPL-023-T011 Candidate-Only Persistence for Fused AI/Tool Findings
+
+- Result: PASS for backend/orchestrator candidate-only persistence.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md`.
+- Scope: fused AI/tool findings persist only as OMI candidate review records when `persist_candidates=True` and source OMI idea context is safe. No frontend UI.
+- Modules updated: `backend/project_manager.py`, `backend/omi_analysis_orchestrator.py`.
+- Test added: `tests/test_omi_tool_assisted_persistence_contract.py`.
+- Contract behavior: `persist_candidates=False` writes nothing; missing source context or raw idea snapshot mismatch writes nothing; valid persistence preserves evidence, source locator, provenance, source adapter identity, support-only metadata, fingerprints, normalized finding IDs, duplicate metadata, conflict group IDs, and uncertainty labels with pending owner decision and candidate/review-pending status.
+- Persistence: rerunning the same source/finding set reuses existing candidate IDs; queue presence is not approval and candidate persistence is not canon.
+- Next child task: `PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX`.
+- Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `python3 -m py_compile backend/project_manager.py` -> PASS; `python3 -m py_compile backend/main.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_persistence_contract.py -q` -> `5 passed`; requested T003-T010 adapter/orchestrator/extraction/routes/project-manager/boundary/manual OMI regressions passed.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS.
+- Safety confirmations: no live tool/model/runtime call, no dependency installation, no Memory/Canon mutation, no promotion/apply-promotion, no frontend UI change, no story prose, no staging/commit/push.
+
 # PHASE8-IMPL-023-T010 Fusion, Dedupe, Conflict, and Uncertainty Contract
 
 - Result: PASS for backend/orchestrator-contract fusion, dedupe, conflict, and uncertainty handling.
@@ -7,7 +21,7 @@
 - Test added: `tests/test_omi_tool_assisted_fusion_dedupe_contract.py`.
 - Contract behavior: equivalent findings receive stable fingerprints and duplicate/related links without deleting evidence; conflicts receive deterministic `conflict_group_id` metadata without truth resolution; weak/question/ambiguous/insufficient/conflicting support receives support-only `uncertainty_label`; `fusion_summary` reports deterministic counts.
 - Persistence: AI/tool findings are never persisted in T010, even when `persist_candidates=True`.
-- Next child task: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`.
+- Historical next child at T010 closeout: `PHASE8-IMPL-023-T011 - Candidate-only persistence for fused AI/tool-assisted findings`; T011 is now complete/PASS and current next child is `PHASE8-IMPL-023-T012 - Frontend OMI analysis results UI/UX`.
 - Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_fusion_dedupe_contract.py -q` -> `5 passed`; T005-T009 adapter contract tests and focused OMI regressions passed.
 - Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
 - Safety confirmations: no live tool/model/runtime call, no dependency installation, no Memory/Canon mutation, no promotion/apply-promotion, no candidate persistence, no frontend UI change, no story prose, no staging/commit/push.
