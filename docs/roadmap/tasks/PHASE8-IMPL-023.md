@@ -4,9 +4,9 @@
 
 Published and active.
 
-Latest correction: `PHASE8-IMPL-023-T004A - Owner override and AI/tool-assisted OMI architecture reset`.
+Latest completed child: `PHASE8-IMPL-023-T007 - BookNLP/spaCy local NLP candidate extraction adapters`.
 
-Next child task: `PHASE8-IMPL-023-T005 - Tool-assisted extraction orchestrator contract and adapter boundaries`.
+Next child task: `PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff`.
 
 Full MVP completion closeout is blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable.
 
@@ -138,9 +138,9 @@ Each finding must carry:
 - `PHASE8-IMPL-023-T004` - Historical deterministic/rule-based backend extractor. Scope: fallback/safety baseline only; not sufficient for MVP completion.
 - `PHASE8-IMPL-023-T004A` - Owner override and AI/tool-assisted OMI architecture reset. Scope: docs/status/architecture correction only; complete/PASS.
 - `PHASE8-IMPL-023-T005` - Tool-assisted extraction orchestrator contract and adapter boundaries. Scope: corrected orchestrator contract and adapter boundaries.
-- `PHASE8-IMPL-023-T006` - Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests.
-- `PHASE8-IMPL-023-T007` - spaCy/BookNLP local NLP candidate extraction adapters.
-- `PHASE8-IMPL-023-T008` - Story Check diagnostic-only OMI handoff.
+- `PHASE8-IMPL-023-T006` - Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests. Scope: fixture-only; complete/PASS.
+- `PHASE8-IMPL-023-T007` - BookNLP/spaCy local NLP candidate extraction adapters. Scope: fixture-only; complete/PASS.
+- `PHASE8-IMPL-023-T008` - Story Check diagnostic-only OMI handoff. Scope: ready/active next.
 - `PHASE8-IMPL-023-T009` - NCP/Subtxt/dramatica-flow analysis-only candidate mapping.
 - `PHASE8-IMPL-023-T010` - Candidate fusion, dedupe, conflict handling, and evidence/provenance normalization.
 - `PHASE8-IMPL-023-T011` - Persistence of fused evidence-backed candidates.

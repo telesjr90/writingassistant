@@ -5,8 +5,8 @@
 - ID: `PHASE8-IMPL-023`
 - Title: OMI AI Tool-Assisted Analysis Candidate Review MVP
 - Status: published/active
-- Latest correction: `PHASE8-IMPL-023-T004A`
-- Next child: `PHASE8-IMPL-023-T005`
+- Latest completed child: `PHASE8-IMPL-023-T007`
+- Next child: `PHASE8-IMPL-023-T008`
 
 ## Owner Override Sources
 
@@ -118,7 +118,7 @@ Each extracted review candidate or diagnostic finding must carry:
 - `PHASE8-IMPL-023-T004A`: owner override and AI/tool-assisted OMI architecture reset.
 - `PHASE8-IMPL-023-T005`: tool-assisted extraction orchestrator contract and adapter boundaries.
 - `PHASE8-IMPL-023-T006`: Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests.
-- `PHASE8-IMPL-023-T007`: spaCy/BookNLP local NLP candidate extraction adapters.
+- `PHASE8-IMPL-023-T007`: BookNLP/spaCy local NLP candidate extraction adapters; complete/PASS as fixture-only local NLP normalization.
 - `PHASE8-IMPL-023-T008`: Story Check diagnostic-only OMI handoff.
 - `PHASE8-IMPL-023-T009`: NCP/Subtxt/dramatica-flow analysis-only candidate mapping.
 - `PHASE8-IMPL-023-T010`: candidate fusion, dedupe, conflict handling, and evidence/provenance normalization.

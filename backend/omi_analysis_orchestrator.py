@@ -11,6 +11,10 @@ T005 scope (PHASE8-IMPL-023):
     ``project_manager.extract_omi_candidates_from_raw_idea`` marker extractor
     as fallback/safety baseline ONLY (the corrected MVP path is
     AI/tool-assisted, not deterministic-marker-only).
+  - Wires ``booknlp`` and ``spacy`` through fixture-only local NLP contracts
+    that normalize evidence-backed entity/event/object/relationship-style
+    support into candidate-only OMI findings without importing or running
+    live runtimes.
   - Stubs every other adapter as fail-closed: unimplemented adapters return
     ``unavailable`` / ``skipped`` / ``failed_closed`` with an explanation and
     never fabricate candidates.
@@ -25,7 +29,7 @@ T005 scope (PHASE8-IMPL-023):
 Boundaries (non-negotiable):
 
   - No Ollama, Story Check, BookNLP, spaCy, NCP, Subtxt, or dramatica-flow
-    runtime calls. This module does not import or invoke any of them.
+    live runtime calls. This module does not import or invoke any of them.
   - No Memory/Canon mutation.
   - No promotion records, no apply-promotion, no canon promotion.
   - No story prose generation, rewriting, continuation, drafting, polishing,
@@ -180,6 +184,7 @@ OMI_ADAPTER_CONTRACTS: dict[str, dict[str, Any]] = {
             "location",
             "organization",
             "object",
+            "timeline_event",
             "evidence_note",
         ),
     },
@@ -1497,6 +1502,652 @@ def _build_ollama_model_fixture_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# BookNLP / spaCy local NLP fixture extraction contracts (T007)
+# ---------------------------------------------------------------------------
+
+OMI_BOOKNLP_SCHEMA_VERSION = "omi_booknlp_local_nlp_extraction.v1"
+OMI_SPACY_SCHEMA_VERSION = "omi_spacy_local_nlp_extraction.v1"
+OMI_LOCAL_NLP_ADAPTER_NAMES: frozenset[str] = frozenset({"booknlp", "spacy"})
+OMI_LOCAL_NLP_SCHEMA_VERSION_BY_ADAPTER: dict[str, str] = {
+    "booknlp": OMI_BOOKNLP_SCHEMA_VERSION,
+    "spacy": OMI_SPACY_SCHEMA_VERSION,
+}
+OMI_LOCAL_NLP_SUPPORT_LABEL_BY_ADAPTER: dict[str, str] = {
+    "booknlp": "BookNLP fixture support only",
+    "spacy": "spaCy fixture support only",
+}
+OMI_LOCAL_NLP_ALLOWED_STATUSES: frozenset[str] = frozenset(
+    {"succeeded", "empty", "failed_closed", "error"}
+)
+OMI_LOCAL_NLP_ENVELOPE_REQUIRED_FIELDS: tuple[str, ...] = (
+    "schema_version",
+    "adapter",
+    "status",
+    "provenance",
+    "findings",
+)
+
+_OMI_LOCAL_NLP_CANDIDATE_TYPE_FIELD_NAMES: tuple[str, ...] = (
+    "candidate_type",
+    "finding_type",
+    "entity_type",
+    "spacy_label",
+    "booknlp_type",
+    "type",
+    "kind",
+    "category",
+)
+_OMI_LOCAL_NLP_LABEL_FIELD_NAMES: tuple[str, ...] = (
+    "label",
+    "name",
+    "text",
+    "mention",
+    "entity",
+    "entity_text",
+    "span_text",
+)
+_OMI_LOCAL_NLP_CLAIM_FIELD_NAMES: tuple[str, ...] = (
+    "extracted_claim",
+    "claim",
+    "support_claim",
+    "owner_authored_support_claim",
+    "observation",
+)
+_OMI_LOCAL_NLP_EVIDENCE_EXCERPT_FIELD_NAMES: tuple[str, ...] = (
+    "source_excerpt",
+    "evidence_excerpt",
+    "excerpt",
+    "sentence",
+    "sentence_text",
+    "quote",
+    "quote_text",
+)
+
+_OMI_FORBIDDEN_OPERATION_FIELD_NAME_SUBSTRINGS: tuple[str, ...] = (
+    "memory mutation",
+    "canon mutation",
+    "promotion record",
+    "apply promotion",
+    "promote to canon",
+    "write memory",
+    "write canon",
+    "enable apply promotion",
+)
+_OMI_FORBIDDEN_OPERATION_VALUE_RE = re.compile(
+    r"(apply[-_\s]?promotion|promotion\s+record|promote\s+to\s+canon|"
+    r"mutat(?:e|ion)\s+(?:memory|canon)|write\s+(?:memory|canon)|"
+    r"enable\s+apply[-_\s]?promotion)",
+    re.IGNORECASE,
+)
+
+
+def _first_non_empty_string(
+    mapping: dict[str, Any],
+    field_names: tuple[str, ...],
+) -> str:
+    for field_name in field_names:
+        value = mapping.get(field_name)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+def _normalize_local_nlp_type_token(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    return value.strip().lower().replace("-", "_").replace(" ", "_")
+
+
+def _coerce_local_nlp_candidate_type(
+    adapter_name: str,
+    finding: dict[str, Any],
+) -> str:
+    raw_type = _first_non_empty_string(
+        finding, _OMI_LOCAL_NLP_CANDIDATE_TYPE_FIELD_NAMES
+    )
+    if raw_type in OMI_ORCHESTRATOR_FINDING_TYPES:
+        return raw_type
+
+    token = _normalize_local_nlp_type_token(raw_type)
+    if adapter_name == "spacy":
+        if token in {"person", "per"}:
+            return "character"
+        if token in {"gpe", "loc", "location", "fac", "facility", "place"}:
+            return "location"
+        if token in {"org", "organization", "group"}:
+            return "organization"
+        if token == "event" or "event" in token:
+            return "timeline_event"
+        if token in {
+            "object",
+            "concrete_noun",
+            "noun",
+            "noun_chunk",
+            "thing",
+            "item",
+            "product",
+        } or "object" in token or "concrete" in token:
+            return "object"
+    else:
+        if (
+            token in {"person", "per", "character", "speaker"}
+            or "person" in token
+            or "character" in token
+            or "speaker" in token
+        ):
+            return "character"
+        if token in {
+            "location",
+            "loc",
+            "gpe",
+            "place",
+            "setting",
+            "fac",
+            "facility",
+        } or "location" in token:
+            return "location"
+        if token in {"org", "organization", "group"} or "organization" in token:
+            return "organization"
+        if "event" in token or "timeline" in token:
+            return "timeline_event"
+        if "coref" in token or "relation" in token:
+            return "relationship"
+        if (
+            token in {"object", "thing", "item", "prop", "concrete_thing"}
+            or "object" in token
+            or "thing" in token
+            or "concrete" in token
+        ):
+            return "object"
+        if (
+            token in {"named_entity", "entity", "mention", "entity_mention"}
+            or "quote" in token
+            or "evidence" in token
+            or "support" in token
+        ):
+            return "evidence_note"
+
+    raise ValueError(
+        f"{adapter_name} finding unknown candidate/finding type {raw_type!r}; "
+        f"fixture outputs must map to one of "
+        f"{sorted(OMI_ORCHESTRATOR_FINDING_TYPES)}."
+    )
+
+
+def _validate_tool_payload_no_forbidden_operations(
+    value: Any,
+    *,
+    path: str,
+) -> None:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            key_text = str(key).strip().lower().replace("-", " ").replace("_", " ")
+            for forbidden in _OMI_FORBIDDEN_OPERATION_FIELD_NAME_SUBSTRINGS:
+                if forbidden in key_text:
+                    raise ValueError(
+                        f"Tool output contains forbidden operation field "
+                        f"{path}.{key}; adapters must not mutate Memory/Canon, "
+                        f"create promotion records, or run/enable apply-promotion."
+                    )
+            _validate_tool_payload_no_forbidden_operations(
+                child, path=f"{path}.{key}"
+            )
+        return
+    if isinstance(value, list):
+        for idx, child in enumerate(value):
+            _validate_tool_payload_no_forbidden_operations(
+                child, path=f"{path}[{idx}]"
+            )
+        return
+    if isinstance(value, str) and _OMI_FORBIDDEN_OPERATION_VALUE_RE.search(value):
+        raise ValueError(
+            f"Tool output contains forbidden operation text at {path}; "
+            f"adapters must not mutate Memory/Canon, create promotion records, "
+            f"or run/enable apply-promotion."
+        )
+
+
+def _validate_local_nlp_provenance(
+    provenance: Any,
+    *,
+    adapter_name: str,
+) -> dict[str, str]:
+    normalized = _validate_finding_provenance(provenance)
+    if normalized["adapter"] != adapter_name:
+        raise ValueError(
+            f"{adapter_name} provenance.adapter must match the adapter identity"
+        )
+    if normalized["tool_source"] != adapter_name:
+        raise ValueError(
+            f"{adapter_name} provenance.tool_source must match the adapter identity"
+        )
+    return normalized
+
+
+def _normalize_local_nlp_evidence(
+    finding: dict[str, Any],
+    *,
+    source_locator: str,
+    adapter_name: str,
+) -> list[dict[str, Any]]:
+    raw_evidence = finding.get("evidence")
+    evidence_items: list[Any] = []
+    if isinstance(raw_evidence, list):
+        evidence_items = list(raw_evidence)
+    elif isinstance(raw_evidence, dict):
+        evidence_items = [dict(raw_evidence)]
+    else:
+        span_value = finding.get("span") or finding.get("token_span")
+        if isinstance(span_value, dict):
+            span_excerpt = _first_non_empty_string(
+                span_value,
+                (
+                    "source_excerpt",
+                    "excerpt",
+                    "text",
+                    "sentence",
+                    "sentence_text",
+                ),
+            )
+            span_locator = _first_non_empty_string(
+                span_value,
+                ("source_locator", "locator"),
+            ) or source_locator
+            if span_excerpt:
+                evidence_items = [
+                    {
+                        "source_excerpt": span_excerpt,
+                        "source_locator": span_locator,
+                        "span": dict(span_value),
+                    }
+                ]
+        excerpt = _first_non_empty_string(
+            finding, _OMI_LOCAL_NLP_EVIDENCE_EXCERPT_FIELD_NAMES
+        )
+        if excerpt:
+            evidence_items = [
+                {
+                    "source_excerpt": excerpt,
+                    "source_locator": source_locator,
+                }
+            ]
+
+    if not evidence_items:
+        raise ValueError(
+            f"{adapter_name} finding requires evidence with a source excerpt "
+            f"and source locator"
+        )
+
+    normalized: list[dict[str, Any]] = []
+    for idx, item in enumerate(evidence_items):
+        if not isinstance(item, dict):
+            raise ValueError(f"{adapter_name} evidence item {idx} must be an object")
+        item_copy = dict(item)
+        excerpt = _first_non_empty_string(
+            item_copy,
+            (
+                "source_excerpt",
+                "excerpt",
+                "text",
+                "sentence",
+                "sentence_text",
+            ),
+        )
+        locator = _first_non_empty_string(
+            item_copy,
+            ("source_locator", "locator"),
+        )
+        if not locator:
+            locator = source_locator
+        if not excerpt:
+            raise ValueError(
+                f"{adapter_name} evidence item {idx} requires source_excerpt"
+            )
+        if not locator:
+            raise ValueError(
+                f"{adapter_name} evidence item {idx} requires source_locator"
+            )
+        item_copy["source_excerpt"] = excerpt
+        item_copy["source_locator"] = locator
+        normalized.append(item_copy)
+    return normalized
+
+
+def _validate_local_nlp_owner_decision(
+    owner_decision: Any,
+    *,
+    adapter_name: str,
+) -> dict[str, Any]:
+    if owner_decision is None:
+        return {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        }
+    if not isinstance(owner_decision, dict):
+        raise ValueError(f"{adapter_name} owner_decision must be an object")
+    decision = owner_decision.get("decision")
+    if decision in {"approve", "approved", "promote", "promoted"}:
+        raise ValueError(
+            f"{adapter_name} finding carries auto-approved owner_decision; "
+            f"local NLP output is support only and must never approve findings."
+        )
+    if owner_decision.get("approved") is True:
+        raise ValueError(
+            f"{adapter_name} finding owner_decision.approved=true; adapters "
+            f"must not auto-approve findings."
+        )
+    return {
+        "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+        "approved": False,
+    }
+
+
+def _normalize_local_nlp_support_label(
+    finding: dict[str, Any],
+    provenance: dict[str, str],
+    *,
+    adapter_name: str,
+) -> str:
+    support_value = (
+        finding.get("support_label")
+        or finding.get("confidence")
+        or finding.get("support")
+        or provenance.get("support")
+        or OMI_LOCAL_NLP_SUPPORT_LABEL_BY_ADAPTER[adapter_name]
+    )
+    if isinstance(support_value, (int, float)):
+        support_label = f"{adapter_name} support metadata: {support_value}"
+    elif isinstance(support_value, str) and support_value.strip():
+        support_label = support_value.strip()
+        if "support" not in support_label.lower():
+            support_label = f"{adapter_name} support metadata: {support_label}"
+    else:
+        support_label = OMI_LOCAL_NLP_SUPPORT_LABEL_BY_ADAPTER[adapter_name]
+    if is_truth_label(support_label):
+        raise ValueError(
+            f"{adapter_name} support/confidence implies truth/canon/approval; "
+            f"must remain support metadata only."
+        )
+    return support_label
+
+
+def _validate_local_nlp_finding(
+    finding: Any,
+    *,
+    adapter_name: str,
+    envelope_provenance: dict[str, str],
+) -> dict[str, Any]:
+    finding = _require_dict(finding, f"{adapter_name} finding")
+    _validate_ollama_field_names_no_prose(
+        finding, path=f"{adapter_name}_finding"
+    )
+    _validate_tool_payload_no_forbidden_operations(
+        finding, path=f"{adapter_name}_finding"
+    )
+    _validate_ollama_no_truth_label_in_value(
+        finding, path=f"{adapter_name}_finding"
+    )
+
+    candidate_type = _coerce_local_nlp_candidate_type(adapter_name, finding)
+    label = _first_non_empty_string(finding, _OMI_LOCAL_NLP_LABEL_FIELD_NAMES)
+    if not label:
+        raise ValueError(f"{adapter_name} finding requires label/name/text")
+    extracted_claim = _first_non_empty_string(
+        finding, _OMI_LOCAL_NLP_CLAIM_FIELD_NAMES
+    )
+    if not extracted_claim:
+        raise ValueError(
+            f"{adapter_name} finding requires extracted_claim or support claim"
+        )
+    if is_prose_like_text(extracted_claim):
+        raise ValueError(
+            f"{adapter_name} finding extracted_claim looks like story prose / "
+            f"rewrite / polish / continuation / draft; OMI must analyze, "
+            f"not write. Rejecting as failed_closed."
+        )
+
+    source_locator = _require_non_empty_string(
+        finding.get("source_locator"),
+        f"{adapter_name} finding source_locator",
+    )
+    evidence = _normalize_local_nlp_evidence(
+        finding,
+        source_locator=source_locator,
+        adapter_name=adapter_name,
+    )
+
+    finding_provenance = finding.get("provenance", envelope_provenance)
+    provenance = _validate_local_nlp_provenance(
+        finding_provenance,
+        adapter_name=adapter_name,
+    )
+    support_label = _normalize_local_nlp_support_label(
+        finding,
+        provenance,
+        adapter_name=adapter_name,
+    )
+    owner_decision = _validate_local_nlp_owner_decision(
+        finding.get("owner_decision"),
+        adapter_name=adapter_name,
+    )
+    raw_finding_id = finding.get("raw_finding_id") or (
+        f"{adapter_name}::{label}::{source_locator}"
+    )
+    if not isinstance(raw_finding_id, str) or not raw_finding_id.strip():
+        raw_finding_id = f"{adapter_name}::fixture::{source_locator}"
+
+    return {
+        "candidate_type": candidate_type,
+        "label": label,
+        "extracted_claim": extracted_claim,
+        "evidence": evidence,
+        "source_locator": source_locator,
+        "provenance": {
+            "tool_source": adapter_name,
+            "adapter": adapter_name,
+            "support": support_label,
+        },
+        "source_adapter": adapter_name,
+        "support_label": support_label,
+        "owner_decision": owner_decision,
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+        "raw_finding_id": raw_finding_id,
+        "candidate_fingerprint": candidate_fingerprint(
+            candidate_type,
+            label,
+            extracted_claim,
+        ),
+    }
+
+
+def validate_local_nlp_fixture_envelope(
+    payload: Any,
+    *,
+    adapter_name: str,
+) -> dict[str, Any]:
+    """Validate a BookNLP/spaCy fixture envelope and normalize findings.
+
+    This T007 contract accepts only fixture/mock/local deterministic payloads;
+    it never imports or runs BookNLP/spaCy. Invalid shape, missing evidence,
+    missing source locators, missing provenance, unsafe prose-like claims,
+    truth/canon/approval labels, owner auto-approval, Memory/Canon mutation
+    requests, promotion records, and apply-promotion requests all fail closed.
+    """
+    if adapter_name not in OMI_LOCAL_NLP_ADAPTER_NAMES:
+        raise ValueError(f"Unsupported local NLP adapter: {adapter_name}")
+    if isinstance(payload, str):
+        try:
+            parsed = json.loads(payload)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"{adapter_name} envelope must be a JSON object; could not "
+                f"parse string payload as JSON: {exc}"
+            ) from exc
+        payload = parsed
+
+    envelope = _require_dict(payload, f"{adapter_name} envelope")
+    _validate_ollama_field_names_no_prose(
+        envelope, path=f"{adapter_name}_envelope"
+    )
+    _validate_tool_payload_no_forbidden_operations(
+        envelope, path=f"{adapter_name}_envelope"
+    )
+    _validate_ollama_no_truth_label_in_value(
+        envelope, path=f"{adapter_name}_envelope"
+    )
+
+    missing = [
+        field for field in OMI_LOCAL_NLP_ENVELOPE_REQUIRED_FIELDS
+        if field not in envelope
+    ]
+    if missing:
+        raise ValueError(
+            f"{adapter_name} envelope missing required fields: {missing}; "
+            f"local NLP fixtures require schema_version, adapter, status, "
+            f"provenance, and findings."
+        )
+
+    schema_version = _require_non_empty_string(
+        envelope["schema_version"], f"{adapter_name} envelope schema_version"
+    )
+    expected_schema = OMI_LOCAL_NLP_SCHEMA_VERSION_BY_ADAPTER[adapter_name]
+    if schema_version != expected_schema:
+        raise ValueError(
+            f"{adapter_name} envelope schema_version={schema_version!r} is "
+            f"not supported; only {expected_schema!r} is accepted."
+        )
+    envelope_adapter = _require_non_empty_string(
+        envelope["adapter"], f"{adapter_name} envelope adapter"
+    )
+    if envelope_adapter != adapter_name:
+        raise ValueError(
+            f"{adapter_name} envelope adapter={envelope_adapter!r} must be "
+            f"{adapter_name!r}; mismatched adapter identities fail closed."
+        )
+    status = _require_non_empty_string(
+        envelope["status"], f"{adapter_name} envelope status"
+    )
+    if status not in OMI_LOCAL_NLP_ALLOWED_STATUSES:
+        raise ValueError(
+            f"{adapter_name} envelope status={status!r} is not allowed; "
+            f"must be one of {sorted(OMI_LOCAL_NLP_ALLOWED_STATUSES)}."
+        )
+    findings_value = envelope["findings"]
+    if not isinstance(findings_value, list):
+        raise ValueError(f"{adapter_name} envelope findings must be an array")
+    if status != "succeeded" and findings_value:
+        raise ValueError(
+            f"{adapter_name} envelope carries findings in status={status!r}; "
+            f"only 'succeeded' may carry findings."
+        )
+
+    envelope_provenance = _validate_local_nlp_provenance(
+        envelope["provenance"],
+        adapter_name=adapter_name,
+    )
+    normalized_findings = [
+        _validate_local_nlp_finding(
+            finding,
+            adapter_name=adapter_name,
+            envelope_provenance=envelope_provenance,
+        )
+        for finding in findings_value
+    ]
+    return {
+        "schema_version": schema_version,
+        "adapter": adapter_name,
+        "status": status,
+        "explanation": (
+            envelope["explanation"]
+            if isinstance(envelope.get("explanation"), str)
+            else ""
+        ),
+        "diagnostics": (
+            list(envelope["diagnostics"])
+            if isinstance(envelope.get("diagnostics"), list)
+            else []
+        ),
+        "findings": normalized_findings,
+    }
+
+
+def _build_local_nlp_fixture_runner(
+    adapter_name: str,
+    fixture: Any,
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a safe fixture-only runner for BookNLP/spaCy local NLP output."""
+    if adapter_name not in OMI_LOCAL_NLP_ADAPTER_NAMES:
+        raise ValueError(f"Unsupported local NLP fixture adapter: {adapter_name}")
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+    cached_envelope: dict[str, Any] | None = None
+    cached_error: str | None = None
+
+    def _try_validate() -> dict[str, Any]:
+        try:
+            return validate_local_nlp_fixture_envelope(
+                fixture,
+                adapter_name=adapter_name,
+            )
+        except ValueError as exc:
+            raise ValueError(
+                f"{adapter_name} fixture failed strict validation: {exc}"
+            ) from exc
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        nonlocal cached_envelope, cached_error
+        _ = project_name
+        _ = raw_idea
+        _ = source_idea_id
+        if cached_error is not None:
+            return {
+                "adapter": adapter_name,
+                "state": "failed_closed",
+                "explanation": cached_error,
+                "candidates": [],
+            }
+        if cached_envelope is None:
+            try:
+                cached_envelope = _try_validate()
+            except ValueError as exc:
+                cached_error = str(exc)
+                return {
+                    "adapter": adapter_name,
+                    "state": "failed_closed",
+                    "explanation": cached_error,
+                    "candidates": [],
+                }
+        envelope = cached_envelope
+        env_status = envelope["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if envelope["findings"] else "empty"
+        else:
+            state = env_status
+        return {
+            "adapter": adapter_name,
+            "state": state,
+            "explanation": (
+                envelope["explanation"]
+                or (
+                    f"{adapter_name} fixture envelope validated against "
+                    f"{OMI_LOCAL_NLP_SCHEMA_VERSION_BY_ADAPTER[adapter_name]}; "
+                    f"orchestrator never performs live {adapter_name} calls."
+                )
+            ),
+            "candidates": envelope["findings"],
+        }
+
+    return _runner
+
+
 def _resolve_adapter_runner(
     adapter: str,
     *,
@@ -1504,25 +2155,25 @@ def _resolve_adapter_runner(
     adapter_fixture_outputs: dict[str, Any] | None = None,
     adapter_config: dict[str, Any] | None = None,
 ) -> Callable[..., dict[str, Any]] | None:
-    """Return the real adapter runner for ``adapter``, or ``None`` if stub.
+    """Return the fixture/mock adapter runner for ``adapter``, or ``None``.
 
-    T005 ships no real adapter runners. Every AI/tool adapter is stubbed
-    (returns unavailable). ``deterministic_fallback`` is wired to the
-    deterministic marker extractor at the orchestrator-call layer, not here.
+    T005 shipped no real adapter runners. ``deterministic_fallback`` is wired
+    to the deterministic marker extractor at the orchestrator-call layer, not
+    here.
 
-    T006 extension-point behavior:
+    T006/T007 extension-point behavior:
 
     - If an explicit ``adapter_runners[adapter]`` callable was supplied by
       the caller, return it. The caller is responsible for honoring the
       no-live-call safety contract (T006 callers pass mock/fixture runners
       only; the orchestrator never imports or invokes a live Ollama client).
-    - If ``adapter == "ollama_model"`` AND ``adapter_fixture_outputs``
-      carries an entry for ``ollama_model``, return a runner that produces
-      a validated adapter envelope from that fixture. The fixture may be
-      either a parsed JSON object (dict) or a JSON string; both forms go
-      through the strict envelope validator and fail closed on any
-      invalid/unsafe output. The fixture path is the only path that lets
-      ``ollama_model`` succeed in tests.
+    - If ``adapter`` is ``ollama_model``, ``booknlp``, or ``spacy`` AND
+      ``adapter_fixture_outputs`` carries a matching entry, return a runner
+      that produces a validated adapter envelope from that fixture. The fixture
+      may be either a parsed JSON object (dict) or a JSON string; both forms go
+      through the strict envelope validator and fail closed on any invalid or
+      unsafe output. Fixture paths are the only paths that let these adapters
+      succeed in tests.
     - Otherwise return ``None`` so the existing T005 stub/unavailable path
       runs unchanged.
     """
@@ -1536,18 +2187,25 @@ def _resolve_adapter_runner(
                     f"adapter_runners[{adapter!r}] must be callable"
                 )
             return runner
-    if adapter == "ollama_model":
+    if adapter in {"ollama_model", "booknlp", "spacy"}:
         if adapter_fixture_outputs is None:
             return None
         if not isinstance(adapter_fixture_outputs, dict):
             raise ValueError(
                 "adapter_fixture_outputs must be a dict[str, Any]"
             )
-        if "ollama_model" in adapter_fixture_outputs:
+        if adapter not in adapter_fixture_outputs:
+            return None
+        if adapter == "ollama_model":
             return _build_ollama_model_fixture_runner(
-                adapter_fixture_outputs["ollama_model"],
+                adapter_fixture_outputs[adapter],
                 adapter_config=adapter_config,
             )
+        return _build_local_nlp_fixture_runner(
+            adapter,
+            adapter_fixture_outputs[adapter],
+            adapter_config=adapter_config,
+        )
     return None
 
 
@@ -1588,14 +2246,14 @@ def analyze_omi_raw_idea_with_tools(
         The corrected MVP path is AI/tool-assisted, not deterministic-only,
         so deterministic_fallback is OFF by default.
     adapter_fixture_outputs:
-        Optional ``dict[str, Any]`` keyed by adapter name. T006 only honors
-        ``"ollama_model"``; when present, the ollama_model adapter runs
-        against the supplied JSON envelope (fixture or mock) and validates
-        it against ``omi_ollama_structured_extraction.v1``. Strict schema
-        validation, no-prose guard, no-truth-label guard, evidence/source-
-        locator requirements, and fail-closed behavior all apply. The
-        orchestrator never calls a live Ollama client and never reads
-        environment variables to silently enable live model calls.
+        Optional ``dict[str, Any]`` keyed by adapter name. T006 honors
+        ``"ollama_model"`` fixtures; T007 honors ``"booknlp"`` and
+        ``"spacy"`` fixtures. Strict schema validation, no-prose guard,
+        no-truth-label guard, evidence/source-locator/provenance
+        requirements, no Memory/Canon mutation, no promotion/apply-promotion,
+        and fail-closed behavior all apply. The orchestrator never calls a
+        live Ollama, BookNLP, or spaCy runtime and never reads environment
+        variables to silently enable live calls.
     adapter_runners:
         Optional ``dict[str, Callable[..., dict[str, Any]]]`` keyed by
         adapter name. Test-only extension point that lets callers inject
@@ -1661,6 +2319,7 @@ def analyze_omi_raw_idea_with_tools(
     findings: list[dict[str, Any]] = []
     any_produced = False
     any_succeeded_real = False
+    deterministic_fallback_produced = False
     persisted_candidate_ids: list[str] = []
 
     if not raw_idea_text:
@@ -1753,6 +2412,7 @@ def analyze_omi_raw_idea_with_tools(
                 }
             adapter_results.append(envelope)
             if envelope["state"] == "succeeded" and envelope["candidates"]:
+                deterministic_fallback_produced = True
                 any_produced = True
                 for finding in envelope["candidates"]:
                     findings.append(validate_normalized_finding(finding))
@@ -1778,6 +2438,16 @@ def analyze_omi_raw_idea_with_tools(
                     f"not perform live Ollama calls and does not read "
                     f"environment variables to enable them. Returning "
                     f"'unavailable' with no candidates."
+                )
+            elif adapter in {"booknlp", "spacy"}:
+                runtime_name = "BookNLP" if adapter == "booknlp" else "spaCy"
+                unavailable_explanation = (
+                    f"Adapter '{adapter}' is available through the T007 "
+                    f"fixture/mock local NLP contract only; no fixture was "
+                    f"supplied via ``adapter_fixture_outputs``. The "
+                    f"orchestrator does not perform live {runtime_name} calls "
+                    f"and does not import or install {runtime_name}. "
+                    f"Returning 'unavailable' with no candidates."
                 )
             else:
                 unavailable_explanation = (
@@ -1816,7 +2486,7 @@ def analyze_omi_raw_idea_with_tools(
     if (
         allow_deterministic_fallback
         and persist_candidates
-        and any_produced
+        and deterministic_fallback_produced
     ):
         # Re-run the deterministic extractor with persist_candidates=True;
         # this is the canonical T004 path. We do NOT persist fused AI/tool

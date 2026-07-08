@@ -5,10 +5,10 @@
     "current_track": "MVP OMI AI Tool-Assisted Analysis / Candidate Review",
     "current_parent_task_id": "PHASE8-IMPL-023",
     "current_parent_task_title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
-    "next_readiness_task_id": "PHASE8-IMPL-023-T007",
-    "next_readiness_task_title": "BookNLP/spaCy local NLP candidate extraction adapters",
-    "next_readiness_task_type": "implementation parent child / local NLP adapter contract",
-    "frontier_note": "PHASE8-IMPL-023 owner override is recorded at docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md. Deterministic-marker-only extraction is not the MVP OMI target. The corrected MVP requires an AI/tool-assisted OMI analysis orchestrator that can use Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow to analyze raw idea text and present evidence-backed candidate findings for owner review. PHASE8-IMPL-023-T004 remains historically complete/PASS as backend deterministic marker extraction, but is superseded/re-scoped as fallback/safety baseline only. PHASE8-IMPL-023-T005 is complete/PASS as the orchestrator contract and adapter-boundary scaffold only. PHASE8-IMPL-023-T006 is complete/PASS as fixture-only Ollama/model structured extraction validation: valid omi_ollama_structured_extraction.v1 JSON/dict fixtures normalize to candidate-only ollama_model findings, invalid or unsafe output fails closed, no live Ollama/model call is made, and AI/tool findings are not persisted. The next child is PHASE8-IMPL-023-T007 - BookNLP/spaCy local NLP candidate extraction adapters. Full MVP completion remains BLOCKED until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, no generated prose, no rewrite/continuation/outline/draft/polish/improvement/expansion/imitation/revision/writing suggestion, confidence/support is not truth, candidate presence is not canon, candidate persistence is not canon, queue presence is not approval, tool/model output is not canon, no automatic Memory/Canon mutation, and no automatic apply-promotion."
+    "next_readiness_task_id": "PHASE8-IMPL-023-T008",
+    "next_readiness_task_title": "Story Check diagnostic-only OMI handoff",
+    "next_readiness_task_type": "implementation parent child / diagnostic adapter contract",
+    "frontier_note": "PHASE8-IMPL-023 owner override is recorded at docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md. Deterministic-marker-only extraction is not the MVP OMI target. The corrected MVP requires an AI/tool-assisted OMI analysis orchestrator that can use Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow to analyze raw idea text and present evidence-backed candidate findings for owner review. PHASE8-IMPL-023-T004 remains historically complete/PASS as backend deterministic marker extraction, but is superseded/re-scoped as fallback/safety baseline only. PHASE8-IMPL-023-T005 is complete/PASS as the orchestrator contract and adapter-boundary scaffold only. PHASE8-IMPL-023-T006 is complete/PASS as fixture-only Ollama/model structured extraction validation: valid omi_ollama_structured_extraction.v1 JSON/dict fixtures normalize to candidate-only ollama_model findings, invalid or unsafe output fails closed, no live Ollama/model call is made, and AI/tool findings are not persisted. PHASE8-IMPL-023-T007 is complete/PASS as fixture-only BookNLP/spaCy local NLP validation: valid omi_booknlp_local_nlp_extraction.v1 and omi_spacy_local_nlp_extraction.v1 JSON/dict fixtures normalize to candidate-only local NLP findings, invalid or unsafe output fails closed, no live BookNLP/spaCy call is made, no dependencies are added, and AI/tool findings are not persisted. The next child is PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff. Full MVP completion remains BLOCKED until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, no generated prose, no rewrite/continuation/outline/draft/polish/improvement/expansion/imitation/revision/writing suggestion, confidence/support is not truth, candidate presence is not canon, candidate persistence is not canon, queue presence is not approval, tool/model output is not canon, no automatic Memory/Canon mutation, and no automatic apply-promotion."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5481,10 +5481,10 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-023.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
-      "latest_child_task": "PHASE8-IMPL-023-T006",
+      "latest_child_task": "PHASE8-IMPL-023-T007",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-023-T007",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T006-ollama-model-structured-extraction-contract.md"
+      "next_child_task": "PHASE8-IMPL-023-T008",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md"
     }
   ]
 }

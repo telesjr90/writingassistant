@@ -1,3 +1,58 @@
+# PHASE8-IMPL-023-T007 BookNLP/spaCy Local NLP Candidate Extraction Adapters
+
+- Result: PASS for fixture-only BookNLP/spaCy local NLP adapter contracts.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md`.
+- Scope: strict `booknlp` and `spacy` JSON/dict fixture validation and normalization only. No live BookNLP/spaCy runtime call; no dependency installation; no frontend UI; no Story Check/NCP/Subtxt/dramatica-flow run; no Memory/Canon mutation; no apply-promotion; no story prose.
+- Module updated: `backend/omi_analysis_orchestrator.py`.
+- Test added: `tests/test_omi_booknlp_spacy_adapter_contract.py`.
+- Contract behavior: no fixture returns `unavailable`; valid `omi_booknlp_local_nlp_extraction.v1` and `omi_spacy_local_nlp_extraction.v1` fixtures normalize to candidate-only findings; invalid shape/schema/missing evidence/source locator/provenance/unsafe/no-prose/truth/auto-approval/Memory-Canon-mutation/promotion/apply-promotion output fails closed with no findings and no persistence.
+- Persistence: `booknlp` and `spacy` findings are never persisted in T007, even when `persist_candidates=True`.
+- Deterministic fallback status: still off by default, opt-in only, and `fallback_only`.
+- Other adapters: Story Check deferred to T008; NCP/Subtxt/dramatica-flow deferred to T009.
+- Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_booknlp_spacy_adapter_contract.py -q` -> `10 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_ollama_model_adapter_contract.py -q` -> `19 passed`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_orchestrator_contract.py -q` -> `26 passed`; existing OMI regressions remained green under the repo interpreter; frontend/source expected-red remains deferred to T012.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
+- Safety confirmations: no live BookNLP/spaCy call, no dependency installation, no Story Check/NCP/Subtxt/dramatica-flow run, no Memory/Canon mutation, no promotion/apply-promotion, no frontend UI change, no story prose, no staging/commit/push.
+- Next child task: `PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff`.
+
+# PHASE8-IMPL-023-T006 Ollama/Model Structured Extraction Contract
+
+- Result: PASS for fixture-only Ollama/model structured extraction contract.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T006-ollama-model-structured-extraction-contract.md`.
+- Scope: strict `ollama_model` JSON/dict fixture validation and normalization only. No live Ollama/model call; no frontend UI; no Story Check/BookNLP/spaCy/NCP/Subtxt/dramatica-flow run; no Memory/Canon mutation; no apply-promotion; no story prose.
+- Module updated: `backend/omi_analysis_orchestrator.py`.
+- Test added: `tests/test_omi_ollama_model_adapter_contract.py`.
+- Contract behavior: no fixture returns `unavailable`; valid `omi_ollama_structured_extraction.v1` fixtures normalize to candidate-only findings; invalid JSON/schema/unsafe/no-prose/truth/auto-approval output fails closed with no findings and no persistence.
+- Persistence: `ollama_model` findings are never persisted in T006, even when `persist_candidates=True`.
+- Deterministic fallback status: still off by default, opt-in only, and `fallback_only`.
+- Other adapters: BookNLP/spaCy deferred to T007; Story Check deferred to T008; NCP/Subtxt/dramatica-flow deferred to T009.
+- Validation: `python3 -m py_compile backend/omi_analysis_orchestrator.py` -> PASS; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_ollama_model_adapter_contract.py -q` -> `19 passed in 0.08s`; `.venv-unsloth-clean/bin/python -m pytest tests/test_omi_tool_assisted_orchestrator_contract.py -q` -> `26 passed in 0.27s`; existing OMI regressions remained green; frontend/source expected-red remains `5 failed, 1 passed` and deferred to T012.
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
+- Safety confirmations: no live Ollama/model call, no Story Check/BookNLP/spaCy/NCP/Subtxt/dramatica-flow run, no Memory/Canon mutation, no promotion/apply-promotion, no frontend UI change, no story prose, no staging/commit/push.
+- Historical next child task at T006 closeout: `PHASE8-IMPL-023-T007 - BookNLP/spaCy local NLP candidate extraction adapters`; T007 is now complete/PASS and current next child is `PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff`.
+
+# PHASE8-IMPL-023-T005 Tool-Assisted Extraction Orchestrator Contract and Adapter Boundaries
+
+- Result: PASS for orchestrator contract and adapter-boundary scaffold only.
+- Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T005-tool-assisted-orchestrator-contract-adapter-boundaries.md`.
+- Scope: corrected orchestrator contract and adapter-boundary scaffold only. No real AI/tool adapter runtime was wired; no frontend UI; no model/Ollama/Story Check/BookNLP/spaCy/NCP/Subtxt/dramatica-flow run; no Memory/Canon mutation; no apply-promotion; no story prose.
+- Module added: `backend/omi_analysis_orchestrator.py`.
+- Exported entrypoint: `analyze_omi_raw_idea_with_tools(project_name, raw_idea, *, source_idea_id=None, persist_candidates=False, requested_adapters=None, allow_deterministic_fallback=False)`.
+- Adapter identities declared and validated: `ollama_model`, `story_check`, `booknlp`, `spacy`, `ncp`, `subtxt`, `dramatica_flow`, `deterministic_fallback`.
+- Adapter result states declared and validated: `succeeded`, `empty`, `skipped`, `unavailable`, `failed_closed`, `error`.
+- Normalized finding schema: required fields `candidate_type`, `label`, `extracted_claim`, `evidence`, `source_locator`, `provenance`, `source_adapter`, `support_label`, `owner_decision`, `review_status`, `raw_finding_id`. Precomputed fusion/dedupe contract fields: `candidate_fingerprint`, `evidence_fingerprint`, `normalized_finding_id`, `duplicate_of`, `related_finding_ids`, `conflict_group_id`, `uncertainty_label`.
+- Owner-decision states: `pending`, `approve`, `reject`, `revise`, `needs_review`; the orchestrator never auto-approves.
+- No-prose guard: `is_prose_like_text` flags dialogue quotes, prose-shaped prefixes (`meanwhile`, `later that`, `the room`, `chapter N`, `scene N`, etc.), and long sentences ending in periods. `validate_normalized_finding` rejects any `extracted_claim` matching the heuristic. `analyze_omi_raw_idea_with_tools` short-circuits prose-shaped raw idea to `fail_closed` before running any adapter.
+- Fail-closed behavior: empty raw idea -> `empty` with every adapter reporting `skipped`; prose-shaped raw idea or non-`succeeded` adapter envelopes with non-empty `candidates` -> `fail_closed` with no writes; no fabricated candidates, no Memory/Canon mutation, no apply-promotion, no canonical truth labels.
+- Deterministic fallback status (fallback-only): `deterministic_fallback` wraps the existing T004 `project_manager.extract_omi_candidates_from_raw_idea` marker extractor; OFF by default; opt-in via `allow_deterministic_fallback=True`; envelope carries `fallback_only: True` and an explicit fallback-baseline explanation; persistence is honored only for `deterministic_fallback` findings and only when `allow_deterministic_fallback=True AND persist_candidates=True`.
+- Helper exports: `adapter_contract`, `build_orchestrator_safety_envelope`, `candidate_fingerprint`, `evidence_fingerprint`, `is_prose_like_text`, `is_truth_label`, `normalized_finding_id`, `stub_adapter_result`, `validate_adapter_result`, `validate_normalized_finding`.
+- Existing route and contract unchanged: `POST /api/projects/{project_name}/omi/extractions` and `project_manager.extract_omi_candidates_from_raw_idea` still call the T004 marker extractor directly; the orchestrator sits beside, not inside, the route layer.
+- Required tests added: `tests/test_omi_tool_assisted_orchestrator_contract.py` (`26 passed in 0.23s`). Required test names cover adapter identities, fail-closed behavior, evidence/source locator/provenance, unsafe prose rejection, candidate-only normalization, support-not-truth, no real tool calls by default, and deterministic-fallback marker-only wiring.
+- Existing OMI regressions remained green: `tests/test_omi_extraction_contract.py` 5 passed; `tests/test_omi_extraction_expected_red.py` 4 passed; `tests/test_omi_routes.py` 20 passed; `tests/test_omi_boundaries.py` 21 passed; `tests/test_omi_manual_workflow_source.py` 7 passed; `tests/test_project_manager.py -k omi` 18 passed, 51 deselected. Aggregate (excluding frontend expected-red): 152 passed in 0.80s.
+- Frontend expected-red remained deferred (must NOT turn green until T012): `tests/test_omi_extraction_ui_source_expected_red.py` 5 failed, 1 passed (red by design).
+- Roadmap validation: `python3 scripts/check_enrichment.py` -> PASS; `python3 scripts/validate_roadmap.py` -> PASS; `python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null` -> PASS; `git diff --check` -> PASS.
+- Safety confirmations: no frontend UI, frontend API helper, browser harness, model/Ollama call, Story Check call, BookNLP/spaCy/NCP/Subtxt/dramatica-flow runtime call, Memory/Canon mutation, apply-promotion run/enablement, promotion record, training artifact, dataset, JSONL record, package install, runtime project file write beyond the existing T004 extractor, staging, commit, push, or story prose occurred.
+- Historical next child task at T005 closeout: `PHASE8-IMPL-023-T006 - Ollama/model-assisted structured extraction contract with JSON/schema validation and no-prose tests`; T006 and T007 are now complete/PASS and current next child is `PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff`.
+
 # PHASE8-IMPL-023-T004A Owner Override AI Tool-Assisted OMI Analysis Required
 
 - Result: PASS for roadmap correction and architecture reset only.

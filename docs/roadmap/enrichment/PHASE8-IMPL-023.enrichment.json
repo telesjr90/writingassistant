@@ -21,7 +21,7 @@
   "current_gap": [
     "Backend deterministic marker extraction exists for explicit owner-authored markers but is now fallback/safety baseline only.",
     "The corrected MVP requires AI/tool-assisted OMI analysis using Ollama/local models, Story Check, BookNLP, spaCy, NCP, Subtxt, and dramatica-flow.",
-    "The orchestrator contract, adapter boundaries, deterministic fallback, and Ollama/model fixture-only structured extraction contract now exist; BookNLP/spaCy, Story Check, NCP/Subtxt/dramatica-flow, fusion/dedupe, fused persistence, and frontend analysis-results UI remain planned."
+    "The orchestrator contract, adapter boundaries, deterministic fallback, Ollama/model fixture-only structured extraction contract, and BookNLP/spaCy fixture-only local NLP contract now exist; Story Check, NCP/Subtxt/dramatica-flow, fusion/dedupe, fused persistence, and frontend analysis-results UI remain planned."
   ],
   "mvp_behavior": [
     "User enters or saves raw idea text in OMI.",
@@ -131,12 +131,14 @@
     "docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json",
     "roadmap/status/governance updates keeping PHASE8-IMPL-023 active with corrected AI/tool-assisted OMI scope",
     "T004 deterministic work recorded as superseded/re-scoped fallback-only",
-    "next child recorded as PHASE8-IMPL-023-T007 - BookNLP/spaCy local NLP candidate extraction adapters"
+    "next child recorded as PHASE8-IMPL-023-T008 - Story Check diagnostic-only OMI handoff"
   ],
   "allowed_files": [
     "backend/omi_analysis_orchestrator.py",
+    "tests/test_omi_booknlp_spacy_adapter_contract.py",
     "tests/test_omi_ollama_model_adapter_contract.py",
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T006-ollama-model-structured-extraction-contract.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md",
     "docs/roadmap/tasks/PHASE8-IMPL-023.md",
@@ -235,14 +237,20 @@
     },
     {
       "task_id": "PHASE8-IMPL-023-T007",
-      "title": "spaCy/BookNLP local NLP candidate extraction adapters",
-      "status": "ready/active",
-      "scope": "local NLP candidate extraction adapters"
+      "title": "BookNLP/spaCy local NLP candidate extraction adapters",
+      "status": "complete/PASS",
+      "scope": "fixture-only local NLP candidate extraction adapters; no live BookNLP/spaCy runtime calls; no AI/tool persistence",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_booknlp_spacy_adapter_contract.py"
+      ],
+      "result": "complete; tests/test_omi_booknlp_spacy_adapter_contract.py -> 10 passed"
     },
     {
       "task_id": "PHASE8-IMPL-023-T008",
       "title": "Story Check diagnostic-only OMI handoff",
-      "status": "planned",
+      "status": "ready/active",
       "scope": "diagnostic-only OMI handoff"
     },
     {
@@ -282,11 +290,11 @@
       "scope": "browser/manual evidence and parent closeout"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T006",
+  "latest_child_task": "PHASE8-IMPL-023-T007",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T006-ollama-model-structured-extraction-contract.md",
-  "next_child_task": "PHASE8-IMPL-023-T007",
-  "next_child_title": "BookNLP/spaCy local NLP candidate extraction adapters",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T007-booknlp-spacy-local-nlp-candidate-extraction-adapters.md",
+  "next_child_task": "PHASE8-IMPL-023-T008",
+  "next_child_title": "Story Check diagnostic-only OMI handoff",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until AI/tool-assisted OMI analysis candidates are visible and owner-reviewable",
