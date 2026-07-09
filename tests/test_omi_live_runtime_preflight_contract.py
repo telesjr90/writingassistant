@@ -19,6 +19,46 @@ from backend import omi_runtime_preflight as preflight
 from backend import project_manager
 
 
+_MOCK_SPACY_AVAILABLE = {
+    "spacy_package_available": True,
+    "spacy_model_available": True,
+    "spacy_model_name": "en_core_web_sm",
+    "spacy_probe_detail": "spaCy model 'en_core_web_sm' loaded successfully",
+}
+
+_MOCK_SPACY_PACKAGE_MISSING = {
+    "spacy_package_available": False,
+    "spacy_model_available": False,
+    "spacy_model_name": "en_core_web_sm",
+    "spacy_probe_detail": "Python package not available: spacy",
+}
+
+_MOCK_SPACY_MODEL_MISSING = {
+    "spacy_package_available": True,
+    "spacy_model_available": False,
+    "spacy_model_name": "en_core_web_sm",
+    "spacy_probe_detail": "spaCy model 'en_core_web_sm' not found/loadable: mock model missing",
+}
+
+
+def _mock_spacy_probe(monkeypatch, result: dict | None = None) -> None:
+    if result is not None:
+        monkeypatch.setattr(
+            preflight,
+            "_spacy_model_probe",
+            lambda _model_name: {**result, "spacy_model_name": _model_name},
+        )
+    else:
+        monkeypatch.setattr(
+            preflight,
+            "_spacy_model_probe",
+            lambda _model_name: {
+                **_MOCK_SPACY_AVAILABLE,
+                "spacy_model_name": _model_name,
+            },
+        )
+
+
 EXPECTED_TOOLS = {
     "spacy",
     "ollama_model",
@@ -109,7 +149,7 @@ def test_global_live_flag_without_per_tool_flag_does_not_enable_tools() -> None:
 
 
 def test_per_tool_flags_are_recognized_and_still_require_global_gate(monkeypatch) -> None:
-    monkeypatch.setattr(preflight.importlib.util, "find_spec", lambda name: name == "spacy")
+    _mock_spacy_probe(monkeypatch)
 
     per_tool_only = _tools_by_name(_report({"OMI_LIVE_SPACY_ENABLED": "true"}))["spacy"]
     assert per_tool_only["tool_enabled"] is True
@@ -127,7 +167,7 @@ def test_per_tool_flags_are_recognized_and_still_require_global_gate(monkeypatch
 def test_preflight_distinguishes_fixture_contract_config_dependency_and_enablement(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(preflight.importlib.util, "find_spec", lambda name: name == "spacy")
+    _mock_spacy_probe(monkeypatch)
 
     tool = _tools_by_name(
         _report({"OMI_LIVE_TOOLS_ENABLED": "true", "OMI_LIVE_SPACY_ENABLED": "true"})
@@ -142,7 +182,7 @@ def test_preflight_distinguishes_fixture_contract_config_dependency_and_enableme
 
 
 def test_blocked_status_is_explicit_and_overrides_enablement(monkeypatch) -> None:
-    monkeypatch.setattr(preflight.importlib.util, "find_spec", lambda name: name == "spacy")
+    _mock_spacy_probe(monkeypatch)
 
     tool = _tools_by_name(
         _report(
@@ -191,3 +231,124 @@ def test_route_wrapper_returns_read_only_preflight_without_project_writes(
     assert report["project_name"] == "demo"
     assert report["safety"]["read_only"] is True
     assert project_manager.get_omi_summary("demo") == before
+
+
+# ---------------------------------------------------------------------------
+# T014B — spaCy runtime availability check
+# ---------------------------------------------------------------------------
+
+
+def test_spacy_package_missing_reports_unavailable_with_clear_reason(monkeypatch) -> None:
+    _mock_spacy_probe(monkeypatch, _MOCK_SPACY_PACKAGE_MISSING)
+
+    tools = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SPACY_ENABLED": "true",
+            }
+        )
+    )
+    spacy_tool = tools["spacy"]
+
+    assert spacy_tool["status"] == "unavailable"
+    assert spacy_tool["runtime_dependency_available"] is False
+    assert spacy_tool["runtime_dependency_status"] == "unavailable"
+    assert spacy_tool["spacy_model_available"] is False
+    assert spacy_tool["spacy_model_name"] == "en_core_web_sm"
+    assert "not available" in spacy_tool["probe_detail"].lower()
+
+
+def test_spacy_model_missing_reports_unavailable_with_model_specific_reason(
+    monkeypatch,
+) -> None:
+    _mock_spacy_probe(monkeypatch, _MOCK_SPACY_MODEL_MISSING)
+
+    tools = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SPACY_ENABLED": "true",
+            }
+        )
+    )
+    spacy_tool = tools["spacy"]
+
+    assert spacy_tool["status"] == "unavailable"
+    assert spacy_tool["runtime_dependency_available"] is False
+    assert spacy_tool["runtime_dependency_status"] == "unavailable"
+    assert spacy_tool["spacy_model_available"] is False
+    assert spacy_tool["spacy_model_name"] == "en_core_web_sm"
+    assert "mock model missing" in spacy_tool["probe_detail"]
+
+
+def test_spacy_package_and_model_available_reports_available(monkeypatch) -> None:
+    _mock_spacy_probe(monkeypatch, _MOCK_SPACY_AVAILABLE)
+
+    tools = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SPACY_ENABLED": "true",
+            }
+        )
+    )
+    spacy_tool = tools["spacy"]
+
+    assert spacy_tool["status"] == "enabled"
+    assert spacy_tool["runtime_dependency_available"] is True
+    assert spacy_tool["runtime_dependency_status"] == "available"
+    assert spacy_tool["spacy_model_available"] is True
+    assert spacy_tool["spacy_model_name"] == "en_core_web_sm"
+    assert "loaded successfully" in spacy_tool["probe_detail"]
+
+
+def test_spacy_model_env_var_changes_reported_model_name(monkeypatch) -> None:
+    _mock_spacy_probe(monkeypatch)
+
+    tools = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SPACY_ENABLED": "true",
+                "OMI_LIVE_SPACY_MODEL": "en_core_web_md",
+            }
+        )
+    )
+    spacy_tool = tools["spacy"]
+
+    assert spacy_tool["spacy_model_name"] == "en_core_web_md"
+
+
+def test_spacy_blocked_flag_overrides_availability(monkeypatch) -> None:
+    _mock_spacy_probe(monkeypatch, _MOCK_SPACY_AVAILABLE)
+
+    tools = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SPACY_ENABLED": "true",
+                "OMI_LIVE_SPACY_BLOCKED": "true",
+                "OMI_LIVE_SPACY_BLOCKED_REASON": "Owner decision pending.",
+            }
+        )
+    )
+    spacy_tool = tools["spacy"]
+
+    assert spacy_tool["status"] == "blocked"
+    assert spacy_tool["blocked"] is True
+    assert spacy_tool["blocked_reason"] == "Owner decision pending."
+    assert spacy_tool["runtime_dependency_available"] is True
+    assert spacy_tool["spacy_model_available"] is True
+
+
+def test_spacy_global_live_tools_disabled_reports_disabled_or_available(monkeypatch) -> None:
+    _mock_spacy_probe(monkeypatch, _MOCK_SPACY_AVAILABLE)
+
+    tools = _tools_by_name(_report({"OMI_LIVE_SPACY_ENABLED": "true"}))
+    spacy_tool = tools["spacy"]
+
+    assert spacy_tool["global_enabled"] is False
+    assert spacy_tool["runtime_enabled"] is False
+    assert spacy_tool["status"] in {"disabled", "available"}
+    assert spacy_tool["safety"]["read_only"] is True

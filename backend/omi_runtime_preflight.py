@@ -34,6 +34,9 @@ OMI_RUNTIME_PREFLIGHT_STATUSES: frozenset[str] = frozenset(
 OMI_LIVE_TOOLS_ENABLED_ENV = "OMI_LIVE_TOOLS_ENABLED"
 OMI_LIVE_RUNTIME_TESTS_ENV = "OMI_LIVE_RUNTIME_TESTS"
 
+OMI_LIVE_SPACY_MODEL_DEFAULT = "en_core_web_sm"
+OMI_LIVE_SPACY_MODEL_ENV = "OMI_LIVE_SPACY_MODEL"
+
 OMI_LIVE_TOOL_ENABLED_ENVS: dict[str, str] = {
     "spacy": "OMI_LIVE_SPACY_ENABLED",
     "ollama_model": "OMI_LIVE_OLLAMA_ENABLED",
@@ -81,11 +84,70 @@ def _path_exists(relative_path: str) -> bool:
     return (_REPO_ROOT / relative_path).exists()
 
 
+def _spacy_model_probe(model_name: str) -> dict[str, Any]:
+    """Probe spaCy package and selected model availability.
+
+    Fail-closed, read-only. Only imports spaCy inside the probe path.
+    Returns (spacy_package_available, spacy_model_available, model_name, detail).
+    """
+    if not _find_module("spacy"):
+        return {
+            "spacy_package_available": False,
+            "spacy_model_available": False,
+            "spacy_model_name": model_name,
+            "spacy_probe_detail": "Python package not available: spacy",
+        }
+    try:
+        import spacy
+
+        spacy.load(model_name)
+        return {
+            "spacy_package_available": True,
+            "spacy_model_available": True,
+            "spacy_model_name": model_name,
+            "spacy_probe_detail": f"spaCy model '{model_name}' loaded successfully",
+        }
+    except OSError as exc:
+        return {
+            "spacy_package_available": True,
+            "spacy_model_available": False,
+            "spacy_model_name": model_name,
+            "spacy_probe_detail": (
+                f"spaCy model '{model_name}' not found/loadable: {exc}"
+            ),
+        }
+    except Exception as exc:
+        return {
+            "spacy_package_available": True,
+            "spacy_model_available": False,
+            "spacy_model_name": model_name,
+            "spacy_probe_detail": (
+                f"spaCy model '{model_name}' load failed: "
+                f"{type(exc).__name__}: {exc}"
+            ),
+        }
+
+
 def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
     if adapter == "spacy":
         configured = True
-        available = _find_module("spacy")
-        detail = "Python package probe: spacy"
+        model_name = (
+            _env_text(env, OMI_LIVE_SPACY_MODEL_ENV) or OMI_LIVE_SPACY_MODEL_DEFAULT
+        )
+        probe = _spacy_model_probe(model_name)
+        available = probe["spacy_package_available"] and probe["spacy_model_available"]
+        detail = probe["spacy_probe_detail"]
+        dependency_status = (
+            "available" if available else "unavailable"
+        )
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": dependency_status,
+            "probe_detail": detail,
+            "spacy_model_name": probe["spacy_model_name"],
+            "spacy_model_available": probe["spacy_model_available"],
+        }
     elif adapter == "booknlp":
         configured = True
         available = _find_module("booknlp") or shutil.which("booknlp") is not None
@@ -209,7 +271,7 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
     if status not in OMI_RUNTIME_PREFLIGHT_STATUSES:
         status = "error"
 
-    return {
+    report = {
         "tool": adapter,
         "status": status,
         "fixture_contract_exists": fixture_contract_exists,
@@ -242,6 +304,10 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "story_prose_generated": False,
         },
     }
+    if adapter == "spacy":
+        report["spacy_model_name"] = dependency.get("spacy_model_name")
+        report["spacy_model_available"] = dependency.get("spacy_model_available")
+    return report
 
 
 def build_omi_runtime_preflight_report(

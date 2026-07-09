@@ -140,7 +140,8 @@
     "PHASE8-IMPL-023-T011 recorded complete/PASS as backend-only candidate-only persistence for fused AI/tool-assisted findings",
     "T012A recorded as live local/runtime integration reset",
     "T013 recorded as read-only runtime preflight/health checks/feature flags",
-    "T014 onward recorded as real runtime connection and validation tasks",
+    "T014B recorded as read-only spaCy runtime availability check in T013 preflight",
+    "T014C onward recorded as real runtime connection and validation tasks",
     "MVP closeout blocked until live OMI/analysis runtime validation passes or selected unavailable tools are explicitly owner-blocked"
   ],
   "allowed_files": [
@@ -372,7 +373,7 @@
       "task_id": "PHASE8-IMPL-023-T014",
       "title": "Live spaCy integration in OMI and analysis",
       "status": "active",
-      "scope": "split into T014A inspect/docs (complete/PASS), T014B expected-red tests (next), T014C implementation, T014D manual validation, T014E closeout"
+      "scope": "split into T014A inspect/docs (complete/PASS), T014B runtime availability check (complete/PASS), T014C implementation (next), T014D manual validation, T014E closeout"
     },
     {
       "task_id": "PHASE8-IMPL-023-T014A",
@@ -380,6 +381,13 @@
       "status": "complete/PASS",
       "scope": "inspect/docs only; no live spaCy runtime; no dependency install; no backend/frontend runtime changes",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014A-spacy-fixture-contract-and-preflight-inspection.md"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T014B",
+      "title": "spaCy runtime availability check",
+      "status": "complete/PASS",
+      "scope": "read-only spaCy package and model availability probe in T013 preflight; no live adapter; no analysis; no candidates; no install/download",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014B-spacy-runtime-availability-check.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T015",
@@ -454,11 +462,11 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T014A",
+  "latest_child_task": "PHASE8-IMPL-023-T014B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014A-spacy-fixture-contract-and-preflight-inspection.md",
-  "next_child_task": "PHASE8-IMPL-023-T014B",
-  "next_child_title": "Live spaCy expected-red tests",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014B-spacy-runtime-availability-check.md",
+  "next_child_task": "PHASE8-IMPL-023-T014C",
+  "next_child_title": "Live spaCy adapter implementation",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
