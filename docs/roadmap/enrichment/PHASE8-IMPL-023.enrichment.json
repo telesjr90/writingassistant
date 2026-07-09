@@ -371,8 +371,15 @@
     {
       "task_id": "PHASE8-IMPL-023-T014",
       "title": "Live spaCy integration in OMI and analysis",
-      "status": "ready/active next",
-      "scope": "live spaCy integration in OMI and analysis with candidate-only, evidence/provenance-backed output"
+      "status": "active",
+      "scope": "split into T014A inspect/docs (complete/PASS), T014B expected-red tests (next), T014C implementation, T014D manual validation, T014E closeout"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T014A",
+      "title": "spaCy fixture contract and T013 preflight inspection",
+      "status": "complete/PASS",
+      "scope": "inspect/docs only; no live spaCy runtime; no dependency install; no backend/frontend runtime changes",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014A-spacy-fixture-contract-and-preflight-inspection.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T015",
@@ -447,11 +454,11 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T013",
+  "latest_child_task": "PHASE8-IMPL-023-T014A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T013-runtime-preflight-health-checks-and-feature-flags.md",
-  "next_child_task": "PHASE8-IMPL-023-T014",
-  "next_child_title": "Live spaCy integration in OMI and analysis",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014A-spacy-fixture-contract-and-preflight-inspection.md",
+  "next_child_task": "PHASE8-IMPL-023-T014B",
+  "next_child_title": "Live spaCy expected-red tests",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",

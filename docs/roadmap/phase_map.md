@@ -8,7 +8,8 @@
 - Active parent: `PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP`.
 - Latest completed phase-map item: `PHASE8-IMPL-023-T013 - Runtime configuration, preflight, health checks, and feature flags`.
 - T004 deterministic status: `PHASE8-IMPL-023-T004 - Deterministic/rule-based MVP extractor` remains historically complete/PASS but is fallback/safety baseline only.
-- Next phase-map step: `PHASE8-IMPL-023-T014 - Live spaCy integration in OMI and analysis`.
+- T014A result: `PHASE8-IMPL-023-T014A - spaCy fixture contract and T013 preflight inspection` is complete/PASS as inspect/docs only. Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-T014A-spacy-fixture-contract-and-preflight-inspection.md`.
+- Next phase-map step: `PHASE8-IMPL-023-T014B - Live spaCy expected-red tests`.
 - Required path: OMI raw idea input must flow through real local/runtime AI/tool-assisted analysis in OMI and analysis for every selected tool unless a tool is explicitly documented as BLOCKED by owner decision, and produce structured, evidence/provenance-backed review candidates before full MVP closeout can proceed.
 - Boundary: analysis-only, candidate-first, owner-controlled, no automatic Memory/Canon mutation, no automatic apply-promotion, no generated story prose, confidence/support is not truth, and tool/model output is not canon.
 - T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-023-T001-omi-extraction-gap-audit-architecture-decision.md` is superseded only where it selected deterministic/rule-based extraction as the first MVP target; safety boundaries remain valid.
