@@ -37,8 +37,12 @@ T005 scope (PHASE8-IMPL-023):
 
 Boundaries (non-negotiable):
 
-  - No Ollama, Story Check, BookNLP, spaCy, NCP, Subtxt, or dramatica-flow
+  - No Ollama, Story Check, BookNLP, NCP, Subtxt, or dramatica-flow
     live runtime calls. This module does not import or invoke any of them.
+  - Live spaCy (T014C) is available only behind explicit runtime flags
+    (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_SPACY_ENABLED) and imports spaCy
+    lazily inside the live runner path. No automatic promotion, Memory/Canon
+    mutation, apply-promotion, or candidate approval.
   - No Memory/Canon mutation.
   - No promotion records, no apply-promotion, no canon promotion.
   - No story prose generation, rewriting, continuation, drafting, polishing,
@@ -57,8 +61,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 # ---------------------------------------------------------------------------
 # Adapter identity and result-state constants
@@ -4128,6 +4133,273 @@ def _build_context_adapter_fixture_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# Live spaCy adapter runner (T014C) — behind explicit env flags
+# ---------------------------------------------------------------------------
+
+_OMI_LIVE_TOOLS_ENABLED_ENV = "OMI_LIVE_TOOLS_ENABLED"
+_OMI_LIVE_SPACY_ENABLED_ENV = "OMI_LIVE_SPACY_ENABLED"
+_OMI_LIVE_SPACY_BLOCKED_ENV = "OMI_LIVE_SPACY_BLOCKED"
+_OMI_LIVE_SPACY_BLOCKED_REASON_ENV = "OMI_LIVE_SPACY_BLOCKED_REASON"
+_OMI_LIVE_SPACY_MODEL_ENV = "OMI_LIVE_SPACY_MODEL"
+_OMI_LIVE_SPACY_MODEL_DEFAULT = "en_core_web_sm"
+
+_OMI_SPACY_LIVE_ENTITY_LABEL_TO_CANDIDATE_TYPE: dict[str, str] = {
+    "PERSON": "character",
+    "GPE": "location",
+    "LOC": "location",
+    "FAC": "location",
+    "ORG": "organization",
+    "EVENT": "timeline_event",
+}
+
+_OMI_SPACY_LIVE_SKIP_NOUN_CHUNK_TEXTS: frozenset[str] = frozenset({
+    "it", "he", "she", "they", "we", "you", "i", "me", "him", "her",
+    "them", "us", "this", "that", "these", "those",
+})
+
+
+def _env_bool(env: Mapping[str, str], name: str, default: bool = False) -> bool:
+    value = env.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _build_spacy_live_runner(
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a live spaCy adapter runner behind explicit runtime flags.
+
+    The runner:
+
+    - Imports spaCy lazily (never at module import time).
+    - Loads the configured model from ``OMI_LIVE_SPACY_MODEL`` (default
+      ``en_core_web_sm``). Does not download models.
+    - Processes the raw idea text and extracts entities and noun chunks.
+    - Converts entity labels: PERSON -> character, GPE/LOC/FAC -> location,
+      ORG -> organization, EVENT -> timeline_event.
+    - Converts non-overlapping noun chunks into object candidates.
+    - Constructs a valid ``omi_spacy_local_nlp_extraction.v1`` envelope
+      and normalizes it through the existing fixture validation pipeline.
+    - Fail-closed on ImportError, OSError (model missing), runtime
+      processing exception, or empty/malformed input.
+
+    The caller (``_resolve_adapter_runner``) must check env flags before
+    building this runner. This runner does not re-check flags.
+    """
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        _ = project_name
+        _ = source_idea_id
+
+        if not isinstance(raw_idea, str) or not raw_idea.strip():
+            return {
+                "adapter": "spacy",
+                "state": "empty",
+                "explanation": (
+                    "Live spaCy runner received empty raw idea text; "
+                    "no entities or noun chunks to extract."
+                ),
+                "candidates": [],
+            }
+
+        raw_text = raw_idea.strip()
+
+        try:
+            import spacy  # lazy import
+
+            model_name = os.environ.get(
+                _OMI_LIVE_SPACY_MODEL_ENV, _OMI_LIVE_SPACY_MODEL_DEFAULT
+            )
+            nlp = spacy.load(model_name)
+            doc = nlp(raw_text)
+        except ImportError:
+            return {
+                "adapter": "spacy",
+                "state": "unavailable",
+                "explanation": (
+                    "Live spaCy requested but the spaCy Python package is not "
+                    "installed. Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+        except OSError as exc:
+            return {
+                "adapter": "spacy",
+                "state": "unavailable",
+                "explanation": (
+                    "Live spaCy requested but the configured model is not "
+                    f"available/loadable: {exc}. Failing closed with no "
+                    "candidates."
+                ),
+                "candidates": [],
+            }
+        except Exception as exc:
+            return {
+                "adapter": "spacy",
+                "state": "failed_closed",
+                "explanation": (
+                    "Live spaCy runtime processing failed: "
+                    f"{type(exc).__name__}: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        findings: list[dict[str, Any]] = []
+        seen_entity_texts: set[str] = set()
+        entity_counter = 0
+
+        for ent in doc.ents:
+            candidate_type = _OMI_SPACY_LIVE_ENTITY_LABEL_TO_CANDIDATE_TYPE.get(
+                ent.label_
+            )
+            if candidate_type is None:
+                continue
+
+            label_text = ent.text.strip()
+            if not label_text:
+                continue
+            label_lower = label_text.lower()
+            if label_lower in seen_entity_texts:
+                continue
+            seen_entity_texts.add(label_lower)
+
+            entity_counter += 1
+            sentence = doc.text
+            if ent.sent and ent.sent.text:
+                sentence = ent.sent.text
+
+            source_locator = (
+                f"raw_idea:L1:C{ent.start_char}-{ent.end_char}"
+            )
+
+            finding: dict[str, Any] = {
+                "raw_finding_id": (
+                    f"spacy-live-{ent.label_.lower()}-{entity_counter}"
+                ),
+                "spacy_label": ent.label_,
+                "text": label_text,
+                "claim": (
+                    f"{label_text} appears as a {ent.label_} entity candidate"
+                ),
+                "sentence": sentence,
+                "source_locator": source_locator,
+                "confidence": "spaCy live support only",
+            }
+            findings.append(finding)
+
+        noun_chunk_counter = 0
+        for chunk in doc.noun_chunks:
+            chunk_text = chunk.text.strip()
+            if not chunk_text:
+                continue
+            chunk_lower = chunk_text.lower()
+            if chunk_lower in seen_entity_texts:
+                continue
+
+            overlaps = False
+            for ent in doc.ents:
+                if chunk.start < ent.end and chunk.end > ent.start:
+                    overlaps = True
+                    break
+            if overlaps:
+                continue
+
+            chunk_tokens = chunk_text.split()
+            if len(chunk_tokens) < 2:
+                if chunk_lower in _OMI_SPACY_LIVE_SKIP_NOUN_CHUNK_TEXTS:
+                    continue
+            if len(chunk_tokens) > 6:
+                continue
+
+            noun_chunk_counter += 1
+            chunk_sentence = doc.text
+            if chunk.sent and chunk.sent.text:
+                chunk_sentence = chunk.sent.text
+
+            chunk_locator = (
+                f"raw_idea:L1:C{chunk.start_char}-{chunk.end_char}"
+            )
+
+            finding = {
+                "raw_finding_id": (
+                    f"spacy-live-noun-chunk-{noun_chunk_counter}"
+                ),
+                "spacy_label": "NOUN_CHUNK",
+                "text": chunk_text,
+                "claim": (
+                    f"{chunk_text} appears as a noun chunk candidate"
+                ),
+                "sentence": chunk_sentence,
+                "source_locator": chunk_locator,
+                "confidence": "spaCy live support only",
+            }
+            findings.append(finding)
+
+        if not findings:
+            return {
+                "adapter": "spacy",
+                "state": "empty",
+                "explanation": (
+                    "Live spaCy found no entities or noun chunks in the "
+                    "raw idea text."
+                ),
+                "candidates": [],
+            }
+
+        envelope = {
+            "schema_version": OMI_SPACY_SCHEMA_VERSION,
+            "adapter": "spacy",
+            "status": "succeeded",
+            "explanation": "Live spaCy local NLP extraction.",
+            "provenance": {
+                "tool_source": "spacy",
+                "adapter": "spacy",
+                "support": "spaCy live support only",
+            },
+            "findings": findings,
+        }
+
+        try:
+            validated = validate_local_nlp_fixture_envelope(
+                envelope,
+                adapter_name="spacy",
+            )
+        except ValueError as exc:
+            return {
+                "adapter": "spacy",
+                "state": "failed_closed",
+                "explanation": (
+                    "Live spaCy envelope failed normalization: "
+                    f"{exc}. Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        state = "succeeded" if validated["findings"] else "empty"
+        return {
+            "adapter": "spacy",
+            "state": state,
+            "explanation": (
+                validated["explanation"]
+                or "Live spaCy local NLP extraction succeeded."
+            ),
+            "candidates": validated["findings"],
+        }
+
+    return _runner
+
+
 def _resolve_adapter_runner(
     adapter: str,
     *,
@@ -4177,35 +4449,44 @@ def _resolve_adapter_runner(
         "subtxt",
         "dramatica_flow",
     }:
-        if adapter_fixture_outputs is None:
-            return None
-        if not isinstance(adapter_fixture_outputs, dict):
-            raise ValueError(
-                "adapter_fixture_outputs must be a dict[str, Any]"
-            )
-        if adapter not in adapter_fixture_outputs:
-            return None
-        if adapter == "ollama_model":
-            return _build_ollama_model_fixture_runner(
-                adapter_fixture_outputs[adapter],
-                adapter_config=adapter_config,
-            )
-        if adapter == "story_check":
-            return _build_story_check_fixture_runner(
-                adapter_fixture_outputs[adapter],
-                adapter_config=adapter_config,
-            )
-        if adapter in OMI_CONTEXT_ADAPTER_NAMES:
-            return _build_context_adapter_fixture_runner(
-                adapter,
-                adapter_fixture_outputs[adapter],
-                adapter_config=adapter_config,
-            )
-        return _build_local_nlp_fixture_runner(
-            adapter,
-            adapter_fixture_outputs[adapter],
-            adapter_config=adapter_config,
-        )
+        if adapter_fixture_outputs is not None:
+            if not isinstance(adapter_fixture_outputs, dict):
+                raise ValueError(
+                    "adapter_fixture_outputs must be a dict[str, Any]"
+                )
+            if adapter in adapter_fixture_outputs:
+                if adapter == "ollama_model":
+                    return _build_ollama_model_fixture_runner(
+                        adapter_fixture_outputs[adapter],
+                        adapter_config=adapter_config,
+                    )
+                if adapter == "story_check":
+                    return _build_story_check_fixture_runner(
+                        adapter_fixture_outputs[adapter],
+                        adapter_config=adapter_config,
+                    )
+                if adapter in OMI_CONTEXT_ADAPTER_NAMES:
+                    return _build_context_adapter_fixture_runner(
+                        adapter,
+                        adapter_fixture_outputs[adapter],
+                        adapter_config=adapter_config,
+                    )
+                return _build_local_nlp_fixture_runner(
+                    adapter,
+                    adapter_fixture_outputs[adapter],
+                    adapter_config=adapter_config,
+                )
+        # T014C: live spaCy path behind explicit env flags.
+        if adapter == "spacy":
+            env = os.environ
+            if (
+                _env_bool(env, _OMI_LIVE_TOOLS_ENABLED_ENV)
+                and _env_bool(env, _OMI_LIVE_SPACY_ENABLED_ENV)
+                and not _env_bool(env, _OMI_LIVE_SPACY_BLOCKED_ENV)
+            ):
+                return _build_spacy_live_runner(
+                    adapter_config=adapter_config,
+                )
     return None
 
 
@@ -4487,15 +4768,23 @@ def analyze_omi_raw_idea_with_tools(
                     f"no candidates."
                 )
             elif adapter in {"booknlp", "spacy"}:
-                runtime_name = "BookNLP" if adapter == "booknlp" else "spaCy"
-                unavailable_explanation = (
-                    f"Adapter '{adapter}' is available through the T007 "
-                    f"fixture/mock local NLP contract only; no fixture was "
-                    f"supplied via ``adapter_fixture_outputs``. The "
-                    f"orchestrator does not perform live {runtime_name} calls "
-                    f"and does not import or install {runtime_name}. "
-                    f"Returning 'unavailable' with no candidates."
-                )
+                if adapter == "spacy":
+                    unavailable_explanation = (
+                        f"Adapter '{adapter}' requires either a T007 fixture "
+                        f"via ``adapter_fixture_outputs`` or live spaCy env "
+                        f"flags (OMI_LIVE_TOOLS_ENABLED + "
+                        f"OMI_LIVE_SPACY_ENABLED). Neither was supplied. "
+                        f"Returning 'unavailable' with no candidates."
+                    )
+                else:
+                    unavailable_explanation = (
+                        f"Adapter '{adapter}' is available through the T007 "
+                        f"fixture/mock local NLP contract only; no fixture was "
+                        f"supplied via ``adapter_fixture_outputs``. The "
+                        f"orchestrator does not perform live BookNLP calls "
+                        f"and does not import or install BookNLP. "
+                        f"Returning 'unavailable' with no candidates."
+                    )
             elif adapter in OMI_CONTEXT_ADAPTER_NAMES:
                 runtime_name = _context_adapter_display_name(adapter)
                 unavailable_explanation = (

@@ -11,6 +11,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -397,3 +398,224 @@ def test_booknlp_and_spacy_findings_are_not_persisted_or_mutating(monkeypatch: A
         assert result["safety"]["no_apply_promotion"] is True
 
     assert calls == []
+
+
+# ---------------------------------------------------------------------------
+# T014C — Live spaCy adapter behind env flags
+# ---------------------------------------------------------------------------
+
+
+def _mock_live_spacy_env(monkeypatch: Any) -> None:
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_SPACY_ENABLED", "true")
+
+
+def _install_mock_spacy(monkeypatch: Any) -> MagicMock:
+    """Install a mock spaCy module so import spacy succeeds."""
+    mock_spacy = MagicMock()
+    mock_nlp = MagicMock()
+    mock_spacy.load.return_value = mock_nlp
+    monkeypatch.setitem(sys.modules, "spacy", mock_spacy)
+    return mock_nlp
+
+
+def _make_mock_doc(
+    text: str,
+    entities: list[tuple[str, str, int, int]] | None = None,
+    noun_chunks: list[tuple[str, int, int]] | None = None,
+) -> MagicMock:
+    """Create a mock spaCy Doc with entities and noun chunks.
+
+    Each entity is a (text, label_, start_char, end_char) tuple.
+    Each noun chunk is a (text, start_char, end_char) tuple.
+    """
+    doc = MagicMock()
+    doc.text = text
+    doc.ents = []
+    doc.noun_chunks = []
+
+    seen_texts: set[str] = set()
+
+    if entities:
+        for label_text, ent_type, start, end in entities:
+            ent = MagicMock()
+            ent.text = label_text
+            ent.label_ = ent_type
+            ent.start_char = start
+            ent.end_char = end
+            ent.start = start
+            ent.end = end
+            sent = MagicMock()
+            sent.text = text
+            ent.sent = sent
+            doc.ents.append(ent)
+            seen_texts.add(label_text.lower())
+
+    if noun_chunks:
+        for chunk_text, chunk_start, chunk_end in noun_chunks:
+            if chunk_text.lower() in seen_texts:
+                continue
+            chunk = MagicMock()
+            chunk.text = chunk_text
+            chunk.start_char = chunk_start
+            chunk.end_char = chunk_end
+            chunk.start = chunk_start
+            chunk.end = chunk_end
+            sent = MagicMock()
+            sent.text = text
+            chunk.sent = sent
+            doc.noun_chunks.append(chunk)
+
+    return doc
+
+
+def test_live_spacy_disabled_by_default_returns_unavailable() -> None:
+    """No env flags -> live spaCy path not triggered -> unavailable."""
+    result = _run_adapter("spacy")
+    env = _assert_failed_closed(result, "spacy")
+    assert env["state"] == "unavailable"
+
+
+def test_live_spacy_enabled_with_mocked_model_returns_normalized_candidates(
+    monkeypatch: Any,
+) -> None:
+    """Live spaCy with mocked model returns normalized candidate findings."""
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+
+    mock_doc = _make_mock_doc(
+        RAW_IDEA,
+        entities=[
+            ("Mara Vale", "PERSON", 12, 21),
+            ("the west quay", "LOC", 61, 73),
+            ("Harbor Archive", "ORG", 28, 42),
+            ("the storm alarm", "EVENT", 104, 119),
+        ],
+    )
+    mock_nlp.return_value = mock_doc
+
+    result = _run_adapter("spacy")
+
+    assert result["analysis_status"] == "succeeded"
+    env = _adapter_env(result, "spacy")
+    assert env["state"] == "succeeded"
+    assert len(env["candidates"]) == 4
+    types = [f["candidate_type"] for f in env["candidates"]]
+    assert "character" in types
+    assert "location" in types
+    assert "organization" in types
+    assert "timeline_event" in types
+    for finding in result["findings"]:
+        _assert_candidate_only_finding(finding, "spacy")
+
+
+def test_live_spacy_noun_chunks_produce_object_candidates(
+    monkeypatch: Any,
+) -> None:
+    """Non-overlapping noun chunks produce object candidates."""
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+
+    mock_doc = _make_mock_doc(
+        RAW_IDEA,
+        entities=[
+            ("Mara Vale", "PERSON", 12, 21),
+        ],
+        noun_chunks=[
+            ("the brass key", 82, 96),
+        ],
+    )
+    mock_nlp.return_value = mock_doc
+
+    result = _run_adapter("spacy")
+
+    assert result["analysis_status"] == "succeeded"
+    env = _adapter_env(result, "spacy")
+    assert env["state"] == "succeeded"
+    types = [f["candidate_type"] for f in env["candidates"]]
+    assert "object" in types
+    for finding in result["findings"]:
+        _assert_candidate_only_finding(finding, "spacy")
+
+
+def test_live_spacy_missing_package_returns_unavailable(
+    monkeypatch: Any,
+) -> None:
+    """spaCy not installed -> runner returns unavailable."""
+    _mock_live_spacy_env(monkeypatch)
+
+    result = _run_adapter("spacy")
+
+    env = _assert_failed_closed(result, "spacy")
+    assert env["state"] == "unavailable"
+    assert "not installed" in env["explanation"].lower()
+
+
+def test_live_spacy_model_load_failure_returns_unavailable(
+    monkeypatch: Any,
+) -> None:
+    """Model load failure -> runner returns unavailable."""
+    _mock_live_spacy_env(monkeypatch)
+
+    mock_spacy = MagicMock()
+    mock_spacy.load.side_effect = OSError("mock model not found")
+    monkeypatch.setitem(sys.modules, "spacy", mock_spacy)
+
+    result = _run_adapter("spacy")
+
+    env = _assert_failed_closed(result, "spacy")
+    assert env["state"] == "unavailable"
+    assert "model" in env["explanation"].lower()
+    assert "not" in env["explanation"].lower()
+
+
+def test_live_spacy_runtime_exception_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Processing exception -> runner returns failed_closed."""
+    _mock_live_spacy_env(monkeypatch)
+
+    mock_spacy = MagicMock()
+    mock_nlp = MagicMock()
+    mock_nlp.side_effect = RuntimeError("mock processing error")
+    mock_spacy.load.return_value = mock_nlp
+    monkeypatch.setitem(sys.modules, "spacy", mock_spacy)
+
+    result = _run_adapter("spacy")
+
+    env = _assert_failed_closed(result, "spacy")
+    assert env["state"] in {"unavailable", "failed_closed"}
+    assert "processing" in env["explanation"].lower() or "error" in (
+        env["explanation"].lower()
+    )
+
+
+def test_live_spacy_safety_boundaries_preserved(
+    monkeypatch: Any,
+) -> None:
+    """Live spaCy findings preserve candidate-only safety boundaries."""
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+
+    mock_doc = _make_mock_doc(
+        RAW_IDEA,
+        entities=[
+            ("Mara Vale", "PERSON", 12, 21),
+        ],
+    )
+    mock_nlp.return_value = mock_doc
+
+    result = _run_adapter("spacy", persist_candidates=True)
+
+    assert result["analysis_status"] == "succeeded"
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+
+    for finding in result["findings"]:
+        for forbidden in ("truth", "canon", "approved", "promoted"):
+            assert forbidden not in finding["support_label"].lower()
+        assert finding["owner_decision"]["approved"] is False
+        assert finding["source_adapter"] == "spacy"
+        assert finding["evidence"][0]["source_excerpt"]
+        assert finding["evidence"][0]["source_locator"]
