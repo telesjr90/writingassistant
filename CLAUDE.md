@@ -247,6 +247,17 @@ git log -1 --oneline
 
 Never stage ignored local reports unless the user explicitly asks.
 
+## OpenCode Go model routing (for MVP implementation)
+
+Remaining MVP implementation (T014–T026) uses **OpenCode Go** as the coding-agent platform, running in the Cursor integrated terminal.
+
+- Docs/status/small scoped edits: `opencode-go/deepseek-v4-flash`.
+- Runtime adapters/debugging: `opencode-go/minimax-m3`, `opencode-go/kimi-k2.7-code`, or `opencode-go/deepseek-v4-pro`.
+- Final review/hard blockers: `opencode-go/deepseek-v4-pro` or `opencode-go/minimax-m3`.
+- Excluded: OpenAI, Anthropic, Google, GPT, Claude, Gemini, Google-hosted Gemma.
+
+Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md`.
+
 ## Preferred Claude Code model settings
 
 For WORKSPACE planning/docs:

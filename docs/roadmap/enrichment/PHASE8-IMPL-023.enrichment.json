@@ -127,6 +127,7 @@
     "no staging/commit/push"
   ],
   "expected_outputs": [
+    "docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-owner-override-ai-tool-assisted-omi-analysis-required.md",
     "docs/roadmap/tasks/PHASE8-IMPL-023.md",
     "docs/roadmap/inventory/PHASE8-IMPL-023.md",
@@ -157,6 +158,7 @@
     "tests/test_omi_tool_assisted_orchestrator_contract.py",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T012A-real-local-runtime-tools-required-for-omi-mvp.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T013-runtime-preflight-health-checks-and-feature-flags.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T010-fusion-dedupe-conflict-uncertainty-contract.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T009-ncp-subtxt-dramatica-flow-diagnostic-context-adapters.md",
@@ -174,7 +176,12 @@
     "docs/roadmap/open_questions.md",
     "docs/roadmap/task_backlog.md",
     "docs/roadmap/phase_map.md",
-    "docs/roadmap/roadmap_index.yaml"
+    "docs/roadmap/roadmap_index.yaml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".cursorrules",
+    "docs/plan.md",
+    "docs/master_plan.md"
   ],
   "disallowed_files": [
     "frontend/**",
@@ -190,6 +197,20 @@
     "python3 scripts/check_enrichment.py",
     "python3 scripts/validate_roadmap.py",
     "python3 -m json.tool docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json >/dev/null",
+    "grep -ci 'OpenCode' AGENTS.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' CLAUDE.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' .cursorrules | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/plan.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/master_plan.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/implementation_status.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/task_backlog.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/decision_log.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/risk_register.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/open_questions.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/phase_map.md | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/roadmap_index.yaml | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json | grep -q '[1-9]'",
+    "grep -ci 'OpenCode' docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md | grep -q '[1-9]'",
     "git diff --check",
     "git status --short --branch",
     "git diff --name-only"
@@ -200,6 +221,7 @@
     "docs/roadmap/decisions/PHASE8-IMPL-023-T003-backend-extraction-contract-schema.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T004-deterministic-rule-based-mvp-extractor.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T011-candidate-only-persistence-for-fused-ai-tool-findings.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md",
     "docs/roadmap/decisions/PHASE8-owner-override-block-full-mvp-closeout-omi-extraction-required.md",
     "docs/roadmap/implementation_status.md",
     "docs/roadmap/validation/latest_roadmap_validation.md"

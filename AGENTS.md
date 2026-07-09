@@ -32,9 +32,25 @@ Do not call Ollama, live models, Story Check, extraction tools, or Dramatica-spe
 
 Do not stage, commit, or push unless the user explicitly asks.
 
+## OpenCode Go platform recommendation
+
+This repo uses **OpenCode Go** as the selected low-cost coding-agent platform for remaining MVP implementation work (T014–T026).
+
+- **Cursor remains the editor**; OpenCode Go runs from the Cursor integrated terminal.
+- Normal model for docs/status and small scoped edits: `opencode-go/deepseek-v4-flash`.
+- Escalation for runtime/debugging: `opencode-go/minimax-m3`, `opencode-go/kimi-k2.7-code`, Qwen/GLM options, or `opencode-go/deepseek-v4-pro`.
+- Final review/hard blockers: `opencode-go/deepseek-v4-pro` or `opencode-go/minimax-m3`.
+- Excluded from this implementation workflow: OpenAI, Anthropic, Google, GPT, Claude, Gemini, Google-hosted Gemma.
+
+Model-routing rules:
+- Cheap models (deepseek-v4-flash) are acceptable only when prompts are small, focused, scoped, and tests-first.
+- Use stronger models (minimax-m3, kimi-k2.7-code, deepseek-v4-pro) only for blockers, multi-file runtime debugging, and closeout review.
+
+See `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md` for the full model-routing plan and T014–T026 subtask structure.
+
 ## Default task mode: implementation micro-task
 
-For normal Codex, Cursor, or Claude implementation micro-tasks:
+For normal Codex, Cursor, Claude, or OpenCode Go implementation micro-tasks:
 
 * One task equals one deliverable.
 * Use the smallest correct change.

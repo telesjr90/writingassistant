@@ -47,6 +47,20 @@ Current MVP readiness after `PHASE8-IMPL-022`: latest owner acceptance evidence 
 
 External SaaS investigation, Dramatica/current-platform investigation, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, controlled external experiments, and authorized non-black-box external reference collection are post-MVP/deferred unless the owner explicitly opens a separate post-MVP research task. `PHASE8-UX-002-T002A` is post-MVP/deferred only and is not part of the active MVP child sequence.
 
+## OpenCode Go Platform and Model Routing
+
+Remaining MVP implementation work (T014–T026) uses **OpenCode Go** as the selected low-cost coding-agent platform.
+
+- **Cursor remains the editor**; OpenCode Go runs from the Cursor integrated terminal.
+- Docs/status and small scoped edits: `opencode-go/deepseek-v4-flash`.
+- Runtime adapters/debugging: `opencode-go/minimax-m3`, `opencode-go/kimi-k2.7-code`, Qwen/GLM options, or `opencode-go/deepseek-v4-pro`.
+- Final review/hard blockers: `opencode-go/deepseek-v4-pro` or `opencode-go/minimax-m3`.
+- Excluded from this implementation workflow: OpenAI, Anthropic, Google, GPT, Claude, Gemini, Google-hosted Gemma.
+
+Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md`.
+
+Model-routing rules: cheap models are acceptable only when prompts are small, focused, scoped, and tests-first. Use stronger models only for blockers, multi-file runtime debugging, and closeout review.
+
 ## 1.1 Pre-Dramatica Project Workspace Foundation
 
 The roadmap priority order is now:
@@ -124,9 +138,10 @@ Preserved core boundaries:
 - Confidence/support is not truth.
 - Candidate persistence is not canon.
 - Tool/model output is not canon.
-- No Memory/Canon mutation.
-- No promotion records.
-- No apply-promotion.
+- No Memory/Canon mutation during analysis/runtime extraction.
+- No automatic promotion records from analysis/runtime/model/tool output.
+- No automatic apply-promotion from model/tool output.
+- Owner-approved apply-promotion remains a separate explicit workflow.
 
 Hard prohibitions:
 

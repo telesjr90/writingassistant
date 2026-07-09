@@ -48,9 +48,10 @@ Preserved product boundaries:
 - Confidence/support is not truth.
 - Candidate persistence is not canon.
 - Tool/model output is not canon.
-- No Memory/Canon mutation.
-- No promotion records.
-- No apply-promotion.
+- No Memory/Canon mutation during analysis/runtime extraction.
+- No automatic promotion records from analysis/runtime/model/tool output.
+- No automatic apply-promotion from model/tool output.
+- Owner-approved apply-promotion remains a separate explicit workflow.
 
 Product layers:
 
@@ -66,9 +67,8 @@ The current workspace is `/home/tjrpirateking/projects/WritingAssistantApplicati
 ---
 
 ## 1. Prerequisites
-- **OpenAI Codex CLI** installed and authenticated.
+- **OpenCode Go CLI** installed and configured (see `AGENTS.md` for model-routing rules).
 - Node.js & Python 3.10+ installed.
-- An OpenAI API key exported as `OPENAI_API_KEY`.
 - Working directory: `/home/tjrpirateking/projects/WritingAssistantApplication`.
 
 ---

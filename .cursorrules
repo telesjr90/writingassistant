@@ -4,6 +4,10 @@ This repo is the Dramatica-Informed Writing Assistant.
 
 Before editing, Cursor must read `AGENTS.md`, relevant `.cursor/rules/*.mdc`, and the task-relevant roadmap docs. `docs/master_plan.md` is the current source of truth for roadmap direction and constraints.
 
+## Platform
+
+Remaining MVP implementation (T014–T026) uses **OpenCode Go** as the coding-agent platform, running in the Cursor integrated terminal. See `AGENTS.md` and `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md` for model-routing rules.
+
 The app is analysis-only. The assistant must never write, rewrite, continue, imitate, polish, improve, expand, or extend story prose.
 
 Preserve the standard refusal message exactly:

@@ -1,3 +1,5 @@
+110. When should the OpenCode Go model routing decision be reviewed for effectiveness? The decision record (PHASE8-IMPL-023-opencode-go-model-routing) recommends review after T014–T020 are complete to assess whether the model-routing lanes (flash for small scope, pro/minimax for hard work) matched actual difficulty.
+
 109. What owner-blocked documentation format should T014-T020 use when a selected live tool remains unavailable after preflight?
 
 108. Which exact local/runtime surfaces exist for NCP, Subtxt, and dramatica-flow? T013 can report configured command/path or existing repo source surfaces, but live integration remains open for T018-T020.

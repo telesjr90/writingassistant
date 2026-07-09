@@ -238,11 +238,13 @@ Any prior smoke-test/manual-validation use of `PHASE7-IMPL-004` is a numbering d
 - New implementation detail belongs in child micro-tasks, not in renamed or repurposed parent IDs.
 - Child micro-tasks may use `planning_microtask`, `runtime_microtask`, or `validation_microtask` types.
 
-## Codex Execution Role
+## Codex / OpenCode Go Execution Role
 
-Codex is a strict micro-task implementer, not a planner.
+Codex and OpenCode Go are strict micro-task implementers, not planners.
 
-Codex prompts should specify one task ID, the exact files allowed to change, the exact validation commands to run, and the final response format. Codex should not infer new roadmap structure during implementation work.
+Prompts should specify one task ID, the exact files allowed to change, the exact validation commands to run, and the final response format. The agent should not infer new roadmap structure during implementation work.
+
+OpenCode Go is the selected platform for remaining MVP implementation (T014–T026). Model routing follows `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md`: `opencode-go/deepseek-v4-flash` for docs/status/small scoped tasks, escalating to `opencode-go/minimax-m3`, `opencode-go/kimi-k2.7-code`, or `opencode-go/deepseek-v4-pro` for runtime/debugging/final-review work. OpenAI, Anthropic, and Google-hosted models are excluded from this implementation workflow.
 
 ## Context Tool Boundary
 
