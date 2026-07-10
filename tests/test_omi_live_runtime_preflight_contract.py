@@ -1591,6 +1591,11 @@ def _all_ncp_surfaces_available_result() -> dict[str, object]:
         "ncp_audit_caveat": (
             "ajv moderate; fast-uri high; do not run npm audit fix"
         ),
+        "ncp_input_path_env": "OMI_LIVE_NCP_INPUT_PATH",
+        "ncp_input_path_configured": False,
+        "ncp_input_path_value": "",
+        "ncp_validate_with_node_env": "OMI_LIVE_NCP_VALIDATE_WITH_NODE",
+        "ncp_validate_with_node_enabled": False,
         "ncp_detail": "all present",
     }
 
@@ -1598,17 +1603,42 @@ def _all_ncp_surfaces_available_result() -> dict[str, object]:
 def _patch_ncp_probe(
     monkeypatch,
     result: dict[str, object] | None = None,
+    *,
+    env_aware: bool = False,
 ) -> None:
     """Patch ``_ncp_runtime_probe`` for tests that must not depend on the
     real ``.external_sources/narrative-context-protocol`` tree, real node,
-    or real npm."""
+    or real npm. T018B takes an optional env argument; the patch accepts
+    any args and returns a fresh copy of the result dict so per-test
+    mutations cannot leak.
+
+    When ``env_aware`` is True, the patched probe mirrors the real
+    implementation's behavior of surfacing the explicit
+    ``OMI_LIVE_NCP_INPUT_PATH`` and ``OMI_LIVE_NCP_VALIDATE_WITH_NODE``
+    env vars as configuration. Otherwise the patched probe returns the
+    static result dict unchanged.
+    """
     if result is None:
         result = _all_ncp_surfaces_available_result()
-    monkeypatch.setattr(
-        preflight,
-        "_ncp_runtime_probe",
-        lambda: {key: value for key, value in result.items()},
-    )
+
+    def _patched(env: object | None = None) -> dict[str, object]:
+        output = {key: value for key, value in result.items()}
+        if env_aware and env is not None:
+            mapping = dict(env)
+            raw_path = str(mapping.get("OMI_LIVE_NCP_INPUT_PATH", "") or "")
+            output["ncp_input_path_value"] = raw_path.strip()
+            output["ncp_input_path_configured"] = bool(
+                output["ncp_input_path_value"]
+            )
+            raw_vwn = str(
+                mapping.get("OMI_LIVE_NCP_VALIDATE_WITH_NODE", "") or ""
+            )
+            output["ncp_validate_with_node_enabled"] = (
+                raw_vwn.strip().lower() in {"1", "true", "yes", "on"}
+            )
+        return output
+
+    monkeypatch.setattr(preflight, "_ncp_runtime_probe", _patched)
 
 
 def test_ncp_preflight_disabled_by_default_remains_safe_read_only() -> None:
@@ -2121,3 +2151,89 @@ def test_ncp_audit_caveat_is_reported_verbatim() -> None:
     assert "high" in caveat
     assert "npm audit fix" in caveat
     assert "recorded, not fixed" in caveat
+
+
+# ---------------------------------------------------------------------------
+# T018B — NCP candidate-import validation adapter preflight fields
+# ---------------------------------------------------------------------------
+
+
+def test_ncp_t018b_input_path_env_field_is_reported(monkeypatch) -> None:
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result())
+    tool = _tools_by_name(_report())["ncp"]
+    assert tool["ncp_input_path_env"] == "OMI_LIVE_NCP_INPUT_PATH"
+    assert tool["ncp_input_path_configured"] is False
+    assert tool["ncp_input_path_value"] == ""
+    assert tool["ncp_validate_with_node_env"] == "OMI_LIVE_NCP_VALIDATE_WITH_NODE"
+    assert tool["ncp_validate_with_node_enabled"] is False
+
+
+def test_ncp_t018b_input_path_configured_when_env_set(monkeypatch) -> None:
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result(), env_aware=True)
+    env = {
+        "OMI_LIVE_TOOLS_ENABLED": "true",
+        "OMI_LIVE_NCP_ENABLED": "true",
+        "OMI_LIVE_NCP_INPUT_PATH": (
+            ".external_sources/narrative-context-protocol/examples/"
+            "complete-storyform-template.json"
+        ),
+    }
+    tool = _tools_by_name(_report(env))["ncp"]
+    assert tool["ncp_input_path_env"] == "OMI_LIVE_NCP_INPUT_PATH"
+    assert tool["ncp_input_path_configured"] is True
+    assert (
+        tool["ncp_input_path_value"]
+        == ".external_sources/narrative-context-protocol/examples/"
+        "complete-storyform-template.json"
+    )
+    assert tool["ncp_validate_with_node_enabled"] is False
+
+
+def test_ncp_t018b_validate_with_node_opt_in_is_reported(monkeypatch) -> None:
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result(), env_aware=True)
+    env = {
+        "OMI_LIVE_TOOLS_ENABLED": "true",
+        "OMI_LIVE_NCP_ENABLED": "true",
+        "OMI_LIVE_NCP_INPUT_PATH": (
+            ".external_sources/narrative-context-protocol/examples/"
+            "complete-storyform-template.json"
+        ),
+        "OMI_LIVE_NCP_VALIDATE_WITH_NODE": "true",
+    }
+    tool = _tools_by_name(_report(env))["ncp"]
+    assert tool["ncp_validate_with_node_env"] == "OMI_LIVE_NCP_VALIDATE_WITH_NODE"
+    assert tool["ncp_validate_with_node_enabled"] is True
+
+
+def test_ncp_t018b_preflight_does_not_read_input_file(monkeypatch, tmp_path) -> None:
+    """Preflight must NOT read the OMI_LIVE_NCP_INPUT_PATH file. We point
+    the env var at a path the test owns; if preflight ever reads it, the
+    file content sentinel would be flagged by the test's safety
+    assertions (read-only preflight cannot read or mutate the file)."""
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result(), env_aware=True)
+    sentinel = tmp_path / "should_not_be_read.json"
+    sentinel.write_text('{"would_be_read": true}', encoding="utf-8")
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_NCP_ENABLED": "true",
+            "OMI_LIVE_NCP_INPUT_PATH": str(sentinel),
+        }
+    )
+    tool = _tools_by_name(report)["ncp"]
+    assert tool["ncp_input_path_configured"] is True
+    assert tool["ncp_input_path_value"] == str(sentinel)
+    assert tool["status"] in {"enabled", "available", "disabled"}
+    # Preflight must not perform analysis or mutate state.
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+    # The sentinel file should be untouched (still on disk, content preserved).
+    assert sentinel.exists()
+    assert sentinel.read_text(encoding="utf-8") == '{"would_be_read": true}'

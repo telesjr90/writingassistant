@@ -19,6 +19,14 @@ scripts, and ``node``/``npm``/``node_modules`` are discoverable, and reports
 a known ``ajv`` moderate / ``fast-uri`` high npm audit caveat. T018A never
 runs ``npm install``, ``npm audit fix``, ``npm run validate:schema``, or
 ``npm run validate:file`` and never reads project data.
+
+T018B extends the ``ncp`` adapter probe with read-only configuration
+fields for the T018B live NCP candidate-import validation adapter. The
+probe surfaces the explicit ``OMI_LIVE_NCP_INPUT_PATH`` and the opt-in
+``OMI_LIVE_NCP_VALIDATE_WITH_NODE`` env vars as configuration only. The
+probe does not read, parse, validate, or write any NCP file even when
+the input path env var is set, and does not invoke Node or ``npm`` based
+on these env vars. The probe is read-only and never mutates state.
 """
 
 from __future__ import annotations
@@ -123,6 +131,17 @@ NCP_AUDIT_CAVEAT = (
     "as a network/server path; do not run npm audit fix in preflight."
 )
 
+# T018B live NCP candidate-import validation adapter env vars.
+# NCP_INPUT_PATH is the explicit owner-selected NCP JSON file path. The
+# live adapter is disabled by default and fail-closed when this is unset,
+# empty, outside the allowlisted roots, a symlink, a directory, or hidden
+# unsafe. NCP_VALIDATE_WITH_NODE is the opt-in for invoking the in-repo
+# Node ``validate:file`` subprocess. The opt-in is off by default and is
+# only honored against the explicit safe input file; it is never used
+# against project data.
+NCP_INPUT_PATH_ENV = "OMI_LIVE_NCP_INPUT_PATH"
+NCP_VALIDATE_WITH_NODE_ENV = "OMI_LIVE_NCP_VALIDATE_WITH_NODE"
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -213,7 +232,7 @@ def _package_json_script_names(package_json: dict[str, Any]) -> list[str]:
     return [str(name) for name in scripts.keys() if isinstance(name, str)]
 
 
-def _ncp_runtime_probe() -> dict[str, Any]:
+def _ncp_runtime_probe(env: Mapping[str, str] | None = None) -> dict[str, Any]:
     """Read-only NCP schema-validator surface probe.
 
     T018A scope: confirm the NCP source tree, ``package.json``, schema JSON,
@@ -226,10 +245,19 @@ def _ncp_runtime_probe() -> dict[str, Any]:
     ``npm run validate:file``. The probe does not import NCP as a Python
     module; it is a static, read-only surface inspection.
 
+    T018B addition: the probe ALSO surfaces the explicit
+    ``OMI_LIVE_NCP_INPUT_PATH`` and the opt-in
+    ``OMI_LIVE_NCP_VALIDATE_WITH_NODE`` env vars as configuration only.
+    The probe does not read, parse, validate, or write any NCP file even
+    when the input path env var is set. The probe does not invoke Node or
+    ``npm`` based on these env vars. The probe is read-only.
+
     Returns a flat dict of booleans, configured paths, and detail strings
     prefixed with ``ncp_``.
     """
     import json as _json  # local alias to keep the import scoped
+
+    effective_env: Mapping[str, str] = os.environ if env is None else env
 
     source_root = _REPO_ROOT / NCP_SOURCE_REL
     source_available = source_root.is_dir()
@@ -289,6 +317,12 @@ def _ncp_runtime_probe() -> dict[str, Any]:
     elif not node_modules_available:
         surface = "degraded"
 
+    ncp_input_path_value = _env_text(effective_env, NCP_INPUT_PATH_ENV) or ""
+    ncp_input_path_configured = bool(ncp_input_path_value.strip())
+    ncp_validate_with_node_enabled = _env_bool(
+        effective_env, NCP_VALIDATE_WITH_NODE_ENV
+    )
+
     if missing:
         detail = (
             "NCP schema-validator surface probe missing: "
@@ -309,7 +343,10 @@ def _ncp_runtime_probe() -> dict[str, Any]:
             "package scripts, node, npm, and node_modules all present; "
             "NCP is schema/interchange validation only, not automatic "
             "analysis runtime, and preflight does not execute "
-            "validate:schema or validate:file"
+            "validate:schema or validate:file. T018B live NCP candidate-"
+            "import validation adapter is disabled by default and requires "
+            "OMI_LIVE_NCP_INPUT_PATH to point at an explicit owner-selected "
+            "NCP JSON file; preflight does not auto-scan project data."
         )
 
     return {
@@ -337,6 +374,11 @@ def _ncp_runtime_probe() -> dict[str, Any]:
         ),
         "ncp_validator_status": surface,
         "ncp_audit_caveat": NCP_AUDIT_CAVEAT,
+        "ncp_input_path_env": NCP_INPUT_PATH_ENV,
+        "ncp_input_path_configured": ncp_input_path_configured,
+        "ncp_input_path_value": ncp_input_path_value,
+        "ncp_validate_with_node_env": NCP_VALIDATE_WITH_NODE_ENV,
+        "ncp_validate_with_node_enabled": ncp_validate_with_node_enabled,
         "ncp_detail": detail,
     }
 
@@ -884,7 +926,7 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "story_check_detail": detail,
         }
     elif adapter == "ncp":
-        probe = _ncp_runtime_probe()
+        probe = _ncp_runtime_probe(env)
         configured = probe["ncp_source_available"]
         available = probe["ncp_validator_available"]
         detail = probe["ncp_detail"]
@@ -921,6 +963,13 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "ncp_validator_available": probe["ncp_validator_available"],
             "ncp_validator_status": probe["ncp_validator_status"],
             "ncp_audit_caveat": probe["ncp_audit_caveat"],
+            "ncp_input_path_env": probe["ncp_input_path_env"],
+            "ncp_input_path_configured": probe["ncp_input_path_configured"],
+            "ncp_input_path_value": probe["ncp_input_path_value"],
+            "ncp_validate_with_node_env": probe["ncp_validate_with_node_env"],
+            "ncp_validate_with_node_enabled": probe[
+                "ncp_validate_with_node_enabled"
+            ],
             "ncp_detail": detail,
         }
     elif adapter == "subtxt":
@@ -1190,6 +1239,17 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
         )
         report["ncp_validator_status"] = dependency.get("ncp_validator_status")
         report["ncp_audit_caveat"] = dependency.get("ncp_audit_caveat")
+        report["ncp_input_path_env"] = dependency.get("ncp_input_path_env")
+        report["ncp_input_path_configured"] = dependency.get(
+            "ncp_input_path_configured"
+        )
+        report["ncp_input_path_value"] = dependency.get("ncp_input_path_value")
+        report["ncp_validate_with_node_env"] = dependency.get(
+            "ncp_validate_with_node_env"
+        )
+        report["ncp_validate_with_node_enabled"] = dependency.get(
+            "ncp_validate_with_node_enabled"
+        )
         report["ncp_detail"] = dependency.get("ncp_detail")
     return report
 

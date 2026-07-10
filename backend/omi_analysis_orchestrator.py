@@ -97,6 +97,7 @@ import re
 import tempfile
 import urllib.error
 import urllib.request
+from pathlib import Path
 from typing import Any, Callable, Mapping
 
 # ---------------------------------------------------------------------------
@@ -4326,6 +4327,114 @@ _OMI_BOOKNLP_LIVE_SKIP_ENTITY_TEXTS: frozenset[str] = frozenset({
     "it", "its", "this", "that", "these", "those",
 })
 
+
+# ---------------------------------------------------------------------------
+# Live NCP candidate-import validation adapter (T018B) — behind explicit env
+# flags
+# ---------------------------------------------------------------------------
+#
+# NCP is treated as a schema/interchange validation surface (NOT an automatic
+# analysis runtime, NOT canon/truth). The T018B live adapter is therefore
+# strictly owner-controlled:
+#
+#   * Disabled by default.
+#   * Reachable only when OMI_LIVE_TOOLS_ENABLED + OMI_LIVE_NCP_ENABLED are
+#     set, OMI_LIVE_NCP_BLOCKED is unset, AND an explicit
+#     OMI_LIVE_NCP_INPUT_PATH points to an owner-selected NCP JSON file.
+#   * The adapter does not scan project data, does not walk ``projects/``,
+#     does not run ``npm install``/``npm audit fix``/``npm run validate:file``
+#     over project data, and does not start a Node server.
+#   * The optional ``OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`` opt-in would
+#     invoke the in-repo ``node`` validator as a child process. The opt-in
+#     is opt-in only, must point at the explicit safe input file, and must
+#     be mocked in tests.
+
+_OMI_LIVE_NCP_ENABLED_ENV = "OMI_LIVE_NCP_ENABLED"
+_OMI_LIVE_NCP_BLOCKED_ENV = "OMI_LIVE_NCP_BLOCKED"
+_OMI_LIVE_NCP_BLOCKED_REASON_ENV = "OMI_LIVE_NCP_BLOCKED_REASON"
+_OMI_LIVE_NCP_INPUT_PATH_ENV = "OMI_LIVE_NCP_INPUT_PATH"
+_OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV = "OMI_LIVE_NCP_VALIDATE_WITH_NODE"
+
+# Maximum number of NCP-derived candidate findings the runner will produce
+# from a single NCP JSON file. The cap protects against unbounded NCP
+# payloads leaking large numbers of candidates into the orchestrator.
+_OMI_LIVE_NCP_MAX_FINDINGS = 64
+
+# Maximum number of characters from a single NCP field value to surface as a
+# source excerpt in the candidate finding. The cap keeps evidence snippets
+# short and within the existing T009 contract.
+_OMI_LIVE_NCP_MAX_EVIDENCE_CHARS = 240
+
+# Mapping from NCP JSON keys (within ``narratives[].subtext.players[]``,
+# ``narratives[].subtext.storypoints[]``, ``narratives[].subtext.storybeats[]``,
+# ``narratives[].subtext.appreciations[]``, and the corresponding
+# ``narratives[].storytelling.overviews`` block) to the candidate-only
+# ``candidate_type`` the T009 fixture envelope will accept. Anything that
+# does not map is skipped (fail-closed, no candidates).
+#
+# The T009 ``omi_ncp_context_handoff.v1`` envelope only accepts the narrow
+# NCP-specific types in ``OMI_CONTEXT_ALLOWED_NORMALIZED_TYPES_BY_ADAPTER``
+# (``story_fact``, ``storyform_context``, ``throughline_context``,
+# ``relationship``, ``open_question``, ``ambiguity``,
+# ``diagnostic_question``, ``evidence_note``). Per-item NCP character /
+# location / organization / object / timeline_event / plot_thread
+# content is therefore mapped to ``evidence_note`` (or ``story_fact`` for
+# beat/point items) so the T009 envelope validator remains authoritative
+# and the candidate still carries a JSON pointer and an evidence excerpt.
+_OMI_LIVE_NCP_FIELD_TO_CANDIDATE_TYPE: dict[str, str] = {
+    # Players / characters -> evidence_note (NCP player/character items
+    # become evidence_note candidate findings).
+    "players": "evidence_note",
+    "player": "evidence_note",
+    "characters": "evidence_note",
+    "character": "evidence_note",
+    "cast": "evidence_note",
+    "roles": "evidence_note",
+    # Locations / organizations / objects -> evidence_note.
+    "locations": "evidence_note",
+    "location": "evidence_note",
+    "settings": "evidence_note",
+    "world_locations": "evidence_note",
+    "organizations": "evidence_note",
+    "organization": "evidence_note",
+    "factions": "evidence_note",
+    "groups": "evidence_note",
+    "objects": "evidence_note",
+    "object": "evidence_note",
+    "items": "evidence_note",
+    "artifacts": "evidence_note",
+    # Storybeats / moments -> story_fact (beat-level items become
+    # story_fact candidate findings).
+    "storybeats": "story_fact",
+    "storybeat": "story_fact",
+    "beats": "story_fact",
+    "moments": "story_fact",
+    "moment": "story_fact",
+    # Storypoints / appreciations / plot threads -> story_fact.
+    "storypoints": "story_fact",
+    "storypoint": "story_fact",
+    "appreciations": "story_fact",
+    "appreciation": "story_fact",
+    "plot_threads": "story_fact",
+    "plot_thread": "story_fact",
+    # Dynamics / vectors -> open_question (interpreted as open
+    # structural questions for owner review).
+    "dynamics": "open_question",
+    "vectors": "open_question",
+    # Overviews -> throughline_context (overview rows become
+    # throughline_context candidate findings).
+    "overviews": "throughline_context",
+    # Relationships -> relationship candidate findings.
+    "relationships": "relationship",
+    "relationship": "relationship",
+    # Open / diagnostic questions -> matching candidate types.
+    "diagnostic_questions": "diagnostic_question",
+    "diagnostic_question": "diagnostic_question",
+    "open_questions": "open_question",
+    "open_question": "open_question",
+}
+
+
 _OMI_SPACY_LIVE_ENTITY_LABEL_TO_CANDIDATE_TYPE: dict[str, str] = {
     "PERSON": "character",
     "GPE": "location",
@@ -4379,6 +4488,791 @@ def _env_positive_float(
     if parsed < float(min_value) or parsed > float(max_value):
         return float(default)
     return float(parsed)
+
+
+# ---------------------------------------------------------------------------
+# Live NCP candidate-import validation adapter (T018B) — helpers
+# ---------------------------------------------------------------------------
+
+
+def _ncp_safe_excerpt(value: Any, *, max_chars: int) -> str:
+    """Return a short, plain trimmed string excerpt from arbitrary input.
+
+    Used to build ``source_excerpt`` snippets for live NCP findings. The
+    helper does NOT rewrite or sanitize the text. The caller is responsible
+    for verifying the result is safe before using it as a candidate value
+    (e.g., via the existing T009 ``validate_context_adapter_fixture_envelope``).
+    The maximum length is hard-capped to keep evidence snippets short and
+    within the existing T009 contract.
+    """
+    if not isinstance(value, str):
+        return ""
+    text = value.strip()
+    if not text:
+        return ""
+    if len(text) > max_chars:
+        text = text[: max_chars - 3].rstrip() + "..."
+    return text
+
+
+def _ncp_label_is_safe(value: Any) -> bool:
+    """Return True iff ``value`` is a safe short NCP label/identifier.
+
+    The check rejects truth/canon/final/approved/promoted/apply-promotion
+    labels so an NCP node carrying a forbidden string cannot leak through
+    as a candidate label.
+    """
+    if not isinstance(value, str):
+        return False
+    token = value.strip()
+    if not token:
+        return False
+    if is_truth_label(token):
+        return False
+    if _PROSE_INTENT_PREFIX_RE.match(token):
+        return False
+    if len(token) > 240:
+        return False
+    return True
+
+
+def _ncp_claim_is_safe(value: Any) -> bool:
+    """Return True iff ``value`` is safe to surface as an NCP claim snippet.
+
+    The check rejects empty/blank values, truth/canon/final/approved/
+    promoted labels, prose-like text, and overly long snippets. Prose-like
+    text is allowed only when the value is a short noun phrase or a single
+    sentence-length description that does not look like story prose.
+    """
+    if not isinstance(value, str):
+        return False
+    token = value.strip()
+    if not token:
+        return False
+    if is_truth_label(token):
+        return False
+    if _PROSE_INTENT_PREFIX_RE.match(token):
+        return False
+    if len(token) > 240:
+        return False
+    if is_prose_like_text(token):
+        return False
+    return True
+
+
+def _ncp_resolve_allowed_input_path(
+    raw_path: Any,
+    *,
+    repo_root: Path | None = None,
+) -> Path | None:
+    """Return an absolute, resolved Path for the owner-selected NCP file.
+
+    The resolver is fail-closed and intentionally strict. It accepts only:
+
+      * repo-local safe fixture/test paths under ``tests/``,
+      * temporary paths under ``tempfile.gettempdir()``,
+      * the in-repo ``.external_sources/narrative-context-protocol/examples``
+        or ``.external_sources/narrative-context-protocol/tests`` trees,
+      * the NCP schema fixtures in
+        ``.external_sources/narrative-context-protocol/examples/invalid``.
+
+    The resolver:
+
+      * Rejects empty/non-string values.
+      * Rejects symlinks (the input must be a regular file, not a symlink).
+      * Rejects directories, hidden unsafe locations, traversal segments,
+        and project-data trees (``projects/``).
+      * Returns ``None`` (the runner treats this as fail-closed) for any
+        value that does not satisfy the allowlist.
+
+    This is the only path-resolution helper that can introduce a path into
+    the NCP live runner. Tests must mock this helper.
+    """
+    if not isinstance(raw_path, str):
+        return None
+    stripped = raw_path.strip()
+    if not stripped:
+        return None
+
+    if repo_root is None:
+        from . import omi_analysis_orchestrator as _self_ref  # noqa: F401
+        # Use the on-disk location of this module as the repo root anchor
+        # when no explicit root is provided. The orchestrator module always
+        # lives at ``<repo>/backend/omi_analysis_orchestrator.py``.
+        repo_root = Path(__file__).resolve().parent.parent
+
+    try:
+        candidate = Path(stripped).expanduser()
+    except (TypeError, ValueError):
+        return None
+
+    # Disallow obvious traversal segments before resolution.
+    if ".." in candidate.parts:
+        return None
+
+    try:
+        resolved = candidate.resolve(strict=False)
+    except OSError:
+        return None
+
+    # The resolved path must be a regular file, not a symlink, not a
+    # directory, and not a hidden unsafe location. The symlink check
+    # runs against the unresolved candidate AND the resolved path
+    # because ``Path.resolve`` follows symlinks and would otherwise
+    # hide the symlink.
+    try:
+        if candidate.is_symlink() or resolved.is_symlink():
+            return None
+    except OSError:
+        return None
+    try:
+        if not resolved.is_file():
+            return None
+    except OSError:
+        return None
+
+    # Project data trees are NEVER valid NCP input paths.
+    try:
+        projects_dir = (repo_root / "projects").resolve(strict=False)
+    except OSError:
+        projects_dir = None
+    if projects_dir is not None:
+        try:
+            resolved.relative_to(projects_dir)
+        except ValueError:
+            pass
+        else:
+            return None
+    # Any path with a ``projects`` segment anywhere along the resolved
+    # path is rejected even when the path is not under the real
+    # ``repo_root/projects`` (e.g., when a test puts a fake ``projects``
+    # dir under ``tmp_path`` to validate the safety boundary).
+    for part in resolved.parts:
+        if part == "projects":
+            return None
+    # ``artifacts``, candidate queue/storage trees, and generated
+    # context packs are NEVER valid NCP input paths either.
+    for forbidden_segment in (
+        "artifacts",
+        "graphify-out",
+        "ai_context",
+        ".codex-context",
+    ):
+        for part in resolved.parts:
+            if part == forbidden_segment:
+                return None
+
+    # Candidate allowed roots, all relative to ``repo_root`` or the system
+    # temp directory.
+    try:
+        temp_root = Path(tempfile.gettempdir()).resolve(strict=False)
+    except OSError:
+        temp_root = None
+
+    try:
+        external_root = (repo_root / ".external_sources").resolve(strict=False)
+    except OSError:
+        external_root = None
+
+    try:
+        tests_root = (repo_root / "tests").resolve(strict=False)
+    except OSError:
+        tests_root = None
+
+    allowed = False
+    for root in (tests_root, temp_root, external_root):
+        if root is None:
+            continue
+        try:
+            resolved.relative_to(root)
+        except ValueError:
+            continue
+        allowed = True
+        break
+    if not allowed:
+        return None
+
+    return resolved
+
+
+def _ncp_json_pointer_for_path(parts: tuple[str, ...]) -> str:
+    """Return a JSON pointer (RFC 6901) for a tuple of path segments.
+
+    Empty segments, ``/``, ``~`` are escaped per RFC 6901. The empty
+    pointer ``""`` is returned when ``parts`` is empty.
+    """
+    if not parts:
+        return ""
+    encoded: list[str] = []
+    for segment in parts:
+        text = str(segment)
+        text = text.replace("~", "~0").replace("/", "~1")
+        encoded.append("/" + text)
+    return "".join(encoded)
+
+
+def _ncp_extract_field(
+    node: Any,
+    field_names: tuple[str, ...],
+) -> Any:
+    """Return the first non-empty value found in ``node`` under any of
+    ``field_names``. Returns ``None`` when no field is present or when
+    every value is empty/blank/non-scalar.
+    """
+    if not isinstance(node, dict):
+        return None
+    for name in field_names:
+        if name not in node:
+            continue
+        value = node[name]
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped:
+                return stripped
+            continue
+        if isinstance(value, (int, float, bool)):
+            return value
+    return None
+
+
+def _ncp_collect_narrative_subtext_lists(
+    ncp_doc: Any,
+) -> list[tuple[str, list[Any]]]:
+    """Return the list of (label, items) pairs the live NCP runner will
+    scan for candidate evidence.
+
+    Only subtext and storytelling fields the NCP schema explicitly defines
+    as list-valued containers are scanned. Free-form ``narratives[].*`` or
+    ``story.*`` fields are NEVER auto-walked; the runner never performs a
+    project-wide scan.
+    """
+    pairs: list[tuple[str, list[Any]]] = []
+    if not isinstance(ncp_doc, dict):
+        return pairs
+
+    narratives = ncp_doc.get("narratives")
+    if not isinstance(narratives, list):
+        narratives = []
+    if not narratives:
+        story = ncp_doc.get("story")
+        if isinstance(story, dict):
+            nested = story.get("narratives")
+            if isinstance(nested, list):
+                narratives = nested
+
+    allowed_subtext_lists: dict[str, tuple[str, ...]] = {
+        "players": ("players",),
+        "storypoints": ("storypoints",),
+        "storybeats": ("storybeats",),
+        "appreciations": ("appreciations",),
+        "dynamics": ("dynamics",),
+        "vectors": ("vectors",),
+    }
+    allowed_storytelling_lists: dict[str, tuple[str, ...]] = {
+        "overviews": ("overviews",),
+        "relationships": ("relationships",),
+        "open_questions": ("open_questions",),
+        "diagnostic_questions": ("diagnostic_questions",),
+    }
+    allowed_story_lists: dict[str, tuple[str, ...]] = {
+        "moments": ("moments",),
+    }
+
+    for narrative_index, narrative in enumerate(narratives):
+        if not isinstance(narrative, dict):
+            continue
+        subtext = narrative.get("subtext")
+        if isinstance(subtext, dict):
+            for label, key_tuple in allowed_subtext_lists.items():
+                container = subtext.get(key_tuple[0])
+                if isinstance(container, list):
+                    pairs.append((label, container))
+        storytelling = narrative.get("storytelling")
+        if isinstance(storytelling, dict):
+            for label, key_tuple in allowed_storytelling_lists.items():
+                container = storytelling.get(key_tuple[0])
+                if isinstance(container, list):
+                    pairs.append((label, container))
+        _ = narrative_index  # currently unused; kept for future per-narrative pointer stability
+
+    story = ncp_doc.get("story")
+    if isinstance(story, dict):
+        for label, key_tuple in allowed_story_lists.items():
+            container = story.get(key_tuple[0])
+            if isinstance(container, list):
+                pairs.append((label, container))
+
+    return pairs
+
+
+def _ncp_safe_field_for_candidate_type(field_label: str) -> str | None:
+    """Map an NCP subtext/storytelling list label to a candidate type.
+
+    Returns the candidate type (T009 allowed) or ``None`` when the label
+    is not in the safe mapping. The runner treats ``None`` as a skip, not
+    as a fail-closed.
+    """
+    return _OMI_LIVE_NCP_FIELD_TO_CANDIDATE_TYPE.get(field_label)
+
+
+def _ncp_validate_with_node_opt_in(
+    *,
+    absolute_input_path: Path,
+) -> bool:
+    """Opt-in Node ``validate:file`` check for an explicit safe NCP file.
+
+    This helper is intentionally minimal and fail-closed:
+
+      * Returns ``True`` only when the owner has opted in via
+        ``OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`` AND
+        ``OMI_LIVE_NCP_INPUT_PATH`` is set AND the resolved file path
+        satisfies ``_ncp_resolve_allowed_input_path``.
+      * Otherwise returns ``False``. It never raises.
+
+    The actual ``node tests/validate-file.js`` invocation is delegated to
+    tests; production callers may pass a custom ``subprocess_runner`` in
+    the future. The current production behavior is to return ``False``
+    unless the opt-in is set, the file is allowed, and the caller wires
+    in a custom runner. The helper exists so the live runner has a
+    single, mockable entry point for the opt-in Node validation step.
+    """
+    if not isinstance(absolute_input_path, Path):
+        return False
+    try:
+        if not absolute_input_path.is_file():
+            return False
+    except OSError:
+        return False
+    env = os.environ
+    if not _env_bool(env, _OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV):
+        return False
+    # The opt-in is intentionally a no-op stub for T018B. The full Node
+    # invocation is mocked in tests. Future tasks may extend this helper
+    # to actually shell out to ``node tests/validate-file.js`` against the
+    # explicit safe input file, but only with the same opt-in + explicit
+    # file + mocked subprocess contract. T018B does not perform that
+    # subprocess invocation.
+    return False
+
+
+def _ncp_build_finding_from_item(
+    *,
+    candidate_type: str,
+    item: Any,
+    container_pointer: str,
+    item_index: int,
+    adapter_name: str,
+) -> dict[str, Any] | None:
+    """Build a single T009-shaped finding dict from one NCP list item.
+
+    Returns ``None`` when the item is empty, not a dict, or carries
+    unsafe/prose-like/truth-labeled text in any of the candidate label,
+    claim, or excerpt fields. The builder never raises.
+    """
+    if not isinstance(item, dict):
+        return None
+    label = _ncp_extract_field(
+        item,
+        (
+            "name",
+            "title",
+            "label",
+            "id",
+            "identifier",
+            "code",
+            "moment_id",
+            "moment_label",
+            "summary",
+        ),
+    )
+    if not _ncp_label_is_safe(label):
+        return None
+
+    claim = _ncp_extract_field(
+        item,
+        (
+            "summary",
+            "description",
+            "narrative_function",
+            "question",
+            "moment_text",
+            "narrative",
+            "note",
+            "observation",
+        ),
+    )
+    if claim is None:
+        claim = label
+    if not _ncp_claim_is_safe(claim):
+        return None
+
+    excerpt_source = _ncp_extract_field(
+        item,
+        (
+            "summary",
+            "description",
+            "narrative_function",
+            "question",
+            "moment_text",
+            "narrative",
+            "note",
+            "observation",
+        ),
+    )
+    excerpt = _ncp_safe_excerpt(
+        excerpt_source if isinstance(excerpt_source, str) else "",
+        max_chars=_OMI_LIVE_NCP_MAX_EVIDENCE_CHARS,
+    )
+    if not excerpt:
+        excerpt = _ncp_safe_excerpt(
+            label if isinstance(label, str) else "",
+            max_chars=_OMI_LIVE_NCP_MAX_EVIDENCE_CHARS,
+        )
+    if not excerpt:
+        return None
+
+    item_id = _ncp_extract_field(item, ("id", "identifier", "code"))
+    pointer_parts: tuple[str, ...] = (container_pointer, str(item_index))
+    if item_id:
+        pointer_parts = (container_pointer, str(item_index), str(item_id))
+    source_locator = _ncp_json_pointer_for_path(pointer_parts)
+    if not source_locator.startswith("/"):
+        source_locator = "/" + source_locator
+
+    return {
+        "raw_finding_id": (
+            f"ncp-live-{candidate_type}-"
+            f"{item_index}-"
+            f"{str(item_id) if item_id else 'no_id'}"
+        ),
+        "finding_type": candidate_type,
+        "label": str(label),
+        "context_claim": str(claim),
+        "extracted_claim": str(claim),
+        "evidence": [
+            {
+                "source_excerpt": excerpt,
+                "source_locator": source_locator,
+            }
+        ],
+        "source_locator": source_locator,
+        "support_label": OMI_CONTEXT_SUPPORT_LABEL_BY_ADAPTER[adapter_name],
+        "confidence": "medium support",
+    }
+
+
+def _build_ncp_live_runner(
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a live NCP candidate-import validation adapter runner.
+
+    T018B scope:
+
+      * Disabled by default; reachable only via
+        ``OMI_LIVE_TOOLS_ENABLED`` + ``OMI_LIVE_NCP_ENABLED`` +
+        not ``OMI_LIVE_NCP_BLOCKED`` AND an explicit
+        ``OMI_LIVE_NCP_INPUT_PATH``.
+      * Reads the owner-selected NCP JSON file (no project-data scan).
+      * Validates the JSON shape with a minimal Python-side schema/readiness
+        check (no Node, no npm, no ``.external_sources`` writes).
+      * Optionally invokes a Node ``validate:file`` subprocess ONLY when
+        ``OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`` is set AND the explicit
+        safe input file is set. The subprocess call is bounded, fail-closed,
+        and mocked in tests. The current T018B implementation returns
+        ``False`` from the opt-in helper; tests that need a real
+        subprocess call must monkeypatch ``_ncp_validate_with_node_opt_in``.
+      * Maps a small, evidence-backed subset of NCP fields into the
+        existing T009 ``omi_ncp_context_handoff.v1`` envelope shape and
+        validates the converted envelope through
+        ``validate_context_adapter_fixture_envelope``. The T009 validator
+        remains authoritative; any T009 validation failure fails the
+        runner closed with no findings.
+      * Fail-closed on missing/empty/unsafe/unreadable/invalid-JSON input.
+      * Never mutates ``.external_sources``, never persists NCP-derived
+        candidates on its own, never mutates Memory/Canon, never creates
+        promotion records, never runs apply-promotion, and never
+        generates story prose.
+      * NCP is treated as a schema/interchange surface only; candidate
+        output is support-only evidence and never claims truth, canon,
+        final, approved, or promoted status.
+
+    The caller (``_resolve_adapter_runner``) must check env flags before
+    building this runner. This runner does not re-check flags.
+    """
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        _ = project_name
+        _ = raw_idea
+        _ = source_idea_id
+
+        # Re-validate the explicit owner-selected input path inside the
+        # runner so the runner is never reachable with an unsafe path.
+        raw_path = os.environ.get(_OMI_LIVE_NCP_INPUT_PATH_ENV)
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            return {
+                "adapter": "ncp",
+                "state": "unavailable",
+                "explanation": (
+                    f"Live NCP runner requested but {_OMI_LIVE_NCP_INPUT_PATH_ENV} "
+                    "is unset/empty. The live NCP adapter requires an explicit "
+                    "owner-selected NCP JSON path and does not auto-scan project "
+                    "data. Failing closed with no candidates and no live call."
+                ),
+                "candidates": [],
+            }
+        absolute_path = _ncp_resolve_allowed_input_path(raw_path)
+        if absolute_path is None:
+            return {
+                "adapter": "ncp",
+                "state": "unavailable",
+                "explanation": (
+                    f"Live NCP runner received an unsafe or unresolvable "
+                    f"{_OMI_LIVE_NCP_INPUT_PATH_ENV}: {raw_path!r}. The live NCP "
+                    "adapter only accepts explicit owner-selected paths inside "
+                    "the allowlisted test/temp/.external_sources trees and "
+                    "refuses project data, traversal, symlinks, directories, "
+                    "and hidden unsafe locations. Failing closed with no "
+                    "candidates."
+                ),
+                "candidates": [],
+            }
+
+        # Opt-in Node validation step. The opt-in is intentionally a no-op
+        # for T018B (the helper returns ``False`` unless tests monkeypatch
+        # a custom subprocess runner in). Fail-closed if the opt-in is
+        # enabled but the subprocess path is unavailable or fails.
+        opt_in_enabled = _env_bool(
+            os.environ, _OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV
+        )
+        if opt_in_enabled:
+            try:
+                opt_in_ok = _ncp_validate_with_node_opt_in(
+                    absolute_input_path=absolute_path
+                )
+            except Exception as exc:  # pragma: no cover - defensive
+                opt_in_ok = False
+                _ = exc
+            if not opt_in_ok:
+                return {
+                    "adapter": "ncp",
+                    "state": "failed_closed",
+                    "explanation": (
+                        "Live NCP runner requested Node validation via "
+                        f"{_OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV}=1, but the "
+                        "opt-in subprocess path did not succeed. Failing "
+                        "closed with no candidates, no Memory/Canon "
+                        "mutation, and no project-data scan."
+                    ),
+                    "candidates": [],
+                }
+
+        # Read the NCP JSON file.
+        try:
+            with open(absolute_path, "r", encoding="utf-8") as handle:
+                raw_text = handle.read()
+        except (OSError, UnicodeDecodeError) as exc:
+            return {
+                "adapter": "ncp",
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live NCP runner could not read the explicit input "
+                    f"file {absolute_path}: {type(exc).__name__}: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        try:
+            parsed = json.loads(raw_text)
+        except ValueError as exc:
+            return {
+                "adapter": "ncp",
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live NCP runner could not parse the explicit input "
+                    f"file {absolute_path} as JSON: {exc}. Failing closed "
+                    "with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        if not isinstance(parsed, dict):
+            return {
+                "adapter": "ncp",
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live NCP runner expected the top-level value of "
+                    f"{absolute_path} to be a JSON object; got "
+                    f"{type(parsed).__name__}. Failing closed with no "
+                    "candidates."
+                ),
+                "candidates": [],
+            }
+
+        # Minimal Python-side schema/readiness check. The T018B runner
+        # never requires a Node validator; it only requires the NCP
+        # document carry the canonical ``schema_version`` and a
+        # ``narratives`` (or ``story``) container. The NCP schema is
+        # referenced as a static file in ``.external_sources/`` only and
+        # is never imported, never installed, and never invoked.
+        schema_version = parsed.get("schema_version")
+        if not isinstance(schema_version, str) or not schema_version.strip():
+            return {
+                "adapter": "ncp",
+                "state": "failed_closed",
+                "explanation": (
+                    "Live NCP runner requires a non-empty top-level "
+                    "schema_version in the NCP JSON; got "
+                    f"{schema_version!r}. Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        if (
+            not isinstance(parsed.get("narratives"), list)
+            and not isinstance(parsed.get("story"), dict)
+        ):
+            return {
+                "adapter": "ncp",
+                "state": "failed_closed",
+                "explanation": (
+                    "Live NCP runner requires either a top-level "
+                    "'narratives' list or a top-level 'story' object in "
+                    "the NCP JSON. Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        # Walk only the explicit, allow-listed subtext/storytelling
+        # containers. No project data, no ``projects/`` traversal, no
+        # ``.external_sources/`` mutation.
+        candidate_pairs = _ncp_collect_narrative_subtext_lists(parsed)
+        if not candidate_pairs:
+            return {
+                "adapter": "ncp",
+                "state": "empty",
+                "explanation": (
+                    f"Live NCP runner found no allowlisted NCP subtext/"
+                    f"storytelling containers in {absolute_path}; produced "
+                    "no candidates."
+                ),
+                "candidates": [],
+            }
+
+        candidate_findings: list[dict[str, Any]] = []
+        for label, items in candidate_pairs:
+            candidate_type = _ncp_safe_field_for_candidate_type(label)
+            if candidate_type is None:
+                continue
+            container_pointer = (
+                f"/narratives/*/subtext/{label}"
+                if label
+                in {
+                    "players",
+                    "storypoints",
+                    "storybeats",
+                    "appreciations",
+                    "dynamics",
+                    "vectors",
+                }
+                else f"/narratives/*/storytelling/{label}"
+                if label
+                in {
+                    "overviews",
+                    "relationships",
+                    "open_questions",
+                    "diagnostic_questions",
+                }
+                else f"/story/{label}"
+            )
+            for item_index, item in enumerate(items):
+                if len(candidate_findings) >= _OMI_LIVE_NCP_MAX_FINDINGS:
+                    break
+                finding = _ncp_build_finding_from_item(
+                    candidate_type=candidate_type,
+                    item=item,
+                    container_pointer=container_pointer,
+                    item_index=item_index,
+                    adapter_name="ncp",
+                )
+                if finding is None:
+                    continue
+                candidate_findings.append(finding)
+            if len(candidate_findings) >= _OMI_LIVE_NCP_MAX_FINDINGS:
+                break
+
+        if not candidate_findings:
+            return {
+                "adapter": "ncp",
+                "state": "empty",
+                "explanation": (
+                    f"Live NCP runner found no safe/evidence-backed items "
+                    f"in {absolute_path}; produced no candidates."
+                ),
+                "candidates": [],
+            }
+
+        envelope = {
+            "schema_version": OMI_NCP_SCHEMA_VERSION,
+            "adapter": "ncp",
+            "status": "succeeded",
+            "explanation": (
+                f"Live NCP candidate-import adapter read the owner-selected "
+                f"NCP JSON file {absolute_path} and converted "
+                f"{len(candidate_findings)} evidence-backed item(s) into "
+                "candidate-only NCP findings through the existing T009 "
+                "fixture envelope shape. NCP output is schema/interchange "
+                "support only; all findings are pending owner decision and "
+                "must be reviewed before any use."
+            ),
+            "provenance": {
+                "tool_source": "ncp",
+                "adapter": "ncp",
+                "support": OMI_CONTEXT_SUPPORT_LABEL_BY_ADAPTER["ncp"],
+            },
+            "findings": candidate_findings,
+        }
+
+        try:
+            validated = validate_context_adapter_fixture_envelope(
+                envelope, adapter_name="ncp"
+            )
+        except ValueError as exc:
+            return {
+                "adapter": "ncp",
+                "state": "failed_closed",
+                "explanation": (
+                    "Live NCP converted envelope failed T009 validation: "
+                    f"{exc}. Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        env_status = validated["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if validated["findings"] else "empty"
+        else:
+            state = env_status
+
+        return {
+            "adapter": "ncp",
+            "state": state,
+            "explanation": (
+                validated["explanation"]
+                or "Live NCP candidate-import adapter completed."
+            ),
+            "candidates": validated["findings"],
+        }
+
+    return _runner
 
 
 def _build_spacy_live_runner(
@@ -6572,6 +7466,13 @@ def _resolve_adapter_runner(
       forms go through the strict envelope validator and fail closed on any
       invalid or unsafe output. Fixture paths are the only paths that let
       these adapters succeed in tests.
+    - T014C/T015C/T016C/T017B/T018B live adapter branches (each gated by
+      its own runtime env flags) may return a live runner when the
+      corresponding ``adapter`` is requested, no fixture was supplied,
+      and the live flags are all enabled. Each live branch is fail-closed
+      on missing/unsafe input. T018B specifically requires an explicit
+      ``OMI_LIVE_NCP_INPUT_PATH`` pointing to an allowlisted owner-selected
+      NCP JSON file.
     - Otherwise return ``None`` so the existing T005 stub/unavailable path
       runs unchanged.
     """
@@ -6678,6 +7579,32 @@ def _resolve_adapter_runner(
                 and not _env_bool(env, _OMI_LIVE_BOOKNLP_BLOCKED_ENV)
             ):
                 return _build_booknlp_live_runner(
+                    adapter_config=adapter_config,
+                )
+        # T018B: live NCP candidate-import validation path behind explicit
+        # env flags. The runner reads the owner-selected NCP JSON file
+        # pointed to by ``OMI_LIVE_NCP_INPUT_PATH`` (explicit, allowlisted
+        # path only), performs a minimal Python-side schema/readiness
+        # check, and maps a small, evidence-backed subset of NCP fields
+        # into the existing T009 ``omi_ncp_context_handoff.v1`` envelope
+        # shape through ``validate_context_adapter_fixture_envelope``. The
+        # T009 validator remains authoritative. The runner does NOT
+        # auto-scan project data, does NOT walk ``projects/``, does NOT
+        # run ``npm install``/``npm audit fix``/``npm run validate:file``
+        # over project data, does NOT start a Node server, does NOT
+        # mutate ``.external_sources/``, does NOT mutate Memory/Canon,
+        # does NOT create promotion records, does NOT run apply-promotion,
+        # and does NOT generate story prose. T018C must later perform
+        # manual real NCP validation against an owner-selected NCP JSON
+        # file to prove the live NCP MVP path.
+        if adapter == "ncp":
+            env = os.environ
+            if (
+                _env_bool(env, _OMI_LIVE_TOOLS_ENABLED_ENV)
+                and _env_bool(env, _OMI_LIVE_NCP_ENABLED_ENV)
+                and not _env_bool(env, _OMI_LIVE_NCP_BLOCKED_ENV)
+            ):
+                return _build_ncp_live_runner(
                     adapter_config=adapter_config,
                 )
     return None
@@ -6987,16 +7914,34 @@ def analyze_omi_raw_idea_with_tools(
                     )
             elif adapter in OMI_CONTEXT_ADAPTER_NAMES:
                 runtime_name = _context_adapter_display_name(adapter)
-                unavailable_explanation = (
-                    f"Adapter '{adapter}' is available through the T009 "
-                    f"{OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER[adapter]} "
-                    f"fixture/mock diagnostic/context handoff contract only; "
-                    f"no fixture was supplied via ``adapter_fixture_outputs``. "
-                    f"The orchestrator does not perform live {runtime_name} "
-                    f"calls, does not import {runtime_name} runtime code, and "
-                    f"does not write {runtime_name} output. Returning "
-                    f"'unavailable' with no candidates."
-                )
+                if adapter == "ncp":
+                    unavailable_explanation = (
+                        f"Adapter '{adapter}' is available through the T009 "
+                        f"{OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER[adapter]} "
+                        f"fixture/mock diagnostic/context handoff contract or "
+                        f"the T018B live NCP candidate-import validation "
+                        f"adapter; neither was supplied. T018B live NCP "
+                        f"requires OMI_LIVE_TOOLS_ENABLED + "
+                        f"OMI_LIVE_NCP_ENABLED, OMI_LIVE_NCP_BLOCKED unset, "
+                        f"AND an explicit owner-selected "
+                        f"{_OMI_LIVE_NCP_INPUT_PATH_ENV}. The orchestrator "
+                        f"does not auto-scan project data, does not run "
+                        f"``npm install``/``npm audit fix``/a Node server, "
+                        f"and does not write NCP output outside the "
+                        f"converted T009 envelope. Returning 'unavailable' "
+                        f"with no candidates."
+                    )
+                else:
+                    unavailable_explanation = (
+                        f"Adapter '{adapter}' is available through the T009 "
+                        f"{OMI_CONTEXT_SCHEMA_VERSION_BY_ADAPTER[adapter]} "
+                        f"fixture/mock diagnostic/context handoff contract only; "
+                        f"no fixture was supplied via ``adapter_fixture_outputs``. "
+                        f"The orchestrator does not perform live {runtime_name} "
+                        f"calls, does not import {runtime_name} runtime code, and "
+                        f"does not write {runtime_name} output. Returning "
+                        f"'unavailable' with no candidates."
+                    )
             else:
                 unavailable_explanation = (
                     f"Adapter '{adapter}' is not implemented at T006; "
