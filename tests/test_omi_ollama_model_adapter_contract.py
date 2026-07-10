@@ -737,3 +737,147 @@ def test_existing_fixture_ollama_tests_still_pass() -> None:
         persist_candidates=False,
     )
     _assert_ollama_failed_closed(result4)
+
+
+# ---------------------------------------------------------------------------
+# T015E — Disable Qwen thinking mode for live Ollama structured extraction
+# ---------------------------------------------------------------------------
+
+
+def test_live_ollama_request_payload_includes_think_false(
+    monkeypatch: Any,
+) -> None:
+    """Live Ollama /api/chat payload includes top-level ``think: false``.
+
+    Qwen3 thinking-mode output would otherwise consume the response budget
+    and leave ``message.content`` empty. The top-level ``think`` field is
+    the Ollama-level switch to disable thinking output.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    bodies: list[bytes] = []
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        bodies.append(request.data)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert len(bodies) == 1
+    sent_body = json.loads(bodies[0].decode("utf-8"))
+    assert sent_body.get("think") is False
+    assert sent_body.get("stream") is False
+    assert sent_body.get("model") == "qwen3:8b"
+
+
+def test_live_ollama_parses_extraction_json_only_from_message_content(
+    monkeypatch: Any,
+) -> None:
+    """Adapter extracts JSON only from ``message.content``, not ``message.thinking``.
+
+    Even if Qwen3 thinking-mode output contains a valid-looking extraction
+    envelope, the adapter must read only ``message.content`` and must not
+    treat ``message.thinking`` as extraction output.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    valid_extraction_in_thinking = json.dumps({
+        "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+        "adapter": "ollama_model",
+        "status": "succeeded",
+        "explanation": "embedded in thinking trace (must be ignored)",
+        "findings": [
+            {
+                "candidate_type": "character",
+                "label": "Thinking Leaked Character",
+                "extracted_claim": (
+                    "Thinking Leaked Character appears in the thinking trace"
+                ),
+                "evidence": [
+                    {
+                        "source_excerpt": (
+                            "Owner note names Thinking Leaked Character"
+                        ),
+                        "source_locator": "raw_idea:L1:C0-78",
+                    }
+                ],
+                "source_locator": "raw_idea:L1:C0-78",
+                "support_label": "ollama model support strength only",
+            }
+        ],
+    })
+    content_extraction = _valid_live_model_content()
+    _mock_urlopen(
+        monkeypatch,
+        {
+            "model": "qwen3:8b",
+            "created_at": "2024-01-01T00:00:00Z",
+            "message": {
+                "role": "assistant",
+                "content": content_extraction,
+                "thinking": valid_extraction_in_thinking,
+            },
+            "done": True,
+        },
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    finding = _assert_valid_ollama_result(result)
+    assert finding["label"] == "Test Character Alpha"
+    assert "Thinking Leaked Character" not in json.dumps(result["findings"])
+
+
+def test_live_ollama_empty_content_with_thinking_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Empty ``message.content`` with non-empty ``message.thinking`` fails closed.
+
+    This is the exact failure shape Qwen3 thinking-mode produces when the
+    response budget is consumed by thinking output: ``message.content`` is
+    empty and ``message.thinking`` is non-empty. The adapter must fail
+    closed with no findings and must not parse ``message.thinking``.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    thinking_trace = (
+        "Let me analyze the raw idea and extract candidate findings. "
+        "First, identify character entities. Then, identify location entities. "
+        "Finally, structure the JSON output."
+    )
+    _mock_urlopen(
+        monkeypatch,
+        {
+            "model": "qwen3:8b",
+            "created_at": "2024-01-01T00:00:00Z",
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "thinking": thinking_trace,
+            },
+            "done_reason": "length",
+            "done": True,
+        },
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+    assert "validation" in env["explanation"].lower() or "json" in (
+        env["explanation"].lower()
+    )

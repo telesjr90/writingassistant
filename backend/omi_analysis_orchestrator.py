@@ -4458,9 +4458,12 @@ def _build_ollama_model_live_runner(
       ``OMI_LIVE_OLLAMA_MODEL_NAME`` for compatibility.
     - Calls Ollama ``/api/chat`` with system instructions that require strict
       JSON output conforming to ``omi_ollama_structured_extraction.v1``.
+    - Sends top-level ``think: false`` so Qwen3 thinking-mode output does not
+      consume the response budget and leave ``message.content`` empty.
     - Uses ``stream=false``, a low output token limit, and a finite timeout.
     - Parses the response, extracts the message content, and validates it
-      through ``validate_ollama_model_envelope``.
+      through ``validate_ollama_model_envelope``. ``message.thinking`` is
+      never parsed as extraction output.
     - Treats non-JSON, malformed, prose-like, or unsafe output as fail-closed
       with no findings.
     - Uses Python standard library only (``urllib.request``).
@@ -4513,6 +4516,7 @@ def _build_ollama_model_live_runner(
             "model": model,
             "messages": messages,
             "stream": False,
+            "think": False,
             "options": {"num_predict": 2048},
         }).encode("utf-8")
 

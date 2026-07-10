@@ -417,8 +417,8 @@
     {
       "task_id": "PHASE8-IMPL-023-T015",
       "title": "Live Ollama/local model integration in OMI and analysis",
-      "status": "complete/PASS",
-      "scope": "split into T015A inspect/docs (complete/PASS), T015B HTTP preflight and model availability (complete/PASS), T015C live Ollama structured extraction adapter implementation (complete/PASS), T015D manual real qwen3:8b validation (ready/active next). T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP. T015B added HTTP API reachability/model availability probe. T015C added live Ollama structured extraction adapter behind env flags with 11 mocked-HTTP tests."
+      "status": "complete/PASS (T015A/T015B/T015C/T015D/T015E/T015D-rerun)",
+      "scope": "split into T015A inspect/docs (complete/PASS), T015B HTTP preflight and model availability (complete/PASS), T015C live Ollama structured extraction adapter implementation (complete/PASS), T015D manual real qwen3:8b validation (complete/PASS-SAFE-FAIL-CLOSED, missing llama-server.exe), T015E disable Qwen thinking mode for live Ollama structured extraction (complete/PASS, added top-level think: false), T015D-rerun manual real qwen3:8b validation after T015E (complete/PASS-SAFE-FAIL-CLOSED, finite adapter timeout < qwen3:8b inference time; T015E think: false fix confirmed working end-to-end via direct /api/chat smoke test). T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP. T015B added HTTP API reachability/model availability probe. T015C added live Ollama structured extraction adapter behind env flags with 11 mocked-HTTP tests. T015D ran manual validation from WSL; adapter correctly fail-closed on HTTP 500 (missing llama-server.exe); no findings, no persistence, no Memory/Canon mutation. T015E added top-level think: false to the /api/chat request body and 3 new mocked-HTTP tests. T015D-rerun ran manual validation after Windows Ollama repair (0.31.2) and T015E fix; adapter correctly fail-closed at finite urllib.request.urlopen(timeout=30) boundary because qwen3:8b with full T006 system prompt takes ~111s on this hardware; T015E think: false fix confirmed working end-to-end via direct /api/chat smoke test (trivial ping 3.7s, full system prompt 111.3s, valid JSON in message.content with done_reason stop). No findings, no persistence, no Memory/Canon mutation, no promotion records, no apply-promotion, no story prose; persist_candidates=False honored; all 87 automated tests passed; no backend/frontend/package/dependency files changed during T015D-rerun."
     },
     {
       "task_id": "PHASE8-IMPL-023-T015A",
@@ -448,6 +448,25 @@
         "backend/omi_analysis_orchestrator.py",
         "tests/test_omi_ollama_model_adapter_contract.py"
       ]
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T015D",
+      "title": "Manual real qwen3:8b validation",
+      "status": "complete/PASS-SAFE-FAIL-CLOSED (original) and complete/PASS-SAFE-FAIL-CLOSED (rerun after T015E)",
+      "scope": "manual real Ollama qwen3:8b validation from WSL against Windows-hosted Ollama; original run: adapter correctly fail-closed on HTTP 500 (missing llama-server.exe); rerun after T015E: adapter correctly fail-closed at finite urllib.request.urlopen(timeout=30) boundary because qwen3:8b with full T006 system prompt takes ~111s on this hardware; T015E think: false fix confirmed working end-to-end via direct /api/chat smoke test; no findings, no persistence, no Memory/Canon mutation; persist_candidates=False honored; all 87 automated tests passed; prose guard blocked narrative input >= 24 words ending with '.'; no backend/frontend/package/dependency files changed during T015D or T015D-rerun",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015D-manual-real-ollama-qwen3-validation.md"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T015E",
+      "title": "Disable Qwen thinking mode for live Ollama structured extraction",
+      "status": "complete/PASS",
+      "scope": "focused T015C live Ollama adapter fix that disables Qwen3 thinking-mode output by adding top-level think: false to the /api/chat request body built by _build_ollama_model_live_runner in backend/omi_analysis_orchestrator.py; stream=false and finite timeout preserved; OMI_LIVE_OLLAMA_BASE_URL/OMI_LIVE_OLLAMA_MODEL/OMI_LIVE_OLLAMA_MODEL_NAME env vars preserved; adapter parses extraction JSON only from message.content and never reads message.thinking; empty message.content with non-empty message.thinking fails closed with no findings; 3 new mocked-HTTP tests in tests/test_omi_ollama_model_adapter_contract.py lock in the request payload field, the content-only extraction boundary, and the fail-closed Qwen3 thinking-mode failure shape; no real Ollama/network call; no frontend/package changes; no candidate persistence; no Memory/Canon mutation, no automatic promotion records, no automatic apply-promotion, no story prose; T015D must be rerun after T015E to validate real qwen3:8b output with think: false enabled",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015E-disable-qwen-thinking-for-ollama-structured-extraction.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_ollama_model_adapter_contract.py"
+      ],
+      "result": "complete; tests/test_omi_ollama_model_adapter_contract.py -> 33 passed (30 existing + 3 new T015E); tests/test_omi_live_runtime_preflight_contract.py -> 23 passed (T015E is not a preflight task); tests/test_omi_tool_assisted_orchestrator_contract.py -> 26 passed; tests/test_omi_tool_assisted_persistence_contract.py -> 5 passed; python3 -m py_compile backend/omi_analysis_orchestrator.py backend/omi_runtime_preflight.py backend/main.py -> exit 0"
     },
     {
       "task_id": "PHASE8-IMPL-023-T016",
@@ -516,12 +535,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T015C",
-  "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015C-live-ollama-structured-extraction-adapter-behind-flags.md",
-  "next_child_task": "PHASE8-IMPL-023-T015D",
-  "next_child_title": "Manual real qwen3:8b validation",
-  "next_child_status": "ready/active (manual real qwen3:8b validation after T015C live adapter implementation)",
+  "latest_child_task": "PHASE8-IMPL-023-T015D-rerun",
+  "latest_child_status": "complete/PASS-SAFE-FAIL-CLOSED",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015D-manual-real-ollama-qwen3-validation.md",
+  "next_child_task": "PHASE8-IMPL-023-T016",
+  "next_child_title": "Live Story Check integration in OMI and analysis",
+  "next_child_status": "planned (T015D rerun is complete; T016 live Story Check integration is the next planned child; a separate future task could address the adapter timeout tuning and/or prose guard review)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"
