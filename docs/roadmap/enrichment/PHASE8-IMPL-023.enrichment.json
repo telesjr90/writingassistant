@@ -375,7 +375,7 @@
       "task_id": "PHASE8-IMPL-023-T014",
       "title": "Live spaCy integration in OMI and analysis",
       "status": "active",
-      "scope": "split into T014A inspect/docs (complete/PASS), T014B runtime availability check (complete/PASS), T014C implementation (complete/PASS), T014D manual validation, T014E closeout"
+      "scope": "split into T014A inspect/docs (complete/PASS), T014B runtime availability check (complete/PASS), T014C implementation (complete/PASS), T014D manual validation (complete/PASS-WITH-BLOCKED-RUNTIME), T014E closeout"
     },
     {
       "task_id": "PHASE8-IMPL-023-T014A",
@@ -397,6 +397,13 @@
       "status": "complete/PASS",
       "scope": "live spaCy runner in orchestrator behind OMI_LIVE_TOOLS_ENABLED/OMI_LIVE_SPACY_ENABLED env flags; lazy spaCy import; entity/noun-chunk extraction; existing fixture normalization reuse; fail-closed; tests mock spaCy only; no real spaCy install/download",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014C-live-spacy-adapter-behind-flags.md"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T014D",
+      "title": "Manual local spaCy validation",
+      "status": "complete/PASS-WITH-BLOCKED-RUNTIME",
+      "scope": "manual/local validation of T014C live spaCy adapter; spaCy not installed in repo virtualenv; live adapter run not attempted; all fixture/mock contract tests pass; no install/download performed; owner must install spaCy and model then re-run",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014D-manual-local-spacy-validation.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T015",
@@ -471,11 +478,11 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T014C",
-  "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014C-live-spacy-adapter-behind-flags.md",
-  "next_child_task": "PHASE8-IMPL-023-T014D",
-  "next_child_title": "Live spaCy manual validation",
+  "latest_child_task": "PHASE8-IMPL-023-T014D",
+  "latest_child_status": "complete/PASS-WITH-BLOCKED-RUNTIME",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014D-manual-local-spacy-validation.md",
+  "next_child_task": "PHASE8-IMPL-023-T014E",
+  "next_child_title": "Live spaCy closeout",
   "next_child_status": "ready/active",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
