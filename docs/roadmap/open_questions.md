@@ -6,7 +6,7 @@
 
 108. Which exact local/runtime surfaces exist for NCP, Subtxt, and dramatica-flow? T013 can report configured command/path or existing repo source surfaces, but live integration remains open for T018-T020.
 
-107. ~~What runtime dependencies are required for BookNLP and spaCy?~~ **Partially resolved in PHASE8-IMPL-023-T014C:** Live spaCy requires the `spacy` Python package and a spaCy model (default `en_core_web_sm`, overridable via `OMI_LIVE_SPACY_MODEL`). The live path is disabled by default and requires `OMI_LIVE_TOOLS_ENABLED=true` + `OMI_LIVE_SPACY_ENABLED=true` env flags. The orchestrator does not download models automatically; `spacy.load()` is called directly and fails closed if the model is unavailable. BookNLP runtime dependencies remain open for T017.
+107. ~~What runtime dependencies are required for BookNLP and spaCy?~~ **Resolved for spaCy:** Live spaCy requires the `spacy` Python package and a spaCy model (default `en_core_web_sm`, overridable via `OMI_LIVE_SPACY_MODEL`). The live path is disabled by default and requires `OMI_LIVE_TOOLS_ENABLED=true` + `OMI_LIVE_SPACY_ENABLED=true` env flags. The orchestrator does not download models automatically; `spacy.load()` is called directly and fails closed if the model is unavailable. spaCy and `en_core_web_sm` have been installed and validated in `.venv-unsloth-clean` (T014D rerun confirmed real-runtime success). BookNLP runtime dependencies remain open for T017.
 
 106. What Ollama model/config is selected for MVP live analysis?
 

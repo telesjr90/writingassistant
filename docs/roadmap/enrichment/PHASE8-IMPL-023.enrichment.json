@@ -374,8 +374,8 @@
     {
       "task_id": "PHASE8-IMPL-023-T014",
       "title": "Live spaCy integration in OMI and analysis",
-      "status": "blocked (spaCy not installed)",
-      "scope": "split into T014A inspect/docs (complete/PASS), T014B runtime availability check (complete/PASS), T014C implementation (complete/PASS), T014D manual validation (complete/PASS-WITH-BLOCKED-RUNTIME), T014E installation inventory (complete/PASS). All subtasks complete. Requires owner to install spaCy + model and re-run T014D before spaCy can be marked live-valid."
+      "status": "complete/PASS (real runtime validated)",
+      "scope": "split into T014A inspect/docs (complete/PASS), T014B runtime availability check (complete/PASS), T014C implementation (complete/PASS), T014D manual validation (rerun after owner-installed spaCy, complete/PASS with real-runtime validation), T014E installation inventory (complete/PASS). All subtasks complete. spaCy and en_core_web_sm are installed and live-validated in .venv-unsloth-clean."
     },
     {
       "task_id": "PHASE8-IMPL-023-T014A",
@@ -401,8 +401,8 @@
     {
       "task_id": "PHASE8-IMPL-023-T014D",
       "title": "Manual local spaCy validation",
-      "status": "complete/PASS-WITH-BLOCKED-RUNTIME",
-      "scope": "manual/local validation of T014C live spaCy adapter; spaCy not installed in repo virtualenv; live adapter run not attempted; all fixture/mock contract tests pass; no install/download performed; owner must install spaCy and model then re-run",
+      "status": "complete/PASS (rerun after owner-installed spaCy)",
+      "scope": "manual/local validation of T014C live spaCy adapter; rerun after owner-installed spaCy and en_core_web_sm in .venv-unsloth-clean; live adapter run succeeded with 4 evidence-backed candidate-only findings; persist_candidates=False; no candidate persistence, Memory/Canon mutation, promotion records, apply-promotion, or story prose occurred",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014D-manual-local-spacy-validation.md"
     },
     {
@@ -485,9 +485,9 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T014E",
-  "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014E-live-runtime-tool-installation-inventory.md",
+  "latest_child_task": "PHASE8-IMPL-023-T014D",
+  "latest_child_status": "complete/PASS (rerun after owner-installed spaCy)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014D-manual-local-spacy-validation.md",
   "next_child_task": "PHASE8-IMPL-023-T015",
   "next_child_title": "Live Ollama/local model integration in OMI and analysis",
   "next_child_status": "planned (blocked until Ollama is installed)",
