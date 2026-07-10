@@ -1058,3 +1058,507 @@ def test_story_check_preflight_does_not_persist_or_promote(
     assert tool["safety"]["memory_canon_mutation"] is False
     assert tool["safety"]["promotion_or_apply_promotion"] is False
     assert tool["safety"]["story_prose_generated"] is False
+
+
+# ---------------------------------------------------------------------------
+# T017A — BookNLP runtime preflight after install
+# ---------------------------------------------------------------------------
+
+_MOCK_BOOKNLP_ALL_AVAILABLE: dict[str, object] = {
+    "booknlp_runtime_surface": "available",
+    "booknlp_package_available": True,
+    "booknlp_package_version": "1.0.8",
+    "booknlp_module_available": True,
+    "booknlp_entrypoint_available": True,
+    "booknlp_spacy_available": True,
+    "booknlp_spacy_version": "3.8.14",
+    "booknlp_spacy_model_available": True,
+    "booknlp_tensorflow_available": True,
+    "booknlp_tensorflow_version": "2.21.0",
+    "booknlp_torch_available": True,
+    "booknlp_torch_version": "2.10.0+cu129",
+    "booknlp_transformers_available": True,
+    "booknlp_transformers_version": "5.5.0",
+    "booknlp_setuptools_available": True,
+    "booknlp_setuptools_version": "80.9.0",
+    "booknlp_pkg_resources_available": True,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools==80.9.0, pkg_resources available: "
+        "compatible with BookNLP import"
+    ),
+    "booknlp_detail": (
+        "BookNLP package 1.0.8 available; booknlp.booknlp entrypoint available; "
+        "spaCy: available; en_core_web_sm: available; "
+        "tensorflow: available; torch: available; "
+        "transformers: available; pkg_resources available; "
+        "torch=2.10.0+cu129 < 2.11 (cpp extensions skipped, non-blocking for import)"
+    ),
+}
+
+_MOCK_BOOKNLP_PACKAGE_MISSING: dict[str, object] = {
+    "booknlp_runtime_surface": "unavailable",
+    "booknlp_package_available": False,
+    "booknlp_package_version": None,
+    "booknlp_module_available": False,
+    "booknlp_entrypoint_available": False,
+    "booknlp_spacy_available": False,
+    "booknlp_spacy_version": None,
+    "booknlp_spacy_model_available": False,
+    "booknlp_tensorflow_available": False,
+    "booknlp_tensorflow_version": None,
+    "booknlp_torch_available": False,
+    "booknlp_torch_version": None,
+    "booknlp_transformers_available": False,
+    "booknlp_transformers_version": None,
+    "booknlp_setuptools_available": False,
+    "booknlp_setuptools_version": None,
+    "booknlp_pkg_resources_available": False,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools not available: BookNLP needs pkg_resources"
+    ),
+    "booknlp_detail": "BookNLP package NOT available",
+}
+
+_MOCK_BOOKNLP_ENTRYPOINT_MISSING: dict[str, object] = {
+    "booknlp_runtime_surface": "degraded",
+    "booknlp_package_available": True,
+    "booknlp_package_version": "1.0.8",
+    "booknlp_module_available": False,
+    "booknlp_entrypoint_available": False,
+    "booknlp_spacy_available": True,
+    "booknlp_spacy_version": "3.8.14",
+    "booknlp_spacy_model_available": True,
+    "booknlp_tensorflow_available": True,
+    "booknlp_tensorflow_version": "2.21.0",
+    "booknlp_torch_available": True,
+    "booknlp_torch_version": "2.10.0+cu129",
+    "booknlp_transformers_available": True,
+    "booknlp_transformers_version": "5.5.0",
+    "booknlp_setuptools_available": True,
+    "booknlp_setuptools_version": "80.9.0",
+    "booknlp_pkg_resources_available": True,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools==80.9.0, pkg_resources available: "
+        "compatible with BookNLP import"
+    ),
+    "booknlp_detail": (
+        "BookNLP package 1.0.8 available; "
+        "booknlp.booknlp entrypoint NOT available; "
+        "spaCy: available; en_core_web_sm: available; "
+        "tensorflow: available; torch: available; "
+        "transformers: available; pkg_resources available; "
+        "torch=2.10.0+cu129 < 2.11 (cpp extensions skipped, non-blocking for import)"
+    ),
+}
+
+_MOCK_BOOKNLP_SPACY_MODEL_MISSING: dict[str, object] = {
+    "booknlp_runtime_surface": "available",
+    "booknlp_package_available": True,
+    "booknlp_package_version": "1.0.8",
+    "booknlp_module_available": True,
+    "booknlp_entrypoint_available": True,
+    "booknlp_spacy_available": True,
+    "booknlp_spacy_version": "3.8.14",
+    "booknlp_spacy_model_available": False,
+    "booknlp_tensorflow_available": True,
+    "booknlp_tensorflow_version": "2.21.0",
+    "booknlp_torch_available": True,
+    "booknlp_torch_version": "2.10.0+cu129",
+    "booknlp_transformers_available": True,
+    "booknlp_transformers_version": "5.5.0",
+    "booknlp_setuptools_available": True,
+    "booknlp_setuptools_version": "80.9.0",
+    "booknlp_pkg_resources_available": True,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools==80.9.0, pkg_resources available: "
+        "compatible with BookNLP import"
+    ),
+    "booknlp_detail": (
+        "BookNLP package 1.0.8 available; booknlp.booknlp entrypoint available; "
+        "spaCy: available; en_core_web_sm: NOT available; "
+        "tensorflow: available; torch: available; "
+        "transformers: available; pkg_resources available; "
+        "torch=2.10.0+cu129 < 2.11 (cpp extensions skipped, non-blocking for import)"
+    ),
+}
+
+_MOCK_BOOKNLP_PKG_RESOURCES_MISSING: dict[str, object] = {
+    "booknlp_runtime_surface": "available",
+    "booknlp_package_available": True,
+    "booknlp_package_version": "1.0.8",
+    "booknlp_module_available": True,
+    "booknlp_entrypoint_available": True,
+    "booknlp_spacy_available": True,
+    "booknlp_spacy_version": "3.8.14",
+    "booknlp_spacy_model_available": True,
+    "booknlp_tensorflow_available": True,
+    "booknlp_tensorflow_version": "2.21.0",
+    "booknlp_torch_available": True,
+    "booknlp_torch_version": "2.10.0+cu129",
+    "booknlp_transformers_available": True,
+    "booknlp_transformers_version": "5.5.0",
+    "booknlp_setuptools_available": True,
+    "booknlp_setuptools_version": "82.0.1",
+    "booknlp_pkg_resources_available": False,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools==82.0.1, pkg_resources NOT available: "
+        "BookNLP needs pkg_resources; pin setuptools<81"
+    ),
+    "booknlp_detail": (
+        "BookNLP package 1.0.8 available; booknlp.booknlp entrypoint available; "
+        "spaCy: available; en_core_web_sm: available; "
+        "tensorflow: available; torch: available; "
+        "transformers: available; "
+        "pkg_resources NOT available (pin setuptools<81); "
+        "torch=2.10.0+cu129 < 2.11 (cpp extensions skipped, non-blocking for import)"
+    ),
+}
+
+_MOCK_BOOKNLP_SETUPTOOLS_80_9: dict[str, object] = {
+    "booknlp_runtime_surface": "available",
+    "booknlp_package_available": True,
+    "booknlp_package_version": "1.0.8",
+    "booknlp_module_available": True,
+    "booknlp_entrypoint_available": True,
+    "booknlp_spacy_available": True,
+    "booknlp_spacy_version": "3.8.14",
+    "booknlp_spacy_model_available": True,
+    "booknlp_tensorflow_available": True,
+    "booknlp_tensorflow_version": "2.21.0",
+    "booknlp_torch_available": True,
+    "booknlp_torch_version": "2.10.0+cu129",
+    "booknlp_transformers_available": True,
+    "booknlp_transformers_version": "5.5.0",
+    "booknlp_setuptools_available": True,
+    "booknlp_setuptools_version": "80.9.0",
+    "booknlp_pkg_resources_available": True,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools==80.9.0, pkg_resources available: "
+        "compatible with BookNLP import"
+    ),
+    "booknlp_detail": (
+        "BookNLP package 1.0.8 available; booknlp.booknlp entrypoint available; "
+        "spaCy: available; en_core_web_sm: available; "
+        "tensorflow: available; torch: available; "
+        "transformers: available; pkg_resources available; "
+        "torch=2.10.0+cu129 < 2.11 (cpp extensions skipped, non-blocking for import)"
+    ),
+}
+
+_MOCK_BOOKNLP_TORCH_CAVEAT: dict[str, object] = {
+    "booknlp_runtime_surface": "available",
+    "booknlp_package_available": True,
+    "booknlp_package_version": "1.0.8",
+    "booknlp_module_available": True,
+    "booknlp_entrypoint_available": True,
+    "booknlp_spacy_available": True,
+    "booknlp_spacy_version": "3.8.14",
+    "booknlp_spacy_model_available": True,
+    "booknlp_tensorflow_available": True,
+    "booknlp_tensorflow_version": "2.21.0",
+    "booknlp_torch_available": True,
+    "booknlp_torch_version": "2.10.0+cu129",
+    "booknlp_transformers_available": True,
+    "booknlp_transformers_version": "5.5.0",
+    "booknlp_setuptools_available": True,
+    "booknlp_setuptools_version": "80.9.0",
+    "booknlp_pkg_resources_available": True,
+    "booknlp_setuptools_compatibility_detail": (
+        "setuptools==80.9.0, pkg_resources available: "
+        "compatible with BookNLP import"
+    ),
+    "booknlp_detail": (
+        "BookNLP package 1.0.8 available; booknlp.booknlp entrypoint available; "
+        "spaCy: available; en_core_web_sm: available; "
+        "tensorflow: available; torch: available; "
+        "transformers: available; pkg_resources available; "
+        "torch=2.10.0+cu129 < 2.11 (cpp extensions skipped, non-blocking for import)"
+    ),
+}
+
+
+def _mock_booknlp_probe(monkeypatch, result: dict[str, object] | None = None) -> None:
+    if result is not None:
+        monkeypatch.setattr(
+            preflight,
+            "_booknlp_runtime_probe",
+            lambda: dict(result),
+        )
+    else:
+        monkeypatch.setattr(
+            preflight,
+            "_booknlp_runtime_probe",
+            lambda: dict(_MOCK_BOOKNLP_ALL_AVAILABLE),
+        )
+
+
+def test_booknlp_preflight_disabled_by_default_remains_safe() -> None:
+    report = _report()
+    tools = _tools_by_name(report)
+
+    tool = tools["booknlp"]
+    assert tool["global_enabled"] is False
+    assert tool["tool_enabled"] is False
+    assert tool["runtime_enabled"] is False
+    assert tool["blocked"] is False
+    assert tool["status"] in {"disabled", "available"}
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_booknlp_enabled_with_all_dependencies_reports_enabled(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_ALL_AVAILABLE)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "enabled"
+    assert tool["runtime_dependency_available"] is True
+    assert tool["runtime_dependency_status"] == "available"
+    assert tool["booknlp_runtime_surface"] == "available"
+    assert tool["booknlp_package_available"] is True
+    assert tool["booknlp_package_version"] == "1.0.8"
+    assert tool["booknlp_module_available"] is True
+    assert tool["booknlp_entrypoint_available"] is True
+    assert tool["booknlp_spacy_available"] is True
+    assert tool["booknlp_spacy_version"] == "3.8.14"
+    assert tool["booknlp_spacy_model_available"] is True
+    assert tool["booknlp_tensorflow_available"] is True
+    assert tool["booknlp_tensorflow_version"] == "2.21.0"
+    assert tool["booknlp_torch_available"] is True
+    assert tool["booknlp_torch_version"] == "2.10.0+cu129"
+    assert tool["booknlp_transformers_available"] is True
+    assert tool["booknlp_transformers_version"] == "5.5.0"
+    assert tool["booknlp_setuptools_available"] is True
+    assert tool["booknlp_setuptools_version"] == "80.9.0"
+    assert tool["booknlp_pkg_resources_available"] is True
+    assert "compatible" in tool["booknlp_setuptools_compatibility_detail"]
+    assert "BookNLP package" in tool["booknlp_detail"]
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_booknlp_missing_package_reports_unavailable(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_PACKAGE_MISSING)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] == "unavailable"
+    assert tool["booknlp_runtime_surface"] == "unavailable"
+    assert tool["booknlp_package_available"] is False
+    assert tool["booknlp_entrypoint_available"] is False
+    assert "NOT available" in tool["probe_detail"]
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_booknlp_missing_entrypoint_reports_degraded_with_clear_detail(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_ENTRYPOINT_MISSING)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["runtime_dependency_available"] is False
+    assert tool["booknlp_runtime_surface"] == "degraded"
+    assert tool["booknlp_package_available"] is True
+    assert tool["booknlp_module_available"] is False
+    assert tool["booknlp_entrypoint_available"] is False
+    assert "entrypoint NOT available" in tool["probe_detail"]
+
+
+def test_booknlp_missing_spacy_model_reports_degraded_with_clear_detail(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_SPACY_MODEL_MISSING)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "enabled"
+    assert tool["runtime_dependency_available"] is True
+    assert tool["booknlp_runtime_surface"] == "available"
+    assert tool["booknlp_spacy_available"] is True
+    assert tool["booknlp_spacy_model_available"] is False
+    assert "en_core_web_sm: NOT available" in tool["booknlp_detail"]
+
+
+def test_booknlp_missing_pkg_resources_reports_setuptools_compatibility_detail(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_PKG_RESOURCES_MISSING)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "enabled"
+    assert tool["booknlp_setuptools_version"] == "82.0.1"
+    assert tool["booknlp_pkg_resources_available"] is False
+    assert "pin setuptools<81" in tool["booknlp_setuptools_compatibility_detail"]
+    assert "pkg_resources NOT available" in tool["booknlp_detail"]
+
+
+def test_booknlp_setuptools_80_9_with_pkg_resources_reports_compatible(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_SETUPTOOLS_80_9)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["booknlp_setuptools_version"] == "80.9.0"
+    assert tool["booknlp_pkg_resources_available"] is True
+    assert "compatible" in tool["booknlp_setuptools_compatibility_detail"]
+
+
+def test_booknlp_torch_caveat_does_not_by_itself_fail_availability(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_TORCH_CAVEAT)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "enabled"
+    assert tool["booknlp_torch_available"] is True
+    assert tool["booknlp_torch_version"] == "2.10.0+cu129"
+    assert tool["runtime_dependency_available"] is True
+    assert "cpp extensions skipped" in tool["booknlp_detail"]
+
+
+def test_booknlp_blocked_flag_overrides_availability(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_ALL_AVAILABLE)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_ENABLED": "true",
+                "OMI_LIVE_BOOKNLP_BLOCKED": "true",
+                "OMI_LIVE_BOOKNLP_BLOCKED_REASON": (
+                    "Owner decision pending."
+                ),
+            }
+        )
+    )["booknlp"]
+
+    assert tool["status"] == "blocked"
+    assert tool["blocked"] is True
+    assert tool["blocked_reason"] == "Owner decision pending."
+    assert tool["runtime_dependency_available"] is True
+
+
+def test_booknlp_preflight_does_not_invoke_booknlp_processing(
+    monkeypatch,
+) -> None:
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_ALL_AVAILABLE)
+
+    booknlp_calls: list[tuple] = []
+
+    class _ProcessingSentinel:
+        def process(self, *args, **kwargs):
+            booknlp_calls.append(("process", args, kwargs))
+            raise AssertionError(
+                "BookNLP.process must not be called from preflight"
+            )
+
+    monkeypatch.setattr(
+        preflight,
+        "_booknlp_runtime_probe",
+        lambda: dict(_MOCK_BOOKNLP_ALL_AVAILABLE),
+    )
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_BOOKNLP_ENABLED": "true",
+        }
+    )
+
+    assert booknlp_calls == []
+    tool = _tools_by_name(report)["booknlp"]
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_booknlp_preflight_does_not_persist_or_mutate(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.create_omi_idea("demo", "Owner-authored preflight note.")
+    before = project_manager.get_omi_summary("demo")
+
+    _mock_booknlp_probe(monkeypatch, _MOCK_BOOKNLP_ALL_AVAILABLE)
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_BOOKNLP_ENABLED": "true",
+        }
+    )
+
+    after = project_manager.get_omi_summary("demo")
+    assert after == before
+    tool = _tools_by_name(report)["booknlp"]
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False

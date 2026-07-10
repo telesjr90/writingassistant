@@ -531,8 +531,20 @@
       "task_id": "PHASE8-IMPL-023-T016D",
       "title": "Manual real Story Check validation",
       "status": "complete/PASS",
-      "scope": "manual real Story Check validation through the OMI orchestrator behind the T016C/T016C1 live flags; no code edits; confirms the T016C live `story_check` adapter (`_build_story_check_live_runner` in backend/omi_analysis_orchestrator.py) bridges the OMI orchestrator to the existing in-repo `backend.analysis_engine.run_story_check(project_name, scene_id)` callable surface and that the T016C1 strict no-sanitization boundary is exercised end-to-end against a real `qwen3:8b` model response; project `example`, scene `scene_001` ('The Princess and the Pea'), Ollama 0.31.2 reachable at http://172.25.144.1:11434, `qwen3:8b` confirmed via /api/tags; runtime flags: OMI_LIVE_TOOLS_ENABLED=1 OMI_LIVE_STORY_CHECK_ENABLED=1 OMI_LIVE_STORY_CHECK_SCENE_ID=scene_001 OMI_LIVE_OLLAMA_BASE_URL=http://172.25.144.1:11434 OMI_LIVE_OLLAMA_MODEL=qwen3:8b OLLAMA_BASE_URL=http://172.25.144.1:11434 OLLAMA_MODEL=qwen3:8b OLLAMA_TIMEOUT_SECONDS=600 ANALYSIS_MODE=ollama_baseline; first manual run with the default 300s (and T015F 180s) timeout confirmed PASS-SAFE-FAIL-CLOSED: live path exercised, `analysis_engine.run_story_check` reached, `Read timed out (read timeout=180.0)` returned, converter failed closed with no findings, no persistence, no Memory/Canon mutation, no promotion records, no apply-promotion, no story prose; second manual run with OLLAMA_TIMEOUT_SECONDS=600 (and a direct `run_story_check('example', 'scene_001')` smoke test at 324.6s) reached the live model, returned a valid rich-Story-Check dict (5 warnings, 5 suggestions, 5 insufficient_evidence, 4 throughline_alignment, theme_drift, character_consistency), and the T016C1 converter produced 14 T008-validated candidate findings: 4 `Story Check warning` (structural_diagnostic), 4 `Story Check insufficient evidence` (evidence_note), 4 `Story Check throughline diagnostic` (throughline_context), 1 `Story Check storyform diagnostic` (storyform_context), 1 `Story Check character consistency diagnostic` (continuity_warning); all 14 carry `source_adapter: story_check`, `provenance.support: Story Check diagnostic support only`, `support_label: Story Check diagnostic support only`, `owner_decision: {approved: false, decision: pending}`, `review_status: candidate_review_pending`, `source_locator: project:example::scene:scene_001`; the T016C1 strict safety checker entirely filtered the model's `suggestions` field and partially filtered `warnings` and `insufficient_evidence`; the converter did NOT rewrite or sanitize AI/tool/model output; `persist_candidates=False` honored (`persistence_status: not_requested`, `new_candidate_ids: []`, `persisted_candidate_ids: []`, `reused_candidate_ids: []`); no candidate files written to `projects/example/omi/candidates/`; all 11 safety envelope flags true; the live adapter did NOT call the legacy `POST /api/projects/{project_name}/story-check/{scene_id}` route; all 114 automated tests pass across the four contract test files; `python3 -m py_compile backend/omi_analysis_orchestrator.py backend/omi_runtime_preflight.py backend/main.py backend/analysis_engine.py` -> exit 0; `find projects/example -newer /tmp/t016d/result1.json` returned no results (no project files mutated); no backend/frontend/test/package/dependency file was edited; no git add/commit/push was performed; T017 (live BookNLP integration in OMI and analysis) is the recommended next task",
+      "scope": "manual real Story Check validation through the OMI orchestrator behind the T016C/T016C1 live flags; no code edits; confirms the T016C live story_check adapter bridges the OMI orchestrator to the existing in-repo run_story_check callable surface and that the T016C1 strict no-sanitization boundary is exercised end-to-end against a real qwen3:8b model response; project example, scene scene_001 (The Princess and the Pea), Ollama 0.31.2 reachable at Windows host, qwen3:8b confirmed via api/tags; first manual run with default 300s timeout confirmed PASS-SAFE-FAIL-CLOSED (read timeout); second manual run with OLLAMA_TIMEOUT_SECONDS=600 reached the live model and produced 14 T008-validated candidate findings across warning, insufficient_evidence, throughline, storyform, and character_consistency types",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016D-manual-real-story-check-validation.md"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T017A",
+      "title": "BookNLP runtime preflight after install",
+      "status": "complete/PASS",
+      "scope": "extend the existing T013 runtime preflight at backend/omi_runtime_preflight.py so the preflight report for the booknlp tool includes detailed BookNLP runtime surface fields: package availability, module/entrypoint availability, spaCy availability/version/model, TensorFlow availability/version, PyTorch availability/version, Transformers availability/version, setuptools availability/version, pkg_resources availability, setuptools compatibility detail (pin <81 required), non-blocking torch caveat when <2.11, and a human-readable booknlp_detail summary; BookNLP is installed (1.0.8 in .venv-unsloth-clean) but not yet live-integrated; setuptools==80.9.0 is pinned because BookNLP imports pkg_resources; torch==2.10.0+cu129 is below the >=2.11 required by BookNLP cpp extensions — non-blocking for import but still requiring runtime validation in T017B/T017C; BookNLP runs on CPU fallback; preflight does not run BookNLP processing; tests mock the probe function and do not require real BookNLP or other installed runtimes",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017A-booknlp-runtime-preflight-after-install.md",
+      "artifacts": [
+        "backend/omi_runtime_preflight.py",
+        "tests/test_omi_live_runtime_preflight_contract.py"
+      ],
+      "result": "complete; tests/test_omi_live_runtime_preflight_contract.py -> 50 passed (39 existing + 11 new T017A)"
     },
     {
       "task_id": "PHASE8-IMPL-023-T016",
@@ -601,12 +613,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T016D",
+  "latest_child_task": "PHASE8-IMPL-023-T017A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016D-manual-real-story-check-validation.md",
-  "next_child_task": "PHASE8-IMPL-023-T017",
-  "next_child_title": "Live BookNLP integration in OMI and analysis",
-  "next_child_status": "planned (T016D manual real Story Check validation is complete/PASS; T017 live BookNLP integration in OMI and analysis is the recommended next task; the BookNLP runtime is not installed on the owner's hardware, so T017 will start with the runtime availability check)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017A-booknlp-runtime-preflight-after-install.md",
+  "next_child_task": "PHASE8-IMPL-023-T017B",
+  "next_child_title": "Live BookNLP adapter behind flags",
+  "next_child_status": "planned (T017A BookNLP runtime preflight after install is complete/PASS; T017B live BookNLP adapter behind flags is the recommended next task)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"

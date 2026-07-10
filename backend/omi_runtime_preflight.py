@@ -368,6 +368,176 @@ def _ollama_http_probe(base_url: str, model_name: str) -> dict[str, Any]:
     return result
 
 
+def _booknlp_runtime_probe() -> dict[str, Any]:
+    """Read-only BookNLP runtime surface probe.
+
+    Uses safe ``importlib.util.find_spec`` and ``importlib.metadata.version``
+    for package and version checks. Imports spaCy only for the model-load
+    probe (same pattern as ``_spacy_model_probe``). Does not import heavy
+    BookNLP, TensorFlow, or Torch modules. Does not run BookNLP processing.
+
+    Returns a flat dict of boolean/surface/version/compatibility fields
+    prefixed with ``booknlp_``.
+    """
+    import importlib.metadata
+
+    def _safe_version(pkg: str) -> str | None:
+        try:
+            return importlib.metadata.version(pkg)
+        except Exception:
+            return None
+
+    result: dict[str, Any] = {
+        "booknlp_runtime_surface": "unavailable",
+        "booknlp_package_available": False,
+        "booknlp_package_version": None,
+        "booknlp_module_available": False,
+        "booknlp_entrypoint_available": False,
+        "booknlp_spacy_available": False,
+        "booknlp_spacy_version": None,
+        "booknlp_spacy_model_available": False,
+        "booknlp_tensorflow_available": False,
+        "booknlp_tensorflow_version": None,
+        "booknlp_torch_available": False,
+        "booknlp_torch_version": None,
+        "booknlp_transformers_available": False,
+        "booknlp_transformers_version": None,
+        "booknlp_setuptools_available": False,
+        "booknlp_setuptools_version": None,
+        "booknlp_pkg_resources_available": False,
+        "booknlp_setuptools_compatibility_detail": None,
+        "booknlp_detail": "",
+    }
+
+    booknlp_spec = importlib.util.find_spec("booknlp")
+    result["booknlp_package_available"] = booknlp_spec is not None
+    if booknlp_spec is not None:
+        result["booknlp_package_version"] = _safe_version("booknlp")
+        result["booknlp_module_available"] = (
+            importlib.util.find_spec("booknlp.booknlp") is not None
+        )
+        result["booknlp_entrypoint_available"] = result["booknlp_module_available"]
+
+    spacy_spec = importlib.util.find_spec("spacy")
+    result["booknlp_spacy_available"] = spacy_spec is not None
+    if spacy_spec is not None:
+        result["booknlp_spacy_version"] = _safe_version("spacy")
+        try:
+            import spacy
+            spacy.load(OMI_LIVE_SPACY_MODEL_DEFAULT)
+            result["booknlp_spacy_model_available"] = True
+        except Exception:
+            result["booknlp_spacy_model_available"] = False
+
+    tf_spec = importlib.util.find_spec("tensorflow")
+    result["booknlp_tensorflow_available"] = tf_spec is not None
+    if tf_spec is not None:
+        result["booknlp_tensorflow_version"] = _safe_version("tensorflow")
+
+    torch_spec = importlib.util.find_spec("torch")
+    result["booknlp_torch_available"] = torch_spec is not None
+    if torch_spec is not None:
+        result["booknlp_torch_version"] = _safe_version("torch")
+
+    transformers_spec = importlib.util.find_spec("transformers")
+    result["booknlp_transformers_available"] = transformers_spec is not None
+    if transformers_spec is not None:
+        result["booknlp_transformers_version"] = _safe_version("transformers")
+
+    st_spec = importlib.util.find_spec("setuptools")
+    result["booknlp_setuptools_available"] = st_spec is not None
+    if st_spec is not None:
+        result["booknlp_setuptools_version"] = _safe_version("setuptools")
+
+    pr_spec = importlib.util.find_spec("pkg_resources")
+    result["booknlp_pkg_resources_available"] = pr_spec is not None
+
+    st_ver = result["booknlp_setuptools_version"]
+    pr_avail = result["booknlp_pkg_resources_available"]
+    if st_ver and pr_avail:
+        result["booknlp_setuptools_compatibility_detail"] = (
+            f"setuptools=={st_ver}, pkg_resources available: "
+            f"compatible with BookNLP import"
+        )
+    elif st_ver and not pr_avail:
+        result["booknlp_setuptools_compatibility_detail"] = (
+            f"setuptools=={st_ver}, pkg_resources NOT available: "
+            f"BookNLP needs pkg_resources; pin setuptools<81"
+        )
+    elif not st_ver:
+        result["booknlp_setuptools_compatibility_detail"] = (
+            "setuptools not available: BookNLP needs pkg_resources"
+        )
+    else:
+        result["booknlp_setuptools_compatibility_detail"] = (
+            "setuptools/pkg_resources status unknown"
+        )
+
+    detail_parts: list[str] = []
+    if result["booknlp_package_available"]:
+        ver = result["booknlp_package_version"] or ""
+        detail_parts.append(f"BookNLP package {ver} available")
+        if result["booknlp_entrypoint_available"]:
+            detail_parts.append("booknlp.booknlp entrypoint available")
+        else:
+            detail_parts.append("booknlp.booknlp entrypoint NOT available")
+    else:
+        detail_parts.append("BookNLP package NOT available")
+
+    detail_parts.append(
+        f"spaCy: "
+        f"{'available' if result['booknlp_spacy_available'] else 'NOT available'}"
+    )
+    if result["booknlp_spacy_available"]:
+        detail_parts.append(
+            f"en_core_web_sm: "
+            f"{'available' if result['booknlp_spacy_model_available'] else 'NOT available'}"
+        )
+
+    detail_parts.append(
+        f"tensorflow: "
+        f"{'available' if result['booknlp_tensorflow_available'] else 'NOT available'}"
+    )
+    detail_parts.append(
+        f"torch: "
+        f"{'available' if result['booknlp_torch_available'] else 'NOT available'}"
+    )
+    detail_parts.append(
+        f"transformers: "
+        f"{'available' if result['booknlp_transformers_available'] else 'NOT available'}"
+    )
+
+    if pr_avail:
+        detail_parts.append("pkg_resources available")
+    else:
+        detail_parts.append("pkg_resources NOT available (pin setuptools<81)")
+
+    torch_ver_str = result["booknlp_torch_version"]
+    if torch_ver_str:
+        try:
+            parts = torch_ver_str.replace("+", ".").split(".")
+            if len(parts) >= 2:
+                major, minor = int(parts[0]), int(parts[1])
+                if major < 2 or (major == 2 and minor < 11):
+                    detail_parts.append(
+                        f"torch={torch_ver_str} < 2.11 (cpp extensions skipped, "
+                        f"non-blocking for import)"
+                    )
+        except (ValueError, IndexError):
+            pass
+
+    result["booknlp_detail"] = "; ".join(detail_parts)
+
+    if result["booknlp_package_available"] and result["booknlp_entrypoint_available"]:
+        result["booknlp_runtime_surface"] = "available"
+    elif not result["booknlp_package_available"]:
+        result["booknlp_runtime_surface"] = "unavailable"
+    else:
+        result["booknlp_runtime_surface"] = "degraded"
+
+    return result
+
+
 def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
     if adapter == "spacy":
         configured = True
@@ -389,9 +559,41 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "spacy_model_available": probe["spacy_model_available"],
         }
     elif adapter == "booknlp":
+        probe = _booknlp_runtime_probe()
         configured = True
-        available = _find_module("booknlp") or shutil.which("booknlp") is not None
-        detail = "Python package/executable probe: booknlp"
+        available = (
+            probe["booknlp_package_available"]
+            and probe["booknlp_entrypoint_available"]
+        )
+        detail = probe["booknlp_detail"]
+        dependency_status = "available" if available else "unavailable"
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": dependency_status,
+            "probe_detail": detail,
+            "booknlp_runtime_surface": probe["booknlp_runtime_surface"],
+            "booknlp_package_available": probe["booknlp_package_available"],
+            "booknlp_package_version": probe["booknlp_package_version"],
+            "booknlp_module_available": probe["booknlp_module_available"],
+            "booknlp_entrypoint_available": probe["booknlp_entrypoint_available"],
+            "booknlp_spacy_available": probe["booknlp_spacy_available"],
+            "booknlp_spacy_version": probe["booknlp_spacy_version"],
+            "booknlp_spacy_model_available": probe["booknlp_spacy_model_available"],
+            "booknlp_tensorflow_available": probe["booknlp_tensorflow_available"],
+            "booknlp_tensorflow_version": probe["booknlp_tensorflow_version"],
+            "booknlp_torch_available": probe["booknlp_torch_available"],
+            "booknlp_torch_version": probe["booknlp_torch_version"],
+            "booknlp_transformers_available": probe["booknlp_transformers_available"],
+            "booknlp_transformers_version": probe["booknlp_transformers_version"],
+            "booknlp_setuptools_available": probe["booknlp_setuptools_available"],
+            "booknlp_setuptools_version": probe["booknlp_setuptools_version"],
+            "booknlp_pkg_resources_available": probe["booknlp_pkg_resources_available"],
+            "booknlp_setuptools_compatibility_detail": probe[
+                "booknlp_setuptools_compatibility_detail"
+            ],
+            "booknlp_detail": probe["booknlp_detail"],
+        }
     elif adapter == "ollama_model":
         base_url = (
             _env_text(env, OMI_LIVE_OLLAMA_BASE_URL_ENV)
@@ -614,6 +816,62 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "story_prose_generated": False,
         },
     }
+    if adapter == "booknlp":
+        report["booknlp_runtime_surface"] = dependency.get(
+            "booknlp_runtime_surface"
+        )
+        report["booknlp_package_available"] = dependency.get(
+            "booknlp_package_available"
+        )
+        report["booknlp_package_version"] = dependency.get(
+            "booknlp_package_version"
+        )
+        report["booknlp_module_available"] = dependency.get(
+            "booknlp_module_available"
+        )
+        report["booknlp_entrypoint_available"] = dependency.get(
+            "booknlp_entrypoint_available"
+        )
+        report["booknlp_spacy_available"] = dependency.get(
+            "booknlp_spacy_available"
+        )
+        report["booknlp_spacy_version"] = dependency.get(
+            "booknlp_spacy_version"
+        )
+        report["booknlp_spacy_model_available"] = dependency.get(
+            "booknlp_spacy_model_available"
+        )
+        report["booknlp_tensorflow_available"] = dependency.get(
+            "booknlp_tensorflow_available"
+        )
+        report["booknlp_tensorflow_version"] = dependency.get(
+            "booknlp_tensorflow_version"
+        )
+        report["booknlp_torch_available"] = dependency.get(
+            "booknlp_torch_available"
+        )
+        report["booknlp_torch_version"] = dependency.get(
+            "booknlp_torch_version"
+        )
+        report["booknlp_transformers_available"] = dependency.get(
+            "booknlp_transformers_available"
+        )
+        report["booknlp_transformers_version"] = dependency.get(
+            "booknlp_transformers_version"
+        )
+        report["booknlp_setuptools_available"] = dependency.get(
+            "booknlp_setuptools_available"
+        )
+        report["booknlp_setuptools_version"] = dependency.get(
+            "booknlp_setuptools_version"
+        )
+        report["booknlp_pkg_resources_available"] = dependency.get(
+            "booknlp_pkg_resources_available"
+        )
+        report["booknlp_setuptools_compatibility_detail"] = dependency.get(
+            "booknlp_setuptools_compatibility_detail"
+        )
+        report["booknlp_detail"] = dependency.get("booknlp_detail")
     if adapter == "spacy":
         report["spacy_model_name"] = dependency.get("spacy_model_name")
         report["spacy_model_available"] = dependency.get("spacy_model_available")
