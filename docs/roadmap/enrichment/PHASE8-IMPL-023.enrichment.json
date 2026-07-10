@@ -652,13 +652,39 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T017C",
-  "latest_child_status": "complete/PASS-SAFE-FAIL-CLOSED",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017C-manual-real-booknlp-validation.md",
-  "next_child_task": "PHASE8-IMPL-023-T017C1",
-  "next_child_title": "Narrow repair of transformers vs BookNLP model state-dict position_ids compatibility and T017C rerun",
-  "next_child_status": "planned (T017A BookNLP runtime preflight after install is complete/PASS; T017B live BookNLP adapter behind flags is complete/PASS; T017C manual real BookNLP validation is complete/PASS-SAFE-FAIL-CLOSED; T017C1 narrow repair of the transformers==5.5.0 vs booknlp==1.0.8 'bert.embeddings.position_ids' state-dict mismatch and T017C rerun is the recommended next task; if T017C1 closes to PASS, the next task is PHASE8-IMPL-023-T018A — NCP schema validator preflight)",
+  "latest_child_task": "PHASE8-IMPL-023-T017C1",
+  "latest_child_status": "complete/PASS",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017C1-booknlp-transformers-state-dict-compatibility-repair.md",
+  "next_child_task": "PHASE8-IMPL-023-T018A",
+  "next_child_title": "NCP schema validator preflight",
+  "next_child_status": "planned (T017A BookNLP runtime preflight after install is complete/PASS; T017B live BookNLP adapter behind flags is complete/PASS; T017C manual real BookNLP validation is complete/PASS-SAFE-FAIL-CLOSED; T017C1 BookNLP / transformers state-dict compatibility repair is complete/PASS; the next task is PHASE8-IMPL-023-T018A — NCP schema validator preflight)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
-  "owner_gate_status": "accepted historically, not full MVP completion"
+  "owner_gate_status": "accepted historically, not full MVP completion",
+  "latest_child_title": "BookNLP / transformers state-dict compatibility repair",
+  "latest_child_summary": "T017C1 repaired the T017C 'Unexpected key(s) in state_dict: \"bert.embeddings.position_ids\"' RuntimeError with a narrow adapter-side shim in `backend/omi_analysis_orchestrator.py` that wraps `torch.load` for the duration of the BookNLP constructor only and drops ONLY the single known-incompatible non-trainable key. No dependency change was applied. Manual real OMI live BookNLP re-validation against `projects/example/scenes/scene_001.md` returns `analysis_status: \"succeeded\"`, `finding_count: 26`, `finding_types: [\"character\", \"location\"]`, `persisted_candidate_ids: []`, `project_files_changed: false`, and all 11 safety envelope flags true. 9 new mocked tests in `tests/test_omi_booknlp_spacy_adapter_contract.py`. All existing T017B mocked tests still pass. The only failing test in the suite is the pre-existing `test_live_spacy_missing_package_returns_unavailable`.",
+  "latest_child_validation": {
+    "tests/test_omi_booknlp_spacy_adapter_contract.py": "39 passed (30 existing + 9 new T017C1)",
+    "tests/test_omi_tool_assisted_orchestrator_contract.py": "30 passed",
+    "tests/test_omi_tool_assisted_persistence_contract.py": "5 passed",
+    "tests/test_omi_live_runtime_preflight_contract.py": "50 passed",
+    "manual_validation_capture": ".codex-context/PHASE8-IMPL-023/manual-validation/T017C1-booknlp-repair/manual-booknlp-repair-validation-output.txt",
+    "known_pre_existing_failure": {
+      "test": "tests/test_omi_booknlp_spacy_adapter_contract.py::test_live_spacy_missing_package_returns_unavailable",
+      "reason": "spaCy is installed locally; the test asserts the unavailable state when spaCy is missing and is documented as a known pre-existing failure in T017C1 task brief."
+    }
+  },
+  "latest_child_no_side_effects": {
+    "no_memory_canon_mutation": true,
+    "no_apply_promotion": true,
+    "no_canon_promotion": true,
+    "no_story_prose_generation": true,
+    "no_package_install_or_upgrade": true,
+    "no_strict_false_broad_workaround": true,
+    "no_site_packages_patch": true,
+    "no_external_sources_edit": true,
+    "no_project_or_candidate_persistence": true,
+    "no_staging_commit_or_push": true,
+    "persist_candidates_false_honored": true
+  }
 }

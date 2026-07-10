@@ -4281,6 +4281,34 @@ _OMI_LIVE_BOOKNLP_INPUT_FILENAME = "omi_booknlp_input.txt"
 _OMI_LIVE_BOOKNLP_MAX_FINDINGS = 64
 _OMI_LIVE_BOOKNLP_MAX_EVIDENCE_CHARS = 240
 
+# T017C1 narrow compatibility shim for BookNLP/transformers state-dict
+# ``bert.embeddings.position_ids`` key.
+#
+# BookNLP 1.0.8 was written against a transformers version in which
+# ``BertEmbeddings.position_ids`` was a persistent buffer and therefore
+# part of the saved state_dict. The newer installed transformers
+# (>=4.13ish, here transformers==5.5.0) registers ``position_ids`` as a
+# non-persistent buffer in ``BertEmbeddings`` so it is NOT part of the
+# model's ``state_dict()``. When BookNLP's
+# ``LitBankEntityTagger`` / ``LitBankCoref`` / ``QuotationAttribution``
+# classes do
+# ``self.model.load_state_dict(torch.load(model_file, map_location=device))``
+# with ``strict=True`` (the default), the saved ``position_ids`` key is
+# reported as an unexpected key and BookNLP fails closed at the entity
+# tagger constructor.
+#
+# The shim is narrowly scoped: it wraps ``torch.load`` ONLY for the
+# duration of the BookNLP constructor inside the live runner, and it
+# removes ONLY the single known-incompatible non-trainable key
+# ``bert.embeddings.position_ids`` from any returned state_dict-like
+# dict that contains it. All other keys are preserved, and
+# ``load_state_dict`` is still called with ``strict=True`` so any
+# other unexpected key still fails closed. The shim is not a broad
+# ``strict=False`` workaround.
+_BOOKNLP_STATE_DICT_SHIM_TOLERATED_KEYS: frozenset[str] = frozenset({
+    "bert.embeddings.position_ids",
+})
+
 _OMI_BOOKNLP_LIVE_ENTITY_CATEGORY_TO_CANDIDATE_TYPE: dict[str, str] = {
     "PER": "character",
     "GPE": "location",
@@ -6179,6 +6207,96 @@ def token_id_for_locator(token_id: str) -> str:
     return "?"
 
 
+def _filter_state_dict_for_booknlp_compat(
+    state_dict: Any,
+) -> tuple[Any, tuple[str, ...]]:
+    """Return a copy of ``state_dict`` with only the known-tolerated keys removed.
+
+    The shim is narrowly scoped to the T017C1 compatibility repair: it
+    removes ONLY keys in :data:`_BOOKNLP_STATE_DICT_SHIM_TOLERATED_KEYS`
+    (currently just ``bert.embeddings.position_ids``) from a state-dict-like
+    dict and returns the modified copy plus the sorted tuple of removed
+    keys. Non-dict inputs are returned unchanged with an empty removed-keys
+    tuple, so wrapping ``torch.load`` remains safe even when BookNLP
+    loads non-state-dict artifacts.
+
+    Any other unexpected key in the returned state_dict is preserved
+    exactly, so ``load_state_dict`` will still fail closed on
+    strict=True for unrelated incompatibilities.
+    """
+    if not isinstance(state_dict, dict):
+        return state_dict, ()
+    removed: list[str] = []
+    cleaned: dict[Any, Any] = {}
+    for key, value in state_dict.items():
+        if isinstance(key, str) and key in _BOOKNLP_STATE_DICT_SHIM_TOLERATED_KEYS:
+            removed.append(key)
+            continue
+        cleaned[key] = value
+    if not removed:
+        return state_dict, ()
+    return cleaned, tuple(sorted(removed))
+
+
+def _booknlp_state_dict_shim_install() -> tuple[Any, Any]:
+    """Install a narrow ``torch.load`` wrapper for the BookNLP constructor.
+
+    Returns ``(original_torch_load, (torch_module, original_load_name))``
+    so the caller can call :func:`_booknlp_state_dict_shim_uninstall`
+    with the same pair. The wrapper preserves the original
+    ``torch.load`` callable's behavior and only filters the single
+    known-incompatible non-trainable key from returned state_dict-like
+    dicts. Non-state-dict returns pass through unchanged.
+
+    The shim is fail-closed: any unexpected error inside the wrapper
+    re-raises, the runner fails closed, and the test suite proves the
+    shim does not silently swallow other unexpected state-dict keys.
+    """
+    import torch  # local import: orchestrator is torch-free at import time
+
+    original_load = torch.load
+
+    def _wrapped(*args: Any, **kwargs: Any) -> Any:
+        result = original_load(*args, **kwargs)
+        return _filter_state_dict_for_booknlp_compat(result)[0]
+
+    torch.load = _wrapped
+    return original_load, torch
+
+
+def _booknlp_state_dict_shim_uninstall(
+    original_load: Any,
+    torch_module: Any,
+) -> None:
+    """Restore the original ``torch.load`` after the BookNLP constructor."""
+    try:
+        torch_module.load = original_load
+    except (AttributeError, TypeError):
+        pass
+
+
+def _booknlp_construct_with_state_dict_shim(
+    language: str,
+    model_params: dict[str, Any],
+) -> Any:
+    """Construct ``BookNLP(language, model_params)`` under the T017C1 shim.
+
+    The wrapper installs a narrow ``torch.load`` shim for the duration of
+    the constructor only, then restores the original. The shim removes
+    ONLY ``bert.embeddings.position_ids`` from any returned state_dict;
+    any other unexpected key is preserved and still triggers a
+    ``strict=True`` failure. The shim is restored even on construction
+    failure.
+    """
+    from booknlp.booknlp import BookNLP  # lazy import (runner-only)
+
+    original_load, torch_module = _booknlp_state_dict_shim_install()
+    try:
+        return BookNLP(language, model_params)
+    finally:
+        _booknlp_state_dict_shim_uninstall(original_load, torch_module)
+
+
 def _build_booknlp_live_runner(
     *,
     adapter_config: dict[str, Any] | None = None,
@@ -6298,9 +6416,15 @@ def _build_booknlp_live_runner(
                 }
 
             try:
-                from booknlp.booknlp import BookNLP  # lazy import
-
-                booknlp_instance = BookNLP("en", model_params)
+                # T017C1 narrow compatibility shim: install a torch.load
+                # wrapper that drops ONLY ``bert.embeddings.position_ids``
+                # from any returned state_dict-like dict, for the duration
+                # of the BookNLP constructor only. Any other unexpected
+                # key still triggers a strict=True failure. See
+                # _booknlp_construct_with_state_dict_shim for details.
+                booknlp_instance = _booknlp_construct_with_state_dict_shim(
+                    "en", model_params
+                )
                 booknlp_instance.process(input_path, output_dir, book_id)
             except ImportError as exc:
                 return {

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 from unittest.mock import MagicMock
 
 
@@ -1360,3 +1360,325 @@ def test_live_booknlp_existing_fixture_tests_still_pass() -> None:
     assert env["state"] == "unavailable"
     assert "fixture" in env["explanation"].lower()
     assert "live booknlp" in env["explanation"].lower()
+
+
+# ---------------------------------------------------------------------------
+# T017C1 — BookNLP/transformers state-dict compatibility shim
+# ---------------------------------------------------------------------------
+
+
+def test_state_dict_shim_drops_only_position_ids_key() -> None:
+    """Shim drops only the known tolerated key from a state-dict-like dict."""
+    state_dict = {
+        "bert.embeddings.position_ids": object(),
+        "bert.encoder.layer.0.weight": object(),
+        "crf.transitions": object(),
+    }
+    cleaned, removed = oao._filter_state_dict_for_booknlp_compat(state_dict)
+    assert removed == ("bert.embeddings.position_ids",)
+    assert "bert.embeddings.position_ids" not in cleaned
+    assert "bert.encoder.layer.0.weight" in cleaned
+    assert "crf.transitions" in cleaned
+
+
+def test_state_dict_shim_does_not_tolerate_arbitrary_unexpected_keys() -> None:
+    """Shim must NOT silently drop other unexpected state-dict keys.
+
+    Proves the repair is narrowly scoped: only the single known
+    ``bert.embeddings.position_ids`` key is filtered. Any other
+    unexpected key (e.g. ``bert.pooler.weight``,
+    ``bert.encoder.layer.99.bias``) is preserved untouched so
+    ``load_state_dict(strict=True)`` will fail closed on real
+    incompatibilities. The shim does not hide unrelated errors.
+    """
+    state_dict = {
+        "bert.embeddings.position_ids": object(),
+        "bert.pooler.weight": object(),
+        "bert.encoder.layer.99.bias": object(),
+    }
+    cleaned, removed = oao._filter_state_dict_for_booknlp_compat(state_dict)
+    assert removed == ("bert.embeddings.position_ids",)
+    assert "bert.embeddings.position_ids" not in cleaned
+    assert "bert.pooler.weight" in cleaned
+    assert "bert.encoder.layer.99.bias" in cleaned
+
+
+def test_state_dict_shim_passes_through_non_dict_inputs() -> None:
+    """Shim does not crash on non-dict torch.load returns (e.g. tensors)."""
+    sentinel = object()
+    cleaned, removed = oao._filter_state_dict_for_booknlp_compat(sentinel)
+    assert cleaned is sentinel
+    assert removed == ()
+
+
+def test_state_dict_shim_passes_through_dict_without_tolerated_key() -> None:
+    """Shim returns the same dict object (no copy) when nothing to filter."""
+    state_dict = {"a": 1, "b": 2}
+    cleaned, removed = oao._filter_state_dict_for_booknlp_compat(state_dict)
+    assert cleaned is state_dict
+    assert removed == ()
+
+
+def test_state_dict_shim_install_uninstall_roundtrip() -> None:
+    """torch.load is restored after the shim is uninstalled."""
+    import torch
+
+    original = torch.load
+    sentinel = object()
+    original_load, torch_module = oao._booknlp_state_dict_shim_install()
+    try:
+        assert torch.load is not original
+    finally:
+        oao._booknlp_state_dict_shim_uninstall(original_load, torch_module)
+    assert torch.load is original
+    _ = sentinel  # keep linter from warning about unused sentinel
+
+
+def test_state_dict_shim_filters_only_during_live_booknlp_constructor(
+    monkeypatch: Any,
+) -> None:
+    """The shim is scoped to the BookNLP constructor and restores after.
+
+    Proves the shim's effect is bounded to the BookNLP constructor: a
+    call to ``torch.load`` BEFORE the constructor sees the original
+    behavior, and a call AFTER the constructor sees the original
+    behavior too. The shim only filters during the constructor itself.
+    """
+    import torch
+
+    import torch as real_torch
+
+    saved_states: list[Any] = []
+
+    def _spy_load(*args: Any, **kwargs: Any) -> Any:
+        saved_states.append(real_torch.load.__name__)
+        # Bypass the shim by calling the real torch.load via import.
+        return real_torch.load(*args, **kwargs)
+
+    # Install a spy on torch.load before constructing BookNLP
+    monkeypatch.setattr(torch, "load", _spy_load)
+    real_load = torch.load
+    assert real_load is _spy_load
+
+    # Now install the shim on top of the spy
+    shim_original, shim_torch = oao._booknlp_state_dict_shim_install()
+    try:
+        # Inside the shim, torch.load is the wrapped version (not the spy)
+        assert torch.load is not _spy_load
+    finally:
+        oao._booknlp_state_dict_shim_uninstall(shim_original, shim_torch)
+
+    # After uninstall, torch.load should be the spy again
+    assert torch.load is _spy_load
+    # And one restore call doesn't leak any side effects
+    oao._booknlp_state_dict_shim_uninstall(real_load, torch)
+
+
+def test_live_booknlp_state_dict_shim_handles_position_ids_succeeds(
+    monkeypatch: Any,
+) -> None:
+    """Constructor succeeds when torch.load returns position_ids.
+
+    Mocks the BookNLP package so that during
+    ``_booknlp_construct_with_state_dict_shim`` the inner BookNLP
+    constructor invokes a ``torch.load`` that returns a state dict
+    containing the known-incompatible ``bert.embeddings.position_ids``
+    key. The shim must drop the key so ``load_state_dict(strict=True)``
+    succeeds, and the runner must report the entity tagger as
+    constructed.
+
+    This proves:
+
+      - The shim removes the single tolerated key from the loaded
+        state dict.
+      - ``strict=True`` is preserved; the inner Tagger construction
+        succeeds because the now-expected state dict matches the
+        model.
+      - The shim is restored after the constructor returns
+        (verified by the shim uninstall test).
+    """
+    import torch
+
+    class _MockTagger:
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            self.bert = type(
+                "_MockBert", (), {"eval": lambda self: None}
+            )()
+
+        def eval(self) -> None:
+            pass
+
+        def state_dict(self) -> dict[str, Any]:
+            return {"bert.encoder.layer.0.weight": object()}
+
+        def load_state_dict(
+            self,
+            state_dict: Mapping[str, Any],
+            strict: bool = True,
+        ) -> Any:
+            assert strict is True
+            assert "bert.embeddings.position_ids" not in state_dict
+            return _MockLoadResult(expected=set(), unexpected=set())
+
+    class _MockLoadResult:
+        def __init__(self, *, expected: set[str], unexpected: set[str]) -> None:
+            self.missing_keys: list[str] = []
+            self.unexpected_keys: list[str] = list(unexpected)
+
+    tagger_instances: list[_MockTagger] = []
+
+    def _tagger_factory(*args: Any, **kwargs: Any) -> _MockTagger:
+        tagger = _MockTagger()
+        tagger_instances.append(tagger)
+        return tagger
+
+    def _patched_load(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        return {
+            "bert.embeddings.position_ids": object(),
+            "bert.encoder.layer.0.weight": object(),
+        }
+
+    booknlp_pkg = MagicMock()
+    booknlp_mod = MagicMock()
+
+    class _StubBookNLP:
+        def __init__(self, language: str, model_params: dict) -> None:
+            self.entityTagger = _tagger_factory()
+            self.language = language
+            self.model_params = model_params
+
+        def process(self, input_file: str, output_dir: str, book_id: str) -> None:
+            return None
+
+    booknlp_mod.BookNLP = _StubBookNLP
+    booknlp_pkg.booknlp = booknlp_mod
+    monkeypatch.setitem(sys.modules, "booknlp", booknlp_pkg)
+    monkeypatch.setitem(sys.modules, "booknlp.booknlp", booknlp_mod)
+    monkeypatch.setattr(torch, "load", _patched_load)
+
+    instance = oao._booknlp_construct_with_state_dict_shim(
+        "en", {"pipeline": "entity", "model": "small"}
+    )
+    assert isinstance(instance, _StubBookNLP)
+    assert tagger_instances, "Tagger constructor was not invoked"
+    # After the shim uninstalls, torch.load is restored to the patched
+    # version (monkeypatch.setattr was the prior value).
+    assert torch.load is _patched_load
+
+
+def test_live_booknlp_state_dict_shim_preserves_strict_true_behavior() -> None:
+    """The shim must NOT use broad ``strict=False`` to hide other issues.
+
+    Proves the shim is narrowly scoped: the filtered state dict is
+    passed to ``load_state_dict`` with ``strict=True`` preserved, and
+    any other unexpected key in the state dict is preserved untouched.
+    The shim is therefore not a broad ``strict=False`` workaround;
+    unrelated incompatibilities still fail closed.
+    """
+    # 1) The shim's filter function preserves arbitrary unexpected keys
+    # so that load_state_dict(strict=True) will still see them.
+    state_dict = {
+        "bert.embeddings.position_ids": "tolerated",
+        "bert.pooler.weight": "arbitrary unexpected",
+        "bert.encoder.layer.0.weight": "matched",
+    }
+    cleaned, removed = oao._filter_state_dict_for_booknlp_compat(state_dict)
+    assert removed == ("bert.embeddings.position_ids",)
+    assert "bert.embeddings.position_ids" not in cleaned
+    assert "bert.pooler.weight" in cleaned, (
+        "shim removed an arbitrary unexpected key; would mask strict=True"
+    )
+    assert "bert.encoder.layer.0.weight" in cleaned
+
+    # 2) The shim does not set strict=False. The wrapped torch.load
+    # still returns a state-dict, and BookNLP's load_state_dict call
+    # uses the default (strict=True). The shim is purely a key-removal
+    # filter, not a strict-flag override.
+    cleaned_dict, removed_keys = oao._filter_state_dict_for_booknlp_compat(
+        {
+            "bert.embeddings.position_ids": "tolerated",
+            "bert.pooler.weight": "arbitrary unexpected",
+        }
+    )
+    assert "bert.pooler.weight" in cleaned_dict
+    assert "bert.embeddings.position_ids" not in cleaned_dict
+    assert removed_keys == ("bert.embeddings.position_ids",)
+
+
+def test_live_booknlp_state_dict_shim_safety_boundaries_preserved(
+    monkeypatch: Any,
+) -> None:
+    """The shim does not affect the OMI safety envelope.
+
+    Proves the shim never mutates Memory/Canon, never persists
+    candidates, never generates story prose, and never bypasses the
+    T007 envelope validator. The shim is strictly an internal
+    compatibility repair.
+    """
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch,
+        entities=[
+            {
+                "COREF": "1",
+                "start_token": "0",
+                "end_token": "1",
+                "prop": "PROP",
+                "cat": "PROP_PER",
+                "text": "Mara Vale",
+            }
+        ],
+        tokens=[
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "0",
+                "token_ID_within_document": "0",
+                "word": "Mara",
+                "lemma": "Mara",
+                "byte_onset": "0",
+                "byte_offset": "4",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "nsubj",
+                "syntactic_head_ID": "1",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "1",
+                "token_ID_within_document": "1",
+                "word": "Vale",
+                "lemma": "Vale",
+                "byte_onset": "5",
+                "byte_offset": "9",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "flat",
+                "syntactic_head_ID": "0",
+                "event": "O",
+            },
+        ],
+    )
+
+    result = _run_adapter("booknlp", persist_candidates=True)
+
+    assert result["analysis_status"] == "succeeded"
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_canon_promotion"] is True
+    assert result["safety"]["no_story_prose_generation"] is True
+    for finding in result["findings"]:
+        assert finding["owner_decision"]["approved"] is False
+        assert finding["review_status"] == "candidate_review_pending"
+        for forbidden in ("truth", "canon", "approved", "promoted"):
+            assert forbidden not in finding["support_label"].lower()
+        for forbidden_text in (
+            "rewrite:",
+            "continuation:",
+            "outline:",
+            "draft:",
+        ):
+            assert forbidden_text not in finding["extracted_claim"].lower()
