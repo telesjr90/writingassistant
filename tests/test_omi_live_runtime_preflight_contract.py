@@ -608,3 +608,453 @@ def test_ollama_model_env_var_changes_reported_model(monkeypatch) -> None:
     ollama_tool = tools["ollama_model"]
 
     assert ollama_tool["ollama_model_name"] == "phi3:mini"
+
+
+# ---------------------------------------------------------------------------
+# T016B — Story Check runtime preflight/config/availability check
+# ---------------------------------------------------------------------------
+
+
+def _mock_story_check_probe(
+    monkeypatch,
+    *,
+    analysis_engine: bool = True,
+    prompt: bool = True,
+    mock_fixture: bool = True,
+    analysis_modes: bool = True,
+    storyform: bool = True,
+    requests_available: bool = True,
+) -> None:
+    """Patch ``_path_exists`` and ``_find_module`` for the Story Check probe.
+
+    The T016B probe consults a known set of relative paths and the
+    ``requests`` Python module. Tests use this helper to flip individual
+    dependencies on/off without touching the real repo.
+    """
+
+    paths_map: dict[str, bool] = {
+        "backend/analysis_engine.py": analysis_engine,
+        "backend/prompts/story_check.txt": prompt,
+        "backend/mock_responses/story_check.json": mock_fixture,
+        "backend/analysis_modes.py": analysis_modes,
+        "backend/storyform.py": storyform,
+    }
+
+    def fake_path_exists(relative_path: str) -> bool:
+        if relative_path in paths_map:
+            return paths_map[relative_path]
+        return False
+
+    def fake_find_module(module_name: str):
+        if module_name == "requests":
+            return object() if requests_available else None
+        return None
+
+    monkeypatch.setattr(preflight, "_path_exists", fake_path_exists)
+    monkeypatch.setattr(preflight.importlib.util, "find_spec", fake_find_module)
+
+
+def test_story_check_runtime_with_all_surfaces_and_requests_reports_available(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(_report())["story_check"]
+
+    assert tool["status"] in {"disabled", "available"}
+    assert tool["runtime_configured"] is True
+    assert tool["runtime_dependency_available"] is True
+    assert tool["runtime_dependency_status"] == "available"
+    assert tool["story_check_runtime_surface"] == "available"
+    assert tool["story_check_analysis_engine_available"] is True
+    assert tool["story_check_prompt_available"] is True
+    assert tool["story_check_mock_fixture_available"] is True
+    assert tool["story_check_analysis_modes_available"] is True
+    assert tool["story_check_storyform_surface_available"] is True
+    assert tool["story_check_requests_available"] is True
+    assert "all present" in tool["story_check_detail"].lower()
+    assert tool["story_check_detail"] == tool["probe_detail"]
+    assert tool["story_check_ollama_base_url"] == "http://localhost:11434"
+    assert tool["story_check_ollama_model_name"] == "qwen3:8b"
+    assert tool["story_check_ollama_timeout_seconds"] == 300.0
+    assert tool["story_check_analysis_mode_value"] == "ollama_baseline"
+    assert tool["story_check_analysis_mode_configured"] is True
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+
+
+def test_story_check_disabled_by_default_reports_safe_read_only_state(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(_report())["story_check"]
+
+    assert tool["global_enabled"] is False
+    assert tool["tool_enabled"] is False
+    assert tool["runtime_enabled"] is False
+    assert tool["blocked"] is False
+    assert tool["status"] in {"disabled", "available"}
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_story_check_live_enabled_flag_changes_status_when_runtime_ready(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["global_enabled"] is True
+    assert tool["tool_enabled"] is True
+    assert tool["runtime_enabled"] is True
+    assert tool["blocked"] is False
+    assert tool["runtime_configured"] is True
+    assert tool["runtime_dependency_available"] is True
+    assert tool["status"] == "enabled"
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+
+
+def test_story_check_live_enabled_but_unconfigured_reports_not_configured(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch, prompt=False)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["runtime_enabled"] is True
+    assert tool["runtime_configured"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] in {"not_configured", "unavailable"}
+    assert tool["status"] == "not_configured"
+    assert tool["story_check_prompt_available"] is False
+    assert "prompts/story_check.txt" in tool["story_check_detail"]
+
+
+def test_story_check_blocked_flag_overrides_available_runtime(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_BLOCKED": "true",
+                "OMI_LIVE_STORY_CHECK_BLOCKED_REASON": "Owner decision pending.",
+            }
+        )
+    )["story_check"]
+
+    assert tool["runtime_enabled"] is True
+    assert tool["runtime_dependency_available"] is True
+    assert tool["blocked"] is True
+    assert tool["blocked_reason"] == "Owner decision pending."
+    assert tool["status"] == "blocked"
+
+
+def test_story_check_missing_prompt_file_reports_unavailable_safely(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch, prompt=False)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_prompt_available"] is False
+    assert tool["runtime_configured"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] in {"not_configured", "unavailable"}
+    assert tool["status"] in {"not_configured", "unavailable"}
+    assert "prompts/story_check.txt" in tool["story_check_detail"]
+
+
+def test_story_check_missing_mock_fixture_reports_partial_availability(
+    monkeypatch,
+) -> None:
+    """Missing mock fixture is reported but does not block the live runtime.
+
+    The mock fixture is only required for ``ANALYSIS_MODE=mock``; the live
+    path still needs the analysis engine, prompt, analysis_modes,
+    storyform, and ``requests``. T016B chooses to treat the mock fixture as
+    a partial-availability signal: when only the mock fixture is missing,
+    the probe remains available but reports ``mock_fixture_available:
+    False`` and a partial-availability detail.
+    """
+    _mock_story_check_probe(monkeypatch, mock_fixture=False)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_mock_fixture_available"] is False
+    assert tool["runtime_configured"] is True
+    assert tool["runtime_dependency_available"] is True
+    assert tool["runtime_dependency_status"] == "available"
+    assert tool["status"] == "enabled"
+    assert "mock_responses/story_check.json" in tool["story_check_detail"]
+
+
+def test_story_check_missing_requests_package_reports_unavailable(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch, requests_available=False)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_requests_available"] is False
+    assert tool["runtime_configured"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] in {"not_configured", "unavailable"}
+    assert tool["status"] in {"not_configured", "unavailable"}
+    assert "python:requests" in tool["story_check_detail"]
+
+
+def test_story_check_missing_analysis_engine_reports_unavailable(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch, analysis_engine=False)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_analysis_engine_available"] is False
+    assert tool["runtime_configured"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] in {"not_configured", "unavailable"}
+    assert tool["status"] in {"not_configured", "unavailable"}
+    assert "analysis_engine.py" in tool["story_check_detail"]
+
+
+def test_story_check_preflight_does_not_call_run_story_check(monkeypatch) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    calls: list[tuple[str, str]] = []
+
+    class _Sentinel:
+        def __call__(self, *args, **kwargs):  # pragma: no cover - never reached
+            calls.append(("args", args))
+            raise AssertionError(
+                "run_story_check must not be called from preflight"
+            )
+
+    sentinel = _Sentinel()
+    monkeypatch.setattr(
+        "backend.analysis_engine.run_story_check",
+        sentinel,
+        raising=False,
+    )
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+        }
+    )
+
+    assert calls == []
+    tool = _tools_by_name(report)["story_check"]
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_story_check_preflight_does_not_call_ollama_or_network(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+    _mock_ollama_probe(monkeypatch, _MOCK_OLLAMA_UNREACHABLE)
+
+    network_attempts: list[tuple[str, tuple]] = []
+
+    def fake_urlopen(*args, **kwargs):
+        network_attempts.append(("urlopen", args))
+        raise AssertionError(
+            "urllib urlopen must not be called by Story Check preflight"
+        )
+
+    def fake_request(*args, **kwargs):
+        network_attempts.append(("request", args))
+        raise AssertionError(
+            "urllib Request must not be called by Story Check preflight"
+        )
+
+    def fake_requests_post(*args, **kwargs):
+        network_attempts.append(("requests.post", args))
+        raise AssertionError(
+            "requests.post must not be called by Story Check preflight"
+        )
+
+    def fake_requests_get(*args, **kwargs):
+        network_attempts.append(("requests.get", args))
+        raise AssertionError(
+            "requests.get must not be called by Story Check preflight"
+        )
+
+    import urllib.request
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(urllib.request, "Request", fake_request)
+    monkeypatch.setattr("requests.post", fake_requests_post, raising=False)
+    monkeypatch.setattr("requests.get", fake_requests_get, raising=False)
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            "OMI_LIVE_OLLAMA_BASE_URL": "http://172.25.144.1:11434",
+            "OMI_LIVE_OLLAMA_MODEL": "qwen3:8b",
+        }
+    )
+
+    assert network_attempts == []
+    tool = _tools_by_name(report)["story_check"]
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_story_check_ollama_config_env_vars_are_surfaced_read_only(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OLLAMA_BASE_URL": "http://172.25.144.1:11434",
+                "OLLAMA_MODEL": "phi3:mini",
+                "OLLAMA_TIMEOUT_SECONDS": "180",
+                "ANALYSIS_MODE": "mock",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_ollama_base_url"] == "http://172.25.144.1:11434"
+    assert tool["story_check_ollama_model_name"] == "phi3:mini"
+    assert tool["story_check_ollama_timeout_seconds"] == 180.0
+    assert tool["story_check_analysis_mode_value"] == "mock"
+    assert tool["story_check_analysis_mode_configured"] is True
+
+
+def test_story_check_invalid_analysis_mode_falls_back_to_default(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "ANALYSIS_MODE": "bogus-mode",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_analysis_mode_value"] == "ollama_baseline"
+    assert tool["story_check_analysis_mode_configured"] is False
+
+
+def test_story_check_invalid_ollama_timeout_falls_back_to_default(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch)
+
+    tool = _tools_by_name(_report({"OLLAMA_TIMEOUT_SECONDS": "not-a-number"}))[
+        "story_check"
+    ]
+
+    assert tool["story_check_ollama_timeout_seconds"] == 300.0
+
+
+def test_story_check_missing_storyform_or_analysis_modes_reports_unavailable(
+    monkeypatch,
+) -> None:
+    _mock_story_check_probe(monkeypatch, storyform=False, analysis_modes=False)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+            }
+        )
+    )["story_check"]
+
+    assert tool["story_check_storyform_surface_available"] is False
+    assert tool["story_check_analysis_modes_available"] is False
+    assert tool["runtime_configured"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] in {"not_configured", "unavailable"}
+    assert tool["status"] in {"not_configured", "unavailable"}
+    assert "storyform.py" in tool["story_check_detail"]
+    assert "analysis_modes.py" in tool["story_check_detail"]
+
+
+def test_story_check_preflight_does_not_persist_or_promote(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.create_omi_idea("demo", "Owner-authored preflight note.")
+    before = project_manager.get_omi_summary("demo")
+
+    _mock_story_check_probe(monkeypatch)
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_STORY_CHECK_ENABLED": "true",
+        }
+    )
+
+    after = project_manager.get_omi_summary("demo")
+    assert after == before
+    tool = _tools_by_name(report)["story_check"]
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False

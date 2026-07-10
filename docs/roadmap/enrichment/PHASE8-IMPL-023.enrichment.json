@@ -499,8 +499,9 @@
     {
       "task_id": "PHASE8-IMPL-023-T016B",
       "title": "Story Check runtime preflight/config/availability check",
-      "status": "planned",
-      "scope": "extend backend/omi_runtime_preflight.py _dependency_probe(adapter=\"story_check\") to probe requests Python package, backend/prompts/story_check.txt existence, backend/mock_responses/story_check.json existence, analysis_modes.get_analysis_mode() validity, storyform.Storyform.from_file importability, and Ollama reachability for the chosen path; add story_check_request_timeout (OLLAMA_TIMEOUT_SECONDS or OMI_LIVE_STORY_CHECK_TIMEOUT_SECONDS); add expected-red tests to tests/test_omi_live_runtime_preflight_contract.py; no live Story Check call; no candidates; no Memory/Canon mutation; no story prose"
+      "status": "complete/PASS",
+      "scope": "extend backend/omi_runtime_preflight.py _dependency_probe(adapter=\"story_check\") and add _story_check_runtime_probe to report boolean availability of backend/analysis_engine.py, backend/prompts/story_check.txt, backend/mock_responses/story_check.json, backend/analysis_modes.py, backend/storyform.py, and the requests Python package (via importlib.util.find_spec); surface configured OLLAMA_BASE_URL/OLLAMA_MODEL/OLLAMA_TIMEOUT_SECONDS/ANALYSIS_MODE env vars as configuration only; reuse existing T013 status vocabulary; preserve disabled-by-default and blocked-state behavior; mock fixture is a partial-availability signal; 16 new mocked tests in tests/test_omi_live_runtime_preflight_contract.py; no live Story Check call; no run_story_check import/call; no legacy Story Check route call; no Ollama call; no candidates; no Memory/Canon mutation; no story prose; no backend/frontend/package/dependency file changes",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016B-story-check-runtime-preflight-config-availability.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T016C",
@@ -575,12 +576,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T016A",
+  "latest_child_task": "PHASE8-IMPL-023-T016B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016A-story-check-runtime-surface-and-fixture-contract-inspection.md",
-  "next_child_task": "PHASE8-IMPL-023-T016B",
-  "next_child_title": "Story Check runtime preflight/config/availability check",
-  "next_child_status": "planned (T015D-rerun-after-T015F is complete/PASS; T015D is now complete/PASS for real Ollama qwen3:8b validation; T016A inspect/docs is complete/PASS; T016B preflight/config/availability is the next planned child)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016B-story-check-runtime-preflight-config-availability.md",
+  "next_child_task": "PHASE8-IMPL-023-T016C",
+  "next_child_title": "Live Story Check adapter behind flags",
+  "next_child_status": "planned (T016A inspect/docs is complete/PASS; T016B preflight/config/availability is complete/PASS; T016C live Story Check adapter behind flags is the next planned child)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"

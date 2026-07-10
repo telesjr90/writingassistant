@@ -3,6 +3,13 @@
 T013 scope only: report configuration, feature-flag, fixture-contract, and
 dependency availability signals without running analysis, models, or external
 services.
+
+T016B extends the ``story_check`` adapter probe with read-only checks for the
+in-repo ``backend.analysis_engine`` runtime surface, the prompt file, the
+mock fixture, ``backend.analysis_modes`` validity, the ``storyform`` surface,
+and the ``requests`` Python package. T016B does not import or execute
+``backend.analysis_engine.run_story_check``, does not call the legacy Story
+Check route, and does not call Ollama.
 """
 
 from __future__ import annotations
@@ -64,6 +71,20 @@ OMI_LIVE_OLLAMA_BASE_URL_DEFAULT = "http://127.0.0.1:11434"
 OMI_LIVE_OLLAMA_MODEL_ENV = "OMI_LIVE_OLLAMA_MODEL"
 OMI_LIVE_OLLAMA_MODEL_DEFAULT = "qwen3:8b"
 
+STORY_CHECK_ANALYSIS_ENGINE_REL = "backend/analysis_engine.py"
+STORY_CHECK_PROMPT_REL = "backend/prompts/story_check.txt"
+STORY_CHECK_MOCK_FIXTURE_REL = "backend/mock_responses/story_check.json"
+STORY_CHECK_ANALYSIS_MODES_REL = "backend/analysis_modes.py"
+STORY_CHECK_STORYFORM_REL = "backend/storyform.py"
+STORY_CHECK_REQUESTS_MODULE = "requests"
+STORY_CHECK_ANALYSIS_MODE_ENV = "ANALYSIS_MODE"
+STORY_CHECK_OLLAMA_BASE_URL_ENV = "OLLAMA_BASE_URL"
+STORY_CHECK_OLLAMA_BASE_URL_DEFAULT = "http://localhost:11434"
+STORY_CHECK_OLLAMA_MODEL_ENV = "OLLAMA_MODEL"
+STORY_CHECK_OLLAMA_MODEL_DEFAULT = "qwen3:8b"
+STORY_CHECK_OLLAMA_TIMEOUT_ENV = "OLLAMA_TIMEOUT_SECONDS"
+STORY_CHECK_OLLAMA_TIMEOUT_DEFAULT = "300"
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -88,6 +109,29 @@ def _find_module(module_name: str) -> bool:
 
 def _path_exists(relative_path: str) -> bool:
     return (_REPO_ROOT / relative_path).exists()
+
+
+def _path_readable(relative_path: str) -> bool:
+    """Read-only readability probe for a repo-relative file.
+
+    Fail-closed: returns False when the file is missing, is not a regular
+    file, or cannot be opened for reading. Does not read the contents and
+    does not write anything.
+    """
+    try:
+        path = _REPO_ROOT / relative_path
+    except (TypeError, ValueError):
+        return False
+    try:
+        if not path.is_file():
+            return False
+    except OSError:
+        return False
+    try:
+        with path.open("rb"):
+            return True
+    except OSError:
+        return False
 
 
 def _spacy_model_probe(model_name: str) -> dict[str, Any]:
@@ -132,6 +176,113 @@ def _spacy_model_probe(model_name: str) -> dict[str, Any]:
                 f"{type(exc).__name__}: {exc}"
             ),
         }
+
+
+def _story_check_runtime_probe(env: Mapping[str, str]) -> dict[str, Any]:
+    """Read-only Story Check runtime preflight probe.
+
+    T016B scope: confirm the in-repo Story Check runtime surface, the prompt
+    file, the mock fixture, the ``analysis_modes`` module, the ``storyform``
+    module surface, and the ``requests`` Python package are all available
+    without importing or executing ``backend.analysis_engine.run_story_check``
+    and without calling the legacy Story Check route. Also surfaces the
+    configured Ollama baseline URL/model/timeout env vars as configuration
+    only; it never calls Ollama.
+
+    The result is a flat dict of booleans, configured values, and detail
+    strings. The caller is responsible for combining these into a status
+    word using the existing T013 status vocabulary.
+    """
+    analysis_engine_available = _path_exists(STORY_CHECK_ANALYSIS_ENGINE_REL)
+    prompt_available = _path_exists(STORY_CHECK_PROMPT_REL)
+    mock_fixture_available = _path_exists(STORY_CHECK_MOCK_FIXTURE_REL)
+    analysis_modes_available = _path_exists(STORY_CHECK_ANALYSIS_MODES_REL)
+    storyform_surface_available = _path_exists(STORY_CHECK_STORYFORM_REL)
+    requests_available = _find_module(STORY_CHECK_REQUESTS_MODULE)
+
+    missing: list[str] = []
+    if not analysis_engine_available:
+        missing.append(STORY_CHECK_ANALYSIS_ENGINE_REL)
+    if not prompt_available:
+        missing.append(STORY_CHECK_PROMPT_REL)
+    if not analysis_modes_available:
+        missing.append(STORY_CHECK_ANALYSIS_MODES_REL)
+    if not storyform_surface_available:
+        missing.append(STORY_CHECK_STORYFORM_REL)
+    if not requests_available:
+        missing.append(f"python:{STORY_CHECK_REQUESTS_MODULE}")
+
+    optional_missing: list[str] = []
+    if not mock_fixture_available:
+        optional_missing.append(STORY_CHECK_MOCK_FIXTURE_REL)
+
+    if missing:
+        detail = (
+            "Story Check runtime surface probe missing: "
+            + ", ".join(missing)
+        )
+    elif optional_missing:
+        detail = (
+            "Story Check runtime surface probe: analysis_engine, prompt, "
+            "analysis_modes, storyform, and requests package all present; "
+            "optional missing: "
+            + ", ".join(optional_missing)
+        )
+    else:
+        detail = (
+            "Story Check runtime surface probe: analysis_engine, prompt, mock "
+            "fixture, analysis_modes, storyform, and requests package all present"
+        )
+
+    ollama_base_url = (
+        _env_text(env, STORY_CHECK_OLLAMA_BASE_URL_ENV)
+        or STORY_CHECK_OLLAMA_BASE_URL_DEFAULT
+    )
+    ollama_model_name = (
+        _env_text(env, STORY_CHECK_OLLAMA_MODEL_ENV)
+        or STORY_CHECK_OLLAMA_MODEL_DEFAULT
+    )
+    ollama_timeout_text = (
+        _env_text(env, STORY_CHECK_OLLAMA_TIMEOUT_ENV)
+        or STORY_CHECK_OLLAMA_TIMEOUT_DEFAULT
+    )
+
+    try:
+        ollama_timeout_seconds: float = float(ollama_timeout_text)
+    except (TypeError, ValueError):
+        ollama_timeout_seconds = float(STORY_CHECK_OLLAMA_TIMEOUT_DEFAULT)
+
+    analysis_mode_value = _env_text(env, STORY_CHECK_ANALYSIS_MODE_ENV) or ""
+    try:
+        valid_analysis_modes = {"mock", "ollama_baseline"}
+        if analysis_mode_value == "":
+            analysis_mode_configured = True
+            analysis_mode_value = "ollama_baseline"
+        else:
+            analysis_mode_configured = analysis_mode_value in valid_analysis_modes
+            if not analysis_mode_configured:
+                analysis_mode_value = "ollama_baseline"
+    except Exception:  # pragma: no cover - defensive fail-closed branch
+        analysis_mode_configured = False
+        analysis_mode_value = "ollama_baseline"
+
+    return {
+        "story_check_runtime_surface": (
+            "available" if not missing else "unavailable"
+        ),
+        "story_check_analysis_engine_available": analysis_engine_available,
+        "story_check_prompt_available": prompt_available,
+        "story_check_mock_fixture_available": mock_fixture_available,
+        "story_check_analysis_modes_available": analysis_modes_available,
+        "story_check_storyform_surface_available": storyform_surface_available,
+        "story_check_requests_available": requests_available,
+        "story_check_ollama_base_url": ollama_base_url,
+        "story_check_ollama_model_name": ollama_model_name,
+        "story_check_ollama_timeout_seconds": ollama_timeout_seconds,
+        "story_check_analysis_mode_value": analysis_mode_value,
+        "story_check_analysis_mode_configured": analysis_mode_configured,
+        "story_check_detail": detail,
+    }
 
 
 def _ollama_http_probe(base_url: str, model_name: str) -> dict[str, Any]:
@@ -278,9 +429,51 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "ollama_probe_detail": probe["ollama_probe_detail"],
         }
     elif adapter == "story_check":
-        configured = _path_exists("backend/analysis_engine.py")
+        probe = _story_check_runtime_probe(env)
+        configured = bool(
+            probe["story_check_analysis_engine_available"]
+            and probe["story_check_prompt_available"]
+            and probe["story_check_analysis_modes_available"]
+            and probe["story_check_storyform_surface_available"]
+            and probe["story_check_requests_available"]
+        )
         available = configured
-        detail = "In-repo module surface probe: backend/analysis_engine.py"
+        detail = probe["story_check_detail"]
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": (
+                "available" if available else "not_configured"
+            ),
+            "probe_detail": detail,
+            "story_check_runtime_surface": probe["story_check_runtime_surface"],
+            "story_check_analysis_engine_available": probe[
+                "story_check_analysis_engine_available"
+            ],
+            "story_check_prompt_available": probe["story_check_prompt_available"],
+            "story_check_mock_fixture_available": probe[
+                "story_check_mock_fixture_available"
+            ],
+            "story_check_analysis_modes_available": probe[
+                "story_check_analysis_modes_available"
+            ],
+            "story_check_storyform_surface_available": probe[
+                "story_check_storyform_surface_available"
+            ],
+            "story_check_requests_available": probe["story_check_requests_available"],
+            "story_check_ollama_base_url": probe["story_check_ollama_base_url"],
+            "story_check_ollama_model_name": probe["story_check_ollama_model_name"],
+            "story_check_ollama_timeout_seconds": probe[
+                "story_check_ollama_timeout_seconds"
+            ],
+            "story_check_analysis_mode_value": probe[
+                "story_check_analysis_mode_value"
+            ],
+            "story_check_analysis_mode_configured": probe[
+                "story_check_analysis_mode_configured"
+            ],
+            "story_check_detail": detail,
+        }
     elif adapter == "ncp":
         configured = bool(
             _env_text(env, "OMI_LIVE_NCP_COMMAND")
@@ -431,6 +624,44 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
         report["ollama_model_name"] = dependency.get("ollama_model_name")
         report["ollama_model_available"] = dependency.get("ollama_model_available")
         report["ollama_probe_detail"] = dependency.get("ollama_probe_detail")
+    if adapter == "story_check":
+        report["story_check_runtime_surface"] = dependency.get(
+            "story_check_runtime_surface"
+        )
+        report["story_check_analysis_engine_available"] = dependency.get(
+            "story_check_analysis_engine_available"
+        )
+        report["story_check_prompt_available"] = dependency.get(
+            "story_check_prompt_available"
+        )
+        report["story_check_mock_fixture_available"] = dependency.get(
+            "story_check_mock_fixture_available"
+        )
+        report["story_check_analysis_modes_available"] = dependency.get(
+            "story_check_analysis_modes_available"
+        )
+        report["story_check_storyform_surface_available"] = dependency.get(
+            "story_check_storyform_surface_available"
+        )
+        report["story_check_requests_available"] = dependency.get(
+            "story_check_requests_available"
+        )
+        report["story_check_ollama_base_url"] = dependency.get(
+            "story_check_ollama_base_url"
+        )
+        report["story_check_ollama_model_name"] = dependency.get(
+            "story_check_ollama_model_name"
+        )
+        report["story_check_ollama_timeout_seconds"] = dependency.get(
+            "story_check_ollama_timeout_seconds"
+        )
+        report["story_check_analysis_mode_value"] = dependency.get(
+            "story_check_analysis_mode_value"
+        )
+        report["story_check_analysis_mode_configured"] = dependency.get(
+            "story_check_analysis_mode_configured"
+        )
+        report["story_check_detail"] = dependency.get("story_check_detail")
     return report
 
 
