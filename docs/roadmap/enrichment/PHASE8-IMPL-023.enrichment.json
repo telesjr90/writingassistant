@@ -180,6 +180,7 @@
     "docs/roadmap/phase_map.md",
     "docs/roadmap/roadmap_index.yaml",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T014C-live-spacy-adapter-behind-flags.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T015B-ollama-http-preflight-and-model-availability.md",
     "AGENTS.md",
     "CLAUDE.md",
     ".cursorrules",
@@ -415,8 +416,8 @@
     {
       "task_id": "PHASE8-IMPL-023-T015",
       "title": "Live Ollama/local model integration in OMI and analysis",
-      "status": "ready/active",
-      "scope": "split into T015A inspect/docs (complete/PASS), T015B live adapter implementation, T015C manual validation. T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP; qwen3:8b selected as MVP model candidate; fixture contract and preflight flags mapped."
+      "status": "active (T015C ready/active next)",
+      "scope": "split into T015A inspect/docs (complete/PASS), T015B HTTP preflight and model availability (complete/PASS), T015C live Ollama structured extraction adapter implementation, T015D manual real qwen3:8b validation. T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP. T015B added HTTP API reachability/model availability probe to preflight with OMI_LIVE_OLLAMA_BASE_URL and OMI_LIVE_OLLAMA_MODEL env vars."
     },
     {
       "task_id": "PHASE8-IMPL-023-T015A",
@@ -424,6 +425,17 @@
       "status": "complete/PASS",
       "scope": "inspect/probe/docs only; no live adapter implementation; no model analysis; no candidates; no backend/frontend/package changes",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015A-ollama-runtime-and-fixture-contract-inspection.md"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T015B",
+      "title": "Ollama HTTP preflight and model availability",
+      "status": "complete/PASS",
+      "scope": "read-only Ollama HTTP API reachability and model availability probe in T013 preflight; urllib.request only; OMI_LIVE_OLLAMA_BASE_URL/OMI_LIVE_OLLAMA_MODEL env vars; 9 new tests (monkeypatched); no live adapter, no model generation, no candidates, no frontend/package changes",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015B-ollama-http-preflight-and-model-availability.md",
+      "artifacts": [
+        "backend/omi_runtime_preflight.py",
+        "tests/test_omi_live_runtime_preflight_contract.py"
+      ]
     },
     {
       "task_id": "PHASE8-IMPL-023-T016",
@@ -492,12 +504,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T015A",
+  "latest_child_task": "PHASE8-IMPL-023-T015B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015A-ollama-runtime-and-fixture-contract-inspection.md",
-  "next_child_task": "PHASE8-IMPL-023-T015B",
-  "next_child_title": "Live Ollama/local model adapter implementation",
-  "next_child_status": "ready/active (Ollama 0.31.1 installed on Windows; WSL reachability verified; qwen3:8b selected)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015B-ollama-http-preflight-and-model-availability.md",
+  "next_child_task": "PHASE8-IMPL-023-T015C",
+  "next_child_title": "Live Ollama/local model structured extraction adapter implementation",
+  "next_child_status": "ready/active (Ollama 0.31.1 HTTP API reachability verified via preflight; qwen3:8b selected; OMI_LIVE_OLLAMA_BASE_URL and OMI_LIVE_OLLAMA_MODEL env vars configured)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"

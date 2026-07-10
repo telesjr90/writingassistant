@@ -58,6 +58,12 @@ OMI_LIVE_TOOL_BLOCKED_REASON_ENVS: dict[str, str] = {
     for adapter, blocked_env in OMI_LIVE_TOOL_BLOCKED_ENVS.items()
 }
 
+OMI_LIVE_OLLAMA_BASE_URL_ENV = "OMI_LIVE_OLLAMA_BASE_URL"
+OMI_LIVE_OLLAMA_BASE_URL_DEFAULT = "http://127.0.0.1:11434"
+
+OMI_LIVE_OLLAMA_MODEL_ENV = "OMI_LIVE_OLLAMA_MODEL"
+OMI_LIVE_OLLAMA_MODEL_DEFAULT = "qwen3:8b"
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -128,6 +134,89 @@ def _spacy_model_probe(model_name: str) -> dict[str, Any]:
         }
 
 
+def _ollama_http_probe(base_url: str, model_name: str) -> dict[str, Any]:
+    """Probe Ollama HTTP API availability.
+
+    Read-only: only calls /api/version and /api/tags.
+    Fail-closed on connection errors, timeouts, invalid JSON, missing fields.
+    Uses Python standard library only (urllib.request).
+    """
+    import json
+    import urllib.error
+    import urllib.request
+
+    clean_base = base_url.rstrip("/")
+    result: dict[str, Any] = {
+        "ollama_base_url": base_url,
+        "ollama_api_available": False,
+        "ollama_version": None,
+        "ollama_model_name": model_name,
+        "ollama_model_available": False,
+        "ollama_probe_detail": "",
+    }
+
+    try:
+        version_url = f"{clean_base}/api/version"
+        req = urllib.request.Request(version_url, method="GET")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            version_data = json.loads(resp.read().decode())
+        ollama_version = version_data.get("version")
+        if not ollama_version:
+            result["ollama_probe_detail"] = (
+                f"Ollama HTTP API reachable at {clean_base} but "
+                f"/api/version missing 'version' field"
+            )
+            return result
+        result["ollama_version"] = ollama_version
+    except json.JSONDecodeError as exc:
+        result["ollama_probe_detail"] = (
+            f"Ollama HTTP API /api/version returned invalid JSON at "
+            f"{clean_base}: {exc}"
+        )
+        return result
+    except Exception as exc:
+        result["ollama_probe_detail"] = (
+            f"Ollama HTTP API unavailable at {clean_base}: "
+            f"{type(exc).__name__}: {exc}"
+        )
+        return result
+
+    try:
+        tags_url = f"{clean_base}/api/tags"
+        req = urllib.request.Request(tags_url, method="GET")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            tags_data = json.loads(resp.read().decode())
+        models = tags_data.get("models", [])
+        model_names = [m.get("name", "") for m in models]
+        model_available = model_name in model_names
+        result["ollama_api_available"] = True
+        result["ollama_model_available"] = model_available
+        if model_available:
+            result["ollama_probe_detail"] = (
+                f"Ollama HTTP API available (version {ollama_version}), "
+                f"model '{model_name}' found in /api/tags"
+            )
+        else:
+            installed = ', '.join(sorted(model_names)) if model_names else "(none)"
+            result["ollama_probe_detail"] = (
+                f"Ollama HTTP API available (version {ollama_version}), "
+                f"model '{model_name}' NOT found in /api/tags. "
+                f"Installed models: {installed}"
+            )
+    except json.JSONDecodeError as exc:
+        result["ollama_probe_detail"] = (
+            f"Ollama HTTP API /api/tags returned invalid JSON at "
+            f"{clean_base}: {exc}"
+        )
+    except Exception as exc:
+        result["ollama_probe_detail"] = (
+            f"Ollama HTTP API version probe succeeded (version {ollama_version}), "
+            f"but /api/tags probe failed: {type(exc).__name__}: {exc}"
+        )
+
+    return result
+
+
 def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
     if adapter == "spacy":
         configured = True
@@ -153,13 +242,41 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
         available = _find_module("booknlp") or shutil.which("booknlp") is not None
         detail = "Python package/executable probe: booknlp"
     elif adapter == "ollama_model":
-        configured = bool(
-            _env_text(env, "OMI_LIVE_OLLAMA_MODEL")
-            or _env_text(env, "OMI_LIVE_OLLAMA_MODEL_NAME")
-            or shutil.which("ollama")
+        base_url = (
+            _env_text(env, OMI_LIVE_OLLAMA_BASE_URL_ENV)
+            or OMI_LIVE_OLLAMA_BASE_URL_DEFAULT
         )
-        available = shutil.which("ollama") is not None
-        detail = "Executable probe only: ollama; no HTTP/model call"
+        model_name = (
+            _env_text(env, OMI_LIVE_OLLAMA_MODEL_ENV)
+            or _env_text(env, "OMI_LIVE_OLLAMA_MODEL_NAME")
+            or OMI_LIVE_OLLAMA_MODEL_DEFAULT
+        )
+        probe = _ollama_http_probe(base_url, model_name)
+        configured = True
+        available = probe["ollama_api_available"] and probe["ollama_model_available"]
+        if not available and shutil.which("ollama"):
+            available = True
+            detail = (
+                f"Ollama CLI available, HTTP API not probed/available "
+                f"({probe['ollama_probe_detail']})"
+            )
+        else:
+            detail = probe["ollama_probe_detail"]
+        dependency_status = (
+            "available" if available else "unavailable"
+        )
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": dependency_status,
+            "probe_detail": detail,
+            "ollama_base_url": probe["ollama_base_url"],
+            "ollama_api_available": probe["ollama_api_available"],
+            "ollama_version": probe["ollama_version"],
+            "ollama_model_name": probe["ollama_model_name"],
+            "ollama_model_available": probe["ollama_model_available"],
+            "ollama_probe_detail": probe["ollama_probe_detail"],
+        }
     elif adapter == "story_check":
         configured = _path_exists("backend/analysis_engine.py")
         available = configured
@@ -307,6 +424,13 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
     if adapter == "spacy":
         report["spacy_model_name"] = dependency.get("spacy_model_name")
         report["spacy_model_available"] = dependency.get("spacy_model_available")
+    if adapter == "ollama_model":
+        report["ollama_base_url"] = dependency.get("ollama_base_url")
+        report["ollama_api_available"] = dependency.get("ollama_api_available")
+        report["ollama_version"] = dependency.get("ollama_version")
+        report["ollama_model_name"] = dependency.get("ollama_model_name")
+        report["ollama_model_available"] = dependency.get("ollama_model_available")
+        report["ollama_probe_detail"] = dependency.get("ollama_probe_detail")
     return report
 
 
