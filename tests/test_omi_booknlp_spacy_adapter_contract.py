@@ -619,3 +619,744 @@ def test_live_spacy_safety_boundaries_preserved(
         assert finding["source_adapter"] == "spacy"
         assert finding["evidence"][0]["source_excerpt"]
         assert finding["evidence"][0]["source_locator"]
+
+
+# ---------------------------------------------------------------------------
+# T017B — Live BookNLP adapter behind env flags
+# ---------------------------------------------------------------------------
+
+
+def _mock_live_booknlp_env(monkeypatch: Any) -> None:
+    """Enable both the global live-tools flag and the per-tool flag."""
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_BOOKNLP_ENABLED", "true")
+
+
+def _install_mock_booknlp(
+    monkeypatch: Any,
+    *,
+    entities: list[dict[str, str]] | None = None,
+    quotes: list[dict[str, str]] | None = None,
+    tokens: list[dict[str, str]] | None = None,
+    raise_on_process: BaseException | None = None,
+) -> None:
+    """Install a mock ``booknlp.booknlp.BookNLP`` module.
+
+    The mock writes fake ``.entities`` / ``.quotes`` / ``.tokens`` files
+    into the temporary output directory so the live runner can parse them
+    without invoking real BookNLP processing. Tests may pass empty
+    lists to simulate ``empty`` / ``failed_closed`` output, or a
+    ``raise_on_process`` exception to simulate a processing failure.
+    """
+    if entities is None:
+        entities = []
+    if quotes is None:
+        quotes = []
+    if tokens is None:
+        tokens = []
+
+    booknlp_pkg = MagicMock()
+    booknlp_mod = MagicMock()
+
+    class _MockBookNLP:
+        def __init__(self, language: str, model_params: dict) -> None:
+            self.language = language
+            self.model_params = model_params
+
+        def process(self, input_file: str, output_dir: str, book_id: str) -> None:
+            if raise_on_process is not None:
+                raise raise_on_process
+            if entities:
+                with open(
+                    f"{output_dir}/{book_id}.entities", "w", encoding="utf-8"
+                ) as handle:
+                    handle.write(
+                        "COREF\tstart_token\tend_token\tprop\tcat\ttext\n"
+                    )
+                    for row in entities:
+                        handle.write(
+                            "\t".join(
+                                [
+                                    str(row.get("COREF", "")),
+                                    str(row.get("start_token", "")),
+                                    str(row.get("end_token", "")),
+                                    str(row.get("prop", "")),
+                                    str(row.get("cat", "")),
+                                    str(row.get("text", "")),
+                                ]
+                            )
+                            + "\n"
+                        )
+            if quotes:
+                with open(
+                    f"{output_dir}/{book_id}.quotes", "w", encoding="utf-8"
+                ) as handle:
+                    handle.write(
+                        "\t".join(
+                            [
+                                "quote_start",
+                                "quote_end",
+                                "mention_start",
+                                "mention_end",
+                                "mention_phrase",
+                                "char_id",
+                                "quote",
+                            ]
+                        )
+                        + "\n"
+                    )
+                    for row in quotes:
+                        handle.write(
+                            "\t".join(
+                                [
+                                    str(row.get("quote_start", "")),
+                                    str(row.get("quote_end", "")),
+                                    str(row.get("mention_start", "")),
+                                    str(row.get("mention_end", "")),
+                                    str(row.get("mention_phrase", "")),
+                                    str(row.get("char_id", "")),
+                                    str(row.get("quote", "")),
+                                ]
+                            )
+                            + "\n"
+                        )
+            if tokens:
+                with open(
+                    f"{output_dir}/{book_id}.tokens", "w", encoding="utf-8"
+                ) as handle:
+                    handle.write(
+                        "\t".join(
+                            [
+                                "paragraph_ID",
+                                "sentence_ID",
+                                "token_ID_within_sentence",
+                                "token_ID_within_document",
+                                "word",
+                                "lemma",
+                                "byte_onset",
+                                "byte_offset",
+                                "POS_tag",
+                                "fine_POS_tag",
+                                "dependency_relation",
+                                "syntactic_head_ID",
+                                "event",
+                            ]
+                        )
+                        + "\n"
+                    )
+                    for row in tokens:
+                        handle.write(
+                            "\t".join(
+                                [
+                                    str(row.get("paragraph_ID", "")),
+                                    str(row.get("sentence_ID", "")),
+                                    str(row.get("token_ID_within_sentence", "")),
+                                    str(row.get("token_ID_within_document", "")),
+                                    str(row.get("word", "")),
+                                    str(row.get("lemma", "")),
+                                    str(row.get("byte_onset", "")),
+                                    str(row.get("byte_offset", "")),
+                                    str(row.get("POS_tag", "")),
+                                    str(row.get("fine_POS_tag", "")),
+                                    str(row.get("dependency_relation", "")),
+                                    str(row.get("syntactic_head_ID", "")),
+                                    str(row.get("event", "")),
+                                ]
+                            )
+                            + "\n"
+                        )
+
+    booknlp_mod.BookNLP = _MockBookNLP
+    booknlp_pkg.booknlp = booknlp_mod
+
+    monkeypatch.setitem(sys.modules, "booknlp", booknlp_pkg)
+    monkeypatch.setitem(sys.modules, "booknlp.booknlp", booknlp_mod)
+
+
+def test_live_booknlp_disabled_by_default_returns_unavailable() -> None:
+    """No env flags -> live BookNLP path not triggered -> unavailable."""
+    result = _run_adapter("booknlp")
+    env = _assert_failed_closed(result, "booknlp")
+    assert env["state"] == "unavailable"
+
+
+def test_live_booknlp_blocked_overrides_enabled_returns_no_live_call(
+    monkeypatch: Any,
+) -> None:
+    """OMI_LIVE_BOOKNLP_BLOCKED wins over OMI_LIVE_BOOKNLP_ENABLED."""
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_BOOKNLP_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_BOOKNLP_BLOCKED", "true")
+    monkeypatch.setenv(
+        "OMI_LIVE_BOOKNLP_BLOCKED_REASON", "Owner decision pending."
+    )
+    _install_mock_booknlp(
+        monkeypatch,
+        entities=[
+            {
+                "COREF": "1",
+                "start_token": "0",
+                "end_token": "1",
+                "prop": "PROP",
+                "cat": "PROP_PER",
+                "text": "Mara Vale",
+            }
+        ],
+    )
+
+    result = _run_adapter("booknlp")
+    env = _assert_failed_closed(result, "booknlp")
+    assert env["state"] == "unavailable"
+    assert "fixture" in env["explanation"].lower()
+    assert "live booknlp" in env["explanation"].lower()
+
+
+def test_live_booknlp_missing_package_returns_unavailable(
+    monkeypatch: Any,
+) -> None:
+    """BookNLP package not installed -> runner returns unavailable."""
+    _mock_live_booknlp_env(monkeypatch)
+
+    # Ensure the lazy import inside the runner raises ImportError.
+    booknlp_pkg = MagicMock()
+    booknlp_mod = MagicMock()
+
+    def _raise(*_args: Any, **_kwargs: Any) -> None:
+        raise ImportError("simulated missing booknlp.booknlp")
+
+    booknlp_mod.BookNLP = _raise
+    booknlp_pkg.booknlp = booknlp_mod
+
+    # Force ``from booknlp.booknlp import BookNLP`` to fail with ImportError.
+    real_import = __builtins__["__import__"] if isinstance(
+        __builtins__, dict
+    ) else __builtins__.__import__
+
+    def _fake_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "booknlp.booknlp" or name.startswith("booknlp.booknlp."):
+            raise ImportError("simulated missing booknlp.booknlp")
+        return real_import(name, *args, **kwargs)
+
+    if isinstance(__builtins__, dict):
+        monkeypatch.setitem(__builtins__, "__import__", _fake_import)
+    else:
+        monkeypatch.setattr(__builtins__, "__import__", _fake_import)
+
+    result = _run_adapter("booknlp")
+    env = _assert_failed_closed(result, "booknlp")
+    assert env["state"] == "unavailable"
+    assert "not installed" in env["explanation"].lower()
+
+
+def test_live_booknlp_runtime_exception_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """BookNLP.process raises -> runner returns failed_closed."""
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch, raise_on_process=RuntimeError("simulated failure")
+    )
+
+    result = _run_adapter("booknlp")
+    env = _assert_failed_closed(result, "booknlp")
+    assert env["state"] in {"unavailable", "failed_closed"}
+    assert "processing" in env["explanation"].lower() or "error" in (
+        env["explanation"].lower()
+    )
+
+
+def test_live_booknlp_empty_output_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """BookNLP produced no .entities/.quotes -> empty state, no findings."""
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(monkeypatch)
+
+    result = _run_adapter("booknlp")
+    assert result["analysis_status"] == "fail_closed"
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] in {"empty", "failed_closed"}
+    assert env["candidates"] == []
+
+
+def test_live_booknlp_malformed_entities_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Malformed BookNLP .entities output -> failed_closed, no findings."""
+    _mock_live_booknlp_env(monkeypatch)
+
+    booknlp_pkg = MagicMock()
+    booknlp_mod = MagicMock()
+
+    class _MalformedBookNLP:
+        def __init__(self, language: str, model_params: dict) -> None:
+            pass
+
+        def process(self, input_file: str, output_dir: str, book_id: str) -> None:
+            with open(
+                f"{output_dir}/{book_id}.entities", "w", encoding="utf-8"
+            ) as handle:
+                # Header only — no data rows; the live runner treats this
+                # as no entities, so the adapter fails closed.
+                handle.write("COREF\tstart_token\tend_token\n")
+            with open(
+                f"{output_dir}/{book_id}.tokens", "w", encoding="utf-8"
+            ) as handle:
+                handle.write(
+                    "paragraph_ID\tsentence_ID\ttoken_ID_within_sentence\t"
+                    "token_ID_within_document\tword\tlemma\tbyte_onset\t"
+                    "byte_offset\tPOS_tag\tfine_POS_tag\tdependency_relation\t"
+                    "syntactic_head_ID\tevent\n"
+                )
+
+    booknlp_mod.BookNLP = _MalformedBookNLP
+    booknlp_pkg.booknlp = booknlp_mod
+
+    monkeypatch.setitem(sys.modules, "booknlp", booknlp_pkg)
+    monkeypatch.setitem(sys.modules, "booknlp.booknlp", booknlp_mod)
+
+    result = _run_adapter("booknlp")
+    assert result["analysis_status"] == "fail_closed"
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] in {"empty", "failed_closed"}
+    assert env["candidates"] == []
+
+
+def test_live_booknlp_unsafe_entity_category_skipped_or_failed_closed(
+    monkeypatch: Any,
+) -> None:
+    """Unsafe entity categories (truth/canon/approved/etc.) are skipped.
+
+    Only safe PER/GPE/LOC/FAC/ORG/VEH-style categories survive; everything
+    else is dropped at the parser or converter level. When no safe rows
+    remain, the adapter returns ``empty`` / ``failed_closed`` with no
+    findings and never sanitizes the unsafe text into a safe claim.
+    """
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch,
+        entities=[
+            {
+                "COREF": "1",
+                "start_token": "0",
+                "end_token": "1",
+                "prop": "PROP",
+                "cat": "approved_canon_per",  # unsafe category token
+                "text": "Mara Vale",
+            }
+        ],
+    )
+
+    result = _run_adapter("booknlp")
+    assert result["analysis_status"] == "fail_closed"
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] in {"empty", "failed_closed"}
+    assert env["candidates"] == []
+
+
+def test_live_booknlp_entities_become_candidate_only_findings(
+    monkeypatch: Any,
+) -> None:
+    """Parsed .entities rows become evidence-backed candidate findings."""
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch,
+        entities=[
+            {
+                "COREF": "1",
+                "start_token": "0",
+                "end_token": "1",
+                "prop": "PROP",
+                "cat": "PROP_PER",
+                "text": "Mara Vale",
+            },
+            {
+                "COREF": "2",
+                "start_token": "4",
+                "end_token": "6",
+                "prop": "PROP",
+                "cat": "PROP_LOC",
+                "text": "Harbor Archive",
+            },
+            {
+                "COREF": "3",
+                "start_token": "10",
+                "end_token": "11",
+                "prop": "PROP",
+                "cat": "PROP_ORG",
+                "text": "Storm Watch",
+            },
+        ],
+        tokens=[
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "0",
+                "token_ID_within_document": "0",
+                "word": "Mara",
+                "lemma": "Mara",
+                "byte_onset": "12",
+                "byte_offset": "16",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "nsubj",
+                "syntactic_head_ID": "1",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "1",
+                "token_ID_within_document": "1",
+                "word": "Vale",
+                "lemma": "Vale",
+                "byte_onset": "17",
+                "byte_offset": "21",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "flat",
+                "syntactic_head_ID": "0",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "4",
+                "token_ID_within_document": "4",
+                "word": "Harbor",
+                "lemma": "Harbor",
+                "byte_onset": "28",
+                "byte_offset": "34",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "compound",
+                "syntactic_head_ID": "5",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "5",
+                "token_ID_within_document": "5",
+                "word": "Archive",
+                "lemma": "Archive",
+                "byte_onset": "35",
+                "byte_offset": "42",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "nsubj",
+                "syntactic_head_ID": "6",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "6",
+                "token_ID_within_document": "6",
+                "word": ".",
+                "lemma": ".",
+                "byte_onset": "42",
+                "byte_offset": "43",
+                "POS_tag": ".",
+                "fine_POS_tag": ".",
+                "dependency_relation": "punct",
+                "syntactic_head_ID": "5",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "1",
+                "token_ID_within_sentence": "0",
+                "token_ID_within_document": "10",
+                "word": "Storm",
+                "lemma": "Storm",
+                "byte_onset": "80",
+                "byte_offset": "86",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "compound",
+                "syntactic_head_ID": "11",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "1",
+                "token_ID_within_sentence": "1",
+                "token_ID_within_document": "11",
+                "word": "Watch",
+                "lemma": "Watch",
+                "byte_onset": "87",
+                "byte_offset": "92",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "nsubj",
+                "syntactic_head_ID": "12",
+                "event": "O",
+            },
+        ],
+    )
+
+    result = _run_adapter("booknlp")
+
+    assert result["analysis_status"] == "succeeded"
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] == "succeeded"
+    types = [f["candidate_type"] for f in env["candidates"]]
+    assert "character" in types
+    assert "location" in types
+    assert "organization" in types
+    for finding in result["findings"]:
+        _assert_candidate_only_finding(finding, "booknlp")
+
+
+def test_live_booknlp_quotes_become_dialogue_attribution_candidates(
+    monkeypatch: Any,
+) -> None:
+    """Parsed .quotes rows become dialogue-attribution candidate findings."""
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch,
+        quotes=[
+            {
+                "quote_start": "0",
+                "quote_end": "3",
+                "mention_start": "5",
+                "mention_end": "5",
+                "mention_phrase": "she",
+                "char_id": "42",
+                "quote": "we wait here",
+            }
+        ],
+    )
+
+    result = _run_adapter("booknlp")
+    assert result["analysis_status"] == "succeeded"
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] == "succeeded"
+    types = [f["candidate_type"] for f in env["candidates"]]
+    assert "diagnostic_question" in types
+    for finding in result["findings"]:
+        _assert_candidate_only_finding(finding, "booknlp")
+        assert "dialogue attribution" in finding["label"].lower() or (
+            "dialogue attribution" in finding["extracted_claim"].lower()
+        )
+
+
+def test_live_booknlp_unsafe_excerpt_text_does_not_leak_into_findings(
+    monkeypatch: Any,
+) -> None:
+    """Unsafe BookNLP output text must not be smuggled into findings.
+
+    The runner does NOT rewrite unsafe text into a safe claim; it SKIPS
+    unsafe rows. A row whose text contains a canon/approved label or
+    rewrite/continue/draft language must not produce a finding.
+    """
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch,
+        entities=[
+            {
+                "COREF": "1",
+                "start_token": "0",
+                "end_token": "1",
+                "prop": "PROP",
+                "cat": "PROP_PER",
+                "text": "approved canon Mara",
+            },
+            {
+                "COREF": "2",
+                "start_token": "2",
+                "end_token": "3",
+                "prop": "PROP",
+                "cat": "PROP_LOC",
+                "text": "rewrite here Harbor",
+            },
+        ],
+    )
+
+    result = _run_adapter("booknlp")
+    env = _assert_failed_closed(result, "booknlp")
+    assert env["state"] in {"empty", "failed_closed"}
+    assert env["candidates"] == []
+    for finding in result["findings"]:
+        for forbidden in ("approved canon", "rewrite here", "rewrite:"):
+            assert forbidden.lower() not in finding["label"].lower()
+            assert forbidden.lower() not in finding["extracted_claim"].lower()
+            assert forbidden.lower() not in finding["evidence"][0][
+                "source_excerpt"
+            ].lower()
+
+
+def test_live_booknlp_does_not_mutate_or_persist_when_enabled(
+    monkeypatch: Any,
+) -> None:
+    """Live BookNLP never mutates Memory/Canon, never persists, no prose."""
+    import backend.project_manager as project_manager
+
+    persist_calls: list[dict[str, Any]] = []
+
+    def _spy_persist(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        persist_calls.append({"args": args, "kwargs": kwargs})
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "not_persisted",
+            "persistence_explanation": "spy",
+        }
+
+    monkeypatch.setattr(
+        project_manager,
+        "persist_omi_tool_assisted_findings_as_candidates",
+        _spy_persist,
+    )
+
+    _mock_live_booknlp_env(monkeypatch)
+    _install_mock_booknlp(
+        monkeypatch,
+        entities=[
+            {
+                "COREF": "1",
+                "start_token": "0",
+                "end_token": "1",
+                "prop": "PROP",
+                "cat": "PROP_PER",
+                "text": "Mara Vale",
+            }
+        ],
+        tokens=[
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "0",
+                "token_ID_within_document": "0",
+                "word": "Mara",
+                "lemma": "Mara",
+                "byte_onset": "12",
+                "byte_offset": "16",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "nsubj",
+                "syntactic_head_ID": "1",
+                "event": "O",
+            },
+            {
+                "paragraph_ID": "0",
+                "sentence_ID": "0",
+                "token_ID_within_sentence": "1",
+                "token_ID_within_document": "1",
+                "word": "Vale",
+                "lemma": "Vale",
+                "byte_onset": "17",
+                "byte_offset": "21",
+                "POS_tag": "NNP",
+                "fine_POS_tag": "NNP",
+                "dependency_relation": "flat",
+                "syntactic_head_ID": "0",
+                "event": "O",
+            },
+        ],
+    )
+
+    result = _run_adapter("booknlp", persist_candidates=True)
+
+    assert result["analysis_status"] == "succeeded"
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_story_prose_generation"] is True
+    assert result["safety"]["no_canon_promotion"] is True
+
+    for finding in result["findings"]:
+        assert finding["owner_decision"]["approved"] is False
+        assert finding["review_status"] == "candidate_review_pending"
+        for forbidden in ("truth", "canon", "approved", "promoted"):
+            assert forbidden not in finding["support_label"].lower()
+        for forbidden_text in ("rewrite:", "continuation:", "outline:", "draft:"):
+            assert forbidden_text not in finding["extracted_claim"].lower()
+
+
+def test_live_booknlp_uses_env_model_and_pipeline_overrides(
+    monkeypatch: Any,
+) -> None:
+    """Runner honors OMI_LIVE_BOOKNLP_MODEL/PIPELINE when safe and valid."""
+    _mock_live_booknlp_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_BOOKNLP_MODEL", "small")
+    monkeypatch.setenv("OMI_LIVE_BOOKNLP_PIPELINE", "entity,quote,event")
+
+    captured: dict[str, Any] = {}
+
+    booknlp_pkg = MagicMock()
+    booknlp_mod = MagicMock()
+
+    class _CaptureBookNLP:
+        def __init__(self, language: str, model_params: dict) -> None:
+            captured["language"] = language
+            captured["model_params"] = model_params
+
+        def process(self, input_file: str, output_dir: str, book_id: str) -> None:
+            captured["input_file"] = input_file
+            captured["output_dir"] = output_dir
+            captured["book_id"] = book_id
+
+    booknlp_mod.BookNLP = _CaptureBookNLP
+    booknlp_pkg.booknlp = booknlp_mod
+
+    monkeypatch.setitem(sys.modules, "booknlp", booknlp_pkg)
+    monkeypatch.setitem(sys.modules, "booknlp.booknlp", booknlp_mod)
+
+    result = _run_adapter("booknlp")
+
+    assert captured["language"] == "en"
+    assert captured["model_params"]["model"] == "small"
+    pipe_tokens = captured["model_params"]["pipeline"].split(",")
+    assert "entity" in pipe_tokens
+    assert "quote" in pipe_tokens
+    assert "event" in pipe_tokens
+    assert result["findings"] == []
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] in {"empty", "failed_closed"}
+
+
+def test_live_booknlp_invalid_model_env_falls_back_to_default(
+    monkeypatch: Any,
+) -> None:
+    """Invalid OMI_LIVE_BOOKNLP_MODEL falls back to ``small`` safely."""
+    _mock_live_booknlp_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_BOOKNLP_MODEL", "unsafe_model_name")
+
+    captured: dict[str, Any] = {}
+
+    booknlp_pkg = MagicMock()
+    booknlp_mod = MagicMock()
+
+    class _CaptureBookNLP:
+        def __init__(self, language: str, model_params: dict) -> None:
+            captured["model_params"] = model_params
+
+        def process(self, input_file: str, output_dir: str, book_id: str) -> None:
+            pass
+
+    booknlp_mod.BookNLP = _CaptureBookNLP
+    booknlp_pkg.booknlp = booknlp_mod
+
+    monkeypatch.setitem(sys.modules, "booknlp", booknlp_pkg)
+    monkeypatch.setitem(sys.modules, "booknlp.booknlp", booknlp_mod)
+
+    _run_adapter("booknlp")
+    assert captured["model_params"]["model"] == "small"
+
+
+def test_live_booknlp_existing_fixture_tests_still_pass() -> None:
+    """Existing fixture tests still produce unavailable when no env flag set."""
+    result = _run_adapter("booknlp")
+    env = _assert_failed_closed(result, "booknlp")
+    assert env["state"] == "unavailable"
+    assert "fixture" in env["explanation"].lower()
+    assert "live booknlp" in env["explanation"].lower()

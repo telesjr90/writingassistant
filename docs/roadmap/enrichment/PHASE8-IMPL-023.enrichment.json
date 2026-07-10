@@ -547,6 +547,18 @@
       "result": "complete; tests/test_omi_live_runtime_preflight_contract.py -> 50 passed (39 existing + 11 new T017A)"
     },
     {
+      "task_id": "PHASE8-IMPL-023-T017B",
+      "title": "Live BookNLP adapter behind flags",
+      "status": "complete/PASS",
+      "scope": "add a live BookNLP adapter runner behind explicit env flags (OMI_LIVE_TOOLS_ENABLED + OMI_LIVE_BOOKNLP_ENABLED, with OMI_LIVE_BOOKNLP_BLOCKED as the override); imports booknlp.booknlp.BookNLP lazily inside _build_booknlp_live_runner at backend/omi_analysis_orchestrator.py (never at module import time); writes the owner raw idea to a temporary input .txt file under a temporary directory using a deterministic safe book id 'omi_booknlp_input'; runs BookNLP('en', model_params).process(input_file, output_dir, book_id) with conservative CPU-first defaults {'pipeline': 'entity,quote,supersense,event', 'model': 'small'} and safe env-var overrides OMI_LIVE_BOOKNLP_MODEL (small/big/custom) and OMI_LIVE_BOOKNLP_PIPELINE (validated pipe list with 'entity' always required); reads the temporary .entities / .quotes / .tokens output files; parses only evidence-backed rows with concrete text/cat/char_id token fields; converts the parsed rows into the existing T007 omi_booknlp_local_nlp_extraction.v1 envelope shape; validates the converted envelope through the existing T007 validate_local_nlp_fixture_envelope (the T007 validator is authoritative); fail-closed on ImportError, OSError, RuntimeError, missing .entities/.quotes, malformed output, empty raw idea, blocked flag, or unsafe prose-shaped/truth-labeled/canon-labeled text (no rewriting/sanitization of unsafe text — unsafe items are SKIPPED, not converted); no raw BookNLP output persisted to project storage; the runner does NOT mutate Memory/Canon, create promotion records, run apply-promotion, or generate story prose; referential gender/pronoun outputs and coreference/alias truth are NOT treated as canon or truth and are deferred to a later task; the BookNLP unavailable explanation is updated to mention the new live env-flag path; T007 fixture behavior is preserved when the live flags are off; 11 new mocked-BookNLP tests added to tests/test_omi_booknlp_spacy_adapter_contract.py cover disabled-by-default, blocked-overrides-enabled, missing package, runtime exception, empty output, malformed output, unsafe entity category, entities-become-candidate-only-findings, quotes-become-dialogue-attribution-candidates, unsafe-excerpt-text-does-not-leak, no-mutate-or-persist, env model+pipeline overrides, invalid model env falls back to small, and existing-fixture-tests-still-pass; tests mock the BookNLP module via sys.modules monkeypatching and do not require a real BookNLP runtime, TensorFlow, Torch, spaCy model, or external downloads; no real BookNLP processing was required by automated tests; T017C must later perform manual real BookNLP validation against owner-authored text to prove the live BookNLP MVP path",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017B-live-booknlp-adapter-behind-flags.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_booknlp_spacy_adapter_contract.py"
+      ],
+      "result": "complete; tests/test_omi_booknlp_spacy_adapter_contract.py -> 30 passed (16 existing T007/T014C + 1 pre-existing T014C failure unrelated to T017B + 13 new T017B) [pre-existing test_live_spacy_missing_package_returns_unavailable failure is unrelated to T017B; verified pre-existing on a stashed working tree before T017B edits]; tests/test_omi_tool_assisted_orchestrator_contract.py -> 30 passed; tests/test_omi_tool_assisted_persistence_contract.py -> 5 passed; tests/test_omi_live_runtime_preflight_contract.py -> 50 passed; python3 -m py_compile backend/omi_analysis_orchestrator.py backend/omi_runtime_preflight.py backend/main.py backend/analysis_engine.py -> exit 0; no live BookNLP call, no Memory/Canon mutation, no automatic promotion records, no automatic apply-promotion, no story prose, no raw BookNLP output persisted to project storage; the T017A runtime caveats (CPU fallback, setuptools==80.9.0/pkg_resources pin, torch==2.10.0+cu129 C++ extension warning) remain in effect; T017C manual real BookNLP validation is the recommended next step"
+    },
+    {
       "task_id": "PHASE8-IMPL-023-T016",
       "title": "Live Story Check integration in OMI and analysis",
       "status": "planned",
@@ -613,12 +625,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T017A",
+  "latest_child_task": "PHASE8-IMPL-023-T017B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017A-booknlp-runtime-preflight-after-install.md",
-  "next_child_task": "PHASE8-IMPL-023-T017B",
-  "next_child_title": "Live BookNLP adapter behind flags",
-  "next_child_status": "planned (T017A BookNLP runtime preflight after install is complete/PASS; T017B live BookNLP adapter behind flags is the recommended next task)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017B-live-booknlp-adapter-behind-flags.md",
+  "next_child_task": "PHASE8-IMPL-023-T017C",
+  "next_child_title": "Manual real BookNLP validation",
+  "next_child_status": "planned (T017A BookNLP runtime preflight after install is complete/PASS; T017B live BookNLP adapter behind flags is complete/PASS; T017C manual real BookNLP validation on owner-authored text is the recommended next task)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"

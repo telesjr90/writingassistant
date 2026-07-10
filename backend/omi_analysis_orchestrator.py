@@ -14,7 +14,21 @@ T005 scope (PHASE8-IMPL-023):
   - Wires ``booknlp`` and ``spacy`` through fixture-only local NLP contracts
     that normalize evidence-backed entity/event/object/relationship-style
     support into candidate-only OMI findings without importing or running
-    live runtimes.
+    live runtimes. T014C adds a live spaCy adapter behind
+    ``OMI_LIVE_TOOLS_ENABLED`` + ``OMI_LIVE_SPACY_ENABLED`` env flags that
+    imports spaCy lazily inside the live runner path. T017B adds a live
+    BookNLP adapter behind ``OMI_LIVE_TOOLS_ENABLED`` +
+    ``OMI_LIVE_BOOKNLP_ENABLED`` env flags that imports
+    ``booknlp.booknlp.BookNLP`` lazily, writes the owner raw idea to a
+    temporary file, runs BookNLP against a temporary output directory,
+    and converts the parsed ``.entities`` / ``.quotes`` / ``.tokens``
+    rows into the existing T007
+    ``omi_booknlp_local_nlp_extraction.v1`` envelope shape. The live
+    BookNLP adapter does NOT persist raw BookNLP output, mutate
+    Memory/Canon, create promotion records, run apply-promotion, or
+    generate story prose. T017C must later perform manual real BookNLP
+    processing on owner-authored text to prove the live BookNLP MVP
+    path.
   - Wires ``story_check`` through a fixture-only diagnostic handoff contract
     that normalizes evidence-backed structural diagnostics/questions into
     candidate-review support without importing or running Story Check.
@@ -55,7 +69,10 @@ Boundaries (non-negotiable):
     Check (T016C) is available only behind explicit runtime flags
     (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_STORY_CHECK_ENABLED) and imports
     ``backend.analysis_engine.run_story_check`` lazily inside the live
-    runner path. No automatic promotion, Memory/Canon mutation,
+    runner path. Live BookNLP (T017B) is available only behind explicit
+    runtime flags (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_BOOKNLP_ENABLED) and
+    imports ``booknlp.booknlp.BookNLP`` lazily inside the live runner
+    path. No automatic promotion, Memory/Canon mutation,
     apply-promotion, or candidate approval.
   - No Memory/Canon mutation.
   - No promotion records, no apply-promotion, no canon promotion.
@@ -77,6 +94,7 @@ import hashlib
 import json
 import os
 import re
+import tempfile
 import urllib.error
 import urllib.request
 from typing import Any, Callable, Mapping
@@ -4247,6 +4265,39 @@ _OMI_LIVE_STORY_CHECK_BLOCKED_ENV = "OMI_LIVE_STORY_CHECK_BLOCKED"
 _OMI_LIVE_STORY_CHECK_BLOCKED_REASON_ENV = "OMI_LIVE_STORY_CHECK_BLOCKED_REASON"
 _OMI_LIVE_STORY_CHECK_SCENE_ID_ENV = "OMI_LIVE_STORY_CHECK_SCENE_ID"
 
+# ---------------------------------------------------------------------------
+# Live BookNLP local NLP adapter (T017B) — behind explicit env flags
+# ---------------------------------------------------------------------------
+
+_OMI_LIVE_BOOKNLP_ENABLED_ENV = "OMI_LIVE_BOOKNLP_ENABLED"
+_OMI_LIVE_BOOKNLP_BLOCKED_ENV = "OMI_LIVE_BOOKNLP_BLOCKED"
+_OMI_LIVE_BOOKNLP_BLOCKED_REASON_ENV = "OMI_LIVE_BOOKNLP_BLOCKED_REASON"
+_OMI_LIVE_BOOKNLP_MODEL_ENV = "OMI_LIVE_BOOKNLP_MODEL"
+_OMI_LIVE_BOOKNLP_MODEL_DEFAULT = "small"
+_OMI_LIVE_BOOKNLP_PIPELINE_ENV = "OMI_LIVE_BOOKNLP_PIPELINE"
+_OMI_LIVE_BOOKNLP_PIPELINE_DEFAULT = "entity,quote,supersense,event"
+_OMI_LIVE_BOOKNLP_INPUT_BOOK_ID = "omi_booknlp_input"
+_OMI_LIVE_BOOKNLP_INPUT_FILENAME = "omi_booknlp_input.txt"
+_OMI_LIVE_BOOKNLP_MAX_FINDINGS = 64
+_OMI_LIVE_BOOKNLP_MAX_EVIDENCE_CHARS = 240
+
+_OMI_BOOKNLP_LIVE_ENTITY_CATEGORY_TO_CANDIDATE_TYPE: dict[str, str] = {
+    "PER": "character",
+    "GPE": "location",
+    "LOC": "location",
+    "FAC": "location",
+    "ORG": "organization",
+    "VEH": "object",
+}
+
+_OMI_BOOKNLP_LIVE_SKIP_ENTITY_TEXTS: frozenset[str] = frozenset({
+    "i", "me", "my", "mine", "you", "your", "yours",
+    "he", "him", "his", "she", "her", "hers",
+    "they", "them", "their", "theirs",
+    "we", "us", "our", "ours",
+    "it", "its", "this", "that", "these", "those",
+})
+
 _OMI_SPACY_LIVE_ENTITY_LABEL_TO_CANDIDATE_TYPE: dict[str, str] = {
     "PERSON": "character",
     "GPE": "location",
@@ -5538,6 +5589,819 @@ def _build_story_check_live_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# Live BookNLP local NLP adapter (T017B) — helpers
+# ---------------------------------------------------------------------------
+
+
+def _booknlp_safe_text_excerpt(value: Any, *, max_chars: int) -> str:
+    """Return a short, plain trimmed string excerpt from arbitrary input.
+
+    Used to build ``source_excerpt``/``extracted_claim`` snippets for live
+    BookNLP findings. The helper does NOT rewrite or sanitize the text. The
+    caller is responsible for verifying the result is safe before using it
+    as a candidate value (e.g., via ``is_prose_like_text`` and
+    ``is_truth_label``). The maximum length is hard-capped to keep evidence
+    snippets short and within the existing T007/T014C contract.
+    """
+    if not isinstance(value, str):
+        return ""
+    text = value.strip()
+    if not text:
+        return ""
+    if len(text) > max_chars:
+        text = text[: max_chars - 3].rstrip() + "..."
+    return text
+
+
+def _booknlp_entity_category_is_safe(value: str) -> bool:
+    """Return True iff ``value`` is a safe BookNLP entity category token.
+
+    BookNLP entity categories are short tokens such as ``PER``, ``GPE``,
+    ``LOC``, ``FAC``, ``ORG``, ``VEH``, ``PROP_PER``, ``NOM_LOC``, etc.
+    Anything else is rejected so a BookNLP row carrying a truth/canon/
+    approved/promoted label or a non-canon code cannot leak through.
+    """
+    if not isinstance(value, str):
+        return False
+    token = value.strip().upper()
+    if not token:
+        return False
+    if is_truth_label(token):
+        return False
+    if _PROSE_INTENT_PREFIX_RE.match(token):
+        return False
+    if len(token) > 32:
+        return False
+    for ch in token:
+        if not (
+            ch.isalnum()
+            or ch == "_"
+            or ch == "-"
+        ):
+            return False
+    return True
+
+
+def _booknlp_parse_entities_file(path: Any) -> list[dict[str, Any]]:
+    """Parse a BookNLP ``.entities`` file into a list of row dicts.
+
+    BookNLP writes ``.entities`` as TSV with a header row::
+
+        COREF   start_token  end_token  prop  cat  text
+
+    Malformed rows, rows missing required fields, rows whose category is not
+    a safe short token, and rows whose text is empty/blank are silently
+    skipped. The parser never raises. The returned list is empty if the
+    file is missing, unreadable, or contains only a header.
+    """
+    rows: list[dict[str, Any]] = []
+    if not isinstance(path, str) or not path:
+        return rows
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            lines = handle.readlines()
+    except OSError:
+        return rows
+
+    if not lines:
+        return rows
+
+    header = [col.strip() for col in lines[0].rstrip("\n").split("\t")]
+    for raw_line in lines[1:]:
+        line = raw_line.rstrip("\n")
+        if not line.strip():
+            continue
+        parts = line.split("\t")
+        if len(parts) < len(header):
+            continue
+        row: dict[str, str] = {}
+        for idx, col in enumerate(header):
+            if idx < len(parts):
+                row[col] = parts[idx]
+            else:
+                row[col] = ""
+        if not row.get("text", "").strip():
+            continue
+        cat = row.get("cat", "").strip()
+        if not cat:
+            continue
+        if not _booknlp_entity_category_is_safe(cat):
+            continue
+        rows.append(row)
+    return rows
+
+
+def _booknlp_entity_candidate_type_from_category(cat: str) -> str | None:
+    """Map a BookNLP entity category to an orchestrator finding type.
+
+    BookNLP category format is ``<PROP|NOM|PRON>_<PER|GPE|LOC|FAC|ORG|VEH>``
+    (and other variants). Only the suffix is mapped to keep the logic
+    conservative. Returns ``None`` for unsupported categories.
+    """
+    if not isinstance(cat, str):
+        return None
+    token = cat.strip().upper()
+    if not token:
+        return None
+    suffix = token.split("_", 1)[-1] if "_" in token else token
+    return _OMI_BOOKNLP_LIVE_ENTITY_CATEGORY_TO_CANDIDATE_TYPE.get(suffix)
+
+
+def _booknlp_safe_locator(parts: dict[str, Any], *, fallback: str) -> str:
+    """Return a safe ``source_locator`` built from short token/locator parts.
+
+    The locator is purely a numeric token locator. It never embeds raw text
+    or owner-authored content. Falls back to ``fallback`` when no usable
+    parts are present.
+    """
+    pieces: list[str] = []
+    for key in ("start_token", "end_token", "byte_onset", "byte_offset"):
+        value = parts.get(key)
+        if isinstance(value, str) and value.strip().isdigit():
+            pieces.append(f"{key}={value.strip()}")
+        elif isinstance(value, int) and value >= 0:
+            pieces.append(f"{key}={value}")
+    if not pieces:
+        return fallback
+    return "raw_idea:" + ";".join(pieces)
+
+
+def _booknlp_parse_tokens_file(path: Any) -> list[dict[str, str]]:
+    """Parse a BookNLP ``.tokens`` file into a list of token row dicts.
+
+    The tokens file is a TSV with a header row
+    (``paragraph_ID``, ``sentence_ID``, ``token_ID_within_sentence``,
+    ``token_ID_within_document``, ``word``, ``lemma``, ``byte_onset``,
+    ``byte_offset``, ``POS_tag``, ``fine_POS_tag``, ``dependency_relation``,
+    ``syntactic_head_ID``, ``event``). Malformed rows are silently
+    skipped. The parser never raises. Returns an empty list when the file
+    is missing, unreadable, or contains only a header.
+    """
+    rows: list[dict[str, str]] = []
+    if not isinstance(path, str) or not path:
+        return rows
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            lines = handle.readlines()
+    except OSError:
+        return rows
+    if not lines:
+        return rows
+    header = [col.strip() for col in lines[0].rstrip("\n").split("\t")]
+    for raw_line in lines[1:]:
+        line = raw_line.rstrip("\n")
+        if not line.strip():
+            continue
+        parts = line.split("\t")
+        if len(parts) < len(header):
+            continue
+        row: dict[str, str] = {}
+        for idx, col in enumerate(header):
+            if idx < len(parts):
+                row[col] = parts[idx]
+            else:
+                row[col] = ""
+        rows.append(row)
+    return rows
+
+
+def _booknlp_resolve_token_locator(
+    tokens: list[dict[str, str]],
+    *,
+    start_token: str,
+    end_token: str,
+) -> str:
+    """Return a ``raw_idea:L1:C<onset>-<offset>`` locator from token rows.
+
+    Uses the first row matching ``start_token`` for ``byte_onset`` and the
+    last row matching ``end_token`` for ``byte_offset``. Missing or
+    non-numeric values fall back to the token ids themselves. Returns an
+    empty string when no usable rows are present.
+    """
+    if not tokens:
+        return ""
+    start_row: dict[str, str] | None = None
+    end_row: dict[str, str] | None = None
+    for row in tokens:
+        if start_row is None and row.get("token_ID_within_document", "") == start_token:
+            start_row = row
+        if row.get("token_ID_within_document", "") == end_token:
+            end_row = row
+
+    if start_row is None or end_row is None:
+        return ""
+
+    onset = start_row.get("byte_onset", "").strip()
+    offset = end_row.get("byte_offset", "").strip()
+    if not onset.isdigit() or not offset.isdigit():
+        return ""
+
+    return f"raw_idea:L1:C{onset}-{offset}"
+
+
+def _booknlp_parse_quotes_file(path: Any) -> list[dict[str, str]]:
+    """Parse a BookNLP ``.quotes`` file into a list of quote row dicts.
+
+    The quotes file is a TSV with a header row
+    (``quote_start``, ``quote_end``, ``mention_start``, ``mention_end``,
+    ``mention_phrase``, ``char_id``, ``quote``). Malformed rows are
+    silently skipped. The parser never raises. Returns an empty list when
+    the file is missing, unreadable, or contains only a header.
+    """
+    rows: list[dict[str, str]] = []
+    if not isinstance(path, str) or not path:
+        return rows
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            lines = handle.readlines()
+    except OSError:
+        return rows
+    if not lines:
+        return rows
+    header = [col.strip() for col in lines[0].rstrip("\n").split("\t")]
+    for raw_line in lines[1:]:
+        line = raw_line.rstrip("\n")
+        if not line.strip():
+            continue
+        parts = line.split("\t")
+        if len(parts) < len(header):
+            continue
+        row: dict[str, str] = {}
+        for idx, col in enumerate(header):
+            if idx < len(parts):
+                row[col] = parts[idx]
+            else:
+                row[col] = ""
+        rows.append(row)
+    return rows
+
+
+def _booknlp_make_entity_finding(
+    *,
+    label: str,
+    cat: str,
+    ner_prop: str,
+    coref: str,
+    raw_text: str,
+    source_locator: str,
+    sentence: str,
+) -> dict[str, Any] | None:
+    """Build a T007-shaped BookNLP entity finding dict.
+
+    Returns ``None`` when the inputs cannot be turned into a T007-compatible
+    finding (empty label, unsupported category, unsafe claim/excerpt, or
+    truth-labeled claim). This is a defense-in-depth safety helper. The
+    T007 ``validate_local_nlp_fixture_envelope`` is the authoritative
+    downstream validator.
+    """
+    candidate_type = _booknlp_entity_candidate_type_from_category(cat)
+    if candidate_type is None:
+        return None
+    safe_label = label.strip()
+    if not safe_label:
+        return None
+    if safe_label.lower() in _OMI_BOOKNLP_LIVE_SKIP_ENTITY_TEXTS:
+        return None
+    if len(safe_label) > 240:
+        return None
+
+    safe_excerpt = _booknlp_safe_text_excerpt(
+        sentence, max_chars=_OMI_LIVE_BOOKNLP_MAX_EVIDENCE_CHARS
+    )
+    if not safe_excerpt:
+        return None
+    if is_prose_like_text(safe_excerpt):
+        return None
+    if is_truth_label(safe_excerpt):
+        return None
+
+    claim = (
+        f"BookNLP entity candidate: {safe_label} ({ner_prop or 'N/A'}/"
+        f"{cat}) in COREF cluster {coref or 'N/A'}"
+    )
+    if is_prose_like_text(claim):
+        return None
+    if is_truth_label(claim):
+        return None
+
+    raw_finding_id = (
+        f"booknlp-live::{candidate_type}::{safe_label}::{source_locator}"
+    )
+
+    return {
+        "raw_finding_id": raw_finding_id,
+        "finding_type": cat.lower(),
+        "booknlp_type": cat.lower(),
+        "candidate_type": candidate_type,
+        "label": safe_label,
+        "text": safe_label,
+        "entity_text": safe_label,
+        "extracted_claim": claim,
+        "claim": claim,
+        "evidence": [
+            {
+                "source_excerpt": safe_excerpt,
+                "source_locator": source_locator,
+            }
+        ],
+        "source_locator": source_locator,
+        "provenance": {
+            "tool_source": "booknlp",
+            "adapter": "booknlp",
+            "support": "BookNLP live support only",
+        },
+        "source_adapter": "booknlp",
+        "support_label": "BookNLP live support only",
+        "confidence": "BookNLP live support only",
+        "owner_decision": {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        },
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+        "booknlp_ner_prop": ner_prop,
+        "booknlp_coref": coref,
+        "raw_text": _booknlp_safe_text_excerpt(
+            raw_text, max_chars=_OMI_LIVE_BOOKNLP_MAX_EVIDENCE_CHARS
+        ),
+    }
+
+
+def _booknlp_make_quote_finding(
+    *,
+    quote_text: str,
+    mention_phrase: str,
+    char_id: str,
+    source_locator: str,
+) -> dict[str, Any] | None:
+    """Build a T007-shaped BookNLP quote attribution finding dict.
+
+    BookNLP quote rows may carry a ``char_id`` (e.g. ``42``) and a
+    ``mention_phrase`` (e.g. ``he``). This helper emits a
+    ``diagnostic_question``/``relationship``-style finding only when the
+    quote text, mention phrase, and speaker id are all safe. It does NOT
+    treat the coref/char_id as canon or truth.
+    """
+    safe_quote = _booknlp_safe_text_excerpt(
+        quote_text, max_chars=_OMI_LIVE_BOOKNLP_MAX_EVIDENCE_CHARS
+    )
+    if not safe_quote:
+        return None
+    if is_prose_like_text(safe_quote):
+        return None
+    if is_truth_label(safe_quote):
+        return None
+
+    safe_mention = _booknlp_safe_text_excerpt(
+        mention_phrase, max_chars=80
+    )
+    if not safe_mention:
+        return None
+    if is_prose_like_text(safe_mention):
+        return None
+    if is_truth_label(safe_mention):
+        return None
+
+    safe_char_id = char_id.strip() if isinstance(char_id, str) else ""
+    if not safe_char_id:
+        return None
+    if not safe_char_id.isalnum():
+        return None
+    if len(safe_char_id) > 16:
+        return None
+
+    claim = (
+        f"BookNLP dialogue attribution candidate: quote attributed to "
+        f"mention '{safe_mention}' (char_id={safe_char_id})"
+    )
+    if is_prose_like_text(claim):
+        return None
+    if is_truth_label(claim):
+        return None
+
+    raw_finding_id = (
+        f"booknlp-live::quote::{safe_char_id}::{source_locator}"
+    )
+
+    return {
+        "raw_finding_id": raw_finding_id,
+        "finding_type": "quote_attribution",
+        "booknlp_type": "quote_attribution",
+        "candidate_type": "diagnostic_question",
+        "label": "BookNLP dialogue attribution",
+        "text": safe_quote,
+        "extracted_claim": claim,
+        "claim": claim,
+        "evidence": [
+            {
+                "source_excerpt": safe_quote,
+                "source_locator": source_locator,
+            }
+        ],
+        "source_locator": source_locator,
+        "provenance": {
+            "tool_source": "booknlp",
+            "adapter": "booknlp",
+            "support": "BookNLP live support only",
+        },
+        "source_adapter": "booknlp",
+        "support_label": "BookNLP live support only",
+        "confidence": "BookNLP live support only",
+        "owner_decision": {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        },
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+        "booknlp_char_id": safe_char_id,
+        "booknlp_mention_phrase": safe_mention,
+    }
+
+
+def _booknlp_live_result_to_envelope(
+    *,
+    entities: list[dict[str, str]],
+    quotes: list[dict[str, str]],
+    tokens: list[dict[str, str]],
+) -> dict[str, Any]:
+    """Convert parsed BookNLP output into the T007 fixture envelope shape.
+
+    The converter is intentionally conservative. It only emits candidate
+    findings when the BookNLP row carries a non-empty ``text``/``cat``
+    pair (entities) or a non-empty ``quote`` + ``mention_phrase`` +
+    ``char_id`` triple (quotes). The resulting envelope carries the T007
+    ``omi_booknlp_local_nlp_extraction.v1`` schema version and runs
+    through ``validate_local_nlp_fixture_envelope`` downstream. Unsafe
+    or malformed rows are skipped at the item level; if every row is
+    unsafe, the converter returns ``failed_closed`` with an empty
+    findings list.
+    """
+    base_explanation = (
+        "Live BookNLP adapter bridged the OMI orchestrator to "
+        "booknlp.booknlp.BookNLP, wrote the owner raw idea to a temporary "
+        ".txt file, ran BookNLP against a temporary output directory, and "
+        "converted the parsed .entities / .quotes / .tokens output into "
+        "the existing T007 omi_booknlp_local_nlp_extraction.v1 envelope "
+        "shape. The T007 fixture validator remains authoritative."
+    )
+    provenance = {
+        "tool_source": "booknlp",
+        "adapter": "booknlp",
+        "support": "BookNLP live support only",
+    }
+
+    findings: list[dict[str, Any]] = []
+
+    for row in entities:
+        if len(findings) >= _OMI_LIVE_BOOKNLP_MAX_FINDINGS:
+            break
+        label = row.get("text", "")
+        cat = row.get("cat", "")
+        ner_prop = cat.split("_", 1)[0] if "_" in cat else ""
+        coref = row.get("COREF", "")
+        start_token = row.get("start_token", "")
+        end_token = row.get("end_token", "")
+        source_locator = _booknlp_resolve_token_locator(
+            tokens, start_token=start_token, end_token=end_token
+        )
+        if not source_locator:
+            source_locator = _booknlp_safe_locator(
+                row,
+                fallback=f"raw_idea:L1:C{token_id_for_locator(start_token)}-"
+                f"{token_id_for_locator(end_token)}",
+            )
+        sentence = ""
+        if tokens:
+            for tok in tokens:
+                tok_id = tok.get("token_ID_within_document", "")
+                if tok_id == start_token:
+                    sentence_word = tok.get("word", "")
+                    if sentence_word:
+                        sentence = sentence_word
+                        break
+        finding = _booknlp_make_entity_finding(
+            label=label,
+            cat=cat,
+            ner_prop=ner_prop,
+            coref=coref,
+            raw_text=label,
+            source_locator=source_locator,
+            sentence=sentence,
+        )
+        if finding is not None:
+            findings.append(finding)
+
+    for row in quotes:
+        if len(findings) >= _OMI_LIVE_BOOKNLP_MAX_FINDINGS:
+            break
+        quote_text = row.get("quote", "")
+        mention_phrase = row.get("mention_phrase", "")
+        char_id = row.get("char_id", "")
+        start_token = row.get("quote_start", "")
+        end_token = row.get("quote_end", "")
+        source_locator = _booknlp_resolve_token_locator(
+            tokens, start_token=start_token, end_token=end_token
+        )
+        if not source_locator:
+            source_locator = _booknlp_safe_locator(
+                row,
+                fallback=f"raw_idea:L1:C{start_token}-{end_token}",
+            )
+        finding = _booknlp_make_quote_finding(
+            quote_text=quote_text,
+            mention_phrase=mention_phrase,
+            char_id=char_id,
+            source_locator=source_locator,
+        )
+        if finding is not None:
+            findings.append(finding)
+
+    if not findings:
+        return {
+            "schema_version": OMI_BOOKNLP_SCHEMA_VERSION,
+            "adapter": "booknlp",
+            "status": "failed_closed",
+            "explanation": (
+                base_explanation
+                + " Parsed .entities/.quotes rows carried no safe evidence-"
+                "backed candidate text after the T017B safety boundary "
+                "filtered empty/malformed/unsafe rows. Free-form BookNLP "
+                "support, referential gender, and coreference/alias "
+                "evidence-only handling are deferred; failing closed with "
+                "no findings."
+            ),
+            "provenance": provenance,
+            "findings": [],
+        }
+
+    return {
+        "schema_version": OMI_BOOKNLP_SCHEMA_VERSION,
+        "adapter": "booknlp",
+        "status": "succeeded",
+        "explanation": (
+            base_explanation
+            + f" Converted {len(findings)} candidate-only findings from "
+            "the parsed BookNLP .entities / .quotes rows into the T007 "
+            "envelope; existing T007 validator remains authoritative."
+        ),
+        "provenance": provenance,
+        "findings": findings,
+    }
+
+
+def _booknlp_entity_result_to_envelope(
+    entities: list[dict[str, str]],
+    tokens: list[dict[str, str]],
+) -> dict[str, Any]:
+    """Convert parsed BookNLP ``.entities`` (+ ``.tokens``) output to envelope.
+
+    Quote attribution is intentionally excluded from this helper. It is
+    used by the live runner when the parsed BookNLP output carries no
+    attributable quote rows. The full envelope helper
+    ``_booknlp_live_result_to_envelope`` combines both kinds of rows.
+    """
+    return _booknlp_live_result_to_envelope(
+        entities=entities,
+        quotes=[],
+        tokens=tokens,
+    )
+
+
+def token_id_for_locator(token_id: str) -> str:
+    """Return a safe token-id segment for fallback source locators.
+
+    Returns ``"?"`` when the token id is missing or non-numeric. This is
+    only used when the BookNLP ``.tokens`` file is unavailable and the
+    runner must still produce a non-empty locator; the ``.tokens``-based
+    locator is preferred whenever possible.
+    """
+    if isinstance(token_id, str) and token_id.strip().isdigit():
+        return token_id.strip()
+    return "?"
+
+
+def _build_booknlp_live_runner(
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a live BookNLP adapter runner behind explicit runtime flags.
+
+    The runner:
+
+    - Imports ``booknlp.booknlp.BookNLP`` lazily (never at module import
+      time and never when live flags are disabled).
+    - Writes the owner-authored ``raw_idea`` text to a temporary input
+      ``.txt`` file under a temporary directory. The book id is the
+      deterministic ``omi_booknlp_input`` token; the runner does NOT use
+      any owner-authored text as a filename or book id.
+    - Calls ``BookNLP("en", model_params).process(input_file, output_dir,
+      book_id)`` with conservative CPU-first model params
+      (``pipeline="entity,quote,supersense,event"``, ``model="small"``)
+      unless ``OMI_LIVE_BOOKNLP_MODEL`` / ``OMI_LIVE_BOOKNLP_PIPELINE``
+      override them.
+    - Reads the temporary ``.entities``, ``.quotes``, and ``.tokens``
+      files written by BookNLP. No BookNLP output is written outside
+      the temporary directory; the temporary directory is cleaned up
+      after processing.
+    - Parses only evidence-backed rows (entity ``text`` + ``cat``,
+      quote ``quote`` + ``mention_phrase`` + ``char_id``) and converts
+      them into the existing T007
+      ``omi_booknlp_local_nlp_extraction.v1`` envelope shape.
+    - Validates the converted envelope through
+      ``validate_local_nlp_fixture_envelope``. The T007 validator
+      remains authoritative; any T007 validation failure fails the
+      runner closed with no findings.
+    - Fails closed on ``ImportError``, ``OSError`` (BookNLP package
+      missing or model files missing), runtime processing exception,
+      empty/malformed raw idea, or malformed BookNLP output.
+    - The runner never persists raw BookNLP output, never mutates
+      Memory/Canon, never creates promotion records, never runs
+      apply-promotion, and never generates story prose.
+
+    The caller (``_resolve_adapter_runner``) must check env flags before
+    building this runner. This runner does not re-check flags.
+    """
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        _ = project_name
+        _ = source_idea_id
+
+        if not isinstance(raw_idea, str) or not raw_idea.strip():
+            return {
+                "adapter": "booknlp",
+                "state": "empty",
+                "explanation": (
+                    "Live BookNLP runner received empty raw idea text; "
+                    "no entities or quotes to extract."
+                ),
+                "candidates": [],
+            }
+
+        raw_text = raw_idea.strip()
+
+        model_name = os.environ.get(
+            _OMI_LIVE_BOOKNLP_MODEL_ENV, _OMI_LIVE_BOOKNLP_MODEL_DEFAULT
+        )
+        if not isinstance(model_name, str) or not model_name.strip():
+            model_name = _OMI_LIVE_BOOKNLP_MODEL_DEFAULT
+        if model_name not in {"small", "big", "custom"}:
+            model_name = _OMI_LIVE_BOOKNLP_MODEL_DEFAULT
+
+        pipeline_value = os.environ.get(
+            _OMI_LIVE_BOOKNLP_PIPELINE_ENV, _OMI_LIVE_BOOKNLP_PIPELINE_DEFAULT
+        )
+        if not isinstance(pipeline_value, str) or not pipeline_value.strip():
+            pipeline_value = _OMI_LIVE_BOOKNLP_PIPELINE_DEFAULT
+        safe_pipes: list[str] = []
+        for raw_pipe in pipeline_value.split(","):
+            pipe = raw_pipe.strip().lower()
+            if pipe in {"entity", "event", "supersense", "quote", "coref"}:
+                if pipe not in safe_pipes:
+                    safe_pipes.append(pipe)
+        if "entity" not in safe_pipes:
+            safe_pipes.insert(0, "entity")
+        safe_pipeline = ",".join(safe_pipes)
+
+        model_params: dict[str, Any] = {
+            "pipeline": safe_pipeline,
+            "model": model_name,
+        }
+
+        tmp_dir_obj = tempfile.TemporaryDirectory(prefix="omi_booknlp_live_")
+        tmp_dir = tmp_dir_obj.name
+        input_path = os.path.join(tmp_dir, _OMI_LIVE_BOOKNLP_INPUT_FILENAME)
+        output_dir = tmp_dir
+        book_id = _OMI_LIVE_BOOKNLP_INPUT_BOOK_ID
+
+        try:
+            try:
+                with open(input_path, "w", encoding="utf-8") as handle:
+                    handle.write(raw_text)
+                    if not raw_text.endswith("\n"):
+                        handle.write("\n")
+            except OSError as exc:
+                return {
+                    "adapter": "booknlp",
+                    "state": "failed_closed",
+                    "explanation": (
+                        "Live BookNLP runner could not write the temporary "
+                        f"input file: {type(exc).__name__}: {exc}. "
+                        "Failing closed with no findings."
+                    ),
+                    "candidates": [],
+                }
+
+            try:
+                from booknlp.booknlp import BookNLP  # lazy import
+
+                booknlp_instance = BookNLP("en", model_params)
+                booknlp_instance.process(input_path, output_dir, book_id)
+            except ImportError as exc:
+                return {
+                    "adapter": "booknlp",
+                    "state": "unavailable",
+                    "explanation": (
+                        "Live BookNLP requested but the BookNLP Python "
+                        f"package is not installed: {type(exc).__name__}: "
+                        f"{exc}. Failing closed with no candidates."
+                    ),
+                    "candidates": [],
+                }
+            except OSError as exc:
+                return {
+                    "adapter": "booknlp",
+                    "state": "unavailable",
+                    "explanation": (
+                        "Live BookNLP requested but the model assets or "
+                        "temporary directory are not available/loadable: "
+                        f"{type(exc).__name__}: {exc}. Failing closed with "
+                        "no candidates."
+                    ),
+                    "candidates": [],
+                }
+            except Exception as exc:
+                return {
+                    "adapter": "booknlp",
+                    "state": "failed_closed",
+                    "explanation": (
+                        "Live BookNLP runtime processing failed: "
+                        f"{type(exc).__name__}: {exc}. Failing closed with "
+                        "no candidates."
+                    ),
+                    "candidates": [],
+                }
+
+            entities_path = os.path.join(output_dir, f"{book_id}.entities")
+            quotes_path = os.path.join(output_dir, f"{book_id}.quotes")
+            tokens_path = os.path.join(output_dir, f"{book_id}.tokens")
+
+            entities_rows = _booknlp_parse_entities_file(entities_path)
+            quotes_rows = _booknlp_parse_quotes_file(quotes_path)
+            tokens_rows = _booknlp_parse_tokens_file(tokens_path)
+
+            if not entities_rows and not quotes_rows:
+                return {
+                    "adapter": "booknlp",
+                    "state": "empty",
+                    "explanation": (
+                        "Live BookNLP produced no parseable .entities or "
+                        ".quotes rows. Failing closed with no findings."
+                    ),
+                    "candidates": [],
+                }
+
+            envelope = _booknlp_live_result_to_envelope(
+                entities=entities_rows,
+                quotes=quotes_rows,
+                tokens=tokens_rows,
+            )
+        finally:
+            try:
+                tmp_dir_obj.cleanup()
+            except OSError:
+                pass
+
+        try:
+            validated = validate_local_nlp_fixture_envelope(
+                envelope,
+                adapter_name="booknlp",
+            )
+        except ValueError as exc:
+            return {
+                "adapter": "booknlp",
+                "state": "failed_closed",
+                "explanation": (
+                    "Live BookNLP converted envelope failed T007 "
+                    f"validation: {exc}. Failing closed with no findings."
+                ),
+                "candidates": [],
+            }
+
+        env_status = validated["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if validated["findings"] else "empty"
+        else:
+            state = env_status
+
+        return {
+            "adapter": "booknlp",
+            "state": state,
+            "explanation": (
+                validated["explanation"]
+                or "Live BookNLP local NLP extraction completed."
+            ),
+            "candidates": validated["findings"],
+        }
+
+    return _runner
+
+
 def _adapter_config_scene_id(
     adapter_config: dict[str, Any] | None,
 ) -> str | None:
@@ -5668,6 +6532,28 @@ def _resolve_adapter_runner(
                 and not _env_bool(env, _OMI_LIVE_STORY_CHECK_BLOCKED_ENV)
             ):
                 return _build_story_check_live_runner(
+                    adapter_config=adapter_config,
+                )
+        # T017B: live BookNLP path behind explicit env flags. The runner
+        # imports ``booknlp.booknlp.BookNLP`` lazily, writes the owner raw
+        # idea to a temporary file, runs BookNLP against a temporary
+        # output directory, and converts parsed ``.entities`` /
+        # ``.quotes`` / ``.tokens`` rows into the existing T007
+        # ``omi_booknlp_local_nlp_extraction.v1`` envelope shape. The T007
+        # ``validate_local_nlp_fixture_envelope`` is the authoritative
+        # downstream validator. The runner does NOT persist raw BookNLP
+        # output, mutate Memory/Canon, create promotion records, run
+        # apply-promotion, or generate story prose. T017C must later
+        # perform manual real BookNLP processing on owner-authored text
+        # to prove the live BookNLP MVP path.
+        if adapter == "booknlp":
+            env = os.environ
+            if (
+                _env_bool(env, _OMI_LIVE_TOOLS_ENABLED_ENV)
+                and _env_bool(env, _OMI_LIVE_BOOKNLP_ENABLED_ENV)
+                and not _env_bool(env, _OMI_LIVE_BOOKNLP_BLOCKED_ENV)
+            ):
+                return _build_booknlp_live_runner(
                     adapter_config=adapter_config,
                 )
     return None
@@ -5965,11 +6851,14 @@ def analyze_omi_raw_idea_with_tools(
                     )
                 else:
                     unavailable_explanation = (
-                        f"Adapter '{adapter}' is available through the T007 "
-                        f"fixture/mock local NLP contract only; no fixture was "
-                        f"supplied via ``adapter_fixture_outputs``. The "
-                        f"orchestrator does not perform live BookNLP calls "
-                        f"and does not import or install BookNLP. "
+                        f"Adapter '{adapter}' requires either a T007 fixture "
+                        f"via ``adapter_fixture_outputs`` or live BookNLP env "
+                        f"flags (OMI_LIVE_TOOLS_ENABLED + "
+                        f"OMI_LIVE_BOOKNLP_ENABLED, with "
+                        f"OMI_LIVE_BOOKNLP_BLOCKED unset). Neither was "
+                        f"supplied. The orchestrator does not perform live "
+                        f"BookNLP calls by default and does not import or "
+                        f"install BookNLP automatically. "
                         f"Returning 'unavailable' with no candidates."
                     )
             elif adapter in OMI_CONTEXT_ADAPTER_NAMES:
