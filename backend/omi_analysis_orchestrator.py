@@ -18,6 +18,11 @@ T005 scope (PHASE8-IMPL-023):
   - Wires ``story_check`` through a fixture-only diagnostic handoff contract
     that normalizes evidence-backed structural diagnostics/questions into
     candidate-review support without importing or running Story Check.
+    T016C adds a live Story Check adapter behind
+    ``OMI_LIVE_TOOLS_ENABLED`` + ``OMI_LIVE_STORY_CHECK_ENABLED`` env flags
+    that lazily calls ``backend.analysis_engine.run_story_check`` and
+    converts the legacy response into the existing T008 fixture
+    envelope shape before validation/normalization.
   - Wires ``ncp``, ``subtxt``, and ``dramatica_flow`` through fixture-only
     diagnostic/context handoff contracts that normalize evidence-backed
     support into candidate-review material without importing or running any
@@ -40,11 +45,18 @@ T005 scope (PHASE8-IMPL-023):
 Boundaries (non-negotiable):
 
   - No Ollama, Story Check, BookNLP, NCP, Subtxt, or dramatica-flow
-    live runtime calls. This module does not import or invoke any of them.
-  - Live spaCy (T014C) is available only behind explicit runtime flags
-    (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_SPACY_ENABLED) and imports spaCy
-    lazily inside the live runner path. No automatic promotion, Memory/Canon
-    mutation, apply-promotion, or candidate approval.
+    live runtime calls. This module does not import or invoke any of them
+    at module import time. Live spaCy (T014C) is available only behind
+    explicit runtime flags (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_SPACY_ENABLED)
+    and imports spaCy lazily inside the live runner path. Live Ollama
+    (T015C) is available only behind explicit runtime flags
+    (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_OLLAMA_ENABLED) and uses
+    ``urllib.request`` lazily inside the live runner path. Live Story
+    Check (T016C) is available only behind explicit runtime flags
+    (OMI_LIVE_TOOLS_ENABLED, OMI_LIVE_STORY_CHECK_ENABLED) and imports
+    ``backend.analysis_engine.run_story_check`` lazily inside the live
+    runner path. No automatic promotion, Memory/Canon mutation,
+    apply-promotion, or candidate approval.
   - No Memory/Canon mutation.
   - No promotion records, no apply-promotion, no canon promotion.
   - No story prose generation, rewriting, continuation, drafting, polishing,
@@ -4226,6 +4238,15 @@ _OMI_LIVE_OLLAMA_SYSTEM_PROMPT = (
     "findings list."
 )
 
+# ---------------------------------------------------------------------------
+# Live Story Check diagnostic adapter (T016C) — behind explicit env flags
+# ---------------------------------------------------------------------------
+
+_OMI_LIVE_STORY_CHECK_ENABLED_ENV = "OMI_LIVE_STORY_CHECK_ENABLED"
+_OMI_LIVE_STORY_CHECK_BLOCKED_ENV = "OMI_LIVE_STORY_CHECK_BLOCKED"
+_OMI_LIVE_STORY_CHECK_BLOCKED_REASON_ENV = "OMI_LIVE_STORY_CHECK_BLOCKED_REASON"
+_OMI_LIVE_STORY_CHECK_SCENE_ID_ENV = "OMI_LIVE_STORY_CHECK_SCENE_ID"
+
 _OMI_SPACY_LIVE_ENTITY_LABEL_TO_CANDIDATE_TYPE: dict[str, str] = {
     "PERSON": "character",
     "GPE": "location",
@@ -4674,6 +4695,868 @@ def _build_ollama_model_live_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# Live Story Check diagnostic adapter (T016C)
+# ---------------------------------------------------------------------------
+
+# T016C1 boundary: the live adapter must NOT rewrite legacy Story Check
+# output text to remove forbidden truth/canon/final/approved/promoted
+# labels, apply-promotion operation text, or rewrite/continue/outline/draft
+# generation language. The T008 validator is authoritative. Unsafe legacy
+# text must be SKIPPED at the item level, not sanitized into acceptable
+# text. The safety checker below classifies legacy text as safe/unsafe
+# against the same T008 patterns the T008 validator uses. The legacy
+# ``run_story_check`` callable surface is treated as an untrusted model
+# output boundary.
+
+
+def _story_check_legacy_text_is_safe(value: Any) -> bool:
+    """Return True iff ``value`` is a non-empty plain string with no
+    truth/canon/final/approved/promoted labels, no apply-promotion/promotion
+    operation text, no rewrite/continue/outline/draft generation language,
+    and no prose-shaped free text.
+
+    The T008 contract rejects these labels in any non-evidence string value.
+    The live Story Check adapter must NOT rewrite the legacy text to
+    remove them. If the text is unsafe, the adapter SKIPS the item
+    entirely; if all items are unsafe, the adapter returns ``failed_closed``
+    with no findings.
+
+    This checker reuses the same forbidden patterns the T008 validator
+    uses, so safe/unsafe classification is consistent with T008.
+    """
+    if not isinstance(value, str):
+        return False
+    text = value.strip()
+    if not text:
+        return False
+    if is_prose_like_text(text):
+        return False
+    if is_truth_label(text):
+        return False
+    if _OMI_STORY_CHECK_FINAL_TRUTH_LABEL_RE.search(text):
+        return False
+    if _OMI_STORY_CHECK_FORBIDDEN_OPERATION_VALUE_RE.search(text):
+        return False
+    if _OMI_STORY_CHECK_FORBIDDEN_GENERATION_VALUE_RE.search(text):
+        return False
+    return True
+
+
+def _story_check_safe_excerpt_text(value: Any, *, max_chars: int = 240) -> str:
+    """Return a plain trimmed string from arbitrary input.
+
+    This helper does NOT sanitize the text. The caller is responsible for
+    verifying the result is safe before using it as a
+    ``diagnostic_claim``, ``extracted_claim``, ``question``, or
+    ``evidence.source_excerpt`` value (e.g., via
+    ``_story_check_legacy_text_is_safe``). T016C1 tightened this boundary
+    so the live adapter never rewrites unsafe legacy text.
+    """
+    if not isinstance(value, str):
+        return ""
+    text = value.strip()
+    if not text:
+        return ""
+    if len(text) > max_chars:
+        text = text[: max_chars - 3].rstrip() + "..."
+    return text
+
+
+def _story_check_extract_excerpts_from_value(
+    value: Any,
+    *,
+    max_items: int = 5,
+    max_chars: int = 240,
+) -> list[str]:
+    """Extract a small list of SAFE evidence excerpt strings from a legacy value.
+
+    Accepts ``list[str]`` (truncated to ``max_items``), ``str`` (treated as
+    a single excerpt), or ``dict`` with a known excerpt-like key. Returns a
+    deduplicated, order-preserving list of safe strings.
+
+    Safety boundary (T016C1): the helper does NOT rewrite or sanitize
+    legacy text. Items whose text fails
+    ``_story_check_legacy_text_is_safe`` are SKIPPED entirely (not
+    converted to a safe phrase). T008 ``validate_story_check_fixture_envelope``
+    remains the authoritative validator downstream.
+    """
+    excerpts: list[str] = []
+
+    def _add_if_safe(raw_text: Any) -> None:
+        if len(excerpts) >= max_items:
+            return
+        if not _story_check_legacy_text_is_safe(raw_text):
+            return
+        excerpt = _story_check_safe_excerpt_text(raw_text, max_chars=max_chars)
+        if excerpt and excerpt not in excerpts:
+            excerpts.append(excerpt)
+
+    if isinstance(value, list):
+        for item in value:
+            _add_if_safe(item)
+    elif isinstance(value, str):
+        _add_if_safe(value)
+    elif isinstance(value, dict):
+        for key in (
+            "source_excerpt",
+            "evidence_excerpt",
+            "excerpt",
+            "source_text",
+            "owner_authored_excerpt",
+            "quote",
+            "quote_text",
+            "sentence",
+            "sentence_text",
+        ):
+            if key in value:
+                _add_if_safe(value.get(key))
+                if len(excerpts) >= max_items:
+                    break
+    return excerpts
+
+
+def _story_check_classify_candidate_type(
+    raw_type: str,
+    *,
+    key_hint: str = "",
+) -> str:
+    """Map a legacy Story Check key/label to a T008 orchestrator finding type.
+
+    Returns one of the recognized orchestrator finding types. The mapping is
+    conservative: ambiguous legacy keys fall back to ``structural_diagnostic``
+    so the resulting finding is still classified as a candidate-only
+    diagnostic (never canon, never truth).
+    """
+    token = _normalize_local_nlp_type_token(raw_type)
+    if token in {
+        "structural_diagnostic",
+        "structural_observation",
+        "structure",
+        "structure_diagnostic",
+        "diagnostic",
+        "diagnostic_observation",
+        "warning",
+        "concern",
+    }:
+        return "structural_diagnostic"
+    if token in {
+        "storyform",
+        "storyform_context",
+        "storyform_support",
+        "context_support",
+        "theme",
+        "theme_drift",
+        "storyform_context_support",
+    }:
+        return "storyform_context"
+    if token in {
+        "throughline",
+        "throughline_context",
+        "throughline_support",
+        "throughline_context_support",
+        "main_character",
+        "influence_character",
+        "relationship_story",
+        "overall_story",
+    }:
+        return "throughline_context"
+    if token in {
+        "conflict",
+        "conflict_diagnostic",
+        "uncertainty",
+        "uncertainty_diagnostic",
+    }:
+        return "conflict_diagnostic"
+    if token in {
+        "question",
+        "diagnostic_question",
+        "review_question",
+        "owner_question",
+        "owner_review_question",
+        "suggestion",
+    }:
+        return "diagnostic_question"
+    if token in {"open_question", "ambiguity", "ambiguous_support"}:
+        return "open_question"
+    if token in {"plot", "plot_thread", "plot_thread_diagnostic", "thread"}:
+        return "plot_thread"
+    if token in {
+        "relationship",
+        "relationship_diagnostic",
+        "relationship_support",
+    }:
+        return "relationship"
+    if token in {
+        "continuity_warning",
+        "continuity",
+        "character_consistency",
+    }:
+        return "continuity_warning"
+    if token in {"world_rule", "rule"}:
+        return "world_rule"
+    if token in {
+        "candidate_support",
+        "evidence_support",
+        "evidence_note",
+        "insufficient_evidence",
+        "reason",
+        "status",
+    }:
+        return "evidence_note"
+
+    key_token = _normalize_local_nlp_type_token(key_hint)
+    if key_token in {"suggestions", "questions"}:
+        return "diagnostic_question"
+    if key_token in {"warnings", "concerns"}:
+        return "structural_diagnostic"
+    if key_token in {"insufficient_evidence", "reasons"}:
+        return "evidence_note"
+    if key_token in {"evidence"}:
+        return "evidence_note"
+
+    return "structural_diagnostic"
+
+
+def _story_check_make_finding(
+    *,
+    candidate_type: str,
+    label: str,
+    diagnostic_claim: str,
+    evidence_excerpts: list[str],
+    source_locator: str,
+    support_label: str = "Story Check diagnostic support only",
+) -> dict[str, Any] | None:
+    """Build one T008-shaped finding dict for the live Story Check adapter.
+
+    Returns ``None`` when the inputs cannot be turned into a T008-compatible
+    finding (empty label or empty diagnostic_claim or no usable evidence or
+    unsafe label/claim/evidence text). T016C1 boundary: the helper
+    re-validates the safety of the label, claim, and evidence excerpts
+    against ``_story_check_legacy_text_is_safe``. Unsafe text is rejected
+    here as a defense-in-depth check so the T008 validator never sees
+    rewritten/sanitized AI/tool/model output text.
+    """
+    if not isinstance(label, str) or not label.strip():
+        return None
+    if not isinstance(diagnostic_claim, str) or not diagnostic_claim.strip():
+        return None
+    if not evidence_excerpts:
+        return None
+    if not isinstance(source_locator, str) or not source_locator.strip():
+        return None
+
+    if not _story_check_legacy_text_is_safe(diagnostic_claim):
+        return None
+    for excerpt in evidence_excerpts:
+        if not _story_check_legacy_text_is_safe(excerpt):
+            return None
+
+    excerpt = evidence_excerpts[0]
+    secondary = evidence_excerpts[1] if len(evidence_excerpts) > 1 else ""
+
+    evidence_items: list[dict[str, Any]] = [
+        {
+            "source_excerpt": excerpt,
+            "source_locator": source_locator,
+        }
+    ]
+    if secondary and secondary != excerpt:
+        evidence_items.append(
+            {
+                "source_excerpt": secondary,
+                "source_locator": source_locator,
+            }
+        )
+
+    return {
+        "raw_finding_id": (
+            f"story_check_live::{label.strip()[:80]}::{source_locator}"
+        ),
+        "candidate_type": candidate_type,
+        "label": label.strip()[:240],
+        "diagnostic_claim": diagnostic_claim.strip(),
+        "extracted_claim": diagnostic_claim.strip(),
+        "question": diagnostic_claim.strip()
+        if candidate_type == "diagnostic_question"
+        else "",
+        "evidence": evidence_items,
+        "source_locator": source_locator,
+        "support_label": support_label,
+        "confidence": support_label,
+        "provenance": {
+            "tool_source": OMI_STORY_CHECK_ADAPTER_NAME,
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "support": support_label,
+        },
+        "source_adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+        "owner_decision": {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        },
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+    }
+
+
+def _story_check_warning_label(category: str) -> str:
+    """Return a generic converter-owned label for a legacy diagnostic item.
+
+    T016C1 boundary: the label does NOT include any legacy text. The
+    legacy text is used only as ``diagnostic_claim`` and
+    ``evidence.source_excerpt`` after the safety check, never inside the
+    label. The label is intentionally generic so the T008 validator
+    cannot reject it on truth/canon/final/approved/promoted/operation/
+    generation grounds.
+    """
+    if "warning" in category:
+        return "Story Check warning"
+    if "concern" in category:
+        return "Story Check concern"
+    if "insufficient" in category or "evidence_note" in category:
+        return "Story Check insufficient evidence"
+    if "question" in category:
+        return "Story Check question"
+    if "throughline" in category:
+        return "Story Check throughline diagnostic"
+    if "storyform" in category or "theme" in category:
+        return "Story Check storyform diagnostic"
+    if "character" in category:
+        return "Story Check character consistency diagnostic"
+    return "Story Check diagnostic"
+
+
+def _story_check_resolve_scene_locator(
+    *,
+    project_name: str,
+    scene_id: str,
+) -> str:
+    """Build a safe ``source_locator`` for live Story Check findings.
+
+    The locator is project-scoped and scene-scoped. It does NOT include the
+    raw scene text or any owner-authored content. The locator only identifies
+    the project/scene surface that the Story Check diagnostic was anchored to.
+    """
+    safe_project = _require_non_empty_string(project_name, "project_name")
+    safe_scene = _require_non_empty_string(scene_id, "scene_id")
+    return f"project:{safe_project}::scene:{safe_scene}"
+
+
+def _story_check_result_to_envelope(
+    legacy_result: Any,
+    *,
+    project_name: str,
+    scene_id: str,
+) -> dict[str, Any]:
+    """Convert a legacy Story Check result into a T008 envelope dict.
+
+    The converter is intentionally conservative. It does NOT pass through
+    legacy prose fields as candidate findings, and it does NOT parse
+    candidate findings from unstructured narrative prose. It only emits
+    candidate findings when the legacy result carries structured evidence
+    (warnings/concerns/suggestions/insufficient_evidence as a list, or a
+    ``throughline_alignment``/``theme_drift``/``character_consistency``
+    object with evidence or concerns or a status/reason). Free-form prose,
+    empty/None/string/NoneType payloads, payloads with only a ``task`` or
+    ``coherence_score``, and any payload that cannot be mapped to at least
+    one T008-shaped finding are converted to a fail-closed envelope with
+    ``status="failed_closed"`` and an empty ``findings`` list.
+
+    T016C1 safety boundary: the converter does NOT rewrite or sanitize
+    legacy text to remove forbidden labels. Every legacy item
+    (warning/concern/suggestion/insufficient_evidence/throughline
+    evidence/throughline concern/theme_drift reason/character_consistency
+    reason) is checked against ``_story_check_legacy_text_is_safe``
+    before it is used as a ``diagnostic_claim`` or
+    ``evidence.source_excerpt`` value. Unsafe items are SKIPPED
+    individually; if every structured item is unsafe, the converter
+    returns ``failed_closed`` with no findings. The converter never
+    synthesizes placeholder text from ``present``/``status``/``reason``
+    flags alone. The T008 ``validate_story_check_fixture_envelope`` is
+    the authoritative downstream validator.
+
+    The returned envelope has shape::
+
+        {
+            "schema_version": "omi_story_check_diagnostic_handoff.v1",
+            "adapter": "story_check",
+            "status": "succeeded" | "empty" | "failed_closed" | "error",
+            "explanation": "...",
+            "provenance": {"tool_source": "story_check", ...},
+            "findings": [<T008-shaped finding>, ...],
+        }
+
+    The caller MUST then validate this envelope through
+    ``validate_story_check_fixture_envelope`` before returning it to the
+    orchestrator. The T008 validator is authoritative and remains the
+    source of truth for evidence/provenance/owner-decision/review-status
+    semantics.
+    """
+    base_explanation = (
+        "Live Story Check adapter bridged the OMI orchestrator to "
+        "backend.analysis_engine.run_story_check and converted the legacy "
+        "result into the existing omi_story_check_diagnostic_handoff.v1 "
+        "envelope shape. The T008 fixture validator remains authoritative."
+    )
+
+    provenance: dict[str, str] = {
+        "tool_source": OMI_STORY_CHECK_ADAPTER_NAME,
+        "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+        "support": OMI_STORY_CHECK_SUPPORT_LABEL,
+    }
+
+    if legacy_result is None or not isinstance(legacy_result, dict):
+        return {
+            "schema_version": OMI_STORY_CHECK_SCHEMA_VERSION,
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "status": "failed_closed",
+            "explanation": (
+                base_explanation
+                + " Legacy result was not a JSON object; failing closed with "
+                "no findings."
+            ),
+            "provenance": provenance,
+            "findings": [],
+        }
+
+    if "error" in legacy_result and isinstance(legacy_result["error"], str):
+        return {
+            "schema_version": OMI_STORY_CHECK_SCHEMA_VERSION,
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "status": "error",
+            "explanation": (
+                base_explanation
+                + " Legacy Story Check returned an error shape: "
+                f"{legacy_result['error'][:240]}. Failing closed with no findings."
+            ),
+            "provenance": provenance,
+            "findings": [],
+        }
+
+    locator = _story_check_resolve_scene_locator(
+        project_name=project_name, scene_id=scene_id
+    )
+
+    findings: list[dict[str, Any]] = []
+
+    warnings_value = legacy_result.get("warnings")
+    if isinstance(warnings_value, list):
+        for warning in warnings_value:
+            if not _story_check_legacy_text_is_safe(warning):
+                continue
+            excerpt = _story_check_safe_excerpt_text(warning, max_chars=240)
+            if not excerpt:
+                continue
+            label = _story_check_warning_label("warning")
+            claim = "Story Check warning: " + excerpt
+            finding = _story_check_make_finding(
+                candidate_type="structural_diagnostic",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=[excerpt],
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    concerns_value = legacy_result.get("concerns")
+    if isinstance(concerns_value, list):
+        for concern in concerns_value:
+            if not _story_check_legacy_text_is_safe(concern):
+                continue
+            excerpt = _story_check_safe_excerpt_text(concern, max_chars=240)
+            if not excerpt:
+                continue
+            label = _story_check_warning_label("concern")
+            claim = "Story Check concern: " + excerpt
+            finding = _story_check_make_finding(
+                candidate_type="structural_diagnostic",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=[excerpt],
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    suggestions_value = legacy_result.get("suggestions")
+    if isinstance(suggestions_value, list):
+        for suggestion in suggestions_value:
+            if not _story_check_legacy_text_is_safe(suggestion):
+                continue
+            excerpt = _story_check_safe_excerpt_text(suggestion, max_chars=240)
+            if not excerpt:
+                continue
+            label = _story_check_warning_label("question")
+            claim = excerpt
+            finding = _story_check_make_finding(
+                candidate_type="diagnostic_question",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=[excerpt],
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    insufficient_evidence_value = legacy_result.get("insufficient_evidence")
+    if isinstance(insufficient_evidence_value, list):
+        for item in insufficient_evidence_value:
+            if not _story_check_legacy_text_is_safe(item):
+                continue
+            excerpt = _story_check_safe_excerpt_text(item, max_chars=240)
+            if not excerpt:
+                continue
+            label = _story_check_warning_label("insufficient_evidence")
+            claim = "Story Check insufficient evidence: " + excerpt
+            finding = _story_check_make_finding(
+                candidate_type="evidence_note",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=[excerpt],
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    throughline_value = legacy_result.get("throughline_alignment")
+    if isinstance(throughline_value, dict):
+        for throughline_name in (
+            "overall_story",
+            "main_character",
+            "influence_character",
+            "relationship_story",
+        ):
+            entry = throughline_value.get(throughline_name)
+            if not isinstance(entry, dict):
+                continue
+            entry_status = entry.get("present")
+            evidence_list = _story_check_extract_excerpts_from_value(
+                entry.get("evidence"), max_items=2, max_chars=240
+            )
+            concern_list = _story_check_extract_excerpts_from_value(
+                entry.get("concerns"), max_items=2, max_chars=240
+            )
+            base_excerpts = evidence_list + concern_list
+            # T016C1: the converter must NOT synthesize placeholder text
+            # (e.g. "marked present" / "marked not present") from the
+            # present flag alone. If no safe legacy evidence or concerns
+            # are available, skip the throughline item rather than
+            # generate text on its own.
+            if not base_excerpts:
+                continue
+            claim = (
+                f"Throughline '{throughline_name}' diagnostic: "
+                f"present={entry_status}; concerns={len(concern_list)}; "
+                f"evidence_items={len(evidence_list)}."
+            )
+            label = _story_check_warning_label("throughline")
+            finding = _story_check_make_finding(
+                candidate_type="throughline_context",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=base_excerpts,
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    theme_drift_value = legacy_result.get("theme_drift")
+    if isinstance(theme_drift_value, dict):
+        reason = theme_drift_value.get("reason")
+        status = theme_drift_value.get("status")
+        # T016C1: only proceed when a SAFE ``reason`` excerpt is available.
+        # The converter must NOT synthesize placeholder text from the
+        # ``status`` flag alone, and it must NOT use an unsafe ``reason``
+        # as evidence. If the reason is missing or unsafe, skip the
+        # theme_drift item entirely.
+        excerpt = ""
+        if isinstance(reason, str) and _story_check_legacy_text_is_safe(reason):
+            excerpt = _story_check_safe_excerpt_text(reason, max_chars=240)
+        if excerpt:
+            claim = (
+                f"Story Check theme drift diagnostic: status={status!r}; "
+                f"reason={excerpt}."
+            )
+            label = _story_check_warning_label("storyform")
+            finding = _story_check_make_finding(
+                candidate_type="storyform_context",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=[excerpt],
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    character_consistency_value = legacy_result.get("character_consistency")
+    if isinstance(character_consistency_value, dict):
+        reason = character_consistency_value.get("reason")
+        status = character_consistency_value.get("status")
+        # T016C1: same boundary as theme_drift above. Only proceed when a
+        # SAFE ``reason`` excerpt is available. The converter must NOT
+        # synthesize placeholder text and must NOT use an unsafe
+        # ``reason`` as evidence.
+        excerpt = ""
+        if isinstance(reason, str) and _story_check_legacy_text_is_safe(reason):
+            excerpt = _story_check_safe_excerpt_text(reason, max_chars=240)
+        if excerpt:
+            claim = (
+                f"Story Check character consistency diagnostic: "
+                f"status={status!r}; reason={excerpt}."
+            )
+            label = _story_check_warning_label("character")
+            finding = _story_check_make_finding(
+                candidate_type="continuity_warning",
+                label=label,
+                diagnostic_claim=claim,
+                evidence_excerpts=[excerpt],
+                source_locator=locator,
+            )
+            if finding is not None:
+                findings.append(finding)
+
+    if not findings:
+        return {
+            "schema_version": OMI_STORY_CHECK_SCHEMA_VERSION,
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "status": "failed_closed",
+            "explanation": (
+                base_explanation
+                + " Legacy Story Check result carried no structured "
+                "diagnostics that could be safely mapped to T008 candidate "
+                "findings (no warnings/concerns/suggestions/insufficient_"
+                "evidence/throughline_alignment/theme_drift/character_"
+                "consistency shape, or every structured item carried "
+                "unsafe truth/canon/final/approved/promoted/apply-promotion"
+                "/rewrite/continue/outline/draft/generation language and "
+                "was skipped by the T016C1 safety boundary). Free-form "
+                "prose and the legacy coherence_score alone are not used "
+                "as candidate findings. Failing closed with no findings."
+            ),
+            "provenance": provenance,
+            "findings": [],
+        }
+
+    return {
+        "schema_version": OMI_STORY_CHECK_SCHEMA_VERSION,
+        "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+        "status": "succeeded",
+        "explanation": (
+            base_explanation
+            + f" Converted {len(findings)} candidate-only diagnostic "
+            "findings from the legacy Story Check response shape into the "
+            "T008 envelope; existing T008 validator remains authoritative."
+        ),
+        "provenance": provenance,
+        "findings": findings,
+    }
+
+
+def _build_story_check_live_runner(
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a live Story Check adapter runner behind explicit runtime flags.
+
+    The runner:
+
+    - Imports ``backend.analysis_engine.run_story_check`` lazily (never at
+      module import time and never when live flags are disabled).
+    - Resolves ``project_name`` from the orchestrator entrypoint and
+      ``scene_id`` from an explicit ``story_check_scene_id`` argument (when
+      supplied by the caller) or from the ``OMI_LIVE_STORY_CHECK_SCENE_ID``
+      environment variable. The explicit argument wins over the env var when
+      both are present. If neither is available, the runner fails closed
+      with ``unavailable`` and an explanation; it does NOT invent a scene
+      id and does NOT call ``run_story_check``.
+    - Calls ``run_story_check(project_name, scene_id)`` through the existing
+      in-repo callable surface. The runner does NOT call the legacy
+      ``POST /api/projects/{project_name}/story-check/{scene_id}`` route
+      and does NOT post to Ollama directly; the existing surface owns
+      scene text/bible/storyform loading, prompt rendering, and Ollama
+      HTTP behavior.
+    - Converts the legacy rich-Story-Check response (warnings, concerns,
+      suggestions, insufficient_evidence, throughline_alignment,
+      theme_drift, character_consistency) into the existing T008
+      ``omi_story_check_diagnostic_handoff.v1`` envelope shape through
+      ``_story_check_result_to_envelope``. Free-form prose, the legacy
+      ``task``/``coherence_score`` alone, malformed/None/dict/string
+      values, and ``{"error": ...}`` shapes all fail closed.
+    - Validates the converted envelope through
+      ``validate_story_check_fixture_envelope``. The T008 validator
+      remains authoritative; any T008 validation failure fails the
+      runner closed with no findings.
+    - Fail-closed on ImportError, runtime exceptions, missing context
+      (project name or scene id), blocked flag, or malformed legacy
+      output. The runner never persists candidates, never mutates
+      Memory/Canon, never creates promotion records, never runs
+      apply-promotion, and never generates story prose.
+    """
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        _ = raw_idea
+        _ = source_idea_id
+
+        if not isinstance(project_name, str) or not project_name.strip():
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "unavailable",
+                "explanation": (
+                    "Live Story Check runner received an empty/missing "
+                    "project name; required context for "
+                    "backend.analysis_engine.run_story_check is not "
+                    "available. Failing closed with no findings and no "
+                    "live call."
+                ),
+                "candidates": [],
+            }
+
+        scene_id = _adapter_config_scene_id(adapter_config)
+        if scene_id is None:
+            env_scene_id = os.environ.get(_OMI_LIVE_STORY_CHECK_SCENE_ID_ENV)
+            if isinstance(env_scene_id, str) and env_scene_id.strip():
+                scene_id = env_scene_id.strip()
+
+        if not scene_id:
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "unavailable",
+                "explanation": (
+                    "Live Story Check runner has no scene id: caller did "
+                    "not pass story_check_scene_id and "
+                    f"{_OMI_LIVE_STORY_CHECK_SCENE_ID_ENV} is unset. "
+                    "Required context for "
+                    "backend.analysis_engine.run_story_check is not "
+                    "available. Failing closed with no findings and no "
+                    "live call."
+                ),
+                "candidates": [],
+            }
+
+        try:
+            from backend import analysis_engine  # lazy import
+
+            run_story_check = getattr(analysis_engine, "run_story_check", None)
+            if not callable(run_story_check):
+                return {
+                    "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                    "state": "unavailable",
+                    "explanation": (
+                        "Live Story Check runner could not import "
+                        "backend.analysis_engine.run_story_check; the "
+                        "function is not callable from this environment. "
+                        "Failing closed with no findings."
+                    ),
+                    "candidates": [],
+                }
+        except ImportError as exc:
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "unavailable",
+                "explanation": (
+                    "Live Story Check runner could not import "
+                    "backend.analysis_engine.run_story_check: "
+                    f"{type(exc).__name__}: {exc}. Failing closed with no "
+                    "findings."
+                ),
+                "candidates": [],
+            }
+
+        try:
+            legacy_result = run_story_check(
+                project_name.strip(), scene_id
+            )
+        except Exception as exc:
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    "Live Story Check runtime call to "
+                    "backend.analysis_engine.run_story_check raised: "
+                    f"{type(exc).__name__}: {exc}. Failing closed with no "
+                    "findings, no persistence, and no Memory/Canon "
+                    "mutation."
+                ),
+                "candidates": [],
+            }
+
+        if not isinstance(legacy_result, dict):
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    "Live Story Check runtime returned a non-dict value "
+                    f"({type(legacy_result).__name__}); cannot be safely "
+                    "converted into the T008 envelope. Failing closed with "
+                    "no findings."
+                ),
+                "candidates": [],
+            }
+
+        envelope = _story_check_result_to_envelope(
+            legacy_result,
+            project_name=project_name.strip(),
+            scene_id=scene_id,
+        )
+
+        try:
+            validated = validate_story_check_fixture_envelope(envelope)
+        except ValueError as exc:
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    "Live Story Check converted envelope failed T008 "
+                    f"validation: {exc}. Failing closed with no findings."
+                ),
+                "candidates": [],
+            }
+
+        env_status = validated["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if validated["findings"] else "empty"
+        else:
+            state = env_status
+
+        return {
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "state": state,
+            "explanation": (
+                validated["explanation"]
+                or "Live Story Check diagnostic adapter completed."
+            ),
+            "candidates": validated["findings"],
+        }
+
+    return _runner
+
+
+def _adapter_config_scene_id(
+    adapter_config: dict[str, Any] | None,
+) -> str | None:
+    """Return the explicit ``scene_id`` from ``adapter_config`` if any.
+
+    The orchestrator entrypoint stores the explicit
+    ``story_check_scene_id`` kwarg on ``adapter_config`` (a dict) under the
+    key ``"story_check_scene_id"``. Non-string, blank, or missing values
+    return ``None`` so the caller can fall back to the env var.
+    """
+    if not isinstance(adapter_config, dict):
+        return None
+    value = adapter_config.get("story_check_scene_id")
+    if not isinstance(value, str):
+        return None
+    stripped = value.strip()
+    return stripped or None
+
+
 def _resolve_adapter_runner(
     adapter: str,
     *,
@@ -4772,6 +5655,21 @@ def _resolve_adapter_runner(
                 return _build_ollama_model_live_runner(
                     adapter_config=adapter_config,
                 )
+        # T016C: live Story Check path behind explicit env flags. Bridges
+        # the OMI orchestrator to the existing in-repo
+        # ``backend.analysis_engine.run_story_check`` callable surface and
+        # converts the legacy rich-Story-Check response into the existing
+        # T008 ``omi_story_check_diagnostic_handoff.v1`` envelope shape.
+        if adapter == "story_check":
+            env = os.environ
+            if (
+                _env_bool(env, _OMI_LIVE_TOOLS_ENABLED_ENV)
+                and _env_bool(env, _OMI_LIVE_STORY_CHECK_ENABLED_ENV)
+                and not _env_bool(env, _OMI_LIVE_STORY_CHECK_BLOCKED_ENV)
+            ):
+                return _build_story_check_live_runner(
+                    adapter_config=adapter_config,
+                )
     return None
 
 
@@ -4786,6 +5684,7 @@ def analyze_omi_raw_idea_with_tools(
     adapter_fixture_outputs: dict[str, Any] | None = None,
     adapter_runners: dict[str, Callable[..., dict[str, Any]]] | None = None,
     adapter_config: dict[str, Any] | None = None,
+    story_check_scene_id: str | None = None,
 ) -> dict[str, Any]:
     """Run the AI/tool-assisted OMI analysis orchestrator on ``raw_idea``.
 
@@ -4889,6 +5788,29 @@ def analyze_omi_raw_idea_with_tools(
 
     if not isinstance(persist_candidates, bool):
         raise ValueError("OMI orchestrator persist_candidates must be a bool")
+
+    if (
+        story_check_scene_id is not None
+        and (
+            not isinstance(story_check_scene_id, str)
+            or not story_check_scene_id.strip()
+        )
+    ):
+        raise ValueError(
+            "OMI orchestrator story_check_scene_id must be a non-empty string when provided"
+        )
+
+    effective_adapter_config: dict[str, Any] | None = adapter_config
+    if isinstance(adapter_config, dict):
+        merged_config: dict[str, Any] = dict(adapter_config)
+    elif adapter_config is None:
+        merged_config = {}
+    else:
+        merged_config = {}
+    if story_check_scene_id is not None:
+        merged_config["story_check_scene_id"] = story_check_scene_id.strip()
+    if merged_config:
+        effective_adapter_config = merged_config
 
     requested = _coerce_requested_adapters(requested_adapters)
     if (
@@ -5009,7 +5931,7 @@ def analyze_omi_raw_idea_with_tools(
             adapter,
             adapter_runners=adapter_runners,
             adapter_fixture_outputs=adapter_fixture_outputs,
-            adapter_config=adapter_config,
+            adapter_config=effective_adapter_config,
         )
         if runner is None:
             # No fixture/runner supplied -> adapters remain unavailable.

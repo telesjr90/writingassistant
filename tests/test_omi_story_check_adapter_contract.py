@@ -377,3 +377,1039 @@ def test_story_check_findings_are_not_persisted_even_when_persist_candidates_tru
     assert result["safety"]["no_memory_canon_mutation"] is True
     assert result["safety"]["no_apply_promotion"] is True
     assert calls == []
+
+
+# ---------------------------------------------------------------------------
+# PHASE8-IMPL-023-T016C — Live Story Check adapter behind flags
+# ---------------------------------------------------------------------------
+
+
+def _reset_live_story_check_env(monkeypatch: Any) -> None:
+    for name in (
+        oao._OMI_LIVE_TOOLS_ENABLED_ENV,
+        oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV,
+        oao._OMI_LIVE_STORY_CHECK_BLOCKED_ENV,
+        oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV,
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+
+def _structured_legacy_story_check_result() -> dict[str, Any]:
+    """Return a structured legacy Story Check result with T016C1-safe text.
+
+    T016C1 safety boundary: the live adapter must NOT rewrite unsafe legacy
+    text. This fixture intentionally uses plain diagnostic text that does
+    NOT carry truth/canon/final/approved/promoted/apply-promotion/
+    rewrite/continue/outline/draft labels so the live adapter can convert
+    the structured items into T008-shaped candidate findings.
+
+    The unsafe-text variants live in the T016C1 unsafe-text fixtures
+    below; see ``_unsafe_text_legacy_story_check_results``.
+    """
+    return {
+        "task": "story_check",
+        "coherence_score": 7,
+        "throughline_alignment": {
+            "overall_story": {
+                "present": True,
+                "evidence": [
+                    "Mara must recover the archive key before the hearing"
+                ],
+                "concerns": [],
+            },
+            "main_character": {
+                "present": False,
+                "evidence": [],
+                "concerns": [
+                    "Main Character throughline is not on hand for this fixture."
+                ],
+            },
+            "influence_character": {
+                "present": False,
+                "evidence": [],
+                "concerns": [
+                    "Influence Character pressure is not established by available evidence."
+                ],
+            },
+            "relationship_story": {
+                "present": False,
+                "evidence": [],
+                "concerns": [
+                    "Generic relationship context is not Relationship Story proof."
+                ],
+            },
+        },
+        "theme_drift": {
+            "status": "insufficient_evidence",
+            "reason": "No owner-supplied Issue or Variation evidence is on hand.",
+        },
+        "character_consistency": {
+            "status": "insufficient_evidence",
+            "reason": "Character context is incomplete for this fixture.",
+        },
+        "warnings": [
+            "[Factual] Treat this Story Check as candidate diagnostics only."
+        ],
+        "suggestions": [
+            "What owner-supplied evidence would help identify a Main Character throughline?"
+        ],
+        "insufficient_evidence": [
+            "Main Character evidence is not on hand for this fixture.",
+            "Influence Character evidence is not on hand for this fixture.",
+        ],
+    }
+
+
+def _unsafe_legacy_warning_fixture() -> dict[str, Any]:
+    return {
+        "task": "story_check",
+        "warnings": [
+            "[Factual] This is canon and approved truth for the project."
+        ],
+    }
+
+
+def _unsafe_legacy_suggestion_fixture() -> dict[str, Any]:
+    return {
+        "task": "story_check",
+        "suggestions": [
+            "What rewrite should the next chapter use?"
+        ],
+    }
+
+
+def _unsafe_legacy_concern_fixture() -> dict[str, Any]:
+    return {
+        "task": "story_check",
+        "concerns": [
+            "The final scene is canon for the project."
+        ],
+    }
+
+
+def _unsafe_legacy_insufficient_evidence_fixture() -> dict[str, Any]:
+    return {
+        "task": "story_check",
+        "insufficient_evidence": [
+            "Main Character evidence is promoted truth."
+        ],
+    }
+
+
+def _unsafe_legacy_apply_promotion_fixture() -> dict[str, Any]:
+    return {
+        "task": "story_check",
+        "warnings": [
+            "Create a promotion record and run apply-promotion on the scene."
+        ],
+    }
+
+
+def _unique_unsafe_phrase_legacy_fixture() -> dict[str, Any]:
+    """Return a legacy fixture where the suggestion text contains both
+    a unique phrase (``MAGIC_PHRASE_ZZZ``) and a forbidden label
+    (``approved``). The T016C1 safety checker must reject the text; the
+    converter must NOT rewrite the unique phrase into a safe phrase and
+    accept the finding.
+    """
+    return {
+        "task": "story_check",
+        "suggestions": [
+            "What MAGIC_PHRASE_ZZZ approved evidence would help?"
+        ],
+    }
+
+
+def test_live_story_check_disabled_by_default_does_not_import_runtime(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+
+    calls: list[tuple[str, str]] = []
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        calls.append((project_name, scene_id))
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = _run_story_check(
+        story_check_scene_id="scene_001",
+    )
+
+    assert calls == []
+    env = _assert_failed_closed(result)
+    assert env["state"] == "unavailable"
+    assert "live story check" in env["explanation"].lower()
+
+
+def test_live_story_check_enabled_with_mocked_runtime_normalizes_candidate_findings(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    captured: dict[str, Any] = {}
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        captured["project_name"] = project_name
+        captured["scene_id"] = scene_id
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    assert captured == {
+        "project_name": "demo_project",
+        "scene_id": "scene_env_001",
+    }
+    env = next(
+        env for env in result["adapter_results"] if env["adapter"] == "story_check"
+    )
+    assert env["state"] == "succeeded"
+    candidate_types = [finding["candidate_type"] for finding in result["findings"]]
+    assert "structural_diagnostic" in candidate_types
+    assert "diagnostic_question" in candidate_types
+    assert "throughline_context" in candidate_types
+    assert "storyform_context" in candidate_types
+    assert "evidence_note" in candidate_types
+    for finding in result["findings"]:
+        assert finding["source_adapter"] == "story_check"
+        assert finding["provenance"]["tool_source"] == "story_check"
+        assert "support" in finding["provenance"]["support"].lower()
+        assert finding["owner_decision"]["decision"] == "pending"
+        assert finding["owner_decision"]["approved"] is False
+        assert finding["review_status"] == "candidate_review_pending"
+        for forbidden in (
+            "truth",
+            "canon",
+            "final",
+            "approved",
+            "promoted",
+        ):
+            assert forbidden not in finding["support_label"].lower()
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+
+
+def test_live_story_check_explicit_scene_id_overrides_env_scene_id(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    captured: dict[str, Any] = {}
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        captured["scene_id"] = scene_id
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+        story_check_scene_id="scene_explicit_002",
+    )
+
+    assert captured["scene_id"] == "scene_explicit_002"
+    env = next(
+        env for env in result["adapter_results"] if env["adapter"] == "story_check"
+    )
+    assert env["state"] == "succeeded"
+
+
+def test_live_story_check_missing_scene_id_fails_closed_without_runtime_call(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+
+    calls: list[tuple[str, str]] = []
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        calls.append((project_name, scene_id))
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    assert calls == []
+    env = _assert_failed_closed(result)
+    assert env["state"] == "unavailable"
+    assert "scene id" in env["explanation"].lower()
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_story_check_blocked_flag_overrides_live_availability(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_BLOCKED_ENV, "1")
+
+    calls: list[tuple[str, str]] = []
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        calls.append((project_name, scene_id))
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    assert calls == []
+    env = _assert_failed_closed(result)
+    assert env["state"] == "unavailable"
+
+
+def test_live_story_check_runtime_exception_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        raise RuntimeError("simulated ollama http timeout")
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert "runtime" in env["explanation"].lower()
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_story_check_malformed_legacy_result_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    malformed_payloads: list[Any] = [
+        None,
+        "not a dict",
+        {"error": "upstream ollama failure"},
+        {"coherence_score": 7, "task": "story_check"},
+    ]
+
+    for payload in malformed_payloads:
+        def make_fake(value: Any) -> Any:
+            def fake_run_story_check(project_name: str, scene_id: str) -> Any:
+                return value
+            return fake_run_story_check
+
+        monkeypatch.setattr(
+            analysis_engine, "run_story_check", make_fake(payload)
+        )
+
+        result = oao.analyze_omi_raw_idea_with_tools(
+            "demo_project",
+            RAW_IDEA,
+            persist_candidates=False,
+            requested_adapters=["story_check"],
+        )
+        env = _assert_failed_closed(result)
+        assert env["state"] in {"failed_closed", "error"}
+        assert result["persisted_candidate_ids"] == []
+
+
+def test_live_story_check_prose_only_legacy_result_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    prose_only = {
+        "task": "story_check",
+        "narrative_prose": (
+            "The princess walked into the grand hall and met the prince. "
+            "They danced until the clock struck midnight and the spell was "
+            "broken. The chapter ends with the kingdom celebrating."
+        ),
+    }
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        return prose_only
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_live_story_check_unsafe_output_fails_closed_via_t008_validator(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    unsafe_payload = {
+        "task": "story_check",
+        "warnings": [
+            "[Factual] This is canon and approved truth for the project."
+        ],
+        "suggestions": [
+            "What rewrite should the next chapter use?"
+        ],
+    }
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        return unsafe_payload
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    env = _assert_failed_closed(result)
+    assert env["state"] in {"failed_closed", "error"}
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_story_check_legacy_error_shape_returns_error_state(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        return {"error": "upstream ollama returned 500"}
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    env = _assert_failed_closed(result)
+    assert env["state"] == "error"
+    assert "upstream ollama returned 500" in env["explanation"]
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_story_check_existing_fixture_tests_still_pass() -> None:
+    result = _run_story_check(_story_check_envelope())
+    assert result["analysis_status"] == "succeeded"
+    env = _story_check_env(result)
+    assert env["state"] == "succeeded"
+
+
+def test_live_story_check_persistence_boundary_remains_safe(
+    monkeypatch: Any,
+) -> None:
+    import backend.project_manager as project_manager
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        "backend.analysis_engine.run_story_check",
+        fake_run_story_check,
+        raising=False,
+    )
+
+    original_extract = project_manager.extract_omi_candidates_from_raw_idea
+    original_persist = getattr(
+        project_manager, "persist_omi_tool_assisted_findings_as_candidates", None
+    )
+    extract_calls: list[dict[str, Any]] = []
+    persist_calls: list[dict[str, Any]] = []
+
+    def spy_extract(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        extract_calls.append({"args": args, "kwargs": kwargs})
+        return original_extract(*args, **kwargs)
+
+    def spy_persist(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        persist_calls.append({"args": args, "kwargs": kwargs})
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "no_candidates_persisted",
+            "persistence_explanation": "spy no-op",
+        }
+
+    monkeypatch.setattr(
+        project_manager, "extract_omi_candidates_from_raw_idea", spy_extract
+    )
+    if original_persist is not None:
+        monkeypatch.setattr(
+            project_manager,
+            "persist_omi_tool_assisted_findings_as_candidates",
+            spy_persist,
+        )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+        source_idea_id="idea_xyz",
+    )
+
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_canon_promotion"] is True
+
+
+def test_live_story_check_does_not_call_legacy_route() -> None:
+    import backend.main as main_module
+
+    route_calls: list[tuple[str, str]] = []
+
+    if not hasattr(main_module, "story_check"):
+        return
+
+    def fake_story_check_route(project_name: str, scene_id: str) -> dict[str, Any]:
+        route_calls.append((project_name, scene_id))
+        return {"error": "should not be called"}
+
+    original = main_module.story_check
+    main_module.story_check = fake_story_check_route  # type: ignore[assignment]
+    try:
+        assert callable(oao._build_story_check_live_runner)
+        runner = oao._build_story_check_live_runner(adapter_config=None)
+        assert runner is not None
+        assert callable(runner)
+    finally:
+        main_module.story_check = original  # type: ignore[assignment]
+
+    assert route_calls == []
+
+
+def test_live_story_check_orchestrator_does_not_call_real_runtime_when_flags_off(
+    monkeypatch: Any,
+) -> None:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+    monkeypatch.delenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, raising=False)
+
+    calls: list[tuple[str, str]] = []
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        calls.append((project_name, scene_id))
+        return _structured_legacy_story_check_result()
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+    assert calls == []
+    env = _assert_failed_closed(result)
+    assert env["state"] == "unavailable"
+    assert result["persisted_candidate_ids"] == []
+
+
+# ---------------------------------------------------------------------------
+# PHASE8-IMPL-023-T016C1 — Tighten Story Check live converter sanitizer boundary
+# ---------------------------------------------------------------------------
+
+
+def _run_live_with_legacy(
+    monkeypatch: Any,
+    legacy_result: dict[str, Any],
+) -> dict[str, Any]:
+    import backend.analysis_engine as analysis_engine
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        return legacy_result
+
+    monkeypatch.setattr(
+        analysis_engine, "run_story_check", fake_run_story_check
+    )
+
+    return oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+    )
+
+
+def test_t016c1_unsafe_canon_approved_in_warning_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _unsafe_legacy_warning_fixture()
+    )
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_t016c1_unsafe_rewrite_in_suggestion_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _unsafe_legacy_suggestion_fixture()
+    )
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_t016c1_unsafe_final_in_concern_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _unsafe_legacy_concern_fixture()
+    )
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_t016c1_unsafe_promoted_in_insufficient_evidence_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _unsafe_legacy_insufficient_evidence_fixture()
+    )
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_t016c1_unsafe_apply_promotion_text_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _unsafe_legacy_apply_promotion_fixture()
+    )
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_t016c1_unsafe_legacy_text_is_not_sanitized_into_finding(
+    monkeypatch: Any,
+) -> None:
+    """The unique unsafe phrase must NOT appear in any finding text.
+
+    T016C1 boundary: the live adapter must NOT rewrite unsafe legacy
+    text. If the text contained the unique phrase ``MAGIC_PHRASE_ZZZ``
+    (e.g. ``"What owner-supplied MAGIC_PHRASE_ZZZ evidence would help?"``)
+    before sanitization, the adapter must SKIP the item and never accept
+    a rewritten phrase as a finding. The correct behavior is fail-closed
+    with no findings, not sanitized acceptance.
+    """
+    result = _run_live_with_legacy(
+        monkeypatch, _unique_unsafe_phrase_legacy_fixture()
+    )
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+    for adapter_env in result["adapter_results"]:
+        assert "MAGIC_PHRASE_ZZZ" not in json.dumps(adapter_env)
+
+
+def test_t016c1_safe_legacy_text_still_converts_to_candidate_finding(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _structured_legacy_story_check_result()
+    )
+    env = next(
+        env for env in result["adapter_results"] if env["adapter"] == "story_check"
+    )
+    assert env["state"] == "succeeded"
+    assert result["findings"]
+    for finding in result["findings"]:
+        assert finding["source_adapter"] == "story_check"
+        assert finding["provenance"]["tool_source"] == "story_check"
+        assert "support" in finding["provenance"]["support"].lower()
+        assert finding["owner_decision"]["decision"] == "pending"
+        assert finding["owner_decision"]["approved"] is False
+        assert finding["review_status"] == "candidate_review_pending"
+        for forbidden in (
+            "truth",
+            "canon",
+            "final",
+            "approved",
+            "promoted",
+        ):
+            assert forbidden not in finding["support_label"].lower()
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+
+
+def test_t016c1_converter_owned_labels_are_generic_and_safe(
+    monkeypatch: Any,
+) -> None:
+    result = _run_live_with_legacy(
+        monkeypatch, _structured_legacy_story_check_result()
+    )
+    assert result["findings"]
+    allowed_label_prefixes = (
+        "Story Check warning",
+        "Story Check concern",
+        "Story Check question",
+        "Story Check insufficient evidence",
+        "Story Check throughline diagnostic",
+        "Story Check storyform diagnostic",
+        "Story Check character consistency diagnostic",
+    )
+    for finding in result["findings"]:
+        label = finding["label"]
+        assert any(
+            label == prefix or label.startswith(prefix + ":")
+            for prefix in allowed_label_prefixes
+        ), f"unexpected label: {label!r}"
+        for forbidden in (
+            "truth",
+            "canon",
+            "final",
+            "approved",
+            "promoted",
+        ):
+            assert forbidden not in label.lower()
+    claim_blob = " ".join(finding["extracted_claim"] for finding in result["findings"])
+    for forbidden in (
+        "truth",
+        "canon",
+        "final",
+        "approved",
+        "promoted",
+    ):
+        assert forbidden not in claim_blob.lower()
+
+
+def test_t016c1_partial_unsafe_legacy_items_are_skipped_safe_items_kept(
+    monkeypatch: Any,
+) -> None:
+    """Mixed legacy result: one safe suggestion + one unsafe suggestion.
+
+    The safe suggestion should be converted into a T008 finding; the
+    unsafe one should be skipped at the item level. The envelope should
+    remain ``succeeded`` because at least one safe item remains.
+    """
+    mixed_legacy = {
+        "task": "story_check",
+        "suggestions": [
+            "What evidence would help identify a Main Character throughline?",
+            "What rewrite should the next chapter use?",
+        ],
+    }
+    result = _run_live_with_legacy(monkeypatch, mixed_legacy)
+    env = next(
+        env for env in result["adapter_results"] if env["adapter"] == "story_check"
+    )
+    assert env["state"] == "succeeded"
+    assert result["findings"]
+    for finding in result["findings"]:
+        assert finding["candidate_type"] == "diagnostic_question"
+        assert "rewrite" not in finding["extracted_claim"].lower()
+        assert "rewrite" not in finding["evidence"][0]["source_excerpt"].lower()
+
+
+def test_t016c1_unsafe_throughline_evidence_is_skipped(
+    monkeypatch: Any,
+) -> None:
+    """Unsafe throughline evidence is skipped, not synthesized.
+
+    T016C1: the converter must NOT generate placeholder text from the
+    ``present``/``status`` flag alone. If the throughline evidence and
+    concerns are all unsafe, the throughline item is skipped entirely
+    (no synthetic excerpt), and the envelope fails closed if no other
+    safe items exist.
+    """
+    legacy = {
+        "task": "story_check",
+        "throughline_alignment": {
+            "main_character": {
+                "present": False,
+                "evidence": [
+                    "Main Character throughline is approved and final truth."
+                ],
+                "concerns": [
+                    "Influence Character pressure is canon and locked."
+                ],
+            },
+        },
+    }
+    result = _run_live_with_legacy(monkeypatch, legacy)
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_t016c1_unsafe_theme_drift_reason_is_skipped(
+    monkeypatch: Any,
+) -> None:
+    """Unsafe ``theme_drift.reason`` is skipped, not converted.
+
+    If the reason text contains forbidden truth/canon/final/approved
+    labels, the theme_drift item is skipped. If no other safe items
+    exist, the envelope fails closed.
+    """
+    legacy = {
+        "task": "story_check",
+        "theme_drift": {
+            "status": "insufficient_evidence",
+            "reason": "No approved evidence is on hand for the project canon.",
+        },
+    }
+    result = _run_live_with_legacy(monkeypatch, legacy)
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["findings"] == []
+
+
+def test_t016c1_persistence_boundary_remains_safe_after_unsafe_skip(
+    monkeypatch: Any,
+) -> None:
+    """persist_candidates=True path: unsafe legacy text still fails closed,
+    and the persistence helpers are NOT invoked in failure paths.
+    """
+    import backend.project_manager as project_manager
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_SCENE_ID_ENV, "scene_env_001")
+
+    extract_calls: list[Any] = []
+    persist_calls: list[Any] = []
+
+    def spy_extract(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        extract_calls.append({"args": args, "kwargs": kwargs})
+        return {"candidates": [], "persisted_candidate_ids": []}
+
+    def spy_persist(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        persist_calls.append({"args": args, "kwargs": kwargs})
+        return {
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "persistence_status": "no_candidates_persisted",
+            "persistence_explanation": "spy no-op",
+        }
+
+    import backend.analysis_engine as analysis_engine
+
+    def fake_run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+        return _unsafe_legacy_apply_promotion_fixture()
+
+    monkeypatch.setattr(analysis_engine, "run_story_check", fake_run_story_check)
+    monkeypatch.setattr(
+        project_manager, "extract_omi_candidates_from_raw_idea", spy_extract
+    )
+    if hasattr(project_manager, "persist_omi_tool_assisted_findings_as_candidates"):
+        monkeypatch.setattr(
+            project_manager,
+            "persist_omi_tool_assisted_findings_as_candidates",
+            spy_persist,
+        )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo_project",
+        RAW_IDEA,
+        persist_candidates=True,
+        requested_adapters=["story_check"],
+        source_idea_id="idea_xyz",
+    )
+
+    env = _assert_failed_closed(result)
+    assert env["state"] == "failed_closed"
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_canon_promotion"] is True
+    assert extract_calls == []
+
+
+def test_t016c1_t008_validator_remains_authoritative(
+    monkeypatch: Any,
+) -> None:
+    """The T008 ``validate_story_check_fixture_envelope`` is the
+    authoritative validator. Even when the converter produces a
+    well-shaped envelope, the T008 validator may reject it for prose,
+    missing evidence, or unsafe output.
+    """
+    from backend.omi_analysis_orchestrator import (
+        _story_check_result_to_envelope,
+    )
+
+    envelope = _story_check_result_to_envelope(
+        {"task": "story_check", "coherence_score": 7},
+        project_name="demo_project",
+        scene_id="scene_env_001",
+    )
+    assert envelope["status"] == "failed_closed"
+    assert envelope["findings"] == []
+
+    prose_only = _story_check_result_to_envelope(
+        {
+            "task": "story_check",
+            "narrative_prose": (
+                "The princess walked into the grand hall and met the "
+                "prince. They danced until the clock struck midnight."
+            ),
+        },
+        project_name="demo_project",
+        scene_id="scene_env_001",
+    )
+    assert prose_only["status"] == "failed_closed"
+    assert prose_only["findings"] == []
+
+    error_shape = _story_check_result_to_envelope(
+        {"error": "upstream ollama returned 500"},
+        project_name="demo_project",
+        scene_id="scene_env_001",
+    )
+    assert error_shape["status"] == "error"
+    assert error_shape["findings"] == []
+
+
+def test_t016c1_existing_fixture_tests_still_pass() -> None:
+    """T008 fixture path remains supported and unchanged by T016C1."""
+    result = _run_story_check(_story_check_envelope())
+    assert result["analysis_status"] == "succeeded"
+    env = _story_check_env(result)
+    assert env["state"] == "succeeded"
+
+
+def test_t016c1_existing_t016c_runtime_success_test_still_uses_safe_text() -> None:
+    """The T016C runtime-success test now uses T016C1-safe text only.
+
+    This test asserts that the legacy fixture used by the
+    T016C runtime-success test does not contain truth/canon/final/
+    approved/promoted labels, so the live adapter can convert it into
+    T008-shaped findings.
+    """
+    legacy = _structured_legacy_story_check_result()
+    blob = json.dumps(legacy)
+    for forbidden in (
+        "approved",
+        "promoted",
+        " canon ",
+        "truth",
+        "final",
+    ):
+        assert forbidden not in blob.lower(), (
+            f"T016C1 safety boundary violated: legacy fixture contains "
+            f"forbidden label {forbidden!r}; the live adapter must NOT "
+            f"sanitize it. Update _structured_legacy_story_check_result "
+            f"to use safe text."
+        )
