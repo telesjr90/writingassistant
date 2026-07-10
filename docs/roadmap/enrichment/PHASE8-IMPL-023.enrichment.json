@@ -409,14 +409,21 @@
       "task_id": "PHASE8-IMPL-023-T014E",
       "title": "Live runtime tool installation inventory",
       "status": "complete/PASS",
-      "scope": "inspect/probe/docs inventory of all selected PHASE8-IMPL-023 live tools; spaCy (NOT installed, blocked), Ollama (NOT installed), Story Check (in-repo), BookNLP (NOT installed), NCP (needs decision), Subtxt (needs decision), dramatica-flow (reference-only). No installs/downloads performed.",
+      "scope": "inspect/probe/docs inventory of all selected PHASE8-IMPL-023 live tools; spaCy (NOT installed, blocked), Ollama (NOT installed in WSL; installed on Windows; T015A verified reachability), Story Check (in-repo), BookNLP (NOT installed), NCP (needs decision), Subtxt (needs decision), dramatica-flow (reference-only). No installs/downloads performed.",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014E-live-runtime-tool-installation-inventory.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T015",
       "title": "Live Ollama/local model integration in OMI and analysis",
-      "status": "planned",
-      "scope": "live Ollama/local model integration in OMI and analysis with schema-bound no-prose candidate output"
+      "status": "ready/active",
+      "scope": "split into T015A inspect/docs (complete/PASS), T015B live adapter implementation, T015C manual validation. T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP; qwen3:8b selected as MVP model candidate; fixture contract and preflight flags mapped."
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T015A",
+      "title": "Ollama runtime and fixture contract inspection",
+      "status": "complete/PASS",
+      "scope": "inspect/probe/docs only; no live adapter implementation; no model analysis; no candidates; no backend/frontend/package changes",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015A-ollama-runtime-and-fixture-contract-inspection.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T016",
@@ -485,12 +492,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T014D",
-  "latest_child_status": "complete/PASS (rerun after owner-installed spaCy)",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T014D-manual-local-spacy-validation.md",
-  "next_child_task": "PHASE8-IMPL-023-T015",
-  "next_child_title": "Live Ollama/local model integration in OMI and analysis",
-  "next_child_status": "planned (blocked until Ollama is installed)",
+  "latest_child_task": "PHASE8-IMPL-023-T015A",
+  "latest_child_status": "complete/PASS",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015A-ollama-runtime-and-fixture-contract-inspection.md",
+  "next_child_task": "PHASE8-IMPL-023-T015B",
+  "next_child_title": "Live Ollama/local model adapter implementation",
+  "next_child_status": "ready/active (Ollama 0.31.1 installed on Windows; WSL reachability verified; qwen3:8b selected)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"
