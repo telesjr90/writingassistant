@@ -4560,6 +4560,26 @@ def _ncp_claim_is_safe(value: Any) -> bool:
     return True
 
 
+def _ncp_path_is_relative_to(child: Path, parent: Path) -> bool:
+    """Return True iff ``child`` is the same as or inside ``parent``.
+
+    Uses :py:meth:`pathlib.PurePath.is_relative_to` when available
+    (Python 3.9+); otherwise falls back to a safe
+    :py:meth:`pathlib.PurePath.relative_to` + ``ValueError`` check.
+    """
+    is_relative_to = getattr(child, "is_relative_to", None)
+    if callable(is_relative_to):
+        try:
+            return bool(child.is_relative_to(parent))
+        except (OSError, ValueError):
+            return False
+    try:
+        child.relative_to(parent)
+    except ValueError:
+        return False
+    return True
+
+
 def _ncp_resolve_allowed_input_path(
     raw_path: Any,
     *,
@@ -4582,8 +4602,23 @@ def _ncp_resolve_allowed_input_path(
       * Rejects symlinks (the input must be a regular file, not a symlink).
       * Rejects directories, hidden unsafe locations, traversal segments,
         and project-data trees (``projects/``).
+      * Rejects paths actually inside the resolved
+        ``repo_root / "projects"``,
+        ``repo_root / "artifacts"``,
+        ``repo_root / "graphify-out"``,
+        ``repo_root / "ai_context"``, or
+        ``repo_root / ".codex-context"`` trees.
       * Returns ``None`` (the runner treats this as fail-closed) for any
         value that does not satisfy the allowlist.
+
+    Forbid-tree rejection uses a strict resolved-root check
+    (``is_relative_to`` / ``relative_to`` + ``ValueError``) against the
+    resolved forbidden roots, so a path under
+    ``repo_root / ".external_sources"`` whose absolute
+    :py:attr:`Path.parts` include an ancestor directory named
+    ``projects`` (e.g., the workspace parent directory itself is named
+    ``projects``) is still accepted — the resolver only rejects paths
+    that are actually inside the resolved forbidden repo-local roots.
 
     This is the only path-resolution helper that can introduce a path into
     the NCP live runner. Tests must mock this helper.
@@ -4631,36 +4666,27 @@ def _ncp_resolve_allowed_input_path(
     except OSError:
         return None
 
-    # Project data trees are NEVER valid NCP input paths.
-    try:
-        projects_dir = (repo_root / "projects").resolve(strict=False)
-    except OSError:
-        projects_dir = None
-    if projects_dir is not None:
-        try:
-            resolved.relative_to(projects_dir)
-        except ValueError:
-            pass
-        else:
+    # Project data trees and generated-context trees are NEVER valid
+    # NCP input paths. The check is a strict resolved-root containment
+    # check (``is_relative_to``) against each resolved forbidden root,
+    # so only paths actually inside those repo-local forbidden trees
+    # are rejected. A safe allowlisted path whose absolute
+    # ``Path.parts`` happen to include an ancestor directory named
+    # ``projects`` / ``artifacts`` / ``graphify-out`` / ``ai_context`` /
+    # ``.codex-context`` outside the repo is NOT mis-rejected.
+    forbidden_roots: tuple[Path, ...] = tuple(
+        (repo_root / name).resolve(strict=False)
+        for name in (
+            "projects",
+            "artifacts",
+            "graphify-out",
+            "ai_context",
+            ".codex-context",
+        )
+    )
+    for forbidden_root in forbidden_roots:
+        if _ncp_path_is_relative_to(resolved, forbidden_root):
             return None
-    # Any path with a ``projects`` segment anywhere along the resolved
-    # path is rejected even when the path is not under the real
-    # ``repo_root/projects`` (e.g., when a test puts a fake ``projects``
-    # dir under ``tmp_path`` to validate the safety boundary).
-    for part in resolved.parts:
-        if part == "projects":
-            return None
-    # ``artifacts``, candidate queue/storage trees, and generated
-    # context packs are NEVER valid NCP input paths either.
-    for forbidden_segment in (
-        "artifacts",
-        "graphify-out",
-        "ai_context",
-        ".codex-context",
-    ):
-        for part in resolved.parts:
-            if part == forbidden_segment:
-                return None
 
     # Candidate allowed roots, all relative to ``repo_root`` or the system
     # temp directory.
@@ -4683,9 +4709,7 @@ def _ncp_resolve_allowed_input_path(
     for root in (tests_root, temp_root, external_root):
         if root is None:
             continue
-        try:
-            resolved.relative_to(root)
-        except ValueError:
+        if not _ncp_path_is_relative_to(resolved, root):
             continue
         allowed = True
         break

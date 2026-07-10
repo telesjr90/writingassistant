@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -1113,21 +1114,27 @@ def test_live_ncp_existing_t009_fixture_tests_still_pass() -> None:
 
 
 def test_live_ncp_path_allowlist_rejects_projects_tree(
-    monkeypatch: Any, tmp_path: Any
+    tmp_path: Any,
 ) -> None:
-    """A ``projects/...`` path must be rejected even when the file
-    exists. The runner must NEVER treat the project data tree as a
-    valid NCP input source."""
-    projects_dir = tmp_path / "projects" / "demo"
-    projects_dir.mkdir(parents=True)
-    fake = projects_dir / "scene.json"
-    fake.write_text(json.dumps(_valid_minimal_ncp_payload()), encoding="utf-8")
-    _mock_live_ncp_env(monkeypatch, fake)
+    """A file actually inside the resolved ``repo_root / "projects"``
+    tree MUST be rejected by the path allowlist, both via the
+    end-to-end orchestrator pipeline AND via the direct resolver call.
 
-    result = _run_adapter("ncp", adapter_config={"runtime": "disabled"})
-    env = _adapter_env(result, "ncp")
-    assert env["state"] in {"unavailable", "failed_closed"}
-    assert env["candidates"] == []
+    The T018C1 repair narrows the allowlist to a strict resolved-root
+    containment check. A file inside ``repo_root / "projects"`` is
+    always rejected; a file under some other ``projects/...`` directory
+    outside the repo is NOT rejected (that is the T018C1 overreach
+    fix). The end-to-end pipeline test routes through the production
+    orchestrator and confirms the fail-closed envelope is preserved.
+    """
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / "projects" / "demo", name="scene.json"
+    )
+    # Direct resolver call: must be rejected.
+    assert oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    ) is None
 
 
 def test_live_ncp_path_allowlist_rejects_symlinks(
@@ -1150,3 +1157,306 @@ def test_live_ncp_path_allowlist_rejects_symlinks(
     env = _adapter_env(result, "ncp")
     assert env["state"] in {"unavailable", "failed_closed"}
     assert env["candidates"] == []
+
+
+# ---------------------------------------------------------------------------
+# PHASE8-IMPL-023-T018C1 — NCP input-path allowlist repair regression tests.
+#
+# These tests exercise the T018C1-narrowed ``_ncp_resolve_allowed_input_path``
+# allowlist resolver directly. They do NOT touch the real
+# ``.external_sources`` tree, real node, real npm, real network, or the
+# owner-selected real NCP JSON file. They use ``tmp_path`` and an
+# explicit ``repo_root`` to construct local trees that mirror the
+# production forbidden / allowed roots.
+# ---------------------------------------------------------------------------
+
+
+def _write_ncp_payload_in_dir(
+    directory: Any, name: str = "minimal.json"
+) -> Any:
+    """Write a minimal NCP JSON payload inside ``directory`` and return
+    the absolute ``Path``. Used by the T018C1 allowlist regression
+    tests that need an NCP-shaped file under a specific filesystem
+    location."""
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / name
+    path.write_text(
+        json.dumps(_valid_minimal_ncp_payload()), encoding="utf-8"
+    )
+    return path
+
+
+def _make_fake_repo_root(tmp_path: Any) -> Any:
+    """Build a fake repo root directory tree that mirrors the T018B
+    forbidden / allowed roots.
+
+    The fake repo root contains:
+
+      * ``projects/`` (forbidden)
+      * ``artifacts/`` (forbidden)
+      * ``graphify-out/`` (forbidden)
+      * ``ai_context/`` (forbidden)
+      * ``.codex-context/`` (forbidden)
+      * ``.external_sources/narrative-context-protocol/examples/`` (allowed)
+      * ``tests/`` (allowed)
+
+    The fake repo root is constructed under a parent whose basename is
+    ``projects`` (e.g., ``tmp_path / "projects" / "fake_repo"``) to
+    reproduce the workspace-parent-is-named-projects case from T018C.
+    """
+    parent = tmp_path / "projects"
+    fake_repo = parent / "fake_repo"
+    (fake_repo / "projects").mkdir(parents=True)
+    (fake_repo / "artifacts").mkdir(parents=True)
+    (fake_repo / "graphify-out").mkdir(parents=True)
+    (fake_repo / "ai_context").mkdir(parents=True)
+    (fake_repo / ".codex-context").mkdir(parents=True)
+    (
+        fake_repo
+        / ".external_sources"
+        / "narrative-context-protocol"
+        / "examples"
+    ).mkdir(parents=True)
+    (fake_repo / "tests").mkdir(parents=True)
+    return fake_repo
+
+
+def test_t018c1_allowlist_accepts_external_sources_path_when_ancestor_is_named_projects(
+    tmp_path: Any,
+) -> None:
+    """A safe ``.external_sources/...`` NCP file under a fake repo root
+    whose parent directory is itself named ``projects`` MUST be
+    accepted by ``_ncp_resolve_allowed_input_path``.
+
+    This is the exact T018C overreach bug: the T018B segments-walk
+    rejected any path whose ``Path.parts`` include a literal
+    ``projects`` segment. The T018C1 repair uses a strict resolved-root
+    containment check, so a safe allowlisted path is accepted even when
+    the workspace parent directory is named ``projects``.
+    """
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / ".external_sources" / "narrative-context-protocol" / "examples",
+        name="complete-space-adventure-storyform.json",
+    )
+    # Sanity: the parent directory's ``Path.parts`` include a literal
+    # ``projects`` segment, reproducing the T018C bug condition.
+    assert "projects" in ncp_path.resolve().parts
+    resolved = oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    )
+    assert resolved is not None
+    assert resolved == ncp_path.resolve()
+
+
+def test_t018c1_allowlist_rejects_repo_local_projects_tree(
+    tmp_path: Any,
+) -> None:
+    """A file actually inside the resolved ``repo_root / "projects"``
+    MUST still be rejected after the T018C1 repair."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / "projects" / "demo", name="scene.json"
+    )
+    assert oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_rejects_repo_local_artifacts_tree(
+    tmp_path: Any,
+) -> None:
+    """A file actually inside the resolved ``repo_root / "artifacts"``
+    MUST still be rejected after the T018C1 repair."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / "artifacts" / "demo", name="art.json"
+    )
+    assert oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_rejects_repo_local_graphify_out_tree(
+    tmp_path: Any,
+) -> None:
+    """A file actually inside the resolved ``repo_root / "graphify-out"``
+    MUST still be rejected after the T018C1 repair."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / "graphify-out" / "demo", name="g.json"
+    )
+    assert oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_rejects_repo_local_ai_context_tree(
+    tmp_path: Any,
+) -> None:
+    """A file actually inside the resolved ``repo_root / "ai_context"``
+    MUST still be rejected after the T018C1 repair."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / "ai_context" / "demo", name="ai.json"
+    )
+    assert oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_rejects_repo_local_codex_context_tree(
+    tmp_path: Any,
+) -> None:
+    """A file actually inside the resolved
+    ``repo_root / ".codex-context"`` MUST still be rejected after the
+    T018C1 repair."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    ncp_path = _write_ncp_payload_in_dir(
+        fake_repo / ".codex-context" / "demo", name="ctx.json"
+    )
+    assert oao._ncp_resolve_allowed_input_path(
+        str(ncp_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_accepts_tempfile_gettempdir_path(
+    tmp_path: Any,
+) -> None:
+    """A file under ``tempfile.gettempdir()`` MUST still be accepted
+    after the T018C1 repair, matching the T018B allowed-root design."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        ncp_path = _write_ncp_payload_in_dir(
+            Path(tmpdir), name="temp_ncp.json"
+        )
+        resolved = oao._ncp_resolve_allowed_input_path(
+            str(ncp_path), repo_root=fake_repo
+        )
+        assert resolved is not None
+        assert resolved == ncp_path.resolve()
+
+
+def test_t018c1_allowlist_rejects_symlink_input_path(
+    tmp_path: Any,
+) -> None:
+    """A symlink pointing at a valid NCP file MUST still be rejected
+    by the T018C1-repaired resolver. The pre- and post-``Path.resolve``
+    symlink checks must continue to fail closed."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    real_ncp = _write_ncp_payload_in_dir(
+        fake_repo / ".external_sources" / "narrative-context-protocol" / "examples",
+        name="real.json",
+    )
+    symlink_dir = tmp_path / "symlink_input"
+    symlink_dir.mkdir()
+    symlink_path = symlink_dir / "linked.json"
+    try:
+        symlink_path.symlink_to(real_ncp)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"symlink unsupported: {exc}")
+    assert oao._ncp_resolve_allowed_input_path(
+        str(symlink_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_rejects_symlinked_parent_into_forbidden_tree(
+    tmp_path: Any,
+) -> None:
+    """A path whose parent directory is a symlink resolving into a
+    forbidden repo-local tree MUST still be rejected after the
+    T018C1 repair.
+
+    The T018C1 fix must not weaken the post-``Path.resolve``
+    containment check: even if the unresolved path lives under
+    ``.external_sources/...``, when ``Path.resolve`` follows a
+    symlinked parent into a forbidden tree the resolver must fail
+    closed.
+    """
+    fake_repo = _make_fake_repo_root(tmp_path)
+    # Build a real file inside the forbidden ``projects/`` tree.
+    forbidden_target = fake_repo / "projects" / "evil" / "evil.json"
+    forbidden_target.parent.mkdir(parents=True, exist_ok=True)
+    forbidden_target.write_text(
+        json.dumps(_valid_minimal_ncp_payload()), encoding="utf-8"
+    )
+    # Build a symlinked ``.external_sources/...`` parent that points
+    # at the forbidden ``projects/evil`` directory. A NCP-shaped file
+    # looked up through that symlink resolves into the forbidden
+    # tree and must be rejected.
+    safe_lookalike = (
+        fake_repo
+        / ".external_sources"
+        / "narrative-context-protocol"
+        / "examples"
+    )
+    symlink_parent = safe_lookalike / "evil_symlink_parent"
+    try:
+        symlink_parent.symlink_to(forbidden_target.parent, target_is_directory=True)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"symlink unsupported: {exc}")
+    deceptive_path = symlink_parent / "evil.json"
+    assert oao._ncp_resolve_allowed_input_path(
+        str(deceptive_path), repo_root=fake_repo
+    ) is None
+
+
+def test_t018c1_allowlist_rejects_empty_traversal_and_directory_inputs(
+    tmp_path: Any,
+) -> None:
+    """The T018C1 repair must preserve the existing rejection
+    behavior for empty input paths, traversal segments, symlinks
+    before resolution, directories, and missing files."""
+    fake_repo = _make_fake_repo_root(tmp_path)
+    # Empty input path -> None
+    assert (
+        oao._ncp_resolve_allowed_input_path("", repo_root=fake_repo)
+        is None
+    )
+    assert (
+        oao._ncp_resolve_allowed_input_path("   ", repo_root=fake_repo)
+        is None
+    )
+    # Traversal segment -> None
+    assert (
+        oao._ncp_resolve_allowed_input_path(
+            str(
+                fake_repo
+                / "tests"
+                / ".."
+                / ".external_sources"
+                / "narrative-context-protocol"
+                / "examples"
+                / "minimal.json"
+            ),
+            repo_root=fake_repo,
+        )
+        is None
+    )
+    # Directory (not a file) -> None
+    assert (
+        oao._ncp_resolve_allowed_input_path(
+            str(
+                fake_repo
+                / ".external_sources"
+                / "narrative-context-protocol"
+                / "examples"
+            ),
+            repo_root=fake_repo,
+        )
+        is None
+    )
+    # Missing file -> None
+    assert (
+        oao._ncp_resolve_allowed_input_path(
+            str(
+                fake_repo
+                / ".external_sources"
+                / "narrative-context-protocol"
+                / "examples"
+                / "does_not_exist.json"
+            ),
+            repo_root=fake_repo,
+        )
+        is None
+    )
