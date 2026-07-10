@@ -470,3 +470,383 @@ tree contains only the pre-existing unrelated leftovers:
 
 plus the untracked T018C evidence directory
 `.codex-context/PHASE8-IMPL-023/manual-validation/T018C-ncp/`.
+
+## Rerun after T018C1 — PASS
+
+`PHASE8-IMPL-023-T018C-rerun` (the post-`PHASE8-IMPL-023-T018C1`
+allowlist-repair validation rerun) is now complete/PASS and is
+documented as a section of this same record. The T018C original
+`PASS-SAFE-FAIL-CLOSED` history is preserved unchanged above;
+this `Rerun after T018C1` section is a clearly labeled
+after-T018C1 addendum, not a replacement for the original run.
+
+### Result of the rerun
+
+The committed T018B live NCP candidate-import validation
+adapter, behind the T018C1-repaired
+`_ncp_resolve_allowed_input_path` allowlist, was re-run through
+`analyze_omi_raw_idea_with_tools` against the same owner-selected
+real NCP JSON file T018C used, with
+`persist_candidates=False`. The live NCP adapter accepted the
+allowlisted path, read the JSON, walked the subtext/storytelling
+containers, and emitted a non-empty candidate-only envelope of
+T009-allowed `story_fact` findings backed by `source_excerpt`,
+`source_locator` (RFC 6901 JSON pointer),
+`provenance.tool_source: "ncp"`,
+`owner_decision: {approved: false, decision: "pending"}`, and
+`review_status: "candidate_review_pending"`. The full
+result-level safety envelope is preserved intact
+(`no_prose`, `no_memory_canon_mutation`, `no_apply_promotion`,
+`no_canon_promotion`, `no_real_tool_calls`,
+`no_package_installs`, `no_story_prose_generation`,
+`candidate_presence_is_not_canon`,
+`queue_presence_is_not_approval`, `support_is_not_truth`,
+`tool_output_is_not_canon` all `True`).
+
+Result-level summary of the rerun:
+
+- `analysis_status: "succeeded"`.
+- `persistence_status: "not_requested"`.
+- `persisted_candidate_ids: []`, `new_candidate_ids: []`,
+  `reused_candidate_ids: []`.
+- `findings: 64`, all of `candidate_type: "story_fact"`, all
+  carrying the required evidence / provenance / source-locator /
+  pending-owner / candidate-review-pending fields (verified
+  directly against `raw-orchestrator-result.json`).
+- `adapter_results[0].adapter: "ncp"`,
+  `state: "succeeded"`,
+  `candidates: 64` (one finding per NCP subtext `storypoint` /
+  `storybeat` item; the T018B mapping is intentionally limited
+  and is the contract per T018B).
+- `safety: { all required keys: True }` (including
+  `no_real_tool_calls: True`; the T018B runner does not invoke
+  `npm` / `node` / `npm run validate:file` when
+  `OMI_LIVE_NCP_VALIDATE_WITH_NODE` is unset, which is the
+  default).
+
+Side-effect checks clean for the rerun:
+`candidate_paths_changed: false`,
+`promotion_paths_changed: false`,
+`projects/example/**` SHA-256 + size + mtime snapshot identical
+before/after (`cmp -s project-files-before.sha256
+project-files-after.sha256` returned `0`;
+`cmp -s project-files-before.metadata
+project-files-after.metadata` returned `0`),
+`.external_sources/narrative-context-protocol/**` status
+identical before/after (`cmp -s
+external-source-status-before.txt
+external-source-status-after.txt` returned `0`), `git status
+--short --branch` after the run shows only the pre-existing
+unrelated leftovers, `git diff --check` clean, and the full
+post-T018C1 automated regression suite still passes
+(`tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py
+-> 59 passed`,
+`tests/test_omi_tool_assisted_orchestrator_contract.py -> 30
+passed`,
+`tests/test_omi_tool_assisted_persistence_contract.py -> 5
+passed`,
+`tests/test_omi_live_runtime_preflight_contract.py -> 72
+passed`).
+
+The original T018C `PASS-SAFE-FAIL-CLOSED` history above is
+preserved unchanged. The rerun confirms that the T018C1 narrow
+code repair unblocks the live NCP adapter for the
+owner-selected real NCP file and that the live adapter emits a
+real candidate-only findings stream with the full safety
+envelope preserved. The T018 sequence
+(`T018A` schema-validator preflight,
+`T018B` candidate-import validation adapter,
+`T018C` manual real NCP validation,
+`T018C1` allowlist repair,
+`T018C-rerun` validation rerun) closes to PASS, and the next
+parent-level task is
+`PHASE8-IMPL-023-T019A — Subtxt docs/source preflight`.
+
+### Selected file and SHA-256 (rerun, unchanged from T018C)
+
+```
+/home/tjrpirateking/projects/WritingAssistantApplication/.external_sources/narrative-context-protocol/examples/complete-space-adventure-storyform.json
+```
+
+```
+34689dab914948b0461952ce1d3e77a7910822f392556510a5b28c750a32543d  /home/tjrpirateking/projects/WritingAssistantApplication/.external_sources/narrative-context-protocol/examples/complete-space-adventure-storyform.json
+```
+
+131824 bytes, regular non-symlink file, NCP
+`schema_version: 1.2.0`, single narrative
+`narrative_anon_0001` with status `complete`. Same canonical
+rich reference fixture T018C used; the T018C1 commit did not
+modify the file. The T018C optional `npm run validate:file:
+PASS` evidence is preserved in
+`.codex-context/PHASE8-IMPL-023/manual-validation/T018C-ncp/optional-npm-validate-file-result.txt`
+and in the original T018C `## Optional \`npm run validate:file\`
+result` section above. The rerun intentionally does not
+re-run `npm run validate:file` (the file is unchanged and the
+T018C-rerun task explicitly disallows re-running it).
+
+### Exact env flags used (rerun, unchanged from T018C)
+
+```
+OMI_LIVE_TOOLS_ENABLED=1
+OMI_LIVE_NCP_ENABLED=1
+OMI_LIVE_NCP_BLOCKED          (unset, fail-closed default)
+OMI_LIVE_NCP_INPUT_PATH=/home/tjrpirateking/projects/WritingAssistantApplication/.external_sources/narrative-context-protocol/examples/complete-space-adventure-storyform.json
+OMI_LIVE_NCP_VALIDATE_WITH_NODE  (unset; default Node-free path)
+```
+
+`OMI_LIVE_NCP_VALIDATE_WITH_NODE` was intentionally not set so
+the T018B default Node-free path was exercised. The T018B
+opt-in Node validation is intentionally a no-op without a
+custom subprocess runner and is not used in the rerun.
+
+Orchestrator call for the rerun (exactly one live invocation):
+
+```python
+analyze_omi_raw_idea_with_tools(
+    project_name="example",
+    raw_idea="Owner-selected NCP candidate-import validation rerun after T018C1.",
+    requested_adapters=["ncp"],
+    persist_candidates=False,
+)
+```
+
+### Live adapter invocation count (rerun)
+
+The live `analyze_omi_raw_idea_with_tools` orchestrator call
+was invoked exactly once. No retry was required. The single
+invocation produced the full raw result (170065 bytes) plus
+the compact summary (1311 bytes); the per-finding
+evidence / provenance / source-locator / pending-owner /
+candidate-review-pending fields were verified directly against
+the raw result.
+
+### Evidence / provenance / source-locator confirmation (rerun)
+
+Verified directly against
+`.codex-context/PHASE8-IMPL-023/manual-validation/T018C-rerun-ncp/raw-orchestrator-result.json`
+(not against the helper-script `compact-summary.json`).
+Every one of the 64 findings has:
+
+- `candidate_type: "story_fact"`.
+- `source_locator`: non-empty RFC 6901 JSON pointer string
+  pointing into `narratives/*\/subtext\/storypoints/0/...` or
+  `narratives/*\/subtext\/storybeats/<index>/...`. Example
+  first finding:
+  `"/~1narratives~1*~1subtext~1storypoints/0/point_anon_0001"`.
+  Example last finding:
+  `"/~1narratives~1*~1subtext~1storybeats/15/beat_anon_0016"`.
+- `evidence`: non-empty list of
+  `{source_excerpt, source_locator}` dicts. Every excerpt is a
+  non-empty string; every locator is a non-empty string
+  matching the finding-level `source_locator` family.
+- `provenance.tool_source: "ncp"`,
+  `provenance.adapter: "ncp"`,
+  `provenance.support: "NCP context support only"`.
+- `owner_decision: {"approved": false, "decision": "pending"}`.
+- `review_status: "candidate_review_pending"`.
+- `source_adapter: "ncp"`,
+  `support_label: "NCP context support only"`,
+  `confidence: "medium support"`,
+  `uncertainty_label: null`,
+  `conflict_group_id: null`, `duplicate_of: []`,
+  `related_finding_ids: []`.
+- `extracted_claim`: non-empty string equal to
+  `evidence[0].source_excerpt` (the T018B contract; the runner
+  does not rewrite / expand / condense the excerpt into a
+  generated prose claim).
+- `label`: NCP item id, e.g. `point_anon_0001` /
+  `beat_anon_0016`.
+- `candidate_fingerprint` / `evidence_fingerprint` /
+  `normalized_finding_id` / `raw_finding_id`: present and
+  deterministic.
+
+### Evidence-summary-script mismatch (rerun, narrow)
+
+The compact-summary helper-script writes
+`all_findings_have_required_evidence: false` only because the
+helper script checks `owner_decision == "pending"` (string), but
+the real field is the object
+`owner_decision == {"approved": false, "decision": "pending"}`.
+This is an evidence-summary-script mismatch, not a runtime
+adapter failure. The direct raw-result inspection confirmed
+all 64 findings carry the required evidence and review fields.
+The mismatch does not affect the live adapter, the result-level
+safety envelope, the side-effect / git status evidence, or the
+rerun PASS classification.
+
+### Persistence / no-side-effect confirmation (rerun)
+
+- `persisted_candidate_ids: []`,
+  `new_candidate_ids: []`,
+  `reused_candidate_ids: []`.
+- `persistence_status: "not_requested"` (because
+  `persist_candidates=False`).
+- `candidate_paths_changed: false`,
+  `promotion_paths_changed: false`.
+- `projects/example/**` SHA-256 + size + mtime snapshot
+  identical before/after (`cmp -s` returned `0` for both the
+  sha256 list and the metadata list).
+- `.external_sources/narrative-context-protocol/**` not
+  modified (`git status --short --
+  .external_sources/narrative-context-protocol` was empty
+  before AND after; `cmp -s` returned `0`).
+- `ai_context/**`, `graphify-out/**`,
+  `artifacts/mvp-readiness/owner-acceptance/**` not modified.
+- `.codex-context/PHASE8-IMPL-023/manual-validation/T018C-rerun-ncp/`
+  is untracked evidence only (not staged, not committed, not
+  pushed; `.codex-context/` is in `.git/info/exclude`).
+- `git status --short --branch` after the rerun shows only
+  the pre-existing unrelated leftovers (no new T018C-rerun
+  files were staged or unstaged beyond the untracked T018C-rerun
+  evidence directory).
+- `git diff --check` is clean.
+
+### Memory / Canon / promotion / apply-promotion / prose safety confirmation (rerun)
+
+- `no_memory_canon_mutation: true`,
+  `no_apply_promotion: true`,
+  `no_canon_promotion: true`,
+  `no_story_prose_generation: true`,
+  `no_prose: true`,
+  `no_real_tool_calls: true`,
+  `no_package_installs: true` in the result-level safety
+  envelope.
+- No promotion records were created; no `promotions/` files
+  were written; `promotion_paths_changed: false`.
+- NCP-derived `story_fact` findings are not Memory, not Canon,
+  not promotion, not apply-promotion, and not story prose. They
+  are support-only evidence that requires owner review before
+  any use.
+
+### No automatic project scan (rerun)
+
+- `requested_adapters=["ncp"]` is the only adapter requested;
+  `allow_deterministic_fallback=False` is the default.
+- The T018B runner walks only
+  `_ncp_collect_narrative_subtext_lists` on the single explicit
+  input file; it does not walk `projects/`, does not walk
+  `.external_sources/` other than the single explicit input,
+  does not walk `artifacts/`, `ai_context/`, `graphify-out/`,
+  or `.codex-context/`.
+- The T018B runner reached the file-read, JSON-parse,
+  subtext/storytelling-collection, and T009-envelope-validation
+  stages for the single explicit input. No project data was
+  scanned. No other adapter was called.
+
+### No `npm install`, `npm audit fix`, Node server, or project-data validation (rerun)
+
+- `npm install` not run (the pre-existing
+  `.external_sources/narrative-context-protocol/node_modules` was
+  not touched; the file system status was identical before and
+  after).
+- `npm audit` not run, `npm audit fix` not run.
+- Node server not started.
+- `npm run validate:file` was not re-run for the rerun
+  (intentionally not run; the T018C `npm run validate:file:
+  PASS` evidence is preserved and the selected file is
+  unchanged from the T018C validation; the rerun task
+  explicitly disallows re-running `npm run validate:file` over
+  the selected file).
+- The T018B adapter itself did not invoke `npm`, did not
+  invoke `node`, did not invoke `npm run validate:file` (the
+  `OMI_LIVE_NCP_VALIDATE_WITH_NODE` opt-in was intentionally
+  unset, so the T018B opt-in Node validation path was not
+  exercised in the rerun; the T018B default Node-free path was
+  confirmed to be reached, succeeded, and side-effect-free).
+- The T018B adapter does not import NCP as a Python module; it
+  parses JSON with `json.loads` only.
+
+### Validation command results (rerun)
+
+`python3 -m py_compile backend/omi_analysis_orchestrator.py`
+-> exit 0.
+
+Focused regression test runs (post-T018C1):
+
+- `tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py`
+  -> 59 passed.
+- `tests/test_omi_tool_assisted_orchestrator_contract.py` -> 30
+  passed.
+- `tests/test_omi_tool_assisted_persistence_contract.py` -> 5
+  passed.
+- `tests/test_omi_live_runtime_preflight_contract.py` -> 72
+  passed.
+
+Enrichment JSON validation:
+
+- `python3 -m json.tool
+  docs/roadmap/enrichment/PHASE8-IMPL-023.enrichment.json
+  >/dev/null` -> exit 0.
+- `python3 scripts/check_enrichment.py` -> exit 0.
+- `python3 scripts/validate_roadmap.py` -> exit 0.
+- `git diff --check` -> exit 0.
+
+### T018 sequence closeout
+
+The T018 sequence
+(`T018A` schema-validator preflight,
+`T018B` candidate-import validation adapter,
+`T018C` manual real NCP validation,
+`T018C1` allowlist repair,
+`T018C-rerun` validation rerun) closes to PASS with the
+T018C-rerun documented in this `Rerun after T018C1 — PASS`
+section of this same decision record.
+
+- `T018A` complete/PASS
+  (`docs/roadmap/decisions/PHASE8-IMPL-023-T018A-ncp-schema-validator-preflight.md`).
+- `T018B` complete/PASS
+  (`docs/roadmap/decisions/PHASE8-IMPL-023-T018B-ncp-candidate-import-validation-adapter.md`).
+- `T018C` complete/PASS-SAFE-FAIL-CLOSED (preserved unchanged
+  in the original `## Result` and following sections of this
+  file).
+- `T018C1` complete/PASS
+  (`docs/roadmap/decisions/PHASE8-IMPL-023-T018C1-ncp-input-path-allowlist-repair.md`).
+- `T018C-rerun` complete/PASS (documented in this
+  `Rerun after T018C1 — PASS` section of this file).
+
+### Recommended next task after the rerun
+
+`PHASE8-IMPL-023-T019A — Subtxt docs/source preflight`
+(planned; follows after the T018 sequence closes to PASS).
+
+T019A must mirror the T018A NCP preflight for the Subtxt
+surface: extends the T013 read-only runtime preflight in
+`backend/omi_runtime_preflight.py` so the OMI
+`runtime-preflight` report for the `subtxt` tool reports a
+focused, read-only Subtxt source/validator surface;
+read-only, fail-closed, never runs `npm install`,
+`npm audit fix`, `npm run validate:schema`, or
+`npm run validate:file`; never imports Subtxt as a Python
+module; never exposes Subtxt as a network/server path; the
+probe records any known audit caveat as known owner evidence;
+Subtxt remains a schema/interchange/diagnostic surface, not
+an automatic analysis runtime, not canon/truth; the existing
+live-tool flag map (`OMI_LIVE_SUBTXT_ENABLED` /
+`OMI_LIVE_SUBTXT_BLOCKED` /
+`OMI_LIVE_SUBTXT_BLOCKED_REASON`) is preserved; Subtxt stays
+disabled by default.
+
+### Rerun caveats
+
+- NCP is a schema/interchange validation surface only.
+  NCP-derived candidate output is support-only evidence; it
+  is not canon, not truth, and not approved memory.
+- The T018A npm audit caveat (`ajv` moderate, `fast-uri` high)
+  remains a known owner evidence item. The rerun did not run
+  `npm audit fix`; the caveat is recorded in the T018A
+  preflight report.
+- The rerun validates the live NCP adapter against a single
+  owner-selected NCP JSON file. Broader NCP compatibility
+  (other schema versions, alternate field shapes, multiple
+  narratives, full open_questions / diagnostic_questions
+  coverage) remains future work if needed.
+- The T018B opt-in `OMI_LIVE_NCP_VALIDATE_WITH_NODE=1` Node
+  validation path was intentionally not exercised in the
+  rerun; the default Node-free path was confirmed to be
+  reached, succeeded, and side-effect-free.
+- The rerun did not run `npm install`, `npm audit fix`, start
+  a Node server, run `npm run validate:file` over the
+  selected file (intentionally not re-run; T018C evidence
+  preserved), generate story prose, mutate Memory/Canon, create
+  promotion records, run apply-promotion, or stage / commit /
+  push.
