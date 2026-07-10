@@ -1,3 +1,5 @@
+111. What exact install/setup commands are confirmed for BookNLP, NCP, Subtxt, and dramatica-flow? T014E inventoried the installation state but could not confirm install commands for these tools. T014E decision record marks BookNLP as NEEDS-RESEARCH, NCP/Subtxt/dramatica-flow as NEEDS-OWNER-DECISION. These must be resolved before T017-T020 can proceed.
+
 110. When should the OpenCode Go model routing decision be reviewed for effectiveness? The decision record (PHASE8-IMPL-023-opencode-go-model-routing) recommends review after T014–T020 are complete to assess whether the model-routing lanes (flash for small scope, pro/minimax for hard work) matched actual difficulty.
 
 109. What owner-blocked documentation format should T014-T020 use when a selected live tool remains unavailable after preflight?
