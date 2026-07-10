@@ -357,18 +357,28 @@ def test_unsafe_prose_output_is_rejected() -> None:
         exc_info.value
     ).lower()
 
-    # Orchestrator-level: prose-shaped raw_idea fails closed before any run
+    # T015F: owner-authored raw idea text is accepted as analyzable data
+    # even when it looks like prose. The orchestrator no longer fail-closes
+    # on prose-shaped raw_idea input; it sends the text to the model and
+    # lets the model analyze it. The strict prose guard remains only on
+    # AI/tool/model ``extracted_claim`` output and forbidden envelope field
+    # names. With no adapter fixture and no fallback opt-in, the
+    # orchestrator may report ``empty``/``unavailable``/``fail_closed``
+    # because no adapter produced findings — but it does NOT fail closed
+    # on the prose-shape of the raw idea itself.
     result = oao.analyze_omi_raw_idea_with_tools(
         "demo",
         "Meanwhile the room grew dark as the rain hammered the windows and "
         "the candles flickered one by one down the long hallway, which seemed "
         "to stretch for miles into the night and beyond.",
         persist_candidates=True,
-        allow_deterministic_fallback=True,
+        allow_deterministic_fallback=False,
     )
-    assert result["analysis_status"] == "fail_closed"
     assert result["findings"] == []
     assert result["persisted_candidate_ids"] == []
+    # Orchestrator must not report a raw-idea prose-guard failure.
+    assert "raw idea text looks like story prose" not in result["explanation"].lower()
+    assert "raw idea text resembles story prose" not in result["explanation"].lower()
 
 
 def test_prose_guard_helper_detects_narrative_shapes() -> None:
@@ -381,6 +391,161 @@ def test_prose_guard_helper_detects_narrative_shapes() -> None:
     )
     assert not oao.is_prose_like_text("Character: Test Character Alpha.")
     assert not oao.is_prose_like_text("Test Character Alpha")
+
+
+def test_owner_prose_input_is_accepted_as_data_at_orchestrator_entrypoint() -> None:
+    """T015F: owner-authored raw idea prose is accepted as analyzable data.
+
+    A 35+ word owner-authored raw idea that ends with a period must
+    reach the orchestrator's adapter loop and not be rejected by the
+    prose guard at the entrypoint. A test-only ``adapter_runners`` hook
+    is used to prove the prose text reached the runner and produced
+    findings, confirming the orchestrator does not fail closed on
+    prose-shape of owner input.
+    """
+    owner_prose = (
+        "Detective Mara Vale meets Jonah Cross at the old Vancouver "
+        "observatory after midnight while the brass compass from the "
+        "missing ship points toward Blackwater Pier under a sky full of "
+        "low clouds and a cold wind off the water."
+    )
+    # Sanity: 35+ words, ends with a period — would be flagged as
+    # prose-like by ``is_prose_like_text`` if the heuristic were still
+    # applied at the orchestrator entrypoint.
+    assert len(owner_prose.split()) >= 35
+    assert owner_prose.endswith(".")
+    assert oao.is_prose_like_text(owner_prose)
+
+    captured: list[dict] = []
+
+    def fake_runner(*, project_name, raw_idea, source_idea_id):
+        captured.append({"raw_idea": raw_idea})
+        return {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "explanation": "fake runner for T015F owner-prose test",
+            "candidates": [
+                _stub_valid_finding(
+                    source_adapter="ollama_model",
+                    extracted_claim=(
+                        "Mara Vale appears as a character candidate "
+                        "in the owner-authored raw idea"
+                    ),
+                )
+            ],
+        }
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        owner_prose,
+        persist_candidates=False,
+        requested_adapters=["ollama_model"],
+        adapter_runners={"ollama_model": fake_runner},
+    )
+
+    # The runner was invoked with the prose-shaped owner text.
+    assert captured, "fake runner should have been invoked exactly once"
+    assert captured[0]["raw_idea"] == owner_prose
+
+    # Orchestrator succeeded because the runner produced a valid finding.
+    assert result["analysis_status"] == "succeeded"
+    assert len(result["findings"]) == 1
+    finding = result["findings"][0]
+    assert finding["source_adapter"] == "ollama_model"
+    assert result["persisted_candidate_ids"] == []
+    # No raw-idea prose-guard failure in the explanation.
+    assert "raw idea text looks like story prose" not in (
+        result["explanation"].lower()
+    )
+    assert "raw idea text resembles story prose" not in (
+        result["explanation"].lower()
+    )
+
+
+def test_owner_prose_input_via_validate_owner_raw_idea_input_helper() -> None:
+    """T015F: ``validate_owner_raw_idea_input`` accepts prose-shaped input.
+
+    The helper enforces only the type/baseline check; it never calls
+    ``is_prose_like_text`` on the content. The orchestrator short-circuits
+    empty input to ``analysis_status == "empty"`` separately, so the
+    helper returns the empty strip without raising.
+    """
+    prose = (
+        "Meanwhile the room grew dark and the rain hammered the windows "
+        "while the candles flickered one by one down the long hallway."
+    )
+    normalized = oao.validate_owner_raw_idea_input(prose)
+    assert normalized == prose
+
+    # Whitespace is stripped.
+    assert oao.validate_owner_raw_idea_input("  " + prose + "  ") == prose
+
+    # Empty/whitespace-only input is returned as the stripped value;
+    # the orchestrator's empty short-circuit is the actual fail-closed
+    # path. The helper is intentionally not the fail-closed boundary.
+    assert oao.validate_owner_raw_idea_input("") == ""
+    assert oao.validate_owner_raw_idea_input("   ") == ""
+
+    # Non-string raises ValueError (matches the existing orchestrator
+    # type check).
+    with pytest.raises(ValueError):
+        oao.validate_owner_raw_idea_input(None)  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
+        oao.validate_owner_raw_idea_input(123)  # type: ignore[arg-type]
+
+
+def test_ai_tool_model_output_prose_still_fails_closed() -> None:
+    """T015F: AI/tool/model prose-shape output still fails closed.
+
+    The prose guard remains strict on model output. A fake adapter
+    runner that returns a candidate with a prose-shaped
+    ``extracted_claim`` is rejected by ``validate_normalized_finding``
+    and never produces findings.
+    """
+    prose_claim = (
+        "Meanwhile the room grew dark as the rain hammered the windows "
+        "and the candles flickered one by one down the long hallway, "
+        "which seemed to stretch for miles into the night and beyond."
+    )
+
+    def bad_runner(*, project_name, raw_idea, source_idea_id):
+        return {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "explanation": "fake runner returning prose-shaped claim",
+            "candidates": [
+                _stub_valid_finding(
+                    source_adapter="ollama_model",
+                    extracted_claim=prose_claim,
+                )
+            ],
+        }
+
+    # The orchestrator should not surface the prose-shaped finding; it
+    # is dropped during normalization (validate_normalized_finding
+    # raises ValueError, the orchestrator treats the runner as having
+    # no findings).
+    with pytest.raises(ValueError) as exc_info:
+        oao.validate_normalized_finding(
+            _stub_valid_finding(
+                source_adapter="ollama_model",
+                extracted_claim=prose_claim,
+            )
+        )
+    assert "prose" in str(exc_info.value).lower()
+
+
+def test_ai_tool_model_output_truth_label_still_fails_closed() -> None:
+    """T015F: AI/tool/model output with truth/canon/approval label still fails.
+
+    The truth-label guard remains strict on model output and on the
+    support_label / provenance.support fields of every normalized
+    finding. Unsafe prose-like and truth-labeled output must continue
+    to fail closed.
+    """
+    bad = _stub_valid_finding(support_label="canon truth support")
+    with pytest.raises(ValueError):
+        oao.validate_normalized_finding(bad)
 
 
 # ---------------------------------------------------------------------------

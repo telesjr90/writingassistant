@@ -28,7 +28,9 @@ T005 scope (PHASE8-IMPL-023):
   - Enforces a no-prose guard against adapter outputs: any prose-like,
     continuation-like, rewrite-like, or draft-like free-text output that could
     be confused with story prose is rejected as ``failed_closed`` with no
-    persisted candidates.
+    persisted candidates. The prose guard is NOT applied to owner-authored
+    raw idea input; owner text is treated as untrusted data to analyze,
+    not as executable instructions, and may legitimately look like prose.
   - Defines and implements the T010 fixture-only fusion/dedupe/conflict/
     uncertainty pass over normalized findings. The pass groups equivalent
     candidates, marks duplicates, assigns deterministic conflict groups, and
@@ -588,6 +590,42 @@ def is_truth_label(value: str) -> bool:
         return False
     lowered = value.strip().lower()
     return any(forbidden in lowered for forbidden in _OMI_FORBIDDEN_TRUTH_LABELS)
+
+
+def validate_owner_raw_idea_input(raw_idea: Any) -> str:
+    """Validate owner-authored raw idea input for the OMI orchestrator.
+
+    The owner-authored raw idea text is the source material that the OMI
+    orchestrator analyzes. It may legitimately look like prose — owners
+    often capture scenes, beats, and dialogue fragments as raw planning
+    notes. The orchestrator therefore accepts prose-shaped owner input
+    as analyzable data and treats it as untrusted text, not as executable
+    instructions.
+
+    This validator enforces the type/baseline checks that should still
+    apply to owner input:
+
+      - ``raw_idea`` must be a string. Non-string input raises
+        ``ValueError`` (this matches the existing pre-existing
+        ``OMI orchestrator raw_idea must be a string`` behavior).
+      - Empty/whitespace-only input is NOT rejected here. The caller
+        (the orchestrator entrypoint) short-circuits empty raw idea
+        text to ``analysis_status == "empty"`` and never invokes
+        any adapter.
+
+    It does NOT call ``is_prose_like_text`` on the content. The prose guard
+    remains strict only on AI/tool/model output (``extracted_claim`` and
+    envelope values) where the safety boundary is the strict JSON/schema
+    validator (``validate_ollama_model_envelope`` and the equivalent
+    per-adapter envelope validators). Owner prose-shaped input flows
+    through the orchestrator and is sent to the model as a user message
+    so the model can analyze the text instead of being asked to write it.
+
+    Returns the stripped string. Raises ``ValueError`` on non-string input.
+    """
+    if not isinstance(raw_idea, str):
+        raise ValueError("OMI orchestrator raw_idea must be a string")
+    return raw_idea.strip()
 
 
 def normalized_finding_id(
@@ -4159,6 +4197,10 @@ _OMI_LIVE_OLLAMA_BASE_URL_DEFAULT = "http://127.0.0.1:11434"
 _OMI_LIVE_OLLAMA_MODEL_ENV = "OMI_LIVE_OLLAMA_MODEL"
 _OMI_LIVE_OLLAMA_MODEL_DEFAULT = "qwen3:8b"
 _OMI_LIVE_OLLAMA_MODEL_NAME_ENV = "OMI_LIVE_OLLAMA_MODEL_NAME"
+_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_ENV = "OMI_LIVE_OLLAMA_TIMEOUT_SECONDS"
+_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_DEFAULT = 180.0
+_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_MIN = 1.0
+_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_MAX = 1800.0
 
 _OMI_LIVE_OLLAMA_SYSTEM_PROMPT = (
     "You are a strictly JSON-only structured extraction assistant. "
@@ -4204,6 +4246,39 @@ def _env_bool(env: Mapping[str, str], name: str, default: bool = False) -> bool:
     if value is None:
         return default
     return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_positive_float(
+    env: Mapping[str, str],
+    name: str,
+    *,
+    default: float,
+    min_value: float,
+    max_value: float,
+) -> float:
+    """Return a positive finite float from ``env[name]`` with safe fallback.
+
+    The orchestrator never raises on a bad timeout value. Missing, blank,
+    non-numeric, zero, negative, non-finite, sub-``min_value``, or
+    over-``max_value`` inputs all fall back to ``default`` so the live
+    Ollama HTTP call always has a finite, positive timeout.
+    """
+    raw_value = env.get(name)
+    if raw_value is None:
+        return float(default)
+    text = str(raw_value).strip()
+    if not text:
+        return float(default)
+    try:
+        parsed = float(text)
+    except (TypeError, ValueError):
+        return float(default)
+    import math as _math
+    if not _math.isfinite(parsed):
+        return float(default)
+    if parsed < float(min_value) or parsed > float(max_value):
+        return float(default)
+    return float(parsed)
 
 
 def _build_spacy_live_runner(
@@ -4456,6 +4531,11 @@ def _build_ollama_model_live_runner(
     - Reads ``OMI_LIVE_OLLAMA_BASE_URL`` (default ``http://127.0.0.1:11434``),
       ``OMI_LIVE_OLLAMA_MODEL`` (default ``qwen3:8b``), and falls back to
       ``OMI_LIVE_OLLAMA_MODEL_NAME`` for compatibility.
+    - Reads ``OMI_LIVE_OLLAMA_TIMEOUT_SECONDS`` (default ``180``) and clamps
+      the value to a finite positive range (clamped to the
+      ``[min, max]`` bounds; falls back to the default on missing,
+      blank, non-numeric, zero, negative, non-finite, or out-of-range
+      values). The HTTP call always uses a finite, positive timeout.
     - Calls Ollama ``/api/chat`` with system instructions that require strict
       JSON output conforming to ``omi_ollama_structured_extraction.v1``.
     - Sends top-level ``think: false`` so Qwen3 thinking-mode output does not
@@ -4504,6 +4584,13 @@ def _build_ollama_model_live_runner(
             or os.environ.get(_OMI_LIVE_OLLAMA_MODEL_NAME_ENV)
             or _OMI_LIVE_OLLAMA_MODEL_DEFAULT
         )
+        timeout_seconds = _env_positive_float(
+            os.environ,
+            _OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_ENV,
+            default=_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_DEFAULT,
+            min_value=_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_MIN,
+            max_value=_OMI_LIVE_OLLAMA_TIMEOUT_SECONDS_MAX,
+        )
         clean_base = base_url.rstrip("/")
         chat_url = f"{clean_base}/api/chat"
 
@@ -4527,7 +4614,7 @@ def _build_ollama_model_live_runner(
                 method="POST",
                 headers={"Content-Type": "application/json"},
             )
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with urllib.request.urlopen(req, timeout=timeout_seconds) as resp:
                 response_data = json.loads(resp.read().decode("utf-8"))
         except Exception as exc:
             return {
@@ -4776,10 +4863,21 @@ def analyze_omi_raw_idea_with_tools(
       canon. No real model/tool calls occur.
 
     Fail-closed behavior:
-      Empty / unsupported / unsafe-prose input -> ``empty`` / ``fail_closed``
-      with explanation and zero writes. Unknown adapter identities, malformed
-      normalized findings, prose-shaped claims, truth-labeled support, or
-      auto-approval all raise ``ValueError`` (treated as fatal by callers).
+      Empty raw idea input -> ``empty`` with explanation and zero writes.
+      Non-string raw idea input raises ``ValueError`` (treated as fatal
+      by callers). Owner-authored raw idea text is accepted as analyzable
+      data even when it looks like prose; the prose guard is intentionally
+      NOT applied to owner input. The prose guard remains strict on
+      AI/tool/model ``extracted_claim`` output and on forbidden envelope
+      field names, so the model can never smuggle generated prose,
+      rewrites, continuations, outlines, drafts, polish, expansions,
+      imitations, revisions, truth/canon/approval claims, Memory/Canon
+      mutation requests, promotion records, or apply-promotion
+      instructions through the orchestrator boundary.
+      Unknown adapter identities, malformed normalized findings,
+      prose-shaped ``extracted_claim`` output, truth-labeled support,
+      or auto-approval all raise ``ValueError`` (treated as fatal by
+      callers).
     """
     if not isinstance(project_name, str) or not project_name.strip():
         raise ValueError("OMI orchestrator project_name must be a non-empty string")
@@ -4849,47 +4947,18 @@ def analyze_omi_raw_idea_with_tools(
             "safety": safety,
         }
 
-    if is_prose_like_text(raw_idea_text):
-        # Raw idea itself looks like prose / continuation / drafting input.
-        # Refuse before running anything.
-        for adapter in requested:
-            adapter_results.append(
-                stub_adapter_result(
-                    adapter,
-                    state="failed_closed",
-                    explanation=(
-                        "Raw idea text looks like story prose / continuation; "
-                        "OMI must analyze, not write. Adapter execution "
-                        "refused; no candidates were extracted or persisted."
-                    ),
-                )
-            )
-        return {
-            "analysis_status": "fail_closed",
-            "explanation": (
-                "Raw idea text resembles story prose / continuation; the OMI "
-                "orchestrator refused to run analysis. OMI is analysis-only and "
-                "never writes, continues, drafts, expands, polishes, imitates, "
-                "or revises story prose."
-            ),
-            "source_idea_id": source_idea_id,
-            "adapter_results": adapter_results,
-            "findings": [],
-            "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
-            "fusion_summary": _fusion_zero_summary(),
-            "persisted_candidate_ids": [],
-            "persistence_status": (
-                "no_candidates_persisted"
-                if persist_candidates
-                else "not_requested"
-            ),
-            "persistence_explanation": (
-                "Unsafe prose-like raw idea failed closed before persistence."
-            ),
-            "new_candidate_ids": [],
-            "reused_candidate_ids": [],
-            "safety": safety,
-        }
+    # Owner-authored raw idea text is accepted regardless of whether it
+    # looks like prose. Owners legitimately capture scenes, beats, and
+    # dialogue fragments as raw planning notes; the orchestrator treats
+    # this text as untrusted input data to analyze, not as executable
+    # instructions. The prose guard remains strict on AI/tool/model
+    # ``extracted_claim`` output and on forbidden envelope field names
+    # so the model can never smuggle generated prose, rewrites,
+    # continuations, outlines, drafts, polish, expansions, imitations,
+    # revisions, truth/canon/approval claims, Memory/Canon mutation
+    # requests, promotion records, or apply-promotion instructions
+    # through the orchestrator boundary.
+    raw_idea_text = validate_owner_raw_idea_input(raw_idea_text)
 
     # Run requested adapters. Real AI/tool adapters are stubbed at T005;
     # deterministic_fallback (if allowed) is wired to the marker extractor.

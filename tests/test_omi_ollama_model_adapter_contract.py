@@ -881,3 +881,354 @@ def test_live_ollama_empty_content_with_thinking_fails_closed(
     assert "validation" in env["explanation"].lower() or "json" in (
         env["explanation"].lower()
     )
+
+
+# ---------------------------------------------------------------------------
+# T015F — Narrow no-prose guard scope and configure live Ollama timeout
+# ---------------------------------------------------------------------------
+
+
+_OWNER_PROSE_IDEA = (
+    "Detective Mara Vale meets Jonah Cross at the old Vancouver "
+    "observatory after midnight while the brass compass from the "
+    "missing ship points toward Blackwater Pier under a sky full of "
+    "low clouds and a cold wind off the water."
+)
+
+
+def test_live_ollama_default_timeout_is_180_seconds(monkeypatch: Any) -> None:
+    """T015F: live Ollama HTTP timeout defaults to 180 seconds.
+
+    The 30-second hard-coded timeout is too short for ``qwen3:8b`` with
+    the full T006 system prompt (~111s on the owner's hardware). The
+    default is now 180 seconds, configurable via
+    ``OMI_LIVE_OLLAMA_TIMEOUT_SECONDS``.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    captured: dict[str, Any] = {}
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        captured["timeout"] = kwargs.get("timeout", args[0] if args else None)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert captured["timeout"] == 180.0
+    assert captured["timeout"] > 0
+
+
+def test_live_ollama_env_timeout_override_is_honored(monkeypatch: Any) -> None:
+    """T015F: ``OMI_LIVE_OLLAMA_TIMEOUT_SECONDS=240`` uses 240-second timeout."""
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", "240")
+    captured: dict[str, Any] = {}
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        captured["timeout"] = kwargs.get("timeout", args[0] if args else None)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert captured["timeout"] == 240.0
+
+
+def test_live_ollama_invalid_timeout_falls_back_to_default(monkeypatch: Any) -> None:
+    """T015F: invalid timeout values fall back to the safe 180s default.
+
+    Non-numeric, zero, negative, blank, and out-of-range values all
+    fall back to the default. The HTTP call always uses a finite,
+    positive timeout — never ``None`` (infinite) and never
+    zero/negative.
+    """
+    invalid_values = (
+        "abc",  # non-numeric
+        "",  # blank
+        "0",  # zero
+        "-1",  # negative
+        "0.0",  # zero float
+        "-3.5",  # negative float
+        "99999",  # above max
+        "inf",  # infinity-like
+        "nan",  # NaN-like
+    )
+    for bad_value in invalid_values:
+        monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+        monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+        monkeypatch.setenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", bad_value)
+        captured: dict[str, Any] = {}
+
+        def capture_urlopen(
+            request: Any, *args: Any, **kwargs: Any
+        ) -> _MockResponse:
+            captured["timeout"] = kwargs.get(
+                "timeout", args[0] if args else None
+            )
+            return _MockResponse(
+                _valid_ollama_chat_response(_valid_live_model_content())
+            )
+
+        monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+        result = oao.analyze_omi_raw_idea_with_tools(
+            "demo",
+            RAW_IDEA,
+            requested_adapters=["ollama_model"],
+            persist_candidates=False,
+        )
+        assert result["analysis_status"] == "succeeded", (
+            f"unexpected fail_closed for invalid timeout value {bad_value!r}"
+        )
+        assert captured["timeout"] == 180.0, (
+            f"invalid timeout {bad_value!r} should fall back to 180s, "
+            f"got {captured['timeout']!r}"
+        )
+        # Cleanup
+        monkeypatch.delenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", raising=False)
+
+
+def test_live_ollama_missing_timeout_uses_default(monkeypatch: Any) -> None:
+    """T015F: missing ``OMI_LIVE_OLLAMA_TIMEOUT_SECONDS`` uses 180s default."""
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.delenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", raising=False)
+    captured: dict[str, Any] = {}
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        captured["timeout"] = kwargs.get("timeout", args[0] if args else None)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert captured["timeout"] == 180.0
+
+
+def test_live_ollama_think_false_preserved_in_request_payload(
+    monkeypatch: Any,
+) -> None:
+    """T015F: T015E ``think: false`` is preserved in the live request payload.
+
+    The T015E Qwen3 thinking-mode fix remains intact: top-level
+    ``think: false``, ``stream: false``, and ``options.num_predict``
+    continue to be sent on the ``/api/chat`` request body.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", "300")
+    bodies: list[bytes] = []
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        bodies.append(request.data)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert len(bodies) == 1
+    sent_body = json.loads(bodies[0].decode("utf-8"))
+    assert sent_body.get("think") is False
+    assert sent_body.get("stream") is False
+    assert sent_body.get("model") == "qwen3:8b"
+    assert sent_body.get("options", {}).get("num_predict") == 2048
+
+
+def test_live_ollama_accepts_owner_prose_input(monkeypatch: Any) -> None:
+    """T015F: owner-authored prose input is accepted by the live Ollama path.
+
+    A 35+ word owner-authored raw idea that ends with a period and
+    triggers ``is_prose_like_text`` is no longer rejected at the
+    orchestrator entrypoint. The live Ollama adapter receives the text
+    as the user message and the model analyzes it. With a mocked
+    ``/api/chat`` response, the orchestrator produces normalized
+    findings.
+    """
+    # Sanity check: the prose input is long, ends with a period, and
+    # would have been blocked by the pre-T015F prose guard.
+    assert len(_OWNER_PROSE_IDEA.split()) >= 35
+    assert _OWNER_PROSE_IDEA.endswith(".")
+    assert oao.is_prose_like_text(_OWNER_PROSE_IDEA)
+
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", "180")
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(_valid_live_model_content()),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        _OWNER_PROSE_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+
+    # No raw-idea prose-guard failure in the explanation.
+    assert "raw idea text looks like story prose" not in (
+        result["explanation"].lower()
+    )
+    assert "raw idea text resembles story prose" not in (
+        result["explanation"].lower()
+    )
+
+    # Mocked valid model content produces a normalized finding.
+    assert result["analysis_status"] == "succeeded"
+    assert len(result["findings"]) == 1
+    finding = result["findings"][0]
+    assert finding["source_adapter"] == "ollama_model"
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_ollama_model_prose_output_still_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """T015F: AI/tool/model prose-shape output still fails closed.
+
+    A live Ollama response whose ``message.content`` envelope contains
+    a prose-shaped ``extracted_claim`` is rejected by the strict
+    envelope validator. Findings list stays empty, no candidate
+    persistence is invoked.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    prose_content = (
+        "Meanwhile the room grew dark and the rain hammered the windows "
+        "and the candles flickered one by one down the long hallway."
+    )
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(
+            json.dumps({
+                "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+                "adapter": "ollama_model",
+                "status": "succeeded",
+                "findings": [
+                    {
+                        "candidate_type": "character",
+                        "label": "Room",
+                        "extracted_claim": prose_content,
+                        "evidence": [
+                            {
+                                "source_excerpt": "the room grew dark",
+                                "source_locator": "raw_idea:L1:C0-20",
+                            }
+                        ],
+                        "source_locator": "raw_idea:L1:C0-20",
+                    }
+                ],
+            })
+        ),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "prose" in env["explanation"].lower()
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_ollama_model_unsafe_truth_output_still_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """T015F: AI/tool/model truth/canon/approval output still fails closed.
+
+    The truth-label guard on model output is preserved. ``support_label``
+    values containing ``canon``, ``truth``, ``approved``, or ``promoted``
+    cause the envelope validator to reject the response with no
+    findings.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(
+            json.dumps({
+                "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+                "adapter": "ollama_model",
+                "status": "succeeded",
+                "findings": [
+                    {
+                        "candidate_type": "character",
+                        "label": "Test",
+                        "extracted_claim": (
+                            "Test is a confirmed canonical fact"
+                        ),
+                        "evidence": [
+                            {
+                                "source_excerpt": "test",
+                                "source_locator": "raw_idea:L1:C0-5",
+                            }
+                        ],
+                        "source_locator": "raw_idea:L1:C0-5",
+                        "support_label": "canon truth support",
+                    }
+                ],
+            })
+        ),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "truth" in env["explanation"].lower() or "canon" in (
+        env["explanation"].lower()
+    )
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_ollama_persistence_boundary_remains_safe(monkeypatch: Any) -> None:
+    """T015F: persist_candidates=False is honored; no candidate persistence.
+
+    With a mocked valid model response, ``persist_candidates=False``
+    never invokes candidate persistence. The orchestrator returns
+    ``persisted_candidate_ids == []`` and ``persistence_status ==
+    "not_requested"`` even when findings are produced.
+    """
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", "180")
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(_valid_live_model_content()),
+    )
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert len(result["findings"]) == 1
+    assert result["persisted_candidate_ids"] == []
+    assert result["persistence_status"] == "not_requested"
