@@ -490,10 +490,29 @@
       "result": "complete; tests/test_omi_ollama_model_adapter_contract.py -> 42 passed (33 existing + 9 new T015F); tests/test_omi_tool_assisted_orchestrator_contract.py -> 30 passed (26 existing + 4 new T015F; 1 existing test updated); tests/test_omi_tool_assisted_persistence_contract.py -> 5 passed (unchanged); tests/test_omi_live_runtime_preflight_contract.py -> 23 passed (T015F is not a preflight task); combined T015F validation: 100 passed across the four contract test files; python3 -m py_compile backend/omi_analysis_orchestrator.py backend/omi_runtime_preflight.py backend/main.py -> exit 0"
     },
     {
+      "task_id": "PHASE8-IMPL-023-T016A",
+      "title": "Story Check runtime surface and fixture contract inspection",
+      "status": "complete/PASS",
+      "scope": "inspect/docs only; no live Story Check runtime call; no adapter implementation; no preflight behavior change; no candidates; no candidate persistence; no Memory/Canon mutation; no automatic promotion records; no automatic apply-promotion; no story prose; mapped existing T008 story_check fixture/mock contract (omi_story_check_diagnostic_handoff.v1) at backend/omi_analysis_orchestrator.py:2550-3264 and 11 fixture/mock tests; mapped existing in-repo Story Check runtime surface (backend/analysis_engine.run_story_check project_name scene_id at backend/analysis_engine.py:46 plus legacy POST /api/projects/{project_name}/story-check/{scene_id} route at backend/main.py:327-332; not gated by OMI live-tools env flags); mapped existing T013 preflight story_check probe as file-existence-only on backend/analysis_engine.py at backend/omi_runtime_preflight.py:280-283; identified T016B (preflight/config/availability with requests package probe, prompt file probe, mock fixture probe, analysis_modes validity probe, Ollama reachability probe, OMI_LIVE_STORY_CHECK_BLOCKED/REASON support) and T016C (live adapter behind flags: choose between (A) bridge to analysis_engine.run_story_check, (B) fresh orchestrator HTTP runner reusing _build_ollama_model_live_runner infrastructure, (C) refactor; convert legacy rich Story Check response to T008-shaped omi_story_check_diagnostic_handoff.v1 findings; validate through existing validate_story_check_fixture_envelope; fail-closed on HTTP error, non-JSON, prose, truth, canon, missing evidence, missing source_locator, missing provenance) and T016D (manual real Story Check validation against live qwen3:8b)",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016A-story-check-runtime-surface-and-fixture-contract-inspection.md"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T016B",
+      "title": "Story Check runtime preflight/config/availability check",
+      "status": "planned",
+      "scope": "extend backend/omi_runtime_preflight.py _dependency_probe(adapter=\"story_check\") to probe requests Python package, backend/prompts/story_check.txt existence, backend/mock_responses/story_check.json existence, analysis_modes.get_analysis_mode() validity, storyform.Storyform.from_file importability, and Ollama reachability for the chosen path; add story_check_request_timeout (OLLAMA_TIMEOUT_SECONDS or OMI_LIVE_STORY_CHECK_TIMEOUT_SECONDS); add expected-red tests to tests/test_omi_live_runtime_preflight_contract.py; no live Story Check call; no candidates; no Memory/Canon mutation; no story prose"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T016C",
+      "title": "Live Story Check adapter behind flags",
+      "status": "planned",
+      "scope": "add _build_story_check_live_runner in backend/omi_analysis_orchestrator.py (or bridge to backend/analysis_engine.run_story_check); wire into _resolve_adapter_runner behind OMI_LIVE_TOOLS_ENABLED + OMI_LIVE_STORY_CHECK_ENABLED + not OMI_LIVE_STORY_CHECK_BLOCKED; convert rich Story Check response (throughline_alignment, theme_drift, character_consistency, warnings, suggestions, insufficient_evidence) to T008-shaped omi_story_check_diagnostic_handoff.v1 findings; validate through validate_story_check_fixture_envelope; fail-closed on HTTP error, non-JSON, prose, truth, canon, missing evidence, missing source_locator, missing provenance; add expected-red tests to tests/test_omi_story_check_adapter_contract.py; no live Story Check call in tests; no candidate persistence; no Memory/Canon mutation; no apply-promotion; no story prose"
+    },
+    {
       "task_id": "PHASE8-IMPL-023-T016",
       "title": "Live Story Check integration in OMI and analysis",
       "status": "planned",
-      "scope": "live Story Check integration in OMI and analysis with diagnostic-only candidate support"
+      "scope": "live Story Check integration in OMI and analysis with diagnostic-only candidate support; T016A inspect/docs is complete/PASS; T016B and T016C are the immediate next children before T016D manual validation"
     },
     {
       "task_id": "PHASE8-IMPL-023-T017",
@@ -556,12 +575,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T015D-rerun-after-T015F",
+  "latest_child_task": "PHASE8-IMPL-023-T016A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015D-manual-real-ollama-qwen3-validation.md",
-  "next_child_task": "PHASE8-IMPL-023-T016",
-  "next_child_title": "Live Story Check integration in OMI and analysis",
-  "next_child_status": "planned (T015D-rerun-after-T015F is complete/PASS; T015D is now complete/PASS for real Ollama qwen3:8b validation; T016 live Story Check integration is the next planned child)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T016A-story-check-runtime-surface-and-fixture-contract-inspection.md",
+  "next_child_task": "PHASE8-IMPL-023-T016B",
+  "next_child_title": "Story Check runtime preflight/config/availability check",
+  "next_child_status": "planned (T015D-rerun-after-T015F is complete/PASS; T015D is now complete/PASS for real Ollama qwen3:8b validation; T016A inspect/docs is complete/PASS; T016B preflight/config/availability is the next planned child)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"
