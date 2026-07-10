@@ -8,8 +8,11 @@ generate story prose.
 
 from __future__ import annotations
 
+import io
 import json
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -132,8 +135,8 @@ def test_ollama_model_without_fixture_does_not_call_live_model_and_returns_unava
 
     env = _assert_ollama_failed_closed(result)
     assert env["state"] == "unavailable"
-    assert "does not perform live ollama calls" in env["explanation"].lower()
-    assert "environment variables" in env["explanation"].lower()
+    assert "t006 fixture" in env["explanation"].lower()
+    assert "live ollama env" in env["explanation"].lower()
 
 
 def test_valid_ollama_model_json_string_normalizes_to_candidate_only_findings() -> None:
@@ -361,3 +364,376 @@ def test_other_tool_adapters_remain_deferred_to_t007_t009() -> None:
     assert "T009" in observed["ncp"]["explanation"]
     assert "T009" in observed["subtxt"]["explanation"]
     assert "T009" in observed["dramatica_flow"]["explanation"]
+
+
+# ---------------------------------------------------------------------------
+# T015C — Live Ollama structured extraction adapter behind flags
+# ---------------------------------------------------------------------------
+
+
+class _MockResponse:
+    """Mock HTTP response with context manager support."""
+
+    def __init__(self, data: dict[str, Any]) -> None:
+        self._body = json.dumps(data).encode("utf-8")
+
+    def read(self) -> bytes:
+        return self._body
+
+    def __enter__(self) -> _MockResponse:
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        pass
+
+
+class _MockRaisingUrlopen:
+    """Callable that raises an HTTPError."""
+
+    def __call__(self, request: Any, *args: Any, **kwargs: Any) -> None:
+        msg = "mock HTTP error"
+        raise urllib.error.HTTPError(
+            "http://mock", 500, msg, {}, io.BytesIO(b"error")
+        )
+
+
+def _valid_ollama_chat_response(model_content: str) -> dict[str, Any]:
+    """Build a valid Ollama /api/chat response dict."""
+    return {
+        "model": "qwen3:8b",
+        "created_at": "2024-01-01T00:00:00Z",
+        "message": {
+            "role": "assistant",
+            "content": model_content,
+        },
+        "done": True,
+    }
+
+
+def _valid_live_model_content() -> str:
+    """Build a valid JSON string that passes validate_ollama_model_envelope."""
+    return json.dumps({
+        "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+        "adapter": "ollama_model",
+        "status": "succeeded",
+        "explanation": "live Ollama test extraction",
+        "findings": [
+            {
+                "candidate_type": "character",
+                "label": "Test Character Alpha",
+                "extracted_claim": (
+                    "Test Character Alpha is identified as a character candidate"
+                ),
+                "evidence": [
+                    {
+                        "source_excerpt": (
+                            "Owner note names Test Character Alpha as "
+                            "the library investigator."
+                        ),
+                        "source_locator": "raw_idea:L1:C0-78",
+                    }
+                ],
+                "source_locator": "raw_idea:L1:C0-78",
+                "support_label": "ollama model support strength only",
+            }
+        ],
+    })
+
+
+def _mock_live_ollama_env(monkeypatch: Any) -> None:
+    """Set env vars to enable live Ollama."""
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+
+
+def _mock_urlopen(monkeypatch: Any, response_data: dict[str, Any]) -> None:
+    """Monkeypatch urllib.request.urlopen to return a mock response."""
+    def mock_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        return _MockResponse(response_data)
+    monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
+
+
+def _mock_urlopen_error(monkeypatch: Any) -> None:
+    """Monkeypatch urllib.request.urlopen to raise an HTTPError."""
+    monkeypatch.setattr(urllib.request, "urlopen", _MockRaisingUrlopen())
+
+
+def test_live_ollama_disabled_by_default_returns_unavailable() -> None:
+    """No env flags -> live Ollama path not triggered -> unavailable."""
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert env["state"] == "unavailable"
+    assert "T006 fixture" in env["explanation"] or "fixture" in env["explanation"]
+
+
+def test_live_ollama_enabled_with_mocked_valid_model_returns_candidates(
+    monkeypatch: Any,
+) -> None:
+    """Live Ollama with mocked /api/chat returns normalized candidates."""
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(_valid_live_model_content()),
+    )
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    finding = _assert_valid_ollama_result(result)
+    assert finding["label"] == "Test Character Alpha"
+    assert "ollama model" in finding["provenance"]["support"].lower()
+
+
+def test_live_ollama_uses_env_base_url(monkeypatch: Any) -> None:
+    """Live Ollama uses OMI_LIVE_OLLAMA_BASE_URL env var."""
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_BASE_URL", "http://custom:11434")
+    calls: list[str] = []
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        full_url = request.full_url if hasattr(request, "full_url") else str(request)
+        calls.append(full_url)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert len(calls) == 1
+    assert "custom:11434" in calls[0]
+
+
+def test_live_ollama_uses_env_model(monkeypatch: Any) -> None:
+    """Live Ollama uses OMI_LIVE_OLLAMA_MODEL env var."""
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_MODEL", "phi3:mini")
+
+    bodies: list[bytes] = []
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        bodies.append(request.data)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert len(bodies) == 1
+    sent_body = json.loads(bodies[0].decode("utf-8"))
+    assert sent_body["model"] == "phi3:mini"
+
+
+def test_live_ollama_uses_env_model_name_compat(monkeypatch: Any) -> None:
+    """Live Ollama falls back to OMI_LIVE_OLLAMA_MODEL_NAME for compat."""
+    _mock_live_ollama_env(monkeypatch)
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_MODEL_NAME", "compat-model")
+
+    bodies: list[bytes] = []
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        bodies.append(request.data)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    assert result["analysis_status"] == "succeeded"
+    assert len(bodies) == 1
+    sent_body = json.loads(bodies[0].decode("utf-8"))
+    assert sent_body["model"] == "compat-model"
+
+
+def test_live_ollama_http_error_fails_closed(monkeypatch: Any) -> None:
+    """HTTP error/timeout -> fail closed with no findings."""
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen_error(monkeypatch)
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "HTTP" in env["explanation"] or "failed" in env["explanation"]
+
+
+def test_live_ollama_invalid_response_json_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Non-JSON model content -> fail closed with no findings."""
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response("this is not json"),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "validation" in env["explanation"].lower() or "json" in (
+        env["explanation"].lower()
+    )
+
+
+def test_live_ollama_missing_message_content_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Response missing message.content -> fail closed."""
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(
+        monkeypatch,
+        {
+            "model": "qwen3:8b",
+            "message": {},
+            "done": True,
+        },
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "message" in env["explanation"].lower() or "content" in (
+        env["explanation"].lower()
+    )
+
+
+def test_live_ollama_prose_output_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Prose/markdown/wrapped content -> fail closed."""
+    _mock_live_ollama_env(monkeypatch)
+    prose_content = (
+        "Meanwhile the room grew dark and the rain hammered the windows."
+    )
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(
+            json.dumps({
+                "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+                "adapter": "ollama_model",
+                "status": "succeeded",
+                "findings": [
+                    {
+                        "candidate_type": "character",
+                        "label": "Room",
+                        "extracted_claim": prose_content,
+                        "evidence": [
+                            {
+                                "source_excerpt": "the room grew dark",
+                                "source_locator": "raw_idea:L1:C0-20",
+                            }
+                        ],
+                        "source_locator": "raw_idea:L1:C0-20",
+                    }
+                ],
+            })
+        ),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "prose" in env["explanation"].lower()
+
+
+def test_live_ollama_unsafe_output_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """Truth/canon/approval output -> fail closed."""
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(
+            json.dumps({
+                "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+                "adapter": "ollama_model",
+                "status": "succeeded",
+                "findings": [
+                    {
+                        "candidate_type": "character",
+                        "label": "Test",
+                        "extracted_claim": (
+                            "Test is a confirmed canonical fact"
+                        ),
+                        "evidence": [
+                            {
+                                "source_excerpt": "test",
+                                "source_locator": "raw_idea:L1:C0-5",
+                            }
+                        ],
+                        "source_locator": "raw_idea:L1:C0-5",
+                        "support_label": "canon truth support",
+                    }
+                ],
+            })
+        ),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    env = _assert_ollama_failed_closed(result)
+    assert "truth" in env["explanation"].lower() or "canon" in (
+        env["explanation"].lower()
+    )
+
+
+def test_existing_fixture_ollama_tests_still_pass() -> None:
+    """Existing fixture-only Ollama tests remain unaffected by live path."""
+    result = _run_with_fixture(json.dumps(_valid_envelope()))
+    _assert_valid_ollama_result(result)
+
+    result2 = _run_with_fixture("not json")
+    _assert_ollama_failed_closed(result2)
+
+    result3 = _run_with_fixture([])
+    _assert_ollama_failed_closed(result3)
+
+    result4 = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+    _assert_ollama_failed_closed(result4)

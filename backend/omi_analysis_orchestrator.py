@@ -63,6 +63,8 @@ import hashlib
 import json
 import os
 import re
+import urllib.error
+import urllib.request
 from typing import Any, Callable, Mapping
 
 # ---------------------------------------------------------------------------
@@ -4144,6 +4146,44 @@ _OMI_LIVE_SPACY_BLOCKED_REASON_ENV = "OMI_LIVE_SPACY_BLOCKED_REASON"
 _OMI_LIVE_SPACY_MODEL_ENV = "OMI_LIVE_SPACY_MODEL"
 _OMI_LIVE_SPACY_MODEL_DEFAULT = "en_core_web_sm"
 
+# ---------------------------------------------------------------------------
+# Live Ollama structured extraction adapter (T015C) — behind explicit env
+# flags
+# ---------------------------------------------------------------------------
+
+_OMI_LIVE_OLLAMA_ENABLED_ENV = "OMI_LIVE_OLLAMA_ENABLED"
+_OMI_LIVE_OLLAMA_BLOCKED_ENV = "OMI_LIVE_OLLAMA_BLOCKED"
+_OMI_LIVE_OLLAMA_BLOCKED_REASON_ENV = "OMI_LIVE_OLLAMA_BLOCKED_REASON"
+_OMI_LIVE_OLLAMA_BASE_URL_ENV = "OMI_LIVE_OLLAMA_BASE_URL"
+_OMI_LIVE_OLLAMA_BASE_URL_DEFAULT = "http://127.0.0.1:11434"
+_OMI_LIVE_OLLAMA_MODEL_ENV = "OMI_LIVE_OLLAMA_MODEL"
+_OMI_LIVE_OLLAMA_MODEL_DEFAULT = "qwen3:8b"
+_OMI_LIVE_OLLAMA_MODEL_NAME_ENV = "OMI_LIVE_OLLAMA_MODEL_NAME"
+
+_OMI_LIVE_OLLAMA_SYSTEM_PROMPT = (
+    "You are a strictly JSON-only structured extraction assistant. "
+    "Analyze the owner-provided raw idea text below. "
+    "Return ONLY valid JSON. No markdown, no explanation, no prose. "
+    "The JSON must conform to the schema 'omi_ollama_structured_extraction.v1': "
+    '{"schema_version": "omi_ollama_structured_extraction.v1", '
+    '"adapter": "ollama_model", '
+    '"status": "succeeded" or "empty", '
+    '"explanation": "brief extraction note", '
+    '"findings": [{"candidate_type": "...", "label": "...", '
+    '"extracted_claim": "...", '
+    '"evidence": [{"source_excerpt": "...", "source_locator": "..."}], '
+    '"source_locator": "..."}]}. '
+    "Allowed candidate types: character, location, organization, object, "
+    "timeline_event, relationship, plot_thread, story_fact, open_question, "
+    "storyform_context, diagnostic_question. "
+    "Rules: extract only from the provided text. "
+    "Do NOT rewrite, continue, brainstorm, suggest, invent facts, or make "
+    "canon/truth/approval claims. Do NOT mutate Memory/Canon or create "
+    "promotion records. Every finding must include evidence from the source "
+    "text. If nothing can be extracted, set status to 'empty' with an empty "
+    "findings list."
+)
+
 _OMI_SPACY_LIVE_ENTITY_LABEL_TO_CANDIDATE_TYPE: dict[str, str] = {
     "PERSON": "character",
     "GPE": "location",
@@ -4400,6 +4440,149 @@ def _build_spacy_live_runner(
     return _runner
 
 
+# ---------------------------------------------------------------------------
+# Live Ollama structured extraction adapter runner (T015C)
+# ---------------------------------------------------------------------------
+
+
+def _build_ollama_model_live_runner(
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a live Ollama structured extraction adapter runner.
+
+    The runner:
+
+    - Reads ``OMI_LIVE_OLLAMA_BASE_URL`` (default ``http://127.0.0.1:11434``),
+      ``OMI_LIVE_OLLAMA_MODEL`` (default ``qwen3:8b``), and falls back to
+      ``OMI_LIVE_OLLAMA_MODEL_NAME`` for compatibility.
+    - Calls Ollama ``/api/chat`` with system instructions that require strict
+      JSON output conforming to ``omi_ollama_structured_extraction.v1``.
+    - Uses ``stream=false``, a low output token limit, and a finite timeout.
+    - Parses the response, extracts the message content, and validates it
+      through ``validate_ollama_model_envelope``.
+    - Treats non-JSON, malformed, prose-like, or unsafe output as fail-closed
+      with no findings.
+    - Uses Python standard library only (``urllib.request``).
+
+    The caller (``_resolve_adapter_runner``) must check env flags before
+    building this runner. This runner does not re-check flags.
+    """
+    if not isinstance(adapter_config, dict) and adapter_config is not None:
+        raise ValueError("adapter_config must be a dict or None")
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        _ = project_name
+        _ = source_idea_id
+
+        if not isinstance(raw_idea, str) or not raw_idea.strip():
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "empty",
+                "explanation": (
+                    "Live Ollama runner received empty raw idea text; "
+                    "no extraction possible."
+                ),
+                "candidates": [],
+            }
+
+        raw_text = raw_idea.strip()
+        base_url = os.environ.get(
+            _OMI_LIVE_OLLAMA_BASE_URL_ENV,
+            _OMI_LIVE_OLLAMA_BASE_URL_DEFAULT,
+        )
+        model = (
+            os.environ.get(_OMI_LIVE_OLLAMA_MODEL_ENV)
+            or os.environ.get(_OMI_LIVE_OLLAMA_MODEL_NAME_ENV)
+            or _OMI_LIVE_OLLAMA_MODEL_DEFAULT
+        )
+        clean_base = base_url.rstrip("/")
+        chat_url = f"{clean_base}/api/chat"
+
+        messages = [
+            {"role": "system", "content": _OMI_LIVE_OLLAMA_SYSTEM_PROMPT},
+            {"role": "user", "content": raw_text},
+        ]
+
+        request_body = json.dumps({
+            "model": model,
+            "messages": messages,
+            "stream": False,
+            "options": {"num_predict": 2048},
+        }).encode("utf-8")
+
+        try:
+            req = urllib.request.Request(
+                chat_url,
+                data=request_body,
+                method="POST",
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                response_data = json.loads(resp.read().decode("utf-8"))
+        except Exception as exc:
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live Ollama HTTP call failed: "
+                    f"{type(exc).__name__}: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        try:
+            message_content = response_data["message"]["content"]
+        except (KeyError, TypeError, IndexError) as exc:
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live Ollama response missing message content: "
+                    f"{type(exc).__name__}: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        try:
+            validated = validate_ollama_model_envelope(message_content)
+        except ValueError as exc:
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live Ollama output failed validation: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+            }
+
+        env_status = validated["status"]
+        if env_status == "succeeded":
+            state = "succeeded" if validated["findings"] else "empty"
+        else:
+            state = env_status
+
+        return {
+            "adapter": OMI_OLLAMA_ADAPTER_NAME,
+            "state": state,
+            "explanation": (
+                validated["explanation"]
+                or "Live Ollama structured extraction completed."
+            ),
+            "candidates": validated["findings"],
+        }
+
+    return _runner
+
+
 def _resolve_adapter_runner(
     adapter: str,
     *,
@@ -4485,6 +4668,17 @@ def _resolve_adapter_runner(
                 and not _env_bool(env, _OMI_LIVE_SPACY_BLOCKED_ENV)
             ):
                 return _build_spacy_live_runner(
+                    adapter_config=adapter_config,
+                )
+        # T015C: live Ollama path behind explicit env flags.
+        if adapter == "ollama_model":
+            env = os.environ
+            if (
+                _env_bool(env, _OMI_LIVE_TOOLS_ENABLED_ENV)
+                and _env_bool(env, _OMI_LIVE_OLLAMA_ENABLED_ENV)
+                and not _env_bool(env, _OMI_LIVE_OLLAMA_BLOCKED_ENV)
+            ):
+                return _build_ollama_model_live_runner(
                     adapter_config=adapter_config,
                 )
     return None
@@ -4748,13 +4942,11 @@ def analyze_omi_raw_idea_with_tools(
             # No fixture/runner supplied -> adapters remain unavailable.
             if adapter == "ollama_model":
                 unavailable_explanation = (
-                    f"Adapter '{adapter}' is available through the "
-                    f"{OMI_OLLAMA_SCHEMA_VERSION} fixture contract only; "
-                    f"no fixture was supplied via "
-                    f"``adapter_fixture_outputs``. The orchestrator does "
-                    f"not perform live Ollama calls and does not read "
-                    f"environment variables to enable them. Returning "
-                    f"'unavailable' with no candidates."
+                    f"Adapter '{adapter}' requires either a T006 fixture "
+                    f"via ``adapter_fixture_outputs`` or live Ollama env "
+                    f"flags (OMI_LIVE_TOOLS_ENABLED + "
+                    f"OMI_LIVE_OLLAMA_ENABLED). Neither was supplied. "
+                    f"Returning 'unavailable' with no candidates."
                 )
             elif adapter == "story_check":
                 unavailable_explanation = (

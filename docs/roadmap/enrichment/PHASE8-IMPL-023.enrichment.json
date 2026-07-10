@@ -181,6 +181,7 @@
     "docs/roadmap/roadmap_index.yaml",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T014C-live-spacy-adapter-behind-flags.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-T015B-ollama-http-preflight-and-model-availability.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-T015C-live-ollama-structured-extraction-adapter-behind-flags.md",
     "AGENTS.md",
     "CLAUDE.md",
     ".cursorrules",
@@ -416,8 +417,8 @@
     {
       "task_id": "PHASE8-IMPL-023-T015",
       "title": "Live Ollama/local model integration in OMI and analysis",
-      "status": "active (T015C ready/active next)",
-      "scope": "split into T015A inspect/docs (complete/PASS), T015B HTTP preflight and model availability (complete/PASS), T015C live Ollama structured extraction adapter implementation, T015D manual real qwen3:8b validation. T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP. T015B added HTTP API reachability/model availability probe to preflight with OMI_LIVE_OLLAMA_BASE_URL and OMI_LIVE_OLLAMA_MODEL env vars."
+      "status": "complete/PASS",
+      "scope": "split into T015A inspect/docs (complete/PASS), T015B HTTP preflight and model availability (complete/PASS), T015C live Ollama structured extraction adapter implementation (complete/PASS), T015D manual real qwen3:8b validation (ready/active next). T015A confirmed Windows Ollama 0.31.1 reachable from WSL at Windows host IP. T015B added HTTP API reachability/model availability probe. T015C added live Ollama structured extraction adapter behind env flags with 11 mocked-HTTP tests."
     },
     {
       "task_id": "PHASE8-IMPL-023-T015A",
@@ -435,6 +436,17 @@
       "artifacts": [
         "backend/omi_runtime_preflight.py",
         "tests/test_omi_live_runtime_preflight_contract.py"
+      ]
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T015C",
+      "title": "Live Ollama/local model structured extraction adapter implementation",
+      "status": "complete/PASS",
+      "scope": "live Ollama structured extraction adapter behind explicit env flags; urllib.request only; OMI_LIVE_OLLAMA_BASE_URL/OMI_LIVE_OLLAMA_MODEL/OMI_LIVE_OLLAMA_MODEL_NAME env vars; fail-closed on HTTP errors, non-JSON, prose, unsafe/truth/canon output; 11 new tests (all mock urllib.request.urlopen; no real Ollama); existing fixture tests unchanged; no frontend/package changes; no live model calls in tests",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015C-live-ollama-structured-extraction-adapter-behind-flags.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_ollama_model_adapter_contract.py"
       ]
     },
     {
@@ -504,12 +516,12 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T015B",
+  "latest_child_task": "PHASE8-IMPL-023-T015C",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015B-ollama-http-preflight-and-model-availability.md",
-  "next_child_task": "PHASE8-IMPL-023-T015C",
-  "next_child_title": "Live Ollama/local model structured extraction adapter implementation",
-  "next_child_status": "ready/active (Ollama 0.31.1 HTTP API reachability verified via preflight; qwen3:8b selected; OMI_LIVE_OLLAMA_BASE_URL and OMI_LIVE_OLLAMA_MODEL env vars configured)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T015C-live-ollama-structured-extraction-adapter-behind-flags.md",
+  "next_child_task": "PHASE8-IMPL-023-T015D",
+  "next_child_title": "Manual real qwen3:8b validation",
+  "next_child_status": "ready/active (manual real qwen3:8b validation after T015C live adapter implementation)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion"
