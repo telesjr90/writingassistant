@@ -10,6 +10,15 @@ mock fixture, ``backend.analysis_modes`` validity, the ``storyform`` surface,
 and the ``requests`` Python package. T016B does not import or execute
 ``backend.analysis_engine.run_story_check``, does not call the legacy Story
 Check route, and does not call Ollama.
+
+T018A extends the ``ncp`` adapter probe with a read-only schema-validator
+surface inspection. NCP is treated as a schema/interchange validation
+surface (not an automatic analysis runtime, not canon/truth). The probe
+confirms the NCP source tree, ``package.json``, schema JSON/YAML, validator
+scripts, and ``node``/``npm``/``node_modules`` are discoverable, and reports
+a known ``ajv`` moderate / ``fast-uri`` high npm audit caveat. T018A never
+runs ``npm install``, ``npm audit fix``, ``npm run validate:schema``, or
+``npm run validate:file`` and never reads project data.
 """
 
 from __future__ import annotations
@@ -85,6 +94,35 @@ STORY_CHECK_OLLAMA_MODEL_DEFAULT = "qwen3:8b"
 STORY_CHECK_OLLAMA_TIMEOUT_ENV = "OLLAMA_TIMEOUT_SECONDS"
 STORY_CHECK_OLLAMA_TIMEOUT_DEFAULT = "300"
 
+NCP_SOURCE_REL = ".external_sources/narrative-context-protocol"
+NCP_PACKAGE_JSON_REL = (
+    ".external_sources/narrative-context-protocol/package.json"
+)
+NCP_SCHEMA_JSON_REL = (
+    ".external_sources/narrative-context-protocol/schema/ncp-schema.json"
+)
+NCP_SCHEMA_YAML_REL = (
+    ".external_sources/narrative-context-protocol/schema/ncp-schema.yaml"
+)
+NCP_VALIDATE_SCHEMA_SCRIPT_REL = (
+    ".external_sources/narrative-context-protocol/tests/validate-schema.js"
+)
+NCP_VALIDATE_FILE_SCRIPT_REL = (
+    ".external_sources/narrative-context-protocol/tests/validate-file.js"
+)
+NCP_NODE_MODULES_REL = (
+    ".external_sources/narrative-context-protocol/node_modules"
+)
+NCP_VALIDATE_SCHEMA_PACKAGE_SCRIPT = "validate:schema"
+NCP_VALIDATE_FILE_PACKAGE_SCRIPT = "validate:file"
+NCP_AUDIT_CAVEAT = (
+    "Known npm audit caveat (recorded, not fixed): "
+    "ajv moderate (direct dependency, ReDoS when using $data option); "
+    "fast-uri high (transitive dependency, path traversal / host confusion "
+    "advisories). NCP source is schema/interchange only and is not exposed "
+    "as a network/server path; do not run npm audit fix in preflight."
+)
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -132,6 +170,175 @@ def _path_readable(relative_path: str) -> bool:
             return True
     except OSError:
         return False
+
+
+def _safe_read_json(absolute_path: Path) -> dict[str, Any] | None:
+    """Read a JSON file into a dict, returning ``None`` on any failure.
+
+    Read-only, fail-closed helper for small JSON metadata files such as
+    ``package.json``. Never writes; never raises.
+    """
+    try:
+        if not absolute_path.is_file():
+            return None
+    except OSError:
+        return None
+    try:
+        with absolute_path.open("rb") as handle:
+            data = handle.read()
+    except OSError:
+        return None
+    try:
+        import json
+    except ImportError:  # pragma: no cover - json is always present
+        return None
+    try:
+        parsed = json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return None
+    if not isinstance(parsed, dict):
+        return None
+    return parsed
+
+
+def _package_json_script_names(package_json: dict[str, Any]) -> list[str]:
+    """Return the list of npm script names declared in a ``package.json`` dict.
+
+    Read-only helper; ignores non-dict ``scripts`` blocks; returns an empty
+    list when ``scripts`` is missing or malformed.
+    """
+    scripts = package_json.get("scripts")
+    if not isinstance(scripts, dict):
+        return []
+    return [str(name) for name in scripts.keys() if isinstance(name, str)]
+
+
+def _ncp_runtime_probe() -> dict[str, Any]:
+    """Read-only NCP schema-validator surface probe.
+
+    T018A scope: confirm the NCP source tree, ``package.json``, schema JSON,
+    schema YAML, the two validator scripts (``validate:schema`` and
+    ``validate:file``), the corresponding ``package.json`` script entries,
+    ``node``/``npm`` command availability, and the presence of
+    ``node_modules`` are all discoverable. Reports a known ``ajv`` moderate /
+    ``fast-uri`` high npm audit caveat. The probe never runs ``npm install``,
+    ``npm audit fix``, ``npm run validate:schema``, or
+    ``npm run validate:file``. The probe does not import NCP as a Python
+    module; it is a static, read-only surface inspection.
+
+    Returns a flat dict of booleans, configured paths, and detail strings
+    prefixed with ``ncp_``.
+    """
+    import json as _json  # local alias to keep the import scoped
+
+    source_root = _REPO_ROOT / NCP_SOURCE_REL
+    source_available = source_root.is_dir()
+    package_json_path = _REPO_ROOT / NCP_PACKAGE_JSON_REL
+    schema_json_path = _REPO_ROOT / NCP_SCHEMA_JSON_REL
+    schema_yaml_path = _REPO_ROOT / NCP_SCHEMA_YAML_REL
+    validate_schema_script_path = _REPO_ROOT / NCP_VALIDATE_SCHEMA_SCRIPT_REL
+    validate_file_script_path = _REPO_ROOT / NCP_VALIDATE_FILE_SCRIPT_REL
+    node_modules_path = _REPO_ROOT / NCP_NODE_MODULES_REL
+
+    package_json_available = package_json_path.is_file()
+    schema_json_available = schema_json_path.is_file()
+    schema_yaml_available = schema_yaml_path.is_file()
+    validate_schema_script_available = validate_schema_script_path.is_file()
+    validate_file_script_available = validate_file_script_path.is_file()
+    node_modules_available = node_modules_path.is_dir()
+
+    package_json_dict = _safe_read_json(package_json_path)
+    script_names = _package_json_script_names(package_json_dict) if package_json_dict else []
+    validate_schema_package_script_available = (
+        NCP_VALIDATE_SCHEMA_PACKAGE_SCRIPT in script_names
+    )
+    validate_file_package_script_available = (
+        NCP_VALIDATE_FILE_PACKAGE_SCRIPT in script_names
+    )
+
+    node_path = shutil.which("node")
+    npm_path = shutil.which("npm")
+    node_available = node_path is not None
+    npm_available = npm_path is not None
+
+    missing: list[str] = []
+    if not source_available:
+        missing.append(NCP_SOURCE_REL)
+    if not package_json_available:
+        missing.append(NCP_PACKAGE_JSON_REL)
+    if not schema_json_available:
+        missing.append(NCP_SCHEMA_JSON_REL)
+    if not schema_yaml_available:
+        missing.append(NCP_SCHEMA_YAML_REL)
+    if not validate_schema_script_available:
+        missing.append(NCP_VALIDATE_SCHEMA_SCRIPT_REL)
+    if not validate_file_script_available:
+        missing.append(NCP_VALIDATE_FILE_SCRIPT_REL)
+    if not validate_schema_package_script_available:
+        missing.append(f"package.json:{NCP_VALIDATE_SCHEMA_PACKAGE_SCRIPT}")
+    if not validate_file_package_script_available:
+        missing.append(f"package.json:{NCP_VALIDATE_FILE_PACKAGE_SCRIPT}")
+    if not node_available:
+        missing.append("command:node")
+    if not npm_available:
+        missing.append("command:npm")
+
+    surface = "available"
+    if missing:
+        surface = "unavailable"
+    elif not node_modules_available:
+        surface = "degraded"
+
+    if missing:
+        detail = (
+            "NCP schema-validator surface probe missing: "
+            + ", ".join(missing)
+        )
+    elif not node_modules_available:
+        detail = (
+            "NCP schema-validator surface probe: source, package.json, schema "
+            "JSON/YAML, validator scripts, validate:schema/validate:file "
+            "package scripts, and node/npm all present; node_modules NOT "
+            "present (validator scripts would not be runnable in this state; "
+            "preflight does not run npm install)"
+        )
+    else:
+        detail = (
+            "NCP schema-validator surface probe: source, package.json, schema "
+            "JSON/YAML, validator scripts, validate:schema/validate:file "
+            "package scripts, node, npm, and node_modules all present; "
+            "NCP is schema/interchange validation only, not automatic "
+            "analysis runtime, and preflight does not execute "
+            "validate:schema or validate:file"
+        )
+
+    return {
+        "ncp_runtime_surface": surface,
+        "ncp_source_path": NCP_SOURCE_REL,
+        "ncp_source_available": source_available,
+        "ncp_package_json_available": package_json_available,
+        "ncp_schema_json_available": schema_json_available,
+        "ncp_schema_yaml_available": schema_yaml_available,
+        "ncp_validate_schema_script_available": validate_schema_script_available,
+        "ncp_validate_file_script_available": validate_file_script_available,
+        "ncp_validate_schema_package_script_available": (
+            validate_schema_package_script_available
+        ),
+        "ncp_validate_file_package_script_available": (
+            validate_file_package_script_available
+        ),
+        "ncp_node_available": node_available,
+        "ncp_node_path": node_path,
+        "ncp_npm_available": npm_available,
+        "ncp_npm_path": npm_path,
+        "ncp_node_modules_available": node_modules_available,
+        "ncp_validator_available": (
+            not missing
+        ),
+        "ncp_validator_status": surface,
+        "ncp_audit_caveat": NCP_AUDIT_CAVEAT,
+        "ncp_detail": detail,
+    }
 
 
 def _spacy_model_probe(model_name: str) -> dict[str, Any]:
@@ -677,19 +884,45 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "story_check_detail": detail,
         }
     elif adapter == "ncp":
-        configured = bool(
-            _env_text(env, "OMI_LIVE_NCP_COMMAND")
-            or _env_text(env, "OMI_LIVE_NCP_PATH")
-            or _path_exists(".external_sources")
-        )
-        command = _env_text(env, "OMI_LIVE_NCP_COMMAND")
-        path = _env_text(env, "OMI_LIVE_NCP_PATH")
-        available = bool(
-            (command and shutil.which(command))
-            or (path and Path(path).exists())
-            or _path_exists(".external_sources")
-        )
-        detail = "Configured command/path or existing in-repo source surface probe"
+        probe = _ncp_runtime_probe()
+        configured = probe["ncp_source_available"]
+        available = probe["ncp_validator_available"]
+        detail = probe["ncp_detail"]
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": (
+                "available" if available else "unavailable"
+            ),
+            "probe_detail": detail,
+            "ncp_runtime_surface": probe["ncp_runtime_surface"],
+            "ncp_source_path": probe["ncp_source_path"],
+            "ncp_source_available": probe["ncp_source_available"],
+            "ncp_package_json_available": probe["ncp_package_json_available"],
+            "ncp_schema_json_available": probe["ncp_schema_json_available"],
+            "ncp_schema_yaml_available": probe["ncp_schema_yaml_available"],
+            "ncp_validate_schema_script_available": probe[
+                "ncp_validate_schema_script_available"
+            ],
+            "ncp_validate_file_script_available": probe[
+                "ncp_validate_file_script_available"
+            ],
+            "ncp_validate_schema_package_script_available": probe[
+                "ncp_validate_schema_package_script_available"
+            ],
+            "ncp_validate_file_package_script_available": probe[
+                "ncp_validate_file_package_script_available"
+            ],
+            "ncp_node_available": probe["ncp_node_available"],
+            "ncp_node_path": probe["ncp_node_path"],
+            "ncp_npm_available": probe["ncp_npm_available"],
+            "ncp_npm_path": probe["ncp_npm_path"],
+            "ncp_node_modules_available": probe["ncp_node_modules_available"],
+            "ncp_validator_available": probe["ncp_validator_available"],
+            "ncp_validator_status": probe["ncp_validator_status"],
+            "ncp_audit_caveat": probe["ncp_audit_caveat"],
+            "ncp_detail": detail,
+        }
     elif adapter == "subtxt":
         configured = bool(
             _env_text(env, "OMI_LIVE_SUBTXT_COMMAND")
@@ -920,6 +1153,44 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "story_check_analysis_mode_configured"
         )
         report["story_check_detail"] = dependency.get("story_check_detail")
+    if adapter == "ncp":
+        report["ncp_runtime_surface"] = dependency.get("ncp_runtime_surface")
+        report["ncp_source_path"] = dependency.get("ncp_source_path")
+        report["ncp_source_available"] = dependency.get("ncp_source_available")
+        report["ncp_package_json_available"] = dependency.get(
+            "ncp_package_json_available"
+        )
+        report["ncp_schema_json_available"] = dependency.get(
+            "ncp_schema_json_available"
+        )
+        report["ncp_schema_yaml_available"] = dependency.get(
+            "ncp_schema_yaml_available"
+        )
+        report["ncp_validate_schema_script_available"] = dependency.get(
+            "ncp_validate_schema_script_available"
+        )
+        report["ncp_validate_file_script_available"] = dependency.get(
+            "ncp_validate_file_script_available"
+        )
+        report["ncp_validate_schema_package_script_available"] = dependency.get(
+            "ncp_validate_schema_package_script_available"
+        )
+        report["ncp_validate_file_package_script_available"] = dependency.get(
+            "ncp_validate_file_package_script_available"
+        )
+        report["ncp_node_available"] = dependency.get("ncp_node_available")
+        report["ncp_node_path"] = dependency.get("ncp_node_path")
+        report["ncp_npm_available"] = dependency.get("ncp_npm_available")
+        report["ncp_npm_path"] = dependency.get("ncp_npm_path")
+        report["ncp_node_modules_available"] = dependency.get(
+            "ncp_node_modules_available"
+        )
+        report["ncp_validator_available"] = dependency.get(
+            "ncp_validator_available"
+        )
+        report["ncp_validator_status"] = dependency.get("ncp_validator_status")
+        report["ncp_audit_caveat"] = dependency.get("ncp_audit_caveat")
+        report["ncp_detail"] = dependency.get("ncp_detail")
     return report
 
 

@@ -1562,3 +1562,562 @@ def test_booknlp_preflight_does_not_persist_or_mutate(
     assert tool["safety"]["memory_canon_mutation"] is False
     assert tool["safety"]["promotion_or_apply_promotion"] is False
     assert tool["safety"]["story_prose_generated"] is False
+
+
+# ---------------------------------------------------------------------------
+# T018A — NCP schema-validator preflight
+# ---------------------------------------------------------------------------
+
+
+def _all_ncp_surfaces_available_result() -> dict[str, object]:
+    return {
+        "ncp_runtime_surface": "available",
+        "ncp_source_path": ".external_sources/narrative-context-protocol",
+        "ncp_source_available": True,
+        "ncp_package_json_available": True,
+        "ncp_schema_json_available": True,
+        "ncp_schema_yaml_available": True,
+        "ncp_validate_schema_script_available": True,
+        "ncp_validate_file_script_available": True,
+        "ncp_validate_schema_package_script_available": True,
+        "ncp_validate_file_package_script_available": True,
+        "ncp_node_available": True,
+        "ncp_node_path": "/usr/bin/node",
+        "ncp_npm_available": True,
+        "ncp_npm_path": "/usr/bin/npm",
+        "ncp_node_modules_available": True,
+        "ncp_validator_available": True,
+        "ncp_validator_status": "available",
+        "ncp_audit_caveat": (
+            "ajv moderate; fast-uri high; do not run npm audit fix"
+        ),
+        "ncp_detail": "all present",
+    }
+
+
+def _patch_ncp_probe(
+    monkeypatch,
+    result: dict[str, object] | None = None,
+) -> None:
+    """Patch ``_ncp_runtime_probe`` for tests that must not depend on the
+    real ``.external_sources/narrative-context-protocol`` tree, real node,
+    or real npm."""
+    if result is None:
+        result = _all_ncp_surfaces_available_result()
+    monkeypatch.setattr(
+        preflight,
+        "_ncp_runtime_probe",
+        lambda: {key: value for key, value in result.items()},
+    )
+
+
+def test_ncp_preflight_disabled_by_default_remains_safe_read_only() -> None:
+    report = _report()
+    tool = _tools_by_name(report)["ncp"]
+
+    assert tool["global_enabled"] is False
+    assert tool["tool_enabled"] is False
+    assert tool["runtime_enabled"] is False
+    assert tool["blocked"] is False
+    assert tool["status"] in {"disabled", "available"}
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_ncp_all_surfaces_and_node_npm_available_reports_validator_available(
+    monkeypatch,
+) -> None:
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result())
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "enabled"
+    assert tool["runtime_enabled"] is True
+    assert tool["runtime_dependency_available"] is True
+    assert tool["runtime_dependency_status"] == "available"
+    assert tool["ncp_runtime_surface"] == "available"
+    assert tool["ncp_source_path"] == ".external_sources/narrative-context-protocol"
+    assert tool["ncp_source_available"] is True
+    assert tool["ncp_package_json_available"] is True
+    assert tool["ncp_schema_json_available"] is True
+    assert tool["ncp_schema_yaml_available"] is True
+    assert tool["ncp_validate_schema_script_available"] is True
+    assert tool["ncp_validate_file_script_available"] is True
+    assert tool["ncp_validate_schema_package_script_available"] is True
+    assert tool["ncp_validate_file_package_script_available"] is True
+    assert tool["ncp_node_available"] is True
+    assert tool["ncp_npm_available"] is True
+    assert tool["ncp_node_modules_available"] is True
+    assert tool["ncp_validator_available"] is True
+    assert tool["ncp_validator_status"] == "available"
+    assert "ajv" in tool["ncp_audit_caveat"]
+    assert "fast-uri" in tool["ncp_audit_caveat"]
+    assert tool["safety"]["read_only"] is True
+
+
+def test_ncp_missing_source_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_source_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = (
+        "NCP schema-validator surface probe missing: "
+        ".external_sources/narrative-context-protocol"
+    )
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] in {"unavailable", "not_configured"}
+    assert tool["runtime_dependency_available"] is False
+    assert tool["ncp_source_available"] is False
+    assert tool["ncp_validator_available"] is False
+    assert tool["ncp_validator_status"] == "unavailable"
+    assert ".external_sources/narrative-context-protocol" in tool["ncp_detail"]
+
+
+def test_ncp_missing_package_json_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_package_json_available"] = False
+    bad["ncp_validate_schema_package_script_available"] = False
+    bad["ncp_validate_file_package_script_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing package.json"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_package_json_available"] is False
+    assert tool["ncp_validate_schema_package_script_available"] is False
+    assert tool["ncp_validate_file_package_script_available"] is False
+    assert tool["ncp_validator_available"] is False
+    assert "package.json" in tool["ncp_detail"]
+
+
+def test_ncp_missing_schema_json_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_schema_json_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing schema/ncp-schema.json"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_schema_json_available"] is False
+    assert tool["ncp_validator_available"] is False
+    assert "ncp-schema.json" in tool["ncp_detail"]
+
+
+def test_ncp_missing_schema_yaml_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_schema_yaml_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing schema/ncp-schema.yaml"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_schema_yaml_available"] is False
+    assert tool["ncp_validator_available"] is False
+    assert "ncp-schema.yaml" in tool["ncp_detail"]
+
+
+def test_ncp_missing_validate_schema_script_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_validate_schema_script_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing tests/validate-schema.js"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_validate_schema_script_available"] is False
+    assert "validate-schema.js" in tool["ncp_detail"]
+
+
+def test_ncp_missing_validate_file_script_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_validate_file_script_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing tests/validate-file.js"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_validate_file_script_available"] is False
+    assert "validate-file.js" in tool["ncp_detail"]
+
+
+def test_ncp_missing_validate_schema_package_script_reports_unavailable(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_validate_schema_package_script_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing package.json:validate:schema"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_validate_schema_package_script_available"] is False
+    assert "validate:schema" in tool["ncp_detail"]
+
+
+def test_ncp_missing_validate_file_package_script_reports_unavailable(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_validate_file_package_script_available"] = False
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing package.json:validate:file"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_validate_file_package_script_available"] is False
+    assert "validate:file" in tool["ncp_detail"]
+
+
+def test_ncp_missing_node_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_node_available"] = False
+    bad["ncp_node_path"] = None
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing command:node"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_node_available"] is False
+    assert tool["ncp_node_path"] is None
+    assert "command:node" in tool["ncp_detail"]
+
+
+def test_ncp_missing_npm_reports_unavailable_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_npm_available"] = False
+    bad["ncp_npm_path"] = None
+    bad["ncp_runtime_surface"] = "unavailable"
+    bad["ncp_validator_available"] = False
+    bad["ncp_validator_status"] = "unavailable"
+    bad["ncp_detail"] = "missing command:npm"
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "unavailable"
+    assert tool["ncp_npm_available"] is False
+    assert tool["ncp_npm_path"] is None
+    assert "command:npm" in tool["ncp_detail"]
+
+
+def test_ncp_existing_node_modules_is_reported_when_present(
+    monkeypatch,
+) -> None:
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result())
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["ncp_node_modules_available"] is True
+
+
+def test_ncp_missing_node_modules_reports_degraded_with_clear_detail(
+    monkeypatch,
+) -> None:
+    bad = _all_ncp_surfaces_available_result()
+    bad["ncp_node_modules_available"] = False
+    bad["ncp_runtime_surface"] = "degraded"
+    bad["ncp_validator_available"] = True
+    bad["ncp_validator_status"] = "degraded"
+    bad["ncp_detail"] = (
+        "node_modules NOT present (validator scripts would not be runnable in "
+        "this state; preflight does not run npm install)"
+    )
+    _patch_ncp_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "enabled"
+    assert tool["ncp_node_modules_available"] is False
+    assert tool["ncp_runtime_surface"] == "degraded"
+    assert "node_modules" in tool["ncp_detail"]
+    assert "npm install" in tool["ncp_detail"]
+
+
+def test_ncp_blocked_flag_overrides_validator_availability(
+    monkeypatch,
+) -> None:
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result())
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_NCP_ENABLED": "true",
+                "OMI_LIVE_NCP_BLOCKED": "true",
+                "OMI_LIVE_NCP_BLOCKED_REASON": "Owner decision pending.",
+            }
+        )
+    )["ncp"]
+
+    assert tool["status"] == "blocked"
+    assert tool["blocked"] is True
+    assert tool["blocked_reason"] == "Owner decision pending."
+    assert tool["runtime_dependency_available"] is True
+    assert tool["ncp_validator_available"] is True
+
+
+def test_ncp_preflight_does_not_run_npm_install_or_audit_fix_or_validate(
+    tmp_path, monkeypatch
+) -> None:
+    """Preflight must not invoke npm install, npm audit fix, or
+    npm run validate:schema / npm run validate:file. We assert this by
+    intercepting subprocess / shell / network probes and confirming
+    neither the real NCP probe nor the patched probe path triggers any of
+    them. The Ollama probe is also mocked so that no real Ollama HTTP
+    request is attempted during this test.
+    """
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result())
+    _mock_ollama_probe(monkeypatch, _MOCK_OLLAMA_UNREACHABLE)
+
+    attempted_subprocess_calls: list[tuple[str, tuple]] = []
+    attempted_network_calls: list[tuple[str, tuple]] = []
+    attempted_node_calls: list[tuple[str, tuple]] = []
+    attempted_npm_calls: list[tuple[str, tuple]] = []
+
+    def fake_subprocess_run(*args, **kwargs):
+        attempted_subprocess_calls.append(("subprocess.run", args))
+        raise AssertionError(
+            "subprocess.run must not be called by NCP preflight"
+        )
+
+    def fake_subprocess_popen(*args, **kwargs):
+        attempted_subprocess_calls.append(("subprocess.Popen", args))
+        raise AssertionError(
+            "subprocess.Popen must not be called by NCP preflight"
+        )
+
+    def fake_urlopen(*args, **kwargs):
+        attempted_network_calls.append(("urlopen", args))
+        raise AssertionError(
+            "urllib urlopen must not be called by NCP preflight"
+        )
+
+    def fake_node(*args, **kwargs):
+        attempted_node_calls.append(("node", args))
+        raise AssertionError(
+            "node must not be invoked by NCP preflight"
+        )
+
+    def fake_npm(*args, **kwargs):
+        attempted_npm_calls.append(("npm", args))
+        raise AssertionError(
+            "npm must not be invoked by NCP preflight"
+        )
+
+    import subprocess
+    import urllib.request
+
+    monkeypatch.setattr(subprocess, "run", fake_subprocess_run, raising=False)
+    monkeypatch.setattr(subprocess, "Popen", fake_subprocess_popen, raising=False)
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(subprocess, "check_call", fake_node, raising=False)
+    monkeypatch.setattr(subprocess, "check_output", fake_node, raising=False)
+    monkeypatch.setattr(subprocess, "call", fake_npm, raising=False)
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_NCP_ENABLED": "true",
+        }
+    )
+
+    assert attempted_subprocess_calls == []
+    assert attempted_network_calls == []
+    assert attempted_node_calls == []
+    assert attempted_npm_calls == []
+
+    tool = _tools_by_name(report)["ncp"]
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_ncp_preflight_does_not_persist_or_mutate(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.create_omi_idea("demo", "Owner-authored NCP preflight note.")
+    before = project_manager.get_omi_summary("demo")
+    _patch_ncp_probe(monkeypatch, _all_ncp_surfaces_available_result())
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_NCP_ENABLED": "true",
+        }
+    )
+
+    after = project_manager.get_omi_summary("demo")
+    assert after == before
+    tool = _tools_by_name(report)["ncp"]
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_ncp_audit_caveat_is_reported_verbatim() -> None:
+    """Audit caveat text is reported as known owner evidence, not run."""
+    report = _report()
+    tool = _tools_by_name(report)["ncp"]
+
+    caveat = tool["ncp_audit_caveat"]
+    assert isinstance(caveat, str)
+    assert "ajv" in caveat
+    assert "moderate" in caveat
+    assert "fast-uri" in caveat
+    assert "high" in caveat
+    assert "npm audit fix" in caveat
+    assert "recorded, not fixed" in caveat

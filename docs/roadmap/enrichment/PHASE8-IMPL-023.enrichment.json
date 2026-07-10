@@ -581,9 +581,10 @@
     },
     {
       "task_id": "PHASE8-IMPL-023-T018A",
-      "title": "NCP schema validator preflight",
-      "status": "planned",
-      "scope": "NCP schema validator preflight and runtime surface inspection for the T018 live NCP integration; conditional next task after T017C1 closes to PASS (or after the owner decides the live BookNLP MVP is fail-closed / unavailable / dropped); mirrors T017A BookNLP runtime preflight pattern"
+      "title": "NCP schema-validator preflight",
+      "status": "complete/PASS",
+      "scope": "extends the T013 read-only runtime preflight in `backend/omi_runtime_preflight.py` so the OMI `runtime-preflight` report for the `ncp` tool reports a focused, read-only NCP schema-validator surface (ncp_runtime_surface, ncp_source_path, ncp_source_available, ncp_package_json_available, ncp_schema_json_available, ncp_schema_yaml_available, ncp_validate_schema_script_available, ncp_validate_file_script_available, ncp_validate_schema_package_script_available, ncp_validate_file_package_script_available, ncp_node_available, ncp_node_path, ncp_npm_available, ncp_npm_path, ncp_node_modules_available, ncp_validator_available, ncp_validator_status, ncp_audit_caveat, ncp_detail); read-only, fail-closed, never runs `npm install`, `npm audit fix`, `npm run validate:schema`, or `npm run validate:file`, never imports NCP as a Python module, and never exposes NCP as a network/server path; the probe records the known npm audit caveat (`ajv` moderate direct dep, `fast-uri` high transitive dep) as known owner evidence; NCP remains a schema/interchange validation surface, not an automatic analysis runtime, not canon/truth; the existing live-tool flag map (`OMI_LIVE_NCP_ENABLED` / `OMI_LIVE_NCP_BLOCKED` / `OMI_LIVE_NCP_BLOCKED_REASON`) is preserved; NCP stays disabled by default; 18 new mocked tests in `tests/test_omi_live_runtime_preflight_contract.py` cover disabled-by-default safety, all-surfaces-available reporting, missing source/package.json/schema JSON/schema YAML/validate-schema.js/validate-file.js/validate:schema package script/validate:file package script/node/npm, existing `node_modules` reporting, `node_modules` missing (degraded), blocked-flag override, no-`npm install`/no-`npm audit fix`/no-`npm run validate:schema`/no-`npm run validate:file`, no persistence / no Memory/Canon mutation / no apply-promotion / no story prose, and audit-caveat reporting",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T018A-ncp-schema-validator-preflight.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T016",
@@ -652,39 +653,40 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T017C1",
+  "latest_child_task": "PHASE8-IMPL-023-T018A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T017C1-booknlp-transformers-state-dict-compatibility-repair.md",
-  "next_child_task": "PHASE8-IMPL-023-T018A",
-  "next_child_title": "NCP schema validator preflight",
-  "next_child_status": "planned (T017A BookNLP runtime preflight after install is complete/PASS; T017B live BookNLP adapter behind flags is complete/PASS; T017C manual real BookNLP validation is complete/PASS-SAFE-FAIL-CLOSED; T017C1 BookNLP / transformers state-dict compatibility repair is complete/PASS; the next task is PHASE8-IMPL-023-T018A — NCP schema validator preflight)",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T018A-ncp-schema-validator-preflight.md",
+  "next_child_task": "PHASE8-IMPL-023-T018B",
+  "next_child_title": "NCP candidate-import validation adapter",
+  "next_child_status": "planned (T017C1 BookNLP / transformers state-dict compatibility repair is complete/PASS; T018A NCP schema-validator preflight is complete/PASS; the next task is PHASE8-IMPL-023-T018B — NCP candidate-import validation adapter)",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "BookNLP / transformers state-dict compatibility repair",
-  "latest_child_summary": "T017C1 repaired the T017C 'Unexpected key(s) in state_dict: \"bert.embeddings.position_ids\"' RuntimeError with a narrow adapter-side shim in `backend/omi_analysis_orchestrator.py` that wraps `torch.load` for the duration of the BookNLP constructor only and drops ONLY the single known-incompatible non-trainable key. No dependency change was applied. Manual real OMI live BookNLP re-validation against `projects/example/scenes/scene_001.md` returns `analysis_status: \"succeeded\"`, `finding_count: 26`, `finding_types: [\"character\", \"location\"]`, `persisted_candidate_ids: []`, `project_files_changed: false`, and all 11 safety envelope flags true. 9 new mocked tests in `tests/test_omi_booknlp_spacy_adapter_contract.py`. All existing T017B mocked tests still pass. The only failing test in the suite is the pre-existing `test_live_spacy_missing_package_returns_unavailable`.",
+  "latest_child_title": "NCP schema-validator preflight",
+  "latest_child_summary": "T018A extended the T013 read-only runtime preflight in `backend/omi_runtime_preflight.py` so the OMI `runtime-preflight` report for the `ncp` tool reports a focused, read-only NCP schema-validator surface (ncp_runtime_surface, ncp_source_path, ncp_source_available, ncp_package_json_available, ncp_schema_json_available, ncp_schema_yaml_available, ncp_validate_schema_script_available, ncp_validate_file_script_available, ncp_validate_schema_package_script_available, ncp_validate_file_package_script_available, ncp_node_available, ncp_node_path, ncp_npm_available, ncp_npm_path, ncp_node_modules_available, ncp_validator_available, ncp_validator_status, ncp_audit_caveat, ncp_detail). NCP is recorded as a schema/interchange validation surface, not an automatic analysis runtime, not canon/truth. The probe is read-only and fail-closed; it never runs `npm install`, `npm audit fix`, `npm run validate:schema`, or `npm run validate:file`; it never imports NCP as a Python module; it never exposes NCP as a network/server path. The known npm audit caveat (`ajv` moderate, `fast-uri` high) is reported as known owner evidence only. 18 new mocked tests in `tests/test_omi_live_runtime_preflight_contract.py`. The existing live-tool flag map (`OMI_LIVE_NCP_ENABLED` / `OMI_LIVE_NCP_BLOCKED` / `OMI_LIVE_NCP_BLOCKED_REASON`) is preserved; NCP stays disabled by default. `backend/omi_analysis_orchestrator.py` was not modified.",
   "latest_child_validation": {
-    "tests/test_omi_booknlp_spacy_adapter_contract.py": "39 passed (30 existing + 9 new T017C1)",
+    "tests/test_omi_live_runtime_preflight_contract.py": "68 passed (50 existing + 18 new T018A)",
+    "tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py": "31 passed (T009 fixture-only NCP adapter contract; not modified by T018A)",
     "tests/test_omi_tool_assisted_orchestrator_contract.py": "30 passed",
     "tests/test_omi_tool_assisted_persistence_contract.py": "5 passed",
-    "tests/test_omi_live_runtime_preflight_contract.py": "50 passed",
-    "manual_validation_capture": ".codex-context/PHASE8-IMPL-023/manual-validation/T017C1-booknlp-repair/manual-booknlp-repair-validation-output.txt",
-    "known_pre_existing_failure": {
-      "test": "tests/test_omi_booknlp_spacy_adapter_contract.py::test_live_spacy_missing_package_returns_unavailable",
-      "reason": "spaCy is installed locally; the test asserts the unavailable state when spaCy is missing and is documented as a known pre-existing failure in T017C1 task brief."
-    }
+    "real_machine_preflight_validation": "on the owner machine, the probe correctly reports the existing NCP source tree at `.external_sources/narrative-context-protocol` with `node` 24.16.0 (`/home/tjrpirateking/.nvm/versions/node/v24.16.0/bin/node`), `npm` 11.13.0 (`/home/tjrpirateking/.nvm/versions/node/v24.16.0/bin/npm`), and `node_modules` all present; `ncp_validator_available == True`; `ncp_audit_caveat` includes `ajv` moderate and `fast-uri` high"
   },
   "latest_child_no_side_effects": {
     "no_memory_canon_mutation": true,
     "no_apply_promotion": true,
     "no_canon_promotion": true,
     "no_story_prose_generation": true,
-    "no_package_install_or_upgrade": true,
-    "no_strict_false_broad_workaround": true,
-    "no_site_packages_patch": true,
+    "no_npm_install": true,
+    "no_npm_audit_fix": true,
+    "no_npm_run_validate_schema": true,
+    "no_npm_run_validate_file": true,
+    "no_ncp_python_import": true,
+    "no_network_server_exposure": true,
+    "no_omi_analysis_orchestrator_modification": true,
+    "no_frontend_modification": true,
+    "no_package_dependency_modification": true,
     "no_external_sources_edit": true,
     "no_project_or_candidate_persistence": true,
-    "no_staging_commit_or_push": true,
-    "persist_candidates_false_honored": true
+    "no_staging_commit_or_push": true
   }
 }
