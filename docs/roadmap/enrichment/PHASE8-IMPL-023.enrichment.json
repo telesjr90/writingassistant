@@ -652,10 +652,28 @@
       "result": "complete/PASS; live Subtxt runtime is owner-blocked; app-owned Subtxt-informed semantic-rubric path is accepted; T019C is the recommended next task"
     },
     {
+      "task_id": "PHASE8-IMPL-023-T019C",
+      "title": "App-owned Subtxt-informed semantic-rubric contract",
+      "status": "complete/PASS",
+      "scope": "pure, app-owned, in-memory, standard-library-only (copy, re, typing) input/output contract for future Subtxt-informed semantic-rubric evaluation; new identity app_owned_subtxt_informed_rubric (distinct from T009 subtxt adapter identity); new user-facing label App-owned Subtxt-informed diagnostic support (distinct from T009 Subtxt diagnostic support only); new request schema omi_app_owned_subtxt_informed_rubric_request.v1; new result schema omi_app_owned_subtxt_informed_rubric_result.v1; output class rubric_mapping_support; three public APIs (validate_subtxt_informed_rubric_request, validate_subtxt_informed_rubric_result, build_subtxt_informed_rubric_fail_closed_result); nine diagnostic categories (5 non-question + 4 question); exact category-to-candidate-type mapping; statement-kind rules; evidence/source-locator/owner-decision/review-status rules; recursive unsafe-output rejection outside source_text and evidence source_excerpt (truth/final/canon/approved/promoted/Storyform/OS/MC/IC/RS/problem/solution/concern/issue/domain/approach/dynamic/signpost/official-Subtxt/prose/rewrite/continuation/outline/draft/polish/improve/expand/revise/imitate/chapter/persistence/queue/canon-mutation/promotion/apply-promotion/training-artifacts/project-scene-note-material-mutation); fail-closed behavior; T009 omi_subtxt_diagnostic_handoff.v1 fixture contract, T009 subtxt adapter identity, T009 Subtxt diagnostic support only support label, T019A subtxt_live_runtime_available False, and analysis_runtime_integration Subtxt boundary (SUPPORTED_ACTIONS['Subtxt'] == {'build_rubric_mapping_support'}, TOOL_BOUNDARIES['Subtxt'] == 'rubric/diagnostic guidance only', executes_subtxt == False) are preserved unchanged; the normalized valid result is compatible with the existing generic analysis_runtime_integration.validate_analysis_runtime_output when validated against an allowlist record whose output_classes_allowed includes rubric_mapping_support; no evaluator, adapter, prompt, model integration, route, UI, candidate persistence, review-queue creation, Memory/Canon mutation, promotion, apply-promotion, story prose, file I/O, env-var reads, subprocess/shell/network, .external_sources import or read, copied Subtxt documentation, package change, or staging/commit/push",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019C-app-owned-subtxt-informed-semantic-rubric-contract.md",
+      "artifacts": [
+        "backend/story_knowledge/subtxt_informed_semantic_rubric_contract.py",
+        "tests/test_omi_subtxt_informed_semantic_rubric_contract.py"
+      ],
+      "result": "complete/PASS; tests/test_omi_subtxt_informed_semantic_rubric_contract.py -> 91 passed; T005/T009/T010/T011/T013/T018/T019A/T019B regression suites all still pass; live Subtxt runtime remains owner-blocked; T019C contract is complete but no evaluator, adapter, route, UI, or OMI integration exists yet; T019D (App-owned Subtxt-informed semantic-rubric evaluator) is the recommended next task; do not skip to T020"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T019D",
+      "title": "App-owned Subtxt-informed semantic-rubric evaluator",
+      "status": "planned",
+      "scope": "Implement a pure local, deterministic/rule-assisted, in-memory evaluator that consumes the committed T019C request contract and produces the committed T019C result contract. It must use original app-owned rubric logic, never read or copy external Subtxt documentation at runtime, never execute or impersonate Subtxt, never call a model, and never persist candidates or mutate project, Memory, Canon, promotion, or prose state. OMI adapter integration remains deferred."
+    },
+    {
       "task_id": "PHASE8-IMPL-023-T019",
       "title": "Live Subtxt integration in OMI and analysis",
       "status": "in_progress",
-      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status; T019A docs preflight is complete/PASS; T019B integration-path decision is complete/PASS; T019C (App-owned Subtxt-informed semantic-rubric contract) is the recommended next task"
+      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status; T019A docs preflight is complete/PASS; T019B integration-path decision is complete/PASS; T019C (App-owned Subtxt-informed semantic-rubric contract) is complete/PASS; T019D (App-owned Subtxt-informed semantic-rubric evaluator) is the recommended next task; do not skip to T020"
     },
     {
       "task_id": "PHASE8-IMPL-023-T020",
@@ -700,28 +718,39 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T019B",
+  "latest_child_task": "PHASE8-IMPL-023-T019C",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019B-subtxt-integration-path-decision.md",
-  "next_child_task": "PHASE8-IMPL-023-T019C",
-  "next_child_title": "App-owned Subtxt-informed semantic-rubric contract",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019C-app-owned-subtxt-informed-semantic-rubric-contract.md",
+  "next_child_task": "PHASE8-IMPL-023-T019D",
+  "next_child_title": "App-owned Subtxt-informed semantic-rubric evaluator",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Subtxt integration-path decision",
-  "latest_child_summary": "T019B completes the docs-only owner-controlled integration-path decision for Subtxt. Live Subtxt runtime is OWNER-BLOCKED. No supported local Subtxt CLI, library, API, validator, or executable analysis engine was found. The app-owned Subtxt-informed semantic-rubric path is ACCEPTED for separate implementation. Automatic Dramatica/Storyform truth is FORBIDDEN. Claiming Subtxt execution without a real authorized runtime is FORBIDDEN. License boundary (CC BY-NC-SA 4.0) caveat is recorded. Accepted future rubric boundary, labeling requirements, and reopening conditions are documented. No rubric, adapter, prompt, model, backend, tests, frontend, .external_sources, package, subprocess, network, candidate persistence, project mutation, Memory/Canon mutation, promotion, apply-promotion, or story prose generation occurred. T019C (App-owned Subtxt-informed semantic-rubric contract) is the recommended next task.",
+  "latest_child_title": "App-owned Subtxt-informed semantic-rubric contract",
+  "latest_child_summary": "T019C implements a pure, app-owned, in-memory, standard-library-only (copy, re, typing) input/output contract for future Subtxt-informed semantic-rubric evaluation at backend/story_knowledge/subtxt_informed_semantic_rubric_contract.py. New identity app_owned_subtxt_informed_rubric (distinct from T009 subtxt adapter identity). New user-facing label App-owned Subtxt-informed diagnostic support (distinct from T009 Subtxt diagnostic support only). New request schema omi_app_owned_subtxt_informed_rubric_request.v1. New result schema omi_app_owned_subtxt_informed_rubric_result.v1. Output class rubric_mapping_support. Three public APIs (validate_subtxt_informed_rubric_request, validate_subtxt_informed_rubric_result, build_subtxt_informed_rubric_fail_closed_result). Nine diagnostic categories (5 non-question + 4 question). Exact category-to-candidate-type mapping. Statement-kind rules. Evidence/source-locator/owner-decision/review-status rules. Recursive unsafe-output rejection outside source_text and evidence source_excerpt. Fail-closed behavior. T009 omi_subtxt_diagnostic_handoff.v1 fixture contract, T009 subtxt adapter identity, T009 Subtxt diagnostic support only support label, T019A subtxt_live_runtime_available False, and analysis_runtime_integration Subtxt boundary are preserved unchanged. The normalized valid result is compatible with the existing generic analysis_runtime_integration.validate_analysis_runtime_output when validated against an allowlist record whose output_classes_allowed includes rubric_mapping_support. tests/test_omi_subtxt_informed_semantic_rubric_contract.py -> 91 passed. T005/T009/T010/T011/T013/T018/T019A/T019B regression suites all still pass. Live Subtxt runtime remains owner-blocked. T019C contract is complete but no evaluator, adapter, route, UI, or OMI integration exists yet. T019D (App-owned Subtxt-informed semantic-rubric evaluator) is the recommended next task; do not skip to T020.",
   "latest_child_validation": {
-    "t019b_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019B-subtxt-integration-path-decision.md exists and contains required decision language (owner-blocked, app-owned, Subtxt-informed, semantic rubric, automatic Storyform forbidden, live Subtxt runtime)",
-    "t019b_license_caveat": "CC BY-NC-SA 4.0 detected in README, no root license file, commercial copying/redistribution/adaptation caveat recorded without legal conclusion",
-    "t019b_no_forbidden_overclaims": "no instance of 'live Subtxt integration is complete', 'Subtxt runtime is available', 'official Subtxt analysis', or 'Subtxt-confirmed Storyform' in any updated roadmap file",
-    "t019b_no_rubric_implementation": "no rubric, adapter, prompt, or model integration was implemented in this task",
-    "t019b_no_backend_or_test_changes": "no backend, test, or frontend files were modified",
-    "t019b_no_external_sources_changes": ".external_sources was not modified",
-    "t019b_no_docs_copying": "no documentation content was copied into application code",
-    "t019b_no_subprocess_or_network": "no package, Nuxt, subprocess, shell, network, or server operation occurred",
-    "t019b_no_story_prose": "no story prose generation occurred",
-    "t019b_unrelated_leftovers_untouched": "known unrelated leftovers were not modified"
+    "t019c_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019C-app-owned-subtxt-informed-semantic-rubric-contract.md exists and contains required decision language (pure contract, app-owned identity, app-owned user-facing label, fail-closed, no evaluator, no .external_sources read, no T009 contract change)",
+    "t019c_new_identity": "app_owned_subtxt_informed_rubric",
+    "t019c_new_user_facing_label": "App-owned Subtxt-informed diagnostic support",
+    "t019c_request_schema_version": "omi_app_owned_subtxt_informed_rubric_request.v1",
+    "t019c_result_schema_version": "omi_app_owned_subtxt_informed_rubric_result.v1",
+    "t019c_output_class": "rubric_mapping_support",
+    "t019c_t009_contract_preserved": "OMI_SUBTXT_SCHEMA_VERSION remains omi_subtxt_diagnostic_handoff.v1; T009 adapter identity subtxt is preserved; T009 support label Subtxt diagnostic support only is preserved; T019A subtxt_live_runtime_available False is preserved; analysis_runtime_integration Subtxt boundary is preserved (SUPPORTED_ACTIONS['Subtxt'] == {'build_rubric_mapping_support'}, TOOL_BOUNDARIES['Subtxt'] == 'rubric/diagnostic guidance only', executes_subtxt == False)",
+    "t019c_test_count": 91,
+    "t019c_test_file": "tests/test_omi_subtxt_informed_semantic_rubric_contract.py",
+    "t019c_regression_results": "tests/test_writer_assistant_core_analysis_runtime_integration_contract.py -> 63 passed; tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py -> 8 passed; tests/test_writer_assistant_core_analysis_runtime_integration_safety_regression.py -> 5 passed; tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py -> 30 passed; tests/test_omi_tool_assisted_orchestrator_contract.py -> 30 passed; tests/test_omi_tool_assisted_persistence_contract.py -> 5 passed; tests/test_omi_live_runtime_preflight_contract.py -> 23 passed",
+    "t019c_no_evaluator_or_adapter_or_route_or_ui": true,
+    "t019c_no_external_sources_read_or_copy": true,
+    "t019c_no_docs_copying_into_application_code": true,
+    "t019c_no_persistence_or_queue_or_memory_canon_mutation": true,
+    "t019c_no_promotion_or_apply_promotion": true,
+    "t019c_no_story_prose": true,
+    "t019c_no_subprocess_or_network": true,
+    "t019c_no_model_calls": true,
+    "t019c_no_package_dependency_change": true,
+    "t019c_no_staging_commit_or_push": true,
+    "t019c_unrelated_leftovers_untouched": "artifacts/mvp-readiness/owner-acceptance/{checklist-results.json,evidence-report.md,workflow-log.json}, PHASE8-IMPL-023-T006-context-files.zip, PHASE8-IMPL-023-T018C1-recovery-context.zip, docs/Writing Assistant_OMI.pdf, docs/roadmap/decisions/PHASE8-IMPL-023-T005-tool-assisted-orchestrator-contract-adapter-boundaries.md are preserved unchanged"
   },
   "latest_child_no_side_effects": {
     "no_memory_canon_mutation": true,
@@ -749,6 +778,19 @@
     "no_adapter_implementation": true,
     "no_prompt_addition": true,
     "no_model_calls": true,
-    "no_docs_copying_into_application_code": true
+    "no_docs_copying_into_application_code": true,
+    "no_t009_contract_modification": true,
+    "no_subtxt_runtime_execution": true,
+    "no_subprocess_run": true,
+    "no_socket_call": true,
+    "no_pathlib_import": true,
+    "no_os_import": true,
+    "no_requests_import": true,
+    "no_urllib_import": true,
+    "no_external_sources_import": true,
+    "no_project_storage_helper_call": true,
+    "no_candidate_persistence_helper_call": true,
+    "no_apply_promotion_module_call": true,
+    "no_omitting_evidence_unsafe_rewrite": true
   }
 }
