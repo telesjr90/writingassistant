@@ -800,9 +800,9 @@
     {
       "task_id": "PHASE8-IMPL-023-T022",
       "title": "Candidate-only persistence validation using real runtime outputs",
-      "status": "blocked/in_progress",
-      "scope": "candidate-only persistence validation against real runtime outputs; first attempt is blocked by a stale persistence adapter-identity allowlist; preserve the exact 113 findings and blocked evidence; no canon, no promotion records, no apply-promotion",
-      "result": "blocked/in_progress; first persistence attempt failed closed on Unknown OMI tool-assisted source_adapter: subtxt_informed_rubric before candidate persistence; exact 113 findings, source idea, index, pre-existing candidates, and blocked evidence remain preserved; T022A repaired the static persistence allowlist; T022B is planned next"
+      "status": "complete/PASS",
+      "scope": "candidate-only persistence validation against the exact 113 preserved real runtime outputs; no canon, no promotion records, no apply-promotion",
+      "result": "complete/PASS; T022B reused the preserved findings after T022A's narrow allowlist repair, persisted 113 pending candidate-only records, replayed all IDs without mutation, and preserved the original blocked evidence"
     },
     {
       "task_id": "PHASE8-IMPL-023-T022A",
@@ -827,8 +827,13 @@
     {
       "task_id": "PHASE8-IMPL-023-T022B",
       "title": "Resume candidate-only persistence using preserved real T022 findings",
-      "status": "planned",
-      "scope": "Reuse source idea idea_2ef4930a04924577a2983e45408bba39 and the exact 113 preserved findings from blocked T022; make no new live adapter call; persist all findings once; replay once to prove ID reuse; preserve blocked evidence; close T022 only after persistence, replay, mutation, regression, and roadmap validation pass"
+      "status": "complete/PASS",
+      "scope": "Reused source idea idea_2ef4930a04924577a2983e45408bba39 and the exact 113 preserved findings from blocked T022; made no live adapter call; persisted once and replayed once with full ID reuse; preserved blocked evidence and candidate-only boundaries",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T022B-resume-candidate-only-persistence-using-preserved-real-findings.md",
+      "artifacts": [
+        ".codex-context/PHASE8-IMPL-023/manual-validation/T022B-candidate-only-persistence-resume/"
+      ],
+      "result": "complete/PASS; live orchestrator calls=0; persistence helper calls=2; first persistence persisted/new/reused=113/113/0; replay already_persisted/new/reused=0/113; final OMI ideas/candidates/promotions=2/115/0; every candidate matched preserved evidence/provenance/fingerprint/ID/conflict/uncertainty/pending-review metadata; replay and protected-state proof passed; focused OMI regressions 301 passed, 51 deselected, one environment-only NVML warning"
     },
     {
       "task_id": "PHASE8-IMPL-023-T023",
@@ -866,17 +871,17 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T022A",
+  "latest_child_task": "PHASE8-IMPL-023-T022B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T022A-persistence-adapter-identity-allowlist-repair.md",
-  "next_child_task": "PHASE8-IMPL-023-T022B",
-  "next_child_title": "Resume candidate-only persistence using preserved real T022 findings",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T022B-resume-candidate-only-persistence-using-preserved-real-findings.md",
+  "next_child_task": "PHASE8-IMPL-023-T023",
+  "next_child_title": "Grouped owner-review UI for real runtime findings",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Persistence adapter-identity allowlist repair",
-  "latest_child_summary": "T022A added exactly subtxt_informed_rubric and dramatica_flow_informed_rubric to the explicit project-manager persistence allowlist, preserving every existing identity and exact provenance matching. Focused persistence coverage passed (10): both identities persist as candidate-only records, mixed persistence creates exactly two candidates, replay reuses both IDs, serialized support/evidence/fingerprint/ID/pending-review/promotion-ineligible metadata survives, and unknown identities fail closed without a write. T022 remains blocked/in_progress; the exact 113 real findings and blocked evidence remain preserved; T022B is planned next. PHASE8-IMPL-023 remains published/active and full MVP completion remains blocked.",
+  "latest_child_title": "Resume candidate-only persistence using preserved real T022 findings",
+  "latest_child_summary": "T022B persisted the exact 113 preserved real findings once as pending candidate-only review material and replayed all IDs without mutation. It made zero live orchestrator calls and exactly two persistence-helper calls. Evidence/provenance/fingerprints/normalized IDs/duplicate-conflict-uncertainty metadata, promotion ineligibility, protected paths, and 301 focused OMI regressions passed. T022B and T022 are complete/PASS; T023 is planned; PHASE8-IMPL-023 remains published/active and full MVP completion remains blocked.",
   "latest_child_validation": {
     "t021b_authoritative_invocation_count": 1,
     "t021b_ncp_helper_call_count": 1,
@@ -896,7 +901,17 @@
     "t021a_fixture_only_continuation": true,
     "t021a_no_real_runtime_execution": true,
     "t021_parent_blocked_in_progress": false,
-    "t022_parent_blocked_in_progress": true,
+    "t022_parent_blocked_in_progress": false,
+    "t022_parent_complete_pass": true,
+    "t022b_live_orchestrator_call_count": 0,
+    "t022b_persistence_helper_call_count": 2,
+    "t022b_persisted_candidate_count": 113,
+    "t022b_replay_reused_candidate_count": 113,
+    "t022b_final_omi_state": {"ideas": 2, "candidates": 115, "promotions": 0},
+    "t022b_replay_unchanged": true,
+    "t022b_candidate_contracts_validated": 113,
+    "t022b_protected_state_identical": true,
+    "t022b_regression_test_count": 301,
     "t022a_allowlist_identities": ["subtxt_informed_rubric", "dramatica_flow_informed_rubric"],
     "t022a_focused_test_count": 10,
     "t022a_mixed_replay_ids_reused": true,
