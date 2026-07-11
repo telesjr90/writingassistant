@@ -127,6 +127,7 @@ REQUIRED_ADAPTERS = {
     "spacy",
     "ncp",
     "subtxt",
+    "subtxt_informed_rubric",
     "dramatica_flow",
     "deterministic_fallback",
 }

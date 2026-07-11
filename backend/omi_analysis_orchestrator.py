@@ -112,6 +112,7 @@ OMI_TOOL_ADAPTER_IDENTITIES: frozenset[str] = frozenset(
         "spacy",
         "ncp",
         "subtxt",
+        "subtxt_informed_rubric",
         "dramatica_flow",
         "deterministic_fallback",
     }
@@ -284,6 +285,25 @@ OMI_ADAPTER_CONTRACTS: dict[str, dict[str, Any]] = {
             "open_question",
             "ambiguity",
             "diagnostic_question",
+            "evidence_note",
+        ),
+    },
+    "subtxt_informed_rubric": {
+        "behavior": (
+            "app-owned, local, deterministic/rule-assisted diagnostic "
+            "support only; pure in-memory evaluation of the T019C request "
+            "contract through the T019D evaluator; not live Subtxt; not a "
+            "model; not a truth/Storyform oracle; no generated prose; no "
+            "rewrite/continuation/outline; evidence/source-locator required; "
+            "owner-review pending; candidate-only; no automatic persistence, "
+            "canon mutation, promotion record, or apply-promotion."
+        ),
+        "produces_candidates": True,
+        "supports_finding_types": (
+            "structural_diagnostic",
+            "conflict_diagnostic",
+            "diagnostic_question",
+            "ambiguity",
             "evidence_note",
         ),
     },
@@ -4205,6 +4225,557 @@ def _build_context_adapter_fixture_runner(
 
 
 # ---------------------------------------------------------------------------
+# App-owned Subtxt-informed semantic-rubric OMI adapter (T019E)
+#
+# This adapter is app-owned and distinct from the existing T009 ``subtxt``
+# fixture adapter identity. It is NOT a live Subtxt integration and it is
+# NOT a model. It runs the T019D evaluator against a T019C-shaped request
+# that is built deterministically from the OMI ``project_name`` and
+# ``raw_idea``, and it is fail-closed on every invalid, malformed, or
+# unsafe evaluator outcome. It runs only when the orchestrator receives
+# an explicit ``requested_adapters=["subtxt_informed_rubric"]`` request;
+# the adapter is intentionally absent from
+# ``OMI_DEFAULT_ADAPTERS`` and ``OMI_CONTEXT_ADAPTER_NAMES``, has no
+# fixture path, has no live-runtime path, has no preflight integration,
+# and has no environment-flag gate. The OMI adapter identity is
+# ``subtxt_informed_rubric``; the T019C/T019D internal rubric identity is
+# ``app_owned_subtxt_informed_rubric``; the user-facing support label is
+# ``App-owned Subtxt-informed diagnostic support``.
+# ---------------------------------------------------------------------------
+
+
+OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME: str = "subtxt_informed_rubric"
+
+OMI_SUBTXT_INFORMED_RUBRIC_REQUESTED_CATEGORIES: tuple[str, ...] = (
+    "structural_diagnostic",
+    "conflict_diagnostic",
+    "throughline_context_question",
+    "story_point_context_question",
+    "source_of_conflict_hypothesis",
+    "subject_vs_conflict_question",
+    "ambiguity",
+    "insufficient_evidence",
+    "owner_review_question",
+)
+
+OMI_SUBTXT_INFORMED_RUBRIC_SUPPORT_LABEL: str = (
+    "App-owned Subtxt-informed diagnostic support"
+)
+
+OMI_SUBTXT_INFORMED_RUBRIC_ALLOWED_FINDING_TYPES: frozenset[str] = frozenset(
+    {
+        "structural_diagnostic",
+        "conflict_diagnostic",
+        "diagnostic_question",
+        "ambiguity",
+        "evidence_note",
+    }
+)
+
+_OMI_SUBTXT_INFORMED_RUBRIC_SAFE_PROJECT_NAME_RE = re.compile(
+    r"^[A-Za-z0-9_-]+$"
+)
+
+_OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_SOURCE_LOCATOR: str = (
+    "source_locator_ref_raw_idea"
+)
+_OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_SOURCE_REF: str = "source_ref_raw_idea"
+_OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_EVIDENCE_REF: str = "evidence_ref_raw_idea"
+_OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_PROVENANCE_REF: str = (
+    "provenance_ref_subtxt_informed_rubric"
+)
+
+
+def _build_subtxt_informed_rubric_request(
+    *,
+    project_name: str,
+    raw_idea: str,
+    source_idea_id: str | None,
+) -> dict[str, Any]:
+    """Build a T019C-shaped request from the OMI ``project_name`` / ``raw_idea``.
+
+    The T019C contract validators are the authoritative gate; this helper
+    only constructs the request and never claims that the constructed
+    request is valid. The adapter boundary validates the constructed
+    request through ``validate_subtxt_informed_rubric_request`` before
+    invoking the T019D evaluator, and the T019D evaluator re-validates
+    the request internally.
+
+    The contract requires a safe ``project_name`` matching
+    ``[A-Za-z0-9_-]+``. The original OMI ``project_name`` is preserved
+    unchanged when it matches the safe pattern; otherwise a deterministic
+    safe contract-only alias of the form ``project_<16 hex characters>``
+    is derived from a SHA-256 of the unsafe name. The actual OMI project
+    name is never mutated. The actual owner source text is also passed
+    through unchanged.
+    """
+    from backend.story_knowledge import (
+        subtxt_informed_semantic_rubric_contract as sisc,
+    )
+
+    if isinstance(project_name, str) and bool(
+        _OMI_SUBTXT_INFORMED_RUBRIC_SAFE_PROJECT_NAME_RE.fullmatch(project_name)
+    ):
+        safe_project_name = project_name
+    else:
+        raw_project_name = (
+            project_name if isinstance(project_name, str) else ""
+        )
+        digest = hashlib.sha256(
+            raw_project_name.encode("utf-8")
+        ).hexdigest()
+        safe_project_name = f"project_{digest[:16]}"
+
+    raw_source_idea_id = source_idea_id
+    if not isinstance(raw_source_idea_id, str) or not raw_source_idea_id:
+        raw_source_idea_id = ""
+    request_id_payload = (
+        safe_project_name + "\x00" + raw_source_idea_id + "\x00" + str(raw_idea or "")
+    )
+    request_id_digest = hashlib.sha256(
+        request_id_payload.encode("utf-8")
+    ).hexdigest()
+    request_id = f"subtxt_informed_rubric_{request_id_digest[:16]}"
+
+    safety_confirmations: dict[str, bool] = {
+        key: True for key in sisc.ALLOWED_REQUEST_SAFETY_CONFIRMATIONS
+    }
+
+    return {
+        "schema_version": sisc.SUBTXT_INFORMED_RUBRIC_REQUEST_SCHEMA_VERSION,
+        "rubric_id": sisc.SUBTXT_INFORMED_RUBRIC_ID,
+        "request_id": request_id,
+        "project_name": safe_project_name,
+        "source_text": raw_idea,
+        "source_locator": _OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_SOURCE_LOCATOR,
+        "source_refs": [_OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_SOURCE_REF],
+        "evidence_refs": [_OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_EVIDENCE_REF],
+        "provenance_refs": [
+            _OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_PROVENANCE_REF
+        ],
+        "source_locator_refs": [
+            _OMI_SUBTXT_INFORMED_RUBRIC_RAW_IDEA_SOURCE_LOCATOR
+        ],
+        "requested_categories": list(
+            OMI_SUBTXT_INFORMED_RUBRIC_REQUESTED_CATEGORIES
+        ),
+        "analysis_intent": "diagnostic_support",
+        "owner_authored_or_owner_provided_source": True,
+        "safety_confirmations": safety_confirmations,
+    }
+
+
+def _normalize_subtxt_informed_rubric_item(
+    item: Any,
+) -> dict[str, Any]:
+    """Convert one T019C T019D item into the OMI normalized-finding schema.
+
+    The T019D evaluator's internal T019C provenance
+    (``tool_source=app_owned_subtxt_informed_rubric`` and
+    ``adapter=app_owned_subtxt_informed_rubric``) is validated before this
+    helper is reached, and is not duplicated here. The OMI provenance
+    conversion uses the OMI adapter identity
+    (``tool_source=subtxt_informed_rubric``,
+    ``adapter=subtxt_informed_rubric``) because the existing
+    ``validate_normalized_finding`` requires
+    ``provenance.adapter``, ``provenance.tool_source``, and
+    ``source_adapter`` to match.
+
+    Diagnostic text, evidence excerpts, source locators, labels, and
+    question texts are passed through unchanged. Evidence is never
+    copied into ``extracted_claim``. Questions are never converted into
+    story facts. Owner decision remains pending and unapproved; review
+    status remains ``candidate_review_pending``. The candidate
+    fingerprint, normalized-finding id, evidence fingerprint, duplicate
+    metadata, and conflict-group metadata are filled in by the existing
+    ``fuse_normalized_findings`` pass.
+    """
+    if not isinstance(item, dict):
+        raise ValueError(
+            "T019D item must be a dict; got "
+            f"{type(item).__name__}"
+        )
+
+    required_fields = (
+        "item_id",
+        "candidate_type",
+        "label",
+        "diagnostic_text",
+        "evidence",
+        "source_locator",
+    )
+    for field_name in required_fields:
+        if field_name not in item:
+            raise ValueError(
+                f"T019D item missing required field: {field_name}"
+            )
+
+    item_id = str(item.get("item_id") or "")
+    candidate_type = str(item.get("candidate_type") or "")
+    label = str(item.get("label") or "")
+    diagnostic_text = str(item.get("diagnostic_text") or "")
+    source_locator = str(item.get("source_locator") or "")
+    evidence = item.get("evidence")
+    confidence = str(item.get("confidence") or "low_support")
+    uncertainty_label = str(item.get("uncertainty_label") or "null")
+
+    if candidate_type not in OMI_SUBTXT_INFORMED_RUBRIC_ALLOWED_FINDING_TYPES:
+        raise ValueError(
+            f"converted candidate_type {candidate_type!r} is not in the "
+            "OMI Subtxt-informed-rubric adapter allowlist "
+            f"{sorted(OMI_SUBTXT_INFORMED_RUBRIC_ALLOWED_FINDING_TYPES)}"
+        )
+
+    if not item_id:
+        raise ValueError(
+            "T019D item_id must be a non-empty string for raw_finding_id"
+        )
+    if not label:
+        raise ValueError("T019D label must be a non-empty string")
+    if not diagnostic_text:
+        raise ValueError(
+            "T019D diagnostic_text must be a non-empty string for "
+            "extracted_claim"
+        )
+    if not source_locator:
+        raise ValueError("T019D source_locator must be a non-empty string")
+    if not isinstance(evidence, list) or not evidence:
+        raise ValueError(
+            "T019D evidence must be a non-empty list of "
+            "{source_excerpt, source_locator} items"
+        )
+
+    return {
+        "candidate_type": candidate_type,
+        "label": label,
+        "extracted_claim": diagnostic_text,
+        "evidence": list(evidence),
+        "source_locator": source_locator,
+        "provenance": {
+            "tool_source": OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME,
+            "adapter": OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME,
+            "support": OMI_SUBTXT_INFORMED_RUBRIC_SUPPORT_LABEL,
+        },
+        "source_adapter": OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME,
+        "support_label": OMI_SUBTXT_INFORMED_RUBRIC_SUPPORT_LABEL,
+        "owner_decision": {
+            "approved": False,
+            "decision": "pending",
+        },
+        "review_status": "candidate_review_pending",
+        "raw_finding_id": (
+            OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME + "::" + item_id
+        ),
+        "confidence": confidence,
+        "uncertainty_label": uncertainty_label,
+    }
+
+
+def _build_subtxt_informed_rubric_runner(
+    *,
+    adapter_config: dict[str, Any] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Build a safe app-owned Subtxt-informed semantic-rubric runner.
+
+    The runner is fail-closed and in-memory only. It:
+
+      1. Validates ``adapter_config`` as ``dict | None``;
+      2. Lazily imports the T019C validators/constants and the T019D
+         evaluator (never at module import time);
+      3. Constructs a T019C request from the OMI ``project_name`` and
+         ``raw_idea``;
+      4. Validates the constructed request through the T019C request
+         validator; a request-validation failure causes the runner to
+         return ``failed_closed`` with no candidates;
+      5. Invokes the T019D evaluator exactly once per runner call;
+      6. Validates the evaluator's result through the T019C result
+         validator; a result-validation failure (or a malformed
+         evaluator output or an evaluator exception) causes the runner
+         to return ``failed_closed`` with no candidates;
+      7. Normalizes each evaluator item into the OMI normalized-finding
+         schema and runs the conversion through
+         ``validate_normalized_finding``; one invalid item fails the
+         whole adapter call closed;
+      8. Maps the T019C status to an OMI adapter-envelope state per
+         the T019E status mapping contract;
+      9. Returns a normal OMI adapter envelope so the existing
+         ``validate_adapter_result`` validator remains authoritative.
+
+    The runner never reads files, never reads environment variables,
+    never reads project storage, never reads external documentation,
+    never calls a model, and never persists anything.
+    """
+    if adapter_config is not None and not isinstance(adapter_config, dict):
+        raise ValueError("adapter_config must be a dict or None")
+
+    invocation_counter: dict[str, int] = {"count": 0}
+
+    def _runner(
+        *,
+        project_name: str,
+        raw_idea: str,
+        source_idea_id: str | None,
+    ) -> dict[str, Any]:
+        invocation_counter["count"] += 1
+        adapter_identity = OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME
+
+        def _fail(reason: str, *, explanation: str) -> dict[str, Any]:
+            return {
+                "adapter": adapter_identity,
+                "state": "failed_closed",
+                "explanation": (
+                    f"App-owned Subtxt-informed semantic-rubric adapter "
+                    f"failed closed ({reason}): {explanation}"
+                ),
+                "candidates": [],
+            }
+
+        from backend.story_knowledge import (
+            subtxt_informed_semantic_rubric_contract as sisc,
+        )
+
+        if not isinstance(raw_idea, str) or not raw_idea:
+            return _fail(
+                "empty_raw_idea",
+                explanation=(
+                    "raw_idea must be a non-empty string; the OMI "
+                    "orchestrator entrypoint already short-circuits "
+                    "empty raw idea input, so this branch is defensive "
+                    "only."
+                ),
+            )
+
+        try:
+            request = _build_subtxt_informed_rubric_request(
+                project_name=project_name,
+                raw_idea=raw_idea,
+                source_idea_id=source_idea_id,
+            )
+        except Exception as exc:
+            return _fail(
+                "request_construction_failed",
+                explanation=(
+                    f"request construction raised "
+                    f"{type(exc).__name__}: {exc}"
+                ),
+            )
+
+        try:
+            request_validation = sisc.validate_subtxt_informed_rubric_request(
+                request
+            )
+        except Exception as exc:
+            return _fail(
+                "request_validation_exception",
+                explanation=(
+                    f"validate_subtxt_informed_rubric_request raised "
+                    f"{type(exc).__name__}: {exc}"
+                ),
+            )
+        if not isinstance(request_validation, dict):
+            return _fail(
+                "malformed_request_validation",
+                explanation=(
+                    "validate_subtxt_informed_rubric_request returned a "
+                    f"non-dict response: "
+                    f"{type(request_validation).__name__}"
+                ),
+            )
+        if request_validation.get("status") != "valid":
+            return _fail(
+                "request_validation_failed",
+                explanation=(
+                    "constructed request failed T019C validation: "
+                    f"{request_validation.get('errors')}"
+                ),
+            )
+
+        try:
+            from backend.story_knowledge import (
+                subtxt_informed_semantic_rubric_evaluator as sise,
+            )
+            result = sise.evaluate_subtxt_informed_semantic_rubric(request)
+        except Exception as exc:
+            return _fail(
+                "evaluator_exception",
+                explanation=(
+                    f"evaluate_subtxt_informed_semantic_rubric raised "
+                    f"{type(exc).__name__}: {exc}"
+                ),
+            )
+
+        if not isinstance(result, dict):
+            return _fail(
+                "malformed_evaluator_result",
+                explanation=(
+                    "evaluator returned a non-dict result: "
+                    f"{type(result).__name__}"
+                ),
+            )
+
+        try:
+            result_validation = sisc.validate_subtxt_informed_rubric_result(
+                result
+            )
+        except Exception as exc:
+            return _fail(
+                "result_validation_exception",
+                explanation=(
+                    f"validate_subtxt_informed_rubric_result raised "
+                    f"{type(exc).__name__}: {exc}"
+                ),
+            )
+        if not isinstance(result_validation, dict):
+            return _fail(
+                "malformed_result_validation",
+                explanation=(
+                    "validate_subtxt_informed_rubric_result returned a "
+                    f"non-dict response: "
+                    f"{type(result_validation).__name__}"
+                ),
+            )
+        if result_validation.get("status") != "valid":
+            return _fail(
+                "malformed_evaluator_result",
+                explanation=(
+                    "evaluator result failed T019C validation: "
+                    f"{result_validation.get('errors')}"
+                ),
+            )
+
+        normalized_result = result_validation.get("normalized_result")
+        if not isinstance(normalized_result, dict):
+            return _fail(
+                "malformed_evaluator_result",
+                explanation=(
+                    "evaluator result is missing normalized_result"
+                ),
+            )
+
+        rubric_status = normalized_result.get("status")
+        candidate_support = list(
+            normalized_result.get("candidate_support") or []
+        )
+        diagnostic_questions = list(
+            normalized_result.get("diagnostic_questions") or []
+        )
+
+        combined_items: list[dict[str, Any]] = []
+        for item in candidate_support:
+            if isinstance(item, dict):
+                combined_items.append(item)
+        for item in diagnostic_questions:
+            if isinstance(item, dict):
+                combined_items.append(item)
+
+        combined_items.sort(
+            key=lambda item: str(item.get("item_id") or "")
+        )
+
+        findings: list[dict[str, Any]] = []
+        for index, item in enumerate(combined_items):
+            try:
+                converted = _normalize_subtxt_informed_rubric_item(item)
+            except ValueError as exc:
+                return _fail(
+                    "normalized_finding_invalid",
+                    explanation=(
+                        f"item {index} (item_id="
+                        f"{item.get('item_id')!r}) failed T019E conversion: "
+                        f"{exc}"
+                    ),
+                )
+            try:
+                findings.append(validate_normalized_finding(converted))
+            except ValueError as exc:
+                return _fail(
+                    "normalized_finding_invalid",
+                    explanation=(
+                        f"item {index} (item_id="
+                        f"{item.get('item_id')!r}) failed "
+                        f"validate_normalized_finding: {exc}"
+                    ),
+                )
+
+        if rubric_status == "succeeded":
+            if findings:
+                envelope_state = "succeeded"
+            else:
+                envelope_state = "empty"
+                findings = []
+        elif rubric_status == "empty":
+            envelope_state = "empty"
+            findings = []
+        elif rubric_status == "failed_closed":
+            envelope_state = "failed_closed"
+            findings = []
+        elif rubric_status == "error":
+            envelope_state = "error"
+            findings = []
+        else:
+            return _fail(
+                "unknown_evaluator_status",
+                explanation=(
+                    f"unknown evaluator status: {rubric_status!r}"
+                ),
+            )
+
+        if envelope_state == "succeeded":
+            explanation = (
+                f"App-owned Subtxt-informed semantic-rubric adapter "
+                f"produced {len(findings)} evidence-backed candidate-only "
+                f"finding(s) through the committed T019D evaluator; "
+                f"OMI adapter identity={adapter_identity!r}; T019C/T019D "
+                f"internal rubric identity="
+                f"{sisc.SUBTXT_INFORMED_RUBRIC_ID!r}; support label="
+                f"{OMI_SUBTXT_INFORMED_RUBRIC_SUPPORT_LABEL!r}; status "
+                f"mapping T019C succeeded -> OMI succeeded; no live "
+                f"Subtxt execution; no model call; no Memory/Canon "
+                f"mutation; no promotion/apply-promotion; no story prose."
+            )
+        elif envelope_state == "empty":
+            explanation = (
+                "App-owned Subtxt-informed semantic-rubric adapter "
+                "completed without producing any candidate findings; "
+                "status mapping T019C succeeded (no surviving items) / "
+                "T019C empty -> OMI empty; no live Subtxt execution; no "
+                "model call; no Memory/Canon mutation; no "
+                "promotion/apply-promotion; no story prose."
+            )
+        elif envelope_state == "failed_closed":
+            explanation = (
+                "App-owned Subtxt-informed semantic-rubric adapter "
+                "fail-closed the evaluator status; no findings, no "
+                "candidates, no live Subtxt execution, no model call, no "
+                "Memory/Canon mutation, no promotion/apply-promotion, no "
+                "story prose."
+            )
+        elif envelope_state == "error":
+            explanation = (
+                "App-owned Subtxt-informed semantic-rubric adapter "
+                "surfaced T019C error status as OMI error; no findings, "
+                "no candidates, no live Subtxt execution, no model "
+                "call, no Memory/Canon mutation, no "
+                "promotion/apply-promotion, no story prose."
+            )
+        else:
+            explanation = (
+                "App-owned Subtxt-informed semantic-rubric adapter "
+                "completed; no findings."
+            )
+
+        return {
+            "adapter": adapter_identity,
+            "state": envelope_state,
+            "explanation": explanation,
+            "candidates": findings,
+        }
+
+    _runner.__invocation_count__ = invocation_counter  # type: ignore[attr-defined]
+    return _runner
+
+
+# ---------------------------------------------------------------------------
 # Live spaCy adapter runner (T014C) — behind explicit env flags
 # ---------------------------------------------------------------------------
 
@@ -7482,6 +8053,14 @@ def _resolve_adapter_runner(
       the caller, return it. The caller is responsible for honoring the
       no-live-call safety contract (T006 callers pass mock/fixture runners
       only; the orchestrator never imports or invokes a live Ollama client).
+    - If ``adapter`` is ``subtxt_informed_rubric`` (T019E), return the
+      app-owned, in-memory, deterministic/rule-assisted built-in runner
+      that drives the T019D evaluator. The T019E branch runs only when
+      the adapter is explicitly requested, has no fixture path, has no
+      live-runtime path, has no preflight integration, and has no
+      environment-flag gate. The T019E runner is fail-closed and never
+      reads files, environment variables, project storage, or external
+      documentation; it never calls a model and never persists anything.
     - If ``adapter`` is ``ollama_model``, ``story_check``, ``booknlp``,
       ``spacy``, ``ncp``, ``subtxt``, or ``dramatica_flow`` AND
       ``adapter_fixture_outputs`` carries a matching entry, return a runner
@@ -7510,6 +8089,10 @@ def _resolve_adapter_runner(
                     f"adapter_runners[{adapter!r}] must be callable"
                 )
             return runner
+    if adapter == OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME:
+        return _build_subtxt_informed_rubric_runner(
+            adapter_config=adapter_config,
+        )
     if adapter in {
         "ollama_model",
         "story_check",
