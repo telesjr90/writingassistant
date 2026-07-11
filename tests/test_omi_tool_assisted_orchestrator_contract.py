@@ -128,6 +128,7 @@ REQUIRED_ADAPTERS = {
     "ncp",
     "subtxt",
     "subtxt_informed_rubric",
+    "dramatica_flow_informed_rubric",
     "dramatica_flow",
     "deterministic_fallback",
 }

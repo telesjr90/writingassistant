@@ -113,6 +113,7 @@ OMI_TOOL_ADAPTER_IDENTITIES: frozenset[str] = frozenset(
         "ncp",
         "subtxt",
         "subtxt_informed_rubric",
+        "dramatica_flow_informed_rubric",
         "dramatica_flow",
         "deterministic_fallback",
     }
@@ -302,6 +303,26 @@ OMI_ADAPTER_CONTRACTS: dict[str, dict[str, Any]] = {
         "supports_finding_types": (
             "structural_diagnostic",
             "conflict_diagnostic",
+            "diagnostic_question",
+            "ambiguity",
+            "evidence_note",
+        ),
+    },
+    "dramatica_flow_informed_rubric": {
+        "behavior": (
+            "app-owned, local, deterministic/rule-assisted diagnostic support "
+            "only; pure in-memory evaluation of the T020C request contract "
+            "through the T020D evaluator; not live or official dramatica-flow "
+            "output; not a model or Storyform/truth oracle; evidence-backed, "
+            "owner-review-pending candidates only; no prose, persistence, "
+            "project or Memory/Canon mutation, promotion, or apply-promotion."
+        ),
+        "produces_candidates": True,
+        "supports_finding_types": (
+            "plot_thread",
+            "continuity_warning",
+            "relationship",
+            "timeline_event",
             "diagnostic_question",
             "ambiguity",
             "evidence_note",
@@ -1263,6 +1284,11 @@ def validate_normalized_finding(finding: Any) -> dict[str, Any]:
         "confidence",
         "support_score",
         "support_metadata",
+        "statement_kind",
+        "source_refs",
+        "evidence_refs",
+        "provenance_refs",
+        "source_locator_refs",
     ):
         if optional_metadata_field not in finding:
             continue
@@ -4776,6 +4802,259 @@ def _build_subtxt_informed_rubric_runner(
 
 
 # ---------------------------------------------------------------------------
+# App-owned dramatica-flow-informed analysis-rubric OMI adapter (T020E)
+# ---------------------------------------------------------------------------
+
+OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME = (
+    "dramatica_flow_informed_rubric"
+)
+OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_REQUESTED_CATEGORIES = (
+    "causal_chain_diagnostic",
+    "narrative_commitment_lifecycle_diagnostic",
+    "emotional_state_consistency",
+    "relationship_delta_diagnostic",
+    "timeline_thread_activity_diagnostic",
+    "information_boundary_diagnostic",
+    "multidimensional_diagnostic_question",
+    "ambiguity",
+    "insufficient_evidence",
+    "owner_review_question",
+)
+OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SUPPORT_LABEL = (
+    "App-owned dramatica-flow-informed diagnostic support"
+)
+OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ALLOWED_FINDING_TYPES = frozenset(
+    {
+        "plot_thread",
+        "continuity_warning",
+        "relationship",
+        "timeline_event",
+        "diagnostic_question",
+        "ambiguity",
+        "evidence_note",
+    }
+)
+_OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SAFE_PROJECT_NAME_RE = re.compile(
+    r"^[A-Za-z0-9_-]+$"
+)
+_OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SOURCE_LOCATOR = (
+    "source_locator_ref_raw_idea"
+)
+
+
+def _build_dramatica_flow_informed_rubric_request(
+    *, project_name: str, raw_idea: str, source_idea_id: str | None
+) -> dict[str, Any]:
+    """Build the exact T020C diagnostic-only request in memory."""
+    from backend.story_knowledge import (
+        dramatica_flow_informed_analysis_rubric_contract as dfrc,
+    )
+
+    if isinstance(project_name, str) and (
+        _OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SAFE_PROJECT_NAME_RE.fullmatch(
+            project_name
+        )
+    ):
+        safe_project_name = project_name
+    else:
+        unsafe_name = project_name if isinstance(project_name, str) else ""
+        safe_project_name = (
+            "project_" + hashlib.sha256(unsafe_name.encode("utf-8")).hexdigest()[:16]
+        )
+    safe_source_id = source_idea_id if isinstance(source_idea_id, str) else ""
+    request_digest = hashlib.sha256(
+        (safe_project_name + "\x00" + safe_source_id + "\x00" + raw_idea).encode(
+            "utf-8"
+        )
+    ).hexdigest()[:16]
+    return {
+        "schema_version": dfrc.DRAMATICA_FLOW_INFORMED_RUBRIC_REQUEST_SCHEMA_VERSION,
+        "rubric_id": dfrc.DRAMATICA_FLOW_INFORMED_RUBRIC_ID,
+        "request_id": "dramatica_flow_informed_rubric_" + request_digest,
+        "project_name": safe_project_name,
+        "source_text": raw_idea,
+        "source_locator": _OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SOURCE_LOCATOR,
+        "source_refs": ["source_ref_raw_idea"],
+        "evidence_refs": ["evidence_ref_raw_idea"],
+        "provenance_refs": ["provenance_ref_dramatica_flow_informed_rubric"],
+        "source_locator_refs": [
+            _OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SOURCE_LOCATOR
+        ],
+        "requested_categories": list(
+            OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_REQUESTED_CATEGORIES
+        ),
+        "analysis_intent": "diagnostic_support",
+        "owner_authored_or_owner_provided_source": True,
+        "safety_confirmations": {
+            key: True for key in dfrc.ALLOWED_REQUEST_SAFETY_CONFIRMATIONS
+        },
+    }
+
+
+def _normalize_dramatica_flow_informed_rubric_item(
+    item: Any,
+) -> dict[str, Any]:
+    """Convert one contract-validated T020D item to an OMI finding."""
+    if not isinstance(item, dict):
+        raise ValueError("T020D item must be a dict")
+    required = (
+        "item_id", "candidate_type", "label", "diagnostic_text",
+        "statement_kind", "evidence", "source_locator", "source_refs",
+        "evidence_refs", "provenance_refs", "source_locator_refs",
+        "confidence", "uncertainty_label", "owner_decision", "review_status",
+    )
+    missing = [field for field in required if field not in item]
+    if missing:
+        raise ValueError(f"T020D item missing required fields: {missing}")
+    candidate_type = item["candidate_type"]
+    if candidate_type not in OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ALLOWED_FINDING_TYPES:
+        raise ValueError(f"unsupported T020D candidate_type: {candidate_type!r}")
+    if item["owner_decision"] != {"approved": False, "decision": "pending"}:
+        raise ValueError("T020D owner decision must remain pending and unapproved")
+    if item["review_status"] != "candidate_review_pending":
+        raise ValueError("T020D review status must remain candidate_review_pending")
+    if not isinstance(item["evidence"], list) or not item["evidence"]:
+        raise ValueError("T020D evidence must be a non-empty list")
+    finding = {
+        "candidate_type": candidate_type,
+        "label": item["label"],
+        "extracted_claim": item["diagnostic_text"],
+        "statement_kind": item["statement_kind"],
+        "evidence": list(item["evidence"]),
+        "source_locator": item["source_locator"],
+        "source_refs": list(item["source_refs"]),
+        "evidence_refs": list(item["evidence_refs"]),
+        "provenance_refs": list(item["provenance_refs"]),
+        "source_locator_refs": list(item["source_locator_refs"]),
+        "provenance": {
+            "tool_source": OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME,
+            "adapter": OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME,
+            "support": OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SUPPORT_LABEL,
+        },
+        "source_adapter": OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME,
+        "support_label": OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_SUPPORT_LABEL,
+        "owner_decision": {"approved": False, "decision": "pending"},
+        "review_status": "candidate_review_pending",
+        "raw_finding_id": (
+            OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME
+            + "::" + str(item["item_id"])
+        ),
+        "confidence": item["confidence"],
+        "uncertainty_label": item["uncertainty_label"],
+    }
+    return finding
+
+
+def _build_dramatica_flow_informed_rubric_runner(
+    *, adapter_config: dict[str, Any] | None = None
+) -> Callable[..., dict[str, Any]]:
+    """Build the explicit-only, in-memory, fail-closed T020E runner."""
+    if adapter_config is not None and not isinstance(adapter_config, dict):
+        raise ValueError("adapter_config must be a dict or None")
+    invocation_counter = {"count": 0}
+
+    def _runner(
+        *, project_name: str, raw_idea: str, source_idea_id: str | None
+    ) -> dict[str, Any]:
+        invocation_counter["count"] += 1
+        adapter = OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME
+
+        def fail(reason: str) -> dict[str, Any]:
+            return {
+                "adapter": adapter,
+                "state": "failed_closed",
+                "explanation": (
+                    "App-owned dramatica-flow-informed diagnostic support "
+                    f"failed closed: {reason}. This is not live or official "
+                    "dramatica-flow output; no candidates were produced."
+                ),
+                "candidates": [],
+            }
+
+        try:
+            from backend.story_knowledge import (
+                dramatica_flow_informed_analysis_rubric_contract as dfrc,
+            )
+            request = _build_dramatica_flow_informed_rubric_request(
+                project_name=project_name,
+                raw_idea=raw_idea,
+                source_idea_id=source_idea_id,
+            )
+            request_validation = (
+                dfrc.validate_dramatica_flow_informed_rubric_request(request)
+            )
+            if not isinstance(request_validation, dict) or (
+                request_validation.get("status") != "valid"
+            ):
+                return fail("the constructed T020C request was invalid")
+            from backend.story_knowledge import (
+                dramatica_flow_informed_analysis_rubric_evaluator as dfre,
+            )
+            result = dfre.evaluate_dramatica_flow_informed_analysis_rubric(request)
+        except Exception as exc:
+            return fail(f"request/evaluator exception {type(exc).__name__}: {exc}")
+        if not isinstance(result, dict):
+            return fail("the evaluator returned a non-dictionary result")
+        try:
+            validation = dfrc.validate_dramatica_flow_informed_rubric_result(result)
+        except Exception as exc:
+            return fail(f"result validator exception {type(exc).__name__}: {exc}")
+        if not isinstance(validation, dict) or validation.get("status") != "valid":
+            return fail("the evaluator result failed the committed T020C validator")
+        normalized = validation.get("normalized_result")
+        if not isinstance(normalized, dict):
+            return fail("the validated result omitted normalized_result")
+        status = normalized.get("status")
+        bucket_names = (
+            "candidate_support", "diagnostic_questions", "uncertainty_notes",
+            "insufficient_evidence_notes",
+        )
+        items: list[dict[str, Any]] = []
+        for bucket_name in bucket_names:
+            bucket = normalized.get(bucket_name)
+            if not isinstance(bucket, list):
+                return fail(f"{bucket_name} was not a list")
+            if any(not isinstance(item, dict) for item in bucket):
+                return fail(f"{bucket_name} contained an invalid item")
+            items.extend(bucket)
+        items.sort(key=lambda item: str(item.get("item_id") or ""))
+        findings: list[dict[str, Any]] = []
+        try:
+            for item in items:
+                findings.append(
+                    validate_normalized_finding(
+                        _normalize_dramatica_flow_informed_rubric_item(item)
+                    )
+                )
+        except (TypeError, ValueError) as exc:
+            return fail(f"one normalized item was invalid: {exc}")
+        if status == "succeeded":
+            state = "succeeded" if findings else "empty"
+        elif status in {"empty", "failed_closed", "error"}:
+            state = status
+            findings = []
+        else:
+            return fail(f"unknown evaluator status {status!r}")
+        explanation = (
+            "App-owned dramatica-flow-informed diagnostic support completed "
+            f"with OMI state {state!r} and {len(findings)} pending-review "
+            "candidate finding(s). This is local deterministic support, not "
+            "live or official dramatica-flow output; no persistence, project "
+            "or Memory/Canon mutation, promotion, model, server, network, "
+            "subprocess, external-source operation, or prose occurred."
+        )
+        return {
+            "adapter": adapter,
+            "state": state,
+            "explanation": explanation,
+            "candidates": findings,
+        }
+
+    _runner.__invocation_count__ = invocation_counter  # type: ignore[attr-defined]
+    return _runner
+
+
+# ---------------------------------------------------------------------------
 # Live spaCy adapter runner (T014C) — behind explicit env flags
 # ---------------------------------------------------------------------------
 
@@ -8091,6 +8370,10 @@ def _resolve_adapter_runner(
             return runner
     if adapter == OMI_SUBTXT_INFORMED_RUBRIC_ADAPTER_NAME:
         return _build_subtxt_informed_rubric_runner(
+            adapter_config=adapter_config,
+        )
+    if adapter == OMI_DRAMATICA_FLOW_INFORMED_RUBRIC_ADAPTER_NAME:
+        return _build_dramatica_flow_informed_rubric_runner(
             adapter_config=adapter_config,
         )
     if adapter in {

@@ -697,7 +697,7 @@
       "task_id": "PHASE8-IMPL-023-T020",
       "title": "Live dramatica-flow integration in OMI and analysis",
       "status": "in_progress",
-      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status; T020A source/runtime preflight and safety inventory is complete/PASS; T020B integration-path and analysis-only boundary decision is complete/PASS; T020C app-owned dramatica-flow-informed analysis-rubric contract is complete/PASS; T020D app-owned deterministic/rule-assisted evaluator is next"
+      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status; T020A source/runtime preflight and safety inventory is complete/PASS; T020B integration-path and analysis-only boundary decision is complete/PASS; T020C app-owned dramatica-flow-informed analysis-rubric contract is complete/PASS; T020D app-owned deterministic/rule-assisted evaluator is complete/PASS; T020E explicit-only app-owned OMI adapter integration is complete/PASS; T020F manual real owner-authored validation is next; T020 remains in_progress"
     },
     {
       "task_id": "PHASE8-IMPL-023-T020A",
@@ -746,8 +746,21 @@
     {
       "task_id": "PHASE8-IMPL-023-T020E",
       "title": "App-owned dramatica-flow-informed analysis-rubric OMI adapter integration",
+      "status": "complete/PASS",
+      "scope": "Integrate the committed T020D evaluator through the new explicit-only app-owned OMI identity dramatica_flow_informed_rubric, distinct from T009 dramatica_flow and T020C/T020D internal app_owned_dramatica_flow_informed_rubric; validate exact T020C requests/results; normalize all four finding buckets in deterministic item_id order; preserve candidate type, statement kind, evidence, locators, references, confidence, uncertainty, support label, and pending review; convert provenance to the OMI identity; map all four statuses; fail the whole call closed without partial findings; add no persistence/runtime/env/preflight/model/server/network/subprocess/external-source/prose path",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020E-app-owned-dramatica-flow-informed-analysis-rubric-omi-adapter-integration.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_dramatica_flow_informed_analysis_rubric_omi_adapter_contract.py",
+        "tests/test_omi_dramatica_flow_informed_analysis_rubric_evaluator.py"
+      ],
+      "result": "complete/PASS; authorized obsolete T020D lifecycle assertion repair 1 passed; focused T020E tests 104 passed; requested T020D/T020C/T019E/T009/orchestrator/persistence/runtime-integration/preflight regressions 926 passed with one environment-only NVML warning; py_compile passed; T009 remains fixture-only; T020C contract and T020D evaluator implementation modules unchanged; no dramatica-flow import/execution/source read, df, external material copy, env/preflight/model/server/network/subprocess integration, persistence/project/Memory/Canon mutation, promotion/apply-promotion, or prose; T020 remains in_progress; T020F manual validation is next"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T020F",
+      "title": "Manual real owner-authored dramatica-flow-informed rubric validation",
       "status": "planned",
-      "scope": "Integrate the committed T020D evaluator through a new explicit-only app-owned OMI adapter identity distinct from T009 dramatica_flow while preserving candidate-only, evidence/provenance-backed, pending-review, fail-closed, no-persistence-by-default behavior. Do not implement live dramatica-flow and do not skip to T021."
+      "scope": "Run one explicit real in-process OMI validation using requested_adapters=[dramatica_flow_informed_rubric] and persist_candidates=False against controlled owner-authored non-story source text; verify the built-in adapter and T020D evaluator are each reached exactly once, return non-empty evidence-backed pending-review candidate-only findings, preserve all safety boundaries, and perform no persistence, project/Memory/Canon mutation, promotion/apply-promotion, runtime/model/external-source call, or prose. Do not skip to T021."
     },
     {
       "task_id": "PHASE8-IMPL-023-T021",
@@ -797,18 +810,27 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T020D",
+  "latest_child_task": "PHASE8-IMPL-023-T020E",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020D-app-owned-dramatica-flow-informed-analysis-rubric-evaluator.md",
-  "next_child_task": "PHASE8-IMPL-023-T020E",
-  "next_child_title": "App-owned dramatica-flow-informed analysis-rubric OMI adapter integration",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020E-app-owned-dramatica-flow-informed-analysis-rubric-omi-adapter-integration.md",
+  "next_child_task": "PHASE8-IMPL-023-T020F",
+  "next_child_title": "Manual real owner-authored dramatica-flow-informed rubric validation",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "App-owned dramatica-flow-informed analysis-rubric evaluator",
-  "latest_child_summary": "T020D implemented a pure local deterministic/rule-assisted in-memory evaluator that consumes and returns the committed T020C contract. Original bounded app-owned paired cue families cover causal/consequence, commitment/follow-through, emotional state/change, relationship role/change, temporal order/thread activity, knowledge access/information transfer, and bounded uncertainty/conflict signals. Categories follow request order; spans follow source order; first qualifying exact substring wins; IDs use request position and category; at most one item emits per category; high support never emits; insufficient evidence uses the fewer-than-12-word or no-substantive rule. Focused T020D tests passed (142); requested regressions passed (787) with one environment-only NVML warning; generic succeeded/failed-closed compatibility passes. T009/T019D/T020A/T020B/T020C remain unchanged. No dramatica-flow import/execution/source read, df, copied external material, OMI adapter, model/server/network/subprocess call, persistence/project/Memory/Canon mutation, promotion/apply-promotion, or prose. T020 remains in_progress. Next task: PHASE8-IMPL-023-T020E - App-owned dramatica-flow-informed analysis-rubric OMI adapter integration.",
+  "latest_child_title": "App-owned dramatica-flow-informed analysis-rubric OMI adapter integration",
+  "latest_child_summary": "T020E integrated the committed T020D evaluator through the new explicit-only app-owned OMI identity dramatica_flow_informed_rubric. Exact T020C request/result validation, one evaluator call, all-four-bucket deterministic normalization, candidate type and statement kind preservation, evidence/locator/reference/confidence/uncertainty/pending-review preservation, OMI provenance conversion, exact status mapping, whole-call fail-closed behavior, and no-persistence-by-default are complete. The obsolete T020D no-adapter frontier assertion was minimally updated to verify explicit-only registration, identity separation, T009 preservation, unchanged T020C internal identity, and independent T020D callability; no evaluator logic changed. Focused tests passed (104); requested regressions passed (926) with one environment-only NVML warning. T009 remains fixture-only; T020C/T020D implementation modules remain unchanged. No dramatica-flow import/execution/source read, df, copied external material, env/preflight/model/server/network/subprocess integration, persistence/project/Memory/Canon mutation, promotion/apply-promotion, or prose. T020 remains in_progress. Next task: PHASE8-IMPL-023-T020F - Manual real owner-authored dramatica-flow-informed rubric validation.",
   "latest_child_validation": {
+    "t020e_test_count": 104,
+    "t020e_regression_test_count": 926,
+    "t020e_omi_adapter_identity": "dramatica_flow_informed_rubric",
+    "t020e_explicit_only_adapter_gate": true,
+    "t020e_four_bucket_normalization": true,
+    "t020e_t009_t020c_t020d_preserved": true,
+    "t020e_obsolete_lifecycle_assertion_minimally_updated": true,
+    "t020e_no_external_source_read_or_copy": true,
+    "t020e_no_persistence_or_mutation_or_prose": true,
     "t020d_test_count": 142,
     "t020d_regression_test_count": 787,
     "t020d_generic_runtime_compatible": true,
@@ -910,7 +932,7 @@
     "no_subprocess_or_shell_or_network": true,
     "no_nuxt_dev_build_or_generate": true,
     "no_package_script_execution": true,
-    "no_omi_analysis_orchestrator_modification": true,
+    "no_omi_analysis_orchestrator_modification": false,
     "no_omi_runtime_preflight_modification": true,
     "no_frontend_modification": true,
     "no_package_dependency_modification": true,
@@ -921,7 +943,7 @@
     "no_test_framework_addition": true,
     "no_staging_commit_or_push": true,
     "no_rubric_implementation": true,
-    "no_adapter_implementation": true,
+    "no_adapter_implementation": false,
     "no_prompt_addition": true,
     "no_model_calls": true,
     "no_docs_copying_into_application_code": true,

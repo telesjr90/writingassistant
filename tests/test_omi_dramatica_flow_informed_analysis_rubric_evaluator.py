@@ -500,8 +500,24 @@ def test_runtime_does_not_call_shell_or_network(monkeypatch):
     assert evaluator.evaluate_dramatica_flow_informed_analysis_rubric(_request())["status"] == "succeeded"
 
 
-def test_no_omi_adapter_was_added():
-    assert "dramatica_flow_informed_rubric" not in orchestrator.OMI_ADAPTER_CONTRACTS
+def test_t020e_omi_adapter_registration_is_explicit_only_and_distinct():
+    adapter = "dramatica_flow_informed_rubric"
+    assert adapter in orchestrator.OMI_TOOL_ADAPTER_IDENTITIES
+    assert adapter in orchestrator.OMI_ADAPTER_CONTRACTS
+    assert adapter not in orchestrator.OMI_DEFAULT_ADAPTERS
+    assert adapter not in orchestrator.OMI_CONTEXT_ADAPTER_NAMES
+    assert adapter != "dramatica_flow"
+    assert "dramatica_flow" in orchestrator.OMI_TOOL_ADAPTER_IDENTITIES
+    assert contract.DRAMATICA_FLOW_INFORMED_RUBRIC_ID == (
+        "app_owned_dramatica_flow_informed_rubric"
+    )
+    assert callable(evaluator.evaluate_dramatica_flow_informed_analysis_rubric)
+    assert evaluator.evaluate_dramatica_flow_informed_analysis_rubric(
+        _request()
+    )["status"] == "succeeded"
+    assert "not live or official dramatica-flow output" in (
+        orchestrator.OMI_ADAPTER_CONTRACTS[adapter]["behavior"]
+    )
 
 
 def test_t009_fixture_identity_is_preserved():
