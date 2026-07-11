@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -88,6 +90,49 @@ def _booknlp_envelope(findings: list[dict[str, Any]]) -> dict[str, Any]:
         },
         "findings": findings,
     }
+
+
+def _tool_assisted_finding(source_adapter: str, suffix: str) -> dict[str, Any]:
+    support_label = f"{source_adapter} support only"
+    return {
+        "candidate_type": "structural_diagnostic",
+        "label": f"Diagnostic {suffix}",
+        "extracted_claim": f"Diagnostic {suffix} is review material",
+        "evidence": [
+            {
+                "source_excerpt": f"Evidence for diagnostic {suffix}",
+                "source_locator": f"raw_idea:L1:C{suffix}-1",
+            }
+        ],
+        "source_locator": f"raw_idea:L1:C{suffix}-1",
+        "source_adapter": source_adapter,
+        "provenance": {
+            "adapter": source_adapter,
+            "tool_source": source_adapter,
+            "support": support_label,
+        },
+        "support_label": support_label,
+        "support_metadata": {
+            "basis": f"bounded {source_adapter} diagnostic support",
+            "support_only": True,
+        },
+        "confidence": "medium support",
+        "owner_decision": {"approved": False, "decision": "pending"},
+        "review_status": "candidate_review_pending",
+        "raw_finding_id": f"{source_adapter}::raw::{suffix}",
+        "candidate_fingerprint": f"omi-cand-{source_adapter}-{suffix}",
+        "evidence_fingerprint": f"omi-evid-{source_adapter}-{suffix}",
+        "normalized_finding_id": f"omi-find-{source_adapter}-{suffix}",
+        "duplicate_of": [],
+        "related_finding_ids": [],
+        "conflict_group_id": None,
+        "uncertainty_label": None,
+    }
+
+
+def _create_temporary_omi_idea(tmp_path, monkeypatch) -> dict[str, Any]:
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    return project_manager.create_omi_idea("demo", RAW_IDEA)
 
 
 def _fixtures_with_duplicate_and_conflict() -> dict[str, Any]:
@@ -352,3 +397,114 @@ def test_rerun_same_fused_findings_reuses_candidates_without_truth_mutation(
     assert not hasattr(project_manager, "apply_omi_promotion")
     for path, content in truth_files.items():
         assert path.read_text(encoding="utf-8") == content
+
+
+def test_persistence_allowlist_includes_current_app_owned_adapter_identities() -> None:
+    assert "subtxt_informed_rubric" in project_manager.OMI_TOOL_ASSISTED_ADAPTER_IDENTITIES
+    assert (
+        "dramatica_flow_informed_rubric"
+        in project_manager.OMI_TOOL_ASSISTED_ADAPTER_IDENTITIES
+    )
+
+
+@pytest.mark.parametrize(
+    "source_adapter",
+    ["subtxt_informed_rubric", "dramatica_flow_informed_rubric"],
+)
+def test_app_owned_findings_persist_with_candidate_only_metadata(
+    source_adapter: str, tmp_path, monkeypatch
+) -> None:
+    idea = _create_temporary_omi_idea(tmp_path, monkeypatch)
+    finding = _tool_assisted_finding(source_adapter, "one")
+
+    result = project_manager.persist_omi_tool_assisted_findings_as_candidates(
+        "demo",
+        raw_idea=RAW_IDEA,
+        source_idea_id=idea["idea_id"],
+        findings=[finding],
+    )
+
+    assert result["persistence_status"] == "persisted"
+    assert len(result["new_candidate_ids"]) == 1
+    assert result["persisted_candidate_ids"] == result["new_candidate_ids"]
+
+    summary = project_manager.get_omi_summary("demo")
+    assert len(summary["candidates"]) == 1
+    record = summary["candidates"][0]
+    content = record["candidate_content"]
+    assert record["status"] == "candidate"
+    assert record["evidence"] == finding["evidence"]
+    assert record["provenance"]["adapter"] == source_adapter
+    assert record["provenance"]["tool_source"] == source_adapter
+    assert record["owner_decision"]["approved"] is False
+    assert record["owner_decision"]["decision"] == "pending"
+    assert record["promotion_status"]["eligible"] is False
+    assert content["source_adapter"] == source_adapter
+    assert content["tool_source"] == source_adapter
+    assert content["provenance"]["adapter"] == source_adapter
+    assert content["provenance"]["tool_source"] == source_adapter
+    assert content["evidence"] == finding["evidence"]
+    assert content["support_label"] == finding["support_label"]
+    assert content["support_metadata"] == finding["support_metadata"]
+    assert content["candidate_fingerprint"] == finding["candidate_fingerprint"]
+    assert content["evidence_fingerprint"] == finding["evidence_fingerprint"]
+    assert content["normalized_finding_id"] == finding["normalized_finding_id"]
+    assert content["owner_decision"]["approved"] is False
+    assert content["owner_decision"]["decision"] == "pending"
+    assert content["review_status"] == "candidate_review_pending"
+
+
+def test_mixed_app_owned_findings_persist_once_and_replay_both_ids(
+    tmp_path, monkeypatch
+) -> None:
+    idea = _create_temporary_omi_idea(tmp_path, monkeypatch)
+    findings = [
+        _tool_assisted_finding("subtxt_informed_rubric", "mixed-subtxt"),
+        _tool_assisted_finding("dramatica_flow_informed_rubric", "mixed-dramatica"),
+    ]
+
+    first = project_manager.persist_omi_tool_assisted_findings_as_candidates(
+        "demo",
+        raw_idea=RAW_IDEA,
+        source_idea_id=idea["idea_id"],
+        findings=findings,
+    )
+    second = project_manager.persist_omi_tool_assisted_findings_as_candidates(
+        "demo",
+        raw_idea=RAW_IDEA,
+        source_idea_id=idea["idea_id"],
+        findings=findings,
+    )
+
+    assert first["persistence_status"] == "persisted"
+    assert len(first["persisted_candidate_ids"]) == 2
+    assert len(first["new_candidate_ids"]) == 2
+    assert first["reused_candidate_ids"] == []
+    assert len(project_manager.get_omi_summary("demo")["candidates"]) == 2
+    assert second["persistence_status"] == "already_persisted"
+    assert second["persisted_candidate_ids"] == first["persisted_candidate_ids"]
+    assert second["new_candidate_ids"] == []
+    assert second["reused_candidate_ids"] == first["persisted_candidate_ids"]
+
+
+def test_unknown_app_owned_identity_fails_closed_without_candidate_write(
+    tmp_path, monkeypatch
+) -> None:
+    idea = _create_temporary_omi_idea(tmp_path, monkeypatch)
+    finding = _tool_assisted_finding("unknown_adapter", "unknown")
+
+    result = project_manager.persist_omi_tool_assisted_findings_as_candidates(
+        "demo",
+        raw_idea=RAW_IDEA,
+        source_idea_id=idea["idea_id"],
+        findings=[finding],
+    )
+
+    assert result["persistence_status"] == "invalid_finding_failed_closed"
+    assert result["persisted_candidate_ids"] == []
+    assert result["new_candidate_ids"] == []
+    assert result["reused_candidate_ids"] == []
+    assert "Unknown OMI tool-assisted source_adapter: unknown_adapter" in result[
+        "persistence_explanation"
+    ]
+    assert project_manager.get_omi_summary("demo")["index"]["candidate_ids"] == []

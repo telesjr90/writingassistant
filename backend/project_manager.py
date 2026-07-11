@@ -714,6 +714,8 @@ OMI_TOOL_ASSISTED_ADAPTER_IDENTITIES = frozenset(
         "spacy",
         "ncp",
         "subtxt",
+        "subtxt_informed_rubric",
+        "dramatica_flow_informed_rubric",
         "dramatica_flow",
         "deterministic_fallback",
     }

@@ -151,7 +151,8 @@
 
 # Open Questions
 
-- `PHASE8-IMPL-023-T021` is complete/PASS through T021B. The original safely blocked attempt remains historical evidence; T021A repaired the NCP Node validator no-op; T021B completed the same-six runtime and fusion validation. T022 is planned next, and full MVP completion remains blocked.
+- `PHASE8-IMPL-023-T022A` is resolved/PASS: persistence now accepts the two current app-owned rubric adapter identities through the existing explicit allowlist, preserves candidate-only metadata and exact provenance matching, reuses mixed candidate IDs on replay, and rejects unknown identities without writes. `PHASE8-IMPL-023-T022` remains blocked/in_progress; T022B is planned to consume the preserved exact 113 findings without a new live adapter call. Full MVP completion remains blocked.
+- `PHASE8-IMPL-023-T021` is complete/PASS through T021B. The original safely blocked attempt remains historical evidence; T021A repaired the NCP Node validator no-op; T021B completed the same-six runtime and fusion validation. T022A repaired the persistence identity mismatch without consuming the preserved real findings. T022B is planned next, and full MVP completion remains blocked.
 
 Owner decisions have answered the original roadmap questions. Remaining items below are implementation or verification follow-ups, not unresolved product decisions.
 
