@@ -303,6 +303,9 @@
 
 # Task Backlog
 
+- Next: `PHASE8-IMPL-023-T020C - App-owned dramatica-flow-informed analysis-rubric contract` (planned). Define the pure app-owned input/output contract, distinct identity and support label, bounded diagnostic/category mappings, evidence/provenance/owner-review/confidence rules, and recursive fail-closed rejection. Preserve T009 unchanged; no evaluator, adapter, route, UI, persistence, mutation, model/server call, or story prose; do not skip to T021.
+- Completed: `PHASE8-IMPL-023-T020B - Dramatica-flow integration-path and analysis-only boundary decision` is complete/PASS. Complete runtime is OWNER-BLOCKED / REFERENCE-ONLY; narrow runtime subset is REJECT/DEFER; app-owned rubric path is ACCEPTED for separate implementation. T020 remains in progress.
+
 This backlog is implementation-ready but not yet converted into GitHub Issues. Create issues only after the owner approves the plan structure.
 
 ## App MVP

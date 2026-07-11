@@ -697,7 +697,7 @@
       "task_id": "PHASE8-IMPL-023-T020",
       "title": "Live dramatica-flow integration in OMI and analysis",
       "status": "in_progress",
-      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status; T020A source/runtime preflight and safety inventory is complete/PASS; T020B integration-path and analysis-only boundary decision is next"
+      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status; T020A source/runtime preflight and safety inventory is complete/PASS; T020B integration-path and analysis-only boundary decision is complete/PASS; T020C app-owned dramatica-flow-informed analysis-rubric contract is next"
     },
     {
       "task_id": "PHASE8-IMPL-023-T020A",
@@ -714,8 +714,16 @@
     {
       "task_id": "PHASE8-IMPL-023-T020B",
       "title": "Dramatica-flow integration-path and analysis-only boundary decision",
+      "status": "complete/PASS",
+      "scope": "docs-only owner-controlled decision: complete runtime OWNER-BLOCKED / REFERENCE-ONLY; narrow runtime subset REJECT/DEFER because audit is model/project/truth-state coupled, status is project-state reporting rather than owner-input candidate analysis, doctor calls a model/API, remaining CLI paths generate/output prose or mutate state, and no suitable pure/static candidate-only subset exists; separate app-owned dramatica-flow-informed analysis-rubric path ACCEPTED for future implementation; T009 fixture identity/schema/support label and T020A hard-false runtime fields preserved; license unverified despite README MIT claims and no root license file; no runtime, contract, evaluator, adapter, route, UI, persistence, mutation, model/server call, or story prose",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020B-dramatica-flow-integration-path-and-analysis-only-boundary-decision.md",
+      "result": "complete/PASS; T020 remains in_progress; T020C app-owned dramatica-flow-informed analysis-rubric contract is next; do not skip to T021"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T020C",
+      "title": "App-owned dramatica-flow-informed analysis-rubric contract",
       "status": "planned",
-      "scope": "owner-controlled decision choosing among complete runtime owner-blocked/reference-only, narrowly audited non-generative/non-mutating subset, or app-owned dramatica-flow-informed analysis rubric; do not implement runtime integration in T020B"
+      "scope": "Define a pure app-owned input/output contract for a future dramatica-flow-informed analysis rubric. Establish an internal identity, request/result schemas, user-facing support label, bounded diagnostic categories, category-to-candidate mappings, statement-kind rules, evidence/source-locator requirements, provenance, owner-decision and review-status requirements, confidence and uncertainty policies, and recursive fail-closed unsafe-output rejection. Preserve the existing T009 dramatica_flow fixture identity, schema, support label, and fixture-only behavior. The contract must not import, execute, or read dramatica-flow at runtime; must not copy external source code, prompts, templates, algorithms, issue descriptions, or suggestions; and must not implement an evaluator, OMI adapter, route, UI, persistence, Memory/Canon mutation, promotion/apply-promotion, model call, server call, or story prose. Do not skip to T021."
     },
     {
       "task_id": "PHASE8-IMPL-023-T021",

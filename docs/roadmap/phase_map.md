@@ -254,6 +254,8 @@
 
 # Phase Map
 
+- `PHASE8-IMPL-023-T020B` — complete/PASS: complete dramatica-flow runtime OWNER-BLOCKED / REFERENCE-ONLY; narrow runtime subset REJECT/DEFER; separate app-owned rubric path ACCEPTED. `PHASE8-IMPL-023-T020` remains in progress. Next: `PHASE8-IMPL-023-T020C - App-owned dramatica-flow-informed analysis-rubric contract` (planned); do not skip to T021.
+
 ## App MVP Track
 
 ### Phase 0: Repo Baseline and Source-of-Truth Sync
