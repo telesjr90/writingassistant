@@ -303,7 +303,8 @@
 
 # Task Backlog
 
-- Next: `PHASE8-IMPL-023-T020F - Manual real owner-authored dramatica-flow-informed rubric validation` (planned). Run one explicit real in-process OMI validation using `requested_adapters=["dramatica_flow_informed_rubric"]` and `persist_candidates=False` against controlled owner-authored non-story source; prove exact invocation counts, non-empty pending-review evidence-backed candidates, and no persistence/mutation/runtime/model/external-source/prose behavior. Do not implement T020F here and do not skip to T021.
+- Next: `PHASE8-IMPL-023-T021 - Cross-tool fusion validation using real runtime outputs` (planned). Do not implement T021 here.
+- Completed: `PHASE8-IMPL-023-T020F - Manual real owner-authored dramatica-flow-informed rubric validation` is complete/PASS. One authoritative built-in OMI run produced 9 findings covering all nine required categories; builder/runner/evaluator counts were 1/1/1; persistence was not requested; protected state was identical; and 708 regressions passed. T020 parent is complete/PASS under the T020B live-runtime owner-blocked/reference-only decision.
 - Completed: `PHASE8-IMPL-023-T020E - App-owned dramatica-flow-informed analysis-rubric OMI adapter integration` is complete/PASS with 104 focused tests and 926 requested regressions. The obsolete T020D no-adapter lifecycle assertion was minimally updated for explicit-only registration and T009 preservation; evaluator logic is unchanged. T020 remains in progress.
 - Completed: `PHASE8-IMPL-023-T020D - App-owned dramatica-flow-informed analysis-rubric evaluator` is complete/PASS with 142 focused tests and 787 requested regressions. T020 remains in progress.
 - Completed: `PHASE8-IMPL-023-T020C - App-owned dramatica-flow-informed analysis-rubric contract` is complete/PASS with 237 focused tests. T020 remains in progress.
