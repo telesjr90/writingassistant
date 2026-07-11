@@ -10,6 +10,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -2742,3 +2744,1101 @@ def test_subtxt_preflight_does_not_persist_or_mutate(
     assert tool["safety"]["memory_canon_mutation"] is False
     assert tool["safety"]["promotion_or_apply_promotion"] is False
     assert tool["safety"]["story_prose_generated"] is False
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE8-IMPL-023-T020A dramatica-flow source/runtime preflight tests
+# ─────────────────────────────────────────────────────────────────────────────
+
+_DF_MIN_PYPROJECT = (
+    "[project]\n"
+    'name = "dramatica-flow"\n'
+    'version = "0.1.0"\n'
+    'requires-python = ">=3.11"\n'
+    "dependencies = [\n"
+    '    "openai>=1.30.0",\n'
+    '    "typer>=0.12.0",\n'
+    '    "fastapi>=0.110.0",\n'
+    '    "uvicorn>=0.29.0",\n'
+    "]\n"
+    "\n"
+    "[project.scripts]\n"
+    'df = "cli.main:app"\n'
+)
+
+_DF_MIN_CLI = (
+    '"""Minimal dramatica-flow CLI for preflight tests."""\n'
+    "import typer\n"
+    "\n"
+    "app = typer.Typer(name=\"df\")\n"
+    "setup_app = typer.Typer()\n"
+    "app.add_typer(setup_app, name=\"setup\")\n"
+    "\n"
+    "@app.command()\n"
+    "def init(name: str) -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def book(title: str) -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def write() -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def audit() -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def revise() -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def status() -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def export() -> None:\n"
+    "    pass\n"
+    "\n"
+    "@app.command()\n"
+    "def doctor() -> None:\n"
+    "    pass\n"
+)
+
+_DF_MIN_VALIDATORS = (
+    '"""Minimal validators for preflight tests."""\n'
+    "import re\n"
+    "AI_MARKER_WORDS = []\n"
+)
+
+_DF_MIN_README = (
+    "# Dramatica-Flow\n"
+    "\n"
+    "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)\n"
+    "\n"
+    "A test README with an MIT license badge and FastAPI/Ollama/DeepSeek mentions.\n"
+    "\n"
+    "## Features\n"
+    "\n"
+    "- OpenAI-compatible LLM provider (DeepSeek)\n"
+    "- FastAPI web UI on uvicorn\n"
+    "- Ollama local model backend\n"
+)
+
+_DF_MIN_README_EN = (
+    "# Dramatica-Flow (EN)\n"
+    "\n"
+    "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)\n"
+    "\n"
+    "A test README_EN with an MIT license badge.\n"
+)
+
+
+def _write_minimal_dramatica_flow_source(source_root) -> None:
+    """Create a minimal but parseable on-disk source tree at source_root."""
+    source_root.mkdir(parents=True, exist_ok=True)
+    (source_root / "pyproject.toml").write_text(_DF_MIN_PYPROJECT, encoding="utf-8")
+    (source_root / "README.md").write_text(_DF_MIN_README, encoding="utf-8")
+    (source_root / "README_EN.md").write_text(_DF_MIN_README_EN, encoding="utf-8")
+    cli_dir = source_root / "cli"
+    cli_dir.mkdir(exist_ok=True)
+    (cli_dir / "main.py").write_text(_DF_MIN_CLI, encoding="utf-8")
+    validators_pkg = source_root / "core" / "validators"
+    validators_pkg.mkdir(parents=True, exist_ok=True)
+    (validators_pkg / "__init__.py").write_text(
+        _DF_MIN_VALIDATORS, encoding="utf-8"
+    )
+
+
+def _write_minimal_dramatica_flow_venv(
+    venv_root,
+    *,
+    include_dist_info: bool = True,
+    include_editable: bool = True,
+    editable_source_url: str | None = None,
+    extra_dist_infos: tuple[str, ...] = (),
+) -> None:
+    """Create a minimal editable virtual environment under venv_root."""
+    venv_root.mkdir(parents=True, exist_ok=True)
+    bin_dir = venv_root / "bin"
+    bin_dir.mkdir(exist_ok=True)
+    (bin_dir / "python").write_text("#!/bin/sh\necho stub\n", encoding="utf-8")
+    (bin_dir / "df").write_text("#!/bin/sh\necho stub\n", encoding="utf-8")
+    lib_dir = venv_root / "lib" / "python3.12" / "site-packages"
+    lib_dir.mkdir(parents=True, exist_ok=True)
+    if include_dist_info:
+        dist_info = lib_dir / "dramatica_flow-0.1.0.dist-info"
+        dist_info.mkdir(exist_ok=True)
+        if editable_source_url is None:
+            url = (
+                "file://"
+                + str((venv_root.parent.parent / "dramatica-flow").resolve())
+            )
+        else:
+            url = editable_source_url
+        if include_editable:
+            direct_url = '{"dir_info": {"editable": true}, "url": "' + url + '"}'
+        else:
+            direct_url = '{"url": "' + url + '"}'
+        (dist_info / "direct_url.json").write_text(direct_url, encoding="utf-8")
+        (dist_info / "entry_points.txt").write_text(
+            "[console_scripts]\ndf = cli.main:app\n", encoding="utf-8"
+        )
+        (dist_info / "METADATA").write_text(
+            "Metadata-Version: 2.4\n"
+            "Name: dramatica-flow\n"
+            "Version: 0.1.0\n"
+            "Requires-Python: >=3.11\n",
+            encoding="utf-8",
+        )
+    for extra in extra_dist_infos:
+        (lib_dir / extra).mkdir(exist_ok=True)
+
+
+def _patch_dramatica_flow_probe(
+    monkeypatch,
+    result: dict[str, object] | None = None,
+) -> None:
+    """Replace dramatica-flow probing and isolate unrelated runtime probes."""
+    if result is None:
+        result = _dramatica_flow_full_surface_result()
+    original_dependency_probe = preflight._dependency_probe
+
+    def _patched(env: object | None = None) -> dict[str, object]:
+        output = {key: value for key, value in result.items()}
+        mapping = dict(env) if env is not None else {}
+        raw_cmd = str(mapping.get("OMI_LIVE_DRAMATICA_FLOW_COMMAND", "") or "")
+        output["dramatica_flow_command_value"] = raw_cmd.strip()
+        output["dramatica_flow_command_configured"] = bool(
+            output["dramatica_flow_command_value"]
+        )
+        raw_path = str(mapping.get("OMI_LIVE_DRAMATICA_FLOW_PATH", "") or "")
+        output["dramatica_flow_path_value"] = raw_path.strip()
+        output["dramatica_flow_path_configured"] = bool(
+            output["dramatica_flow_path_value"]
+        )
+        return output
+
+    monkeypatch.setattr(preflight, "_dramatica_flow_runtime_probe", _patched)
+
+    def _patched_dependency_probe(adapter: str, env) -> dict[str, object]:
+        if adapter in {"dramatica_flow", "deterministic_fallback"}:
+            return original_dependency_probe(adapter, env)
+        return {
+            "runtime_configured": False,
+            "runtime_dependency_available": False,
+            "runtime_dependency_status": "unavailable",
+            "probe_detail": (
+                f"{adapter} probe intentionally isolated for T020A report test"
+            ),
+        }
+
+    monkeypatch.setattr(preflight, "_dependency_probe", _patched_dependency_probe)
+
+
+def _dramatica_flow_full_surface_result() -> dict[str, object]:
+    """Return a fully-installed + fully-parsed dramatica_flow probe result.
+
+    Reflects the expected values for the committed real
+    ``.external_sources/dramatica-flow`` source + editable venv.
+    """
+    return {
+        "dramatica_flow_source_root": ".external_sources/dramatica-flow",
+        "dramatica_flow_source_available": True,
+        "dramatica_flow_pyproject_available": True,
+        "dramatica_flow_readme_available": True,
+        "dramatica_flow_readme_en_available": True,
+        "dramatica_flow_cli_source_available": True,
+        "dramatica_flow_validators_source_available": True,
+        "dramatica_flow_package_name": "dramatica-flow",
+        "dramatica_flow_package_version": "0.1.0",
+        "dramatica_flow_requires_python": ">=3.11",
+        "dramatica_flow_declared_dependencies": [
+            "fastapi>=0.110.0",
+            "openai>=1.30.0",
+            "typer>=0.12.0",
+            "uvicorn>=0.29.0",
+        ],
+        "dramatica_flow_console_script_name": "df",
+        "dramatica_flow_console_script_target": "cli.main:app",
+        "dramatica_flow_package_metadata_consistent": True,
+        "dramatica_flow_console_script_consistent": True,
+        "dramatica_flow_dist_info_metadata_consistent": True,
+        "dramatica_flow_dist_info_console_script_consistent": True,
+        "dramatica_flow_pyproject_console_script_name": "df",
+        "dramatica_flow_pyproject_console_script_target": "cli.main:app",
+        "dramatica_flow_dist_info_console_script_name": "df",
+        "dramatica_flow_dist_info_console_script_target": "cli.main:app",
+        "dramatica_flow_dist_info_name": "dramatica_flow-0.1.0.dist-info",
+        "dramatica_flow_dist_info_count": 1,
+        "dramatica_flow_dist_info_package_name": "dramatica-flow",
+        "dramatica_flow_dist_info_package_version": "0.1.0",
+        "dramatica_flow_dist_info_requires_python": ">=3.11",
+        "dramatica_flow_dist_info_declared_dependencies": [],
+        "dramatica_flow_direct_url_present": True,
+        "dramatica_flow_direct_url_error": "",
+        "dramatica_flow_venv_root": ".external_sources/venvs/dramatica-flow",
+        "dramatica_flow_venv_available": True,
+        "dramatica_flow_venv_python_available": True,
+        "dramatica_flow_df_entrypoint_available": True,
+        "dramatica_flow_dist_info_available": True,
+        "dramatica_flow_editable_install": True,
+        "dramatica_flow_editable_source": (
+            "file:///tmp/.external_sources/dramatica-flow"
+        ),
+        "dramatica_flow_editable_source_matches_expected": True,
+        "dramatica_flow_detected_cli_commands": [
+            "audit",
+            "book",
+            "create",
+            "delete",
+            "doctor",
+            "export",
+            "init",
+            "init-templates",
+            "list",
+            "load",
+            "revise",
+            "setup",
+            "show",
+            "status",
+            "threads",
+            "update",
+            "write",
+        ],
+        "dramatica_flow_analysis_candidate_commands": ["audit", "status"],
+        "dramatica_flow_prose_production_commands": ["export", "revise", "write"],
+        "dramatica_flow_model_or_network_surface_detected": True,
+        "dramatica_flow_project_mutation_surface_detected": True,
+        "dramatica_flow_license_claimed": True,
+        "dramatica_flow_license_name": "MIT",
+        "dramatica_flow_license_source": "README.md, README_EN.md",
+        "dramatica_flow_license_file_available": False,
+        "dramatica_flow_license_verified": False,
+        "dramatica_flow_reference_surface_available": True,
+        "dramatica_flow_installation_surface_available": True,
+        "dramatica_flow_analysis_only_runtime_authorized": False,
+        "dramatica_flow_live_runtime_available": False,
+        "dramatica_flow_integration_decision_required": True,
+        "dramatica_flow_runtime_surface": "installed_reference_surface",
+        "dramatica_flow_command_env": "OMI_LIVE_DRAMATICA_FLOW_COMMAND",
+        "dramatica_flow_command_configured": False,
+        "dramatica_flow_command_value": "",
+        "dramatica_flow_path_env": "OMI_LIVE_DRAMATICA_FLOW_PATH",
+        "dramatica_flow_path_configured": False,
+        "dramatica_flow_path_value": "",
+        "dramatica_flow_probe_detail": (
+            "dramatica-flow source and editable venv are present; T020A is "
+            "inspection and preflight only; live adapter is not authorized; "
+            "the owner-controlled integration-path decision is deferred to T020B."
+        ),
+    }
+
+
+@pytest.fixture
+def dramatica_flow_tmp_repo(monkeypatch, tmp_path):
+    """Set up a tmp repo with a parseable dramatica-flow source + venv."""
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+    return tmp_path
+
+
+def test_dramatica_flow_t020a_disabled_by_default_remains_read_only() -> None:
+    report = _report()
+    tool = _tools_by_name(report)["dramatica_flow"]
+
+    assert tool["global_enabled"] is False
+    assert tool["tool_enabled"] is False
+    assert tool["runtime_enabled"] is False
+    assert tool["blocked"] is False
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+
+
+def test_dramatica_flow_t020a_source_unavailable_reports_unavailable(
+    monkeypatch, tmp_path
+) -> None:
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_source_available"] is False
+    assert result["dramatica_flow_pyproject_available"] is False
+    assert result["dramatica_flow_readme_available"] is False
+    assert result["dramatica_flow_cli_source_available"] is False
+    assert result["dramatica_flow_reference_surface_available"] is False
+    assert result["dramatica_flow_runtime_surface"] == "unavailable"
+    assert result["dramatica_flow_live_runtime_available"] is False
+    assert result["dramatica_flow_analysis_only_runtime_authorized"] is False
+    assert result["dramatica_flow_integration_decision_required"] is True
+
+
+def test_dramatica_flow_t020a_source_only_reports_source_only_surface(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_source_available"] is True
+    assert result["dramatica_flow_pyproject_available"] is True
+    assert result["dramatica_flow_venv_available"] is False
+    assert result["dramatica_flow_dist_info_available"] is False
+    assert result["dramatica_flow_reference_surface_available"] is True
+    assert result["dramatica_flow_installation_surface_available"] is False
+    assert result["dramatica_flow_runtime_surface"] == "source_only"
+    assert result["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_full_source_and_venv_reports_installed_reference_surface(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_source_available"] is True
+    assert result["dramatica_flow_venv_available"] is True
+    assert result["dramatica_flow_reference_surface_available"] is True
+    assert result["dramatica_flow_installation_surface_available"] is True
+    assert result["dramatica_flow_runtime_surface"] == "installed_reference_surface"
+    assert result["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_exact_package_metadata(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_package_name"] == "dramatica-flow"
+    assert result["dramatica_flow_package_version"] == "0.1.0"
+    assert result["dramatica_flow_requires_python"] == ">=3.11"
+    assert result["dramatica_flow_dist_info_package_name"] == "dramatica-flow"
+    assert result["dramatica_flow_dist_info_package_version"] == "0.1.0"
+    assert result["dramatica_flow_dist_info_requires_python"] == ">=3.11"
+
+
+def test_dramatica_flow_t020a_dependency_normalization_and_sorting(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    deps = result["dramatica_flow_declared_dependencies"]
+    assert deps == sorted(deps)
+    assert deps == [
+        "fastapi>=0.110.0",
+        "openai>=1.30.0",
+        "typer>=0.12.0",
+        "uvicorn>=0.29.0",
+    ]
+
+
+def test_dramatica_flow_t020a_exact_console_script(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_console_script_name"] == "df"
+    assert result["dramatica_flow_console_script_target"] == "cli.main:app"
+    assert result["dramatica_flow_pyproject_console_script_name"] == "df"
+    assert result["dramatica_flow_pyproject_console_script_target"] == "cli.main:app"
+    assert result["dramatica_flow_dist_info_console_script_name"] == "df"
+    assert result["dramatica_flow_dist_info_console_script_target"] == "cli.main:app"
+
+
+def test_dramatica_flow_t020a_venv_python_presence(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    venv_root.mkdir(parents=True)
+    (venv_root / "lib" / "python3.12" / "site-packages").mkdir(parents=True)
+    bin_dir = venv_root / "bin"
+    bin_dir.mkdir()
+    (bin_dir / "df").write_text("#!/bin/sh\n", encoding="utf-8")
+    (venv_root / "lib" / "python3.12" / "site-packages" / "dramatica_flow-0.1.0.dist-info").mkdir()
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_venv_available"] is True
+    assert result["dramatica_flow_venv_python_available"] is False
+    assert result["dramatica_flow_runtime_surface"] == "source_only"
+
+
+def test_dramatica_flow_t020a_df_entrypoint_presence(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    venv_root.mkdir(parents=True)
+    lib = venv_root / "lib" / "python3.12" / "site-packages"
+    lib.mkdir(parents=True)
+    (lib / "dramatica_flow-0.1.0.dist-info").mkdir()
+    (venv_root / "bin").mkdir()
+    (venv_root / "bin" / "python").write_text("#!/bin/sh\n", encoding="utf-8")
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_venv_python_available"] is True
+    assert result["dramatica_flow_df_entrypoint_available"] is False
+    assert result["dramatica_flow_runtime_surface"] == "source_only"
+
+
+def test_dramatica_flow_t020a_dist_info_discovery(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_dist_info_available"] is True
+    assert result["dramatica_flow_dist_info_name"] == "dramatica_flow-0.1.0.dist-info"
+    assert result["dramatica_flow_dist_info_count"] == 1
+
+
+def test_dramatica_flow_t020a_editable_install_detection(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_editable_install"] is True
+    assert result["dramatica_flow_direct_url_present"] is True
+    assert result["dramatica_flow_direct_url_error"] == ""
+
+
+def test_dramatica_flow_t020a_expected_editable_source_match(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_editable_source_matches_expected"] is True
+    assert result["dramatica_flow_editable_source"].endswith(
+        "/.external_sources/dramatica-flow"
+    )
+
+
+def test_dramatica_flow_t020a_source_mismatch_reports_false(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(
+        venv_root,
+        editable_source_url="file:///some/other/path",
+    )
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_editable_install"] is True
+    assert result["dramatica_flow_editable_source_matches_expected"] is False
+
+
+def test_dramatica_flow_t020a_malformed_direct_url(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    dist_info = (
+        venv_root
+        / "lib"
+        / "python3.12"
+        / "site-packages"
+        / "dramatica_flow-0.1.0.dist-info"
+    )
+    (dist_info / "direct_url.json").write_text("{ not valid json", encoding="utf-8")
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_direct_url_present"] is False
+    assert "invalid JSON" in result["dramatica_flow_direct_url_error"]
+    assert result["dramatica_flow_editable_install"] is False
+    assert result["dramatica_flow_editable_source_matches_expected"] is False
+
+
+def test_dramatica_flow_t020a_malformed_entry_points(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    dist_info = (
+        venv_root
+        / "lib"
+        / "python3.12"
+        / "site-packages"
+        / "dramatica_flow-0.1.0.dist-info"
+    )
+    (dist_info / "entry_points.txt").write_text(
+        "[console_scripts]\nbroken line without equals\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_dist_info_console_script_name"] == ""
+    assert result["dramatica_flow_dist_info_console_script_target"] == ""
+    assert result["dramatica_flow_console_script_name"] == "df"
+    assert result["dramatica_flow_console_script_target"] == "cli.main:app"
+
+
+def test_dramatica_flow_t020a_malformed_pyproject_fails_closed(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    (source_root / "pyproject.toml").write_text("[project\n", encoding="utf-8")
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_pyproject_available"] is True
+    assert result["dramatica_flow_package_name"] == ""
+    assert result["dramatica_flow_package_version"] == ""
+    assert result["dramatica_flow_requires_python"] == ""
+    assert result["dramatica_flow_console_script_name"] == "df"
+    assert result["dramatica_flow_dist_info_package_name"] == "dramatica-flow"
+    assert result["dramatica_flow_package_metadata_consistent"] is False
+    assert result["dramatica_flow_reference_surface_available"] is False
+    assert result["dramatica_flow_runtime_surface"] == "degraded"
+    assert result["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_malformed_cli_source_fails_closed(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    (source_root / "cli" / "main.py").write_text(
+        "def broken(:\n", encoding="utf-8"
+    )
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_cli_source_available"] is True
+    assert result["dramatica_flow_detected_cli_commands"] == []
+    assert result["dramatica_flow_analysis_candidate_commands"] == []
+    assert result["dramatica_flow_prose_production_commands"] == []
+    assert result["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_non_file_direct_url_fails_closed(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(
+        venv_root,
+        editable_source_url="https://example.test/dramatica-flow",
+    )
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_direct_url_present"] is True
+    assert result["dramatica_flow_editable_install"] is True
+    assert result["dramatica_flow_editable_source_matches_expected"] is False
+    assert result["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_non_editable_direct_url_fails_closed(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root, include_editable=False)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_direct_url_present"] is True
+    assert result["dramatica_flow_editable_install"] is False
+    assert result["dramatica_flow_editable_source_matches_expected"] is False
+    assert result["dramatica_flow_installation_surface_available"] is False
+    assert result["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_multiple_dist_info_directories(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(
+        venv_root,
+        extra_dist_infos=("dramatica_flow-0.2.0.dist-info",),
+    )
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_dist_info_available"] is False
+    assert result["dramatica_flow_dist_info_count"] == 2
+    assert result["dramatica_flow_installation_surface_available"] is False
+    assert result["dramatica_flow_runtime_surface"] == "source_only"
+
+
+def test_dramatica_flow_t020a_command_discovery(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    detected = set(result["dramatica_flow_detected_cli_commands"])
+    for expected in (
+        "init",
+        "book",
+        "setup",
+        "write",
+        "audit",
+        "revise",
+        "status",
+        "export",
+        "doctor",
+    ):
+        assert expected in detected
+    assert detected == set(result["dramatica_flow_detected_cli_commands"])
+    assert result["dramatica_flow_detected_cli_commands"] == sorted(
+        result["dramatica_flow_detected_cli_commands"]
+    )
+
+
+def test_dramatica_flow_t020a_analysis_candidate_command_classification(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(_report())["dramatica_flow"]
+
+    assert tool["dramatica_flow_analysis_candidate_commands"] == ["audit", "status"]
+
+
+def test_dramatica_flow_t020a_prose_production_command_classification(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(_report())["dramatica_flow"]
+
+    assert tool["dramatica_flow_prose_production_commands"] == [
+        "export",
+        "revise",
+        "write",
+    ]
+
+
+def test_dramatica_flow_t020a_doctor_not_classified_as_safe_analysis(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(_report())["dramatica_flow"]
+
+    assert "doctor" not in tool["dramatica_flow_analysis_candidate_commands"]
+    assert "doctor" not in tool["dramatica_flow_prose_production_commands"]
+
+
+def test_dramatica_flow_t020a_model_network_capability_detection(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_model_or_network_surface_detected"] is True
+
+
+def test_dramatica_flow_t020a_project_mutation_capability_detection(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_project_mutation_surface_detected"] is True
+
+
+def test_dramatica_flow_t020a_readme_mit_claim(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_license_claimed"] is True
+    assert result["dramatica_flow_license_name"] == "MIT"
+    assert "README.md" in result["dramatica_flow_license_source"]
+    assert "README_EN.md" in result["dramatica_flow_license_source"]
+
+
+def test_dramatica_flow_t020a_missing_root_license_file(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_license_file_available"] is False
+    assert result["dramatica_flow_license_verified"] is False
+
+
+def test_dramatica_flow_t020a_present_root_license_file(
+    monkeypatch, tmp_path
+) -> None:
+    source_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(source_root)
+    (source_root / "LICENSE").write_text("MIT License\n", encoding="utf-8")
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_license_claimed"] is True
+    assert result["dramatica_flow_license_file_available"] is True
+    assert result["dramatica_flow_license_verified"] is True
+
+
+def test_dramatica_flow_t020a_license_claim_is_not_license_verification(
+    dramatica_flow_tmp_repo,
+) -> None:
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert result["dramatica_flow_license_claimed"] is True
+    assert result["dramatica_flow_license_verified"] is False
+
+
+def test_dramatica_flow_t020a_live_runtime_always_false(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    for env in (
+        {},
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_DRAMATICA_FLOW_ENABLED": "true",
+            "OMI_LIVE_DRAMATICA_FLOW_COMMAND": "df",
+            "OMI_LIVE_DRAMATICA_FLOW_PATH": "/opt/df",
+        },
+        {
+            "OMI_LIVE_DRAMATICA_FLOW_BLOCKED": "false",
+        },
+    ):
+        tool = _tools_by_name(_report(env))["dramatica_flow"]
+        assert tool["dramatica_flow_live_runtime_available"] is False
+        assert tool["runtime_dependency_available"] is False
+
+
+def test_dramatica_flow_t020a_analysis_only_authorization_always_false(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    for env in (
+        {},
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_DRAMATICA_FLOW_ENABLED": "true",
+            "OMI_LIVE_DRAMATICA_FLOW_COMMAND": "df",
+        },
+    ):
+        tool = _tools_by_name(_report(env))["dramatica_flow"]
+        assert tool["dramatica_flow_analysis_only_runtime_authorized"] is False
+
+
+def test_dramatica_flow_t020a_integration_decision_required(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(_report())["dramatica_flow"]
+
+    assert tool["dramatica_flow_integration_decision_required"] is True
+
+
+def test_dramatica_flow_t020a_configured_command_does_not_enable_runtime(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(
+        _report({"OMI_LIVE_DRAMATICA_FLOW_COMMAND": "df"})
+    )["dramatica_flow"]
+
+    assert tool["dramatica_flow_command_configured"] is True
+    assert tool["dramatica_flow_command_value"] == "df"
+    assert tool["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_configured_path_does_not_enable_runtime(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(
+        _report({"OMI_LIVE_DRAMATICA_FLOW_PATH": "/opt/df"})
+    )["dramatica_flow"]
+
+    assert tool["dramatica_flow_path_configured"] is True
+    assert tool["dramatica_flow_path_value"] == "/opt/df"
+    assert tool["dramatica_flow_live_runtime_available"] is False
+
+
+def test_dramatica_flow_t020a_global_per_tool_enabled_does_not_enable_runtime(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_DRAMATICA_FLOW_ENABLED": "true",
+            }
+        )
+    )["dramatica_flow"]
+
+    assert tool["global_enabled"] is True
+    assert tool["tool_enabled"] is True
+    assert tool["runtime_enabled"] is True
+    assert tool["dramatica_flow_live_runtime_available"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["status"] in {"disabled", "unavailable"}
+
+
+def test_dramatica_flow_t020a_blocked_state_remains_authoritative(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_DRAMATICA_FLOW_ENABLED": "true",
+                "OMI_LIVE_DRAMATICA_FLOW_BLOCKED": "true",
+                "OMI_LIVE_DRAMATICA_FLOW_BLOCKED_REASON": (
+                    "T020A: owner decision pending."
+                ),
+            }
+        )
+    )["dramatica_flow"]
+
+    assert tool["status"] == "blocked"
+    assert tool["blocked"] is True
+    assert tool["blocked_reason"] == "T020A: owner decision pending."
+    assert tool["dramatica_flow_live_runtime_available"] is False
+    assert tool["dramatica_flow_reference_surface_available"] is True
+    assert tool["dramatica_flow_installation_surface_available"] is True
+
+
+def test_dramatica_flow_t020a_dependency_record_contains_new_fields(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    tool = _tools_by_name(_report())["dramatica_flow"]
+
+    for key in (
+        "dramatica_flow_source_root",
+        "dramatica_flow_source_available",
+        "dramatica_flow_pyproject_available",
+        "dramatica_flow_readme_available",
+        "dramatica_flow_readme_en_available",
+        "dramatica_flow_cli_source_available",
+        "dramatica_flow_validators_source_available",
+        "dramatica_flow_package_name",
+        "dramatica_flow_package_version",
+        "dramatica_flow_requires_python",
+        "dramatica_flow_declared_dependencies",
+        "dramatica_flow_console_script_name",
+        "dramatica_flow_console_script_target",
+        "dramatica_flow_package_metadata_consistent",
+        "dramatica_flow_console_script_consistent",
+        "dramatica_flow_dist_info_metadata_consistent",
+        "dramatica_flow_dist_info_console_script_consistent",
+        "dramatica_flow_venv_root",
+        "dramatica_flow_venv_available",
+        "dramatica_flow_venv_python_available",
+        "dramatica_flow_df_entrypoint_available",
+        "dramatica_flow_dist_info_available",
+        "dramatica_flow_editable_install",
+        "dramatica_flow_editable_source",
+        "dramatica_flow_editable_source_matches_expected",
+        "dramatica_flow_detected_cli_commands",
+        "dramatica_flow_analysis_candidate_commands",
+        "dramatica_flow_prose_production_commands",
+        "dramatica_flow_model_or_network_surface_detected",
+        "dramatica_flow_project_mutation_surface_detected",
+        "dramatica_flow_license_claimed",
+        "dramatica_flow_license_name",
+        "dramatica_flow_license_source",
+        "dramatica_flow_license_file_available",
+        "dramatica_flow_license_verified",
+        "dramatica_flow_reference_surface_available",
+        "dramatica_flow_installation_surface_available",
+        "dramatica_flow_analysis_only_runtime_authorized",
+        "dramatica_flow_live_runtime_available",
+        "dramatica_flow_integration_decision_required",
+        "dramatica_flow_runtime_surface",
+        "dramatica_flow_command_env",
+        "dramatica_flow_path_env",
+        "dramatica_flow_probe_detail",
+    ):
+        assert key in tool, f"missing key: {key}"
+
+
+def test_dramatica_flow_t020a_no_subprocess_shell_network_behavior(
+    monkeypatch,
+    dramatica_flow_tmp_repo,
+) -> None:
+    import subprocess
+    import urllib.request
+
+    attempted_subprocess: list[tuple[str, tuple]] = []
+    attempted_network: list[tuple[str, tuple]] = []
+
+    def fake_subprocess_run(*args, **kwargs):
+        attempted_subprocess.append(("subprocess.run", args))
+        raise AssertionError(
+            "subprocess.run must not be called by dramatica-flow preflight"
+        )
+
+    def fake_subprocess_popen(*args, **kwargs):
+        attempted_subprocess.append(("subprocess.Popen", args))
+        raise AssertionError(
+            "subprocess.Popen must not be called by dramatica-flow preflight"
+        )
+
+    def fake_urlopen(*args, **kwargs):
+        attempted_network.append(("urlopen", args))
+        raise AssertionError(
+            "urllib urlopen must not be called by dramatica-flow preflight"
+        )
+
+    monkeypatch.setattr(subprocess, "run", fake_subprocess_run, raising=False)
+    monkeypatch.setattr(subprocess, "Popen", fake_subprocess_popen, raising=False)
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+
+    result = preflight._dramatica_flow_runtime_probe({})
+
+    assert attempted_subprocess == []
+    assert attempted_network == []
+    assert result["dramatica_flow_source_available"] is True
+    assert result["dramatica_flow_runtime_surface"] == "installed_reference_surface"
+    assert result["dramatica_flow_live_runtime_available"] is False
+    assert result["dramatica_flow_analysis_only_runtime_authorized"] is False
+
+
+def test_dramatica_flow_t020a_complete_report_isolates_unrelated_probes(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+
+    import subprocess
+    import urllib.request
+
+    def fake_subprocess_run(*args, **kwargs):
+        raise AssertionError("unrelated subprocess.run must stay isolated")
+
+    def fake_subprocess_popen(*args, **kwargs):
+        raise AssertionError("unrelated subprocess.Popen must stay isolated")
+
+    def fake_urlopen(*args, **kwargs):
+        raise AssertionError("unrelated urllib urlopen must stay isolated")
+
+    monkeypatch.setattr(subprocess, "run", fake_subprocess_run, raising=False)
+    monkeypatch.setattr(subprocess, "Popen", fake_subprocess_popen, raising=False)
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_DRAMATICA_FLOW_ENABLED": "true",
+        }
+    )
+
+    tool = _tools_by_name(report)["dramatica_flow"]
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_dramatica_flow_t020a_no_source_or_venv_mutation(
+    tmp_path, monkeypatch
+) -> None:
+    src_root = tmp_path / ".external_sources" / "dramatica-flow"
+    _write_minimal_dramatica_flow_source(src_root)
+    venv_root = tmp_path / ".external_sources" / "venvs" / "dramatica-flow"
+    _write_minimal_dramatica_flow_venv(venv_root)
+    monkeypatch.setattr(preflight, "_REPO_ROOT", tmp_path)
+
+    before = []
+    for path in (
+        src_root / "pyproject.toml",
+        src_root / "README.md",
+        src_root / "README_EN.md",
+        src_root / "cli" / "main.py",
+        src_root / "core" / "validators" / "__init__.py",
+        venv_root / "bin" / "python",
+        venv_root / "bin" / "df",
+        venv_root / "lib" / "python3.12" / "site-packages"
+        / "dramatica_flow-0.1.0.dist-info" / "direct_url.json",
+        venv_root / "lib" / "python3.12" / "site-packages"
+        / "dramatica_flow-0.1.0.dist-info" / "entry_points.txt",
+        venv_root / "lib" / "python3.12" / "site-packages"
+        / "dramatica_flow-0.1.0.dist-info" / "METADATA",
+    ):
+        before.append(
+            (str(path), path.read_bytes())
+        )
+
+    preflight._dramatica_flow_runtime_probe({})
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+    _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_DRAMATICA_FLOW_ENABLED": "true",
+        }
+    )
+
+    for path_str, original_bytes in before:
+        with open(path_str, "rb") as handle:
+            current_bytes = handle.read()
+        assert current_bytes == original_bytes
+
+
+def test_dramatica_flow_t020a_existing_tool_preflight_behavior_unchanged(
+    monkeypatch,
+) -> None:
+    _patch_dramatica_flow_probe(monkeypatch, _dramatica_flow_full_surface_result())
+
+    report = _report()
+    tools = _tools_by_name(report)
+
+    assert tools["spacy"]["status"] in {"disabled", "available"}
+    assert tools["ollama_model"]["status"] in {"disabled", "available", "unavailable"}
+    assert tools["story_check"]["status"] in {"disabled", "available", "unavailable"}
+    assert tools["booknlp"]["status"] in {"disabled", "available", "unavailable"}
+    assert tools["ncp"]["status"] in {"disabled", "available", "unavailable"}
+    assert tools["subtxt"]["status"] in {"disabled", "available", "unavailable"}
+    assert tools["deterministic_fallback"]["status"] in {"disabled", "available"}
+    assert tools["dramatica_flow"]["status"] in {"disabled", "available", "unavailable"}
+    for tool in tools.values():
+        assert tool["safety"]["read_only"] is True
+        assert tool["safety"]["candidate_persistence"] is False
+        assert tool["safety"]["memory_canon_mutation"] is False
+        assert tool["safety"]["promotion_or_apply_promotion"] is False
+        assert tool["safety"]["story_prose_generated"] is False

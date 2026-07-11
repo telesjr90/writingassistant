@@ -40,6 +40,37 @@ no runnable Subtxt classifier, semantic-analysis executable, machine schema
 validator, or local analysis API has been established, and that configured
 command/path env vars are configuration evidence only and must not make the
 runtime available. T019A does not implement a live Subtxt adapter.
+
+T020A extends the ``dramatica_flow`` adapter probe with a focused, read-only
+dramatica-flow source/runtime preflight. The new preflight inspects the
+actual local source at ``.external_sources/dramatica-flow`` and the actual
+editable virtual environment at
+``.external_sources/venvs/dramatica-flow`` and accurately reports:
+
+* source availability for the inspected metadata/source files
+  (``pyproject.toml``, ``README.md``, ``README_EN.md``, ``cli/main.py``,
+  ``core/validators/__init__.py``);
+* exact package metadata (name, version, ``requires-python``, normalized
+  declared dependencies, console script name and target);
+* editable venv availability (Python, ``df`` entrypoint, single
+  unambiguous ``dramatica_flow-*.dist-info`` directory);
+* static AST-based CLI command discovery from ``cli/main.py``;
+* analysis-candidate / prose-production command classification lists;
+* static model/network and project-mutation surface evidence bounded to
+  the audited metadata/source files (no broad full-source scan);
+* license claim (README badge/text) versus license file (root ``LICENSE``
+  family), with no legal conclusion;
+* that the complete runtime is not authorized and is not available as a
+  live analysis runtime in T020A, leaving the owner-controlled
+  integration-path decision for T020B.
+
+T020A is inspection and preflight only. It does not import or execute
+dramatica-flow, does not run the Typer application, does not run the
+``df`` entrypoint, does not start any server, does not call any model,
+API, or network, and does not perform any subprocess or shell call. The
+probe is standard-library only, fail-closed, and read-only. The result
+of source or virtual-environment discovery never makes
+``dramatica_flow_live_runtime_available`` true.
 """
 
 from __future__ import annotations
@@ -49,6 +80,7 @@ import os
 import shutil
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import unquote, urlparse
 
 try:
     from . import omi_analysis_orchestrator as oao
@@ -191,6 +223,74 @@ SUBTXT_COMMAND_ENV = "OMI_LIVE_SUBTXT_COMMAND"
 SUBTXT_PATH_ENV = "OMI_LIVE_SUBTXT_PATH"
 SUBTXT_CC_LICENSE = (
     "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
+)
+
+# T020A dramatica-flow source/runtime preflight constants.
+# Source clone path: .external_sources/dramatica-flow
+# Source Git HEAD (from prior context refresh):
+#   890f099bfcb64adbf407fd83ab708c48e92b0766
+# Package name: dramatica-flow; version 0.1.0
+# Requires-Python: >=3.11
+# Console script: df = cli.main:app
+# Editable venv: .external_sources/venvs/dramatica-flow
+# Editable direct_url: file:///.../.external_sources/dramatica-flow
+# T020A is inspection and preflight only. It does not authorize a live
+# adapter and does not make the live runtime available.
+DRAMATICA_FLOW_SOURCE_REL = ".external_sources/dramatica-flow"
+DRAMATICA_FLOW_VENV_REL = ".external_sources/venvs/dramatica-flow"
+DRAMATICA_FLOW_PYPROJECT_REL = (
+    ".external_sources/dramatica-flow/pyproject.toml"
+)
+DRAMATICA_FLOW_README_REL = (
+    ".external_sources/dramatica-flow/README.md"
+)
+DRAMATICA_FLOW_README_EN_REL = (
+    ".external_sources/dramatica-flow/README_EN.md"
+)
+DRAMATICA_FLOW_CLI_REL = (
+    ".external_sources/dramatica-flow/cli/main.py"
+)
+DRAMATICA_FLOW_VALIDATORS_REL = (
+    ".external_sources/dramatica-flow/core/validators/__init__.py"
+)
+DRAMATICA_FLOW_VENV_PYTHON_REL = (
+    ".external_sources/venvs/dramatica-flow/bin/python"
+)
+DRAMATICA_FLOW_VENV_DF_REL = (
+    ".external_sources/venvs/dramatica-flow/bin/df"
+)
+DRAMATICA_FLOW_DISTINFO_GLOB = (
+    "dramatica_flow-*.dist-info"
+)
+DRAMATICA_FLOW_COMMAND_ENV = "OMI_LIVE_DRAMATICA_FLOW_COMMAND"
+DRAMATICA_FLOW_PATH_ENV = "OMI_LIVE_DRAMATICA_FLOW_PATH"
+DRAMATICA_FLOW_LICENSE_BASENAME_CANDIDATES: tuple[str, ...] = (
+    "LICENSE",
+    "LICENSE.md",
+    "LICENSE.txt",
+    "COPYING",
+    "COPYING.md",
+)
+DRAMATICA_FLOW_ANALYSIS_CANDIDATE_COMMANDS: tuple[str, ...] = (
+    "audit",
+    "status",
+)
+DRAMATICA_FLOW_PROSE_PRODUCTION_COMMANDS: tuple[str, ...] = (
+    "export",
+    "revise",
+    "write",
+)
+DRAMATICA_FLOW_RUNTIME_SURFACE_UNAVAILABLE = "unavailable"
+DRAMATICA_FLOW_RUNTIME_SURFACE_SOURCE_ONLY = "source_only"
+DRAMATICA_FLOW_RUNTIME_SURFACE_INSTALLED_REFERENCE = "installed_reference_surface"
+DRAMATICA_FLOW_RUNTIME_SURFACE_DEGRADED = "degraded"
+DRAMATICA_FLOW_RUNTIME_SURFACES: frozenset[str] = frozenset(
+    {
+        DRAMATICA_FLOW_RUNTIME_SURFACE_UNAVAILABLE,
+        DRAMATICA_FLOW_RUNTIME_SURFACE_SOURCE_ONLY,
+        DRAMATICA_FLOW_RUNTIME_SURFACE_INSTALLED_REFERENCE,
+        DRAMATICA_FLOW_RUNTIME_SURFACE_DEGRADED,
+    }
 )
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -640,6 +740,924 @@ def _subtxt_docs_source_probe(
         "subtxt_path_configured": path_configured,
         "subtxt_path_value": path_value,
         "subtxt_detail": detail,
+    }
+
+
+def _safe_normalize_requirement_specs(
+    raw_dependencies: Any,
+) -> list[str]:
+    """Normalize a ``project.dependencies`` TOML list into sorted requirement specs.
+
+    Read-only helper; ignores non-list inputs; strips whitespace; drops empty
+    entries; returns an empty list when missing or malformed. Never raises.
+    """
+    if not isinstance(raw_dependencies, list):
+        return []
+    cleaned: list[str] = []
+    for entry in raw_dependencies:
+        if not isinstance(entry, str):
+            continue
+        text = entry.strip()
+        if not text:
+            continue
+        cleaned.append(text)
+    return sorted(set(cleaned))
+
+
+def _safe_collect_required_dist(metadata_text: str) -> list[str]:
+    """Parse the ``Requires-Dist:`` lines of a dist-info ``METADATA`` file.
+
+    Read-only helper; returns the sorted, deduplicated, whitespace-stripped
+    requirement specifiers. Never raises.
+    """
+    if not isinstance(metadata_text, str) or not metadata_text:
+        return []
+    out: list[str] = []
+    for line in metadata_text.splitlines():
+        if not line.startswith("Requires-Dist:"):
+            continue
+        spec = line[len("Requires-Dist:"):].strip()
+        if not spec:
+            continue
+        if ";" in spec:
+            head = spec.split(";", 1)[0].strip()
+            if not head:
+                continue
+            spec = head
+        if spec.lower() == "setuptools":
+            continue
+        out.append(spec)
+    return sorted(set(out))
+
+
+def _safe_parse_console_entry_points(entry_points_text: str) -> list[tuple[str, str]]:
+    """Parse a dist-info ``entry_points.txt`` into ``(name, target)`` pairs.
+
+    Read-only helper; returns the sorted-by-name console-script pairs found
+    under the ``[console_scripts]`` section. Ignores other sections, blank
+    lines, and comments. Never raises.
+    """
+    if not isinstance(entry_points_text, str) or not entry_points_text:
+        return []
+    pairs: list[tuple[str, str]] = []
+    in_console_scripts = False
+    for raw_line in entry_points_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith("#"):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            in_console_scripts = line == "[console_scripts]"
+            continue
+        if not in_console_scripts or "=" not in line:
+            continue
+        name, _, target = line.partition("=")
+        name = name.strip()
+        target = target.strip()
+        if not name or not target:
+            continue
+        pairs.append((name, target))
+    pairs.sort(key=lambda item: item[0])
+    return pairs
+
+
+def _safe_parse_pyproject_console_scripts(
+    project_section: dict[str, Any],
+) -> list[tuple[str, str]]:
+    """Parse a pyproject ``[project.scripts]`` section into ``(name, target)`` pairs.
+
+    Read-only helper; returns sorted-by-name pairs. Never raises.
+    """
+    scripts = project_section.get("scripts")
+    if not isinstance(scripts, dict):
+        return []
+    pairs: list[tuple[str, str]] = []
+    for name, target in scripts.items():
+        if not isinstance(name, str) or not isinstance(target, str):
+            continue
+        name_clean = name.strip()
+        target_clean = target.strip()
+        if not name_clean or not target_clean:
+            continue
+        pairs.append((name_clean, target_clean))
+    pairs.sort(key=lambda item: item[0])
+    return pairs
+
+
+def _safe_discover_dramatica_flow_dist_info(
+    venv_root: Path,
+    distinfo_glob: str,
+) -> tuple[list[Path], Path | None]:
+    """Discover the unique ``dramatica_flow-*.dist-info`` directory.
+
+    Walks ``<venv>/lib/python*/site-packages/`` without expanding shell
+    globs (purely through ``Path.iterdir``) and applies the
+    ``distinfo_glob`` pattern. Returns ``(matches, selected)``. When there
+    is exactly one unambiguous match, ``selected`` is the unique path.
+    When there are zero or multiple matches, ``selected`` is ``None`` and
+    the matches list is returned for reporting. Never raises.
+    """
+    matches: list[Path] = []
+    selected: Path | None = None
+    try:
+        if not venv_root.is_dir():
+            return matches, selected
+        lib_dir = venv_root / "lib"
+        if not lib_dir.is_dir():
+            return matches, selected
+        for py_dir in lib_dir.iterdir():
+            if not py_dir.is_dir():
+                continue
+            if not py_dir.name.startswith("python"):
+                continue
+            site_packages = py_dir / "site-packages"
+            if not site_packages.is_dir():
+                continue
+            for entry in site_packages.iterdir():
+                if not entry.is_dir():
+                    continue
+                if _fnmatch(entry.name, distinfo_glob):
+                    matches.append(entry)
+    except OSError:
+        return matches, selected
+    matches.sort(key=lambda p: p.as_posix())
+    if len(matches) == 1:
+        selected = matches[0]
+    return matches, selected
+
+
+def _fnmatch(name: str, pattern: str) -> bool:
+    """A minimal ``fnmatch.fnmatch`` substitute for a single ``*`` glob.
+
+    The probe only needs the ``*`` wildcard in
+    ``dramatica_flow-*.dist-info``; using ``fnmatch.fnmatch`` directly is
+    also acceptable, but the helper keeps the probe standard-library-only
+    and deterministic without importing ``fnmatch`` for one pattern.
+    """
+    if "*" not in pattern:
+        return name == pattern
+    head, _, tail = pattern.partition("*")
+    if not name.startswith(head):
+        return False
+    if not tail:
+        return True
+    return name.endswith(tail) and len(name) >= len(head) + len(tail)
+
+
+def _safe_detect_dramatica_flow_cli_commands(cli_source: str) -> list[str]:
+    """Static AST-based Typer CLI command-name detection for dramatica-flow.
+
+    Read-only; parses the ``cli/main.py`` source with ``ast`` only; never
+    imports or executes dramatica-flow. Identifies:
+
+    * top-level ``@<typer>.command()`` and ``@<typer>.command("name")``
+      decorators on module-level function definitions;
+    * sub-typer registered names via
+      ``app.add_typer(sub_app, name="<name>")`` calls.
+
+    Returns the sorted, deduplicated union of detected command names. When
+    parsing fails or the source is missing, returns an empty list.
+    """
+    import ast as _ast
+
+    if not isinstance(cli_source, str) or not cli_source:
+        return []
+    try:
+        tree = _ast.parse(cli_source)
+    except (SyntaxError, ValueError):
+        return []
+
+    detected: set[str] = set()
+    typer_vars: set[str] = set()
+
+    for node in tree.body:
+        if (
+            isinstance(node, _ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], _ast.Name)
+            and isinstance(node.value, _ast.Call)
+        ):
+            target = node.targets[0]
+            if _is_typer_call(node.value):
+                typer_vars.add(target.id)
+
+    for node in tree.body:
+        if isinstance(node, _ast.Expr) and isinstance(node.value, _ast.Call):
+            call = node.value
+            if (
+                isinstance(call.func, _ast.Attribute)
+                and call.func.attr == "add_typer"
+                and isinstance(call.func.value, _ast.Name)
+            ):
+                for kw in call.keywords:
+                    if kw.arg == "name" and isinstance(kw.value, _ast.Constant):
+                        if isinstance(kw.value.value, str):
+                            name = kw.value.value.strip()
+                            if name:
+                                detected.add(name)
+
+    for node in tree.body:
+        if not isinstance(node, _ast.FunctionDef):
+            continue
+        for decorator in node.decorator_list:
+            cmd_name = _command_name_from_decorator(decorator, node.name)
+            if cmd_name is None:
+                continue
+            if cmd_name.typer_var is None:
+                continue
+            if cmd_name.typer_var in typer_vars:
+                if cmd_name.command_name:
+                    detected.add(cmd_name.command_name)
+
+    return sorted(detected)
+
+
+class _TyperCommandName:
+    __slots__ = ("typer_var", "command_name")
+
+    def __init__(self, typer_var: str | None, command_name: str) -> None:
+        self.typer_var = typer_var
+        self.command_name = command_name
+
+
+def _is_typer_call(call: object) -> bool:
+    import ast as _ast
+
+    if not isinstance(call, _ast.Call):
+        return False
+    func = call.func
+    if isinstance(func, _ast.Name) and func.id == "Typer":
+        return True
+    if isinstance(func, _ast.Attribute) and func.attr == "Typer":
+        return True
+    return False
+
+
+def _command_name_from_decorator(
+    decorator: object,
+    function_name: str,
+) -> _TyperCommandName | None:
+    import ast as _ast
+
+    if not isinstance(decorator, _ast.Call):
+        return None
+    func = decorator.func
+    if not isinstance(func, _ast.Attribute):
+        return None
+    if func.attr != "command":
+        return None
+    if not isinstance(func.value, _ast.Name):
+        return None
+    typer_var = func.value.id
+    if decorator.args:
+        first = decorator.args[0]
+        if isinstance(first, _ast.Constant) and isinstance(first.value, str):
+            name = first.value.strip()
+            if name:
+                return _TyperCommandName(typer_var, name)
+    return _TyperCommandName(typer_var, function_name or "")
+
+
+def _safe_read_dramatica_flow_console_entrypoints(
+    dist_info_path: Path,
+) -> list[tuple[str, str]]:
+    """Read the ``entry_points.txt`` of a single resolved dist-info directory.
+
+    Returns the sorted-by-name ``(name, target)`` console-script pairs, or
+    an empty list when the file is missing, unreadable, or malformed.
+    """
+    entry_points_path = dist_info_path / "entry_points.txt"
+    try:
+        if not entry_points_path.is_file():
+            return []
+    except OSError:
+        return []
+    try:
+        with entry_points_path.open("rb") as handle:
+            data = handle.read()
+    except OSError:
+        return []
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return []
+    return _safe_parse_console_entry_points(text)
+
+
+def _safe_read_dramatica_flow_direct_url(
+    dist_info_path: Path,
+) -> tuple[dict[str, Any] | None, str | None]:
+    """Read the ``direct_url.json`` of a single resolved dist-info directory.
+
+    Returns ``(parsed_dict, error_detail)``. ``parsed_dict`` is ``None`` on
+    any failure. ``error_detail`` is a short human-readable string when the
+    read/parse failed, otherwise ``None``. Never raises.
+    """
+    direct_url_path = dist_info_path / "direct_url.json"
+    import json as _json
+
+    try:
+        if not direct_url_path.is_file():
+            return None, "direct_url.json missing"
+    except OSError:
+        return None, "direct_url.json not accessible"
+    try:
+        with direct_url_path.open("rb") as handle:
+            data = handle.read()
+    except OSError as exc:
+        return None, f"direct_url.json read failed: {type(exc).__name__}"
+    try:
+        parsed = _json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as exc:
+        return None, f"direct_url.json invalid JSON: {exc}"
+    if not isinstance(parsed, dict):
+        return None, "direct_url.json is not a JSON object"
+    return parsed, None
+
+
+def _safe_resolve_file_url_path(url: str) -> Path | None:
+    """Resolve an editable ``file://`` URL to a local path.
+
+    Returns ``None`` for malformed, non-file, host-qualified, empty, or
+    unresolvable URLs. Never raises.
+    """
+    if not isinstance(url, str) or not url:
+        return None
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return None
+    if parsed.scheme != "file":
+        return None
+    if parsed.netloc not in {"", "localhost"}:
+        return None
+    path_text = unquote(parsed.path or "")
+    if not path_text:
+        return None
+    try:
+        return Path(path_text).resolve()
+    except (OSError, RuntimeError, ValueError):
+        return None
+
+
+def _safe_detect_model_or_network_evidence(
+    pyproject_text: str | None,
+    cli_source_text: str | None,
+    validators_source_text: str | None,
+) -> bool:
+    """Detect static model/network evidence in audited metadata/source files.
+
+    Bounded static indicator check. Looks for known tokens in
+    ``pyproject.toml`` dependencies, ``cli/main.py`` text, and
+    ``core/validators/__init__.py`` text. Does not perform a broad full-
+    source scan.
+    """
+    indicators = (
+        "openai",
+        "deepseek",
+        "ollama",
+        "fastapi",
+        "uvicorn",
+        "llm",
+        "model",
+    )
+    haystacks: tuple[str | None, ...] = (
+        pyproject_text,
+        cli_source_text,
+        validators_source_text,
+    )
+    for hay in haystacks:
+        if not isinstance(hay, str) or not hay:
+            continue
+        haystack = hay.lower()
+        for token in indicators:
+            if token in haystack:
+                return True
+    return False
+
+
+def _safe_detect_project_mutation_evidence(
+    cli_source_text: str | None,
+    validators_source_text: str | None,
+    pyproject_text: str | None,
+) -> bool:
+    """Detect static project-mutation evidence in audited metadata/source files.
+
+    Bounded static indicator check. Looks for known project-mutation
+    surface tokens in the audited files. Does not perform a broad full-
+    source scan.
+    """
+    indicators = (
+        "init",
+        "setup",
+        "book",
+        "world_state",
+        "truth",
+        "outline",
+        "chapter",
+        "story_bible",
+        "revise",
+        "export",
+        "project",
+        "state",
+    )
+    haystacks: tuple[str | None, ...] = (
+        cli_source_text,
+        validators_source_text,
+        pyproject_text,
+    )
+    for hay in haystacks:
+        if not isinstance(hay, str) or not hay:
+            continue
+        haystack = hay.lower()
+        for token in indicators:
+            if token in haystack:
+                return True
+    return False
+
+
+def _safe_detect_license_claim(
+    readme_text: str | None,
+    readme_en_text: str | None,
+) -> tuple[bool, str, str]:
+    """Detect a README-claimed MIT license from the audited README files.
+
+    Returns ``(claimed, name, source)``. ``source`` is a comma-separated
+    sorted list of README files that mention the MIT license, or an empty
+    string when no claim is found.
+    """
+    sources: list[str] = []
+    if isinstance(readme_text, str) and readme_text:
+        if "MIT" in readme_text:
+            sources.append("README.md")
+    if isinstance(readme_en_text, str) and readme_en_text:
+        if "MIT" in readme_en_text:
+            sources.append("README_EN.md")
+    if sources:
+        return True, "MIT", ", ".join(sorted(set(sources)))
+    return False, "", ""
+
+
+def _safe_detect_license_file(source_root: Path) -> bool:
+    """Return True if a root-level license file exists and is readable.
+
+    The check is intentionally limited to the configured basename candidates
+    and never inspects dependency license files.
+    """
+    for basename in DRAMATICA_FLOW_LICENSE_BASENAME_CANDIDATES:
+        candidate = source_root / basename
+        try:
+            if not candidate.is_file():
+                continue
+        except OSError:
+            continue
+        try:
+            with candidate.open("rb"):
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def _dramatica_flow_runtime_probe(
+    env: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Read-only dramatica-flow source/runtime preflight.
+
+    T020A scope: inspect the actual local source at
+    ``.external_sources/dramatica-flow`` and the actual editable virtual
+    environment at ``.external_sources/venvs/dramatica-flow`` and accurately
+    report:
+
+    * source availability for the audited metadata/source files;
+    * exact package metadata;
+    * editable venv availability (Python, ``df`` entrypoint, single
+      unambiguous ``dramatica_flow-*.dist-info`` directory);
+    * static AST-based CLI command discovery from ``cli/main.py``;
+    * analysis-candidate / prose-production command classification lists;
+    * static model/network and project-mutation surface evidence bounded
+      to the audited metadata/source files;
+    * license claim (README badge/text) versus license file (root
+      ``LICENSE`` family), with no legal conclusion;
+    * that the complete runtime is not authorized and is not available as
+      a live analysis runtime in T020A, leaving the owner-controlled
+      integration-path decision for T020B.
+
+    The probe is pure, read-only, fail-closed, and standard-library only.
+    It never imports or executes dramatica-flow, never runs the Typer
+    application, never runs the ``df`` entrypoint, never starts any
+    server, never calls any model, API, or network, and never performs
+    any subprocess, shell, or package-management call. It never mutates
+    the source tree or the editable virtual environment.
+
+    The probe ALWAYS reports ``dramatica_flow_live_runtime_available``
+    as ``False`` and ``dramatica_flow_analysis_only_runtime_authorized``
+    as ``False``, regardless of what source or installation evidence is
+    discovered. The owner-controlled integration-path decision is the
+    responsibility of T020B.
+    """
+    effective_env: Mapping[str, str] = os.environ if env is None else env
+
+    source_root = _REPO_ROOT / DRAMATICA_FLOW_SOURCE_REL
+    venv_root = _REPO_ROOT / DRAMATICA_FLOW_VENV_REL
+    pyproject_path = _REPO_ROOT / DRAMATICA_FLOW_PYPROJECT_REL
+    readme_path = _REPO_ROOT / DRAMATICA_FLOW_README_REL
+    readme_en_path = _REPO_ROOT / DRAMATICA_FLOW_README_EN_REL
+    cli_path = _REPO_ROOT / DRAMATICA_FLOW_CLI_REL
+    validators_path = _REPO_ROOT / DRAMATICA_FLOW_VALIDATORS_REL
+    venv_python_path = _REPO_ROOT / DRAMATICA_FLOW_VENV_PYTHON_REL
+    venv_df_path = _REPO_ROOT / DRAMATICA_FLOW_VENV_DF_REL
+
+    source_available = source_root.is_dir()
+    pyproject_available = pyproject_path.is_file()
+    readme_available = readme_path.is_file()
+    readme_en_available = readme_en_path.is_file()
+    cli_source_available = cli_path.is_file()
+    validators_source_available = validators_path.is_file()
+
+    venv_available = venv_root.is_dir()
+    venv_python_available = venv_python_path.is_file() or venv_python_path.is_symlink()
+    df_entrypoint_available = venv_df_path.is_file() or venv_df_path.is_symlink()
+
+    package_name = ""
+    package_version = ""
+    requires_python = ""
+    declared_dependencies: list[str] = []
+    pyproject_console_pairs: list[tuple[str, str]] = []
+    pyproject_text: str | None = None
+    if pyproject_available:
+        pyproject_text = _safe_read_text(pyproject_path)
+        if pyproject_text is not None:
+            try:
+                import tomllib as _tomllib
+            except ImportError:  # pragma: no cover - tomllib always present on 3.11+
+                _tomllib = None
+            if _tomllib is not None:
+                try:
+                    parsed_pyproject = _tomllib.loads(pyproject_text)
+                except (ValueError, TypeError):
+                    parsed_pyproject = None
+                if isinstance(parsed_pyproject, dict):
+                    project = parsed_pyproject.get("project")
+                    if isinstance(project, dict):
+                        pkg_name = project.get("name")
+                        if isinstance(pkg_name, str):
+                            package_name = pkg_name
+                        pkg_version = project.get("version")
+                        if isinstance(pkg_version, str):
+                            package_version = pkg_version
+                        req_py = project.get("requires-python")
+                        if isinstance(req_py, str):
+                            requires_python = req_py
+                        declared_dependencies = _safe_normalize_requirement_specs(
+                            project.get("dependencies")
+                        )
+                        pyproject_console_pairs = _safe_parse_pyproject_console_scripts(
+                            project
+                        )
+
+    dist_info_matches: list[Path] = []
+    dist_info_selected: Path | None = None
+    if venv_available:
+        dist_info_matches, dist_info_selected = _safe_discover_dramatica_flow_dist_info(
+            venv_root,
+            DRAMATICA_FLOW_DISTINFO_GLOB,
+        )
+
+    dist_info_available = dist_info_selected is not None
+    dist_info_name = dist_info_selected.name if dist_info_selected is not None else ""
+    dist_info_count = len(dist_info_matches)
+
+    editable_install = False
+    editable_source = ""
+    editable_source_matches_expected = False
+    direct_url_error: str | None = None
+    direct_url_parsed: dict[str, Any] | None = None
+    metadata_dependencies: list[str] = []
+    metadata_console_pairs: list[tuple[str, str]] = []
+    dist_info_console_pairs: list[tuple[str, str]] = []
+    package_name_dist = ""
+    package_version_dist = ""
+    requires_python_dist = ""
+    if dist_info_selected is not None:
+        parsed, error = _safe_read_dramatica_flow_direct_url(dist_info_selected)
+        if parsed is not None:
+            direct_url_parsed = parsed
+        if error is not None:
+            direct_url_error = error
+        metadata_path = dist_info_selected / "METADATA"
+        try:
+            if metadata_path.is_file():
+                metadata_text = _safe_read_text(metadata_path)
+                if metadata_text is not None:
+                    for line in metadata_text.splitlines():
+                        if line.startswith("Name:"):
+                            value = line[len("Name:"):].strip()
+                            if value:
+                                package_name_dist = value
+                        elif line.startswith("Version:"):
+                            value = line[len("Version:"):].strip()
+                            if value:
+                                package_version_dist = value
+                        elif line.startswith("Requires-Python:"):
+                            value = line[len("Requires-Python:"):].strip()
+                            if value:
+                                requires_python_dist = value
+                    metadata_dependencies = _safe_collect_required_dist(metadata_text)
+        except OSError:
+            pass
+        dist_info_console_pairs = _safe_read_dramatica_flow_console_entrypoints(
+            dist_info_selected
+        )
+        if direct_url_parsed is not None:
+            dir_info = direct_url_parsed.get("dir_info")
+            if isinstance(dir_info, dict):
+                editable_install = bool(dir_info.get("editable"))
+            url = direct_url_parsed.get("url")
+            if isinstance(url, str):
+                editable_source = url
+            elif url is not None:
+                editable_source = str(url)
+        if (
+            isinstance(editable_source, str)
+            and editable_source
+            and editable_install
+            and source_available
+        ):
+            try:
+                editable_source_path = _safe_resolve_file_url_path(editable_source)
+                expected_source_path = source_root.resolve()
+                if editable_source_path == expected_source_path:
+                    editable_source_matches_expected = True
+            except OSError:
+                editable_source_matches_expected = False
+
+    pyproject_console_name = ""
+    pyproject_console_target = ""
+    if pyproject_console_pairs:
+        pyproject_console_name = pyproject_console_pairs[0][0]
+        pyproject_console_target = pyproject_console_pairs[0][1]
+
+    dist_info_console_name = ""
+    dist_info_console_target = ""
+    if dist_info_console_pairs:
+        dist_info_console_name = dist_info_console_pairs[0][0]
+        dist_info_console_target = dist_info_console_pairs[0][1]
+
+    resolved_console_name = dist_info_console_name or pyproject_console_name
+    resolved_console_target = (
+        dist_info_console_target or pyproject_console_target
+    )
+    package_metadata_consistent = (
+        package_name == "dramatica-flow"
+        and package_version == "0.1.0"
+        and requires_python == ">=3.11"
+    )
+    pyproject_console_script_consistent = (
+        pyproject_console_name == "df"
+        and pyproject_console_target == "cli.main:app"
+    )
+    dist_info_metadata_consistent = (
+        dist_info_available
+        and package_name_dist == "dramatica-flow"
+        and package_version_dist == "0.1.0"
+        and requires_python_dist == ">=3.11"
+    )
+    dist_info_console_script_consistent = (
+        dist_info_available
+        and dist_info_console_name == "df"
+        and dist_info_console_target == "cli.main:app"
+    )
+    console_script_consistent = (
+        resolved_console_name == "df"
+        and resolved_console_target == "cli.main:app"
+        and pyproject_console_script_consistent
+    )
+
+    cli_source_text: str | None = None
+    if cli_source_available:
+        cli_source_text = _safe_read_text(cli_path)
+    validators_source_text: str | None = None
+    if validators_source_available:
+        validators_source_text = _safe_read_text(validators_path)
+
+    detected_cli_commands = _safe_detect_dramatica_flow_cli_commands(
+        cli_source_text or ""
+    )
+
+    analysis_candidate_commands = sorted(
+        set(DRAMATICA_FLOW_ANALYSIS_CANDIDATE_COMMANDS).intersection(
+            detected_cli_commands
+        )
+    )
+    prose_production_commands = sorted(
+        set(DRAMATICA_FLOW_PROSE_PRODUCTION_COMMANDS).intersection(
+            detected_cli_commands
+        )
+    )
+
+    model_or_network_detected = _safe_detect_model_or_network_evidence(
+        pyproject_text,
+        cli_source_text,
+        validators_source_text,
+    )
+    project_mutation_detected = _safe_detect_project_mutation_evidence(
+        cli_source_text,
+        validators_source_text,
+        pyproject_text,
+    )
+
+    readme_text: str | None = None
+    if readme_available:
+        readme_text = _safe_read_text(readme_path)
+    readme_en_text: str | None = None
+    if readme_en_available:
+        readme_en_text = _safe_read_text(readme_en_path)
+
+    license_claimed, license_name, license_source = _safe_detect_license_claim(
+        readme_text,
+        readme_en_text,
+    )
+    license_file_available = (
+        source_available and _safe_detect_license_file(source_root)
+    )
+    license_verified = license_claimed and license_file_available
+
+    reference_surface_available = (
+        source_available
+        and pyproject_available
+        and readme_available
+        and readme_en_available
+        and cli_source_available
+        and validators_source_available
+        and package_metadata_consistent
+        and console_script_consistent
+    )
+    installation_surface_available = (
+        venv_available
+        and venv_python_available
+        and df_entrypoint_available
+        and dist_info_available
+        and editable_install
+        and editable_source_matches_expected
+        and dist_info_metadata_consistent
+        and dist_info_console_script_consistent
+    )
+
+    if not source_available:
+        runtime_surface = DRAMATICA_FLOW_RUNTIME_SURFACE_UNAVAILABLE
+    elif not reference_surface_available:
+        runtime_surface = DRAMATICA_FLOW_RUNTIME_SURFACE_DEGRADED
+    elif installation_surface_available:
+        runtime_surface = DRAMATICA_FLOW_RUNTIME_SURFACE_INSTALLED_REFERENCE
+    else:
+        runtime_surface = DRAMATICA_FLOW_RUNTIME_SURFACE_SOURCE_ONLY
+
+    live_runtime_available = False
+    analysis_only_runtime_authorized = False
+    integration_decision_required = True
+
+    command_value = _env_text(effective_env, DRAMATICA_FLOW_COMMAND_ENV) or ""
+    command_configured = bool(command_value)
+    path_value = _env_text(effective_env, DRAMATICA_FLOW_PATH_ENV) or ""
+    path_configured = bool(path_value)
+
+    detail_parts: list[str] = []
+    if not source_available:
+        detail_parts.append(
+            f"dramatica-flow source not found at {DRAMATICA_FLOW_SOURCE_REL}."
+        )
+    else:
+        detail_parts.append(
+            f"dramatica-flow source present at {DRAMATICA_FLOW_SOURCE_REL} "
+            f"(package={package_name or 'unknown'}, "
+            f"version={package_version or 'unknown'}, "
+            f"requires-python={requires_python or 'unknown'})."
+        )
+    if installation_surface_available:
+        detail_parts.append(
+            f"Editable virtual environment present at "
+            f"{DRAMATICA_FLOW_VENV_REL} (python, df entrypoint, "
+            f"dramatica_flow-*.dist-info)."
+        )
+    else:
+        detail_parts.append(
+            f"Editable virtual environment not fully available at "
+            f"{DRAMATICA_FLOW_VENV_REL}; runtime_surface="
+            f"{runtime_surface}."
+        )
+    if model_or_network_detected:
+        detail_parts.append(
+            "Static model/network surface evidence detected in audited "
+            "metadata/source files."
+        )
+    if project_mutation_detected:
+        detail_parts.append(
+            "Static project-mutation surface evidence detected in audited "
+            "metadata/source files."
+        )
+    if license_claimed:
+        detail_parts.append(
+            f"License claimed as {license_name} via {license_source}; "
+            f"license file available={license_file_available}; "
+            f"license verified={license_verified}."
+        )
+    else:
+        detail_parts.append("No README license claim detected.")
+    detail_parts.append(
+        "T020A is inspection and preflight only; the live adapter is not "
+        "authorized; dramatica_flow_live_runtime_available is always False; "
+        "the owner-controlled integration-path decision is deferred to T020B."
+    )
+    detail = " ".join(detail_parts)
+
+    if runtime_surface not in DRAMATICA_FLOW_RUNTIME_SURFACES:
+        runtime_surface = DRAMATICA_FLOW_RUNTIME_SURFACE_DEGRADED
+
+    return {
+        "dramatica_flow_source_root": DRAMATICA_FLOW_SOURCE_REL,
+        "dramatica_flow_source_available": source_available,
+        "dramatica_flow_pyproject_available": pyproject_available,
+        "dramatica_flow_readme_available": readme_available,
+        "dramatica_flow_readme_en_available": readme_en_available,
+        "dramatica_flow_cli_source_available": cli_source_available,
+        "dramatica_flow_validators_source_available": validators_source_available,
+        "dramatica_flow_package_name": package_name,
+        "dramatica_flow_package_version": package_version,
+        "dramatica_flow_requires_python": requires_python,
+        "dramatica_flow_declared_dependencies": declared_dependencies,
+        "dramatica_flow_console_script_name": resolved_console_name,
+        "dramatica_flow_console_script_target": resolved_console_target,
+        "dramatica_flow_package_metadata_consistent": (
+            package_metadata_consistent
+        ),
+        "dramatica_flow_console_script_consistent": console_script_consistent,
+        "dramatica_flow_dist_info_metadata_consistent": (
+            dist_info_metadata_consistent
+        ),
+        "dramatica_flow_dist_info_console_script_consistent": (
+            dist_info_console_script_consistent
+        ),
+        "dramatica_flow_pyproject_console_script_name": pyproject_console_name,
+        "dramatica_flow_pyproject_console_script_target": pyproject_console_target,
+        "dramatica_flow_dist_info_console_script_name": dist_info_console_name,
+        "dramatica_flow_dist_info_console_script_target": dist_info_console_target,
+        "dramatica_flow_dist_info_name": dist_info_name,
+        "dramatica_flow_dist_info_count": dist_info_count,
+        "dramatica_flow_dist_info_package_name": package_name_dist,
+        "dramatica_flow_dist_info_package_version": package_version_dist,
+        "dramatica_flow_dist_info_requires_python": requires_python_dist,
+        "dramatica_flow_dist_info_declared_dependencies": metadata_dependencies,
+        "dramatica_flow_dist_info_console_pairs": [
+            {"name": name, "target": target}
+            for name, target in dist_info_console_pairs
+        ],
+        "dramatica_flow_direct_url_present": direct_url_parsed is not None,
+        "dramatica_flow_direct_url_error": direct_url_error or "",
+        "dramatica_flow_venv_root": DRAMATICA_FLOW_VENV_REL,
+        "dramatica_flow_venv_available": venv_available,
+        "dramatica_flow_venv_python_available": venv_python_available,
+        "dramatica_flow_df_entrypoint_available": df_entrypoint_available,
+        "dramatica_flow_dist_info_available": dist_info_available,
+        "dramatica_flow_editable_install": editable_install,
+        "dramatica_flow_editable_source": editable_source,
+        "dramatica_flow_editable_source_matches_expected": (
+            editable_source_matches_expected
+        ),
+        "dramatica_flow_detected_cli_commands": detected_cli_commands,
+        "dramatica_flow_analysis_candidate_commands": analysis_candidate_commands,
+        "dramatica_flow_prose_production_commands": prose_production_commands,
+        "dramatica_flow_model_or_network_surface_detected": (
+            model_or_network_detected
+        ),
+        "dramatica_flow_project_mutation_surface_detected": (
+            project_mutation_detected
+        ),
+        "dramatica_flow_license_claimed": license_claimed,
+        "dramatica_flow_license_name": license_name,
+        "dramatica_flow_license_source": license_source,
+        "dramatica_flow_license_file_available": license_file_available,
+        "dramatica_flow_license_verified": license_verified,
+        "dramatica_flow_reference_surface_available": reference_surface_available,
+        "dramatica_flow_installation_surface_available": (
+            installation_surface_available
+        ),
+        "dramatica_flow_analysis_only_runtime_authorized": (
+            analysis_only_runtime_authorized
+        ),
+        "dramatica_flow_live_runtime_available": live_runtime_available,
+        "dramatica_flow_integration_decision_required": (
+            integration_decision_required
+        ),
+        "dramatica_flow_runtime_surface": runtime_surface,
+        "dramatica_flow_command_env": DRAMATICA_FLOW_COMMAND_ENV,
+        "dramatica_flow_command_configured": command_configured,
+        "dramatica_flow_command_value": command_value,
+        "dramatica_flow_path_env": DRAMATICA_FLOW_PATH_ENV,
+        "dramatica_flow_path_configured": path_configured,
+        "dramatica_flow_path_value": path_value,
+        "dramatica_flow_probe_detail": detail,
     }
 
 
@@ -1311,19 +2329,169 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "subtxt_detail": detail,
         }
     elif adapter == "dramatica_flow":
-        configured = bool(
-            _env_text(env, "OMI_LIVE_DRAMATICA_FLOW_COMMAND")
-            or _env_text(env, "OMI_LIVE_DRAMATICA_FLOW_PATH")
-            or _path_exists(".external_sources")
-        )
-        command = _env_text(env, "OMI_LIVE_DRAMATICA_FLOW_COMMAND")
-        path = _env_text(env, "OMI_LIVE_DRAMATICA_FLOW_PATH")
-        available = bool(
-            (command and shutil.which(command))
-            or (path and Path(path).exists())
-            or _path_exists(".external_sources")
-        )
-        detail = "Configured command/path or existing in-repo source surface probe"
+        probe = _dramatica_flow_runtime_probe(env)
+        reference_available = probe["dramatica_flow_reference_surface_available"]
+        installation_available = probe["dramatica_flow_installation_surface_available"]
+        configured = bool(reference_available or installation_available)
+        available = False
+        dependency_status = "unavailable"
+        detail = probe["dramatica_flow_probe_detail"]
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": dependency_status,
+            "probe_detail": detail,
+            "dramatica_flow_source_root": probe["dramatica_flow_source_root"],
+            "dramatica_flow_source_available": probe[
+                "dramatica_flow_source_available"
+            ],
+            "dramatica_flow_pyproject_available": probe[
+                "dramatica_flow_pyproject_available"
+            ],
+            "dramatica_flow_readme_available": probe[
+                "dramatica_flow_readme_available"
+            ],
+            "dramatica_flow_readme_en_available": probe[
+                "dramatica_flow_readme_en_available"
+            ],
+            "dramatica_flow_cli_source_available": probe[
+                "dramatica_flow_cli_source_available"
+            ],
+            "dramatica_flow_validators_source_available": probe[
+                "dramatica_flow_validators_source_available"
+            ],
+            "dramatica_flow_package_name": probe["dramatica_flow_package_name"],
+            "dramatica_flow_package_version": probe[
+                "dramatica_flow_package_version"
+            ],
+            "dramatica_flow_requires_python": probe[
+                "dramatica_flow_requires_python"
+            ],
+            "dramatica_flow_declared_dependencies": probe[
+                "dramatica_flow_declared_dependencies"
+            ],
+            "dramatica_flow_console_script_name": probe[
+                "dramatica_flow_console_script_name"
+            ],
+            "dramatica_flow_console_script_target": probe[
+                "dramatica_flow_console_script_target"
+            ],
+            "dramatica_flow_package_metadata_consistent": probe[
+                "dramatica_flow_package_metadata_consistent"
+            ],
+            "dramatica_flow_console_script_consistent": probe[
+                "dramatica_flow_console_script_consistent"
+            ],
+            "dramatica_flow_dist_info_metadata_consistent": probe[
+                "dramatica_flow_dist_info_metadata_consistent"
+            ],
+            "dramatica_flow_dist_info_console_script_consistent": probe[
+                "dramatica_flow_dist_info_console_script_consistent"
+            ],
+            "dramatica_flow_pyproject_console_script_name": probe[
+                "dramatica_flow_pyproject_console_script_name"
+            ],
+            "dramatica_flow_pyproject_console_script_target": probe[
+                "dramatica_flow_pyproject_console_script_target"
+            ],
+            "dramatica_flow_dist_info_console_script_name": probe[
+                "dramatica_flow_dist_info_console_script_name"
+            ],
+            "dramatica_flow_dist_info_console_script_target": probe[
+                "dramatica_flow_dist_info_console_script_target"
+            ],
+            "dramatica_flow_dist_info_name": probe["dramatica_flow_dist_info_name"],
+            "dramatica_flow_dist_info_count": probe["dramatica_flow_dist_info_count"],
+            "dramatica_flow_dist_info_package_name": probe[
+                "dramatica_flow_dist_info_package_name"
+            ],
+            "dramatica_flow_dist_info_package_version": probe[
+                "dramatica_flow_dist_info_package_version"
+            ],
+            "dramatica_flow_dist_info_requires_python": probe[
+                "dramatica_flow_dist_info_requires_python"
+            ],
+            "dramatica_flow_dist_info_declared_dependencies": probe[
+                "dramatica_flow_dist_info_declared_dependencies"
+            ],
+            "dramatica_flow_direct_url_present": probe[
+                "dramatica_flow_direct_url_present"
+            ],
+            "dramatica_flow_direct_url_error": probe[
+                "dramatica_flow_direct_url_error"
+            ],
+            "dramatica_flow_venv_root": probe["dramatica_flow_venv_root"],
+            "dramatica_flow_venv_available": probe["dramatica_flow_venv_available"],
+            "dramatica_flow_venv_python_available": probe[
+                "dramatica_flow_venv_python_available"
+            ],
+            "dramatica_flow_df_entrypoint_available": probe[
+                "dramatica_flow_df_entrypoint_available"
+            ],
+            "dramatica_flow_dist_info_available": probe[
+                "dramatica_flow_dist_info_available"
+            ],
+            "dramatica_flow_editable_install": probe[
+                "dramatica_flow_editable_install"
+            ],
+            "dramatica_flow_editable_source": probe["dramatica_flow_editable_source"],
+            "dramatica_flow_editable_source_matches_expected": probe[
+                "dramatica_flow_editable_source_matches_expected"
+            ],
+            "dramatica_flow_detected_cli_commands": probe[
+                "dramatica_flow_detected_cli_commands"
+            ],
+            "dramatica_flow_analysis_candidate_commands": probe[
+                "dramatica_flow_analysis_candidate_commands"
+            ],
+            "dramatica_flow_prose_production_commands": probe[
+                "dramatica_flow_prose_production_commands"
+            ],
+            "dramatica_flow_model_or_network_surface_detected": probe[
+                "dramatica_flow_model_or_network_surface_detected"
+            ],
+            "dramatica_flow_project_mutation_surface_detected": probe[
+                "dramatica_flow_project_mutation_surface_detected"
+            ],
+            "dramatica_flow_license_claimed": probe[
+                "dramatica_flow_license_claimed"
+            ],
+            "dramatica_flow_license_name": probe["dramatica_flow_license_name"],
+            "dramatica_flow_license_source": probe["dramatica_flow_license_source"],
+            "dramatica_flow_license_file_available": probe[
+                "dramatica_flow_license_file_available"
+            ],
+            "dramatica_flow_license_verified": probe[
+                "dramatica_flow_license_verified"
+            ],
+            "dramatica_flow_reference_surface_available": probe[
+                "dramatica_flow_reference_surface_available"
+            ],
+            "dramatica_flow_installation_surface_available": probe[
+                "dramatica_flow_installation_surface_available"
+            ],
+            "dramatica_flow_analysis_only_runtime_authorized": probe[
+                "dramatica_flow_analysis_only_runtime_authorized"
+            ],
+            "dramatica_flow_live_runtime_available": probe[
+                "dramatica_flow_live_runtime_available"
+            ],
+            "dramatica_flow_integration_decision_required": probe[
+                "dramatica_flow_integration_decision_required"
+            ],
+            "dramatica_flow_runtime_surface": probe["dramatica_flow_runtime_surface"],
+            "dramatica_flow_command_env": probe["dramatica_flow_command_env"],
+            "dramatica_flow_command_configured": probe[
+                "dramatica_flow_command_configured"
+            ],
+            "dramatica_flow_command_value": probe["dramatica_flow_command_value"],
+            "dramatica_flow_path_env": probe["dramatica_flow_path_env"],
+            "dramatica_flow_path_configured": probe[
+                "dramatica_flow_path_configured"
+            ],
+            "dramatica_flow_path_value": probe["dramatica_flow_path_value"],
+            "dramatica_flow_detail": detail,
+        }
     elif adapter == "deterministic_fallback":
         configured = True
         available = hasattr(oao, "OMI_DETERMINISTIC_FALLBACK_ADAPTER_NAME")
@@ -1658,6 +2826,70 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
         )
         report["subtxt_path_value"] = dependency.get("subtxt_path_value")
         report["subtxt_detail"] = dependency.get("subtxt_detail")
+    if adapter == "dramatica_flow":
+        for key in (
+            "dramatica_flow_source_root",
+            "dramatica_flow_source_available",
+            "dramatica_flow_pyproject_available",
+            "dramatica_flow_readme_available",
+            "dramatica_flow_readme_en_available",
+            "dramatica_flow_cli_source_available",
+            "dramatica_flow_validators_source_available",
+            "dramatica_flow_package_name",
+            "dramatica_flow_package_version",
+            "dramatica_flow_requires_python",
+            "dramatica_flow_declared_dependencies",
+            "dramatica_flow_console_script_name",
+            "dramatica_flow_console_script_target",
+            "dramatica_flow_package_metadata_consistent",
+            "dramatica_flow_console_script_consistent",
+            "dramatica_flow_dist_info_metadata_consistent",
+            "dramatica_flow_dist_info_console_script_consistent",
+            "dramatica_flow_pyproject_console_script_name",
+            "dramatica_flow_pyproject_console_script_target",
+            "dramatica_flow_dist_info_console_script_name",
+            "dramatica_flow_dist_info_console_script_target",
+            "dramatica_flow_dist_info_name",
+            "dramatica_flow_dist_info_count",
+            "dramatica_flow_dist_info_package_name",
+            "dramatica_flow_dist_info_package_version",
+            "dramatica_flow_dist_info_requires_python",
+            "dramatica_flow_dist_info_declared_dependencies",
+            "dramatica_flow_direct_url_present",
+            "dramatica_flow_direct_url_error",
+            "dramatica_flow_venv_root",
+            "dramatica_flow_venv_available",
+            "dramatica_flow_venv_python_available",
+            "dramatica_flow_df_entrypoint_available",
+            "dramatica_flow_dist_info_available",
+            "dramatica_flow_editable_install",
+            "dramatica_flow_editable_source",
+            "dramatica_flow_editable_source_matches_expected",
+            "dramatica_flow_detected_cli_commands",
+            "dramatica_flow_analysis_candidate_commands",
+            "dramatica_flow_prose_production_commands",
+            "dramatica_flow_model_or_network_surface_detected",
+            "dramatica_flow_project_mutation_surface_detected",
+            "dramatica_flow_license_claimed",
+            "dramatica_flow_license_name",
+            "dramatica_flow_license_source",
+            "dramatica_flow_license_file_available",
+            "dramatica_flow_license_verified",
+            "dramatica_flow_reference_surface_available",
+            "dramatica_flow_installation_surface_available",
+            "dramatica_flow_analysis_only_runtime_authorized",
+            "dramatica_flow_live_runtime_available",
+            "dramatica_flow_integration_decision_required",
+            "dramatica_flow_runtime_surface",
+            "dramatica_flow_command_env",
+            "dramatica_flow_command_configured",
+            "dramatica_flow_command_value",
+            "dramatica_flow_path_env",
+            "dramatica_flow_path_configured",
+            "dramatica_flow_path_value",
+            "dramatica_flow_probe_detail",
+        ):
+            report[key] = dependency.get(key)
     return report
 
 
