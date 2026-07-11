@@ -770,8 +770,26 @@
     {
       "task_id": "PHASE8-IMPL-023-T021",
       "title": "Cross-tool fusion validation using real runtime outputs",
+      "status": "blocked/in_progress",
+      "scope": "fusion/dedupe/conflict/uncertainty validation against real runtime outputs; first attempt safely blocked after four contributors produced 44 partial findings, Ollama timed out at 180 seconds, and NCP exposed the production validator no-op"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T021A",
+      "title": "Production NCP Node validation opt-in repair",
+      "status": "complete/PASS",
+      "scope": "Replace the unconditional NCP Node-validation no-op with an exact, bounded, fail-closed npm validate:file subprocess path while preserving safe-path containment and the Node-free default; repair only the remaining idempotent fixture setup",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T021A-production-ncp-node-validation-opt-in-repair.md",
+      "artifacts": [
+        "backend/omi_analysis_orchestrator.py",
+        "tests/test_omi_ncp_node_validation_opt_in_contract.py"
+      ],
+      "result": "complete/PASS; exact npm run validate:file -- <absolute-resolved-input-path> argument-list command; shell false; fixed NCP cwd; captured output; text mode; no stdin; 60-second timeout; exact PASS line and zero exit required; unavailable/unsafe/symlink/forbidden/unavailable-process/timeout/nonzero/malformed cases fail closed; Node-free default preserved; continuation changed only input_path.parent.mkdir(parents=True, exist_ok=True); formerly failing node 1 passed; focused 25 passed; regressions 230 passed with one environment-only NVML warning; no real npm/Node/runtime/model/server/network call; no persistence, project/Memory/Canon mutation, promotion/apply-promotion, prose, external-source modification, stage, commit, or push"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T021B",
+      "title": "Cross-tool fusion real-runtime validation rerun after NCP validator repair",
       "status": "planned",
-      "scope": "fusion/dedupe/conflict/uncertainty validation against real runtime outputs"
+      "scope": "Rerun the same six mandatory contributors with OMI_LIVE_NCP_VALIDATE_WITH_NODE=1 and OMI_LIVE_OLLAMA_TIMEOUT_SECONDS=600; do not redesign fusion or persistence"
     },
     {
       "task_id": "PHASE8-IMPL-023-T022",
@@ -815,18 +833,28 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T020F",
+  "latest_child_task": "PHASE8-IMPL-023-T021A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020F-manual-real-owner-authored-dramatica-flow-informed-rubric-validation.md",
-  "next_child_task": "PHASE8-IMPL-023-T021",
-  "next_child_title": "Cross-tool fusion validation using real runtime outputs",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T021A-production-ncp-node-validation-opt-in-repair.md",
+  "next_child_task": "PHASE8-IMPL-023-T021B",
+  "next_child_title": "Cross-tool fusion real-runtime validation rerun after NCP validator repair",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Manual real owner-authored dramatica-flow-informed rubric validation",
-  "latest_child_summary": "T020F ran one authoritative real in-process OMI validation through the committed built-in dramatica_flow_informed_rubric path with persist_candidates=False. Builder, real runner, and T020D evaluator counts were each 1. The result succeeded with 9 evidence-backed pending-review findings covering all nine required categories; insufficient_evidence was absent; mappings, evidence, locators, provenance/support, low/medium confidence, allowed uncertainty, pending owner decisions, and every safety flag passed; persistence remained not_requested; protected before/after state was identical; py_compile and 708 regressions passed. Complete live runtime remains OWNER-BLOCKED / REFERENCE-ONLY, narrow runtime remains REJECT/DEFER, and T009 remains fixture-only/distinct. T020F and T020 are complete/PASS. T021 is planned next; PHASE8-IMPL-023 remains active and full MVP completion remains blocked.",
+  "latest_child_title": "Production NCP Node validation opt-in repair",
+  "latest_child_summary": "T021A replaced the production NCP Node-validator no-op with an exact bounded fail-closed subprocess path while preserving the Node-free default, safe-path containment, and no-candidate failure behavior. The first T021A execution stopped after two focused-command failures; this continuation changed only the fixture's idempotent parent mkdir. The formerly failing node, 25 focused tests, and 230 regressions passed, with one environment-only NVML warning. No real npm/Node/runtime operation occurred. T021 remains blocked/in_progress; T021B is planned next with Node validation enabled, Ollama timeout 600 seconds, and the same six contributors. PHASE8-IMPL-023 remains active and full MVP completion remains blocked.",
   "latest_child_validation": {
+    "t021a_formerly_failing_test_count": 1,
+    "t021a_focused_test_count": 25,
+    "t021a_regression_test_count": 230,
+    "t021a_regression_warning_count": 1,
+    "t021a_fixture_only_continuation": true,
+    "t021a_no_real_runtime_execution": true,
+    "t021_parent_blocked_in_progress": true,
+    "t021b_same_six_contributors": true,
+    "t021b_ncp_node_validation_enabled": true,
+    "t021b_ollama_timeout_seconds": 600,
     "t020f_finding_count": 9,
     "t020f_builder_runner_evaluator_counts": [1, 1, 1],
     "t020f_required_categories_present": true,

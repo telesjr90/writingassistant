@@ -149,6 +149,8 @@
 
 # Open Questions
 
+- `PHASE8-IMPL-023-T021` remains blocked/in_progress after the safely blocked first real-runtime fusion attempt. `PHASE8-IMPL-023-T021A` is complete/PASS and repaired the NCP Node validator no-op. Next: run planned T021B with `OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`, `OMI_LIVE_OLLAMA_TIMEOUT_SECONDS=600`, and the same six mandatory contributors; determine whether the rerun completes fusion validation. T022 remains planned only after T021 completes, and full MVP completion remains blocked.
+
 Owner decisions have answered the original roadmap questions. Remaining items below are implementation or verification follow-ups, not unresolved product decisions.
 
 ## Accepted Answers

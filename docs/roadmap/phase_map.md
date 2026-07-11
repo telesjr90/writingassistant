@@ -254,6 +254,8 @@
 
 # Phase Map
 
+- Current frontier: `PHASE8-IMPL-023` is published/active; `PHASE8-IMPL-023-T021A` is complete/PASS; `PHASE8-IMPL-023-T021` remains blocked/in_progress; `PHASE8-IMPL-023-T021B` (cross-tool fusion real-runtime validation rerun after NCP validator repair) is planned next with the same six contributors, Node validation opt-in enabled, and the Ollama timeout set to 600 seconds. T022 follows only after T021 completion. Full MVP completion remains blocked.
+
 - `PHASE8-IMPL-023-T020B` — complete/PASS: complete dramatica-flow runtime OWNER-BLOCKED / REFERENCE-ONLY; narrow runtime subset REJECT/DEFER; separate app-owned rubric path ACCEPTED. `PHASE8-IMPL-023-T020` remains in progress. Next: `PHASE8-IMPL-023-T020C - App-owned dramatica-flow-informed analysis-rubric contract` (planned); do not skip to T021.
 - `PHASE8-IMPL-023-T020C` — complete/PASS: separate app-owned contract, ten bounded categories/mappings, fail-closed safety, and 237 focused tests. `PHASE8-IMPL-023-T020` remains in progress. Next: `PHASE8-IMPL-023-T020D - App-owned dramatica-flow-informed analysis-rubric evaluator` (planned).
 - `PHASE8-IMPL-023-T020D` — complete/PASS: pure local deterministic T020C evaluator, original bounded app-owned rules, exact evidence/provenance/pending review, fail-closed safety, 142 focused tests, and 787 requested regression tests. `PHASE8-IMPL-023-T020` remains in progress. Next: `PHASE8-IMPL-023-T020E - App-owned dramatica-flow-informed analysis-rubric OMI adapter integration` (planned); do not skip to T021.

@@ -94,6 +94,8 @@ import hashlib
 import json
 import os
 import re
+import shutil
+import subprocess
 import tempfile
 import urllib.error
 import urllib.request
@@ -5195,15 +5197,16 @@ _OMI_BOOKNLP_LIVE_SKIP_ENTITY_TEXTS: frozenset[str] = frozenset({
 #     does not run ``npm install``/``npm audit fix``/``npm run validate:file``
 #     over project data, and does not start a Node server.
 #   * The optional ``OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`` opt-in would
-#     invoke the in-repo ``node`` validator as a child process. The opt-in
-#     is opt-in only, must point at the explicit safe input file, and must
-#     be mocked in tests.
+#     invoke the checked-in NCP package's ``validate:file`` script as a
+#     bounded, fail-closed child process. The opt-in is opt-in only, must
+#     point at the explicit safe input file, and is mocked in tests.
 
 _OMI_LIVE_NCP_ENABLED_ENV = "OMI_LIVE_NCP_ENABLED"
 _OMI_LIVE_NCP_BLOCKED_ENV = "OMI_LIVE_NCP_BLOCKED"
 _OMI_LIVE_NCP_BLOCKED_REASON_ENV = "OMI_LIVE_NCP_BLOCKED_REASON"
 _OMI_LIVE_NCP_INPUT_PATH_ENV = "OMI_LIVE_NCP_INPUT_PATH"
 _OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV = "OMI_LIVE_NCP_VALIDATE_WITH_NODE"
+_OMI_LIVE_NCP_NODE_VALIDATION_TIMEOUT_SECONDS = 60.0
 
 # Maximum number of NCP-derived candidate findings the runner will produce
 # from a single NCP JSON file. The cap protects against unbounded NCP
@@ -5693,40 +5696,79 @@ def _ncp_validate_with_node_opt_in(
     *,
     absolute_input_path: Path,
 ) -> bool:
-    """Opt-in Node ``validate:file`` check for an explicit safe NCP file.
+    """Run the opt-in NCP ``validate:file`` check for one safe input file.
 
-    This helper is intentionally minimal and fail-closed:
-
-      * Returns ``True`` only when the owner has opted in via
-        ``OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`` AND
-        ``OMI_LIVE_NCP_INPUT_PATH`` is set AND the resolved file path
-        satisfies ``_ncp_resolve_allowed_input_path``.
-      * Otherwise returns ``False``. It never raises.
-
-    The actual ``node tests/validate-file.js`` invocation is delegated to
-    tests; production callers may pass a custom ``subprocess_runner`` in
-    the future. The current production behavior is to return ``False``
-    unless the opt-in is set, the file is allowed, and the caller wires
-    in a custom runner. The helper exists so the live runner has a
-    single, mockable entry point for the opt-in Node validation step.
+    The caller owns the disabled-by-default environment gate. This helper
+    independently revalidates the exact already-resolved owner-selected
+    file, invokes only the checked-in NCP validator with a finite timeout,
+    and returns ``False`` for every unsafe, unavailable, malformed, timeout,
+    OS, or validator-failure condition. It never raises or surfaces child
+    process output.
     """
     if not isinstance(absolute_input_path, Path):
         return False
+
+    if not absolute_input_path.is_absolute():
+        return False
+
     try:
-        if not absolute_input_path.is_file():
+        if absolute_input_path.is_symlink():
             return False
-    except OSError:
+        resolved_input_path = absolute_input_path.resolve(strict=True)
+        if resolved_input_path != absolute_input_path:
+            return False
+        if resolved_input_path.is_symlink() or not resolved_input_path.is_file():
+            return False
+    except (OSError, RuntimeError, ValueError):
         return False
-    env = os.environ
-    if not _env_bool(env, _OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV):
+
+    allowed_input_path = _ncp_resolve_allowed_input_path(str(resolved_input_path))
+    if allowed_input_path is None or allowed_input_path != resolved_input_path:
         return False
-    # The opt-in is intentionally a no-op stub for T018B. The full Node
-    # invocation is mocked in tests. Future tasks may extend this helper
-    # to actually shell out to ``node tests/validate-file.js`` against the
-    # explicit safe input file, but only with the same opt-in + explicit
-    # file + mocked subprocess contract. T018B does not perform that
-    # subprocess invocation.
-    return False
+
+    try:
+        repo_root = Path(__file__).resolve(strict=True).parent.parent
+        ncp_source_root = (
+            repo_root / ".external_sources" / "narrative-context-protocol"
+        ).resolve(strict=True)
+        if not ncp_source_root.is_dir():
+            return False
+        if not (ncp_source_root / "package.json").is_file():
+            return False
+        if not (ncp_source_root / "tests" / "validate-file.js").is_file():
+            return False
+    except (OSError, RuntimeError, ValueError):
+        return False
+
+    npm_executable = shutil.which("npm")
+    if not npm_executable:
+        return False
+
+    try:
+        completed = subprocess.run(
+            [
+                npm_executable,
+                "run",
+                "validate:file",
+                "--",
+                str(resolved_input_path),
+            ],
+            cwd=ncp_source_root,
+            shell=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=_OMI_LIVE_NCP_NODE_VALIDATION_TIMEOUT_SECONDS,
+            stdin=subprocess.DEVNULL,
+            check=False,
+        )
+    except (subprocess.TimeoutExpired, OSError, ValueError):
+        return False
+
+    if completed.returncode != 0 or not isinstance(completed.stdout, str):
+        return False
+    expected_success_line = f"PASS {resolved_input_path}"
+    return expected_success_line in completed.stdout.splitlines()
 
 
 def _ncp_build_finding_from_item(
@@ -5849,13 +5891,11 @@ def _build_ncp_live_runner(
         ``OMI_LIVE_NCP_INPUT_PATH``.
       * Reads the owner-selected NCP JSON file (no project-data scan).
       * Validates the JSON shape with a minimal Python-side schema/readiness
-        check (no Node, no npm, no ``.external_sources`` writes).
+        check without mutating ``.external_sources``.
       * Optionally invokes a Node ``validate:file`` subprocess ONLY when
         ``OMI_LIVE_NCP_VALIDATE_WITH_NODE=1`` is set AND the explicit
-        safe input file is set. The subprocess call is bounded, fail-closed,
-        and mocked in tests. The current T018B implementation returns
-        ``False`` from the opt-in helper; tests that need a real
-        subprocess call must monkeypatch ``_ncp_validate_with_node_opt_in``.
+        safe input file is set. The subprocess call validates only that file,
+        is bounded and fail-closed, and is mocked in automated tests.
       * Maps a small, evidence-backed subset of NCP fields into the
         existing T009 ``omi_ncp_context_handoff.v1`` envelope shape and
         validates the converted envelope through
@@ -5919,10 +5959,8 @@ def _build_ncp_live_runner(
                 "candidates": [],
             }
 
-        # Opt-in Node validation step. The opt-in is intentionally a no-op
-        # for T018B (the helper returns ``False`` unless tests monkeypatch
-        # a custom subprocess runner in). Fail-closed if the opt-in is
-        # enabled but the subprocess path is unavailable or fails.
+        # Opt-in Node validation step. Fail closed if the bounded validator
+        # invocation is unavailable, unsafe, malformed, times out, or fails.
         opt_in_enabled = _env_bool(
             os.environ, _OMI_LIVE_NCP_VALIDATE_WITH_NODE_ENV
         )
