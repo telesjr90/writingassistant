@@ -644,10 +644,18 @@
       "result": "complete/PASS; 17 focused mocked tests pass (all mocked, no real .external_sources/subtxt-docs dependency); no subprocess/shell/network; no .external_sources mutation; no live Subtxt runtime claimed; no persistence; no Memory/Canon mutation; no promotion/apply-promotion; no story prose"
     },
     {
+      "task_id": "PHASE8-IMPL-023-T019B",
+      "title": "Subtxt integration-path decision",
+      "status": "complete/PASS",
+      "scope": "docs-only owner-controlled integration-path decision; records that live Subtxt runtime is OWNER-BLOCKED, app-owned Subtxt-informed semantic-rubric path is ACCEPTED, automatic Dramatica/Storyform truth is FORBIDDEN, claiming Subtxt execution without a real authorized runtime is FORBIDDEN; documents rationale, license boundary, accepted future rubric boundary, labeling requirements, reopening conditions, and existing contract preservation; no rubric, adapter, prompt, model integration, backend, tests, frontend, .external_sources, package, subprocess, network, candidate persistence, project mutation, Memory/Canon mutation, promotion, apply-promotion, or story prose generation occurred",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019B-subtxt-integration-path-decision.md",
+      "result": "complete/PASS; live Subtxt runtime is owner-blocked; app-owned Subtxt-informed semantic-rubric path is accepted; T019C is the recommended next task"
+    },
+    {
       "task_id": "PHASE8-IMPL-023-T019",
       "title": "Live Subtxt integration in OMI and analysis",
-      "status": "planned",
-      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status; T019A docs preflight is complete/PASS; T019B integration-path decision is the recommended next task"
+      "status": "in_progress",
+      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status; T019A docs preflight is complete/PASS; T019B integration-path decision is complete/PASS; T019C (App-owned Subtxt-informed semantic-rubric contract) is the recommended next task"
     },
     {
       "task_id": "PHASE8-IMPL-023-T020",
@@ -692,29 +700,28 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T019A",
+  "latest_child_task": "PHASE8-IMPL-023-T019B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019A-subtxt-docs-source-preflight.md",
-  "next_child_task": "PHASE8-IMPL-023-T019B",
-  "next_child_title": "Subtxt integration-path decision",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019B-subtxt-integration-path-decision.md",
+  "next_child_task": "PHASE8-IMPL-023-T019C",
+  "next_child_title": "App-owned Subtxt-informed semantic-rubric contract",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Subtxt docs/source preflight",
-  "latest_child_summary": "T019A replaces the overbroad generic Subtxt check in backend/omi_runtime_preflight.py with a focused, read-only Subtxt documentation/source preflight (_subtxt_docs_source_probe). The probe inspects .external_sources/subtxt-docs and reports subtxt_live_runtime_available: False even when all docs surfaces are present and even when configured env vars. 17 new mocked tests. Package name nuxt-ui-pro-template-docs, docs-site scripts (build, dev, generate, lint, postinstall, preview, typecheck), CC BY-NC-SA 4.0 license. No subprocess/shell/network. T019B is the recommended next task.",
+  "latest_child_title": "Subtxt integration-path decision",
+  "latest_child_summary": "T019B completes the docs-only owner-controlled integration-path decision for Subtxt. Live Subtxt runtime is OWNER-BLOCKED. No supported local Subtxt CLI, library, API, validator, or executable analysis engine was found. The app-owned Subtxt-informed semantic-rubric path is ACCEPTED for separate implementation. Automatic Dramatica/Storyform truth is FORBIDDEN. Claiming Subtxt execution without a real authorized runtime is FORBIDDEN. License boundary (CC BY-NC-SA 4.0) caveat is recorded. Accepted future rubric boundary, labeling requirements, and reopening conditions are documented. No rubric, adapter, prompt, model, backend, tests, frontend, .external_sources, package, subprocess, network, candidate persistence, project mutation, Memory/Canon mutation, promotion, apply-promotion, or story prose generation occurred. T019C (App-owned Subtxt-informed semantic-rubric contract) is the recommended next task.",
   "latest_child_validation": {
-    "t019a_preflight_contract": "tests/test_omi_live_runtime_preflight_contract.py -> all tests pass (existing + 17 new T019A sutbtxt tests); no real .external_sources/subtxt-docs dependency; all tests mock _subtxt_docs_source_probe",
-    "t019a_no_subprocess_or_network": "subprocess.run, subprocess.Popen, urllib.request.urlopen intercepted in test_subtxt_preflight_does_not_invoke_subprocess_shell_network_or_npm; no calls made",
-    "t019a_no_persistence_or_mutation": "test_subtxt_preflight_does_not_persist_or_mutate: project summary unchanged before/after; all safety flags false",
-    "t019a_docs_reference_vs_live_runtime": "test_subtxt_docs_reference_does_not_make_live_runtime_available: subtxt_live_runtime_available=False even when all docs surfaces present and Subtxt flags enabled",
-    "t019a_source_path_exact": "test_subtxt_source_path_is_exact_subtxt_docs_not_generic_external_sources: source path is .external_sources/subtxt-docs, not .external_sources",
-    "t019a_missing_source": "test_subtxt_missing_source_root_reports_unavailable: runtime_surface=unavailable, source_available=False, configured=False",
-    "t019a_degraded_surface": "test_subtxt_missing_content_root_reports_degraded and test_subtxt_missing_key_docs_reports_degraded: runtime_surface=degraded when core docs missing",
-    "t019a_license_detection": "test_subtxt_license_detected_from_readme: license_declared=True, license_name=CC BY-NC-SA 4.0, license_source=README.md",
-    "t019a_package_metadata": "test_subtxt_package_metadata_reported_without_executing_scripts: package_name=nuxt-ui-pro-template-docs, private=True, scripts contain build/dev/generate/lint/postinstall/preview/typecheck",
-    "t019a_command_path_env_config_only": "test_subtxt_command_env_surfaced_as_configuration_only and test_subtxt_path_env_surfaced_as_configuration_only: configured env vars surfaced but live_runtime_available=False",
-    "t019a_blocked_override": "test_subtxt_blocked_flag_overrides_docs_availability: blocked=True, status=blocked, docs surfaces still visible"
+    "t019b_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019B-subtxt-integration-path-decision.md exists and contains required decision language (owner-blocked, app-owned, Subtxt-informed, semantic rubric, automatic Storyform forbidden, live Subtxt runtime)",
+    "t019b_license_caveat": "CC BY-NC-SA 4.0 detected in README, no root license file, commercial copying/redistribution/adaptation caveat recorded without legal conclusion",
+    "t019b_no_forbidden_overclaims": "no instance of 'live Subtxt integration is complete', 'Subtxt runtime is available', 'official Subtxt analysis', or 'Subtxt-confirmed Storyform' in any updated roadmap file",
+    "t019b_no_rubric_implementation": "no rubric, adapter, prompt, or model integration was implemented in this task",
+    "t019b_no_backend_or_test_changes": "no backend, test, or frontend files were modified",
+    "t019b_no_external_sources_changes": ".external_sources was not modified",
+    "t019b_no_docs_copying": "no documentation content was copied into application code",
+    "t019b_no_subprocess_or_network": "no package, Nuxt, subprocess, shell, network, or server operation occurred",
+    "t019b_no_story_prose": "no story prose generation occurred",
+    "t019b_unrelated_leftovers_untouched": "known unrelated leftovers were not modified"
   },
   "latest_child_no_side_effects": {
     "no_memory_canon_mutation": true,
@@ -737,6 +744,11 @@
     "no_project_file_modification": true,
     "no_promotion_file_modification": true,
     "no_test_framework_addition": true,
-    "no_staging_commit_or_push": true
+    "no_staging_commit_or_push": true,
+    "no_rubric_implementation": true,
+    "no_adapter_implementation": true,
+    "no_prompt_addition": true,
+    "no_model_calls": true,
+    "no_docs_copying_into_application_code": true
   }
 }
