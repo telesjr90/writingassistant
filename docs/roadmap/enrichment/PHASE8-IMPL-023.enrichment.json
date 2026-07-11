@@ -697,7 +697,7 @@
       "task_id": "PHASE8-IMPL-023-T020",
       "title": "Live dramatica-flow integration in OMI and analysis",
       "status": "in_progress",
-      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status; T020A source/runtime preflight and safety inventory is complete/PASS; T020B integration-path and analysis-only boundary decision is complete/PASS; T020C app-owned dramatica-flow-informed analysis-rubric contract is next"
+      "scope": "live dramatica-flow integration in OMI and analysis or explicit owner-blocked status; T020A source/runtime preflight and safety inventory is complete/PASS; T020B integration-path and analysis-only boundary decision is complete/PASS; T020C app-owned dramatica-flow-informed analysis-rubric contract is complete/PASS; T020D app-owned deterministic/rule-assisted evaluator is next"
     },
     {
       "task_id": "PHASE8-IMPL-023-T020A",
@@ -722,8 +722,20 @@
     {
       "task_id": "PHASE8-IMPL-023-T020C",
       "title": "App-owned dramatica-flow-informed analysis-rubric contract",
+      "status": "complete/PASS",
+      "scope": "Pure standard-library app-owned request/result contract with separate identity, schemas, support label, ten bounded diagnostic categories and existing-OMI mappings, exact statement/evidence/provenance/pending-owner-review rules, low/medium confidence only, four finding buckets, hard-false operations, recursive unsafe-output rejection, and a safe fail-closed builder; no evaluator, adapter, runtime, persistence, mutation, model/server/network/subprocess call, external-source read/copy, or prose",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020C-app-owned-dramatica-flow-informed-analysis-rubric-contract.md",
+      "artifacts": [
+        "backend/story_knowledge/dramatica_flow_informed_analysis_rubric_contract.py",
+        "tests/test_omi_dramatica_flow_informed_analysis_rubric_contract.py"
+      ],
+      "result": "complete/PASS; focused T020C tests 237 passed; generic validate_analysis_runtime_output compatibility passes for rubric_mapping_support; T009/T019C/T020A/T020B preserved; no dramatica-flow import/execution/source read, no copied external material, no evaluator/adapter, no model/server/network/subprocess call, no persistence/project/Memory/Canon mutation, no promotion/apply-promotion, no prose; T020 remains in_progress; T020D evaluator is next"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T020D",
+      "title": "App-owned dramatica-flow-informed analysis-rubric evaluator",
       "status": "planned",
-      "scope": "Define a pure app-owned input/output contract for a future dramatica-flow-informed analysis rubric. Establish an internal identity, request/result schemas, user-facing support label, bounded diagnostic categories, category-to-candidate mappings, statement-kind rules, evidence/source-locator requirements, provenance, owner-decision and review-status requirements, confidence and uncertainty policies, and recursive fail-closed unsafe-output rejection. Preserve the existing T009 dramatica_flow fixture identity, schema, support label, and fixture-only behavior. The contract must not import, execute, or read dramatica-flow at runtime; must not copy external source code, prompts, templates, algorithms, issue descriptions, or suggestions; and must not implement an evaluator, OMI adapter, route, UI, persistence, Memory/Canon mutation, promotion/apply-promotion, model call, server call, or story prose. Do not skip to T021."
+      "scope": "Implement a pure local deterministic/rule-assisted evaluator using the committed T020C contract and original app-owned rules. It must not read or execute dramatica-flow, call a model, persist candidates, mutate project/truth/Memory/Canon state, promote/apply-promotion, or generate prose."
     },
     {
       "task_id": "PHASE8-IMPL-023-T021",
@@ -773,18 +785,23 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T020A",
+  "latest_child_task": "PHASE8-IMPL-023-T020C",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020A-dramatica-flow-source-runtime-preflight-and-safety-inventory.md",
-  "next_child_task": "PHASE8-IMPL-023-T020B",
-  "next_child_title": "Dramatica-flow integration-path and analysis-only boundary decision",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T020C-app-owned-dramatica-flow-informed-analysis-rubric-contract.md",
+  "next_child_task": "PHASE8-IMPL-023-T020D",
+  "next_child_title": "App-owned dramatica-flow-informed analysis-rubric evaluator",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Dramatica-flow source/runtime preflight and safety inventory",
-  "latest_child_summary": "T020A added a focused, read-only dramatica-flow source/runtime preflight and safety inventory. The real source probe reports source available, package dramatica-flow, version 0.1.0, Python >=3.11, console script df = cli.main:app, editable venv available with exact editable-source match, runtime_surface=installed_reference_surface, detected commands audit/book/create/delete/doctor/export/init/init-templates/list/load/revise/setup/show/status/threads/update/write, analysis_candidate_commands=[audit, status], prose_production_commands=[export, revise, write], model/network/server evidence detected, project mutation evidence detected, MIT claimed through README files, no root license file, license not verified, integration decision required, and runtime unauthorized/unavailable. Hard-false values remain: dramatica_flow_analysis_only_runtime_authorized=false, dramatica_flow_live_runtime_available=false, runtime_dependency_available=false. Focused T020A tests passed (42 selected). No dramatica-flow import or execution, no df execution, no server/model/network/subprocess/shell call by the probe, no install or external-source mutation, no orchestrator/T009/runtime-integration/route/UI/persistence/Memory/Canon/promotion/prose change, and no stage/commit/push occurred. T020 parent is now in_progress. Next task: PHASE8-IMPL-023-T020B - Dramatica-flow integration-path and analysis-only boundary decision.",
+  "latest_child_title": "App-owned dramatica-flow-informed analysis-rubric contract",
+  "latest_child_summary": "T020C implemented a pure standard-library app-owned input/output contract with identity app_owned_dramatica_flow_informed_rubric, request/result v1 schemas, rubric_mapping_support output class, App-owned dramatica-flow-informed diagnostic support label, ten bounded categories mapped to existing OMI candidate vocabulary, low/medium support only, exact evidence/provenance/pending-owner-review rules, separate substantive/question/ambiguity/insufficient-evidence buckets, recursive unsafe-output rejection, and a safe fail-closed builder. Focused T020C tests passed (237); generic runtime-output compatibility passes. T009/T019C/T020A/T020B remain unchanged. No dramatica-flow import/execution/source read, copied external material, evaluator/adapter, model/server/network/subprocess call, persistence/project/Memory/Canon mutation, promotion/apply-promotion, or prose. T020 remains in_progress. Next task: PHASE8-IMPL-023-T020D - App-owned dramatica-flow-informed analysis-rubric evaluator.",
   "latest_child_validation": {
+    "t020c_test_count": 237,
+    "t020c_generic_runtime_compatible": true,
+    "t020c_t009_t019c_t020a_t020b_preserved": true,
+    "t020c_no_external_source_read_or_copy": true,
+    "t020c_no_evaluator_or_adapter": true,
     "t019e_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019E-app-owned-subtxt-informed-semantic-rubric-omi-adapter-integration.md exists and contains required decision language (app-owned OMI adapter identity subtxt_informed_rubric, distinct from T009 subtxt and from T019C internal app_owned_subtxt_informed_rubric, user-facing support label App-owned Subtxt-informed diagnostic support, explicit-only adapter gate, omission from OMI_DEFAULT_ADAPTERS and OMI_CONTEXT_ADAPTER_NAMES, no fixture path, no env flags, no preflight integration, T019C request construction with safe project_name preservation or deterministic safe alias, all 13 T019C safety confirmations set to True, T019C status mapping, no partial findings on failure, T019C internal provenance validated before conversion, OMI provenance conversion, evidence and owner-review preservation, fail-closed, no new persistence, no preflight/env/live-runtime integration, T009 preservation, no live Subtxt execution, no external documentation read or copied, no model call, no OMI live integration, no contract/evaluator/preflight/main/project_manager modification, no existing test modification except the one-line REQUIRED_ADAPTERS allowlist addition, no file/network/subprocess/env access in T019E helpers, no persistence or queue creation, no Memory/Canon mutation, no promotion/apply-promotion, no story prose, no stage/commit/push)",
     "t019e_omi_adapter_identity": "subtxt_informed_rubric",
     "t019e_requested_categories": [
