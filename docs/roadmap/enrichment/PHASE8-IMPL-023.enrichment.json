@@ -836,10 +836,28 @@
       "result": "complete/PASS; live orchestrator calls=0; persistence helper calls=2; first persistence persisted/new/reused=113/113/0; replay already_persisted/new/reused=0/113; final OMI ideas/candidates/promotions=2/115/0; every candidate matched preserved evidence/provenance/fingerprint/ID/conflict/uncertainty/pending-review metadata; replay and protected-state proof passed; focused OMI regressions 301 passed, 51 deselected, one environment-only NVML warning"
     },
     {
+      "task_id": "PHASE8-IMPL-023-T023A",
+      "title": "Grouped-review data contract and route-boundary decision",
+      "status": "complete/PASS",
+      "scope": "Establish the authoritative existing OMI summary and candidate-decision routes, keep review-queue storage separate, and add a pure deterministic grouped-review data contract for the persisted T022 candidates.",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023A-grouped-review-data-contract-and-route-boundary.md",
+      "artifacts": [
+        "frontend/src/omiGroupedReview.js",
+        "frontend/tests/omiGroupedReview.test.mjs"
+      ],
+      "result": "complete/PASS; no new backend route; OMI summary is the authoritative read source; candidate-decision PATCH is the authoritative owner-decision path; pure grouping uses only source-idea-linked omi_tool_assisted_fused_analysis records, adapter/type grouping, deterministic ordering, preserved review metadata, and no-approval/no-truth/no-canon/no-apply-promotion boundaries; Node tests, build, 48 focused regressions, and read-only real-data validation passed."
+    },
+    {
       "task_id": "PHASE8-IMPL-023-T023",
       "title": "Grouped owner-review UI for real runtime findings",
+      "status": "in_progress",
+      "scope": "Child sequence: T023A grouped-review data contract and route-boundary decision (complete/PASS); T023B grouped-review React UI and owner-decision integration (planned); T023C automated frontend/backend integration tests (planned); T023D manual browser and accessibility validation (planned); parent closeout only after all children pass."
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T023B",
+      "title": "Grouped-review React UI and owner-decision integration",
       "status": "planned",
-      "scope": "grouped owner-review UI for real runtime findings"
+      "scope": "Render the T023A grouped model from the authoritative OMI summary and use server-confirmed candidate-decision responses followed by an OMI refresh; no optimistic approval state, promotion, or apply-promotion."
     },
     {
       "task_id": "PHASE8-IMPL-023-T024",
@@ -871,17 +889,17 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T022B",
+  "latest_child_task": "PHASE8-IMPL-023-T023A",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T022B-resume-candidate-only-persistence-using-preserved-real-findings.md",
-  "next_child_task": "PHASE8-IMPL-023-T023",
-  "next_child_title": "Grouped owner-review UI for real runtime findings",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023A-grouped-review-data-contract-and-route-boundary.md",
+  "next_child_task": "PHASE8-IMPL-023-T023B",
+  "next_child_title": "Grouped-review React UI and owner-decision integration",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Resume candidate-only persistence using preserved real T022 findings",
-  "latest_child_summary": "T022B persisted the exact 113 preserved real findings once as pending candidate-only review material and replayed all IDs without mutation. It made zero live orchestrator calls and exactly two persistence-helper calls. Evidence/provenance/fingerprints/normalized IDs/duplicate-conflict-uncertainty metadata, promotion ineligibility, protected paths, and 301 focused OMI regressions passed. T022B and T022 are complete/PASS; T023 is planned; PHASE8-IMPL-023 remains published/active and full MVP completion remains blocked.",
+  "latest_child_title": "Grouped-review data contract and route-boundary decision",
+  "latest_child_summary": "T023A established the existing OMI summary as the authoritative persisted-candidate read source and the existing candidate-decision PATCH as the authoritative owner-action path. It added a pure deterministic grouped-review module and Node tests, without backend/UI/project mutation. T023A is complete/PASS; T023 is in progress; T023B is planned next; PHASE8-IMPL-023 remains published/active and full MVP completion remains blocked.",
   "latest_child_validation": {
     "t021b_authoritative_invocation_count": 1,
     "t021b_ncp_helper_call_count": 1,
