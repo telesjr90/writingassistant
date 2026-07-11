@@ -27,6 +27,19 @@ probe surfaces the explicit ``OMI_LIVE_NCP_INPUT_PATH`` and the opt-in
 probe does not read, parse, validate, or write any NCP file even when
 the input path env var is set, and does not invoke Node or ``npm`` based
 on these env vars. The probe is read-only and never mutates state.
+
+T019A extends the ``subtxt`` adapter probe with a focused, read-only
+Subtxt documentation/source preflight that replaces the current overbroad
+generic Subtxt check. The new preflight inspects the actual local source
+at ``.external_sources/subtxt-docs`` and accurately reports whether the
+official Subtxt documentation source is present, whether its core
+documentation surfaces are present, whether its README license declaration
+and package metadata are discoverable, that this repository is a
+documentation/reference surface (not a live Subtxt analysis runtime), that
+no runnable Subtxt classifier, semantic-analysis executable, machine schema
+validator, or local analysis API has been established, and that configured
+command/path env vars are configuration evidence only and must not make the
+runtime available. T019A does not implement a live Subtxt adapter.
 """
 
 from __future__ import annotations
@@ -142,6 +155,44 @@ NCP_AUDIT_CAVEAT = (
 NCP_INPUT_PATH_ENV = "OMI_LIVE_NCP_INPUT_PATH"
 NCP_VALIDATE_WITH_NODE_ENV = "OMI_LIVE_NCP_VALIDATE_WITH_NODE"
 
+# T019A Subtxt documentation source preflight constants.
+# The official local clone SHA is:
+#   ec66121364c039693314dcce4cde464e497bece4
+SUBTXT_SOURCE_REL = ".external_sources/subtxt-docs"
+SUBTXT_README_REL = ".external_sources/subtxt-docs/README.md"
+SUBTXT_PACKAGE_JSON_REL = ".external_sources/subtxt-docs/package.json"
+SUBTXT_CONTENT_ROOT_REL = ".external_sources/subtxt-docs/content"
+SUBTXT_CONTENT_INDEX_REL = ".external_sources/subtxt-docs/content/index.yml"
+SUBTXT_KEY_CONCEPTS_REL = (
+    ".external_sources/subtxt-docs/content/1.getting-started/5.key-concepts.md"
+)
+SUBTXT_NARRATIVE_ASPECTS_REL = (
+    ".external_sources/subtxt-docs/content/2.narrative-aspects"
+)
+SUBTXT_STORYPOINTS_REL = (
+    ".external_sources/subtxt-docs/content/2.narrative-aspects/5.storypoints.md"
+)
+SUBTXT_STORYBEATS_REL = (
+    ".external_sources/subtxt-docs/content/2.narrative-aspects/6.storybeats.md"
+)
+SUBTXT_NARRATIVE_INTELLIGENCE_INDEX_REL = (
+    ".external_sources/subtxt-docs/content/5.narrative-intelligence/0.index.md"
+)
+SUBTXT_ADVANCED_CONCEPTS_INDEX_REL = (
+    ".external_sources/subtxt-docs/content/6.advanced-concepts/0.index.md"
+)
+SUBTXT_NARRATIVE_TASKS_INDEX_REL = (
+    ".external_sources/subtxt-docs/content/7.narrative-tasks/0.index.md"
+)
+SUBTXT_API_REFERENCE_INDEX_REL = (
+    ".external_sources/subtxt-docs/content/8.API-reference/0.index.md"
+)
+SUBTXT_COMMAND_ENV = "OMI_LIVE_SUBTXT_COMMAND"
+SUBTXT_PATH_ENV = "OMI_LIVE_SUBTXT_PATH"
+SUBTXT_CC_LICENSE = (
+    "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
+)
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -218,6 +269,27 @@ def _safe_read_json(absolute_path: Path) -> dict[str, Any] | None:
     if not isinstance(parsed, dict):
         return None
     return parsed
+
+
+def _safe_read_text(absolute_path: Path, max_bytes: int = 65536) -> str | None:
+    """Read a small text file into a string, returning ``None`` on failure.
+
+    Read-only, fail-closed helper for small metadata files such as
+    ``README.md``. Never writes; never raises.
+    """
+    try:
+        if not absolute_path.is_file():
+            return None
+    except OSError:
+        return None
+    try:
+        with absolute_path.open("rb") as handle:
+            data = handle.read(max_bytes + 1)
+        if len(data) > max_bytes:
+            return None
+        return data.decode("utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
 
 
 def _package_json_script_names(package_json: dict[str, Any]) -> list[str]:
@@ -380,6 +452,194 @@ def _ncp_runtime_probe(env: Mapping[str, str] | None = None) -> dict[str, Any]:
         "ncp_validate_with_node_env": NCP_VALIDATE_WITH_NODE_ENV,
         "ncp_validate_with_node_enabled": ncp_validate_with_node_enabled,
         "ncp_detail": detail,
+    }
+
+
+def _subtxt_docs_source_probe(
+    env: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Read-only Subtxt documentation source probe.
+
+    T019A scope: inspect the actual local source at
+    ``.external_sources/subtxt-docs`` and accurately report whether the
+    official Subtxt documentation source is present, whether its core
+    documentation surfaces are present, whether its README license
+    declaration and package metadata are discoverable, that this repository
+    is a documentation/reference surface (not a live Subtxt analysis
+    runtime), that no runnable Subtxt classifier, semantic-analysis
+    executable, machine schema validator, or local analysis API has been
+    established, and that configured command/path env vars are configuration
+    evidence only and must not make the runtime available.
+
+    The probe is pure, read-only, fail-closed. It never executes package
+    scripts, never runs Node, npm, pnpm, Nuxt, shell commands, subprocesses,
+    or network calls, never imports code from ``.external_sources/subtxt-docs``,
+    never starts the documentation website, never reads project data, never
+    inspects arbitrary configured paths to decide runtime availability, never
+    treats a configured command/path as proof that a runtime exists, and
+    never mutates the source tree.
+    """
+    effective_env: Mapping[str, str] = os.environ if env is None else env
+
+    source_root = _REPO_ROOT / SUBTXT_SOURCE_REL
+    source_available = source_root.is_dir()
+
+    readme_path = _REPO_ROOT / SUBTXT_README_REL
+    package_json_path = _REPO_ROOT / SUBTXT_PACKAGE_JSON_REL
+    content_root_path = _REPO_ROOT / SUBTXT_CONTENT_ROOT_REL
+    content_index_path = _REPO_ROOT / SUBTXT_CONTENT_INDEX_REL
+    key_concepts_path = _REPO_ROOT / SUBTXT_KEY_CONCEPTS_REL
+    narrative_aspects_path = _REPO_ROOT / SUBTXT_NARRATIVE_ASPECTS_REL
+    storypoints_path = _REPO_ROOT / SUBTXT_STORYPOINTS_REL
+    storybeats_path = _REPO_ROOT / SUBTXT_STORYBEATS_REL
+    narrative_intelligence_index_path = (
+        _REPO_ROOT / SUBTXT_NARRATIVE_INTELLIGENCE_INDEX_REL
+    )
+    advanced_concepts_index_path = (
+        _REPO_ROOT / SUBTXT_ADVANCED_CONCEPTS_INDEX_REL
+    )
+    narrative_tasks_index_path = _REPO_ROOT / SUBTXT_NARRATIVE_TASKS_INDEX_REL
+    api_reference_index_path = _REPO_ROOT / SUBTXT_API_REFERENCE_INDEX_REL
+
+    readme_available = readme_path.is_file()
+    package_json_available = package_json_path.is_file()
+    content_root_available = content_root_path.is_dir()
+    content_index_available = content_index_path.is_file()
+    key_concepts_available = key_concepts_path.is_file()
+    narrative_aspects_available = narrative_aspects_path.is_dir()
+    storypoints_available = storypoints_path.is_file()
+    storybeats_available = storybeats_path.is_file()
+    narrative_intelligence_available = narrative_intelligence_index_path.is_file()
+    advanced_concepts_available = advanced_concepts_index_path.is_file()
+    narrative_tasks_available = narrative_tasks_index_path.is_file()
+    api_reference_available = api_reference_index_path.is_file()
+
+    package_json_dict = _safe_read_json(package_json_path)
+    package_json_parseable = package_json_dict is not None
+    package_name = ""
+    package_private = False
+    package_scripts: list[str] = []
+    if package_json_dict is not None:
+        pkg_name = package_json_dict.get("name")
+        if isinstance(pkg_name, str):
+            package_name = pkg_name
+        package_private = bool(package_json_dict.get("private"))
+        package_scripts = _package_json_script_names(package_json_dict)
+    if package_scripts:
+        package_scripts = sorted(package_scripts)
+
+    licence_declared = False
+    licence_name = ""
+    licence_source = ""
+    if readme_available:
+        readme_text = _safe_read_text(readme_path)
+        if readme_text is not None and SUBTXT_CC_LICENSE in readme_text:
+            licence_declared = True
+            licence_name = "CC BY-NC-SA 4.0"
+            licence_source = "README.md"
+
+    core_surfaces_available = (
+        content_root_available
+        and content_index_available
+        and key_concepts_available
+        and narrative_aspects_available
+    )
+
+    if not source_available:
+        runtime_surface = "unavailable"
+    elif not core_surfaces_available:
+        runtime_surface = "degraded"
+    else:
+        runtime_surface = "reference_only"
+
+    docs_reference_available = (runtime_surface == "reference_only")
+
+    command_value = _env_text(effective_env, SUBTXT_COMMAND_ENV) or ""
+    command_configured = bool(command_value)
+    path_value = _env_text(effective_env, SUBTXT_PATH_ENV) or ""
+    path_configured = bool(path_value)
+
+    live_runtime_available = False
+    live_runtime_status = (
+        "reference_only" if docs_reference_available else "unavailable"
+    )
+
+    if not source_available:
+        detail = (
+            f"Subtxt documentation source not found at "
+            f"{SUBTXT_SOURCE_REL}. No Subtxt reference surface "
+            f"available. T019A does not execute Subtxt. "
+            f"A separate owner-controlled integration-path "
+            f"decision is required."
+        )
+    elif runtime_surface == "degraded":
+        detail = (
+            f"Subtxt documentation source present at "
+            f"{SUBTXT_SOURCE_REL} but one or more core documentation "
+            f"surfaces are missing or unreadable. "
+            f"The local source is a Subtxt documentation/reference "
+            f"repository (package name: {package_name}). "
+            f"Documentation availability is not live-runtime "
+            f"availability. Package scripts are Nuxt docs-site "
+            f"operations, not Subtxt analysis. "
+            f"T019A does not execute Subtxt. "
+            f"A separate owner-controlled integration-path "
+            f"decision is required."
+        )
+    else:
+        script_names_str = (
+            ", ".join(package_scripts) if package_scripts else "none"
+        )
+        detail = (
+            f"Subtxt documentation source present at "
+            f"{SUBTXT_SOURCE_REL}. "
+            f"The local source is a Subtxt documentation/reference "
+            f"repository (package name: {package_name}, "
+            f"private: {str(package_private).lower()}, "
+            f"docs-site scripts: {script_names_str}). "
+            f"Documentation availability is not live-runtime "
+            f"availability. Package scripts are Nuxt docs-site "
+            f"operations, not Subtxt analysis. "
+            f"T019A does not execute Subtxt. "
+            f"A separate owner-controlled integration-path "
+            f"decision is required."
+        )
+
+    return {
+        "subtxt_runtime_surface": runtime_surface,
+        "subtxt_source_path": SUBTXT_SOURCE_REL,
+        "subtxt_source_available": source_available,
+        "subtxt_readme_available": readme_available,
+        "subtxt_package_json_available": package_json_available,
+        "subtxt_package_json_parseable": package_json_parseable,
+        "subtxt_content_root_available": content_root_available,
+        "subtxt_content_index_available": content_index_available,
+        "subtxt_key_concepts_available": key_concepts_available,
+        "subtxt_narrative_aspects_available": narrative_aspects_available,
+        "subtxt_storypoints_docs_available": storypoints_available,
+        "subtxt_storybeats_docs_available": storybeats_available,
+        "subtxt_narrative_intelligence_available": (
+            narrative_intelligence_available
+        ),
+        "subtxt_advanced_concepts_available": advanced_concepts_available,
+        "subtxt_narrative_tasks_available": narrative_tasks_available,
+        "subtxt_api_reference_available": api_reference_available,
+        "subtxt_package_name": package_name,
+        "subtxt_package_private": package_private,
+        "subtxt_package_scripts": package_scripts,
+        "subtxt_license_declared": licence_declared,
+        "subtxt_license_name": licence_name,
+        "subtxt_license_source": licence_source,
+        "subtxt_docs_reference_available": docs_reference_available,
+        "subtxt_live_runtime_available": live_runtime_available,
+        "subtxt_live_runtime_status": live_runtime_status,
+        "subtxt_command_env": SUBTXT_COMMAND_ENV,
+        "subtxt_command_configured": command_configured,
+        "subtxt_command_value": command_value,
+        "subtxt_path_env": SUBTXT_PATH_ENV,
+        "subtxt_path_configured": path_configured,
+        "subtxt_path_value": path_value,
+        "subtxt_detail": detail,
     }
 
 
@@ -973,19 +1233,83 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "ncp_detail": detail,
         }
     elif adapter == "subtxt":
-        configured = bool(
-            _env_text(env, "OMI_LIVE_SUBTXT_COMMAND")
-            or _env_text(env, "OMI_LIVE_SUBTXT_PATH")
-            or _path_exists(".external_sources")
-        )
-        command = _env_text(env, "OMI_LIVE_SUBTXT_COMMAND")
-        path = _env_text(env, "OMI_LIVE_SUBTXT_PATH")
-        available = bool(
-            (command and shutil.which(command))
-            or (path and Path(path).exists())
-            or _path_exists(".external_sources")
-        )
-        detail = "Configured command/path or existing in-repo source surface probe"
+        probe = _subtxt_docs_source_probe(env)
+        configured = probe["subtxt_source_available"]
+        available = False
+        surface = probe["subtxt_runtime_surface"]
+        if surface == "unavailable":
+            dependency_status = "unavailable"
+        elif surface == "degraded":
+            dependency_status = "unavailable"
+        else:
+            dependency_status = "available"
+        detail = probe["subtxt_detail"]
+        return {
+            "runtime_configured": configured,
+            "runtime_dependency_available": available,
+            "runtime_dependency_status": dependency_status,
+            "probe_detail": detail,
+            "subtxt_runtime_surface": probe["subtxt_runtime_surface"],
+            "subtxt_source_path": probe["subtxt_source_path"],
+            "subtxt_source_available": probe["subtxt_source_available"],
+            "subtxt_readme_available": probe["subtxt_readme_available"],
+            "subtxt_package_json_available": probe[
+                "subtxt_package_json_available"
+            ],
+            "subtxt_package_json_parseable": probe[
+                "subtxt_package_json_parseable"
+            ],
+            "subtxt_content_root_available": probe[
+                "subtxt_content_root_available"
+            ],
+            "subtxt_content_index_available": probe[
+                "subtxt_content_index_available"
+            ],
+            "subtxt_key_concepts_available": probe[
+                "subtxt_key_concepts_available"
+            ],
+            "subtxt_narrative_aspects_available": probe[
+                "subtxt_narrative_aspects_available"
+            ],
+            "subtxt_storypoints_docs_available": probe[
+                "subtxt_storypoints_docs_available"
+            ],
+            "subtxt_storybeats_docs_available": probe[
+                "subtxt_storybeats_docs_available"
+            ],
+            "subtxt_narrative_intelligence_available": probe[
+                "subtxt_narrative_intelligence_available"
+            ],
+            "subtxt_advanced_concepts_available": probe[
+                "subtxt_advanced_concepts_available"
+            ],
+            "subtxt_narrative_tasks_available": probe[
+                "subtxt_narrative_tasks_available"
+            ],
+            "subtxt_api_reference_available": probe[
+                "subtxt_api_reference_available"
+            ],
+            "subtxt_package_name": probe["subtxt_package_name"],
+            "subtxt_package_private": probe["subtxt_package_private"],
+            "subtxt_package_scripts": probe["subtxt_package_scripts"],
+            "subtxt_license_declared": probe["subtxt_license_declared"],
+            "subtxt_license_name": probe["subtxt_license_name"],
+            "subtxt_license_source": probe["subtxt_license_source"],
+            "subtxt_docs_reference_available": probe[
+                "subtxt_docs_reference_available"
+            ],
+            "subtxt_live_runtime_available": probe[
+                "subtxt_live_runtime_available"
+            ],
+            "subtxt_live_runtime_status": probe["subtxt_live_runtime_status"],
+            "subtxt_command_env": probe["subtxt_command_env"],
+            "subtxt_command_configured": probe["subtxt_command_configured"],
+            "subtxt_command_value": probe["subtxt_command_value"],
+            "subtxt_path_env": probe["subtxt_path_env"],
+            "subtxt_path_configured": probe["subtxt_path_configured"],
+            "subtxt_path_value": probe["subtxt_path_value"],
+            "subtxt_detail": detail,
+        }
     elif adapter == "dramatica_flow":
         configured = bool(
             _env_text(env, "OMI_LIVE_DRAMATICA_FLOW_COMMAND")
@@ -1251,6 +1575,89 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "ncp_validate_with_node_enabled"
         )
         report["ncp_detail"] = dependency.get("ncp_detail")
+    if adapter == "subtxt":
+        report["subtxt_runtime_surface"] = dependency.get(
+            "subtxt_runtime_surface"
+        )
+        report["subtxt_source_path"] = dependency.get("subtxt_source_path")
+        report["subtxt_source_available"] = dependency.get(
+            "subtxt_source_available"
+        )
+        report["subtxt_readme_available"] = dependency.get(
+            "subtxt_readme_available"
+        )
+        report["subtxt_package_json_available"] = dependency.get(
+            "subtxt_package_json_available"
+        )
+        report["subtxt_package_json_parseable"] = dependency.get(
+            "subtxt_package_json_parseable"
+        )
+        report["subtxt_content_root_available"] = dependency.get(
+            "subtxt_content_root_available"
+        )
+        report["subtxt_content_index_available"] = dependency.get(
+            "subtxt_content_index_available"
+        )
+        report["subtxt_key_concepts_available"] = dependency.get(
+            "subtxt_key_concepts_available"
+        )
+        report["subtxt_narrative_aspects_available"] = dependency.get(
+            "subtxt_narrative_aspects_available"
+        )
+        report["subtxt_storypoints_docs_available"] = dependency.get(
+            "subtxt_storypoints_docs_available"
+        )
+        report["subtxt_storybeats_docs_available"] = dependency.get(
+            "subtxt_storybeats_docs_available"
+        )
+        report["subtxt_narrative_intelligence_available"] = dependency.get(
+            "subtxt_narrative_intelligence_available"
+        )
+        report["subtxt_advanced_concepts_available"] = dependency.get(
+            "subtxt_advanced_concepts_available"
+        )
+        report["subtxt_narrative_tasks_available"] = dependency.get(
+            "subtxt_narrative_tasks_available"
+        )
+        report["subtxt_api_reference_available"] = dependency.get(
+            "subtxt_api_reference_available"
+        )
+        report["subtxt_package_name"] = dependency.get("subtxt_package_name")
+        report["subtxt_package_private"] = dependency.get(
+            "subtxt_package_private"
+        )
+        report["subtxt_package_scripts"] = dependency.get(
+            "subtxt_package_scripts"
+        )
+        report["subtxt_license_declared"] = dependency.get(
+            "subtxt_license_declared"
+        )
+        report["subtxt_license_name"] = dependency.get("subtxt_license_name")
+        report["subtxt_license_source"] = dependency.get(
+            "subtxt_license_source"
+        )
+        report["subtxt_docs_reference_available"] = dependency.get(
+            "subtxt_docs_reference_available"
+        )
+        report["subtxt_live_runtime_available"] = dependency.get(
+            "subtxt_live_runtime_available"
+        )
+        report["subtxt_live_runtime_status"] = dependency.get(
+            "subtxt_live_runtime_status"
+        )
+        report["subtxt_command_env"] = dependency.get("subtxt_command_env")
+        report["subtxt_command_configured"] = dependency.get(
+            "subtxt_command_configured"
+        )
+        report["subtxt_command_value"] = dependency.get(
+            "subtxt_command_value"
+        )
+        report["subtxt_path_env"] = dependency.get("subtxt_path_env")
+        report["subtxt_path_configured"] = dependency.get(
+            "subtxt_path_configured"
+        )
+        report["subtxt_path_value"] = dependency.get("subtxt_path_value")
+        report["subtxt_detail"] = dependency.get("subtxt_detail")
     return report
 
 

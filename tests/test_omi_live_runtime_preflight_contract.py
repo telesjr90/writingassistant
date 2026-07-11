@@ -2237,3 +2237,508 @@ def test_ncp_t018b_preflight_does_not_read_input_file(monkeypatch, tmp_path) -> 
     # The sentinel file should be untouched (still on disk, content preserved).
     assert sentinel.exists()
     assert sentinel.read_text(encoding="utf-8") == '{"would_be_read": true}'
+
+
+# ---------------------------------------------------------------------------
+# T019A — Subtxt docs/source preflight
+# ---------------------------------------------------------------------------
+
+
+def _subtxt_full_reference_result() -> dict[str, object]:
+    return {
+        "subtxt_runtime_surface": "reference_only",
+        "subtxt_source_path": ".external_sources/subtxt-docs",
+        "subtxt_source_available": True,
+        "subtxt_readme_available": True,
+        "subtxt_package_json_available": True,
+        "subtxt_package_json_parseable": True,
+        "subtxt_content_root_available": True,
+        "subtxt_content_index_available": True,
+        "subtxt_key_concepts_available": True,
+        "subtxt_narrative_aspects_available": True,
+        "subtxt_storypoints_docs_available": True,
+        "subtxt_storybeats_docs_available": True,
+        "subtxt_narrative_intelligence_available": True,
+        "subtxt_advanced_concepts_available": True,
+        "subtxt_narrative_tasks_available": True,
+        "subtxt_api_reference_available": True,
+        "subtxt_package_name": "nuxt-ui-pro-template-docs",
+        "subtxt_package_private": True,
+        "subtxt_package_scripts": [
+            "build",
+            "dev",
+            "generate",
+            "lint",
+            "postinstall",
+            "preview",
+            "typecheck",
+        ],
+        "subtxt_license_declared": True,
+        "subtxt_license_name": "CC BY-NC-SA 4.0",
+        "subtxt_license_source": "README.md",
+        "subtxt_docs_reference_available": True,
+        "subtxt_live_runtime_available": False,
+        "subtxt_live_runtime_status": "reference_only",
+        "subtxt_command_env": "OMI_LIVE_SUBTXT_COMMAND",
+        "subtxt_command_configured": False,
+        "subtxt_command_value": "",
+        "subtxt_path_env": "OMI_LIVE_SUBTXT_PATH",
+        "subtxt_path_configured": False,
+        "subtxt_path_value": "",
+        "subtxt_detail": (
+            "Subtxt documentation source present at "
+            ".external_sources/subtxt-docs. "
+            "The local source is a Subtxt documentation/reference "
+            "repository (package name: nuxt-ui-pro-template-docs, "
+            "private: true, "
+            "docs-site scripts: build, dev, generate, lint, "
+            "postinstall, preview, typecheck). "
+            "Documentation availability is not live-runtime "
+            "availability. Package scripts are Nuxt docs-site "
+            "operations, not Subtxt analysis. "
+            "T019A does not execute Subtxt. "
+            "A separate owner-controlled integration-path "
+            "decision is required."
+        ),
+    }
+
+
+def _patch_subtxt_probe(
+    monkeypatch,
+    result: dict[str, object] | None = None,
+) -> None:
+    if result is None:
+        result = _subtxt_full_reference_result()
+
+    def _patched(env: object | None = None) -> dict[str, object]:
+        output = {key: value for key, value in result.items()}
+        mapping = dict(env) if env is not None else {}
+        raw_cmd = str(mapping.get("OMI_LIVE_SUBTXT_COMMAND", "") or "")
+        output["subtxt_command_value"] = raw_cmd.strip()
+        output["subtxt_command_configured"] = bool(output["subtxt_command_value"])
+        raw_path = str(mapping.get("OMI_LIVE_SUBTXT_PATH", "") or "")
+        output["subtxt_path_value"] = raw_path.strip()
+        output["subtxt_path_configured"] = bool(output["subtxt_path_value"])
+        return output
+
+    monkeypatch.setattr(preflight, "_subtxt_docs_source_probe", _patched)
+
+
+def test_subtxt_disabled_by_default_remains_read_only() -> None:
+    report = _report()
+    tool = _tools_by_name(report)["subtxt"]
+
+    assert tool["global_enabled"] is False
+    assert tool["tool_enabled"] is False
+    assert tool["runtime_enabled"] is False
+    assert tool["blocked"] is False
+    assert tool["status"] in {"disabled", "available"}
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_subtxt_full_docs_surface_reports_reference_only(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_runtime_surface"] == "reference_only"
+    assert tool["subtxt_source_path"] == ".external_sources/subtxt-docs"
+    assert tool["subtxt_source_available"] is True
+    assert tool["subtxt_docs_reference_available"] is True
+    assert tool["subtxt_live_runtime_available"] is False
+    assert tool["subtxt_live_runtime_status"] == "reference_only"
+    assert tool["subtxt_readme_available"] is True
+    assert tool["subtxt_package_json_available"] is True
+    assert tool["subtxt_package_json_parseable"] is True
+    assert tool["subtxt_content_root_available"] is True
+    assert tool["subtxt_content_index_available"] is True
+    assert tool["subtxt_key_concepts_available"] is True
+    assert tool["subtxt_narrative_aspects_available"] is True
+    assert tool["subtxt_storypoints_docs_available"] is True
+    assert tool["subtxt_storybeats_docs_available"] is True
+    assert tool["subtxt_narrative_intelligence_available"] is True
+    assert tool["subtxt_advanced_concepts_available"] is True
+    assert tool["subtxt_narrative_tasks_available"] is True
+    assert tool["subtxt_api_reference_available"] is True
+    assert tool["subtxt_package_name"] == "nuxt-ui-pro-template-docs"
+    assert tool["subtxt_package_private"] is True
+    assert isinstance(tool["subtxt_package_scripts"], list)
+    assert "build" in tool["subtxt_package_scripts"]
+    assert "dev" in tool["subtxt_package_scripts"]
+    assert "generate" in tool["subtxt_package_scripts"]
+    assert "Subtxt documentation source present" in tool["probe_detail"]
+    assert tool["subtxt_detail"] == tool["probe_detail"]
+
+
+def test_subtxt_docs_reference_does_not_make_live_runtime_available(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SUBTXT_ENABLED": "true",
+            }
+        )
+    )["subtxt"]
+
+    assert tool["global_enabled"] is True
+    assert tool["tool_enabled"] is True
+    assert tool["runtime_enabled"] is True
+    assert tool["subtxt_docs_reference_available"] is True
+    assert tool["subtxt_live_runtime_available"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] == "available"
+    assert tool["status"] == "unavailable"
+    assert tool["safety"]["read_only"] is True
+
+
+def test_subtxt_enabled_plus_global_does_not_falsely_report_runnable_runtime(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SUBTXT_ENABLED": "true",
+                "OMI_LIVE_SUBTXT_COMMAND": "subtxt",
+                "OMI_LIVE_SUBTXT_PATH": "/opt/subtxt",
+            }
+        )
+    )["subtxt"]
+
+    assert tool["runtime_enabled"] is True
+    assert tool["subtxt_live_runtime_available"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["status"] == "unavailable"
+
+
+def test_subtxt_source_path_is_exact_subtxt_docs_not_generic_external_sources(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_source_path"] == ".external_sources/subtxt-docs"
+    assert tool["subtxt_source_path"] != ".external_sources"
+
+
+def test_subtxt_missing_source_root_reports_unavailable(
+    monkeypatch,
+) -> None:
+    bad = _subtxt_full_reference_result()
+    bad["subtxt_runtime_surface"] = "unavailable"
+    bad["subtxt_source_available"] = False
+    bad["subtxt_docs_reference_available"] = False
+    bad["subtxt_live_runtime_status"] = "unavailable"
+    bad["subtxt_detail"] = (
+        "Subtxt documentation source not found at "
+        ".external_sources/subtxt-docs. No Subtxt reference surface "
+        "available. T019A does not execute Subtxt. "
+        "A separate owner-controlled integration-path "
+        "decision is required."
+    )
+    _patch_subtxt_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_runtime_surface"] == "unavailable"
+    assert tool["subtxt_source_available"] is False
+    assert tool["subtxt_docs_reference_available"] is False
+    assert tool["runtime_configured"] is False
+    assert tool["runtime_dependency_available"] is False
+    assert tool["runtime_dependency_status"] == "unavailable"
+    assert "not found" in tool["probe_detail"]
+    assert tool["status"] in {"disabled", "unavailable"}
+
+
+def test_subtxt_missing_readme_reports_safely(
+    monkeypatch,
+) -> None:
+    bad = _subtxt_full_reference_result()
+    bad["subtxt_readme_available"] = False
+    bad["subtxt_license_declared"] = False
+    bad["subtxt_license_name"] = ""
+    bad["subtxt_license_source"] = ""
+    _patch_subtxt_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_readme_available"] is False
+    assert tool["subtxt_license_declared"] is False
+    assert tool["subtxt_license_name"] == ""
+    assert tool["subtxt_license_source"] == ""
+    assert tool["subtxt_runtime_surface"] in {"degraded", "reference_only"}
+
+
+def test_subtxt_missing_malformed_package_json_reports_safely(
+    monkeypatch,
+) -> None:
+    bad = _subtxt_full_reference_result()
+    bad["subtxt_package_json_available"] = True
+    bad["subtxt_package_json_parseable"] = False
+    bad["subtxt_package_name"] = ""
+    bad["subtxt_package_private"] = False
+    bad["subtxt_package_scripts"] = []
+    _patch_subtxt_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_package_json_available"] is True
+    assert tool["subtxt_package_json_parseable"] is False
+    assert tool["subtxt_package_name"] == ""
+    assert tool["subtxt_package_private"] is False
+    assert tool["subtxt_package_scripts"] == []
+
+
+def test_subtxt_missing_content_root_reports_degraded(
+    monkeypatch,
+) -> None:
+    bad = _subtxt_full_reference_result()
+    bad["subtxt_content_root_available"] = False
+    bad["subtxt_content_index_available"] = False
+    bad["subtxt_key_concepts_available"] = False
+    bad["subtxt_narrative_aspects_available"] = False
+    bad["subtxt_runtime_surface"] = "degraded"
+    bad["subtxt_docs_reference_available"] = False
+    bad["subtxt_live_runtime_status"] = "unavailable"
+    bad["subtxt_detail"] = (
+        "Subtxt documentation source present at "
+        ".external_sources/subtxt-docs but one or more core "
+        "documentation surfaces are missing or unreadable."
+    )
+    _patch_subtxt_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SUBTXT_ENABLED": "true",
+            }
+        )
+    )["subtxt"]
+
+    assert tool["subtxt_runtime_surface"] == "degraded"
+    assert tool["subtxt_source_available"] is True
+    assert tool["subtxt_content_root_available"] is False
+    assert tool["subtxt_content_index_available"] is False
+    assert tool["subtxt_docs_reference_available"] is False
+    assert tool["subtxt_live_runtime_available"] is False
+    assert tool["subtxt_live_runtime_status"] == "unavailable"
+    assert "missing" in tool["probe_detail"] or "degraded" in tool["probe_detail"] or "unreadable" in tool["probe_detail"]
+
+
+def test_subtxt_missing_key_docs_reports_degraded(
+    monkeypatch,
+) -> None:
+    bad = _subtxt_full_reference_result()
+    bad["subtxt_key_concepts_available"] = False
+    bad["subtxt_narrative_aspects_available"] = False
+    bad["subtxt_runtime_surface"] = "degraded"
+    bad["subtxt_docs_reference_available"] = False
+    bad["subtxt_live_runtime_status"] = "unavailable"
+    bad["subtxt_detail"] = (
+        "Subtxt documentation source present at "
+        ".external_sources/subtxt-docs but one or more core "
+        "documentation surfaces are missing or unreadable."
+    )
+    _patch_subtxt_probe(monkeypatch, bad)
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_runtime_surface"] == "degraded"
+    assert tool["subtxt_source_available"] is True
+    assert tool["subtxt_key_concepts_available"] is False
+    assert tool["subtxt_narrative_aspects_available"] is False
+    assert tool["subtxt_docs_reference_available"] is False
+
+
+def test_subtxt_license_detected_from_readme(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_license_declared"] is True
+    assert tool["subtxt_license_name"] == "CC BY-NC-SA 4.0"
+    assert tool["subtxt_license_source"] == "README.md"
+
+
+def test_subtxt_package_metadata_reported_without_executing_scripts(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(_report())["subtxt"]
+
+    assert tool["subtxt_package_name"] == "nuxt-ui-pro-template-docs"
+    assert tool["subtxt_package_private"] is True
+    assert tool["subtxt_package_scripts"] == [
+        "build",
+        "dev",
+        "generate",
+        "lint",
+        "postinstall",
+        "preview",
+        "typecheck",
+    ]
+
+
+def test_subtxt_command_env_surfaced_as_configuration_only(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(
+        monkeypatch,
+        _subtxt_full_reference_result(),
+    )
+    env = {
+        "OMI_LIVE_SUBTXT_COMMAND": "/usr/local/bin/subtxt",
+    }
+    tool = _tools_by_name(_report(env))["subtxt"]
+
+    assert tool["subtxt_command_env"] == "OMI_LIVE_SUBTXT_COMMAND"
+    assert tool["subtxt_command_configured"] is True
+    assert tool["subtxt_command_value"] == "/usr/local/bin/subtxt"
+    assert tool["subtxt_live_runtime_available"] is False
+    assert tool["subtxt_path_configured"] is False
+    assert tool["subtxt_path_value"] == ""
+
+
+def test_subtxt_path_env_surfaced_as_configuration_only(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(
+        monkeypatch,
+        _subtxt_full_reference_result(),
+    )
+    env = {
+        "OMI_LIVE_SUBTXT_PATH": "/home/user/subtxt-runtime",
+    }
+    tool = _tools_by_name(_report(env))["subtxt"]
+
+    assert tool["subtxt_path_env"] == "OMI_LIVE_SUBTXT_PATH"
+    assert tool["subtxt_path_configured"] is True
+    assert tool["subtxt_path_value"] == "/home/user/subtxt-runtime"
+    assert tool["subtxt_live_runtime_available"] is False
+    assert tool["runtime_dependency_available"] is False
+
+
+def test_subtxt_blocked_flag_overrides_docs_availability(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    tool = _tools_by_name(
+        _report(
+            {
+                "OMI_LIVE_TOOLS_ENABLED": "true",
+                "OMI_LIVE_SUBTXT_ENABLED": "true",
+                "OMI_LIVE_SUBTXT_BLOCKED": "true",
+                "OMI_LIVE_SUBTXT_BLOCKED_REASON": (
+                    "Owner decision pending."
+                ),
+            }
+        )
+    )["subtxt"]
+
+    assert tool["status"] == "blocked"
+    assert tool["blocked"] is True
+    assert tool["blocked_reason"] == "Owner decision pending."
+    assert tool["subtxt_source_available"] is True
+    assert tool["subtxt_docs_reference_available"] is True
+    assert tool["subtxt_live_runtime_available"] is False
+
+
+def test_subtxt_preflight_does_not_invoke_subprocess_shell_network_or_npm(
+    monkeypatch,
+) -> None:
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+    _mock_ollama_probe(monkeypatch, _MOCK_OLLAMA_UNREACHABLE)
+
+    attempted_subprocess: list[tuple[str, tuple]] = []
+    attempted_network: list[tuple[str, tuple]] = []
+
+    import subprocess
+    import urllib.request
+
+    def fake_subprocess_run(*args, **kwargs):
+        attempted_subprocess.append(("subprocess.run", args))
+        raise AssertionError(
+            "subprocess.run must not be called by Subtxt preflight"
+        )
+
+    def fake_subprocess_popen(*args, **kwargs):
+        attempted_subprocess.append(("subprocess.Popen", args))
+        raise AssertionError(
+            "subprocess.Popen must not be called by Subtxt preflight"
+        )
+
+    def fake_urlopen(*args, **kwargs):
+        attempted_network.append(("urlopen", args))
+        raise AssertionError(
+            "urllib urlopen must not be called by Subtxt preflight"
+        )
+
+    monkeypatch.setattr(subprocess, "run", fake_subprocess_run, raising=False)
+    monkeypatch.setattr(subprocess, "Popen", fake_subprocess_popen, raising=False)
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_SUBTXT_ENABLED": "true",
+        }
+    )
+
+    assert attempted_subprocess == []
+    assert attempted_network == []
+
+    tool = _tools_by_name(report)["subtxt"]
+    assert tool["safety"]["read_only"] is True
+    assert tool["safety"]["external_services_called"] is False
+    assert tool["safety"]["live_models_called"] is False
+    assert tool["safety"]["heavy_analysis_executed"] is False
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
+
+
+def test_subtxt_preflight_does_not_persist_or_mutate(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.create_omi_idea("demo", "Owner-authored subtxt preflight note.")
+    before = project_manager.get_omi_summary("demo")
+
+    _patch_subtxt_probe(monkeypatch, _subtxt_full_reference_result())
+
+    report = _report(
+        {
+            "OMI_LIVE_TOOLS_ENABLED": "true",
+            "OMI_LIVE_SUBTXT_ENABLED": "true",
+        }
+    )
+
+    after = project_manager.get_omi_summary("demo")
+    assert after == before
+    tool = _tools_by_name(report)["subtxt"]
+    assert tool["safety"]["candidate_persistence"] is False
+    assert tool["safety"]["memory_canon_mutation"] is False
+    assert tool["safety"]["promotion_or_apply_promotion"] is False
+    assert tool["safety"]["story_prose_generated"] is False
