@@ -690,8 +690,8 @@
     {
       "task_id": "PHASE8-IMPL-023-T019",
       "title": "Live Subtxt integration in OMI and analysis",
-      "status": "in_progress",
-      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status; T019A docs preflight is complete/PASS; T019B integration-path decision is complete/PASS; T019C (App-owned Subtxt-informed semantic-rubric contract) is complete/PASS; T019D (App-owned Subtxt-informed semantic-rubric evaluator) is complete/PASS; T019E (App-owned Subtxt-informed semantic-rubric OMI adapter integration) is complete/PASS; T019F (Manual real owner-authored Subtxt-informed rubric validation) is the recommended next task; do not skip to T020"
+      "status": "complete/PASS",
+      "scope": "live Subtxt integration in OMI and analysis or explicit owner-blocked status; T019A docs preflight is complete/PASS; T019B integration-path decision is complete/PASS; T019C (App-owned Subtxt-informed semantic-rubric contract) is complete/PASS; T019D (App-owned Subtxt-informed semantic-rubric evaluator) is complete/PASS; T019E (App-owned Subtxt-informed semantic-rubric OMI adapter integration) is complete/PASS; T019F (Manual real owner-authored Subtxt-informed rubric validation) is complete/PASS; live Subtxt runtime is owner-blocked (T019A / T019B) and remains owner-blocked; the accepted app-owned Subtxt-informed semantic-rubric path is now both implemented and manually validated through OMI; next parent task is PHASE8-IMPL-023-T020 - Live dramatica-flow integration in OMI and analysis (planned); do not skip to T021, T022, T023, T024, T025, or T026"
     },
     {
       "task_id": "PHASE8-IMPL-023-T020",
@@ -732,8 +732,13 @@
     {
       "task_id": "PHASE8-IMPL-023-T019F",
       "title": "Manual real owner-authored Subtxt-informed rubric validation",
-      "status": "planned",
-      "scope": "Run one explicit real in-process OMI orchestrator validation using requested_adapters=['subtxt_informed_rubric'] and persist_candidates=False against a controlled owner-authored raw idea designed to exercise multiple T019D diagnostic categories. Verify the built-in adapter and evaluator are reached exactly once, produce non-empty evidence-backed candidate-only findings with subtxt_informed_rubric OMI provenance, pending owner decisions, candidate-review-pending status, and no persistence, project mutation, Memory/Canon mutation, promotion/apply-promotion, model call, external documentation read, live Subtxt claim, or story prose. Preserve before/after snapshots and record the actual result. Do not skip directly to T020."
+      "status": "complete/PASS",
+      "scope": "Run one explicit real in-process OMI orchestrator validation using requested_adapters=['subtxt_informed_rubric'] and persist_candidates=False against a controlled owner-authored raw idea designed to exercise multiple T019D diagnostic categories. Verify the built-in adapter and evaluator are reached exactly once, produce non-empty evidence-backed candidate-only findings with subtxt_informed_rubric OMI provenance, pending owner decisions, candidate-review-pending status, and no persistence, project mutation, Memory/Canon mutation, promotion/apply-promotion, model call, external documentation read, live Subtxt claim, or story prose. Preserve before/after snapshots and record the actual result. Do not skip directly to T020.",
+      "artifacts": [
+        ".codex-context/PHASE8-IMPL-023/manual-validation/T019F-subtxt-informed-rubric/"
+      ],
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019F-manual-real-owner-authored-subtxt-informed-rubric-validation.md",
+      "result": "complete/PASS; ran one explicit real in-process OMI orchestrator validation through analyze_omi_raw_idea_with_tools with requested_adapters=[subtxt_informed_rubric] and persist_candidates=False against the controlled non-story owner-authored raw idea; committed T019E built-in adapter and committed T019D evaluator were each reached exactly once; analysis_status=succeeded; persistence_status=not_requested; findings=8 evidence-backed candidate-only findings; expected category coverage present; provenance/owner-decision/safety envelope assertions passed; before/after protected snapshots identical; no live Subtxt execution or claim; live Subtxt runtime remains owner-blocked; the accepted app-owned Subtxt-informed path is now both implemented and manually validated through OMI; post-T019F regressions 78+81+91+30+5+59+89=433 passed across 7 contract test files; py_compile exit 0; T019 parent is now complete/PASS; next task is PHASE8-IMPL-023-T020 - Live dramatica-flow integration in OMI and analysis (planned; do not skip to T021+); T019F is the last child under T019; no stage, commit, or push was performed"
     },
     {
       "task_id": "PHASE8-IMPL-023-T026",
@@ -742,17 +747,17 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T019E",
+  "latest_child_task": "PHASE8-IMPL-023-T019F",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019E-app-owned-subtxt-informed-semantic-rubric-omi-adapter-integration.md",
-  "next_child_task": "PHASE8-IMPL-023-T019F",
-  "next_child_title": "Manual real owner-authored Subtxt-informed rubric validation",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019F-manual-real-owner-authored-subtxt-informed-rubric-validation.md",
+  "next_child_task": "PHASE8-IMPL-023-T020",
+  "next_child_title": "Live dramatica-flow integration in OMI and analysis",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "App-owned Subtxt-informed semantic-rubric OMI adapter integration",
-  "latest_child_summary": "T019E integrates the committed T019D evaluator into the OMI analysis orchestrator under a new app-owned adapter identity subtxt_informed_rubric, distinct from the existing T009 subtxt adapter identity, distinct from the T019C/T019D internal rubric identity app_owned_subtxt_informed_rubric, and distinct from the user-facing support label App-owned Subtxt-informed diagnostic support. T019E adds the new identity to OMI_TOOL_ADAPTER_IDENTITIES and OMI_ADAPTER_CONTRACTS; omits it from OMI_DEFAULT_ADAPTERS and OMI_CONTEXT_ADAPTER_NAMES; does not route it through the T009 fixture contract; does not support it through adapter_fixture_outputs; adds no environment flags; adds no runtime preflight integration; never treats it as live Subtxt; the explicit requested_adapters=['subtxt_informed_rubric'] request is the only activation path; the explicit injected adapter_runners['subtxt_informed_rubric'] override retains precedence. T019E adds _build_subtxt_informed_rubric_request, _build_subtxt_informed_rubric_runner, and _normalize_subtxt_informed_rubric_item helpers. The T019C request is constructed from the OMI project_name and raw_idea with safe project_name preservation (or a deterministic safe project_<16 hex> alias when the project_name is unsafe) and all 13 T019C safety confirmations set to True. The built-in runner is in-memory only, validates adapter_config as dict|None, lazily imports the T019C validator/constants and the T019D evaluator, never reads files / env vars / project storage / external documentation, never calls a model, never persists anything, and invokes the T019D evaluator exactly once per runner call. The T019C status maps to OMI succeeded / empty / failed_closed / error with non-empty explanations and empty candidates on every non-succeeded state; malformed/unsafe/exception evaluator results fail closed; one invalid normalized item fails the whole adapter call closed (no partial candidate set is ever returned). T019C candidate_support and diagnostic_questions are combined and sorted by item_id for deterministic ordering. OMI provenance uses the OMI adapter identity subtxt_informed_rubric (not the T019C internal identity) because validate_normalized_finding requires provenance.adapter/provenance.tool_source/source_adapter to match. T019C internal provenance is validated before conversion and is not duplicated. Evidence excerpts and source locators are preserved unchanged; extracted_claim equals the per-category app-owned diagnostic_text (never derived from owner source); owner_decision stays {approved: False, decision: pending} and review_status stays candidate_review_pending on every item. persist_candidates=False produces persistence_status=not_requested and empty persisted/new/reused candidate ids. T009 subtxt, T009 OMI_SUBTXT_SCHEMA_VERSION, T009 Subtxt diagnostic support only, T019A subtxt_live_runtime_available False, analysis_runtime_integration, T013 runtime preflight, T014C/T015C/T016C/T017B/T018B live adapter branches, deterministic_fallback, and persistence are all preserved unchanged. No contract/evaluator/preflight/main/project_manager/other backend module was modified. No existing test file was modified except for the minimum one-line addition of subtxt_informed_rubric to the existing orchestrator test file's REQUIRED_ADAPTERS allowlist set (required by the explicit-only adapter gate that mandates adding the identity to OMI_TOOL_ADAPTER_IDENTITIES). 78 focused in-memory tests in tests/test_omi_subtxt_informed_semantic_rubric_omi_adapter_contract.py pass. Combined T019E + T019D + T019C + existing-regression validation: T019E 78 passed, T019D 81 passed, T019C 91 passed, T009 59 passed, orchestrator 30 passed, persistence 5 passed, analysis_runtime_integration contract 103 passed, handoff 26 passed, safety regression 115 passed, preflight 89 passed. Live Subtxt runtime remains owner-blocked. The T019E app-owned adapter integration is implemented but not yet manually validated; T019F is the recommended next task; do not skip to T020.",
+  "latest_child_title": "Manual real owner-authored Subtxt-informed rubric validation",
+  "latest_child_summary": "T019F ran one explicit real in-process OMI orchestrator validation through analyze_omi_raw_idea_with_tools(requested_adapters=['subtxt_informed_rubric'], persist_candidates=False, project_name='example', source_idea_id='t019f_owner_validation') against the controlled non-story owner-authored raw idea designed to exercise multiple T019D diagnostic categories. The committed T019E built-in _build_subtxt_informed_rubric_runner was reached exactly once (adapter_builder_calls == 1); the committed T019E built-in runner closure was invoked exactly once (adapter_runner_calls == 1); the committed T019D evaluate_subtxt_informed_semantic_rubric evaluator was invoked exactly once (evaluator_calls == 1); the analysis succeeded with analysis_status='succeeded', persistence_status='not_requested', persisted_candidate_ids=[], new_candidate_ids=[], reused_candidate_ids=[], findings is non-empty (8 evidence-backed candidate-only findings). adapter_results contains exactly one adapter result with adapter='subtxt_informed_rubric', state='succeeded', and a non-empty candidates list; no other adapter ran (other_adapter_names == []); the T009 'subtxt' identity was not requested and did not run. Observed category IDs include all 7 required category IDs: structural_diagnostic, conflict_diagnostic, throughline_context_question, story_point_context_question, source_of_conflict_hypothesis, ambiguity, owner_review_question (plus subject_vs_conflict_question, which is allowed but not required, and insufficient_evidence correctly decided not to emit). Every finding has source_adapter='subtxt_informed_rubric', provenance.adapter='subtxt_informed_rubric', provenance.tool_source='subtxt_informed_rubric', provenance.support='App-owned Subtxt-informed diagnostic support', support_label='App-owned Subtxt-informed diagnostic support', owner_decision={approved: false, decision: 'pending'}, review_status='candidate_review_pending', a non-empty extracted_claim, a non-empty deterministic raw_finding_id, a non-empty evidence list, every evidence item carries source_locator='source_locator_ref_raw_idea', and every source_excerpt is an exact substring of the controlled raw idea input. confidence is medium_support or low_support; high_support is never emitted. The top-level safety envelope is preserved intact. Before/after protected snapshots identical: HEAD 5e0d23bd18cefe665ba3bd3e788ee096aa793d4d stable; projects/ snapshot byte-for-byte identical; candidate/review/promotion paths clean; .external_sources/ paths clean. Post-T019F automated regressions: 78 + 81 + 91 + 30 + 5 + 59 + 89 = 433 passed across 7 contract test files; py_compile exit 0. Live Subtxt runtime remains owner-blocked; the accepted app-owned Subtxt-informed path is now both implemented and manually validated through OMI; the validated app-owned adapter is clearly distinguished from the existing T009 'subtxt' fixture identity. T019F is the last child under the T019 parent. Next task: PHASE8-IMPL-023-T020 - Live dramatica-flow integration in OMI and analysis (planned; do not skip to T021, T022, T023, T024, T025, or T026). No staging, commit, or push was performed.",
   "latest_child_validation": {
     "t019e_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019E-app-owned-subtxt-informed-semantic-rubric-omi-adapter-integration.md exists and contains required decision language (app-owned OMI adapter identity subtxt_informed_rubric, distinct from T009 subtxt and from T019C internal app_owned_subtxt_informed_rubric, user-facing support label App-owned Subtxt-informed diagnostic support, explicit-only adapter gate, omission from OMI_DEFAULT_ADAPTERS and OMI_CONTEXT_ADAPTER_NAMES, no fixture path, no env flags, no preflight integration, T019C request construction with safe project_name preservation or deterministic safe alias, all 13 T019C safety confirmations set to True, T019C status mapping, no partial findings on failure, T019C internal provenance validated before conversion, OMI provenance conversion, evidence and owner-review preservation, fail-closed, no new persistence, no preflight/env/live-runtime integration, T009 preservation, no live Subtxt execution, no external documentation read or copied, no model call, no OMI live integration, no contract/evaluator/preflight/main/project_manager modification, no existing test modification except the one-line REQUIRED_ADAPTERS allowlist addition, no file/network/subprocess/env access in T019E helpers, no persistence or queue creation, no Memory/Canon mutation, no promotion/apply-promotion, no story prose, no stage/commit/push)",
     "t019e_omi_adapter_identity": "subtxt_informed_rubric",
@@ -798,7 +803,44 @@
     "t019e_no_existing_test_modification": "only the minimum one-line addition of 'subtxt_informed_rubric' to the existing orchestrator test file's REQUIRED_ADAPTERS allowlist set (required by the explicit-only adapter gate that mandates adding the identity to OMI_TOOL_ADAPTER_IDENTITIES); no other existing test file was modified",
     "t019e_no_package_dependency_change": true,
     "t019e_no_staging_commit_or_push": true,
-    "t019e_unrelated_leftovers_untouched": "artifacts/mvp-readiness/owner-acceptance/{checklist-results.json,evidence-report.md,workflow-log.json}, PHASE8-IMPL-023-T006-context-files.zip, PHASE8-IMPL-023-T018C1-recovery-context.zip, docs/Writing Assistant_OMI.pdf, docs/roadmap/decisions/PHASE8-IMPL-023-T005-tool-assisted-orchestrator-contract-adapter-boundaries.md are preserved unchanged"
+    "t019e_unrelated_leftovers_untouched": "artifacts/mvp-readiness/owner-acceptance/{checklist-results.json,evidence-report.md,workflow-log.json}, PHASE8-IMPL-023-T006-context-files.zip, PHASE8-IMPL-023-T018C1-recovery-context.zip, docs/Writing Assistant_OMI.pdf, docs/roadmap/decisions/PHASE8-IMPL-023-T005-tool-assisted-orchestrator-contract-adapter-boundaries.md are preserved unchanged",
+    "t019f_analysis_status": "succeeded",
+    "t019f_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T019F-manual-real-owner-authored-subtxt-informed-rubric-validation.md exists and contains required validation evidence (current HEAD 5e0d23bd18cefe665ba3bd3e788ee096aa793d4d on branch docs/opencode-go-routing-small-task-execution; controlled non-story validation input; explicit analyze_omi_raw_idea_with_tools invocation with project_name='example', source_idea_id='t019f_owner_validation', persist_candidates=False, requested_adapters=['subtxt_informed_rubric']; adapter_builder_calls == 1; adapter_runner_calls == 1; evaluator_calls == 1; analysis_status='succeeded'; persistence_status='not_requested'; persisted_candidate_ids/new_candidate_ids/reused_candidate_ids all empty; findings is non-empty (8); exactly one adapter result with adapter='subtxt_informed_rubric' and state='succeeded' and non-empty candidates; no other adapter ran; the T009 'subtxt' identity was not requested and did not run; expected category coverage present (all 7 required category IDs plus subject_vs_conflict_question which is allowed but not required; insufficient_evidence correctly did not emit); every finding has source_adapter='subtxt_informed_rubric' and provenance.adapter='subtxt_informed_rubric' and provenance.tool_source='subtxt_informed_rubric' and provenance.support='App-owned Subtxt-informed diagnostic support' and support_label='App-owned Subtxt-informed diagnostic support' and owner_decision={approved: false, decision: 'pending'} and review_status='candidate_review_pending' and a non-empty evidence list with source_locator='source_locator_ref_raw_idea' and source_excerpt exact substring of input; top-level safety envelope preserved intact; before/after protected snapshots identical: HEAD stable, projects/ byte-for-byte identical, candidate/review/promotion paths clean, .external_sources/ paths clean; no live Subtxt execution or claim; no model call; no network/subprocess/environment live-flag enable; no external documentation read; no persistence; no project mutation; no Memory/Canon mutation; no promotion/apply-promotion; no story prose; untracked evidence preserved under .codex-context/PHASE8-IMPL-023/manual-validation/T019F-subtxt-informed-rubric/; no staging, commit, or push was performed; the validated app-owned adapter is clearly distinguished from the existing T009 'subtxt' fixture identity)",
+    "t019f_each_reached_exactly_once": true,
+    "t019f_finding_count": 8,
+    "t019f_invocation_counts": {
+      "adapter_builder_calls": 1,
+      "adapter_runner_calls": 1,
+      "evaluator_calls": 1
+    },
+    "t019f_live_subtxt_runtime_remains_owner_blocked": true,
+    "t019f_no_external_sources_read_or_copy": true,
+    "t019f_no_fake_adapter_injected": true,
+    "t019f_no_live_subtxt_execution_or_claim": true,
+    "t019f_no_model_calls": true,
+    "t019f_no_persistence_or_queue_or_memory_canon_mutation": true,
+    "t019f_no_promotion_or_apply_promotion": true,
+    "t019f_no_staging_commit_or_push": true,
+    "t019f_no_story_prose": true,
+    "t019f_no_subprocess_or_network": true,
+    "t019f_no_subtxt_provenance_or_adapter_identity": true,
+    "t019f_observed_category_ids": [
+      "structural_diagnostic",
+      "conflict_diagnostic",
+      "throughline_context_question",
+      "story_point_context_question",
+      "source_of_conflict_hypothesis",
+      "subject_vs_conflict_question",
+      "ambiguity",
+      "owner_review_question"
+    ],
+    "t019f_omi_adapter_identity": "subtxt_informed_rubric",
+    "t019f_persistence_status": "not_requested",
+    "t019f_real_committed_built_in_adapter_used": true,
+    "t019f_real_committed_evaluator_used": true,
+    "t019f_required_category_ids_present": true,
+    "t019f_test_regressions": "tests/test_omi_subtxt_informed_semantic_rubric_omi_adapter_contract.py -> 78 passed; tests/test_omi_subtxt_informed_semantic_rubric_evaluator.py -> 81 passed; tests/test_omi_subtxt_informed_semantic_rubric_contract.py -> 91 passed; tests/test_omi_tool_assisted_orchestrator_contract.py -> 30 passed; tests/test_omi_tool_assisted_persistence_contract.py -> 5 passed; tests/test_omi_ncp_subtxt_dramatica_flow_adapter_contract.py -> 59 passed; tests/test_omi_live_runtime_preflight_contract.py -> 89 passed; py_compile exit 0; combined 433 passed across 7 contract test files",
+    "t019f_unrelated_leftovers_untouched": "artifacts/mvp-readiness/owner-acceptance/{checklist-results.json,evidence-report.md,workflow-log.json}, PHASE8-IMPL-023-T006-context-files.zip, PHASE8-IMPL-023-T018C1-recovery-context.zip, docs/Writing Assistant_OMI.pdf, docs/roadmap/decisions/PHASE8-IMPL-023-T005-tool-assisted-orchestrator-contract-adapter-boundaries.md are preserved unchanged"
   },
   "latest_child_no_side_effects": {
     "no_memory_canon_mutation": true,
@@ -840,6 +882,48 @@
     "no_project_storage_helper_call": true,
     "no_candidate_persistence_helper_call": true,
     "no_apply_promotion_module_call": true,
-    "no_omitting_evidence_unsafe_rewrite": true
+    "no_omitting_evidence_unsafe_rewrite": true,
+    "t019f_no_adapter_implementation": true,
+    "t019f_no_apply_promotion": true,
+    "t019f_no_apply_promotion_module_call": true,
+    "t019f_no_candidate_persistence_helper_call": true,
+    "t019f_no_canon_promotion": true,
+    "t019f_no_docs_copying_into_application_code": true,
+    "t019f_no_external_sources_edit": true,
+    "t019f_no_external_sources_import_in_validation": true,
+    "t019f_no_frontend_modification": true,
+    "t019f_no_memory_canon_mutation": true,
+    "t019f_no_model_calls": true,
+    "t019f_no_npm_audit_fix": true,
+    "t019f_no_npm_install": true,
+    "t019f_no_npm_run_validate_file_over_project_data": true,
+    "t019f_no_npm_run_validate_schema": true,
+    "t019f_no_nuxt_dev_build_or_generate": true,
+    "t019f_no_omi_analysis_orchestrator_modification": true,
+    "t019f_no_omi_runtime_preflight_modification": true,
+    "t019f_no_omitting_evidence_unsafe_rewrite": true,
+    "t019f_no_os_import_in_validation": true,
+    "t019f_no_package_dependency_modification": true,
+    "t019f_no_package_script_execution": true,
+    "t019f_no_pathlib_import_in_validation": true,
+    "t019f_no_project_file_modification": true,
+    "t019f_no_project_or_candidate_persistence": true,
+    "t019f_no_project_storage_helper_call": true,
+    "t019f_no_promotion_file_modification": true,
+    "t019f_no_prompt_addition": true,
+    "t019f_no_requests_import_in_validation": true,
+    "t019f_no_rubric_implementation": true,
+    "t019f_no_socket_call": true,
+    "t019f_no_staging_commit_or_push": true,
+    "t019f_no_story_prose_generation": true,
+    "t019f_no_subprocess_or_shell_or_network": true,
+    "t019f_no_subprocess_run": true,
+    "t019f_no_subtxt_runtime_execution": true,
+    "t019f_no_t009_contract_modification": true,
+    "t019f_no_t019c_contract_modification": true,
+    "t019f_no_t019d_evaluator_modification": true,
+    "t019f_no_t019e_adapter_modification": true,
+    "t019f_no_test_framework_addition": true,
+    "t019f_no_urllib_import_in_validation": true
   }
 }
