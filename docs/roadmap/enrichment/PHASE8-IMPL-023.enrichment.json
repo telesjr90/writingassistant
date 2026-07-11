@@ -770,8 +770,9 @@
     {
       "task_id": "PHASE8-IMPL-023-T021",
       "title": "Cross-tool fusion validation using real runtime outputs",
-      "status": "blocked/in_progress",
-      "scope": "fusion/dedupe/conflict/uncertainty validation against real runtime outputs; first attempt safely blocked after four contributors produced 44 partial findings, Ollama timed out at 180 seconds, and NCP exposed the production validator no-op"
+      "status": "complete/PASS",
+      "scope": "fusion/dedupe/conflict/uncertainty validation against real runtime outputs; original blocked attempt preserved historically; T021A repaired the NCP validator and T021B completed the same-six real-runtime validation",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T021B-cross-tool-fusion-real-runtime-validation-rerun.md"
     },
     {
       "task_id": "PHASE8-IMPL-023-T021A",
@@ -788,8 +789,13 @@
     {
       "task_id": "PHASE8-IMPL-023-T021B",
       "title": "Cross-tool fusion real-runtime validation rerun after NCP validator repair",
-      "status": "planned",
-      "scope": "Rerun the same six mandatory contributors with OMI_LIVE_NCP_VALIDATE_WITH_NODE=1 and OMI_LIVE_OLLAMA_TIMEOUT_SECONDS=600; do not redesign fusion or persistence"
+      "status": "complete/PASS",
+      "scope": "Rerun the same six mandatory contributors with OMI_LIVE_NCP_VALIDATE_WITH_NODE=1 and OMI_LIVE_OLLAMA_TIMEOUT_SECONDS=600; validate T010 fusion and deterministic replay without persistence",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T021B-cross-tool-fusion-real-runtime-validation-rerun.md",
+      "artifacts": [
+        ".codex-context/PHASE8-IMPL-023/manual-validation/T021B-cross-tool-fusion-real-runtime-rerun/"
+      ],
+      "result": "complete/PASS; one authoritative same-six invocation; NCP helper 1/true; adapter findings spacy=17, ollama_model=5, story_check=11, ncp=64, subtxt_informed_rubric=7, dramatica_flow_informed_rubric=9; 113 inputs preserved as 113 outputs; 113 unique normalized IDs; zero natural duplicates; two conflict groups without truth selection; 23 uncertain findings; forward/reverse replay identical; persistence not requested; all safety and mutation assertions passed; focused 25 and regressions 270 passed with one environment-only NVML warning; original blocked evidence preserved; T021 complete/PASS; T022 planned"
     },
     {
       "task_id": "PHASE8-IMPL-023-T022",
@@ -833,18 +839,29 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T021A",
+  "latest_child_task": "PHASE8-IMPL-023-T021B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T021A-production-ncp-node-validation-opt-in-repair.md",
-  "next_child_task": "PHASE8-IMPL-023-T021B",
-  "next_child_title": "Cross-tool fusion real-runtime validation rerun after NCP validator repair",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T021B-cross-tool-fusion-real-runtime-validation-rerun.md",
+  "next_child_task": "PHASE8-IMPL-023-T022",
+  "next_child_title": "Candidate-only persistence validation using real runtime outputs",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Production NCP Node validation opt-in repair",
-  "latest_child_summary": "T021A replaced the production NCP Node-validator no-op with an exact bounded fail-closed subprocess path while preserving the Node-free default, safe-path containment, and no-candidate failure behavior. The first T021A execution stopped after two focused-command failures; this continuation changed only the fixture's idempotent parent mkdir. The formerly failing node, 25 focused tests, and 230 regressions passed, with one environment-only NVML warning. No real npm/Node/runtime operation occurred. T021 remains blocked/in_progress; T021B is planned next with Node validation enabled, Ollama timeout 600 seconds, and the same six contributors. PHASE8-IMPL-023 remains active and full MVP completion remains blocked.",
+  "latest_child_title": "Cross-tool fusion real-runtime validation rerun after NCP validator repair",
+  "latest_child_summary": "T021B completed one authoritative same-six real-runtime invocation with Node validation enabled and Ollama timeout 600 seconds. All six adapters succeeded with 113 findings; the real NCP helper ran once and returned true; T010 preservation, fingerprints/IDs, zero-natural-duplicate handling, conflicts without truth selection, support-only uncertainty, deterministic replay, pending review, no persistence, all safety flags, and protected-state mutation proof passed. T021B and T021 are complete/PASS. PHASE8-IMPL-023 remains published/active, full MVP completion remains blocked, and T022 is planned next.",
   "latest_child_validation": {
+    "t021b_authoritative_invocation_count": 1,
+    "t021b_ncp_helper_call_count": 1,
+    "t021b_ncp_helper_result": true,
+    "t021b_finding_count": 113,
+    "t021b_adapter_finding_counts": {"spacy": 17, "ollama_model": 5, "story_check": 11, "ncp": 64, "subtxt_informed_rubric": 7, "dramatica_flow_informed_rubric": 9},
+    "t021b_forward_reverse_replay_identical": true,
+    "t021b_persistence_not_requested": true,
+    "t021b_protected_state_identical": true,
+    "t021b_regression_test_count": 270,
+    "t021b_regression_warning_count": 1,
+    "t021_parent_complete_pass": true,
     "t021a_formerly_failing_test_count": 1,
     "t021a_focused_test_count": 25,
     "t021a_regression_test_count": 230,
