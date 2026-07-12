@@ -24,6 +24,7 @@ import {
   PROJECT_ID,
   createOwnerAuthoredNote,
   createOwnerProvidedMaterial,
+  createOmiGuidedProject,
   createOrImportOwnerAuthoredSource,
   createProject,
   createOMICandidate,
@@ -70,6 +71,62 @@ const WORKSPACE_VIEWS = {
   OMI_DASHBOARD: 'omi-dashboard',
   EDITOR: 'editor',
 };
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.length > 0;
+}
+
+export function requireCompleteOmiGuidedProjectResponse(response) {
+  const metadata = response?.project_metadata;
+  const guidedMetadata = metadata?.omi_guided_creation;
+  const isComplete = response?.status === 'complete'
+    && response?.creation_method === 'omi_guided'
+    && isNonEmptyString(response?.project_id)
+    && isNonEmptyString(response?.omi_idea_id)
+    && isNonEmptyString(response?.setup_note_id)
+    && metadata
+    && typeof metadata === 'object'
+    && !Array.isArray(metadata)
+    && metadata.project_id === response.project_id
+    && metadata.creation_method === 'omi_guided'
+    && guidedMetadata?.status === 'complete'
+    && guidedMetadata.omi_idea_id === response.omi_idea_id
+    && guidedMetadata.setup_note_id === response.setup_note_id;
+
+  if (!isComplete) {
+    const error = new Error(
+      'Guided creation returned an incomplete response. No project was opened.',
+    );
+    error.code = 'malformed_guided_creation_response';
+    error.payload = response ?? null;
+    throw error;
+  }
+
+  return metadata;
+}
+
+export function upsertGuidedProjectMetadata(currentProjects, metadata) {
+  const projectId = metadata.project_id;
+  let foundExisting = false;
+  const integratedProjects = currentProjects.flatMap((project) => {
+    const matches = project?.project_id === projectId
+      || project?.projectId === projectId
+      || project?.id === projectId;
+
+    if (!matches) {
+      return [project];
+    }
+
+    if (foundExisting) {
+      return [];
+    }
+
+    foundExisting = true;
+    return [metadata];
+  });
+
+  return foundExisting ? integratedProjects : [...integratedProjects, metadata];
+}
 
 function formatJson(value) {
   return JSON.stringify(value ?? {}, null, 2);
@@ -189,12 +246,16 @@ export default function App() {
     loadProjects();
   }, [loadProjects]);
 
-  const handleSelectProject = useCallback((projectId) => {
+  const handleSelectProject = useCallback((projectId, options = {}) => {
     if (!projectId || projectId === activeProjectId) {
       return;
     }
 
-    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
+    if (
+      !options.skipUnsavedConfirmation
+      && hasUnsavedDocumentChanges
+      && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)
+    ) {
       return;
     }
 
@@ -244,6 +305,61 @@ export default function App() {
       setIsCreatingProject(false);
     }
   }, [hasUnsavedDocumentChanges, isCreatingProject, loadProjects]);
+
+  const handleCreateOmiGuidedProject = useCallback(async ({
+    title,
+    rawIdea,
+    setupNotes,
+  } = {}) => {
+    if (
+      typeof title !== 'string'
+      || typeof rawIdea !== 'string'
+      || typeof setupNotes !== 'string'
+    ) {
+      const error = new Error('Guided creation requires a title, setup idea, and setup notes.');
+      error.code = 'invalid_guided_creation_request';
+      throw error;
+    }
+
+    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_CREATE_MESSAGE)) {
+      const error = new Error('Guided project creation was cancelled.');
+      error.code = 'guided_creation_cancelled';
+      throw error;
+    }
+
+    if (isCreatingProject) {
+      const error = new Error('Guided project creation is already in progress.');
+      error.code = 'guided_creation_pending';
+      throw error;
+    }
+
+    setIsCreatingProject(true);
+    setCreateProjectError('');
+    setCreateProjectStatus('Creating guided project...');
+
+    try {
+      const response = await createOmiGuidedProject({ title, rawIdea, setupNotes });
+      const metadata = requireCompleteOmiGuidedProjectResponse(response);
+      const newProjectId = response.project_id;
+
+      setProjects((currentProjects) => (
+        upsertGuidedProjectMetadata(currentProjects, metadata)
+      ));
+      handleSelectProject(newProjectId, { skipUnsavedConfirmation: true });
+      setCreateProjectStatus('Guided project created');
+      setCreateProjectError('');
+      return { success: true, projectId: newProjectId, response };
+    } catch (error) {
+      const message = error instanceof Error
+        ? error.message
+        : 'Failed to create guided project.';
+      setCreateProjectError(message);
+      setCreateProjectStatus('');
+      throw error;
+    } finally {
+      setIsCreatingProject(false);
+    }
+  }, [handleSelectProject, hasUnsavedDocumentChanges, isCreatingProject]);
 
   useEffect(() => {
     let isMounted = true;
@@ -1195,7 +1311,7 @@ export default function App() {
         {activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (
           <>
             <OmiGuidedProjectCreation
-              onCreateProject={handleCreateProject}
+              onCreateGuidedProject={handleCreateOmiGuidedProject}
               disabled={isCreatingProject}
               onCancel={() => {
                 setCreateProjectError('');

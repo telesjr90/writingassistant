@@ -39,6 +39,51 @@ export async function createProject(title) {
   return requestData(() => client.post('/projects', { title }));
 }
 
+export class OmiGuidedProjectCreationError extends Error {
+  constructor(message, { status = null, payload = null, code = null } = {}) {
+    super(message);
+    this.name = 'OmiGuidedProjectCreationError';
+    this.status = status;
+    this.payload = payload;
+    this.code = code;
+  }
+}
+
+export async function createOmiGuidedProject({ title, rawIdea, setupNotes }) {
+  if (
+    typeof title !== 'string'
+    || typeof rawIdea !== 'string'
+    || typeof setupNotes !== 'string'
+  ) {
+    throw new OmiGuidedProjectCreationError(
+      'Guided creation requires string values for title, raw idea, and setup notes.',
+      { code: 'invalid_guided_creation_request' },
+    );
+  }
+
+  const payload = {
+    title,
+    raw_idea: rawIdea,
+    setup_notes: setupNotes,
+  };
+
+  try {
+    const response = await client.post('/projects/omi-guided', payload);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status ?? null;
+      const responsePayload = error.response?.data ?? null;
+      throw new OmiGuidedProjectCreationError(
+        getErrorMessage(error),
+        { status, payload: responsePayload },
+      );
+    }
+
+    throw new OmiGuidedProjectCreationError(getErrorMessage(error));
+  }
+}
+
 export async function fetchScenes(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/scenes`));
 }
