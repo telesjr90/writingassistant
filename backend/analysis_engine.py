@@ -9,12 +9,24 @@ import requests
 
 try:
     from . import analysis_modes, analysis_normalizer, guardrails, project_manager
+    from .story_check_grounding_contract import build_story_check_source_snapshot
+    from .story_check_grounding_integration import (
+        StoryCheckGroundingIntegrationError,
+        build_story_check_grounding_failure,
+        ground_story_check_result,
+    )
     from .storyform import Storyform
 except ImportError:  # pragma: no cover - supports direct execution from backend/
     import analysis_modes
     import analysis_normalizer
     import guardrails
     import project_manager
+    from story_check_grounding_contract import build_story_check_source_snapshot
+    from story_check_grounding_integration import (
+        StoryCheckGroundingIntegrationError,
+        build_story_check_grounding_failure,
+        ground_story_check_result,
+    )
     from storyform import Storyform
 
 
@@ -44,14 +56,23 @@ def _ollama_chat_url() -> str:
 
 
 def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
+    source_snapshot = None
     try:
+        scene_text = project_manager.load_scene(project_name, scene_id)
+        source_snapshot = build_story_check_source_snapshot(
+            project_id=project_name,
+            source_type="scene",
+            source_id=scene_id,
+            source_content=scene_text,
+        )
         mode = analysis_modes.get_analysis_mode()
         if mode == analysis_modes.MOCK:
-            return _load_mock_story_check_response()
+            return ground_story_check_result(
+                _load_mock_story_check_response(), source_snapshot
+            )
 
         timeout_seconds = float(os.getenv("OLLAMA_TIMEOUT_SECONDS", "300"))
         storyform_context = Storyform.from_file(project_name).to_prompt_context()
-        scene_text = project_manager.load_scene(project_name, scene_id)
         bible_summary = json.dumps(
             project_manager.load_bible(project_name),
             indent=2,
@@ -83,6 +104,12 @@ def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
         payload = response.json()
         content = payload.get("message", {}).get("content", "")
 
-        return _parse_story_check_response(content)
+        return ground_story_check_result(
+            _parse_story_check_response(content), source_snapshot
+        )
+    except StoryCheckGroundingIntegrationError as exc:
+        if source_snapshot is not None:
+            return build_story_check_grounding_failure(source_snapshot, str(exc))
+        return {"error": str(exc)}
     except Exception as e:
         return {"error": str(e)}

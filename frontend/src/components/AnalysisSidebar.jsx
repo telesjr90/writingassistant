@@ -28,6 +28,162 @@ function isReportObject(report) {
   return report && typeof report === 'object' && !Array.isArray(report);
 }
 
+function hasValidEvidenceReference(reference, sourceIdentity) {
+  return reference
+    && typeof reference === 'object'
+    && !Array.isArray(reference)
+    && reference.source_id === sourceIdentity?.source_id
+    && reference.source_sha256 === sourceIdentity?.source_sha256
+    && Number.isInteger(reference.start_byte)
+    && Number.isInteger(reference.end_byte)
+    && reference.start_byte >= 0
+    && reference.end_byte > reference.start_byte
+    && typeof reference.excerpt === 'string'
+    && reference.offset_basis === 'utf-8-bytes-zero-based-half-open';
+}
+
+export function getGroundedStoryCheckDiagnostics(report) {
+  const grounding = report?.grounding;
+  if (!grounding || typeof grounding !== 'object' || Array.isArray(grounding)) {
+    return [];
+  }
+  if (grounding.status !== 'completed' || !Array.isArray(grounding.diagnostics)) {
+    return [];
+  }
+
+  return grounding.diagnostics.filter((diagnostic) => (
+    diagnostic && typeof diagnostic === 'object' && typeof diagnostic.message === 'string'
+  ));
+}
+
+export function getGroundingPresentationState(diagnostic, sourceIdentity) {
+  const factual = diagnostic?.classification === 'factual_warning';
+  if (diagnostic?.verification_state === 'quarantined') {
+    return 'quarantined';
+  }
+  if (diagnostic?.verification_state !== 'verified') {
+    return 'unverified';
+  }
+
+  const validator = diagnostic?.validator_result;
+  const evidence = Array.isArray(diagnostic?.evidence) ? diagnostic.evidence : [];
+  const validVerifiedState = validator?.outcome === 'supported'
+    && validator?.direct_evidence_matched === true
+    && evidence.length > 0
+    && evidence.every((reference) => hasValidEvidenceReference(reference, sourceIdentity));
+  if (validVerifiedState) {
+    return 'verified';
+  }
+
+  return factual ? 'quarantined' : 'unverified';
+}
+
+function DiagnosticEvidence({ diagnostic, sourceIdentity }) {
+  const evidence = asArray(diagnostic.evidence);
+  const validator = diagnostic.validator_result && typeof diagnostic.validator_result === 'object'
+    ? diagnostic.validator_result
+    : {};
+
+  return (
+    <details className="grounding-evidence-details">
+      <summary>Source and evidence details</summary>
+      <dl className="analysis-metadata">
+        <div>
+          <dt>Source ID</dt>
+          <dd><code>{sourceIdentity?.source_id ?? 'unavailable'}</code></dd>
+        </div>
+        <div>
+          <dt>Source SHA-256</dt>
+          <dd><code>{sourceIdentity?.source_sha256 ?? 'unavailable'}</code></dd>
+        </div>
+        <div>
+          <dt>Validator outcome</dt>
+          <dd>{validator.outcome ?? 'not available'}</dd>
+        </div>
+        <div>
+          <dt>Reason codes</dt>
+          <dd>{asArray(validator.reason_codes).join(', ') || 'none supplied'}</dd>
+        </div>
+      </dl>
+      {evidence.length > 0 ? evidence.map((reference, index) => (
+        <div className="grounding-evidence-reference" key={`${reference?.start_byte}-${index}`}>
+          <p className="mini-heading">Exact UTF-8 evidence {index + 1}</p>
+          <p><q>{reference?.excerpt}</q></p>
+          <p className="muted-copy">
+            Bytes {reference?.start_byte}–{reference?.end_byte}; {reference?.offset_basis}
+          </p>
+        </div>
+      )) : (
+        <p className="muted-copy">No validated direct evidence reference is attached.</p>
+      )}
+    </details>
+  );
+}
+
+function GroundedDiagnosticList({ title, state, diagnostics, sourceIdentity, description }) {
+  return (
+    <section
+      className={`analysis-section grounded-diagnostic-group is-${state}`}
+      aria-label={`${title}: ${state}`}
+    >
+      <h3>{title}</h3>
+      <p className="muted-copy">{description}</p>
+      {diagnostics.length > 0 ? (
+        <ul className="grounded-diagnostic-list">
+          {diagnostics.map(({ diagnostic, presentationState }, index) => (
+            <li key={diagnostic.diagnostic_id ?? `${state}-${index}`}>
+              <p className={`grounding-status is-${presentationState}`}>
+                Status: {presentationState}
+              </p>
+              <p className="grounded-diagnostic-text">{diagnostic.message}</p>
+              <p className="muted-copy">Classification: {diagnostic.classification ?? 'unknown'}</p>
+              <DiagnosticEvidence diagnostic={diagnostic} sourceIdentity={sourceIdentity} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="muted-copy">No {state} diagnostics returned.</p>
+      )}
+    </section>
+  );
+}
+
+function GroundedStoryCheckDiagnostics({ report }) {
+  const diagnostics = getGroundedStoryCheckDiagnostics(report);
+  const sourceIdentity = report?.grounding?.source_identity;
+  const grouped = { verified: [], unverified: [], quarantined: [] };
+  diagnostics.forEach((diagnostic) => {
+    const presentationState = getGroundingPresentationState(diagnostic, sourceIdentity);
+    grouped[presentationState].push({ diagnostic, presentationState });
+  });
+
+  return (
+    <div className="grounded-diagnostics" data-testid="story-check-grounded-diagnostics">
+      <GroundedDiagnosticList
+        title="Verified Findings"
+        state="verified"
+        diagnostics={grouped.verified}
+        sourceIdentity={sourceIdentity}
+        description="Verified means the deterministic validator matched direct evidence to this exact source identity."
+      />
+      <GroundedDiagnosticList
+        title="Unverified Diagnostics"
+        state="unverified"
+        diagnostics={grouped.unverified}
+        sourceIdentity={sourceIdentity}
+        description="Useful structural diagnostics, questions, and observations remain visible but are not confirmed facts."
+      />
+      <GroundedDiagnosticList
+        title="Quarantined Factual Warnings"
+        state="quarantined"
+        diagnostics={grouped.quarantined}
+        sourceIdentity={sourceIdentity}
+        description="Quarantined output is unsupported or mismatched model output. It is not confirmation or project truth."
+      />
+    </div>
+  );
+}
+
 function formatPresent(value) {
   if (value === true) {
     return 'yes';
@@ -286,6 +442,9 @@ export default function AnalysisSidebar({
   const warnings = hasReport ? asArray(report.warnings) : [];
   const suggestions = hasReport ? asArray(report.suggestions) : [];
   const insufficientEvidence = hasReport ? asArray(report.insufficient_evidence) : [];
+  const hasGroundedResult = hasReport
+    && report?.grounding?.status === 'completed'
+    && Array.isArray(report?.grounding?.diagnostics);
   const diagnostics = hasReport ? getDiagnosticEntries(report.diagnostics) : [];
   const throughlineAlignment = hasReport && report.throughline_alignment
     && typeof report.throughline_alignment === 'object'
@@ -372,19 +531,24 @@ export default function AnalysisSidebar({
               )}
             </div>
 
-            <section className="analysis-section">
-              <h3>Warnings</h3>
-              {renderList(warnings, 'No warnings returned.')}
-            </section>
+            {hasGroundedResult ? (
+              <GroundedStoryCheckDiagnostics report={report} />
+            ) : (
+              <section className="analysis-section grounded-diagnostic-group is-quarantined">
+                <h3>Legacy Ungrounded Output</h3>
+                <p className="muted-copy">
+                  Status: unverified. This response has no completed grounding contract and cannot be treated as verified.
+                </p>
+                <h4>Warnings</h4>
+                {renderList(warnings, 'No warnings returned.')}
+                <h4>Diagnostic Suggestions</h4>
+                {renderList(suggestions, 'No diagnostic suggestions returned.')}
+              </section>
+            )}
 
             <section className="analysis-section">
-              <h3>Diagnostic Suggestions</h3>
-              {renderList(suggestions, 'No diagnostic suggestions returned.')}
-            </section>
-
-            <section className="analysis-section">
-              <h3>Throughline Alignment</h3>
-              <p className="muted-copy">Candidate diagnostic. Evidence shown only when present.</p>
+              <h3>Throughline Alignment (unverified diagnostic context)</h3>
+              <p className="muted-copy">Candidate diagnostic context. These legacy fields are not verified evidence.</p>
               {throughlineAlignment ? (
                 <div className="throughline-grid">
                   {renderThroughline('Overall Story', throughlineAlignment.overall_story)}
@@ -397,13 +561,15 @@ export default function AnalysisSidebar({
               )}
             </section>
 
-            {renderStatusReason('Theme Drift', report.theme_drift)}
-            {renderStatusReason('Character Consistency', report.character_consistency)}
+            {renderStatusReason('Theme Drift (unverified)', report.theme_drift)}
+            {renderStatusReason('Character Consistency (unverified)', report.character_consistency)}
 
-            <section className="analysis-section insufficient-evidence">
-              <h3>Insufficient Evidence</h3>
-              {renderList(insufficientEvidence, 'No insufficient-evidence notes returned.')}
-            </section>
+            {!hasGroundedResult && (
+              <section className="analysis-section insufficient-evidence">
+                <h3>Insufficient Evidence</h3>
+                {renderList(insufficientEvidence, 'No insufficient-evidence notes returned.')}
+              </section>
+            )}
 
             {diagnostics.length > 0 && (
               <section className="analysis-section">

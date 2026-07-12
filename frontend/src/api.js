@@ -170,7 +170,13 @@ export async function runStoryCheckForSelectedSource({
     throw new Error('Story Check requires a selected owner-authored source.');
   }
 
-  return runStoryCheck(selectedStoryCheckSourceId, projectId);
+  const response = await runStoryCheck(selectedStoryCheckSourceId, projectId);
+  const groundedSourceId = response?.grounding?.source_identity?.source_id;
+  if (groundedSourceId && groundedSourceId !== selectedStoryCheckSourceId) {
+    throw new Error('Story Check response source does not match the selected source.');
+  }
+
+  return response;
 }
 
 export function fetchRawArtifactEvidenceStatus(projectId = PROJECT_ID) {

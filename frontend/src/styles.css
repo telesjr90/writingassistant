@@ -850,6 +850,99 @@ h2 {
   line-height: 1.5;
 }
 
+.grounded-diagnostics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grounded-diagnostic-group {
+  padding: 12px;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.grounded-diagnostic-group.is-verified {
+  background: #f1f8f4;
+  border-color: #a9d0b8;
+}
+
+.grounded-diagnostic-group.is-unverified {
+  background: #f7f9fc;
+}
+
+.grounded-diagnostic-group.is-quarantined {
+  background: #fff6ed;
+  border-color: #e6b98a;
+}
+
+.grounded-diagnostic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.grounded-diagnostic-list > li {
+  padding-top: 12px;
+  border-top: 1px solid #dfe5ef;
+}
+
+.grounded-diagnostic-list > li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.grounding-status {
+  display: inline-block;
+  width: fit-content;
+  margin: 0 0 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: #344054;
+  background: #e7ecf4;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.grounding-status.is-verified {
+  color: #175c38;
+  background: #d9eee1;
+}
+
+.grounding-status.is-quarantined {
+  color: #7a2e0e;
+  background: #f8dcc5;
+}
+
+.grounded-diagnostic-text,
+.grounding-evidence-reference p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.grounding-evidence-details {
+  margin-top: 8px;
+  color: #344054;
+  font-size: 13px;
+}
+
+.grounding-evidence-details summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.grounding-evidence-details .analysis-metadata,
+.grounding-evidence-reference {
+  margin-top: 8px;
+}
+
+.grounding-evidence-details code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
 .analysis-metadata {
   display: flex;
   flex-direction: column;
