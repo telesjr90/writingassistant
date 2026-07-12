@@ -11,7 +11,10 @@
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
     "controlling_architecture_decision": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-    "activation_after": ["PHASE8-IMPL-024-T001", "PHASE8-IMPL-024-T002"],
+    "activation_after": [
+      "PHASE8-IMPL-024-T001",
+      "PHASE8-IMPL-024-T002"
+    ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; PHASE8-IMPL-025-T007 consumes and extends it without duplicate contracts",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
     "immediate_next_task": "PHASE8-IMPL-024-T002A",
@@ -38,7 +41,10 @@
     },
     "final_validation": ".codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T205343Z",
     "superseded_blocked_validation": ".codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T203726Z",
-    "resolved_questions": [134, 135],
+    "resolved_questions": [
+      134,
+      135
+    ],
     "accessibility_advisories": [
       "focus returned to BODY after guided setup-to-review transition; follow up under T005",
       "directly inserted selected project option temporarily appeared disabled/invalid until library refresh; follow up under T007"
@@ -63,21 +69,59 @@
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
     "PHASE8-IMPL-024-T002 Story Check grounding integrity",
     "PHASE8-IMPL-024-T003 Optional-resource handling",
-    "PHASE8-IMPL-024-T004 Responsive containment",
-    "PHASE8-IMPL-024-T005 Accessibility semantics and target sizing",
-    "PHASE8-IMPL-024-T006 Truthful OMI navigation",
-    "PHASE8-IMPL-024-T007 OMI information architecture and component standardization",
+    "PHASE8-IMPL-024-T006 Truthful OMI navigation and remaining functional P1 repair",
+    "PHASE8-IMPL-024-T007 Impeccable review, component-library decision, and design-system standardization",
+    "PHASE8-IMPL-024-T004 Responsive containment after design-system standardization",
+    "PHASE8-IMPL-024-T005 Accessibility semantics and target sizing after responsive repair",
     "PHASE8-IMPL-024-T008 Remaining validation suites"
   ],
   "child_task_ordering": {
-    "T001": ["T001A", "T001B", "T001C", "T001D"],
-    "T002": ["T002A", "T002B", "T002C", "T002D", "T002E"],
-    "T003": ["T003A", "T003B", "T003C"],
-    "T004": ["T004A", "T004B", "T004C"],
-    "T005": ["T005A", "T005B", "T005C"],
-    "T006": ["T006A", "T006B", "T006C"],
-    "T007": ["T007A", "T007B", "T007C"],
-    "T008": ["T008A", "T008B", "T008C", "T008D", "T008E", "T008F"]
+    "T001": [
+      "T001A",
+      "T001B",
+      "T001C",
+      "T001D"
+    ],
+    "T002": [
+      "T002A",
+      "T002B",
+      "T002C",
+      "T002D",
+      "T002E"
+    ],
+    "T003": [
+      "T003A",
+      "T003B",
+      "T003C"
+    ],
+    "T004": [
+      "T004A",
+      "T004B",
+      "T004C"
+    ],
+    "T005": [
+      "T005A",
+      "T005B",
+      "T005C"
+    ],
+    "T006": [
+      "T006A",
+      "T006B",
+      "T006C"
+    ],
+    "T007": [
+      "T007A",
+      "T007B",
+      "T007C"
+    ],
+    "T008": [
+      "T008A",
+      "T008B",
+      "T008C",
+      "T008D",
+      "T008E",
+      "T008F"
+    ]
   },
   "validation_frontier": {
     "verified_working": [
@@ -103,7 +147,8 @@
       "App.jsx and OMIShell.jsx navigation reset ambiguity",
       "repeated metadata and safety presentation patterns",
       "guided review transition focus returns to BODY; non-blocking T005 follow-up",
-      "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up"
+      "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up",
+      "evidence-based Impeccable review before component-library selection and design-system standardization"
     ],
     "not_yet_tested": [
       "grouped-review owner-decision mutation",
@@ -126,7 +171,9 @@
     "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
     "failed collectors mistaken for product evidence",
     "guided review focus and immediate selected-project presentation advisories",
-    "over-filtering useful Story Check diagnostics"
+    "over-filtering useful Story Check diagnostics",
+    "premature component-library adoption before Impeccable evidence review and an explicit owner-approved decision",
+    "responsive and accessibility rework caused by replacing shared components after those repairs are completed"
   ],
   "open_questions": [
     "grounded-warning evidence contract",
@@ -134,7 +181,8 @@
     "optional-resource availability in project metadata versus a dedicated read-only endpoint",
     "MVP-required versus intentionally unavailable OMI destinations",
     "minimum desktop width and touch-target policy",
-    "advanced mutation validation sequencing relative to MVP acceptance"
+    "advanced mutation validation sequencing relative to MVP acceptance",
+    "component-foundation decision after Impeccable review: shadcn/ui, React Aria, Radix Primitives, or retained native/custom components"
   ],
   "boundaries": [
     "analysis-only",

@@ -32,6 +32,34 @@ T001A/T001B implemented the dedicated bounded guided-creation contract and front
 
 The selected source and POST transport were correct, but the result claimed selected-scene details were absent when those details were visibly present. The repair must carry selected source ID and source-content hash, require direct source evidence for factual warnings, validate grounding deterministically against the exact selected scene, quarantine or mark unsupported warnings unverified, and fail closed on source mismatch. Story Check remains non-mutating and model output remains non-canon.
 
+<!-- PHASE8-IMPL-024-UI-ORDER:START -->
+## Owner-approved UI execution order
+
+The UI/UX roadmap follows this sequence:
+
+1. Fix P0/P1 functional and integrity issues.
+2. Use Impeccable for evidence-based UI review.
+3. Decide between shadcn/ui, React Aria, Radix Primitives, or retaining native/custom components.
+4. Standardize the design system according to that recorded decision.
+5. Complete responsive and accessibility work against the standardized component foundation.
+
+Task identifiers remain stable. Dependencies and the documented workstream
+order establish execution sequence:
+
+- Functional and integrity work: `T001`, `T002`, `T003`, then `T006`.
+- Impeccable evidence review: `T007A`.
+- Component-library decision: `T007B`.
+- Design-system and shared-component standardization: `T007C`.
+- Responsive containment and validation: `T004`.
+- Accessibility semantics, target sizing, and keyboard validation: `T005`.
+- Remaining validation suites: `T008`.
+
+This ordering prevents premature visual polish, avoids selecting a component
+library without evidence, and avoids repeating responsive and accessibility
+work after shared components are replaced.
+
+<!-- PHASE8-IMPL-024-UI-ORDER:END -->
+
 ## Child Task Hierarchy
 
 Lettered children are bounded execution slices under the indexed workstream child.
@@ -63,9 +91,29 @@ Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/h
 
 Normal absence must not generate repeated noisy 404s or obscure genuine invalid-resource and request-failure errors.
 
+### `PHASE8-IMPL-024-T006` - Truthful OMI navigation
+
+- `PHASE8-IMPL-024-T006A` - Resettable OMI Dashboard navigation and `App.jsx`/`OMIShell.jsx` state-owner decision (`planned`; depends on T003C).
+- `PHASE8-IMPL-024-T006B` - Repeated inner-view navigation and enabled actions only for implemented destinations (`planned`; depends on T006A).
+- `PHASE8-IMPL-024-T006C` - Navigation regression validation and closeout (`planned`; depends on T006B).
+
+Unavailable workflows must render as honest status rows, not enabled no-op buttons. Duplicate resolution, audit mutation, and apply-promotion must not be implemented merely to make a dashboard button work.
+
+### `PHASE8-IMPL-024-T007` - Evidence-based UI review, component-library decision, and design-system standardization
+
+- `PHASE8-IMPL-024-T007A` - Run an evidence-based Impeccable UI review after the P0/P1 functional work, consolidate findings with the existing Playwright evidence, and define the prioritized information-architecture and shared-component requirements (`planned`; depends on T006C).
+- `PHASE8-IMPL-024-T007B` - Record the owner-approved component-foundation decision between shadcn/ui, React Aria, Radix Primitives, or retaining native/custom components; evaluate accessibility, styling, migration cost, dependency impact, local-first compatibility, and fit with the existing React/Vite application before adoption (`planned`; depends on T007A).
+- `PHASE8-IMPL-024-T007C` - Standardize the design system and shared boundary, metadata, status, empty, loading, error, action, disclosure, and owner-attention components according to the T007B decision; retain complete provenance and safety details and validate the standardized information architecture (`planned`; depends on T007B).
+
+Impeccable is an evidence-based design and critique tool, not a runtime component dependency. T007A findings inform T007B but do not select a component library automatically.
+
+T007B is a decision task. It must not install shadcn/ui, React Aria, Radix Primitives, Tailwind, or another component dependency until the decision is documented and its migration scope is explicitly authorized.
+
+T007C implements the approved component strategy before responsive and accessibility repair, preventing those later workstreams from being performed against components that will immediately be replaced.
+
 ### `PHASE8-IMPL-024-T004` - Responsive containment
 
-- `PHASE8-IMPL-024-T004A` - Document-level overflow repair and native-control containment (`planned`; depends on T003C).
+- `PHASE8-IMPL-024-T004A` - Document-level overflow repair and native-control containment (`planned`; depends on T007C).
 - `PHASE8-IMPL-024-T004B` - OMI status/metric wrapping, local wide-table containment, and wider contextual OMI workspace (`planned`; depends on T004A).
 - `PHASE8-IMPL-024-T004C` - Responsive validation at 1440, 1280, 834, 640, 390, and 320 pixels (`planned`; depends on T004B).
 
@@ -76,22 +124,6 @@ Normal absence must not generate repeated noisy 404s or obscure genuine invalid-
 - `PHASE8-IMPL-024-T005C` - Manual keyboard validation (`planned`; depends on T005B).
 
 The policy must distinguish the WCAG 2.2 24 CSS-pixel minimum target requirement and its exceptions from the preferred 44 CSS-pixel touch target. A sub-44-pixel control is not automatically a WCAG failure.
-
-### `PHASE8-IMPL-024-T006` - Truthful OMI navigation
-
-- `PHASE8-IMPL-024-T006A` - Resettable OMI Dashboard navigation and `App.jsx`/`OMIShell.jsx` state-owner decision (`planned`; depends on T005C).
-- `PHASE8-IMPL-024-T006B` - Repeated inner-view navigation and enabled actions only for implemented destinations (`planned`; depends on T006A).
-- `PHASE8-IMPL-024-T006C` - Navigation regression validation and closeout (`planned`; depends on T006B).
-
-Unavailable workflows must render as honest status rows, not enabled no-op buttons. Duplicate resolution, audit mutation, and apply-promotion must not be implemented merely to make a dashboard button work.
-
-### `PHASE8-IMPL-024-T007` - OMI information architecture and component standardization
-
-- `PHASE8-IMPL-024-T007A` - "Needs owner attention" summary with pending and blocked work prioritization (`planned`; depends on T006C).
-- `PHASE8-IMPL-024-T007B` - Progressive disclosure for hashes/raw audit metadata plus shared boundary, metadata, status, empty, loading, error, and action components (`planned`; depends on T007A).
-- `PHASE8-IMPL-024-T007C` - Information-architecture validation and closeout (`planned`; depends on T007B).
-
-This workstream follows the integrity, optional-resource, responsive, accessibility, and navigation repairs. Complete provenance and safety details must remain available.
 
 ### `PHASE8-IMPL-024-T008` - Remaining validation suites
 

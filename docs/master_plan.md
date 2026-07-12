@@ -1052,3 +1052,35 @@ test -f training/reports/master_plan_creation_report.md
 Roadmap implementation work follows the context-maintenance process in `docs/roadmap/context_execution_standard.md`.
 
 Before implementation prompts are run, the active roadmap frontier, context pack, collect-plan files, relevant collected evidence, validators, and git status should be checked outside the task prompt. Implementation prompts may reference already-generated context artifacts, but must not run context tools or broad repository collection themselves.
+
+<!-- PHASE8-IMPL-024-UI-ORDER:START -->
+## PHASE8-IMPL-024 UI execution order
+
+Owner decision:
+
+1. Fix P0/P1 functional and integrity issues.
+2. Use Impeccable for evidence-based UI review.
+3. Decide between shadcn/ui, React Aria, Radix Primitives, or retaining native/custom components.
+4. Standardize the design system according to that recorded decision.
+5. Complete responsive and accessibility work against the standardized component foundation.
+
+Task mapping:
+
+- Functional and integrity work: `T001`, `T002`, `T003`, then `T006`.
+- Impeccable evidence review: `T007A`.
+- Component-library decision: `T007B`.
+- Design-system and shared-component standardization: `T007C`.
+- Responsive containment and validation: `T004`.
+- Accessibility semantics, target sizing, and keyboard validation: `T005`.
+- Remaining validation suites: `T008`.
+
+Task IDs remain unchanged. Functional repairs precede UI review. Impeccable
+evidence precedes the component-library decision. Design-system
+standardization precedes responsive and accessibility repair.
+
+Decision record:
+
+`docs/roadmap/decisions/PHASE8-IMPL-024-ui-execution-order-impeccable-component-library-design-system.md`
+
+This ordering update does not change current completion status.
+<!-- PHASE8-IMPL-024-UI-ORDER:END -->

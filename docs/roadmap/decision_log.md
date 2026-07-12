@@ -360,3 +360,24 @@
 | Implement Project Workspace Foundation | Pre-Dramatica product milestone | FUTURE; project creation, selector/library, chapters/scenes/notes/materials, owner-authored editor, project pages, OMI-guided creation, extraction triggers, owner approval, and memory/canon pages remain implementation tasks |
 | PHASE8-UX-002 publication | Accepted | `PHASE8-UX-002-T001` publishes `PHASE8-UX-002 - MVP acceptance UI completion and route wiring` as the active MVP-first UI parent after `PHASE8-IMPL-022` closeout and owner acceptance evidence remaining `MANUAL_REVIEW_REQUIRED`. The parent focuses on our app's missing browser-testable UI/workflow surfaces: owner-authored scene/source create/import/select, selected-source Story Check diagnostic-only UI, no-prose refusal/fail-closed UI, Notes/Materials project-scoped proof, runtime/raw artifact evidence UI, review/apply-promotion evidence UI, and NCP/Subtxt/dramatica-flow exposure decision. Owner acceptance remains pending and MVP is not complete. External SaaS investigation, Dramatica/current-platform investigation, controlled external experiments, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, and authorized non-black-box external reference collection are post-MVP/deferred. `PHASE8-UX-002-T002A` is post-MVP/deferred only and is not part of the active MVP child sequence. T001 changes no frontend/backend/tests/package files, creates no crawlers, raw captures, `.external_sources`, context bundles, model calls, generated prose, canon/memory mutation, candidate records, or apply-promotion shortcut. |
 - PHASE8-IMPL-023-T020E App-owned dramatica-flow-informed analysis-rubric OMI adapter integration: accepted `docs/roadmap/decisions/PHASE8-IMPL-023-T020E-app-owned-dramatica-flow-informed-analysis-rubric-omi-adapter-integration.md`. The explicit-only app-owned `dramatica_flow_informed_rubric` adapter validates exact T020C requests/results, invokes T020D once, normalizes all four buckets with deterministic ordering, converts provenance to the OMI identity, preserves evidence/references/confidence/uncertainty/pending review, and fails closed without partial findings or persistence. The obsolete T020D no-adapter frontier assertion was minimally updated for T020E; evaluator logic is unchanged. Focused result: 104 passed; requested regressions: 926 passed with one environment-only NVML warning. T009 remains fixture-only. T020 remains in progress; T020F manual validation is next.
+
+<!-- PHASE8-IMPL-024-UI-ORDER:START -->
+## PHASE8-IMPL-024 UI execution-order decision
+
+The owner approved the following sequence:
+
+1. Fix P0/P1 functional and integrity issues.
+2. Use Impeccable for evidence-based UI review.
+3. Decide between shadcn/ui, React Aria, Radix Primitives, or retaining native/custom components.
+4. Standardize the design system according to that recorded decision.
+5. Complete responsive and accessibility work against the standardized component foundation.
+
+The existing task IDs are retained and dependencies are reordered as
+`T001 → T002 → T003 → T006 → T007 → T004 → T005 → T008`.
+
+No component library is selected by this decision.
+
+Decision record:
+
+`docs/roadmap/decisions/PHASE8-IMPL-024-ui-execution-order-impeccable-component-library-design-system.md`
+<!-- PHASE8-IMPL-024-UI-ORDER:END -->
