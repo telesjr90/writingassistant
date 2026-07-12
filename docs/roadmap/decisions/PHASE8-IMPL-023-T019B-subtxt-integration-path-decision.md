@@ -1,5 +1,15 @@
 # PHASE8-IMPL-023-T019B — Subtxt Integration-Path Decision
 
+> **Superseded authorization point (2026-07-11):**
+> `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`
+> supersedes `Live Subtxt runtime: OWNER-BLOCKED`, the licensing/authorization
+> reopening condition, and any use of those points to limit implementation.
+> Full Subtxt runtime is authorized and planned under PHASE8-IMPL-025 T005/T006.
+> The T019A technical inventory, this record's historical rationale, the
+> completed app-owned rubric path, identity separation, fail-closed behavior,
+> candidate-only status, owner review, and all no-prose/no-truth/no-mutation
+> boundaries remain valid.
+
 ## Decision
 
 ```

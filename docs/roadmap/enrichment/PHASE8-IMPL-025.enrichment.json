@@ -1,0 +1,213 @@
+{
+  "task_id": "PHASE8-IMPL-025",
+  "title": "Layered Analysis Architecture and Tool Integration Expansion",
+  "status": "published/planned",
+  "task_type": "implementation parent",
+  "mvp_required": true,
+  "context_pack": null,
+  "context_pack_status": "not generated; requires a separate owner-authorized context-generation task before implementation activation",
+  "architecture_decision": {
+    "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
+    "accepted_pattern": "layered plus parallel",
+    "current_pattern": "source/raw idea -> independent adapters -> normalization -> fusion/conflict/uncertainty -> candidate persistence -> owner review",
+    "current_pattern_classification": "valid implemented foundation, incomplete target architecture",
+    "layers": [
+      "Layer 0 - owner source and source identity",
+      "Layer 1 - raw extraction",
+      "Layer 2 - raw artifact and evidence ledger",
+      "Layer 3 - interpretation and diagnostics",
+      "Layer 4 - grounding and semantic guardrails",
+      "Layer 5 - fusion",
+      "Layer 6 - candidate persistence and owner review",
+      "Layer 7 - explicit promotion and approved context",
+      "Layer 8 - NCP gateway"
+    ]
+  },
+  "owner_subtxt_authorization": {
+    "licensing_resolved": true,
+    "authorization_resolved": true,
+    "full_runtime_authorized": true,
+    "full_runtime_required_as_separate_path": true,
+    "supersedes_only": [
+      "prior owner-blocked live Subtxt classification",
+      "prior licensing-blocked Subtxt classification",
+      "prior reference-only-by-owner-decision Subtxt limitation",
+      "prior authorization reopening condition"
+    ],
+    "preserves": [
+      "historical T019 implementation evidence",
+      "subtxt_informed_rubric identity and implementation",
+      "analysis-only and no-prose boundaries",
+      "candidate-only and owner-review-required status",
+      "separate audited promotion and apply-promotion boundaries"
+    ]
+  },
+  "current_implemented_foundation": [
+    "real local spaCy evidence extraction",
+    "real Ollama qwen3:8b structured candidate extraction",
+    "real Story Check through analysis_engine and Ollama, with P0 grounding repair still required",
+    "real BookNLP character/location findings after narrow compatibility repair",
+    "explicit owner-selected NCP JSON candidate import validation",
+    "app-owned subtxt_informed_rubric",
+    "app-owned dramatica_flow_informed_rubric",
+    "deterministic fusion IDs, fingerprints, duplicate/conflict/uncertainty metadata",
+    "candidate-only persistence",
+    "grouped owner review with T023A and T023B complete/PASS"
+  ],
+  "missing_layers": [
+    "unified stable source identity and exact source snapshots",
+    "immutable AnalysisRunManifest and transformation lineage",
+    "complete immutable raw artifact/evidence ledger",
+    "expanded BookNLP mappings and precise offset translation",
+    "official/full authorized Subtxt runtime inventory, contracts, adapter, and validation",
+    "two-role evidence-bounded Ollama contract",
+    "completed Story Check factual grounding and layered integration",
+    "cross-adapter semantic guardrails",
+    "read-only project-level narrative diagnostics",
+    "full NCP import/export gateway and round-trip provenance",
+    "expanded owner correction, merge, split, and rerun lifecycle",
+    "isolated layered end-to-end validation"
+  ],
+  "activation": {
+    "status": "planned",
+    "depends_on": [
+      "PHASE8-IMPL-024-T001",
+      "PHASE8-IMPL-024-T002"
+    ],
+    "immediate_next_task": "PHASE8-IMPL-024-T001A",
+    "immediate_next_task_status": "ready",
+    "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
+    "first_phase8_impl_025_task_status": "planned"
+  },
+  "workstream_order": [
+    "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
+    "PHASE8-IMPL-025-T002 Source identity and AnalysisRunManifest",
+    "PHASE8-IMPL-025-T003 Immutable raw artifact and evidence ledger",
+    "PHASE8-IMPL-025-T004 BookNLP extraction expansion",
+    "PHASE8-IMPL-025-T005 Full Subtxt runtime inventory and contracts",
+    "PHASE8-IMPL-025-T006 Full Subtxt adapter, integration, and validation",
+    "PHASE8-IMPL-025-T007 Evidence-bounded Ollama and Story Check",
+    "PHASE8-IMPL-025-T008 Cross-adapter semantic guardrails",
+    "PHASE8-IMPL-025-T009 Read-only project-level narrative diagnostics",
+    "PHASE8-IMPL-025-T010 Full NCP gateway",
+    "PHASE8-IMPL-025-T011 Candidate review lifecycle expansion",
+    "PHASE8-IMPL-025-T012 Layered end-to-end validation"
+  ],
+  "child_task_ordering": {
+    "T001": ["T001A", "T001B", "T001C", "T001D"],
+    "T002": ["T002A", "T002B", "T002C", "T002D", "T002E"],
+    "T003": ["T003A", "T003B", "T003C", "T003D", "T003E"],
+    "T004": ["T004A", "T004B", "T004C", "T004D", "T004E", "T004F", "T004G"],
+    "T005": ["T005A", "T005B", "T005C", "T005D", "T005E", "T005F", "T005G"],
+    "T006": ["T006A", "T006B", "T006C", "T006D", "T006E", "T006F", "T006G", "T006H", "T006I", "T006J"],
+    "T007": ["T007A", "T007B", "T007C", "T007D", "T007E"],
+    "T008": ["T008A", "T008B", "T008C", "T008D", "T008E"],
+    "T009": ["T009A", "T009B", "T009C", "T009D", "T009E", "T009F", "T009G"],
+    "T010": ["T010A", "T010B", "T010C", "T010D", "T010E", "T010F", "T010G"],
+    "T011": ["T011A", "T011B", "T011C", "T011D", "T011E", "T011F", "T011G"],
+    "T012": ["T012A", "T012B", "T012C", "T012D", "T012E", "T012F", "T012G", "T012H", "T012I", "T012J"]
+  },
+  "dependencies": {
+    "external": {
+      "PHASE8-IMPL-025": ["PHASE8-IMPL-024-T002"],
+      "PHASE8-IMPL-025-T007": ["PHASE8-IMPL-024-T002", "PHASE8-IMPL-025-T006"]
+    },
+    "internal_chain": [
+      "T001 -> T002",
+      "T002 -> T003",
+      "T003 -> T004",
+      "T004 -> T005",
+      "T005 -> T006",
+      "T006 -> T007",
+      "T007 -> T008",
+      "T008 -> T009",
+      "T009 -> T010",
+      "T010 -> T011",
+      "T011 -> T012"
+    ]
+  },
+  "full_subtxt_runtime_path": {
+    "status": "planned",
+    "official_identity_distinct_from": "subtxt_informed_rubric",
+    "inventory_and_contracts": "PHASE8-IMPL-025-T005",
+    "adapter_integration_and_validation": "PHASE8-IMPL-025-T006",
+    "required_provenance": [
+      "Subtxt runtime version",
+      "model/provider identity where available",
+      "input source identity and hash",
+      "analysis operation",
+      "transformation into app candidate records"
+    ]
+  },
+  "risks": [
+    "source-to-candidate traceability gaps",
+    "missing immutable raw artifacts",
+    "adapter-role ambiguity",
+    "raw text sent to normalized-evidence consumers",
+    "unsupported factual model claims",
+    "BookNLP coreference and speaker uncertainty",
+    "full Subtxt runtime integration complexity",
+    "missing Subtxt internal model/runtime provenance",
+    "cross-adapter semantic inconsistency",
+    "NCP schema and semantic drift",
+    "NCP field flattening into generic story_fact",
+    "incomplete approved-context export",
+    "project-level diagnostics mistaken for truth",
+    "incomplete owner correction workflows",
+    "failed collectors or partial validation mistaken for architecture completion"
+  ],
+  "open_questions": [
+    "exact full Subtxt runtime interface",
+    "official analysis-only operation allowlist",
+    "Subtxt internal model/provider provenance",
+    "supported source/document granularity",
+    "raw artifact retention",
+    "AnalysisRunManifest schema",
+    "cross-adapter guardrail ordering",
+    "exact BookNLP candidate mapping expansion",
+    "NCP import/export mapping version",
+    "trusted app-generated NCP round-trip rules",
+    "project-level narrative-diagnostic context contract",
+    "owner correction and candidate merge/split lifecycle"
+  ],
+  "validation_frontier": {
+    "preserved_verified_foundation": [
+      "spaCy live extraction",
+      "Ollama live structured extraction",
+      "Story Check live execution",
+      "BookNLP live character/location findings",
+      "NCP candidate import",
+      "app-owned rubric validation",
+      "fusion",
+      "candidate-only persistence",
+      "grouped-review contract and UI"
+    ],
+    "not_yet_validated": [
+      "complete source identity and AnalysisRunManifest",
+      "immutable layered evidence ledger",
+      "expanded BookNLP output classes",
+      "official/full Subtxt runtime",
+      "shared semantic guardrails",
+      "project-level diagnostics",
+      "full NCP approved export and round trip",
+      "expanded correction workflows",
+      "isolated layered end-to-end suites"
+    ],
+    "apply_promotion_isolated": true,
+    "partial_or_failed_collectors_are_not_completion": true
+  },
+  "boundaries": [
+    "analysis-only",
+    "candidate-first",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "no generated prose",
+    "no rewrite/continuation/outline/draft/polish/improvement/expansion/revision/imitation",
+    "no automatic Storyform truth",
+    "no automatic candidate approval",
+    "no automatic promotion",
+    "no automatic apply-promotion",
+    "no direct tool/model Memory/Canon mutation",
+    "approved Memory/Canon mutation only through explicit audited apply-promotion"
+  ]
+}

@@ -5,8 +5,10 @@
 - ID: `PHASE8-IMPL-023`
 - Title: OMI AI Tool-Assisted Analysis Candidate Review MVP
 - Status: published/active
-- Latest completed child: `PHASE8-IMPL-023-T011`
-- Next child: `PHASE8-IMPL-023-T012A`
+- Latest completed child: `PHASE8-IMPL-023-T023B`
+- Current child parent: `PHASE8-IMPL-023-T023` (`in_progress`)
+- Remaining children: T023C/T023D and reserved T024-T026 (`planned`)
+- Immediate release-blocker frontier: `PHASE8-IMPL-024-T001A` (`ready`)
 
 ## Owner Override Sources
 
@@ -22,6 +24,16 @@
 OMI must analyze raw idea text through an AI/tool-assisted analysis orchestrator and present evidence-backed findings for owner review.
 
 The MVP target is not deterministic-marker-only extraction. `PHASE8-IMPL-023-T004` remains historically complete/PASS as backend deterministic marker extraction, but it is fallback/safety baseline only and is not sufficient for MVP completion.
+
+## Layered Architecture Follow-On
+
+- Controlling reconciliation: `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
+- New planned parent: `PHASE8-IMPL-025 - Layered Analysis Architecture and Tool Integration Expansion`.
+- Existing PHASE8-IMPL-023 adapter/fusion/persistence/review work is valid foundation and remains historically complete within each recorded scope.
+- Full Subtxt licensing/authorization is resolved. Official/full Subtxt runtime is authorized and planned separately under PHASE8-IMPL-025 T005/T006.
+- The completed app-owned `subtxt_informed_rubric` remains distinct, valid, supplemental, deterministic, and non-official.
+- Missing layers include stable source/run identity, immutable evidence lineage, richer BookNLP mappings, evidence-bounded interpretation/grounding, shared semantic guardrails, project-level diagnostics, the full NCP gateway, expanded owner corrections, and isolated layered validation.
+- PHASE8-IMPL-024-T001A remains the immediate implementation frontier; PHASE8-IMPL-024 T001/T002 precede PHASE8-IMPL-025.
 
 ## Current Known Limitation
 
@@ -39,9 +51,10 @@ The corrected OMI path can use:
 - Story Check for fixture-only diagnostic structural observations/questions.
 - BookNLP for narrative/entity/event/coreference-style extraction where applicable.
 - spaCy for local entity/entity-like extraction, sentence segmentation, and rule-assisted NLP.
-- NCP for structural context mapping/import-export candidate representation.
-- Subtxt rubric/reference guidance for diagnostic structural interpretation.
-- dramatica-flow as analysis-pattern reference/integration for narrative-state patterns, promises, mysteries, causal chains, thread activity, and relationship shifts.
+- NCP primarily as an explicit validated import/export gateway; current narrow import remains candidate-only.
+- Full authorized Subtxt runtime as a separate official-runtime path with source/hash/evidence/provenance and candidate-only review boundaries.
+- App-owned `subtxt_informed_rubric` as deterministic fallback, supplemental diagnostic contributor, and future semantic guardrail.
+- App-owned `dramatica_flow_informed_rubric` as the valid local text-level path, with any future project-level diagnostics read-only and non-mutating.
 
 ## Required Candidate Types
 
@@ -83,14 +96,17 @@ Each extracted review candidate or diagnostic finding must carry:
 - UI lists what was found, grouped by type/tool/evidence.
 - Owner confirms, rejects, or revises findings.
 
+This inventory is the implemented independent-adapter foundation. The accepted PHASE8-IMPL-025 target adds Layer 0 source identity, Layer 2 immutable run evidence, Layer 4 grounding/semantic guardrails, Layer 7 explicit approved-context handoff validation, Layer 8 NCP gateway behavior, and richer work within the existing extraction/interpretation/review layers.
+
 ## Tool Boundary Inventory
 
-- Ollama/model: structured extraction only, schema-bound JSON, no prose, no rewriting.
-- Story Check: fixture-only diagnostic observations/questions in T008, no live runtime calls, no prose suggestions, no candidate persistence.
-- BookNLP/spaCy: entities/events/relationships/mentions as evidence-backed candidate sources.
-- NCP: structural context candidate mapping, not truth export.
-- Subtxt: rubric/diagnostic interpretation, not automatic Dramatica truth.
-- dramatica-flow: analysis-pattern reference only; generation/revision/continuation disabled.
+- Ollama/model: completed exact-source structured extraction plus a planned distinct normalized-evidence interpretation role; neither selects truth.
+- Story Check: real runtime path exists; P0 exact-source factual grounding remains planned under PHASE8-IMPL-024 T002.
+- BookNLP/spaCy: evidence producers; BookNLP expansion, offsets, immutable artifacts, manifests, and uncertainty metadata remain planned.
+- NCP: gateway role; imports are candidates and exports default to approved context only.
+- Official/full Subtxt: authorized/planned, distinct from app-owned rubric identity.
+- App-owned Subtxt-informed rubric: deterministic supplemental guardrail/fallback, not official Subtxt.
+- App-owned dramatica-flow-informed rubric: valid local text-level diagnostic; project-level expansion remains read-only; generation/revision/continuation disabled.
 - All tools must fail closed.
 
 ## Safety Boundaries
@@ -130,14 +146,18 @@ Each extracted review candidate or diagnostic finding must carry:
 - `PHASE8-IMPL-023-T016`: live Story Check integration in OMI and analysis.
 - `PHASE8-IMPL-023-T017`: live BookNLP integration in OMI and analysis.
 - `PHASE8-IMPL-023-T018`: live NCP integration in OMI and analysis.
-- `PHASE8-IMPL-023-T019`: live Subtxt integration in OMI and analysis.
+- `PHASE8-IMPL-023-T019`: complete/PASS historical app-owned Subtxt-informed rubric path; not official/full Subtxt runtime. The authorized official path is planned in PHASE8-IMPL-025 T005/T006.
 - `PHASE8-IMPL-023-T020`: live dramatica-flow integration in OMI and analysis.
 - `PHASE8-IMPL-023-T021`: cross-tool fusion validation using real runtime outputs.
 - `PHASE8-IMPL-023-T022`: candidate-only persistence validation using real runtime outputs.
 - `PHASE8-IMPL-023-T023`: grouped owner-review UI for real runtime findings.
 - `PHASE8-IMPL-023-T024`: automated end-to-end live OMI test.
 - `PHASE8-IMPL-023-T025`: manual Cyber Detective Story live OMI test.
-- `PHASE8-IMPL-023-T026`: PHASE8-IMPL-023 closeout only after live runtime tools are connected/tested or explicitly owner-blocked.
+- `PHASE8-IMPL-023-T026`: historical closeout identity retained; current closeout must include PHASE8-IMPL-024 P0 integrity and PHASE8-IMPL-025 layered gates. Full Subtxt licensing/authorization is resolved and cannot be used as an owner-blocked closeout branch.
+
+## UI/UX Audit Reconciliation Dependency
+
+The successful reconciliation collector is scoped evidence collection, not product-wide validation. It verified P0-A guided-creation input loss and P0-B ungrounded Story Check findings. Those defects are owned by `PHASE8-IMPL-024`; they do not change T023A/T023B completion but block broad owner acceptance and T026 closeout. Failed `playwright-advanced` attempts are excluded, and advanced mutation/apply-promotion/approved-data workflows remain `NOT_YET_TESTED`.
 
 ## UI/UX Inventory
 

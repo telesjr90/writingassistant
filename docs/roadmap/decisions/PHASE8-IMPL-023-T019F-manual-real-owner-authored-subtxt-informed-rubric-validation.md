@@ -1,5 +1,12 @@
 # PHASE8-IMPL-023-T019F — Manual real owner-authored Subtxt-informed rubric validation
 
+> **Supersession note (2026-07-11):** T019F's validation result remains
+> complete/PASS for the app-owned `subtxt_informed_rubric`. Its later statement
+> that live Subtxt remained owner-blocked is historical and is superseded by
+> `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
+> Full Subtxt runtime is now authorized and planned separately; T019F is not
+> relabeled as official Subtxt execution.
+
 ## Result
 
 `PASS`.

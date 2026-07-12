@@ -1,5 +1,13 @@
 # PHASE8-IMPL-023-T014E — Live Runtime Tool Installation Inventory
 
+> **Supersession note (2026-07-11):** this inventory remains historical
+> evidence of the surfaces available when T014E ran. Its statements that
+> Subtxt needed an owner decision or could be owner-blocked are superseded by
+> `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
+> Full Subtxt runtime is authorized; PHASE8-IMPL-025 T005 performs the current
+> technical surface inventory. No T014E completion evidence for other tools is
+> invalidated.
+
 ## Result
 
 PASS. All selected tools probed, documented, and no installs/downloads performed.

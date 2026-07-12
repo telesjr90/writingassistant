@@ -4,7 +4,9 @@
 
 The product vision is a local-first writing assistant that helps a writer focus on writing by identifying, organizing, connecting, and annotating story knowledge from the writer's own text without taking over authorship. The working product name can remain Dramatica-Informed Writing Assistant, but the near-term roadmap is no longer Dramatica-first. The MVP now requires a usable Writer Assistant Core path: real BookNLP/spaCy install/run/import, runtime extraction, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon mutation, model-assisted evidence-backed extraction, and analysis-only NCP/Subtxt/dramatica-flow runtime integration.
 
-The Project Workspace Foundation and Writer Assistant Core implementation sequence are now complete through `PHASE8-IMPL-022`. The active frontier is `PHASE8-UX-002 - MVP acceptance UI completion and route wiring`, an MVP-first UX parent focused on making this app's missing owner-acceptance UI and workflow surfaces browser-visible and testable. This is not an external SaaS research phase.
+The accepted analysis architecture is now layered plus parallel. Existing independent adapters, normalization, fusion/conflict/uncertainty, candidate-only persistence, and grouped owner review remain valid implemented foundations, but they are not the complete target. Trustworthy interpretation must follow stable source identity, exact source snapshots/hashes/maps, an immutable `AnalysisRunManifest`, and an immutable raw-artifact/evidence ledger. Full Subtxt runtime implementation is authorized and planned separately from the existing app-owned `subtxt_informed_rubric`; licensing and owner authorization are resolved and are not active risks or blockers. The rubric remains a valid deterministic fallback, supplemental contributor, and future semantic guardrail.
+
+The Project Workspace Foundation and Writer Assistant Core implementation sequence are complete through `PHASE8-IMPL-022`, but the application is not ready for broad owner acceptance or MVP readiness. The active release-blocker frontier is `PHASE8-IMPL-024 - Application UI/UX Audit Integrity and Acceptance Repair`. Its first executable child is the backend-only `PHASE8-IMPL-024-T001A - Backend OMI-guided creation contract and storage`. `PHASE8-IMPL-023` remains published/active historically: T023A and T023B remain complete/PASS, T023 remains in progress, and T024-T026 remain reserved and incomplete.
 
 The product is analysis-only. It must never write, rewrite, continue, imitate, polish, improve, expand, outline, draft, revise, or produce story prose. The app may store, edit, and organize prose only when the prose is owner-authored.
 
@@ -17,6 +19,19 @@ MVP completion is gated by the formal matrix in `docs/roadmap/mvp_completion_tes
 `PHASE8-IMPL-023` cannot close as MVP-complete until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision.
 
 Fixture/mock adapter contracts prove safety/schema compatibility only. They do not prove live analysis and do not count as MVP completion.
+
+### Application-wide UI/UX audit readiness gate
+
+The successful Playwright reconciliation run `20260712T030010Z` is evidence collection, not a product-wide pass. It verified working behavior only within its exercised read-only, regular disposable-project, selected-source Story Check transport, and staged guided-creation paths. It does not validate advanced owner mutation or the product as a whole. Failed `playwright-advanced` collector-development attempts are excluded from product evidence.
+
+Two P0 integrity repairs precede UI polish:
+
+1. OMI-guided creation confirms owner-authored title, idea, and notes but submits only the title, returns `creation_method: blank`, and does not persist the idea or notes. The repair requires a bounded guided-creation contract, exact owner input persistence with provenance, `creation_method: omi_guided`, and explicit partial-failure/rollback semantics without model calls, extraction, candidates, promotion, Memory/Canon mutation, or generated story content.
+2. Story Check submits the correct selected source but can return contradictory factual warnings without exact-source grounding. The repair requires source ID/hash, direct source evidence for factual warnings, deterministic grounding against the selected scene, quarantine/unverified handling for unsupported warnings, and fail-closed source mismatch behavior. The result remains non-mutating and non-canon.
+
+Functional integrity, optional-resource handling, responsive containment, accessibility semantics/target sizing, truthful OMI navigation, OMI information architecture/component standardization, and remaining validation are separate workstreams. Functional/data-integrity repairs and responsive containment precede visual redesign. The owner-controlled, candidate-first, evidence/provenance-backed, non-canon boundaries remain unchanged, and no generated prose is introduced.
+
+The following remain `NOT_YET_TESTED`: grouped-review owner-decision mutation; candidate lifecycle mutations beyond existing evidence; promotion creation/audit persistence; apply-promotion; approved Memory/Canon mutation; review-queue commands; evidence-drawer focus restoration; complete keyboard navigation; browser zoom and screen-reader behavior; and controlled loading, degraded, failure, retry, and recovery states. Every future mutation suite uses its own disposable `uiux-audit-*` project with before/after API and filesystem manifests, rejects writes outside that project, packages evidence before exact-project cleanup, and preserves all existing projects. Apply-promotion validation remains isolated from read-only and candidate-decision suites.
 
 ### MVP tool integration completion rule
 
@@ -33,7 +48,7 @@ A tool is complete for MVP only when:
 7. no promotion/apply-promotion occurs,
 8. no story prose is generated.
 
-Current MVP readiness after `PHASE8-IMPL-022`: latest owner acceptance evidence reached `SCRIPT_EXIT=0`, but the final automated decision remains `MANUAL_REVIEW_REQUIRED`. Owner acceptance remains pending and MVP is not complete. The blocker is missing safe UI/workflow surfaces in our own app, not external SaaS research. `PHASE8-UX-002-T001` is complete/PASS as docs/status/planning parent publication only. `PHASE8-UX-002-T002` is complete/PASS as docs/decision/planning only and created `docs/roadmap/decisions/PHASE8-UX-002-ui-acceptance-matrix-route-workflow-decision.md` plus `docs/roadmap/ux/PHASE8-UX-002-ui-acceptance-matrix.md`. `PHASE8-UX-002-T003` is complete/PASS as tests-first expected-red only at `tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py`. `PHASE8-UX-002-T004` is complete/PASS as frontend owner-authored source/scene create/import/select UI. `PHASE8-UX-002-T005` is complete/PASS as frontend Story Check diagnostic-only/no-prose evidence UI. `PHASE8-UX-002-T006A` is complete/PASS for `UX2-NOTES-MATERIALS-001`, `PHASE8-UX-002-T006B` is complete/PASS for `UX2-RAW-ARTIFACT-001` and `UX2-ANALYSIS-RUNTIME-001`, and `PHASE8-UX-002-T006C` is complete/PASS for `UX2-REVIEW-PROMOTION-001`. Focused review/promotion validation passes with `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q -k ux2_review_promotion_001` -> `1 passed, 6 deselected in 0.03s`. The full UX2 expected-red acceptance file passes with `.venv-unsloth-clean/bin/python -m pytest tests/test_phase8_ux002_mvp_ui_acceptance_expected_red.py -q` -> `7 passed in 0.03s`. `PHASE8-UX-002-T006` is complete/PASS, and `PHASE8-UX-002-T007` is next for closeout plus owner acceptance harness rerun. The active `PHASE8-UX-002` child sequence is:
+Historical MVP readiness after `PHASE8-IMPL-022`: owner acceptance evidence reached `SCRIPT_EXIT=0`, but the final automated decision remained `MANUAL_REVIEW_REQUIRED`. `PHASE8-UX-002-T001` through T006 completed their scoped planning and implementation work, and T007 later closed complete/PARTIAL after the owner-acceptance harness rerun. These results remain historical evidence and do not override the current PHASE8-IMPL-024 P0 blockers. The historical `PHASE8-UX-002` child sequence was:
 
 - `PHASE8-UX-002-T001` - Parent publication.
 - `PHASE8-UX-002-T002` - UI acceptance matrix + route/workflow decision. Complete/PASS as docs/decision/planning only.
@@ -41,7 +56,7 @@ Current MVP readiness after `PHASE8-IMPL-022`: latest owner acceptance evidence 
 - `PHASE8-UX-002-T004` - Implement owner-authored source/scene create/import/select UI. Complete/PASS.
 - `PHASE8-UX-002-T005` - Implement Story Check diagnostic-only/no-prose evidence UI. Complete/PASS.
 - `PHASE8-UX-002-T006` - Implement Notes/Materials + runtime/review evidence UI. Complete/PASS; T006A Notes/Materials evidence UI, T006B raw artifact / analysis runtime status UI, and T006C review/promotion evidence UI are complete/PASS.
-- `PHASE8-UX-002-T007` - Closeout + rerun owner acceptance harness.
+- `PHASE8-UX-002-T007` - Closeout + owner acceptance harness rerun. Complete/PARTIAL; automated decision remained `MANUAL_REVIEW_REQUIRED`.
 
 `PHASE8-UX-002` must cover seven MVP UI/workflow gaps: owner-authored scene/source create/import/select workflow; Story Check diagnostic-only UI against selected owner-authored source; no-prose refusal/fail-closed UI; Notes/Materials project-scoped create/save/reload proof; runtime extraction/raw artifact unavailable/read-only evidence UI; review/apply-promotion confirmation and audit evidence UI; and the NCP/Subtxt/dramatica-flow exposure decision. T002 records that MVP analysis-runtime exposure should be split: selected labels/status may be visible, but NCP/Subtxt/dramatica-flow runtime execution remains `NOT_EXPOSED`/unavailable for the active MVP UI fix path.
 
@@ -69,7 +84,7 @@ The roadmap priority order is now:
 2. Chapter, scene, note, and material storage/editing.
 3. MVP-required runtime extraction from owner-authored or owner-provided project text, with source maps, evidence, provenance, raw refs, candidate-only outputs, and owner review gates.
 4. MVP-required raw artifact persistence, review UI/API, frontend owner-action execution, apply-promotion, and approved memory/canon mutation through explicit owner-approved workflows only.
-5. MVP-required model-assisted extraction and analysis-only NCP/Subtxt/dramatica-flow runtime integration, with NCP as structured context interchange, Subtxt as rubric guidance, and dramatica-flow through an audited allowlist that blocks prose and outline generation paths.
+5. MVP-required model-assisted extraction and layered analysis integration, with NCP primarily as an explicit import/export gateway, full authorized Subtxt runtime as a separately labeled evidence-bounded diagnostic path, the app-owned Subtxt-informed rubric as supplemental guardrail/fallback, and app-owned dramatica-flow-informed analysis expanding only through read-only diagnostics that block prose, outline, revision, continuation, and truth-state mutation paths.
 6. Fine-tuning, RunPod, Books 4-5, and model artifact work after MVP.
 
 The Project Workspace Foundation should provide:
@@ -318,6 +333,103 @@ Remaining setup/verification tasks:
 
 ## 5. Architecture Target
 
+### Layered-plus-parallel analysis architecture
+
+The implemented OMI/tool path primarily follows:
+
+```text
+source/raw idea
+  -> independent adapters
+  -> normalization
+  -> fusion/conflict/uncertainty
+  -> candidate persistence
+  -> owner review
+```
+
+That flow remains valid foundation work. The target also supports sequential
+layered cooperation:
+
+```text
+Layer 0 — Owner source and source identity
+  - stable project/document/chapter/scene IDs
+  - exact owner-authored input snapshot
+  - content hash
+  - offsets and source map
+  - source ownership/type
+
+Layer 1 — Raw extraction
+  - spaCy
+  - BookNLP
+  - explicit NCP import artifact parsing
+  - deterministic app extraction where applicable
+
+Layer 2 — Raw artifact and evidence ledger
+  - immutable tool outputs
+  - run manifest
+  - tool/model versions
+  - source hashes
+  - exact offsets and excerpts
+  - transformation lineage
+
+Layer 3 — Interpretation and diagnostics
+  - Ollama structured extraction
+  - Story Check
+  - full authorized Subtxt runtime
+  - app-owned Subtxt-informed rubric
+  - app-owned dramatica-flow-informed rubric
+  - future read-only project-level narrative diagnostics
+
+Layer 4 — Grounding and semantic guardrails
+  - exact-source factual grounding
+  - unsupported-output quarantine
+  - subject-matter-versus-conflict checks
+  - author-intent dependency
+  - insufficient-evidence state
+  - perspective/Storypoint overclaim prevention
+  - no silent rewriting of tool/model output
+
+Layer 5 — Fusion
+  - deterministic normalized IDs and fingerprints
+  - duplicate relationships and corroboration
+  - conflicts without truth selection
+  - uncertainty labels
+  - preserved provenance
+
+Layer 6 — Candidate persistence and owner review
+  - pending candidate-only storage
+  - approve/reject/needs-more-evidence
+  - merge/split/correct/supersede workflows
+  - no canon effect from review status alone
+
+Layer 7 — Explicit promotion and approved context
+  - separate promotion record and blocker validation
+  - final owner confirmation
+  - audited apply-promotion
+  - approved Memory/Canon mutation only here
+
+Layer 8 — NCP gateway
+  - external NCP import as candidates
+  - immutable original import artifact
+  - approved-context export
+  - canonical schema validation
+  - explicit round-trip provenance
+```
+
+spaCy and BookNLP are evidence producers, not structural-truth deciders.
+Ollama has separate exact-source extraction and normalized-evidence
+interpretation roles. Story Check is an evidence-bounded diagnostic consumer
+and retains the PHASE8-IMPL-024 P0 grounding repair. Full Subtxt runtime is
+authorized and planned under `PHASE8-IMPL-025`, while
+`subtxt_informed_rubric` remains distinctly app-owned. The dramatica-flow
+informed path remains app-owned and may expand only into read-only
+project-level diagnostics. NCP is primarily a validated import/export gateway,
+not a default raw-text analyzer.
+
+Approved context remains owner-controlled. Tool/model outputs are non-canon;
+no generated prose, automatic Storyform truth, automatic candidate approval,
+automatic promotion, automatic apply-promotion, or direct tool/model
+Memory/Canon mutation is introduced.
+
 Target folder structure:
 
 ```text
@@ -426,6 +538,8 @@ Optional extractor status:
 - Extractor output is candidate analysis only and must route through OMI candidate records, owner review, and promotion gates.
 - Extractors must not directly modify `bible.json`, `storyform.json`, `scenes/`, `project.json`, `owner_memory.json`, OMI promotions, `training/data`, or `dataset_manifest.json`.
 - Candidate future references now use a replaceable-adapter model scoped to nine approved evaluation candidates in `PHASE8-IMPL-005`: dramatica-flow is accepted as `reference-only` with runtime adapter REJECT/DEFER per `docs/roadmap/decisions/PHASE8-IMPL-005-dramatica-flow-analysis-only-reference-decision.md`; Narrative Context Protocol is accepted as `reference-only` and future approved-context import/export candidate per `docs/roadmap/decisions/PHASE8-IMPL-005-ncp-subtxt-structural-interpretation-strategy-decision.md`; Subtxt docs are accepted as `reference-only` and future semantic rubric candidate per the same T005 decision; NCP/Subtxt runtime adapter, import/export, and Subtxt analysis implementation are REJECT/DEFER; spaCy is the likely first local NLP baseline to evaluate; segram, BookNLP, GLiNER, LangExtract, and Renard are extraction/reference candidates for later evaluation. CoreNLP/OpenIE/SUTime, AI-Reader-V2, narrative-blueprint, NovelClaw, NotebookLM workflow, llm_finetuning, and ai-llm-project-file-structure-template remain out of scope unless a later owner-approved parent reintroduces them. Dramatron, ai-story-writer, Inkos, and generation-heavy story-engine systems remain blocked or documentation-only references. No extractor dependency is currently implemented or installed. No extraction implementation has started.
+
+The preceding PHASE8-IMPL-005 classifications are preserved as historical decisions at that task boundary. `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md` supersedes the NCP gateway deferral and the Subtxt reference-only/runtime REJECT-DEFER/owner-authorization/licensing limitations for current planning. Full Subtxt runtime is authorized, the full NCP gateway is planned, and current real spaCy, BookNLP, Ollama, Story Check, NCP-import, rubric, fusion, persistence, and grouped-review results remain valid foundation evidence rather than proof that the layered target is complete.
 
 ## 6. MVP Scope
 

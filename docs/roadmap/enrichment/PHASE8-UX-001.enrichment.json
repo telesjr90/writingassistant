@@ -73,6 +73,24 @@
       "generated prose features"
     ]
   },
+  "application_uiux_audit_reconciliation": {
+    "status": "verified findings incorporated; implementation owned by PHASE8-IMPL-024",
+    "evidence_pack": ".codex-context/application-uiux-audit/",
+    "successful_reconciliation": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/",
+    "readiness": "not ready for broad owner acceptance or MVP readiness",
+    "priority_order": [
+      "guided-creation integrity",
+      "Story Check grounding integrity",
+      "optional-resource handling",
+      "responsive containment",
+      "accessibility semantics and target sizing",
+      "truthful OMI navigation",
+      "OMI information architecture and component standardization",
+      "remaining isolated validation suites"
+    ],
+    "failed_advanced_collectors": "excluded from product evidence",
+    "implementation_parent": "PHASE8-IMPL-024"
+  },
   "validation_commands": [
     "python3 scripts/check_enrichment.py",
     "python3 scripts/validate_roadmap.py",

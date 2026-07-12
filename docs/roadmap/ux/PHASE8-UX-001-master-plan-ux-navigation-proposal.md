@@ -571,3 +571,23 @@ All `PHASE8-UX-001` product boundaries remain in force: analysis-only, candidate
 - Which approved memory/canon categories are most important for MVP?
 - How prominently should apply-promotion audit records be shown?
 - Are the recommended user-facing labels clear to actual writers?
+
+## 16. Verified Application-Wide Audit Reconciliation
+
+The `20260712T030010Z` Playwright reconciliation is successful evidence collection, not a product-wide pass. The application is not ready for broad owner acceptance. Two functional integrity blockers precede visual redesign: OMI-guided creation silently loses the confirmed owner-authored idea and notes, and Story Check can present contradictory factual warnings without deterministic grounding against the exact selected scene.
+
+The UI/UX repair sequence is therefore:
+
+1. Guided-creation and Story Check integrity.
+2. Optional-resource readiness and error-state distinction.
+3. Document-level responsive containment at 1440, 1280, 834, 640, 390, and 320 pixels.
+4. Heading semantics, standards-aware target sizing, focus visibility, and keyboard validation.
+5. Truthful/resettable OMI navigation with enabled actions only for implemented destinations.
+6. OMI owner-attention prioritization, progressive disclosure, and shared presentation components.
+7. Isolated remaining validation suites.
+
+The responsive work includes native-control containment, wrapping status/metric grids, local containment of wide tables, and a wider contextual OMI workspace. Accessibility triage must distinguish the WCAG 2.2 24 CSS-pixel minimum target requirement and exceptions from the preferred 44 CSS-pixel touch target; sub-44-pixel controls are not automatically failures.
+
+OMI information architecture should add a "Needs owner attention" summary, prioritize pending/blocked work, and move hashes/raw audit metadata behind progressive disclosure while retaining complete provenance and safety access. Later component standardization should cover shared boundary banners and metadata, status, empty, loading, error, and action patterns.
+
+Unavailable OMI workflows should be honest status rows, not enabled no-op buttons. Duplicate resolution, audit mutation, and apply-promotion are not authorized merely to make a dashboard destination work. Failed `playwright-advanced` attempts remain excluded from product evidence, and advanced mutation, promotion, apply-promotion, approved Memory/Canon mutation, review commands, complete accessibility, and controlled recovery workflows remain `NOT_YET_TESTED`.

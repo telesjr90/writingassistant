@@ -1,0 +1,130 @@
+{
+  "task_id": "PHASE8-IMPL-024",
+  "title": "Application UI/UX Audit Integrity and Acceptance Repair",
+  "status": "published/active",
+  "task_type": "implementation parent",
+  "mvp_required": true,
+  "context_pack": ".codex-context/application-uiux-audit/",
+  "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
+  "architecture_coordination": {
+    "follow_on_parent": "PHASE8-IMPL-025",
+    "follow_on_status": "published/planned",
+    "controlling_architecture_decision": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
+    "activation_after": ["PHASE8-IMPL-024-T001", "PHASE8-IMPL-024-T002"],
+    "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; PHASE8-IMPL-025-T007 consumes and extends it without duplicate contracts",
+    "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
+    "immediate_next_task_unchanged": "PHASE8-IMPL-024-T001A"
+  },
+  "readiness": {
+    "broad_owner_acceptance": "blocked",
+    "mvp_readiness": "blocked",
+    "p0_blockers": [
+      "P0-A: OMI-guided creation loses confirmed owner-authored idea and notes and returns creation_method blank",
+      "P0-B: Story Check accepts contradictory factual warnings without exact-source grounding validation"
+    ]
+  },
+  "latest_verified_evidence": {
+    "classification": "successful evidence collection, not product-wide pass",
+    "run_id": "20260712T030010Z",
+    "summary": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/evidence-summary.md",
+    "collector_report": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/collector-report.json",
+    "project_manifest_diff": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/project-manifest-diff.json",
+    "phases": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/phases/",
+    "failed_advanced_collectors": "excluded from product evidence"
+  },
+  "next_planned_task": {
+    "task_id": "PHASE8-IMPL-024-T001A",
+    "title": "Backend OMI-guided creation contract and storage",
+    "status": "ready",
+    "scope": "Dedicated bounded guided-creation contract; exact owner-authored idea and notes persistence; owner provenance; creation_method omi_guided; explicit rollback or incomplete-project semantics; no model, extraction, candidates, promotion, Memory/Canon mutation, Bible, storyform, or scene creation from setup text"
+  },
+  "workstream_order": [
+    "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
+    "PHASE8-IMPL-024-T002 Story Check grounding integrity",
+    "PHASE8-IMPL-024-T003 Optional-resource handling",
+    "PHASE8-IMPL-024-T004 Responsive containment",
+    "PHASE8-IMPL-024-T005 Accessibility semantics and target sizing",
+    "PHASE8-IMPL-024-T006 Truthful OMI navigation",
+    "PHASE8-IMPL-024-T007 OMI information architecture and component standardization",
+    "PHASE8-IMPL-024-T008 Remaining validation suites"
+  ],
+  "child_task_ordering": {
+    "T001": ["T001A", "T001B", "T001C", "T001D"],
+    "T002": ["T002A", "T002B", "T002C", "T002D", "T002E"],
+    "T003": ["T003A", "T003B", "T003C"],
+    "T004": ["T004A", "T004B", "T004C"],
+    "T005": ["T005A", "T005B", "T005C"],
+    "T006": ["T006A", "T006B", "T006C"],
+    "T007": ["T007A", "T007B", "T007C"],
+    "T008": ["T008A", "T008B", "T008C", "T008D", "T008E", "T008F"]
+  },
+  "validation_frontier": {
+    "verified_working": [
+      "read-only existing-project navigation exercised by the reconciliation collector",
+      "selected Story Check source and POST transport",
+      "regular disposable project creation and owner-authored scene/note/material writes",
+      "unsaved-project-switch confirmation",
+      "guided-creation staged UI progression",
+      "existing-project preservation during the reconciliation run"
+    ],
+    "verified_defects": [
+      "guided-creation confirmed input loss",
+      "contradictory ungrounded Story Check factual warnings",
+      "captured document-level horizontal overflow",
+      "captured OMI heading hierarchy skip",
+      "repeated 404s for normally absent Bible/storyform/storyform-context resources"
+    ],
+    "likely_manual_review": [
+      "OMI workspace density and weak next-task prioritization",
+      "misleading enabled OMI actions",
+      "undersized controls requiring standards-aware triage",
+      "App.jsx and OMIShell.jsx navigation reset ambiguity",
+      "repeated metadata and safety presentation patterns"
+    ],
+    "not_yet_tested": [
+      "grouped-review owner-decision mutation",
+      "candidate lifecycle mutations beyond existing evidence",
+      "promotion creation and audit persistence",
+      "apply-promotion",
+      "approved Memory/Canon mutation",
+      "review-queue commands",
+      "evidence-drawer focus restoration",
+      "complete keyboard navigation",
+      "browser zoom and screen-reader behavior",
+      "controlled loading, degraded, failure, retry, and recovery states"
+    ]
+  },
+  "risks": [
+    "silent loss of confirmed owner input",
+    "ungrounded model diagnostics presented as findings",
+    "misleading enabled UI actions",
+    "hidden content caused by document overflow",
+    "optional-resource absence obscuring real errors",
+    "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
+    "failed collectors mistaken for product evidence",
+    "partial writes during guided creation",
+    "over-filtering useful Story Check diagnostics"
+  ],
+  "open_questions": [
+    "atomic rollback versus explicit incomplete guided-project creation",
+    "setup-notes storage location and identifier linkage",
+    "grounded-warning evidence contract",
+    "handling useful but unsupported Story Check output",
+    "optional-resource availability in project metadata versus a dedicated read-only endpoint",
+    "MVP-required versus intentionally unavailable OMI destinations",
+    "minimum desktop width and touch-target policy",
+    "advanced mutation validation sequencing relative to MVP acceptance"
+  ],
+  "boundaries": [
+    "analysis-only",
+    "candidate-first",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "model output is not canon",
+    "no automatic Memory/Canon mutation",
+    "no automatic promotion",
+    "no automatic apply-promotion",
+    "no generated prose",
+    "no training/JSONL/dataset/model artifacts"
+  ]
+}

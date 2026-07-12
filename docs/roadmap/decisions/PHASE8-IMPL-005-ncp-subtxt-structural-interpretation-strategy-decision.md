@@ -1,5 +1,14 @@
 # PHASE8-IMPL-005 NCP/Subtxt Structural Interpretation Strategy Decision
 
+> **Superseded authorization point (2026-07-11):**
+> `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`
+> supersedes this record's Subtxt reference-only, runtime REJECT/DEFER,
+> licensing/terms-open, and owner-authorization limitations. Full Subtxt
+> runtime implementation is authorized and planned separately. This record's
+> historical evidence, NCP candidate/approved-context safety boundaries,
+> app-owned rubric guidance, no-automatic-truth rules, and no-prose rules
+> remain valid.
+
 ## 1. Decision Summary
 
 `PHASE8-IMPL-005-T005` accepts **Narrative Context Protocol (NCP)** as **`reference-only`** now and an optional future **`approved-context import/export candidate`**.
