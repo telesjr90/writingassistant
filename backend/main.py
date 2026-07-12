@@ -6,6 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from jsonschema.exceptions import ValidationError
 from pydantic import BaseModel
+try:
+    from pydantic import StrictStr
+except ImportError:  # pragma: no cover - supports lightweight route-test fakes
+    StrictStr = str
 from urllib.parse import unquote
 
 try:
@@ -22,6 +26,15 @@ except ImportError:  # pragma: no cover - supports uvicorn main:app from backend
 
 class ProjectCreate(BaseModel):
     title: str
+
+    class Config:
+        extra = "forbid"
+
+
+class OMIGuidedProjectCreate(BaseModel):
+    title: StrictStr
+    raw_idea: StrictStr
+    setup_notes: StrictStr
 
     class Config:
         extra = "forbid"
@@ -255,6 +268,30 @@ def post_project(payload: ProjectCreate) -> dict:
         raise HTTPException(status_code=409, detail="Project already exists") from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Failed to create project") from exc
+
+
+@app.post("/api/projects/omi-guided")
+def post_omi_guided_project(payload: OMIGuidedProjectCreate):
+    try:
+        return project_manager.create_omi_guided_project(
+            title=payload.title,
+            raw_idea=payload.raw_idea,
+            setup_notes=payload.setup_notes,
+        )
+    except project_manager.OMIGuidedCreationError as exc:
+        return JSONResponse(status_code=500, content=exc.result)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=_safe_create_project_error_detail(exc),
+        ) from exc
+    except FileExistsError as exc:
+        raise HTTPException(status_code=409, detail="Project already exists") from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create OMI-guided project",
+        ) from exc
 
 
 @app.get("/api/projects/{project_name}/scenes")

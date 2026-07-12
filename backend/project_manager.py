@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import shutil
 import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -31,6 +32,9 @@ MAX_PROJECT_ID_COLLISION_ATTEMPTS = 1000
 MAX_DOCUMENT_ID_LENGTH = 64
 
 PROJECT_CREATION_METHOD_BLANK = "blank"
+OMI_GUIDED_CREATION_METHOD = "omi_guided"
+OMI_GUIDED_SETUP_NOTE_ID = "omi_guided_setup_notes"
+_OMI_GUIDED_TRANSACTION_MARKER = ".omi-guided-creation.json"
 
 _PROJECT_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
 _PROJECT_ID_INVALID_CHAR_RUN = re.compile(r"[^a-z0-9]+")
@@ -244,6 +248,230 @@ def create_project(
     _write_json_object(project_path / "project.json", metadata, "project.json", overwrite=False)
 
     return metadata
+
+
+class OMIGuidedCreationError(Exception):
+    """Structured guided-creation failure after filesystem mutation began."""
+
+    def __init__(self, result: dict[str, Any]):
+        super().__init__(result["message"])
+        self.result = result
+
+
+def _omi_guided_owner_provenance(*, record_kind: str) -> dict[str, Any]:
+    return {
+        "source_type": "owner_input",
+        "source": "owner",
+        "created_by": "owner",
+        "creation_method": OMI_GUIDED_CREATION_METHOD,
+        "creation_source": "omi_guided_project_creation",
+        "record_kind": record_kind,
+        "tool": None,
+        "model": None,
+        "prompt_id": None,
+        "model_generated": False,
+        "is_canon": False,
+        "owner_approval_status": "pending",
+    }
+
+
+def _rollback_omi_guided_project(
+    *,
+    project_id: str,
+    project_path: Path,
+    projects_dir: Path,
+    operation_id: str,
+) -> bool:
+    """Remove only the project carrying this operation's identity marker."""
+    expected_path = _project_path_for_id(project_id, projects_dir)
+    if project_path != expected_path or project_path.is_symlink() or not project_path.is_dir():
+        return False
+
+    marker_path = project_path / _OMI_GUIDED_TRANSACTION_MARKER
+    try:
+        marker = _load_json_object_from_path(marker_path, "Guided creation marker")
+    except (FileNotFoundError, OSError, ValueError, json.JSONDecodeError):
+        return False
+
+    if marker != {
+        "operation_id": operation_id,
+        "project_id": project_id,
+        "creation_method": OMI_GUIDED_CREATION_METHOD,
+    }:
+        return False
+
+    try:
+        shutil.rmtree(project_path)
+    except OSError:
+        return False
+    return not project_path.exists()
+
+
+def create_omi_guided_project(
+    title: str,
+    raw_idea: str,
+    setup_notes: str,
+) -> dict[str, Any]:
+    """Atomically create a project containing owner-authored guided setup records."""
+    validated_title = _validate_project_title(title)
+    if not isinstance(raw_idea, str):
+        raise TypeError("OMI guided raw_idea must be a string")
+    if not raw_idea.strip():
+        raise ValueError("OMI guided raw_idea must not be blank")
+    if not isinstance(setup_notes, str):
+        raise TypeError("OMI guided setup_notes must be a string")
+
+    target_root = PROJECTS_DIR
+    base_id = derive_project_id(validated_title)
+    project_id = resolve_project_id_with_collision(base_id, target_root)
+    project_path = _project_path_for_id(project_id, target_root)
+    operation_id = uuid4().hex
+    marker_path = project_path / _OMI_GUIDED_TRANSACTION_MARKER
+    failed_step = "create_project"
+    project_created = False
+
+    try:
+        project_path.mkdir(parents=True, exist_ok=False)
+        project_created = True
+        _write_json_object(
+            marker_path,
+            {
+                "operation_id": operation_id,
+                "project_id": project_id,
+                "creation_method": OMI_GUIDED_CREATION_METHOD,
+            },
+            "Guided creation marker",
+            overwrite=False,
+        )
+        for folder in WORKSPACE_CORE_FOLDERS:
+            (project_path / folder).mkdir(exist_ok=False)
+
+        timestamp = _utc_now_iso()
+        metadata: dict[str, Any] = {
+            "project_id": project_id,
+            "title": validated_title,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+            "schema_version": PROJECT_SCHEMA_VERSION,
+            "creation_method": OMI_GUIDED_CREATION_METHOD,
+            "owner_approved_truth_policy": OWNER_APPROVED_TRUTH_POLICY,
+        }
+        _write_json_object(
+            project_path / "project.json",
+            metadata,
+            "project.json",
+            overwrite=False,
+        )
+
+        failed_step = "persist_omi_idea"
+        idea = create_omi_idea(
+            project_id,
+            raw_idea,
+            provenance=_omi_guided_owner_provenance(record_kind="raw_idea"),
+        )
+
+        failed_step = "persist_setup_note"
+        save_note(project_id, OMI_GUIDED_SETUP_NOTE_ID, setup_notes)
+
+        failed_step = "persist_setup_note_metadata"
+        note_metadata = create_note_metadata(
+            project_id,
+            OMI_GUIDED_SETUP_NOTE_ID,
+            {
+                "title": "OMI guided setup notes",
+                "note_type": "project_setup",
+                "status": "pending_owner_use",
+                "provenance": _omi_guided_owner_provenance(
+                    record_kind="setup_notes"
+                ),
+                "model_generated": False,
+                "is_canon": False,
+                "owner_approval_status": "pending",
+            },
+        )
+
+        failed_step = "link_guided_creation_metadata"
+        metadata["updated_at"] = _utc_after(metadata["updated_at"])
+        metadata["omi_guided_creation"] = {
+            "status": "complete",
+            "omi_idea_id": idea["idea_id"],
+            "setup_note_id": note_metadata["note_id"],
+            "owner_authored": True,
+            "model_generated": False,
+            "is_canon": False,
+            "owner_approval_status": "pending",
+        }
+        _write_json_object(
+            project_path / "project.json",
+            metadata,
+            "project.json",
+            overwrite=True,
+        )
+
+        failed_step = "finalize_guided_creation"
+        marker_path.unlink()
+    except FileExistsError:
+        if not project_created:
+            raise
+        rollback_succeeded = _rollback_omi_guided_project(
+            project_id=project_id,
+            project_path=project_path,
+            projects_dir=target_root,
+            operation_id=operation_id,
+        )
+        raise OMIGuidedCreationError(
+            {
+                "status": "failed_rolled_back" if rollback_succeeded else "recovery_required",
+                "project_id": project_id,
+                "failed_step": failed_step,
+                "rollback_attempted": True,
+                "rollback_succeeded": rollback_succeeded,
+                "message": (
+                    "Guided project creation failed and was rolled back."
+                    if rollback_succeeded
+                    else "Guided project creation failed; the project requires owner recovery."
+                ),
+                "title": title,
+                "raw_idea": raw_idea,
+                "setup_notes": setup_notes,
+            }
+        )
+    except Exception as exc:
+        if not project_created:
+            raise
+        rollback_succeeded = _rollback_omi_guided_project(
+            project_id=project_id,
+            project_path=project_path,
+            projects_dir=target_root,
+            operation_id=operation_id,
+        )
+        raise OMIGuidedCreationError(
+            {
+                "status": "failed_rolled_back" if rollback_succeeded else "recovery_required",
+                "project_id": project_id,
+                "failed_step": failed_step,
+                "rollback_attempted": True,
+                "rollback_succeeded": rollback_succeeded,
+                "message": (
+                    "Guided project creation failed and was rolled back."
+                    if rollback_succeeded
+                    else "Guided project creation failed; the project requires owner recovery."
+                ),
+                "title": title,
+                "raw_idea": raw_idea,
+                "setup_notes": setup_notes,
+            }
+        ) from exc
+
+    return {
+        "status": "complete",
+        "project_id": project_id,
+        "title": validated_title,
+        "creation_method": OMI_GUIDED_CREATION_METHOD,
+        "omi_idea_id": idea["idea_id"],
+        "setup_note_id": note_metadata["note_id"],
+        "project_metadata": metadata,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -2185,7 +2413,7 @@ def create_omi_idea(
     idea = {
         "idea_id": idea_id,
         "project_id": project_name,
-        "raw_idea": raw_idea.strip(),
+        "raw_idea": raw_idea,
         "status": "draft",
         "created_at": timestamp,
         "updated_at": timestamp,
