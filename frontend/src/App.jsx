@@ -1233,7 +1233,10 @@ export default function App() {
             projectTitle={activeProject.title}
             omiData={omiData}
             isLoading={isLoadingOMI}
+            isUpdating={isUpdatingOMI}
+            status={omiStatus}
             error={omiError}
+            onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
           />
         ) : (
           <>

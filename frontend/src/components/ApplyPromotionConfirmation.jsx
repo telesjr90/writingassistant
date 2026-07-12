@@ -428,11 +428,11 @@ export default function ApplyPromotionConfirmation({
       </header>
 
       <section className="omi-apply-boundary" aria-label="Apply-Promotion boundary copy">
-        <p>This is the only screen that may lead to Memory/Canon mutation.</p>
-        <p>Candidate approval, queue presence, confidence, and promotion audit records are not enough.</p>
-        <p>Ready means the handoff packet is complete. Memory/Canon has not changed.</p>
-        <p>Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete.</p>
-        <p>This remains a candidate until apply-promotion is separately confirmed and completed.</p>
+        <p>This is a candidate-only, no-canon handoff.</p>
+        <p>Queue presence is not approval. Confidence is not truth.</p>
+        <p>Candidate persistence is not canon. Raw artifacts are support data, not canon.</p>
+        <p>Apply-Promotion is the only approved Memory/Canon mutation path.</p>
+        <p>Final owner confirmation is required before Apply-Promotion.</p>
         <p>Memory/Canon Unchanged.</p>
       </section>
 

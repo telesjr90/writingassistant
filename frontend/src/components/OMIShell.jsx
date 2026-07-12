@@ -5,6 +5,7 @@ import OMICandidateDetail from './OMICandidateDetail.jsx';
 import OMIApplyPromotionRoute from './OMIApplyPromotionRoute.jsx';
 import OMIDashboard, { getOMIDashboardSummary } from './OMIDashboard.jsx';
 import OMIEvidenceDrawer from './OMIEvidenceDrawer.jsx';
+import OMIGroupedReview from './OMIGroupedReview.jsx';
 
 function getCandidateId(candidate) {
   return candidate?.candidate_id ?? candidate?.candidateId ?? candidate?.id ?? '';
@@ -17,6 +18,9 @@ function getShellTitle(omiView) {
   if (omiView === 'apply-promotion') {
     return 'Apply-Promotion Confirmation';
   }
+  if (omiView === 'grouped-review') {
+    return 'Grouped Owner Review';
+  }
   return 'OMI Dashboard';
 }
 
@@ -25,7 +29,10 @@ export default function OMIShell({
   projectTitle,
   omiData,
   isLoading = false,
+  isUpdating = false,
+  status = '',
   error = '',
+  onUpdateCandidateDecision = async () => null,
 }) {
   const summary = getOMIDashboardSummary(omiData, { isLoading, error });
   const [omiView, setOmiView] = useState('dashboard');
@@ -48,6 +55,11 @@ export default function OMIShell({
       const firstCandidateId = selectedCandidateId || getCandidateId(candidates[0]);
       setSelectedCandidateId(firstCandidateId);
       setOmiView('apply-promotion');
+      return;
+    }
+
+    if (destination === 'grouped-review') {
+      setOmiView('grouped-review');
       return;
     }
 
@@ -116,6 +128,17 @@ export default function OMIShell({
           onBackToDashboard={handleBackToDashboard}
           onOpenApplyPromotion={() => handleNavigate('promotion-handoff')}
           onOpenEvidence={handleOpenEvidence}
+        />
+      ) : omiView === 'grouped-review' ? (
+        <OMIGroupedReview
+          omiData={omiData}
+          isLoading={isLoading}
+          isUpdating={isUpdating}
+          status={status}
+          error={error}
+          onUpdateCandidateDecision={onUpdateCandidateDecision}
+          onOpenEvidence={handleOpenEvidence}
+          onBackToDashboard={handleBackToDashboard}
         />
       ) : (
         <OMIDashboard

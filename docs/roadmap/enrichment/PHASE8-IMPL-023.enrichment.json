@@ -851,13 +851,36 @@
       "task_id": "PHASE8-IMPL-023-T023",
       "title": "Grouped owner-review UI for real runtime findings",
       "status": "in_progress",
-      "scope": "Child sequence: T023A grouped-review data contract and route-boundary decision (complete/PASS); T023B grouped-review React UI and owner-decision integration (planned); T023C automated frontend/backend integration tests (planned); T023D manual browser and accessibility validation (planned); parent closeout only after all children pass."
+      "scope": "Child sequence: T023A grouped-review data contract and route-boundary decision (complete/PASS); T023B grouped-review React UI and owner-decision integration (complete/PASS); T023C automated frontend/backend integration tests (planned); T023D manual browser and accessibility validation (planned); parent closeout only after all children pass."
     },
     {
       "task_id": "PHASE8-IMPL-023-T023B",
       "title": "Grouped-review React UI and owner-decision integration",
+      "status": "complete/PASS",
+      "scope": "Rendered the T023A grouped model from the authoritative OMI summary and integrated server-confirmed candidate-decision responses followed by OMI refresh. The initial implementation was PARTIAL because three stale apply-promotion source assertions reproduced against clean starting HEAD; the narrow repair preserved blocker behavior, route/payload, review-queue separation, project data, and Memory/Canon.",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md",
+      "artifacts": [
+        "frontend/src/App.jsx",
+        "frontend/src/components/OMIShell.jsx",
+        "frontend/src/components/OMIGroupedReview.jsx",
+        "frontend/src/components/ApplyPromotionConfirmation.jsx",
+        "frontend/src/styles.css",
+        "tests/test_frontend_omi_grouped_review_ui_source.py",
+        "tests/test_frontend_apply_promotion_workflow_source.py"
+      ],
+      "result": "complete/PASS; initial T023B result PARTIAL; three stale source-test failures reproduced against isolated clean starting HEAD; apply-promotion component/test reconciled without behavior, API route, payload, blocker, dependency, project-data, review-queue, or Memory/Canon change; repaired test 7 passed; Node grouping test 1 passed; frontend build passed; combined regressions 67 passed; read-only real-data counts and complete OMI manifest passed"
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T023C",
+      "title": "Automated grouped-review frontend/backend integration tests",
       "status": "planned",
-      "scope": "Render the T023A grouped model from the authoritative OMI summary and use server-confirmed candidate-decision responses followed by an OMI refresh; no optimistic approval state, promotion, or apply-promotion."
+      "scope": "Add automated integration coverage for the grouped-review frontend and existing authoritative OMI summary/candidate-decision backend contract."
+    },
+    {
+      "task_id": "PHASE8-IMPL-023-T023D",
+      "title": "Manual grouped-review browser and accessibility validation",
+      "status": "planned",
+      "scope": "Run manual browser and accessibility validation after T023C passes."
     },
     {
       "task_id": "PHASE8-IMPL-023-T024",
@@ -889,18 +912,28 @@
       "scope": "parent closeout only after live runtime tools are connected/tested or explicitly owner-blocked"
     }
   ],
-  "latest_child_task": "PHASE8-IMPL-023-T023A",
+  "latest_child_task": "PHASE8-IMPL-023-T023B",
   "latest_child_status": "complete/PASS",
-  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023A-grouped-review-data-contract-and-route-boundary.md",
-  "next_child_task": "PHASE8-IMPL-023-T023B",
-  "next_child_title": "Grouped-review React UI and owner-decision integration",
+  "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md",
+  "next_child_task": "PHASE8-IMPL-023-T023C",
+  "next_child_title": "Automated grouped-review frontend/backend integration tests",
   "next_child_status": "planned",
   "parent_status": "published/active",
   "full_mvp_completion_status": "blocked until OMI and analysis run real local/runtime analysis through all selected tools, or any unavailable tool is explicitly documented as BLOCKED by owner decision, with real runtime outputs fused, persisted as candidates only, reviewed in grouped UI, and validated end to end",
   "owner_gate_status": "accepted historically, not full MVP completion",
-  "latest_child_title": "Grouped-review data contract and route-boundary decision",
-  "latest_child_summary": "T023A established the existing OMI summary as the authoritative persisted-candidate read source and the existing candidate-decision PATCH as the authoritative owner-action path. It added a pure deterministic grouped-review module and Node tests, without backend/UI/project mutation. T023A is complete/PASS; T023 is in progress; T023B is planned next; PHASE8-IMPL-023 remains published/active and full MVP completion remains blocked.",
+  "latest_child_title": "Grouped-review React UI and owner-decision integration",
+  "latest_child_summary": "T023B rendered the T023A grouped model and integrated server-confirmed owner decisions with OMI refresh. Its initial PARTIAL result came from three stale apply-promotion source assertions reproduced against clean starting HEAD; the narrow continuation preserved blocker behavior, route/payload, review-queue separation, project data, and Memory/Canon, then passed all validation. T023B is complete/PASS; T023 is in progress; T023C is planned next and T023D remains planned after it; PHASE8-IMPL-023 remains published/active and full MVP completion remains blocked.",
   "latest_child_validation": {
+    "t023b_initial_result": "PARTIAL",
+    "t023b_baseline_failures_reproduced": 3,
+    "t023b_repaired_apply_source_test_count": 7,
+    "t023b_combined_regression_test_count": 67,
+    "t023b_node_grouping_test_count": 1,
+    "t023b_frontend_build_passed": true,
+    "t023b_real_data_counts": {"ideas": 2, "candidates": 115, "promotions": 0, "linked_grouped_review_candidates": 113, "source_adapter_groups": 6, "uncertain_candidates": 22, "conflict_groups": 2, "pending_unapproved_candidates": 113},
+    "t023b_project_manifest_sha256": "14a0bfc2c16dc290f5b4bb7fa5757fd47c97ac07611cf790bf109fa2701230c8",
+    "t023b_project_data_unchanged": true,
+    "t023_parent_in_progress": true,
     "t021b_authoritative_invocation_count": 1,
     "t021b_ncp_helper_call_count": 1,
     "t021b_ncp_helper_result": true,

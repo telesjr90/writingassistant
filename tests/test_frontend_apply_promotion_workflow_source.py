@@ -84,6 +84,7 @@ def test_apply_promotion_api_helper_targets_t004_route() -> None:
 
 def test_apply_promotion_confirmation_gate_and_boundary_copy_exist() -> None:
     source = read_source(APPLY_PROMOTION_CONFIRMATION_JSX)
+    semantic_source = source.casefold()
 
     for marker in (
         "owner_confirmation",
@@ -93,12 +94,19 @@ def test_apply_promotion_confirmation_gate_and_boundary_copy_exist() -> None:
         "queue presence is not approval",
         "confidence is not truth",
         "candidate persistence is not canon",
-        "raw artifacts are support data",
+        "raw artifacts are support data, not canon",
         "final owner confirmation",
-        "Apply-promotion is the only approved memory/canon mutation path",
+        "apply-promotion is the only approved memory/canon mutation path",
+    ):
+        assert marker.casefold() in semantic_source
+
+    for marker in (
+        "getApplyPromotionBlockers",
+        "const finalDisabled = blockers.length > 0 || isSubmitting",
+        "if (finalDisabled)",
+        "disabled={finalDisabled}",
     ):
         assert marker in source
-    assert "submitDisabled = Boolean(unavailableReason) || !ownerConfirmation || isSubmitting" in source
 
 
 def test_evidence_provenance_source_locator_fields_are_preserved() -> None:
@@ -130,18 +138,34 @@ def test_fail_closed_apply_promotion_inputs_exist() -> None:
     body = apply_helper_body()
 
     for marker in (
-        "project_id is missing or unsafe",
-        "candidate_id is missing",
-        "candidate_type is missing",
-        "unsupported destination_type",
-        "destination_key is required",
-        "evidence_refs are required",
-        "provenance_refs are required",
-        "source_locator_refs are required",
-        "owner actor is required",
-        "owner_confirmation is required before apply-promotion",
+        "Candidate not ready",
+        "Missing owner approval",
+        "Missing destination",
+        "Unsupported destination",
+        "Missing evidence/provenance",
+        "Missing source locator",
+        "Duplicate unresolved",
+        "Dependency unresolved",
+        "Promotion audit record missing",
+        "Target file/path missing",
+        "Approved Memory/Canon before-state unavailable",
+        "Final confirmation incomplete",
+        "Apply-promotion unavailable in this version",
+        "Apply-promotion failed or would fail closed",
     ):
-        assert marker in source or marker in body
+        assert marker in source
+
+    for marker in (
+        "requireSafeReviewRouteId(projectId, 'project_id')",
+        "requireSafeReviewRouteId(payload.candidate_id, 'candidate_id')",
+        "requireApplyPromotionDestinationType(payload.destination_type)",
+        "requireNonEmptyRefList(payload.evidence_refs, 'evidence_refs')",
+        "requireNonEmptyRefList(payload.provenance_refs, 'provenance_refs')",
+        "requireNonEmptyRefList(payload.source_locator_refs, 'source_locator_refs')",
+        "owner_confirmation is required before apply-promotion",
+        "client.post(`/projects/${projectId}/apply-promotion`, requestPayload)",
+    ):
+        assert marker in body
 
 
 def test_review_commands_remain_separate_from_apply_promotion_controls() -> None:
@@ -155,7 +179,10 @@ def test_review_commands_remain_separate_from_apply_promotion_controls() -> None
     assert "submitApplyPromotion" not in owner_controls_source
     assert "submitReviewQueueAction" not in apply_source
     assert "review workflow command" in owner_controls_source
-    assert "Apply-promotion is the only approved memory/canon mutation path" in apply_source
+    assert (
+        "apply-promotion is the only approved memory/canon mutation path"
+        in apply_source.casefold()
+    )
 
 
 def test_apply_promotion_source_excludes_forbidden_controls() -> None:
