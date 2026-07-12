@@ -24,9 +24,9 @@
 
 **Resolved owner question — Subtxt authorization/licensing:** the owner has resolved and approved all Subtxt licensing and authorization concerns. Full Subtxt runtime implementation is authorized. Question 115 and other historical owner-blocked/licensing-open statements are superseded only on that point by `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`; the twelve questions above are technical implementation questions, not permission or licensing blockers.
 
-135. For `PHASE8-IMPL-024-T001A`, should a guided-creation failure atomically roll back the entire project, or retain an explicitly marked incomplete project with recoverable owner input? The audit establishes the need for explicit semantics but does not choose one.
+135. ~~For `PHASE8-IMPL-024-T001A`, should a guided-creation failure atomically roll back the entire project, or retain an explicitly marked incomplete project with recoverable owner input?~~ **Resolved by PHASE8-IMPL-024-T001:** guided creation uses atomic rollback. Verified cleanup reports `failed_rolled_back`; unsafe or failed cleanup reports `recovery_required`; submitted values remain available to the frontend for recovery; and incomplete projects are never returned as normal success.
 
-134. What exact project-local storage location and identifier linkage should hold the owner-authored guided-creation setup notes, while preserving exact text and owner provenance without treating notes as canon?
+134. ~~What exact project-local storage location and identifier linkage should hold the owner-authored guided-creation setup notes, while preserving exact text and owner provenance without treating notes as canon?~~ **Resolved by PHASE8-IMPL-024-T001:** reuse existing Notes storage, preserve exact owner-authored text, attach note metadata with owner provenance and `model_generated: false`, keep the note non-canon, and link its setup-note ID with the OMI idea ID through guided project metadata.
 
 133. What exact evidence object must every grounded Story Check factual warning carry: source ID, content hash, exact excerpt/range, normalized comparison evidence, and validator outcome are required in principle, but the final schema remains open.
 

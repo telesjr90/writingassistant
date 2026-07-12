@@ -6,6 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T001-omi-guided-creation-integrity-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -13,14 +14,34 @@
     "activation_after": ["PHASE8-IMPL-024-T001", "PHASE8-IMPL-024-T002"],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; PHASE8-IMPL-025-T007 consumes and extends it without duplicate contracts",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task_unchanged": "PHASE8-IMPL-024-T001A"
+    "immediate_next_task": "PHASE8-IMPL-024-T002A",
+    "activation_state": "inactive until PHASE8-IMPL-024-T002 also completes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
     "mvp_readiness": "blocked",
     "p0_blockers": [
-      "P0-A: OMI-guided creation loses confirmed owner-authored idea and notes and returns creation_method blank",
       "P0-B: Story Check accepts contradictory factual warnings without exact-source grounding validation"
+    ]
+  },
+  "t001_closeout": {
+    "status": "complete/PASS",
+    "children": {
+      "T001A": "complete/PASS",
+      "T001B": "complete/PASS",
+      "T001C": "complete/PASS",
+      "T001D": "complete/PASS"
+    },
+    "commits": {
+      "T001A": "77d9968d1b8eb893a76bdd4f485c0415fb75f907",
+      "T001B": "5bcaed06e429a8d6e1d5f65974c5a08fe7185656"
+    },
+    "final_validation": ".codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T205343Z",
+    "superseded_blocked_validation": ".codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T203726Z",
+    "resolved_questions": [134, 135],
+    "accessibility_advisories": [
+      "focus returned to BODY after guided setup-to-review transition; follow up under T005",
+      "directly inserted selected project option temporarily appeared disabled/invalid until library refresh; follow up under T007"
     ]
   },
   "latest_verified_evidence": {
@@ -33,10 +54,10 @@
     "failed_advanced_collectors": "excluded from product evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T001A",
-    "title": "Backend OMI-guided creation contract and storage",
-    "status": "ready",
-    "scope": "Dedicated bounded guided-creation contract; exact owner-authored idea and notes persistence; owner provenance; creation_method omi_guided; explicit rollback or incomplete-project semantics; no model, extraction, candidates, promotion, Memory/Canon mutation, Bible, storyform, or scene creation from setup text"
+    "task_id": "PHASE8-IMPL-024-T002A",
+    "title": "Source identity/hash and diagnostic contract",
+    "status": "next; T002 pending",
+    "scope": "Define the exact selected-source identity/hash and diagnostic evidence contract for Story Check grounding without implementing later T002 children or activating PHASE8-IMPL-025"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -65,10 +86,11 @@
       "regular disposable project creation and owner-authored scene/note/material writes",
       "unsaved-project-switch confirmation",
       "guided-creation staged UI progression",
+      "guided-creation dedicated backend/frontend contract with exact owner text preservation, linked OMI idea and Notes storage, atomic failure semantics, and blank-route isolation",
+      "guided-creation deterministic and disposable API/browser validation PASS at 20260712T205343Z",
       "existing-project preservation during the reconciliation run"
     ],
     "verified_defects": [
-      "guided-creation confirmed input loss",
       "contradictory ungrounded Story Check factual warnings",
       "captured document-level horizontal overflow",
       "captured OMI heading hierarchy skip",
@@ -79,7 +101,9 @@
       "misleading enabled OMI actions",
       "undersized controls requiring standards-aware triage",
       "App.jsx and OMIShell.jsx navigation reset ambiguity",
-      "repeated metadata and safety presentation patterns"
+      "repeated metadata and safety presentation patterns",
+      "guided review transition focus returns to BODY; non-blocking T005 follow-up",
+      "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up"
     ],
     "not_yet_tested": [
       "grouped-review owner-decision mutation",
@@ -95,19 +119,16 @@
     ]
   },
   "risks": [
-    "silent loss of confirmed owner input",
     "ungrounded model diagnostics presented as findings",
     "misleading enabled UI actions",
     "hidden content caused by document overflow",
     "optional-resource absence obscuring real errors",
     "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
     "failed collectors mistaken for product evidence",
-    "partial writes during guided creation",
+    "guided review focus and immediate selected-project presentation advisories",
     "over-filtering useful Story Check diagnostics"
   ],
   "open_questions": [
-    "atomic rollback versus explicit incomplete guided-project creation",
-    "setup-notes storage location and identifier linkage",
     "grounded-warning evidence contract",
     "handling useful but unsupported Story Check output",
     "optional-resource availability in project metadata versus a dedicated read-only endpoint",

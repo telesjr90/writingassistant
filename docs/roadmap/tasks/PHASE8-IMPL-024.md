@@ -4,9 +4,11 @@
 
 Published and active as the release-blocker repair parent.
 
-Next implementation task: `PHASE8-IMPL-024-T001A - Backend OMI-guided creation contract and storage` (`ready`).
+T001 OMI-guided creation integrity is complete/PASS through T001A-T001D.
 
-The application is not ready for broad owner acceptance or MVP readiness. The successful application-wide Playwright reconciliation is evidence collection, not a product-wide pass. It verified two P0 integrity defects that must be repaired before visual polish or the remaining `PHASE8-IMPL-023-T023C` through `T026` closeout path can establish readiness.
+Next implementation task: `PHASE8-IMPL-024-T002A - Source identity/hash and diagnostic contract` (first bounded child of pending T002).
+
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect, but T002 Story Check grounding remains pending and blocks readiness before visual polish or the remaining `PHASE8-IMPL-023-T023C` through `T026` closeout path can establish readiness.
 
 ## Controlling Evidence
 
@@ -18,13 +20,13 @@ The application is not ready for broad owner acceptance or MVP readiness. The su
 
 The failed `playwright-advanced` runs are excluded from product evidence. They are failed collector-development attempts and cannot classify any workflow as PASS or FAIL.
 
+T001 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T205343Z`. The prior BLOCKED locator-ambiguity run at `.codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T203726Z` remains preserved as superseded validation history. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T001-omi-guided-creation-integrity-closeout.md`.
+
 ## Release Blockers
 
-### P0-A - OMI-guided creation loses confirmed owner input
+### P0-A - OMI-guided creation integrity (repaired/closed by T001 PASS)
 
-The guided flow displays and confirms the owner-authored title, idea, and setup notes, but the request contains only the title. The created project reports `creation_method: blank`; neither idea nor notes are persisted.
-
-The repair must provide a dedicated bounded guided-creation contract; exact idea and notes persistence; owner provenance; `creation_method: omi_guided`; and explicit rollback or incomplete-project semantics. It must not call a model, run extraction, create candidates or promotions, apply promotion, mutate Memory/Canon, or create Bible, storyform, scene, or other story content from setup text.
+T001A/T001B implemented the dedicated bounded guided-creation contract and frontend path. Exact owner-authored idea and note text is stored through existing OMI idea/Notes storage with owner provenance, linked IDs, `model_generated: false`, non-canon state, `creation_method: omi_guided`, atomic rollback, `failed_rolled_back`, and exceptional `recovery_required`; blank creation is unchanged. T001C validated deterministic and disposable API/browser behavior with no prohibited side effects.
 
 ### P0-B - Story Check accepts contradictory ungrounded findings
 
@@ -32,14 +34,14 @@ The selected source and POST transport were correct, but the result claimed sele
 
 ## Child Task Hierarchy
 
-All tasks begin planned except the immediate backend-only child, which is ready. Lettered children are bounded execution slices under the indexed workstream child.
+Lettered children are bounded execution slices under the indexed workstream child.
 
 ### `PHASE8-IMPL-024-T001` - OMI-guided creation integrity
 
-- `PHASE8-IMPL-024-T001A` - Backend guided-creation contract and storage (`ready`).
-- `PHASE8-IMPL-024-T001B` - Frontend request and confirmation wiring (`planned`; depends on T001A).
-- `PHASE8-IMPL-024-T001C` - Focused deterministic tests and disposable-project Playwright validation (`planned`; depends on T001A-T001B).
-- `PHASE8-IMPL-024-T001D` - Documentation and status closeout (`planned`; depends on T001C).
+- `PHASE8-IMPL-024-T001A` - Backend guided-creation contract and storage (`complete/PASS`; commit `77d9968d1b8eb893a76bdd4f485c0415fb75f907`).
+- `PHASE8-IMPL-024-T001B` - Frontend request and confirmation wiring (`complete/PASS`; commit `5bcaed06e429a8d6e1d5f65974c5a08fe7185656`).
+- `PHASE8-IMPL-024-T001C` - Focused deterministic tests and disposable-project Playwright validation (`complete/PASS`; final evidence `20260712T205343Z`; prior BLOCKED run preserved as superseded history).
+- `PHASE8-IMPL-024-T001D` - Documentation and status closeout (`complete/PASS`).
 
 ### `PHASE8-IMPL-024-T002` - Story Check grounding integrity
 
