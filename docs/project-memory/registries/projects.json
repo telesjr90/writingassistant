@@ -1,0 +1,50 @@
+{
+  "registry_type": "project",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "project:dramatica-informed-writing-assistant",
+      "type": "project",
+      "schema_version": "1.0.0",
+      "title": "Dramatica-Informed Writing Assistant",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "backend/", "symbol": "root_app" },
+          { "path": "frontend/", "symbol": "root_ui" },
+          { "path": "README.md" }
+        ]
+      },
+      "project_id": "writing-assistant",
+      "description": "Analysis-only Dramatica-informed writing assistant application. Provides OMI-guided creation, Story Check diagnostics, candidate review workflows, and evidence-backed analysis without generating or mutating story prose.",
+      "repository_root": "/home/tjrpirateking/projects/WritingAssistantApplication"
+    },
+    {
+      "id": "project:project-memory-and-plan-integrity",
+      "type": "project",
+      "schema_version": "1.0.0",
+      "title": "Project Memory and Plan Integrity",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/project-memory/" },
+          { "path": "scripts/project_memory/" },
+          { "path": "tests/project_memory/" }
+        ],
+        "owner_decision_ref": "owner-decision:pmf-parent-identity"
+      },
+      "project_id": "project-memory",
+      "description": "Project Memory and Plan Integrity initiative — a parallel governance, documentation, and developer infrastructure workstream that provides a normalized, machine-readable, commit-bound system comparing the accepted plan with actual implementation.",
+      "repository_root": "/home/tjrpirateking/projects/WritingAssistantApplication-project-memory"
+    }
+  ]
+}

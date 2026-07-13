@@ -1,0 +1,108 @@
+{
+  "registry_type": "manifest",
+  "schema_version": "1.0.0",
+  "architecture_version": "1.0.0",
+  "description": "Project Memory registry manifest — declares all registry files, their record types, cross-reference policy, and the generated snapshot output root.",
+  "registries": [
+    {
+      "filename": "projects.json",
+      "record_type": "project",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence"],
+      "validation_order": 0,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "features.json",
+      "record_type": "feature",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence"],
+      "validation_order": 1,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "boundaries.json",
+      "record_type": "boundary",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative"],
+      "validation_order": 2,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "tasks.json",
+      "record_type": "task",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence"],
+      "validation_order": 3,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "decisions.json",
+      "record_type": "decision",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence", "historical", "superseded"],
+      "validation_order": 4,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "capabilities.json",
+      "record_type": "capability",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence"],
+      "validation_order": 5,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "assets.json",
+      "record_type": "asset",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence", "historical", "uncertain"],
+      "validation_order": 6,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "evidence.json",
+      "record_type": "evidence",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence", "generated_evidence"],
+      "validation_order": 7,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "dependencies.json",
+      "record_type": "dependency",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence"],
+      "validation_order": 8,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "tools.json",
+      "record_type": "tool",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative", "accepted_evidence", "uncertain", "owner_pending"],
+      "validation_order": 9,
+      "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "owner-decisions.json",
+      "record_type": "owner_decision",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative"],
+      "validation_order": 10,
+      "cross_reference_policy": "allow_all"
+    }
+  ],
+  "generated_snapshot_output_root": ".codex-context/project-memory/"
+}

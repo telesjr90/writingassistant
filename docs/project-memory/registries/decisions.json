@@ -1,0 +1,52 @@
+{
+  "registry_type": "decision",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "decision:pmf-t001-authority-foundation",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Project Memory Authority, Lifecycle, and Provenance Foundation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "decision_id": "pmf-t001-authority-foundation",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md",
+      "question": "What controlling policies, authority hierarchy, trust classes, freshness model, and provenance rules should govern Project Memory before any schema, scanner, registry, renderer, or retrieval tool exists?",
+      "selected_option": "ACCEPTED as a parallel governance, documentation, and developer infrastructure workstream. Defined seven-tier authority hierarchy, eight trust classes, commit-bound freshness, supersession, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization policy, and product boundaries.",
+      "rationale": "Without normalized controlling policies, context tools, retrieval systems, agent prompts, and generated indexes could silently drift from the authoritative roadmap and live code.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T002", "PHASE8-IMPL-026-T003"]
+    },
+    {
+      "id": "decision:pmf-t002-schema-registry-architecture",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Schema and Normalized-Registry Architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T002-schema-and-normalized-registry-architecture.md" }
+        ]
+      },
+      "decision_id": "pmf-t002-schema-registry-architecture",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T002-schema-and-normalized-registry-architecture.md",
+      "question": "What exact data model, schema standard, registry decomposition, stable identifier contract, and validation architecture should Project Memory adopt?",
+      "selected_option": "JSON as canonical tracked registry format; JSON Schema Draft 2020-12 as formal data contract; one schema bundle with typed $defs; 12 separate normalized registry files; registry manifest; dependency-free standard-library validator; tracked source versus generated snapshot separation; stable namespaced identifiers; enforced trust classes, lifecycle values, and cross-record references.",
+      "rationale": "The architecture must support deterministic comparison between plan and implementation, allow later scanners and renderers to extend records without replacing identifiers, and enforce product safety boundaries through structural validation.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T002", "PHASE8-IMPL-026-T003"]
+    }
+  ]
+}

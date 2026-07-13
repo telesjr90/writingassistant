@@ -1,0 +1,181 @@
+{
+  "registry_type": "task",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "task:PHASE8-IMPL-024",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Application UI/UX Audit Integrity and Acceptance Repair",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-024.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-024",
+      "parent_task_id": null,
+      "depends_on": [],
+      "task_type": "runtime",
+      "classification": "application repair",
+      "is_application_frontier": true,
+      "is_blocking": true,
+      "notes": "Active application implementation frontier. T001 and T002 complete/PASS. T003A is the immediate next task."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T003A",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 11, "line_end": 11 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-024-T003A",
+      "parent_task_id": "PHASE8-IMPL-024",
+      "depends_on": ["PHASE8-IMPL-024"],
+      "task_type": "runtime",
+      "classification": "backend-only contract micro-task",
+      "is_application_frontier": true,
+      "is_blocking": false,
+      "notes": "The immediate application implementation frontier. Planned next under T003."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Layered Analysis Architecture and Tool Integration Expansion",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-025-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-025.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-025",
+      "parent_task_id": null,
+      "depends_on": ["PHASE8-IMPL-024"],
+      "task_type": "runtime",
+      "classification": "architecture expansion",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Published/planned and inactive. T001/T002 external prerequisites satisfied but no implementation child activated. Separate from the application frontier."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Project Memory and Plan Integrity",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ],
+        "owner_decision_ref": "owner-decision:pmf-parent-identity"
+      },
+      "task_id": "PHASE8-IMPL-026",
+      "parent_task_id": null,
+      "depends_on": [],
+      "task_type": "governance",
+      "classification": "hybrid governance, documentation, and developer infrastructure",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Parallel governance workstream. Not an application feature. Published/active."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T001",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Project Memory authority, lifecycle, and provenance foundation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T001",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": [],
+      "task_type": "governance",
+      "classification": "authority foundation",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Published the controlling decision defining authority hierarchy, trust classes, freshness model, commit binding, supersession, conflicting-evidence resolution, and all other T001 decision areas."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T002",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Schema and normalized-registry architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/project-memory/schemas/project-memory.schema.json" },
+          { "path": "docs/project-memory/registries/manifest.json" }
+        ],
+        "owner_decision_ref": "owner-decision:json-canonical-registry-format"
+      },
+      "task_id": "PHASE8-IMPL-026-T002",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T001"],
+      "task_type": "infrastructure",
+      "classification": "schema and registry architecture",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Established the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle, 12 normalized registry files, registry manifest, dependency-free validator, and focused tests."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T003",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Deterministic scanners and convergence",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 82, "line_end": 88 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T003",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T002"],
+      "task_type": "infrastructure",
+      "classification": "deterministic scanner",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Next Project Memory task. Will implement read-only deterministic scanners that inspect repository state and produce normalized evidence records."
+    }
+  ]
+}

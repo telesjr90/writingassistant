@@ -1,0 +1,799 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://writing-assistant-project-memory/schemas/project-memory.schema.json",
+  "title": "Project Memory Schema Bundle",
+  "description": "Canonical JSON Schema Draft 2020-12 for all Project Memory record types and the generated snapshot manifest. This is the formal machine-readable data contract.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "$defs": {
+    "SchemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "StableId": {
+      "type": "string",
+      "pattern": "^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision):[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+      "description": "Namespaced stable identifier. No path traversal, whitespace, control characters, or absolute paths allowed."
+    },
+    "TrustClass": {
+      "type": "string",
+      "enum": [
+        "authoritative",
+        "accepted_evidence",
+        "generated_evidence",
+        "historical",
+        "superseded",
+        "uncertain",
+        "owner_pending",
+        "untrusted"
+      ]
+    },
+    "LifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "current",
+        "planned",
+        "in_progress",
+        "complete",
+        "blocked",
+        "deferred",
+        "historical",
+        "superseded",
+        "rejected",
+        "owner_pending"
+      ]
+    },
+    "TaskLifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "in_progress",
+        "complete",
+        "blocked",
+        "deferred",
+        "historical",
+        "superseded",
+        "owner_pending"
+      ]
+    },
+    "DecisionLifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "current",
+        "superseded",
+        "historical",
+        "owner_pending"
+      ]
+    },
+    "GitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-character lowercase Git SHA."
+    },
+    "IsoTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "SourceLocator": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Repository-relative path. Must not be absolute, must not contain .. traversal, must not be blank."
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "json_pointer": {
+          "type": "string",
+          "description": "RFC 6901 JSON Pointer."
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "task_id": {
+          "type": "string"
+        },
+        "decision_id": {
+          "type": "string"
+        },
+        "evidence_artifact_id": {
+          "type": "string"
+        }
+      },
+      "required": ["path"],
+      "additionalProperties": false
+    },
+    "ProvenanceMetadata": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "string",
+          "description": "Task ID or agent identity that created the record."
+        },
+        "created_at": {
+          "$ref": "#/$defs/IsoTimestamp"
+        },
+        "accepted_by": {
+          "type": "string",
+          "description": "Identity that accepted the record (task ID or owner marker)."
+        },
+        "source_locators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceLocator"
+          }
+        },
+        "owner_decision_ref": {
+          "$ref": "#/$defs/StableId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LifecycleMetadata": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/LifecycleStatus"
+        },
+        "effective_from": {
+          "$ref": "#/$defs/IsoTimestamp"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StableId"
+          },
+          "uniqueItems": true
+        },
+        "superseded_by": {
+          "$ref": "#/$defs/StableId"
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false
+    },
+    "BaseRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/StableId"
+        },
+        "type": {
+          "type": "string",
+          "description": "Record type matching the containing registry."
+        },
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority_class": {
+          "$ref": "#/$defs/TrustClass"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/LifecycleMetadata"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ProvenanceMetadata"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Human-readable data notes, not agent instructions."
+        }
+      },
+      "required": ["id", "type", "schema_version", "title", "authority_class", "lifecycle"],
+      "additionalProperties": true
+    },
+    "ProjectRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "project" },
+            "project_id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Short unique project slug."
+            },
+            "description": {
+              "type": "string"
+            },
+            "repository_root": {
+              "type": "string",
+              "description": "Repository path identity."
+            }
+          },
+          "required": ["project_id"]
+        }
+      ]
+    },
+    "FeatureRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "feature" },
+            "feature_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "parent_task_id": {
+              "type": "string"
+            },
+            "implementation_status": {
+              "type": "string",
+              "description": "One of implemented, partially_implemented, planned, not_implemented."
+            }
+          },
+          "required": ["feature_id", "implementation_status"]
+        }
+      ]
+    },
+    "BoundaryRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "boundary" },
+            "boundary_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "product_safety",
+                "architecture",
+                "data",
+                "provenance",
+                "tooling",
+                "governance"
+              ]
+            },
+            "is_non_negotiable": {
+              "type": "boolean"
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "required": ["boundary_id", "category", "is_non_negotiable"]
+        }
+      ]
+    },
+    "TaskRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "task" },
+            "task_id": {
+              "type": "string",
+              "pattern": "^PHASE[0-9]+-(IMPL|UX)-[0-9]{3}(-T[0-9]{3}[A-Z]?)?$"
+            },
+            "parent_task_id": {
+              "type": "string"
+            },
+            "depends_on": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true
+            },
+            "task_type": {
+              "type": "string",
+              "enum": [
+                "planning",
+                "docs-only",
+                "runtime",
+                "validation",
+                "closeout",
+                "governance",
+                "infrastructure"
+              ]
+            },
+            "classification": {
+              "type": "string"
+            },
+            "is_application_frontier": {
+              "type": "boolean",
+              "default": false
+            },
+            "is_blocking": {
+              "type": "boolean",
+              "default": false
+            },
+            "lifecycle": {
+              "allOf": [
+                { "$ref": "#/$defs/LifecycleMetadata" },
+                {
+                  "properties": {
+                    "status": { "$ref": "#/$defs/TaskLifecycleStatus" }
+                  }
+                }
+              ]
+            }
+          },
+          "required": ["task_id"]
+        }
+      ]
+    },
+    "DecisionRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "decision" },
+            "decision_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "decision_path": {
+              "type": "string",
+              "description": "Repository-relative path to the decision record file."
+            },
+            "question": {
+              "type": "string"
+            },
+            "selected_option": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            },
+            "affected_tasks": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true
+            },
+            "lifecycle": {
+              "allOf": [
+                { "$ref": "#/$defs/LifecycleMetadata" },
+                {
+                  "properties": {
+                    "status": { "$ref": "#/$defs/DecisionLifecycleStatus" }
+                  }
+                }
+              ]
+            }
+          },
+          "required": ["decision_id", "decision_path"]
+        }
+      ]
+    },
+    "CapabilityRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "capability" },
+            "capability_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "implemented": {
+              "type": "boolean"
+            },
+            "validated": {
+              "type": "boolean"
+            },
+            "associated_tasks": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true
+            }
+          },
+          "required": ["capability_id", "implemented", "validated"]
+        }
+      ]
+    },
+    "AssetRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "asset" },
+            "asset_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "asset_path": {
+              "type": "string",
+              "description": "Repository-relative path to the asset."
+            },
+            "asset_type": {
+              "type": "string",
+              "enum": [
+                "project_fixture",
+                "source_file",
+                "evidence_artifact",
+                "training_data",
+                "evaluation_data",
+                "documentation",
+                "external_reference"
+              ]
+            },
+            "is_durable_fixture": {
+              "type": "boolean",
+              "default": false
+            },
+            "role": {
+              "type": "string",
+              "description": "Mixed-role classification where applicable."
+            },
+            "warnings": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "required": ["asset_id", "asset_type"]
+        }
+      ]
+    },
+    "EvidenceRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "evidence" },
+            "evidence_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence_type": {
+              "type": "string",
+              "enum": [
+                "manual_validation",
+                "automated_test",
+                "commit_record",
+                "generated_context",
+                "defect_record",
+                "audit_log"
+              ]
+            },
+            "description": {
+              "type": "string"
+            },
+            "associated_task_id": {
+              "type": "string"
+            },
+            "is_blocking_defect": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": ["evidence_id", "evidence_type"]
+        }
+      ]
+    },
+    "DependencyRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "dependency" },
+            "dependency_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_id": {
+              "type": "string",
+              "description": "Stable ID of the source (dependent) record."
+            },
+            "target_id": {
+              "type": "string",
+              "description": "Stable ID of the target (depended-on) record."
+            },
+            "dependency_type": {
+              "type": "string",
+              "enum": [
+                "task_depends_on",
+                "decision_affects",
+                "capability_enables",
+                "boundary_constrains",
+                "asset_supports"
+              ]
+            },
+            "is_separate": {
+              "type": "boolean",
+              "default": false,
+              "description": "True if the source is intentionally separate from the target chain."
+            }
+          },
+          "required": ["dependency_id", "source_id", "target_id", "dependency_type"]
+        }
+      ]
+    },
+    "ToolRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "tool" },
+            "tool_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tool_name": {
+              "type": "string"
+            },
+            "tool_type": {
+              "type": "string",
+              "enum": [
+                "validation_script",
+                "context_tool",
+                "evidence_collector",
+                "external_tool",
+                "generation_script"
+              ]
+            },
+            "tool_path": {
+              "type": "string",
+              "description": "Repository-relative path or command."
+            },
+            "provenance_state": {
+              "type": "string",
+              "enum": [
+                "approved",
+                "installed",
+                "configured",
+                "owner_pending",
+                "uncertain",
+                "rejected",
+                "blocked"
+              ]
+            },
+            "is_approved_dependency": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": ["tool_id", "tool_type", "provenance_state"]
+        }
+      ]
+    },
+    "OwnerDecisionRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "owner_decision" },
+            "owner_decision_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "question": {
+              "type": "string"
+            },
+            "selected_option": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            },
+            "affected_tasks": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true
+            }
+          },
+          "required": ["owner_decision_id", "question", "selected_option"]
+        }
+      ]
+    },
+    "RegistryManifest": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "architecture_version": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "description": {
+          "type": "string"
+        },
+        "registries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "filename": {
+                "type": "string",
+                "minLength": 1
+              },
+              "record_type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "tracked_or_generated": {
+                "type": "string",
+                "enum": ["tracked", "generated"]
+              },
+              "allowed_authority_classes": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/TrustClass" },
+                "uniqueItems": true
+              },
+              "validation_order": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cross_reference_policy": {
+                "type": "string",
+                "enum": ["allow_all", "same_registry_only", "declared_only"]
+              }
+            },
+            "required": ["filename", "record_type", "required", "tracked_or_generated", "validation_order"],
+            "additionalProperties": false
+          }
+        },
+        "generated_snapshot_output_root": {
+          "type": "string",
+          "const": ".codex-context/project-memory/"
+        }
+      },
+      "required": ["schema_version", "architecture_version", "registries", "generated_snapshot_output_root"],
+      "additionalProperties": false
+    },
+    "RegistryContainer": {
+      "type": "object",
+      "properties": {
+        "registry_type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Record type contained in this registry."
+        },
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "records": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": ["registry_type", "schema_version", "records"],
+      "additionalProperties": false
+    },
+    "GeneratedSnapshotManifest": {
+      "type": "object",
+      "properties": {
+        "snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "authority_class": {
+          "type": "string",
+          "const": "generated_evidence"
+        },
+        "repository_root": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "bound_commit": {
+          "$ref": "#/$defs/GitSha"
+        },
+        "generated_at": {
+          "$ref": "#/$defs/IsoTimestamp"
+        },
+        "synced_at": {
+          "$ref": "#/$defs/IsoTimestamp"
+        },
+        "generator": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "command": { "type": "string" }
+          },
+          "required": ["name", "version"]
+        },
+        "included_scopes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source_file_hashes": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "registry_hashes": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "unresolved_conflicts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "freshness_state": {
+          "type": "string",
+          "enum": ["current", "stale", "dirty", "unbound", "conflicting"]
+        },
+        "known_limitations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "schema_version",
+        "authority_class",
+        "repository_root",
+        "branch",
+        "bound_commit",
+        "generated_at",
+        "generator",
+        "freshness_state"
+      ],
+      "additionalProperties": false
+    },
+    "ValidationFinding": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["error", "warning"]
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "registry_file": {
+          "type": "string"
+        },
+        "record_id": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "required": ["level", "code", "message"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "registry_type": "evidence",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "evidence:ph8-impl-024-t002d-story-check-grounding",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "T002D Story Check Grounding Live Validation PASS",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T002D",
+        "accepted_by": "PHASE8-IMPL-024-T002",
+        "source_locators": [
+          { "path": ".codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z" }
+        ]
+      },
+      "evidence_id": "ph8-impl-024-t002d-story-check-grounding",
+      "evidence_type": "manual_validation",
+      "description": "T002D live validation PASS at 20260713T022337Z: 22 diagnostics (17 unverified + 5 quarantined, zero falsely verified), exact source identity matched, non-mutating, fail-closed on unsupported claims.",
+      "associated_task_id": "PHASE8-IMPL-024-T002D",
+      "is_blocking_defect": false
+    },
+    {
+      "id": "evidence:ph8-impl-026-t001-authority-foundation-commit",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "T001 Project Memory Authority Foundation Commit",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "evidence_id": "ph8-impl-026-t001-authority-foundation-commit",
+      "evidence_type": "commit_record",
+      "description": "T001 publication commit establishing the Project Memory authority, lifecycle, and provenance foundation. Defined seven-tier authority hierarchy, eight trust classes, and all controlling policies.",
+      "associated_task_id": "PHASE8-IMPL-026-T001",
+      "is_blocking_defect": false
+    },
+    {
+      "id": "evidence:q148-fastapi-test-harness-defect",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "Q148 FastAPI Test-Harness Defect (Unresolved Non-Blocking)",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T002D",
+        "source_locators": [
+          { "path": ".codex-context/PHASE8-IMPL-024/T002D-unrelated-test-harness-defect/20260713T020959Z" }
+        ]
+      },
+      "evidence_id": "q148-fastapi-test-harness-defect",
+      "evidence_type": "defect_record",
+      "description": "Pre-existing non-blocking defect in test_context_routes.py: synthetic FastAPI stub missing Request. Unrelated to T002D Story Check grounding validation. Recorded as accepted defect evidence.",
+      "associated_task_id": "PHASE8-IMPL-024-T002D",
+      "is_blocking_defect": false
+    }
+  ]
+}

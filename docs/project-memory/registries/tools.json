@@ -1,0 +1,144 @@
+{
+  "registry_type": "tool",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "tool:roadmap-validator",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Roadmap Validator",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "scripts/validate_roadmap.py" }
+        ]
+      },
+      "tool_id": "roadmap-validator",
+      "tool_name": "validate_roadmap.py",
+      "tool_type": "validation_script",
+      "tool_path": "scripts/validate_roadmap.py",
+      "provenance_state": "approved",
+      "is_approved_dependency": true,
+      "notes": "Standard-library-only Python script that validates roadmap_index.yaml structure, task IDs, dependencies, and status values against the accepted roadmap schema."
+    },
+    {
+      "id": "tool:enrichment-checker",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Enrichment Checker",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "scripts/check_enrichment.py" }
+        ]
+      },
+      "tool_id": "enrichment-checker",
+      "tool_name": "check_enrichment.py",
+      "tool_type": "validation_script",
+      "tool_path": "scripts/check_enrichment.py",
+      "provenance_state": "approved",
+      "is_approved_dependency": true,
+      "notes": "Standard-library-only Python script that validates enrichment JSON files against expected schema and task references."
+    },
+    {
+      "id": "tool:repomix-config",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Repomix Configuration",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "repomix.config.json" }
+        ]
+      },
+      "tool_id": "repomix-config",
+      "tool_name": "Repomix",
+      "tool_type": "context_tool",
+      "tool_path": "repomix.config.json",
+      "provenance_state": "configured",
+      "is_approved_dependency": false,
+      "notes": "Repomix is configured for scoped frozen context packs. Used as a planning and evidence tool only. Not an approved Project Memory dependency."
+    },
+    {
+      "id": "tool:ai-context-script",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "AI Context Generation Script",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "scripts/generate_ai_context.sh" }
+        ]
+      },
+      "tool_id": "ai-context-script",
+      "tool_name": "generate_ai_context.sh",
+      "tool_type": "generation_script",
+      "tool_path": "scripts/generate_ai_context.sh",
+      "provenance_state": "configured",
+      "is_approved_dependency": false,
+      "notes": "AI Context generation script. Used as a planning and evidence tool only. Not an approved Project Memory dependency."
+    },
+    {
+      "id": "tool:graphify-config",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Graphify Configuration",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": ".claude/skills/graphify/SKILL.md" }
+        ]
+      },
+      "tool_id": "graphify-config",
+      "tool_name": "Graphify",
+      "tool_type": "context_tool",
+      "tool_path": ".claude/skills/graphify/SKILL.md",
+      "provenance_state": "configured",
+      "is_approved_dependency": false,
+      "notes": "Graphify is configured for topology and dependency questions. Used as a planning and evidence tool only. Not an approved Project Memory dependency."
+    },
+    {
+      "id": "tool:playwright-evidence-collector",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Playwright Evidence Collector",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024",
+        "source_locators": [
+          { "path": ".codex-context/application-uiux-audit/" }
+        ]
+      },
+      "tool_id": "playwright-evidence-collector",
+      "tool_name": "Playwright",
+      "tool_type": "evidence_collector",
+      "tool_path": ".codex-context/application-uiux-audit/",
+      "provenance_state": "configured",
+      "is_approved_dependency": false,
+      "notes": "Playwright evidence collector configured for UI/UX audit evidence. Successful reconciliation at 20260712T030010Z is evidence collection, not product-wide PASS. Failed playwright-advanced attempts are excluded. Not an approved Project Memory dependency."
+    }
+  ]
+}

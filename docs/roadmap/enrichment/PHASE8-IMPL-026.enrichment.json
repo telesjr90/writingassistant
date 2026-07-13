@@ -80,6 +80,18 @@
     ],
     "policy_only": true
   },
+  "t002_status": {
+    "task_id": "PHASE8-IMPL-026-T002",
+    "title": "Schema and normalized-registry architecture",
+    "status": "complete/PASS",
+    "summary": "Defined the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 normalized tracked registry files; registry manifest; dependency-free standard-library validator; focused tests. Established stable namespaced identifiers, tracked-source vs. generated-snapshot separation, enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity. Resolved Q149 (JSON canonical format) and Q150 (one schema bundle, separate registry files, dependency-free validator)."
+  },
+  "next_project_memory_task": {
+    "task_id": "PHASE8-IMPL-026-T003",
+    "title": "Deterministic scanners and convergence",
+    "status": "planned",
+    "depends_on": "PHASE8-IMPL-026-T002"
+  },
   "dependencies": {
     "none_approved": [
       "Serena",
@@ -89,14 +101,16 @@
     "tool_installation_contingent_on_provenance": true
   },
   "open_questions": [
-    "exact registry storage format (YAML, JSON, single-file, or multi-file)",
-    "schema decomposition and normal form",
     "convergence criteria for plan-vs-implementation comparison",
     "criteria for Serena adoption",
     "embedding model selection for LlamaIndex pilot",
     "retrieval benchmark thresholds beyond initial planning target",
     "operational synchronization cadence"
   ],
+  "resolved_questions": {
+    "Q149": "Canonical registry storage format: JSON. Resolved by PHASE8-IMPL-026-T002.",
+    "Q150": "Schema decomposition: one JSON Schema Draft 2020-12 bundle with typed $defs, 12 separate registry files, one manifest, one dependency-free standard-library validator. Resolved by PHASE8-IMPL-026-T002."
+  },
   "risks": [
     "competing authority systems",
     "stale memory",
@@ -123,13 +137,12 @@
     "Project Memory cannot activate, close, or reorder application tasks"
   ],
   "no_implementation_created": [
-    "schemas",
     "scanners",
-    "registries",
     "renderers",
     "retrieval tools",
     "reviewers",
     "MCP servers",
-    "documentation rendering"
+    "documentation rendering",
+    "generated snapshots"
   ]
 }

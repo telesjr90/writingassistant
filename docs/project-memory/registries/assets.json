@@ -1,0 +1,93 @@
+{
+  "registry_type": "asset",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "asset:example-project-fixture",
+      "type": "asset",
+      "schema_version": "1.0.0",
+      "title": "Example Project Fixture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "projects/example/" }
+        ]
+      },
+      "asset_id": "example-project-fixture",
+      "asset_path": "projects/example/",
+      "asset_type": "project_fixture",
+      "is_durable_fixture": true,
+      "notes": "Current committed fixture used for deterministic and automated tests. Contains owner-authored scene prose and metadata."
+    },
+    {
+      "id": "asset:example-storyform",
+      "type": "asset",
+      "schema_version": "1.0.0",
+      "title": "Example Project Storyform",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "projects/example/storyform.json" }
+        ]
+      },
+      "asset_id": "example-storyform",
+      "asset_path": "projects/example/storyform.json",
+      "asset_type": "project_fixture",
+      "is_durable_fixture": true,
+      "notes": "Storyform fixture used by Story Check and analysis workflows."
+    },
+    {
+      "id": "asset:example-scene-001",
+      "type": "asset",
+      "schema_version": "1.0.0",
+      "title": "Scene 001 — The Princess and the Pea",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE7-IMPL-001",
+        "source_locators": [
+          { "path": "projects/example/scenes/scene_001.md" }
+        ]
+      },
+      "asset_id": "example-scene-001",
+      "asset_path": "projects/example/scenes/scene_001.md",
+      "asset_type": "project_fixture",
+      "is_durable_fixture": true,
+      "notes": "Public-domain 'The Princess and the Pea' scene used as owner-authored project fixture for deterministic and automated tests. Not classified as an owner-approved durable fixture beyond its committed fixture role."
+    },
+    {
+      "id": "asset:elena-asset-family",
+      "type": "asset",
+      "schema_version": "1.0.0",
+      "title": "Elena Asset Family",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-005",
+        "source_locators": [
+          { "path": "projects/example/" }
+        ]
+      },
+      "asset_id": "elena-asset-family",
+      "asset_type": "project_fixture",
+      "is_durable_fixture": false,
+      "role": "mixed-role: historical evidence, training evaluation data, and owner-authored material. The Elena-named Ember Crown source carries a known misleading naming warning.",
+      "warnings": [
+        "The 'Elena' naming in the Ember Crown source may be misleading. Treat as mixed-role evidence, not as durable fixture identity."
+      ],
+      "notes": "Elena assets serve multiple roles: historical project evidence, training evaluation data, and owner-authored material. Not classified as obsolete or training-only. The known misleading Elena-named Ember Crown source warning is preserved."
+    }
+  ]
+}

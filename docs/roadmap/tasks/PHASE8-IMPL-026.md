@@ -11,8 +11,10 @@ PHASE8-IMPL-025 remains published/planned and inactive.
 T001 — Project Memory authority, lifecycle, and provenance foundation —
 is complete/PASS.
 
-Next Project Memory task: PHASE8-IMPL-026-T002 — Schema and normalized-registry
-architecture.
+T002 — Schema and normalized-registry architecture — is complete/PASS.
+
+Next Project Memory task: PHASE8-IMPL-026-T003 — Deterministic scanners and
+convergence.
 
 ## Classification
 
@@ -72,15 +74,20 @@ product boundaries.
 
 ### PHASE8-IMPL-026-T002 — Schema and normalized-registry architecture
 
-Status: planned. Depends on T001.
+Status: complete/PASS. Depends on T001.
 
-Define machine-readable schemas for Project Memory records, registry storage
-format, normal form, ID governance, and cross-record linking before any
-scanner, renderer, or retrieval tool exists.
+Defined the deterministic, tracked Project Memory data model: JSON Schema Draft
+2020-12 schema bundle with typed $defs; 12 normalized tracked registry files;
+registry manifest; dependency-free standard-library validator; focused tests.
+Established stable namespaced identifiers, tracked-source vs. generated-snapshot
+separation, enforced trust classes, lifecycle values, source locator validation,
+and cross-record reference integrity. Resolved Q149 (JSON canonical format) and
+Q150 (one schema bundle, separate registry files, dependency-free validator).
+No scanners, renderers, generated snapshots, or retrieval tools were implemented.
 
 ### PHASE8-IMPL-026-T003 — Deterministic scanners and convergence
 
-Status: planned. Depends on T002.
+Status: planned. Depends on T002. Next Project Memory task.
 
 Implement read-only deterministic scanners that inspect the repository state
 (code, tests, roadmap decisions, task records, enrichment data) and produce
@@ -163,7 +170,7 @@ Document the operator's manual for Project Memory maintenance.
 
 ```text
 T001 (authority foundation) — complete/PASS
-  -> T002 (schemas and registries)
+  -> T002 (schemas and registries) — complete/PASS
   -> T003 (deterministic scanners)
   -> T004 (human-readable memory)
   -> T005 (context-tool integration)

@@ -60,8 +60,8 @@ silently override it.
 1. `PHASE8-IMPL-026-T001` — Authority, lifecycle, provenance, and roadmap
    foundation (complete/PASS).
 2. `PHASE8-IMPL-026-T002` — Schema and normalized-registry architecture
-   (planned; next).
-3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (planned).
+   (complete/PASS).
+3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (planned; next).
 4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (planned).
 5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
@@ -81,7 +81,7 @@ LlamaIndex, and Qdrant are not approved dependencies.
 
 ```text
 PHASE8-IMPL-026-T001 (complete/PASS)
-  -> T002 -> T003 -> T004 -> T005 -> T006 [contingent]
+  -> T002 (complete/PASS) -> T003 -> T004 -> T005 -> T006 [contingent]
                                    -> T007 [contingent]
                             -> T008 -> T009 -> T010 -> T011
 ```
@@ -125,11 +125,14 @@ implemented by T001.
 
 ## Current state
 
-- No Project Memory schemas exist.
-- No registries exist.
+- Project Memory schemas exist (JSON Schema Draft 2020-12).
+- Registry architecture and tracked seed registries exist (12 registries + manifest).
+- Dependency-free standard-library validator exists.
+- Focused tests exist.
 - No scanners exist.
 - No renderers exist.
 - No retrieval tools exist.
 - No reviewers exist.
-- The authority foundation is the only delivered artifact.
-- The next task is schema and normalized-registry architecture (T002).
+- No generated snapshots exist.
+- T001 and T002 are the delivered artifacts.
+- The next task is deterministic scanners and convergence (T003).

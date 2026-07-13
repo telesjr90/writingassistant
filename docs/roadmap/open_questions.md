@@ -32,9 +32,9 @@
 
 132. ~~How should potentially useful but unsupported Story Check output be retained: quarantined diagnostic, explicitly unverified warning, or omitted from the primary findings list? The choice must avoid both presenting unsupported claims as findings and over-filtering useful diagnostics.~~ **Resolved by PHASE8-IMPL-024-T002:** unsupported factual claims are quarantined (visible with quarantined status, not presented as verified); structural/contextual diagnostics without direct factual-claim evidence are unverified (visible with unverified status); no diagnostic is omitted solely for being unsupported. The deterministic grounding validator classifies every diagnostic. Live run preserved 17 unverified structural diagnostics and 5 quarantined factual claims.
 
-149. What exact registry storage format should Project Memory use (YAML, JSON, single-file, or multi-file), and what are the trade-offs for determinism, diff-friendliness, and human readability?
+149. ~~What exact registry storage format should Project Memory use (YAML, JSON, single-file, or multi-file), and what are the trade-offs for determinism, diff-friendliness, and human readability?~~ **Resolved by PHASE8-IMPL-026-T002:** JSON as the canonical tracked Project Memory registry format. Reasons: Python standard-library parsing, direct compatibility with JSON Schema, deterministic serialization, no new YAML dependency, exact value types, easier automated validation.
 
-150. What schema decomposition and normal form should Project Memory registries adopt to enable deterministic comparison between plan and implementation without ambiguity?
+150. ~~What schema decomposition and normal form should Project Memory registries adopt to enable deterministic comparison between plan and implementation without ambiguity?~~ **Resolved by PHASE8-IMPL-026-T002:** one JSON Schema Draft 2020-12 bundle with typed $defs; 12 separate normalized tracked registry files; one registry manifest; one dependency-free standard-library Python validator.
 
 151. What convergence criteria should the Plan Integrity engine use to classify task status as matching, diverging, superseded, conflicting, or having insufficient evidence?
 
