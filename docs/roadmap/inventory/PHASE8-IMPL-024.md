@@ -5,16 +5,16 @@
 - ID: `PHASE8-IMPL-024`
 - Title: Application UI/UX Audit Integrity and Acceptance Repair
 - Status: published/active
-- Latest completed workstream: `PHASE8-IMPL-024-T001` (`complete/PASS` through T001A-T001D)
-- Immediate child: `PHASE8-IMPL-024-T002A` (next bounded child of pending T002)
+- Latest completed workstream: `PHASE8-IMPL-024-T002` (`complete/PASS` through T002A-T002E)
+- Immediate child: `PHASE8-IMPL-024-T003A` (next bounded child of planned T003)
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md`
-- Latest closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T001-omi-guided-creation-integrity-closeout.md`
+- Latest closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md`
 - Evidence pack: `.codex-context/application-uiux-audit/`
 
 ## Workstreams
 
 1. `T001` OMI-guided creation integrity: T001A-T001D complete/PASS.
-2. `T002` Story Check grounding integrity: T002A-T002E.
+2. `T002` Story Check grounding integrity: T002A-T002E complete/PASS.
 3. `T003` optional-resource handling: T003A-T003C.
 4. `T004` responsive containment: T004A-T004C.
 5. `T005` accessibility semantics and target sizing: T005A-T005C.
@@ -24,7 +24,7 @@
 
 ## Sequencing
 
-P0-A T001 is complete/PASS. P0-B T002 is the immediate pending implementation frontier, beginning with T002A. Both integrity repairs precede optional-resource, responsive, accessibility, truthful-navigation, and information-architecture work. T007 visual/structural standardization is last among product repairs. T008 validation suites are independently isolated and may run only after their corresponding implementation dependencies are ready.
+P0-A T001 is complete/PASS. P0-B T002 is complete/PASS. T003A context-availability/readiness contract is the immediate implementation frontier.
 
 Existing `PHASE8-IMPL-023-T023A` and T023B completion remains historical and valid. T023 remains in progress. T023C/T023D and T024-T026 are not renumbered or marked complete; broad acceptance and closeout claims are blocked by PHASE8-IMPL-024.
 

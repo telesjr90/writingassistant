@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T001-omi-guided-creation-integrity-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -15,17 +15,15 @@
       "PHASE8-IMPL-024-T001",
       "PHASE8-IMPL-024-T002"
     ],
-    "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; PHASE8-IMPL-025-T007 consumes and extends it without duplicate contracts",
+    "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T002A",
-    "activation_state": "inactive until PHASE8-IMPL-024-T002 also completes"
+    "immediate_next_task": "PHASE8-IMPL-024-T003A",
+    "activation_state": "T001 and T002 are complete/PASS; PHASE8-IMPL-025 prerequisites satisfied; T003A is the immediate active implementation frontier; no PHASE8-IMPL-025 child is activated"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
     "mvp_readiness": "blocked",
-    "p0_blockers": [
-      "P0-B: Story Check accepts contradictory factual warnings without exact-source grounding validation"
-    ]
+    "p0_blockers": []
   },
   "t001_closeout": {
     "status": "complete/PASS",
@@ -50,6 +48,51 @@
       "directly inserted selected project option temporarily appeared disabled/invalid until library refresh; follow up under T007"
     ]
   },
+  "t002_closeout": {
+    "status": "complete/PASS",
+    "children": {
+      "T002A": "complete/PASS",
+      "T002B": "complete/PASS",
+      "T002C": "complete/PASS",
+      "T002D": "complete/PASS",
+      "T002E": "complete/PASS"
+    },
+    "commits": {
+      "T002A": "1ee250b9c1432651436149c3f377ce69790d7add",
+      "T002B": "cde5f8855925c1a8245d3c9b5c939de8b93316eb",
+      "T002C": "02e9e5e40ff63aaa2e092a98ca6f9a1a7dc38ad2",
+      "T002D": "467b7b747c7544054685053f5a44154e4e5eefe1"
+    },
+    "final_validation": ".codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z",
+    "historical_evidence": {
+      "blocked_missing_storyform": ".codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260712T235515Z",
+      "validation_script_failure": ".codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T021350Z",
+      "test_harness_defect": ".codex-context/PHASE8-IMPL-024/T002D-unrelated-test-harness-defect/20260713T020959Z"
+    },
+    "source_identity_result": {
+      "sha256": "4bd30a8138d2ab8579739b962021af2de892bf634118d991be2df9445ef072c3",
+      "utf8_byte_length": 1972,
+      "source_type": "scene",
+      "source_id": "scene_001",
+      "identity_matched": true
+    },
+    "diagnostic_counts": {
+      "total": 22,
+      "unverified": 17,
+      "quarantined": 5,
+      "verified": 0,
+      "unknown_verification_states": 0
+    },
+    "runtime": {
+      "http_status": 200,
+      "elapsed_seconds": 266.762,
+      "model": "qwen3:8b",
+      "ollama_timeout_seconds": 600
+    },
+    "p0_b": "repaired/closed; unsupported model claims handled fail-closed; source identity exact; no diagnostic falsely presented as verified",
+    "resolved_questions": [132, 133],
+    "unrelated_test_harness_defect": "tests/test_context_routes.py FastAPI synthetic stub missing Request; pre-existing, not modified by T002A-T002D"
+  },
   "latest_verified_evidence": {
     "classification": "successful evidence collection, not product-wide pass",
     "run_id": "20260712T030010Z",
@@ -60,10 +103,10 @@
     "failed_advanced_collectors": "excluded from product evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T002A",
-    "title": "Source identity/hash and diagnostic contract",
-    "status": "next; T002 pending",
-    "scope": "Define the exact selected-source identity/hash and diagnostic evidence contract for Story Check grounding without implementing later T002 children or activating PHASE8-IMPL-025"
+    "task_id": "PHASE8-IMPL-024-T003A",
+    "title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
+    "status": "next; T003 pending",
+    "scope": "Define the context-availability/readiness contract and distinct absent/invalid/failure states for optional resources without implementing later T003 children or creating unnecessary endpoints"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -132,10 +175,10 @@
       "guided-creation staged UI progression",
       "guided-creation dedicated backend/frontend contract with exact owner text preservation, linked OMI idea and Notes storage, atomic failure semantics, and blank-route isolation",
       "guided-creation deterministic and disposable API/browser validation PASS at 20260712T205343Z",
-      "existing-project preservation during the reconciliation run"
+      "existing-project preservation during the reconciliation run",
+      "Story Check grounded diagnostics: exact source identity/hash, deterministic verification-state classification, quarantined unsupported factual claims, source-mismatch fail-closed, non-mutating, live validation PASS at 20260713T022337Z (22 diagnostics: 17 unverified + 5 quarantined, identity matched, no false verification)"
     ],
     "verified_defects": [
-      "contradictory ungrounded Story Check factual warnings",
       "captured document-level horizontal overflow",
       "captured OMI heading hierarchy skip",
       "repeated 404s for normally absent Bible/storyform/storyform-context resources"
@@ -164,20 +207,17 @@
     ]
   },
   "risks": [
-    "ungrounded model diagnostics presented as findings",
     "misleading enabled UI actions",
     "hidden content caused by document overflow",
     "optional-resource absence obscuring real errors",
     "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
     "failed collectors mistaken for product evidence",
     "guided review focus and immediate selected-project presentation advisories",
-    "over-filtering useful Story Check diagnostics",
+    "over-filtering useful Story Check diagnostics (now guarded by quarantined/unverified classification; future architecture ungrounded-model-output risk carried into PHASE8-IMPL-025-T007)",
     "premature component-library adoption before Impeccable evidence review and an explicit owner-approved decision",
     "responsive and accessibility rework caused by replacing shared components after those repairs are completed"
   ],
   "open_questions": [
-    "grounded-warning evidence contract",
-    "handling useful but unsupported Story Check output",
     "optional-resource availability in project metadata versus a dedicated read-only endpoint",
     "MVP-required versus intentionally unavailable OMI destinations",
     "minimum desktop width and touch-target policy",

@@ -6,9 +6,11 @@ Published and active as the release-blocker repair parent.
 
 T001 OMI-guided creation integrity is complete/PASS through T001A-T001D.
 
-Next implementation task: `PHASE8-IMPL-024-T002A - Source identity/hash and diagnostic contract` (first bounded child of pending T002).
+T002 Story Check grounding integrity is complete/PASS through T002A-T002E. Live validation evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z` (PASS, 22 diagnostics: 17 unverified + 5 quarantined, exact source identity/hash matched, fail-closed on unsupported claims, non-mutating).
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect, but T002 Story Check grounding remains pending and blocks readiness before visual polish or the remaining `PHASE8-IMPL-023-T023C` through `T026` closeout path can establish readiness.
+Next implementation task: `PHASE8-IMPL-024-T003A - Context-availability/readiness contract for Bible, storyform, and storyform-context` (first bounded child of planned T003).
+
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect. T003 optional-resource handling remains planned and T003A is the immediate frontier.
 
 ## Controlling Evidence
 
@@ -22,15 +24,17 @@ The failed `playwright-advanced` runs are excluded from product evidence. They a
 
 T001 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T205343Z`. The prior BLOCKED locator-ambiguity run at `.codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T203726Z` remains preserved as superseded validation history. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T001-omi-guided-creation-integrity-closeout.md`.
 
+T002 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z`. The prior BLOCKED missing-storyform run at `20260712T235515Z` and the validation-script-failure run at `20260713T021350Z` remain preserved as superseded validation history. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md`.
+
 ## Release Blockers
 
 ### P0-A - OMI-guided creation integrity (repaired/closed by T001 PASS)
 
 T001A/T001B implemented the dedicated bounded guided-creation contract and frontend path. Exact owner-authored idea and note text is stored through existing OMI idea/Notes storage with owner provenance, linked IDs, `model_generated: false`, non-canon state, `creation_method: omi_guided`, atomic rollback, `failed_rolled_back`, and exceptional `recovery_required`; blank creation is unchanged. T001C validated deterministic and disposable API/browser behavior with no prohibited side effects.
 
-### P0-B - Story Check accepts contradictory ungrounded findings
+### P0-B - Story Check accepts contradictory ungrounded findings (repaired/closed by T002 PASS)
 
-The selected source and POST transport were correct, but the result claimed selected-scene details were absent when those details were visibly present. The repair must carry selected source ID and source-content hash, require direct source evidence for factual warnings, validate grounding deterministically against the exact selected scene, quarantine or mark unsupported warnings unverified, and fail closed on source mismatch. Story Check remains non-mutating and model output remains non-canon.
+The selected source now carries exact source ID and content hash; every diagnostic carries a deterministic verification state (`verified`/`unverified`/`quarantined`); unsupported factual warnings are quarantined rather than presented as verified; source mismatch fails closed. Story Check remains non-mutating and model output remains non-canon. Live validation returned 22 diagnostics (17 unverified + 5 quarantined, zero falsely verified) with exact source identity matched. Future architecture ungrounded-model-output risk is carried into PHASE8-IMPL-025-T007.
 
 <!-- PHASE8-IMPL-024-UI-ORDER:START -->
 ## Owner-approved UI execution order
@@ -73,11 +77,11 @@ Lettered children are bounded execution slices under the indexed workstream chil
 
 ### `PHASE8-IMPL-024-T002` - Story Check grounding integrity
 
-- `PHASE8-IMPL-024-T002A` - Source identity/hash and diagnostic contract (`planned`; depends on T001D).
-- `PHASE8-IMPL-024-T002B` - Deterministic grounding validator (`planned`; depends on T002A).
-- `PHASE8-IMPL-024-T002C` - Engine, normalizer, route, and UI integration (`planned`; depends on T002B).
-- `PHASE8-IMPL-024-T002D` - Fixture regressions and live manual validation (`planned`; depends on T002C).
-- `PHASE8-IMPL-024-T002E` - Documentation and status closeout (`planned`; depends on T002D).
+- `PHASE8-IMPL-024-T002A` - Source identity/hash and diagnostic contract (`complete/PASS`; commit `1ee250b9c1432651436149c3f377ce69790d7add`).
+- `PHASE8-IMPL-024-T002B` - Deterministic grounding validator (`complete/PASS`; commit `cde5f8855925c1a8245d3c9b5c939de8b93316eb`).
+- `PHASE8-IMPL-024-T002C` - Engine, normalizer, route, and UI integration (`complete/PASS`; commit `02e9e5e40ff63aaa2e092a98ca6f9a1a7dc38ad2`).
+- `PHASE8-IMPL-024-T002D` - Fixture regressions and live manual validation (`complete/PASS`; commit `467b7b747c7544054685053f5a44154e4e5eefe1`; final evidence `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z`; earlier BLOCKED run at `20260712T235515Z` preserved as superseded history).
+- `PHASE8-IMPL-024-T002E` - Documentation and status closeout (`complete/PASS`).
 
 The grounding validator must avoid over-filtering potentially useful diagnostics: unsupported factual warnings are quarantined or explicitly unverified, while supported non-factual diagnostics may remain visible under their correct evidence status.
 
@@ -85,7 +89,7 @@ Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/h
 
 ### `PHASE8-IMPL-024-T003` - Optional-resource handling
 
-- `PHASE8-IMPL-024-T003A` - Context-availability/readiness contract for Bible, storyform, and storyform-context (`planned`; depends on T002E).
+- `PHASE8-IMPL-024-T003A` - Context-availability/readiness contract for Bible, storyform, and storyform-context (`next; T003 pending`; depends on T002E).
 - `PHASE8-IMPL-024-T003B` - Conditional frontend loading with distinct absent, invalid, and request-failure states (`planned`; depends on T003A).
 - `PHASE8-IMPL-024-T003C` - Console/network regression validation (`planned`; depends on T003B).
 
