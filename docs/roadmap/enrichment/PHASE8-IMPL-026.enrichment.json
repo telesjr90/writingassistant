@@ -86,11 +86,29 @@
     "status": "complete/PASS",
     "summary": "Defined the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 normalized tracked registry files; registry manifest; dependency-free standard-library validator; focused tests. Established stable namespaced identifiers, tracked-source vs. generated-snapshot separation, enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity. Resolved Q149 (JSON canonical format) and Q150 (one schema bundle, separate registry files, dependency-free validator)."
   },
-  "next_project_memory_task": {
+  "t003_status": {
     "task_id": "PHASE8-IMPL-026-T003",
     "title": "Deterministic scanners and convergence",
-    "status": "planned",
+    "status": "in_progress",
+    "t003a": {
+      "task_id": "PHASE8-IMPL-026-T003A",
+      "title": "Deterministic repository scanners and snapshot-builder implementation",
+      "status": "complete/PASS",
+      "summary": "Implemented standard-library-only deterministic scanner suite (repository_state.py, convergence.py, build_snapshot.py) with 68 focused tests. Defined 20 convergence finding codes and three result levels (PASS, PASS_WITH_FINDINGS, BLOCKED). Established generated snapshot package contract, clean-HEAD publication rule, atomic output behavior, and source hashing/exclusion rules. No publication snapshot created from the dirty implementation worktree."
+    },
+    "t003b": {
+      "task_id": "PHASE8-IMPL-026-T003B",
+      "title": "Clean-HEAD snapshot, convergence validation, and T003 closeout",
+      "status": "planned",
+      "depends_on": "PHASE8-IMPL-026-T003A"
+    },
     "depends_on": "PHASE8-IMPL-026-T002"
+  },
+  "next_project_memory_task": {
+    "task_id": "PHASE8-IMPL-026-T003B",
+    "title": "Clean-HEAD snapshot, convergence validation, and T003 closeout",
+    "status": "planned",
+    "depends_on": "PHASE8-IMPL-026-T003A"
   },
   "dependencies": {
     "none_approved": [
@@ -137,12 +155,21 @@
     "Project Memory cannot activate, close, or reorder application tasks"
   ],
   "no_implementation_created": [
-    "scanners",
     "renderers",
     "retrieval tools",
     "reviewers",
     "MCP servers",
     "documentation rendering",
     "generated snapshots"
+  ],
+  "implemented": [
+    "standard-library registry validator",
+    "deterministic repository-state scanner",
+    "deterministic convergence checker",
+    "deterministic snapshot builder",
+    "source hashing and exclusion rules",
+    "convergence finding vocabulary (20 codes)",
+    "generated snapshot package contract",
+    "atomic output and path safety"
   ]
 }

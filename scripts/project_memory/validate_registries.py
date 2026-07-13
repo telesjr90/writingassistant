@@ -152,16 +152,17 @@ def validate(registries_dir: Path | None = None) -> list[dict[str, str]]:
     """Validate all registries. Returns list of findings (empty = PASS)."""
     if registries_dir is None:
         registries_dir = REGISTRIES_DIR
+    manifest_path = registries_dir / "manifest.json"
+
     findings: list[dict[str, str]] = []
 
     # 0. Load and validate manifest
-    if not MANIFEST_PATH.exists():
+    if not manifest_path.exists():
         findings.append(_finding("error", "MISSING_MANIFEST",
-                                 f"manifest not found at {MANIFEST_PATH}"))
-        return findings
+                                 f"manifest not found at {manifest_path}"))
 
     try:
-        manifest = _parse_json(MANIFEST_PATH)
+        manifest = _parse_json(manifest_path)
     except Exception as exc:
         findings.append(_finding("error", "MANIFEST_PARSE_ERROR",
                                  f"failed to parse manifest: {exc}"))

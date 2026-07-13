@@ -61,7 +61,9 @@ silently override it.
    foundation (complete/PASS).
 2. `PHASE8-IMPL-026-T002` — Schema and normalized-registry architecture
    (complete/PASS).
-3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (planned; next).
+3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (in_progress).
+   - T003A (scanner implementation and testing) — complete/PASS.
+   - T003B (clean-HEAD snapshot, convergence validation, closeout) — planned next.
 4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (planned).
 5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
@@ -128,11 +130,11 @@ implemented by T001.
 - Project Memory schemas exist (JSON Schema Draft 2020-12).
 - Registry architecture and tracked seed registries exist (12 registries + manifest).
 - Dependency-free standard-library validator exists.
-- Focused tests exist.
-- No scanners exist.
+- Deterministic repository-state scanner, convergence checker, and snapshot builder exist (T003A).
+- Focused tests exist (68 passing).
 - No renderers exist.
 - No retrieval tools exist.
 - No reviewers exist.
-- No generated snapshots exist.
-- T001 and T002 are the delivered artifacts.
-- The next task is deterministic scanners and convergence (T003).
+- No generated publication snapshot exists (deferred to T003B).
+- T001, T002, and T003A are the delivered artifacts.
+- The next task is PHASE8-IMPL-026-T003B (clean-HEAD snapshot and T003 closeout).

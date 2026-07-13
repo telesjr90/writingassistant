@@ -36,7 +36,9 @@
 
 150. ~~What schema decomposition and normal form should Project Memory registries adopt to enable deterministic comparison between plan and implementation without ambiguity?~~ **Resolved by PHASE8-IMPL-026-T002:** one JSON Schema Draft 2020-12 bundle with typed $defs; 12 separate normalized tracked registry files; one registry manifest; one dependency-free standard-library Python validator.
 
-151. What convergence criteria should the Plan Integrity engine use to classify task status as matching, diverging, superseded, conflicting, or having insufficient evidence?
+### Partially refined by T003A
+
+151. What convergence criteria should the Plan Integrity engine use to classify task status as matching, diverging, superseded, conflicting, or having insufficient evidence? **Partially refined by PHASE8-IMPL-026-T003A:** T003A defines scanner-level convergence result vocabulary (PASS, PASS_WITH_FINDINGS, BLOCKED), 20 finding codes across four severity levels (info, warning, error, critical), deterministic finding sorting, and overall result rules. Frontier mismatch, planned-parent unexpected activation, dirty worktree, registry validation failure, and missing authoritative sources all block publication. Q151 remains open until T003B proves the first clean-HEAD snapshot and later operational workflows define closure rules.
 
 152. What exact criteria should govern Serena adoption for Project Memory retrieval (benchmark thresholds, latency, accuracy, provenance reporting, stale-index behavior)?
 

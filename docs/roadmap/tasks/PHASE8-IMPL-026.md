@@ -13,8 +13,12 @@ is complete/PASS.
 
 T002 — Schema and normalized-registry architecture — is complete/PASS.
 
-Next Project Memory task: PHASE8-IMPL-026-T003 — Deterministic scanners and
-convergence.
+T003 — Deterministic scanners and convergence is in progress:
+- T003A (scanner implementation and testing) is complete/PASS.
+- T003B (clean-HEAD snapshot, convergence validation, and T003 closeout)
+  is planned next.
+
+Next Project Memory task: PHASE8-IMPL-026-T003B.
 
 ## Classification
 
@@ -87,12 +91,19 @@ No scanners, renderers, generated snapshots, or retrieval tools were implemented
 
 ### PHASE8-IMPL-026-T003 — Deterministic scanners and convergence
 
-Status: planned. Depends on T002. Next Project Memory task.
+Status: in_progress. Depends on T002.
 
-Implement read-only deterministic scanners that inspect the repository state
-(code, tests, roadmap decisions, task records, enrichment data) and produce
-normalized evidence records. Define convergence criteria that detect when
-plan and implementation agree, disagree, or have insufficient evidence.
+T003 is decomposed into two bounded children:
+
+- **T003A** — Implements and tests the standard-library-only deterministic
+  scanner suite (repository_state, convergence, build_snapshot) against
+  temporary Git repositories. Does not create a final publication snapshot.
+  Status: complete/PASS.
+
+- **T003B** — Runs the scanner against the clean committed HEAD, creates
+  the first generated evidence under `.codex-context/project-memory/`,
+  validates the evidence package and repository convergence, and closes
+  T003. Status: planned. Next Project Memory task.
 
 ### PHASE8-IMPL-026-T004 — Human-readable Project Memory
 

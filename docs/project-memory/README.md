@@ -122,43 +122,129 @@ Run focused tests:
 python3 -m pytest tests/project_memory/test_validate_registries.py -q -p no:cacheprovider
 ```
 
-## How Later Scanners Will Extend the Seed
+## Deterministic Scanners
 
-Future T003 deterministic scanners will:
-1. Read the existing tracked registries as a known-good baseline.
-2. Inspect live repository state (code, tests, roadmap files, enrichment data).
-3. Produce generated evidence records in a commit-bound snapshot under `.codex-context/project-memory/`.
-4. Report convergence, divergence, staleness, and conflicts without mutating tracked registries.
+T003A implemented deterministic read-only scanners that inspect repository state
+and produce normalized evidence records. The scanners use only the Python standard
+library and read-only Git commands.
 
-Scanners will extend records by adding new entries; they will not replace existing identifiers or create a competing roadmap.
+### Scanner Modules
 
-## How Later MkDocs Rendering Will Consume Registries
+- **`scripts/project_memory/repository_state.py`** — Collects Git repository state
+  (branch, HEAD, staged, clean/dirty, tracked files, worktrees), hashes tracked
+  sources (SHA-256), parses roadmap state, and validates registry source locators
+  against the filesystem.
+- **`scripts/project_memory/convergence.py`** — Computes structured convergence
+  findings from registry validation, repository state, roadmap state, and source
+  locator validation. Produces 20 finding codes across four severity levels.
+- **`scripts/project_memory/build_snapshot.py`** — Builds complete generated snapshot
+  packages into `.codex-context/project-memory/<TASK_ID>/<RUN_ID>/`. Produces JSON
+  evidence files, SHA256SUMS, FILE-INVENTORY.txt, and a human-readable summary.md.
 
-Future T004 MkDocs rendering will:
-1. Read tracked registries and generated snapshots.
-2. Produce human-readable documentation explaining what is implemented, planned, missing, or conflicting.
-3. Surface freshness, trust class, and authority level in every rendered view.
-4. Treat generated rendered output as non-authoritative build output.
+### Convergence Results
 
-## Why Generated Indexes and AI Summaries Remain Non-Authoritative
+| Result | Meaning |
+| --- | --- |
+| `PASS` | No findings requiring owner attention or repair. |
+| `PASS_WITH_FINDINGS` | Warnings or non-blocking errors detected; scan completed correctly. |
+| `BLOCKED` | Registries invalid, worktree dirty (for publication), frontier silently changed, or other critical condition. |
 
-Generated context packs, AI summaries, vector indexes, and retrieval results are `generated_evidence`. They:
-- May contain plausible-looking but incorrect information.
-- Cannot be treated as default authority without explicit owner review.
-- Must report their `bound_commit`, `generated_at`, and freshness state in every response.
-- Must not silently answer as current truth when stale.
+### T003A / T003B Split
+
+T003 is decomposed into two bounded children:
+
+- **T003A** — Implements and tests the scanners and snapshot builder. Does not
+  create a final publication snapshot from the dirty implementation worktree.
+- **T003B** — Runs the scanner against a clean committed HEAD, creates the first
+  generated evidence under `.codex-context/project-memory/`, validates convergence,
+  and closes T003.
+
+### Publication Snapshot Command (T003B)
+
+After T003A is committed and the worktree is clean:
+
+```bash
+python3 scripts/project_memory/build_snapshot.py \
+  --repo-root . \
+  --output-root .codex-context/project-memory \
+  --task-id PHASE8-IMPL-026-T003B
+```
+
+### Generated Snapshot Package Structure
+
+```text
+.codex-context/project-memory/
+  <TASK_ID>/
+    <RUN_ID>/
+      run-metadata.json
+      repository-state.json
+      roadmap-state.json
+      registry-validation.json
+      source-inventory.json
+      source-hashes.json
+      convergence-findings.json
+      snapshot.json
+      summary.md
+      FILE-INVENTORY.txt
+      SHA256SUMS
+```
+
+### Clean-HEAD Requirement
+
+Publication snapshots require a clean committed HEAD (no modified files, no
+staged changes). A `--nonpublication` testing mode exists for temporary test
+repositories but marks output as `publication_eligible: false`.
+
+### Why Generated Snapshots Remain Non-Authoritative
+
+Generated snapshots carry `authority_class: generated_evidence`. They:
+- Are bound to an exact commit but are not project authority.
+- Report convergence without claiming to be authoritative.
+- Surface findings for owner review without automatically mutating tracked sources.
+- Must not be treated as the source of truth for task status, dependencies, or
+  roadmap decisions.
+
+## Validation
+
+Run the dependency-free standard-library validator:
+
+```bash
+python3 scripts/project_memory/validate_registries.py
+```
+
+For machine-readable output:
+
+```bash
+python3 scripts/project_memory/validate_registries.py --json
+```
+
+Run focused tests:
+
+```bash
+python3 -m pytest tests/project_memory/ -q -p no:cacheprovider
+```
+
+Run individual scanner modules:
+
+```bash
+python3 scripts/project_memory/repository_state.py --repo-root . --json
+python3 scripts/project_memory/convergence.py --repo-root . --json
+```
 
 ## Current Limitations
 
 - Minimal representative seed only; not a complete repository inventory.
-- No scanners or repository discovery yet (T003).
 - No human-readable rendered output (T004).
 - No context-tool integration (T005).
 - No retrieval or AI agent integration (T006-T008).
 - No Plan Integrity engine (T009).
-- No generated snapshots exist yet.
+- No generated publication snapshot exists yet (deferred to T003B).
 - No branch synchronization performed yet.
+- Stale memory detection requires future operational automation.
 
 ## Next Task
 
-`PHASE8-IMPL-026-T003` — Deterministic scanners and convergence. Will implement read-only deterministic scanners that inspect repository state and produce normalized evidence records with convergence criteria.
+`PHASE8-IMPL-026-T003B` — Clean-HEAD snapshot, convergence validation, and
+T003 closeout. Will run the scanner against the clean committed HEAD (after
+T003A is committed), create the first generated evidence package, validate
+the evidence package and repository convergence, and close T003.
