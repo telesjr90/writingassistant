@@ -1,3 +1,18 @@
+# PHASE8-IMPL-026 Project Memory and Plan Integrity
+
+- Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature.
+- T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
+- Parent records: `docs/roadmap/tasks/PHASE8-IMPL-026.md`, `docs/roadmap/inventory/PHASE8-IMPL-026.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json`.
+- Application frontier: unchanged — PHASE8-IMPL-024-T003A. PHASE8-IMPL-025 remains published/planned and inactive.
+- PHASE8-IMPL-026 defines controlling policies for authority hierarchy (7 tiers), trust classes (8 classes), freshness (commit-bound), commit binding, supersession, conflicting evidence, owner decisions, generated evidence, memory update approval, roadmap synchronization, stale indexes, tool provenance, prompt-injection boundaries, branch synchronization, and product boundaries.
+- T001 is complete/PASS as the publication and authority-foundation micro-task.
+- Immediate next Project Memory task: `PHASE8-IMPL-026-T002 - Schema and normalized-registry architecture`.
+- Planned workstreams: T002 (schemas and registries), T003 (deterministic scanners), T004 (human-readable memory), T005 (context-tool integration), T006 (Serena pilot, contingent), T007 (LlamaIndex/Qdrant pilot, contingent), T008 (agent guidance and Ask), T009 (Plan Integrity engine), T010 (specialized reviewers), T011 (synchronization and rollout).
+- Tool installation is contingent on provenance and benchmark approval. Serena, LlamaIndex, and Qdrant are not approved dependencies.
+- Branch synchronization: full-commit sync from clean worktrees at defined checkpoints; path-filtered cherry-picking, roadmap-only copying, and destructive workflows rejected.
+- Product boundaries: analysis-only, evidence/provenance-backed, owner-controlled, no generated prose, no automatic truth or Memory/Canon mutation, no automatic promotion or apply-promotion, model output is not canon.
+- No Project Memory schema, scanner, registry, renderer, retrieval tool, or reviewer exists. T001 is the only delivered artifact.
+
 # PHASE8-IMPL-025 Layered Analysis Architecture and Tool Integration Expansion
 
 - Status: published/planned; no implementation child is complete or ready.

@@ -1,3 +1,13 @@
+# PHASE8-IMPL-026 Project Memory and Plan Integrity
+
+- Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature.
+- Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
+- T001 (authority, lifecycle, provenance, and roadmap foundation) is complete/PASS.
+- Planned workstreams: authority foundation (T001, complete/PASS), schemas and registries (T002), deterministic scanners (T003), human-readable memory (T004), context-tool integration (T005), Serena pilot (T006, contingent), LlamaIndex/Qdrant pilot (T007, contingent), agent guidance and Ask (T008), Plan Integrity engine (T009), specialized reviewers (T010), synchronization and rollout (T011).
+- Application frontier: unchanged — PHASE8-IMPL-024-T003A. PHASE8-IMPL-025 remains published/planned and inactive.
+- This is a parallel governance workstream; it does not replace the application roadmap. Project Memory normalizes and explains the plan. It cannot activate, close, or reorder application tasks.
+- No schema, scanner, registry, renderer, retrieval tool, or reviewer exists. T001 is the only delivered artifact.
+
 # PHASE8-IMPL-025 Layered Analysis Architecture and Tool Integration Expansion
 
 - Status: published/planned; no implementation workstream is complete or ready.

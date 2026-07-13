@@ -32,7 +32,19 @@
 
 132. ~~How should potentially useful but unsupported Story Check output be retained: quarantined diagnostic, explicitly unverified warning, or omitted from the primary findings list? The choice must avoid both presenting unsupported claims as findings and over-filtering useful diagnostics.~~ **Resolved by PHASE8-IMPL-024-T002:** unsupported factual claims are quarantined (visible with quarantined status, not presented as verified); structural/contextual diagnostics without direct factual-claim evidence are unverified (visible with unverified status); no diagnostic is omitted solely for being unsupported. The deterministic grounding validator classifies every diagnostic. Live run preserved 17 unverified structural diagnostics and 5 quarantined factual claims.
 
-148. What repair should fix `tests/test_context_routes.py` so its synthetic FastAPI stub defines `Request` in addition to `FastAPI` and `HTTPException`, matching the real installed FastAPI environment, and which existing roadmap or regression task is the correct owner?
+149. What exact registry storage format should Project Memory use (YAML, JSON, single-file, or multi-file), and what are the trade-offs for determinism, diff-friendliness, and human readability?
+
+150. What schema decomposition and normal form should Project Memory registries adopt to enable deterministic comparison between plan and implementation without ambiguity?
+
+151. What convergence criteria should the Plan Integrity engine use to classify task status as matching, diverging, superseded, conflicting, or having insufficient evidence?
+
+152. What exact criteria should govern Serena adoption for Project Memory retrieval (benchmark thresholds, latency, accuracy, provenance reporting, stale-index behavior)?
+
+153. Which embedding model should the LlamaIndex/local-embedding pilot evaluate, and what retrieval benchmark thresholds should determine adoption or rejection?
+
+154. What operational synchronization cadence should govern the Project Memory branch — per-task, per-parent, per-phase, or time-based — and what should trigger a deterministic memory refresh?
+
+155. ~~What exact Project Memory authority hierarchy, trust classes, freshness model, commit binding, supersession, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization, and product boundaries should T001 define?~~ **Resolved by PHASE8-IMPL-026-T001:** `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md` defines all fifteen decision areas. No schema, scanner, registry, renderer, retrieval tool, or reviewer is implemented by T001.
 
 131. Should optional Bible/storyform/storyform-context availability be included in project metadata or exposed through a dedicated read-only context-readiness endpoint?
 

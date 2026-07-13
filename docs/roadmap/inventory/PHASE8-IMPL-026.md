@@ -1,0 +1,135 @@
+# PHASE8-IMPL-026 Inventory
+
+## Parent
+
+- ID: `PHASE8-IMPL-026`
+- Title: Project Memory and Plan Integrity
+- Classification: hybrid governance, documentation, and developer infrastructure
+- Status: published/active (parallel governance workstream)
+- Application frontier: unchanged — PHASE8-IMPL-024-T003A
+- PHASE8-IMPL-025: unchanged — published/planned, inactive
+- Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`
+
+## Relationship to application roadmap
+
+PHASE8-IMPL-026 is a parallel workstream. It does not replace, activate,
+close, or reorder application tasks. The `active_frontier` in
+`roadmap_index.yaml` continues to track the application implementation
+frontier. Project Memory normalizes and explains the roadmap; it must not
+silently override it.
+
+## Repository locations
+
+| Content | Path | Created by T001 |
+| --- | --- | --- |
+| Decisions | `docs/roadmap/decisions/` | No (existing convention) |
+| Future documentation and registries | `docs/project-memory/` | No |
+| Future implementation | `scripts/project_memory/` | No |
+| Future tests | `tests/project_memory/` | No |
+| Future shared skills | `.agents/skills/` | No |
+| Future OpenCode agents | `.opencode/agents/` | No |
+| Generated evidence and indexes | `.codex-context/project-memory/` | No |
+
+## Authority hierarchy
+
+1. Accepted roadmap and decision records — authoritative.
+2. Live code and schemas — authoritative for implementation behavior.
+3. Automated tests — authoritative for contract validation.
+4. Accepted manual validation — authoritative within recorded scope.
+5. Exact Git history — authoritative for provenance.
+6. Normalized Project Memory registries — explain and cross-reference tiers
+   1–5; stale when conflicting.
+7. Generated context, indexes, retrieval results, and AI summaries —
+   evidence only; never authoritative.
+
+## Trust classes
+
+| Class | May update registries | Default retrieval |
+| --- | --- | --- |
+| `authoritative` | Yes | Included |
+| `accepted_evidence` | Yes (when consistent) | Included |
+| `generated_evidence` | No | Excluded from default |
+| `historical` | No | Excluded from default |
+| `superseded` | No | Excluded from default |
+| `uncertain` | No | Included with warning |
+| `owner_pending` | No | Included with warning |
+| `untrusted` | No | Excluded |
+
+## Indexed workstreams
+
+1. `PHASE8-IMPL-026-T001` — Authority, lifecycle, provenance, and roadmap
+   foundation (complete/PASS).
+2. `PHASE8-IMPL-026-T002` — Schema and normalized-registry architecture
+   (planned; next).
+3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (planned).
+4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (planned).
+5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
+6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
+7. `PHASE8-IMPL-026-T007` — LlamaIndex / local-embedding / Qdrant Local pilot
+   (planned; contingent).
+8. `PHASE8-IMPL-026-T008` — Shared agent guidance and Project Memory Ask
+   (planned).
+9. `PHASE8-IMPL-026-T009` — Deterministic Plan Integrity engine (planned).
+10. `PHASE8-IMPL-026-T010` — Specialized Plan Integrity reviewers (planned).
+11. `PHASE8-IMPL-026-T011` — Synchronization, CI, rebuild, and operational
+    rollout (planned).
+
+T006 and T007 are contingent on provenance and benchmark approval. Serena,
+LlamaIndex, and Qdrant are not approved dependencies.
+
+## Dependencies
+
+```text
+PHASE8-IMPL-026-T001 (complete/PASS)
+  -> T002 -> T003 -> T004 -> T005 -> T006 [contingent]
+                                   -> T007 [contingent]
+                            -> T008 -> T009 -> T010 -> T011
+```
+
+## Safety inventory
+
+- Analysis-only — Project Memory analyzes and explains; no application features.
+- Candidate-first — registries are evidence, not truth.
+- Evidence/provenance-backed — every claim traces to a source.
+- Owner-controlled — no automatic mutation.
+- No generated prose — structured metadata only.
+- No confidence-as-truth.
+- No automatic Memory/Canon mutation.
+- No automatic promotion or apply-promotion.
+- Model output is not canon.
+- Registries do not silently override the roadmap or live code.
+
+## T001 decision scope
+
+The controlling decision (`PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`)
+defines:
+
+1. Authority hierarchy (7 tiers).
+2. Trust classes (8 classes).
+3. Freshness model (commit-bound, not time-bound).
+4. Commit binding requirements.
+5. Supersession fields and behavior.
+6. Conflicting-evidence resolution.
+7. Owner-decision representation.
+8. Generated-evidence requirements.
+9. Memory-update approval rules.
+10. Roadmap synchronization policy.
+11. Stale-index and retrieval behavior.
+12. Tool provenance and security requirements.
+13. Prompt-injection trust boundaries.
+14. Branch synchronization policy.
+15. Product boundaries for Project Memory.
+
+No schema, scanner, registry, renderer, retrieval tool, or reviewer is
+implemented by T001.
+
+## Current state
+
+- No Project Memory schemas exist.
+- No registries exist.
+- No scanners exist.
+- No renderers exist.
+- No retrieval tools exist.
+- No reviewers exist.
+- The authority foundation is the only delivered artifact.
+- The next task is schema and normalized-registry architecture (T002).

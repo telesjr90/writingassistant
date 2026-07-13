@@ -1,0 +1,135 @@
+{
+  "task_id": "PHASE8-IMPL-026",
+  "title": "Project Memory and Plan Integrity",
+  "status": "published/active",
+  "task_type": "docs-only",
+  "mvp_required": false,
+  "classification": "hybrid governance, documentation, and developer infrastructure",
+  "parallel_workstream": true,
+  "application_frontier_unchanged": "PHASE8-IMPL-024",
+  "application_frontier_next_task": "PHASE8-IMPL-024-T003A",
+  "ph8_impl_025_unchanged": "published/planned, inactive",
+  "context_pack": null,
+  "context_pack_status": "not generated; future context-generation task may create .codex-context/PHASE8-IMPL-026/ when implementation begins",
+  "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md",
+  "t001_status": {
+    "task_id": "PHASE8-IMPL-026-T001",
+    "title": "Project Memory authority, lifecycle, and provenance foundation",
+    "status": "complete/PASS",
+    "summary": "Published the controlling decision defining authority hierarchy, trust classes, freshness model, commit binding, supersession, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization policy, and product boundaries."
+  },
+  "repository_locations": {
+    "decisions": "docs/roadmap/decisions/",
+    "future_documentation": "docs/project-memory/",
+    "future_implementation": "scripts/project_memory/",
+    "future_tests": "tests/project_memory/",
+    "future_skills": ".agents/skills/",
+    "future_agents": ".opencode/agents/",
+    "generated_evidence": ".codex-context/project-memory/"
+  },
+  "workstream_order": [
+    "PHASE8-IMPL-026-T001 Authority, lifecycle, provenance, and roadmap foundation",
+    "PHASE8-IMPL-026-T002 Schema and normalized-registry architecture",
+    "PHASE8-IMPL-026-T003 Deterministic scanners and convergence",
+    "PHASE8-IMPL-026-T004 Human-readable Project Memory",
+    "PHASE8-IMPL-026-T005 Existing context-tool integration",
+    "PHASE8-IMPL-026-T006 Serena read-only pilot",
+    "PHASE8-IMPL-026-T007 LlamaIndex / local-embedding / Qdrant Local pilot",
+    "PHASE8-IMPL-026-T008 Shared agent guidance and Project Memory Ask",
+    "PHASE8-IMPL-026-T009 Deterministic Plan Integrity engine",
+    "PHASE8-IMPL-026-T010 Specialized Plan Integrity reviewers",
+    "PHASE8-IMPL-026-T011 Synchronization, CI, rebuild, and operational rollout"
+  ],
+  "contingent_workstreams": {
+    "T006": "Serena provenance and benchmark approval required before implementation",
+    "T007": "LlamaIndex, Qdrant provenance and benchmark approval required before implementation"
+  },
+  "authority_hierarchy": {
+    "tier1": "accepted roadmap and decision records",
+    "tier2": "live code and schemas",
+    "tier3": "automated tests",
+    "tier4": "accepted manual validation",
+    "tier5": "exact Git history",
+    "tier6": "normalized Project Memory registries",
+    "tier7": "generated context, indexes, retrieval results, and AI summaries"
+  },
+  "trust_classes": [
+    "authoritative",
+    "accepted_evidence",
+    "generated_evidence",
+    "historical",
+    "superseded",
+    "uncertain",
+    "owner_pending",
+    "untrusted"
+  ],
+  "branch_synchronization": {
+    "rejected": [
+      "path-filtered cherry-picking",
+      "copying only roadmap files",
+      "treating memory branch with stale code/tests as current",
+      "destructive reset/clean/stash workflows"
+    ],
+    "accepted": [
+      "synchronize only from clean worktrees",
+      "synchronize accepted commits as complete commits",
+      "prefer reviewed full merge from application branch at defined checkpoints",
+      "complete-commit cherry-pick when owner selects a precise accepted commit",
+      "full deterministic memory refresh after every synchronization",
+      "every memory snapshot records the accepted application commit"
+    ],
+    "policy_only": true
+  },
+  "dependencies": {
+    "none_approved": [
+      "Serena",
+      "LlamaIndex",
+      "Qdrant"
+    ],
+    "tool_installation_contingent_on_provenance": true
+  },
+  "open_questions": [
+    "exact registry storage format (YAML, JSON, single-file, or multi-file)",
+    "schema decomposition and normal form",
+    "convergence criteria for plan-vs-implementation comparison",
+    "criteria for Serena adoption",
+    "embedding model selection for LlamaIndex pilot",
+    "retrieval benchmark thresholds beyond initial planning target",
+    "operational synchronization cadence"
+  ],
+  "risks": [
+    "competing authority systems",
+    "stale memory",
+    "partial branch synchronization",
+    "generated-evidence promotion",
+    "prompt injection through retrieved content",
+    "tool/plugin provenance gaps",
+    "duplicate context systems",
+    "retrieval of superseded records",
+    "model-generated plan amendments mistaken for approval"
+  ],
+  "boundaries": [
+    "analysis-only",
+    "candidate-first",
+    "evidence/provenance-backed",
+    "owner-controlled",
+    "no generated prose",
+    "no confidence-as-truth",
+    "no automatic Memory/Canon mutation",
+    "no automatic promotion",
+    "no automatic apply-promotion",
+    "model output is not canon",
+    "Project Memory does not replace the application roadmap",
+    "Project Memory cannot activate, close, or reorder application tasks"
+  ],
+  "no_implementation_created": [
+    "schemas",
+    "scanners",
+    "registries",
+    "renderers",
+    "retrieval tools",
+    "reviewers",
+    "MCP servers",
+    "documentation rendering"
+  ]
+}
