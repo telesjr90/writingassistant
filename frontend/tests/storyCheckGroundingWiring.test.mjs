@@ -190,6 +190,34 @@ test('malformed verified or legacy responses cannot default to verified', () => 
   assert.doesNotMatch(legacyHtml, /Status: verified/);
 });
 
+test('missing verification fields and unknown states cannot render as verified', () => {
+  const missingFields = {
+    diagnostic_id: 'missing-fields',
+    classification: 'observation',
+    message: 'Missing verification fields',
+    evidence: [],
+  };
+  const unknownState = {
+    ...diagnostic({
+      id: 'unknown-state',
+      classification: 'factual_warning',
+      message: 'Unknown verification state',
+      state: 'future_state',
+      outcome: 'supported',
+      evidenceItems: [evidence()],
+      directEvidenceMatched: true,
+    }),
+  };
+
+  assert.equal(getGroundingPresentationState(missingFields, sourceIdentity), 'unverified');
+  assert.equal(getGroundingPresentationState(unknownState, sourceIdentity), 'unverified');
+  const html = render(groundedReport([missingFields, unknownState]));
+  assert.match(html, /Missing verification fields/);
+  assert.match(html, /Unknown verification state/);
+  assert.match(html, /Status: unverified/);
+  assert.doesNotMatch(html, /Status: verified/);
+});
+
 test('current loading and error states remain visible', () => {
   assert.match(render(null, { isAnalyzing: true }), /Analyzing\.\.\./);
   const errorHtml = render({ error: 'Story check failed.' });

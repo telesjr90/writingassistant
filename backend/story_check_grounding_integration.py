@@ -119,9 +119,11 @@ def _explicit_diagnostics(result: Mapping[str, Any]) -> list[dict[str, Any]] | N
     for index, raw_item in enumerate(raw_items, start=1):
         if not isinstance(raw_item, Mapping) or not isinstance(raw_item.get("message"), str):
             continue
-        raw_evidence = raw_item.get("evidence", ())
+        raw_evidence = raw_item.get("evidence")
         evidence: Sequence[Any]
-        if isinstance(raw_evidence, list):
+        if "evidence" not in raw_item:
+            evidence = ()
+        elif isinstance(raw_evidence, list):
             evidence = tuple(_untrusted_evidence(item) for item in raw_evidence)
         else:
             evidence = (_untrusted_evidence(raw_evidence),)

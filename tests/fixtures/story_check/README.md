@@ -18,3 +18,4 @@ Positive Dramatica/NCP truth still requires owner-approved evidence. These fixtu
 | `refusal_response.json` | Standard no-prose refusal shape. |
 | `insufficient_evidence_story_check.json` | Rich unresolved IC/RS/CIPS/dynamics case. |
 | `unsafe_output_story_check.json` | Short unsafe model-authored strings for output guard sanitization. |
+| `grounding_regression_t002d.json` | Non-literary exact-byte grounding, quarantine, mismatch, and determinism data. |

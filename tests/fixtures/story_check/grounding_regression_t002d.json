@@ -1,0 +1,49 @@
+{
+  "fixture_id": "grounding_regression_t002d",
+  "description": "Non-literary deterministic Story Check grounding validation data.",
+  "project_id": "fixture-project",
+  "source_id": "validation_scene",
+  "source_content_lf": "VALIDATION FIXTURE T002D\nLOCATION_TOKEN=LOC-7Q9\nENTITY_TOKEN=ENTITY-4M2\nOBJECT_TOKEN=OBJ-8K1\nUNICODE_TOKEN=雨-café\n",
+  "source_content_crlf": "VALIDATION FIXTURE T002D\r\nLOCATION_TOKEN=LOC-7Q9\r\nENTITY_TOKEN=ENTITY-4M2\r\nOBJECT_TOKEN=OBJ-8K1\r\nUNICODE_TOKEN=雨-café\r\n",
+  "expected_identity": {
+    "lf_sha256": "db25aaba643a1e2f3c99ee100c99cd1e89b450886dd4488bffff1eba2777495c",
+    "lf_utf8_byte_length": 117,
+    "crlf_sha256": "fd1c65cec33229068dca1b09ddf511e888afaf094b80ef6feede9e23dac8c045",
+    "crlf_utf8_byte_length": 122
+  },
+  "supported": {
+    "diagnostic_id": "supported-location",
+    "message": "LOCATION_TOKEN=LOC-7Q9",
+    "excerpt": "LOCATION_TOKEN=LOC-7Q9",
+    "start_byte": 25,
+    "end_byte": 47
+  },
+  "unsupported": {
+    "diagnostic_id": "unsupported-location",
+    "message": "LOCATION_TOKEN=LOC-WRONG",
+    "excerpt": "LOCATION_TOKEN=LOC-7Q9",
+    "start_byte": 25,
+    "end_byte": 47
+  },
+  "missing_evidence": {
+    "diagnostic_id": "missing-object",
+    "message": "OBJECT_TOKEN=OBJ-MISSING"
+  },
+  "non_factual": [
+    {
+      "diagnostic_id": "structural-1",
+      "classification": "structural_diagnostic",
+      "message": "Validation structure requires review."
+    },
+    {
+      "diagnostic_id": "question-1",
+      "classification": "question",
+      "message": "Which validation token should be checked?"
+    },
+    {
+      "diagnostic_id": "observation-1",
+      "classification": "observation",
+      "message": "The fixture contains line-separated tokens."
+    }
+  ]
+}
