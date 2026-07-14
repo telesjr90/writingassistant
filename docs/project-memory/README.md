@@ -238,13 +238,29 @@ python3 scripts/project_memory/convergence.py --repo-root . --json
 - No context-tool integration (T005).
 - No retrieval or AI agent integration (T006-T008).
 - No Plan Integrity engine (T009).
-- No generated publication snapshot exists yet (deferred to T003B).
+- No generated publication snapshot existed at T003A. T003B created the first clean-HEAD generated snapshot.
 - No branch synchronization performed yet.
 - Stale memory detection requires future operational automation.
 
+## First Clean-HEAD Snapshot
+
+T003B generated the first publication snapshot against the clean committed
+T003A implementation HEAD:
+
+- **Snapshot path:** `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/`
+- **Bound commit:** `a04b65cc42ba37fe1357272416828e49479cbce1`
+- **Convergence result:** PASS_WITH_FINDINGS (14 findings, none blocking)
+- **Authority class:** `generated_evidence` (non-authoritative)
+- **Freshness:** current only for the bound T003A commit
+
+The snapshot represents the T003A implementation commit, not the later
+documentation-closeout commit. Future commits require a new snapshot before
+being described as fresh.
+
+T003 is complete/PASS-WITH-FINDINGS. T003A is complete/PASS.
+T003B is complete/PASS-WITH-FINDINGS.
+
 ## Next Task
 
-`PHASE8-IMPL-026-T003B` — Clean-HEAD snapshot, convergence validation, and
-T003 closeout. Will run the scanner against the clean committed HEAD (after
-T003A is committed), create the first generated evidence package, validate
-the evidence package and repository convergence, and close T003.
+`PHASE8-IMPL-026-T004` — Human-readable Project Memory. Will render
+normalized registries and scanner output into human-readable documentation.

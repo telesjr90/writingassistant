@@ -4,11 +4,11 @@
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
 - T001 (authority, lifecycle, provenance, and roadmap foundation) is complete/PASS.
 - T002 (schema and normalized-registry architecture) is complete/PASS.
-- T003 (deterministic scanners and convergence) is in progress: T003A complete/PASS, T003B planned next.
+- T003 (deterministic scanners and convergence) is complete/PASS-WITH-FINDINGS: T003A complete/PASS, T003B complete/PASS-WITH-FINDINGS. First publication snapshot at `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/` bound to `a04b65c`.
 - Planned workstreams: authority foundation (T001, complete/PASS), schemas and registries (T002, complete/PASS), deterministic scanners (T003, in_progress), human-readable memory (T004), context-tool integration (T005), Serena pilot (T006, contingent), LlamaIndex/Qdrant pilot (T007, contingent), agent guidance and Ask (T008), Plan Integrity engine (T009), specialized reviewers (T010), synchronization and rollout (T011).
 - Application frontier: unchanged — PHASE8-IMPL-024-T003A. PHASE8-IMPL-025 remains published/planned and inactive.
 - This is a parallel governance workstream; it does not replace the application roadmap. Project Memory normalizes and explains the plan. It cannot activate, close, or reorder application tasks.
-- Project Memory schemas and registry architecture exist (T002). Deterministic scanners and snapshot builder exist (T003A). No renderer, generated publication snapshot, retrieval tool, or reviewer exists. T001, T002, and T003A are the delivered artifacts.
+- Project Memory schemas and registry architecture exist (T002). Deterministic scanners and snapshot builder exist (T003A). First clean-HEAD publication snapshot exists (T003B). No renderer, retrieval tool, or reviewer exists. T001, T002, T003A, and T003B are the delivered artifacts.
 
 # PHASE8-IMPL-025 Layered Analysis Architecture and Tool Integration Expansion
 

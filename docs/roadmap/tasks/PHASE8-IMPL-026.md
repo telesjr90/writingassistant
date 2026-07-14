@@ -13,12 +13,12 @@ is complete/PASS.
 
 T002 — Schema and normalized-registry architecture — is complete/PASS.
 
-T003 — Deterministic scanners and convergence is in progress:
+T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
 - T003A (scanner implementation and testing) is complete/PASS.
 - T003B (clean-HEAD snapshot, convergence validation, and T003 closeout)
-  is planned next.
+  is complete/PASS-WITH-FINDINGS.
 
-Next Project Memory task: PHASE8-IMPL-026-T003B.
+Next Project Memory task: PHASE8-IMPL-026-T004 (Human-readable Project Memory).
 
 ## Classification
 
@@ -100,10 +100,13 @@ T003 is decomposed into two bounded children:
   temporary Git repositories. Does not create a final publication snapshot.
   Status: complete/PASS.
 
-- **T003B** — Runs the scanner against the clean committed HEAD, creates
-  the first generated evidence under `.codex-context/project-memory/`,
-  validates the evidence package and repository convergence, and closes
-  T003. Status: planned. Next Project Memory task.
+- **T003B** — Validates the committed T003A implementation, runs the scanner
+  against the clean committed HEAD, creates the first generated evidence under
+  `.codex-context/project-memory/`, validates the evidence package and
+  repository convergence, and closes T003. Snapshot bound to
+  `a04b65cc42ba37fe1357272416828e49479cbce1`. 14 findings (10
+  source_locator_invalid, 4 source_missing), none blocking publication.
+  Status: complete/PASS-WITH-FINDINGS.
 
 ### PHASE8-IMPL-026-T004 — Human-readable Project Memory
 

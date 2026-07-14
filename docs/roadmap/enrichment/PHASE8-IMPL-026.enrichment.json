@@ -89,7 +89,7 @@
   "t003_status": {
     "task_id": "PHASE8-IMPL-026-T003",
     "title": "Deterministic scanners and convergence",
-    "status": "in_progress",
+    "status": "complete/PASS-WITH-FINDINGS",
     "t003a": {
       "task_id": "PHASE8-IMPL-026-T003A",
       "title": "Deterministic repository scanners and snapshot-builder implementation",
@@ -99,16 +99,21 @@
     "t003b": {
       "task_id": "PHASE8-IMPL-026-T003B",
       "title": "Clean-HEAD snapshot, convergence validation, and T003 closeout",
-      "status": "planned",
+      "status": "complete/PASS-WITH-FINDINGS",
+      "snapshot_path": ".codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/",
+      "bound_commit": "a04b65cc42ba37fe1357272416828e49479cbce1",
+      "convergence_result": "PASS_WITH_FINDINGS",
+      "finding_count": 14,
       "depends_on": "PHASE8-IMPL-026-T003A"
     },
-    "depends_on": "PHASE8-IMPL-026-T002"
+    "depends_on": "PHASE8-IMPL-026-T002",
+    "status": "complete/PASS-WITH-FINDINGS"
   },
   "next_project_memory_task": {
-    "task_id": "PHASE8-IMPL-026-T003B",
-    "title": "Clean-HEAD snapshot, convergence validation, and T003 closeout",
+    "task_id": "PHASE8-IMPL-026-T004",
+    "title": "Human-readable Project Memory",
     "status": "planned",
-    "depends_on": "PHASE8-IMPL-026-T003A"
+    "depends_on": "PHASE8-IMPL-026-T003"
   },
   "dependencies": {
     "none_approved": [

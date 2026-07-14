@@ -7,13 +7,13 @@
 - PHASE8-IMPL-026 defines controlling policies for authority hierarchy (7 tiers), trust classes (8 classes), freshness (commit-bound), commit binding, supersession, conflicting evidence, owner decisions, generated evidence, memory update approval, roadmap synchronization, stale indexes, tool provenance, prompt-injection boundaries, branch synchronization, and product boundaries.
 - T001 is complete/PASS as the publication and authority-foundation micro-task.
 - T002 is complete/PASS as the schema and normalized-registry architecture micro-task.
-- T003 (deterministic scanners and convergence) is in progress: T003A (scanner implementation and testing) is complete/PASS; T003B (clean-HEAD snapshot, convergence validation, and T003 closeout) is planned next.
-- Immediate next Project Memory task: `PHASE8-IMPL-026-T003B - Clean-HEAD snapshot, convergence validation, and T003 closeout`.
+- T003 (deterministic scanners and convergence) is complete/PASS-WITH-FINDINGS: T003A (scanner implementation and testing) is complete/PASS; T003B (clean-HEAD snapshot, convergence validation, and T003 closeout) is complete/PASS-WITH-FINDINGS. First publication snapshot at `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/` bound to `a04b65c`.
+- Immediate next Project Memory task: `PHASE8-IMPL-026-T004 - Human-readable Project Memory`.
 - Planned workstreams: authority foundation (T001, complete/PASS), schemas and registries (T002, complete/PASS), deterministic scanners (T003), human-readable memory (T004), context-tool integration (T005), Serena pilot (T006, contingent), LlamaIndex/Qdrant pilot (T007, contingent), agent guidance and Ask (T008), Plan Integrity engine (T009), specialized reviewers (T010), synchronization and rollout (T011).
 - Tool installation is contingent on provenance and benchmark approval. Serena, LlamaIndex, and Qdrant are not approved dependencies.
 - Branch synchronization: full-commit sync from clean worktrees at defined checkpoints; path-filtered cherry-picking, roadmap-only copying, and destructive workflows rejected.
 - Product boundaries: analysis-only, evidence/provenance-backed, owner-controlled, no generated prose, no automatic truth or Memory/Canon mutation, no automatic promotion or apply-promotion, model output is not canon.
-- Project Memory schemas and registry architecture exist (T002). Deterministic scanners and snapshot builder exist (T003A). No renderer, generated publication snapshot, retrieval tool, or reviewer exists. T001, T002, and T003A are the delivered artifacts.
+- Project Memory schemas and registry architecture exist (T002). Deterministic scanners and snapshot builder exist (T003A). First clean-HEAD publication snapshot exists (T003B). No renderer, retrieval tool, or reviewer exists. T001, T002, T003A, and T003B are the delivered artifacts.
 
 # PHASE8-IMPL-025 Layered Analysis Architecture and Tool Integration Expansion
 
