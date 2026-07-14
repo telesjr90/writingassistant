@@ -19,19 +19,25 @@ T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
   is complete/PASS-WITH-FINDINGS.
 
 Next Project Memory task: PHASE8-IMPL-026-T005 (Existing context-tool integration), planned/inactive.
-A post-T004C1 clean-HEAD refresh is required before T005 can start.
+A post-T004C2 clean-HEAD refresh is required before T005 can start.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
 - T004B (Markdown renderer implementation) is complete/PASS.
 - T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) is complete/PASS-WITH-FINDINGS.
 - T004C1 (post-closeout task-registry synchronization and current-truth quality-gate repair) is complete/PASS.
+- T004C2 (generated-evidence authority semantics and publication-acceptance repair) is complete/PASS.
 First publication render at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` bound to `3f09420`.
 Post-closeout clean-HEAD refresh at `20260714T042826Z` bound to `a415270` produced structurally valid packages
 but was not accepted as the current publication because the renderer's hardcoded index-page status table
 incorrectly showed T004 as "in progress" and T004C as "planned".
 T004C1 (post-closeout task-registry synchronization and current-truth quality-gate repair) is complete/PASS.
-A separate renderer repair task is required before an accepted post-repair clean-HEAD refresh.
+The T004C1 refresh at `20260714T213628Z` was correctly commit-bound, current,
+publication eligible, and task-state convergent, but was rejected by a
+subject-insensitive authority-keyword validator. T004C2 repairs that validator
+with line-level allowed-reference and forbidden-claim diagnostics. Renderer
+wording did not require modification. Accepted current publication remains
+pending the post-T004C2 clean-HEAD refresh.
 
 ## Classification
 
@@ -162,9 +168,17 @@ T004 is decomposed into four bounded children:
   removed renderer hardcodes, implemented registry-derived task status,
   added semantic rendered-package validator, implemented fail-closed
   semantic publication gate, and added focused regression tests (29 tests,
-  177 total Project Memory tests pass). A post-T004C1 clean-HEAD refresh
-  is required; no accepted current publication exists yet for the current
-  clean HEAD.
+  217 total Project Memory tests pass). Its `20260714T213628Z` refresh was
+  task-state correct but rejected by a false-positive authority gate.
+
+- **T004C2** — Generated-evidence authority semantics and publication-acceptance
+  repair. Complete/PASS. Replaced page-wide authority-keyword matching with
+  deterministic subject-aware rules, exact banner checks, Markdown-aware
+  normalization, allowed-reference classifications, and concrete page/line
+  forbidden-claim diagnostics. Added focused allowed/forbidden regressions and
+  preserved-package coverage. No renderer wording change was required. A
+  post-T004C2 clean-HEAD refresh is required; accepted current publication is
+  pending that refresh.
 
 ### PHASE8-IMPL-026-T005 — Existing context-tool integration
 
@@ -235,7 +249,7 @@ Document the operator's manual for Project Memory maintenance.
 T001 (authority foundation) — complete/PASS
   -> T002 (schemas and registries) — complete/PASS
   -> T003 (deterministic scanners)
-  -> T004 (human-readable memory) [complete/PASS-WITH-FINDINGS; T004C1 complete/PASS]
+  -> T004 (human-readable memory) [complete/PASS-WITH-FINDINGS; T004C1/T004C2 complete/PASS]
   -> T005 (context-tool integration)
   -> T006 (Serena pilot) [contingent]
   -> T007 (LlamaIndex/Qdrant pilot) [contingent]

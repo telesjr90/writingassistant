@@ -51,6 +51,95 @@ _ALLOWED_RESULTS = frozenset([RESULT_PASS, RESULT_PASS_WITH_FINDINGS, RESULT_BLO
 
 _GIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
+_EXACT_GENERATED_EVIDENCE_BANNER = "# Generated Evidence — Not Project Authority"
+
+_GENERATED_SUBJECT = (
+    r"(?:(?:this|the)\s+)?(?:generated\s+)?"
+    r"(?:page|render|snapshot|package|documentation|docs|output|publication)"
+    r"|generated\s+evidence"
+)
+
+_FORBIDDEN_AUTHORITY_RULES: tuple[tuple[str, str, str, re.Pattern[str]], ...] = (
+    (
+        "generated_self_authority",
+        "generated_evidence_self_authority_claim",
+        "Generated evidence must not claim authoritative, project-authority, "
+        "project-truth, or source-of-truth status.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b\s+"
+            r"(?:is|are|becomes?|constitutes?|represents?|serves\s+as)\s+"
+            r"(?:an?\s+|the\s+)?"
+            r"(?:authoritative|project\s+authority|project\s+truth|"
+            r"(?:(?:project|roadmap)\s+)?source\s+of\s+truth)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "generated_controls_task_status",
+        "generated_evidence_controls_task_status",
+        "Generated documentation must not control, determine, set, or govern roadmap/task status.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b[^.;|]{{0,80}}\b"
+            r"(?:controls?|determines?|sets?|governs?)\s+(?:the\s+)?"
+            r"(?:roadmap|task|project)\s+status\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "generated_overrides_tracked_sources",
+        "generated_evidence_overrides_tracked_sources",
+        "Generated evidence must not override or outrank tracked roadmap records or sources.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b[^.;|]{{0,80}}\b"
+            r"(?:overrides?|supersedes?|outranks?|takes?\s+precedence\s+over)\s+"
+            r"(?:the\s+)?(?:accepted\s+)?(?:tracked\s+)?"
+            r"(?:roadmap|records?|sources?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "generated_resolves_owner_decisions",
+        "generated_evidence_resolves_owner_decisions",
+        "Generated output must not resolve owner decisions.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b[^.;|]{{0,80}}\b"
+            r"resolves?\s+(?:the\s+)?owner\s+decisions?\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "generated_establishes_canon",
+        "generated_evidence_establishes_canon",
+        "Generated output must not establish canon.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b[^.;|]{{0,80}}\b"
+            r"establish(?:es)?\s+(?:the\s+)?canon\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "generated_approves_candidates",
+        "generated_evidence_approves_candidates",
+        "Generated output must not automatically approve or promote candidates.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b[^.;|]{{0,80}}\b"
+            r"automatically\s+(?:approves?|promotes?)\s+(?:the\s+)?candidates?\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "generated_equal_or_greater_authority",
+        "generated_evidence_equal_or_greater_authority",
+        "Generated evidence must not claim authority equal to or greater than tracked sources.",
+        re.compile(
+            rf"\b(?:{_GENERATED_SUBJECT})\b[^.;|]{{0,80}}\b"
+            r"(?:has|holds|carries|possesses|is\s+assigned)\s+"
+            r"(?:equal(?:\s+or\s+greater)?|equivalent|same|greater|higher)\s+authority\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
 _PM_TASK_ORDER: tuple[str, ...] = (
     "PHASE8-IMPL-026-T001",
     "PHASE8-IMPL-026-T002",
@@ -76,6 +165,187 @@ def _read_text(path: Path) -> str:
 
 def _load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _normalize_markdown_line(line: str, *, strip_inline_code: bool) -> str:
+    """Return deterministic visible Markdown text for authority inspection."""
+    text = re.sub(r"!?(?:\[([^\]]*)\])\([^)]*\)", r"\1", line)
+    if strip_inline_code:
+        text = re.sub(r"`[^`]*`", "", text)
+    else:
+        text = text.replace("`", "")
+    text = re.sub(r"^[\s#>*+\-]+", "", text)
+    text = text.replace("**", "").replace("__", "")
+    text = text.replace("|", " ")
+    return " ".join(text.split())
+
+
+def _authority_allowed_classification(original: str, visible: str) -> str:
+    """Classify a legitimate authority reference, or return an empty string."""
+    lower = visible.lower()
+    original_lower = original.lower()
+
+    if _EXACT_GENERATED_EVIDENCE_BANNER.lower() in original_lower:
+        return "generated_evidence_banner"
+    if re.search(r"\bauthority_class\b[^\n]*\bgenerated_evidence\b", lower):
+        return "generated_evidence_classification"
+    if re.search(r"\bauthority(?:\s+context)?\s*:\s*authoritative\b", lower):
+        return "tracked_record_authority_metadata"
+    if "historical" in lower and (
+        "quotation" in lower or "quote" in lower or original.lstrip().startswith(">")
+    ):
+        return "historical_quotation"
+    if any(term in lower for term in (
+        "validator", "validation", "validation rule", "forbidden pattern",
+        "rejected pattern", "rejects the pattern", "detects the claim",
+        "test case", "technical documentation",
+    )):
+        return "technical_validation_description"
+    if "authority hierarchy" in lower or re.search(r"\btier\s+[1-7]\b", lower):
+        return "authority_hierarchy_description"
+    if "trust class" in lower or re.fullmatch(
+        r"(?:authoritative|accepted_evidence|generated_evidence|historical|"
+        r"superseded|uncertain|owner_pending|untrusted)(?:\s*:\s*\d+)?", lower,
+    ):
+        return "trust_class_description"
+    if re.search(
+        r"\b(?:generated evidence|generated (?:page|render|snapshot|package|output|documentation)|"
+        r"this (?:generated )?(?:page|render|snapshot|package|output))\b[^.;|]{0,100}"
+        r"\b(?:not|never|non-authoritative|cannot|can't|must not|does not|isn't|aren't)\b",
+        lower,
+    ) or re.search(
+        r"\b(?:not|never|cannot|can't|must not|does not)\b[^.;|]{0,100}"
+        r"\b(?:authoritative|project authority|project truth|source of truth|canon)\b",
+        lower,
+    ):
+        return "generated_evidence_non_authority"
+    if re.search(
+        r"\b(?:model|agent) output\b[^.;|]{0,100}\b(?:not|cannot|can't|must not|never)\b"
+        r"[^.;|]{0,100}\b(?:truth|canon|authoritative)\b",
+        lower,
+    ):
+        return "candidate_non_authority_boundary"
+    if re.search(
+        r"\b(?:roadmap|tracked sources?|accepted (?:roadmap|owner decisions?|decisions?)|"
+        r"owner decisions?)\b[^.;|]{0,120}\b(?:authoritative|authority)\b",
+        lower,
+    ) or re.search(
+        r"\b(?:authoritative|authority)\b[^.;|]{0,120}"
+        r"\b(?:roadmap|tracked sources?|owner decisions?)\b",
+        lower,
+    ):
+        return "higher_authority_tracked_source"
+    if "no automatic mutation of authoritative state" in lower:
+        return "authority_mutation_prohibition"
+    if "authoritative" in lower or "authority" in lower:
+        return "authority_context_reference"
+    if "truth" in lower or "canon" in lower:
+        return "truth_or_canon_boundary"
+    return ""
+
+
+def analyze_authority_claims(docs_dir: str | Path) -> dict[str, Any]:
+    """Inspect rendered pages for subject-aware generated-evidence authority claims."""
+    docs_path = Path(docs_dir)
+    allowed_references: list[dict[str, Any]] = []
+    forbidden_claims: list[dict[str, Any]] = []
+
+    for page in RENDERED_PAGE_NAMES:
+        page_path = docs_path / page
+        if not page_path.is_file():
+            continue
+        in_fence = False
+        fence_marker = ""
+        for line_number, original in enumerate(_read_text(page_path).splitlines(), start=1):
+            stripped = original.lstrip()
+            fence_match = re.match(r"(```+|~~~+)", stripped)
+            if fence_match:
+                marker = fence_match.group(1)[0]
+                if not in_fence:
+                    in_fence = True
+                    fence_marker = marker
+                elif marker == fence_marker:
+                    in_fence = False
+                    fence_marker = ""
+                continue
+            if in_fence:
+                continue
+
+            visible_with_code = _normalize_markdown_line(original, strip_inline_code=False)
+            visible = _normalize_markdown_line(original, strip_inline_code=True)
+            if not visible and not visible_with_code:
+                continue
+
+            searchable = visible.lower()
+            authority_terms = (
+                "authorit", "truth", "canon", "roadmap status", "task status",
+                "owner decision", "candidates", "override", "supersede", "outrank",
+                "precedence", "establish", "resolve", "approve", "promote",
+            )
+            if not any(term in searchable for term in authority_terms):
+                if "authorit" in visible_with_code.lower():
+                    contextual_class = _authority_allowed_classification(
+                        original, visible_with_code
+                    )
+                    allowed_references.append({
+                        "page": page,
+                        "line": line_number,
+                        "text": original.strip(),
+                        "classification": (
+                            contextual_class
+                            if contextual_class != "authority_context_reference"
+                            else "inline_code_reference"
+                        ),
+                    })
+                continue
+
+            allowed_class = _authority_allowed_classification(original, visible_with_code)
+            if allowed_class in {
+                "historical_quotation", "technical_validation_description",
+                "generated_evidence_banner", "generated_evidence_classification",
+                "tracked_record_authority_metadata", "authority_hierarchy_description",
+                "trust_class_description", "generated_evidence_non_authority",
+                "candidate_non_authority_boundary", "higher_authority_tracked_source",
+                "authority_mutation_prohibition",
+            }:
+                allowed_references.append({
+                    "page": page,
+                    "line": line_number,
+                    "text": original.strip(),
+                    "classification": allowed_class,
+                })
+                continue
+
+            matched_forbidden = False
+            for rule_id, classification, reason, pattern in _FORBIDDEN_AUTHORITY_RULES:
+                if pattern.search(visible):
+                    forbidden_claims.append({
+                        "page": page,
+                        "line": line_number,
+                        "text": original.strip(),
+                        "rule": rule_id,
+                        "classification": classification,
+                        "reason": reason,
+                    })
+                    matched_forbidden = True
+                    break
+            if matched_forbidden:
+                continue
+
+            if allowed_class:
+                allowed_references.append({
+                    "page": page,
+                    "line": line_number,
+                    "text": original.strip(),
+                    "classification": allowed_class,
+                })
+
+    return {
+        "result": "fail" if forbidden_claims else "pass",
+        "matches": list(forbidden_claims),
+        "allowed_references": allowed_references,
+        "forbidden_claims": forbidden_claims,
+    }
 
 
 def derive_expected_task_states(
@@ -225,10 +495,11 @@ def _check_structural(
         if not fpath.is_file():
             continue
         text = _read_text(fpath)
-        if "Generated Evidence" in text or "generated evidence" in text.lower():
-            continue
-        checks.append({"check": f"banner:{page}", "result": "fail",
-                       "detail": "Missing generated-evidence banner"})
+        if _EXACT_GENERATED_EVIDENCE_BANNER in text:
+            checks.append({"check": f"banner:{page}", "result": "pass"})
+        else:
+            checks.append({"check": f"banner:{page}", "result": "fail",
+                           "detail": "Missing exact generated-evidence banner"})
 
     for page in RENDERED_PAGE_NAMES:
         fpath = docs_dir / page
@@ -269,6 +540,31 @@ def validate_rendered_package(
     render_path = Path(render_dir).resolve()
     errors: list[str] = []
     warnings: list[str] = []
+    nonblocking_findings: list[dict[str, Any]] = []
+
+    if snapshot_bundle is not None:
+        convergence_findings = snapshot_bundle.get("findings", [])
+    else:
+        convergence_path = Path(snapshot_dir) / "convergence-findings.json"
+        if convergence_path.is_file():
+            convergence_data = _load_json(convergence_path)
+            convergence_findings = convergence_data.get("findings", [])
+        else:
+            convergence_findings = []
+    for finding in convergence_findings:
+        if not isinstance(finding, dict):
+            continue
+        if finding.get("severity") == "warning" and not finding.get("blocks_publication", False):
+            diagnostic = {
+                "code": finding.get("code", "unknown"),
+                "finding_id": finding.get("finding_id", ""),
+                "severity": "warning",
+                "title": finding.get("title", ""),
+            }
+            nonblocking_findings.append(diagnostic)
+            warnings.append(
+                f"{diagnostic['code']}: {diagnostic['finding_id']}: {diagnostic['title']}"
+            )
 
     if registries is not None:
         tasks_data = registries.get("tasks.json", {})
@@ -307,7 +603,11 @@ def validate_rendered_package(
             "application_frontier_check": "fail",
             "ph8_impl_025_check": "fail",
             "remaining_work_check": "fail",
-            "authority_check": "fail",
+            "authority_check": "not_run",
+            "authority": {
+                "result": "not_run", "matches": [],
+                "allowed_references": [], "forbidden_claims": [],
+            },
         }
 
     dup_ids: dict[str, int] = {}
@@ -467,17 +767,15 @@ def validate_rendered_package(
         else:
             semantic_checks.append({"check": "next_task_in_remaining", "result": "pass"})
 
-    authority_ok = True
-    for page in RENDERED_PAGE_NAMES:
-        pp = docs_dir / page
-        if not pp.is_file():
-            continue
-        text = _read_text(pp)
-        if "authoritative" in text and "generated evidence" not in text[:200]:
-            authority_ok = False
+    authority = analyze_authority_claims(docs_dir)
+    authority_ok = authority["result"] == "pass"
     semantic_checks.append({"check": "non_authoritative", "result": "pass" if authority_ok else "fail"})
     if not authority_ok:
-        warnings.append("Some pages may claim authoritative status")
+        for claim in authority["forbidden_claims"]:
+            errors.append(
+                "Authority: forbidden generated-evidence claim at "
+                f"{claim['page']}:{claim['line']} [{claim['rule']}]: {claim['text']}"
+            )
 
     observed = {}
     for tid in _PM_TASK_ORDER:
@@ -495,6 +793,7 @@ def validate_rendered_package(
         "result": result,
         "errors": errors,
         "warnings": warnings,
+        "nonblocking_findings": nonblocking_findings,
         "target_commit": r_commit,
         "target_branch": r_branch,
         "snapshot_commit": s_commit,
@@ -510,6 +809,7 @@ def validate_rendered_package(
         "ph8_impl_025_check": "fail" if ph25_active else "pass",
         "remaining_work_check": "pass",
         "authority_check": "pass" if authority_ok else "fail",
+        "authority": authority,
     }
 
 
@@ -543,7 +843,11 @@ def _blocked_result(
         "application_frontier_check": "fail",
         "ph8_impl_025_check": "fail",
         "remaining_work_check": "fail",
-        "authority_check": "fail",
+        "authority_check": "not_run",
+        "authority": {
+            "result": "not_run", "matches": [],
+            "allowed_references": [], "forbidden_claims": [],
+        },
     }
 
 

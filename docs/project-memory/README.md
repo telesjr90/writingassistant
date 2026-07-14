@@ -397,7 +397,7 @@ Task status is now derived from the validated task registry.
 ### Required next steps
 
 1. **Post-repair clean-HEAD refresh** — Generate an accepted current
-   publication snapshot and render bound to the T004C1 commit.
+   publication snapshot and render bound to the T004C2 commit.
 
 T005 remains next and inactive. It must not start before the post-repair
 clean-HEAD refresh.
@@ -406,7 +406,33 @@ clean-HEAD refresh.
 
 `PHASE8-IMPL-026-T005` — Existing context-tool integration. Planned/inactive.
 
-T004 is closed as complete/PASS-WITH-FINDINGS. T004C1 is complete/PASS.
+T004 is closed as complete/PASS-WITH-FINDINGS. T004C1 and T004C2 are complete/PASS.
+
+## T004C2 Authority Semantics Repair
+
+The current, task-state-convergent T004C1 refresh at `20260714T213628Z`
+was rejected by the committed authority validator because it treated any
+lowercase `authoritative` token as a possible claim that the generated page
+itself was authoritative. The rendered pages instead displayed tracked-record
+authority metadata, described the accepted authority hierarchy and trust
+classes, or explicitly denied generated-evidence authority.
+
+T004C2 replaces that page-wide keyword rule with deterministic line-level
+checks that distinguish statement subjects. The validator now:
+
+- requires the exact generated-evidence banner;
+- classifies legitimate hierarchy, trust-class, tracked-source, disclaimer,
+  historical, technical, inline-code, and Markdown-link references;
+- detects explicit generated-page/render/snapshot/package/output claims of
+  authority, truth control, roadmap override, owner-decision resolution,
+  canon establishment, or automatic candidate approval;
+- reports every forbidden claim with page, line, matched text, rule, class,
+  and reason;
+- returns no generic authority warning when no forbidden claim exists.
+
+Renderer wording did not require modification. Accepted current publication
+remains pending the post-T004C2 clean-HEAD refresh. T005 remains planned and
+inactive until that refresh succeeds.
 
 ## First Clean-HEAD Snapshot
 

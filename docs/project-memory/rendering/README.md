@@ -317,3 +317,26 @@ verifies both structural integrity and semantic task-state convergence.
 - Historical-preview mode validates semantic consistency with its selected
   historical snapshot/registry context.
 - Current publication must be commit-bound and semantically convergent.
+
+## Generated-Evidence Authority Semantics (T004C2)
+
+Authority validation is subject-aware. Words such as `authority`,
+`authoritative`, `truth`, and `canon` do not fail validation by themselves.
+Generated pages may describe tracked-record authority classes, the seven-tier
+authority hierarchy, the eight trust classes, accepted roadmap or owner
+authority, technical validation rules, and historical quotations. Explicit
+non-authority statements are required and allowed.
+
+Validation fails only when a live generated-page statement claims or implies
+that the generated page, render, snapshot, package, documentation, output, or
+publication is authoritative; is project truth or a source of truth; controls
+roadmap/task status; overrides tracked sources; resolves owner decisions;
+establishes canon; automatically approves/promotes candidates; or has equal or
+greater authority than tracked sources.
+
+The deterministic validator normalizes Markdown headings, tables, and links;
+ignores fenced examples and inline-code-only mentions; recognizes clearly
+labeled historical and technical descriptions; and reports forbidden claims
+with page, line, text, rule identifier, classification, and reason. Passing
+authority results include informational `allowed_references` and an empty
+`forbidden_claims` list. T004C2 required no renderer wording change.

@@ -163,9 +163,11 @@
   ],
   "t004c_status": "complete/PASS-WITH-FINDINGS",
   "t004c1_status": "complete/PASS (repaired: task-registry synchronization, renderer hardcodes removed, registry-derived task status, semantic rendered-package validator, fail-closed semantic publication gate, focused regression tests)",
+  "t004c2_status": "complete/PASS (repaired generated-evidence authority semantics with subject-aware rules, allowed-reference classifications, concrete forbidden-claim diagnostics, and preserved-package regressions; renderer wording unchanged)",
   "post_closeout_refresh_042826z": "structurally valid generated evidence; not accepted as current publication (renderer hardcodes index status table)",
+  "post_t004c1_refresh_20260714t213628z": "current, publication eligible, correctly commit-bound, and task-state convergent; rejected as accepted current publication because the committed authority validator used a false-positive page-wide keyword rule",
   "renderer_defect_identified": "hardcoded index-page status table in _render_index() and hardcoded PM child indicator in _render_current_roadmap() — repaired by T004C1",
   "accepted_current_publication_for_a415270": null,
-  "next_operational_step": "post-T004C1 clean-HEAD refresh; no accepted current publication exists yet",
-  "next_project_memory_task": "PHASE8-IMPL-026-T005 — Existing context-tool integration. Planned/inactive; clean-HEAD refresh required before start."
+  "next_operational_step": "post-T004C2 clean-HEAD refresh; accepted current publication remains pending",
+  "next_project_memory_task": "PHASE8-IMPL-026-T005 — Existing context-tool integration. Planned/inactive; post-T004C2 clean-HEAD refresh required before start."
 }
