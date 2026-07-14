@@ -18,8 +18,9 @@ T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
 - T003B (clean-HEAD snapshot, convergence validation, and T003 closeout)
   is complete/PASS-WITH-FINDINGS.
 
-Next Project Memory task: PHASE8-IMPL-026-T005 (Existing context-tool integration), planned/inactive.
-A post-T004C2 clean-HEAD refresh is required before T005 can start.
+T005 — Existing context-tool integration — is complete/PASS.
+The next sequenced Project Memory task is T006, planned/contingent/inactive;
+it is not activated. T007 remains planned/contingent/inactive. T008-T011 remain planned.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
@@ -36,8 +37,8 @@ The T004C1 refresh at `20260714T213628Z` was correctly commit-bound, current,
 publication eligible, and task-state convergent, but was rejected by a
 subject-insensitive authority-keyword validator. T004C2 repairs that validator
 with line-level allowed-reference and forbidden-claim diagnostics. Renderer
-wording did not require modification. Accepted current publication remains
-pending the post-T004C2 clean-HEAD refresh.
+wording did not require modification. The accepted current T004C2 publication
+is the `20260714T221454Z` snapshot/render/quality set bound to `8961b35`.
 
 ## Classification
 
@@ -182,12 +183,15 @@ T004 is decomposed into four bounded children:
 
 ### PHASE8-IMPL-026-T005 — Existing context-tool integration
 
-Status: planned. Depends on T003.
+Status: complete/PASS. Depends on T004.
 
-Integrate existing context tools (Repomix, Graphify, CCE) as evidence
-producers under the Project Memory provenance and freshness model without
-requiring new tool installation. Existing generated packs under
-`.codex-context/` and `ai_context/` are consumed as `generated_evidence`.
+Implemented standard-library-only read adapters for existing Repomix, Graphify,
+and CCE artifacts under the Project Memory provenance and freshness model.
+Existing generated packs remain `generated_evidence`; unknown, ambiguous,
+stale, historical, unsafe, and provenance-incomplete artifacts are inventoried
+but quarantined. The deterministic eight-file evidence package is atomic and
+overwrite-refusing. No tool was installed or executed, and read-import approval
+remains separate from live-execution approval.
 
 ### PHASE8-IMPL-026-T006 — Serena read-only pilot
 

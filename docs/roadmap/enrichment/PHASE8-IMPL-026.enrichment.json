@@ -87,7 +87,7 @@
     "summary": "Defined the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 normalized tracked registry files; registry manifest; dependency-free standard-library validator; focused tests. Established stable namespaced identifiers, tracked-source vs. generated-snapshot separation, enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity. Resolved Q149 (JSON canonical format) and Q150 (one schema bundle, separate registry files, dependency-free validator)."
   },
   "t003_status": "complete/PASS-WITH-FINDINGS (T003A: complete/PASS, T003B: complete/PASS-WITH-FINDINGS)",
-  "next_project_memory_task": "PHASE8-IMPL-026-T005 — Existing context-tool integration. Planned/inactive.",
+  "next_project_memory_task": "PHASE8-IMPL-026-T006 — Serena read-only pilot. Planned/contingent/inactive; not activated.",
   "t004_parent": "complete/PASS-WITH-FINDINGS",
   "dependencies": {
     "none_approved": [
@@ -95,7 +95,9 @@
       "LlamaIndex",
       "Qdrant"
     ],
-    "tool_installation_contingent_on_provenance": true
+    "tool_installation_contingent_on_provenance": true,
+    "existing_context_read_import_approved": true,
+    "live_context_tool_execution_approved": false
   },
   "open_questions": [
     "convergence criteria for plan-vs-implementation comparison",
@@ -159,15 +161,22 @@
     "renderer repair (registry-derived task status)",
     "semantic rendered-package validator",
     "renderer fail-closed semantic publication gate",
-    "focused regression coverage (29 tests for task registry current state)"
+    "focused regression coverage (29 tests for task registry current state)",
+    "read-only Repomix, Graphify, and CCE evidence import adapters",
+    "deterministic context artifact attribution and normalized envelopes",
+    "context evidence freshness, safety, eligibility, and quarantine classification",
+    "exact eight-file atomic context-evidence package with overwrite refusal",
+    "focused T005 fixture coverage (45 tests)"
   ],
   "t004c_status": "complete/PASS-WITH-FINDINGS",
   "t004c1_status": "complete/PASS (repaired: task-registry synchronization, renderer hardcodes removed, registry-derived task status, semantic rendered-package validator, fail-closed semantic publication gate, focused regression tests)",
-  "t004c2_status": "complete/PASS (repaired generated-evidence authority semantics with subject-aware rules, allowed-reference classifications, concrete forbidden-claim diagnostics, and preserved-package regressions; renderer wording unchanged)",
+  "t004c2_status": "complete/PASS (repaired generated-evidence authority semantics with subject-aware rules, allowed-reference classifications, concrete forbidden-claim diagnostics, and preserved-package regressions; accepted current publication at 20260714T221454Z bound to 8961b35)",
+  "t005_status": "complete/PASS (standard-library-only read adapters for existing Repomix, Graphify, and CCE evidence; deterministic attribution, provenance, freshness, safety, eligibility, quarantine, and atomic package output; no live tool execution)",
   "post_closeout_refresh_042826z": "structurally valid generated evidence; not accepted as current publication (renderer hardcodes index status table)",
   "post_t004c1_refresh_20260714t213628z": "current, publication eligible, correctly commit-bound, and task-state convergent; rejected as accepted current publication because the committed authority validator used a false-positive page-wide keyword rule",
   "renderer_defect_identified": "hardcoded index-page status table in _render_index() and hardcoded PM child indicator in _render_current_roadmap() — repaired by T004C1",
   "accepted_current_publication_for_a415270": null,
-  "next_operational_step": "post-T004C2 clean-HEAD refresh; accepted current publication remains pending",
-  "next_project_memory_task": "PHASE8-IMPL-026-T005 — Existing context-tool integration. Planned/inactive; post-T004C2 clean-HEAD refresh required before start."
+  "accepted_current_publication_for_8961b35": ".codex-context/project-memory/PHASE8-IMPL-026-T004C2/20260714T221454Z/",
+  "next_operational_step": "T006 is next in sequence but remains contingent/inactive pending provenance and benchmark approval; T007 remains contingent/inactive; T008-T011 remain planned",
+  "next_project_memory_task": "PHASE8-IMPL-026-T006 — Serena read-only pilot. Planned/contingent/inactive; not activated."
 }

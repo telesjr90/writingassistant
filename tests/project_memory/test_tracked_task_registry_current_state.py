@@ -1,7 +1,7 @@
 """Tracked task registry current-state regression tests.
 
 Verifies that the tracked tasks.json registry represents the accepted
-post-T004C task state.  Must not mutate any real registry file.
+post-T005 task state.  Must not mutate any real registry file.
 
 These tests guard against the defect discovered by the 20260714T042826Z
 post-closeout refresh: the task registry stopped at T003 and the
@@ -51,6 +51,14 @@ def _load_tracked_registry(name: str) -> dict:
 
 def _tracked_task_records() -> list[dict]:
     return list(_load_tracked_registry("tasks.json")["records"])
+
+
+def _roadmap_task_section(task_id: str) -> str:
+    path = Path(__file__).resolve().parents[2] / "docs" / "roadmap" / "tasks" / "PHASE8-IMPL-026.md"
+    text = path.read_text(encoding="utf-8")
+    marker = f"### {task_id}"
+    assert marker in text, f"Roadmap section {task_id} not found"
+    return text.split(marker, 1)[1].split("\n### ", 1)[0]
 
 
 def _record_by_id(records: list[dict], rid: str) -> dict | None:
@@ -113,21 +121,38 @@ def test_t004c_is_complete():
     assert _lifecycle_status(_tracked_task_records(), "task:PHASE8-IMPL-026-T004C") == "complete"
 
 
-def test_t005_is_planned():
-    assert _lifecycle_status(_tracked_task_records(), "task:PHASE8-IMPL-026-T005") == "planned"
+def test_t005_is_complete():
+    assert _lifecycle_status(_tracked_task_records(), "task:PHASE8-IMPL-026-T005") == "complete"
 
 
-def test_t005_is_not_complete():
-    assert _lifecycle_status(_tracked_task_records(), "task:PHASE8-IMPL-026-T005") != "complete"
+def test_t005_has_complete_pass_result():
+    record = _record_by_id(_tracked_task_records(), "task:PHASE8-IMPL-026-T005")
+    assert _derive_task_display_status(record) == "complete/PASS"
+    assert record["notes"].startswith("Complete/PASS.")
 
 
-def test_t005_is_not_in_progress():
-    assert _lifecycle_status(_tracked_task_records(), "task:PHASE8-IMPL-026-T005") != "in_progress"
+def test_t005_is_no_longer_planned_pending_or_remaining():
+    record = _record_by_id(_tracked_task_records(), "task:PHASE8-IMPL-026-T005")
+    assert record["lifecycle"]["status"] == "complete"
+    assert record["lifecycle"]["status"] not in ("planned", "in_progress", "owner_pending")
+    assert _derive_task_display_status(record) == "complete/PASS"
 
 
-def test_t005_is_not_active():
-    st = _lifecycle_status(_tracked_task_records(), "task:PHASE8-IMPL-026-T005")
-    assert st not in ("in_progress", "complete", "blocked")
+def test_t005_is_not_application_frontier_and_does_not_approve_live_tools():
+    record = _record_by_id(_tracked_task_records(), "task:PHASE8-IMPL-026-T005")
+    assert record["parent_task_id"] == "PHASE8-IMPL-026"
+    assert record["is_application_frontier"] is False
+    assert "read-only import adapters" in record["notes"]
+    assert "No context tool was installed or executed" in record["notes"]
+
+    tool_records = _load_tracked_registry("tools.json")["records"]
+    by_id = {item["id"]: item for item in tool_records}
+    for tool_id in ("tool:repomix-config", "tool:graphify-config", "tool:cce-config"):
+        assert by_id[tool_id]["is_approved_dependency"] is False
+        assert "read-only import" in by_id[tool_id]["notes"]
+        assert "execution" in by_id[tool_id]["notes"]
+    assert by_id["tool:context-tool-evidence-importer"]["is_approved_dependency"] is True
+    assert "without executing an external tool" in by_id["tool:context-tool-evidence-importer"]["notes"]
 
 
 # ---- field-integrity tests ----
@@ -219,8 +244,8 @@ def test_remaining_work_excludes_complete_t004():
     )
 
 
-def test_remaining_work_includes_planned_t005():
-    """Prove that _render_remaining_work includes T005 when it is 'planned'."""
+def test_remaining_work_excludes_complete_t005_and_preserves_planned_successors():
+    """T005 is complete; authoritative roadmap successors remain planned."""
     tasks_registry = _load_tracked_registry("tasks.json")
     registries = {"tasks.json": tasks_registry}
     manifest = {
@@ -238,10 +263,11 @@ def test_remaining_work_includes_planned_t005():
     model = _build_page_model(registries, manifest, [], {}, {}, set())
     output = _render_remaining_work(model)
 
-    # T005 should appear as planned
-    assert "PHASE8-IMPL-026-T005" in output or "T005" in output, (
-        "T005 missing from remaining-work output"
-    )
+    assert "task:PHASE8-IMPL-026-T005" not in output
+    for task_id in range(6, 12):
+        assert "Status: planned." in _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}")
+    assert "Contingent on Serena" in _roadmap_task_section("PHASE8-IMPL-026-T006")
+    assert "Contingent on provenance" in _roadmap_task_section("PHASE8-IMPL-026-T007")
 
 
 def test_current_roadmap_distinguishes_frontier_from_pm_next():
@@ -279,6 +305,8 @@ def test_application_frontier_unchanged():
     r = _record_by_id(recs, "task:PHASE8-IMPL-024-T003A")
     assert r is not None, "PHASE8-IMPL-024-T003A not in task registry"
     assert r.get("is_application_frontier") is True
+    t005 = _record_by_id(recs, "task:PHASE8-IMPL-026-T005")
+    assert t005.get("is_application_frontier") is False
 
 
 def test_ph8_impl_025_stays_planned():
@@ -287,6 +315,7 @@ def test_ph8_impl_025_stays_planned():
     assert r is not None
     assert r["lifecycle"]["status"] == "planned"
     assert r.get("is_application_frontier") is False
+    assert "inactive" in r.get("notes", "").lower()
 
 
 # ---- authority-class test ----
@@ -370,9 +399,8 @@ def test_render_index_derives_t004c_from_registry():
     assert "complete/PASS-WITH-FINDINGS" in output
 
 
-def test_render_current_roadmap_identifies_t005_as_next():
-    """Prove _render_current_roadmap identifies T005 as the next PM task,
-    not T004B as the current child."""
+def test_render_current_roadmap_preserves_t005_completion_and_t006_sequence():
+    """Normalized records close T005; accepted roadmap sequences contingent T006."""
     tasks_registry = _load_tracked_registry("tasks.json")
     registries = {"tasks.json": tasks_registry}
     manifest = {
@@ -390,8 +418,12 @@ def test_render_current_roadmap_identifies_t005_as_next():
     model = _build_page_model(registries, manifest, [], {}, {}, set())
     output = _render_current_roadmap(model)
 
-    assert "Next Project Memory task:" in output
-    assert "T005" in output
+    assert "Next Project Memory task:** (all complete)" in output
+    assert "PHASE8-IMPL-026-T005" in output
+    assert "Lifecycle:** `complete`" in output
+    t006 = _roadmap_task_section("PHASE8-IMPL-026-T006")
+    assert "Status: planned." in t006
+    assert "Contingent on Serena" in t006
     assert "Current Project Memory child" not in output
 
 
@@ -586,8 +618,18 @@ def test_identify_completed_children():
 def test_identify_next_planned_child():
     tasks = _tracked_task_records()
     next_task = _identify_next_planned_child(tasks, _PM_PARENT_TASK_ID)
-    assert next_task is not None
-    assert next_task["task_id"] == "PHASE8-IMPL-026-T005"
+    assert next_task is None  # normalized registry is complete through T005
+
+    planned_sections = [
+        (f"PHASE8-IMPL-026-T{task_id:03d}", _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}"))
+        for task_id in range(6, 12)
+    ]
+    assert all("Status: planned." in section for _, section in planned_sections)
+    next_roadmap_task = planned_sections[0]
+    assert next_roadmap_task[0] == "PHASE8-IMPL-026-T006"
+    assert "Contingent on Serena" in next_roadmap_task[1]
+    assert "benchmark approval" in next_roadmap_task[1]
+    assert "Contingent on provenance" in planned_sections[1][1]
 
 
 def test_derive_task_display_status_complete_pass_with_findings():

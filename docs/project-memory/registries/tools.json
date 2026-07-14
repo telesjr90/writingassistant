@@ -69,7 +69,7 @@
       "tool_path": "repomix.config.json",
       "provenance_state": "configured",
       "is_approved_dependency": false,
-      "notes": "Repomix is configured for scoped frozen context packs. Used as a planning and evidence tool only. Not an approved Project Memory dependency."
+      "notes": "Repomix is configured for scoped frozen context packs. T005 approves read-only import of safely attributed existing output as generated_evidence. Installation and live execution remain separately unapproved; Repomix is not an approved Project Memory dependency."
     },
     {
       "id": "tool:ai-context-script",
@@ -115,7 +115,57 @@
       "tool_path": ".claude/skills/graphify/SKILL.md",
       "provenance_state": "configured",
       "is_approved_dependency": false,
-      "notes": "Graphify is configured for topology and dependency questions. Used as a planning and evidence tool only. Not an approved Project Memory dependency."
+      "notes": "Graphify is configured for topology and dependency questions. T005 approves read-only import of safely attributed existing output as generated_evidence. Installation and live execution remain separately unapproved; Graphify is not an approved Project Memory dependency."
+    },
+    {
+      "id": "tool:cce-config",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "CCE Configuration",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T005",
+        "source_locators": [
+          { "path": ".context-engine.yaml" },
+          { "path": "scripts/roadmap_enrichment/tool_commands.md" }
+        ]
+      },
+      "tool_id": "cce-config",
+      "tool_name": "CCE",
+      "tool_type": "context_tool",
+      "tool_path": ".context-engine.yaml",
+      "provenance_state": "configured",
+      "is_approved_dependency": false,
+      "notes": "CCE is configured for explicit context collection only. T005 approves read-only import of safely attributed existing output as generated_evidence. Installation, indexing, search, and live execution remain separately unapproved."
+    },
+    {
+      "id": "tool:context-tool-evidence-importer",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Existing Context-Tool Evidence Importer",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T005",
+        "accepted_by": "PHASE8-IMPL-026-T005",
+        "source_locators": [
+          { "path": "scripts/project_memory/context_tool_evidence.py" },
+          { "path": "scripts/project_memory/build_context_tool_evidence.py" },
+          { "path": "tests/project_memory/test_context_tool_evidence.py" }
+        ]
+      },
+      "tool_id": "context-tool-evidence-importer",
+      "tool_name": "context_tool_evidence.py",
+      "tool_type": "evidence_collector",
+      "tool_path": "scripts/project_memory/context_tool_evidence.py",
+      "provenance_state": "approved",
+      "is_approved_dependency": true,
+      "notes": "Repository-owned, standard-library-only read adapter. It inventories existing generated context evidence without executing an external tool, network call, model call, source mutation, registry mutation, or authority promotion."
     },
     {
       "id": "tool:playwright-evidence-collector",

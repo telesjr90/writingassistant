@@ -76,8 +76,11 @@ silently override it.
    - T004C1 repaired: task-registry synchronization, renderer hardcodes removed, registry-derived task status, semantic validator, fail-closed semantic publication gate, focused regression tests.
    - T004C1 refresh `20260714T213628Z` was current and task-state convergent but rejected by a false-positive page-wide authority-keyword rule.
    - T004C2 repaired authority semantics with subject-aware rules and page/line diagnostics; renderer wording was unchanged.
-   - No accepted current publication exists yet; a post-T004C2 clean-HEAD refresh is required.
-5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
+   - Accepted current publication: `20260714T221454Z`, bound to `8961b35`.
+5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (complete/PASS).
+   - Standard-library-only read adapters for Repomix, Graphify, and CCE evidence.
+   - Unknown, ambiguous, stale, historical, unsafe, and provenance-incomplete artifacts are quarantined.
+   - No context tool installation or execution; generated output remains `generated_evidence`.
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
 7. `PHASE8-IMPL-026-T007` — LlamaIndex / local-embedding / Qdrant Local pilot
    (planned; contingent).
@@ -95,7 +98,7 @@ LlamaIndex, and Qdrant are not approved dependencies.
 
 ```text
 PHASE8-IMPL-026-T001 (complete/PASS)
-  -> T002 (complete/PASS) -> T003 -> T004 -> T005 -> T006 [contingent]
+  -> T002 (complete/PASS) -> T003 -> T004 -> T005 (complete/PASS) -> T006 [contingent]
                                    -> T007 [contingent]
                             -> T008 -> T009 -> T010 -> T011
 ```
@@ -147,8 +150,8 @@ implemented by T001.
 - Deterministic Markdown renderer exists (`scripts/project_memory/render_docs.py`) with 71 focused tests and deterministic/atomic output (T004B). 148 total Project Memory tests pass.
 - First clean-HEAD publication snapshot exists at `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/` bound to `3f09420` (T004C), 4 findings, none blocking.
 - First publication render exists at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` (14 Markdown pages, offline quality gate PASS_WITH_FINDINGS).
-- No retrieval tools exist.
+- Read-only context-tool evidence import exists; no retrieval tool or live context-tool runner exists.
 - No reviewers exist.
-- T001, T002, T003A, T003B, T004B, T004C, T004C1, and T004C2 are the delivered artifacts.
-- The next operational step is a post-T004C2 clean-HEAD refresh. No accepted current publication exists yet for the current clean HEAD.
-- The next Project Memory task is PHASE8-IMPL-026-T005 (Existing context-tool integration), planned/inactive.
+- T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, and T005 are delivered.
+- The accepted current T004C2 publication is the `20260714T221454Z` set bound to `8961b35`.
+- The next sequenced Project Memory task is T006, planned/contingent/inactive and not activated. T007 remains contingent/inactive; T008-T011 remain planned.

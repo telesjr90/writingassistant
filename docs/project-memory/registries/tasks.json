@@ -292,13 +292,16 @@
       "title": "Existing context-tool integration",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "planned"
+        "status": "complete"
       },
       "provenance": {
         "created_by": "PHASE8-IMPL-026-T004C",
+        "accepted_by": "PHASE8-IMPL-026-T005",
         "source_locators": [
-          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 21, "line_end": 21 },
-          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" },
+          { "path": "scripts/project_memory/context_tool_evidence.py" },
+          { "path": "tests/project_memory/test_context_tool_evidence.py" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T005-existing-context-tool-evidence-integration.md" }
         ]
       },
       "task_id": "PHASE8-IMPL-026-T005",
@@ -308,7 +311,7 @@
       "classification": "context-tool integration",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Planned next Project Memory task. Inactive — not started. Existing context-tool integration (Repomix, Graphify, LeanCTX). Must not activate before post-T004C1 clean-HEAD refresh."
+      "notes": "Complete/PASS. Implements standard-library-only, read-only import adapters for existing Repomix, Graphify, and CCE artifacts. Generated packs remain generated_evidence; unknown, stale, ambiguous, unsafe, or provenance-incomplete artifacts are quarantined. No context tool was installed or executed. T006 and T007 remain contingent/inactive."
     }
   ]
 }

@@ -235,8 +235,8 @@ python3 scripts/project_memory/convergence.py --repo-root . --json
 
 - Minimal representative seed only; not a complete repository inventory.
 - No MkDocs integration or published documentation site (T004C).
-- No context-tool integration (T005).
-- No retrieval or AI agent integration (T006-T008).
+- Read-only existing context-tool evidence import is implemented (T005); no live context-tool runner exists.
+- No retrieval or AI agent integration (T006-T008). T006/T007 remain contingent and inactive.
 - No Plan Integrity engine (T009).
 - No generated publication snapshot existed at T003A. T003B created the first clean-HEAD generated snapshot.
 - No publication render existed at T004B. T004C generated the first publication render against a clean-HEAD snapshot bound to the T004B commit.
@@ -262,7 +262,7 @@ documentation from a clean-HEAD snapshot bound to the T004B commit:
 - **T004A:** complete/PASS-WITH-FINDINGS
 - **T004B:** complete/PASS
 - **T004C:** complete/PASS-WITH-FINDINGS
-- **Next:** T005 (existing context-tool integration)
+- **T005:** complete/PASS (read-only existing context-tool evidence import)
 
 ## Deterministic Markdown Renderer
 
@@ -399,12 +399,13 @@ Task status is now derived from the validated task registry.
 1. **Post-repair clean-HEAD refresh** — Generate an accepted current
    publication snapshot and render bound to the T004C2 commit.
 
-T005 remains next and inactive. It must not start before the post-repair
-clean-HEAD refresh.
+The post-repair clean-HEAD publication was accepted at `20260714T221454Z`,
+bound to `8961b35`. T005 is complete/PASS.
 
 ## Next Task
 
-`PHASE8-IMPL-026-T005` — Existing context-tool integration. Planned/inactive.
+The next sequenced Project Memory task is T006, planned/contingent/inactive and
+not activated. T007 remains contingent/inactive; T008-T011 remain planned.
 
 T004 is closed as complete/PASS-WITH-FINDINGS. T004C1 and T004C2 are complete/PASS.
 
@@ -430,9 +431,9 @@ checks that distinguish statement subjects. The validator now:
   and reason;
 - returns no generic authority warning when no forbidden claim exists.
 
-Renderer wording did not require modification. Accepted current publication
-remains pending the post-T004C2 clean-HEAD refresh. T005 remains planned and
-inactive until that refresh succeeds.
+Renderer wording did not require modification. The accepted current T004C2
+publication is the `20260714T221454Z` snapshot/render/quality set bound to
+`8961b35`.
 
 ## First Clean-HEAD Snapshot
 
@@ -454,7 +455,9 @@ T003B is complete/PASS-WITH-FINDINGS.
 
 ## Next Task
 
-`PHASE8-IMPL-026-T005` — Existing context-tool integration. Planned/inactive.
+T005 is complete/PASS. The next sequenced task is T006,
+planned/contingent/inactive and not activated. T007 remains contingent/inactive;
+T008-T011 remain planned.
 
 T004 is complete/PASS-WITH-FINDINGS. T004C is complete/PASS-WITH-FINDINGS.
 
@@ -466,4 +469,29 @@ T004 is decomposed into three bounded children:
 - **T004C** — Clean-HEAD documentation generation, offline site quality gate,
   and T004 closeout. Complete/PASS-WITH-FINDINGS.
 
-T004 is complete/PASS-WITH-FINDINGS. T005 remains planned and inactive.
+T004 is complete/PASS-WITH-FINDINGS. T005 is complete/PASS.
+
+## T005 Existing Context-Tool Evidence Import
+
+T005 implements deterministic, standard-library-only read adapters for
+existing Repomix, Graphify, and CCE artifacts:
+
+- public discovery, inspection, normalization, package-build, and package-validation APIs;
+- deterministic tool attribution from manifests, recorded commands, metadata,
+  or tracked conventions—never filenames alone;
+- `current`, `stale`, `historical`, `unknown`, and `unusable` freshness states;
+- bounded inventory, declared-checksum validation, safety exclusions, and
+  explicit default eligibility or quarantine;
+- fixed `generated_evidence` authority with no automatic registry or truth update;
+- exact eight-file, atomic, overwrite-refusing ignored evidence packages.
+
+Unknown and ambiguous origins are classified as
+`unknown_generated_context`. Stale, historical, unknown, ambiguous, unsafe,
+authority-claiming, and provenance-incomplete artifacts remain inventoried but
+quarantined. Read-import approval does not approve installation, indexing,
+search, or live execution.
+
+At implementation time, `ai_context/` and `graphify-out/` were absent in this
+checkout. `.codex-context/` contained only prior Project Memory evidence, which
+is excluded from recursive ingestion. No context tool was installed or
+executed, and no network or model call occurred.

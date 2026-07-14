@@ -66,6 +66,29 @@
       "description": "Pre-existing non-blocking defect in test_context_routes.py: synthetic FastAPI stub missing Request. Unrelated to T002D Story Check grounding validation. Recorded as accepted defect evidence.",
       "associated_task_id": "PHASE8-IMPL-024-T002D",
       "is_blocking_defect": false
+    },
+    {
+      "id": "evidence:ph8-impl-026-t005-context-tool-import",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "T005 Existing Context-Tool Evidence Import Integration",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T005",
+        "accepted_by": "PHASE8-IMPL-026-T005",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T005-existing-context-tool-evidence-integration.md" },
+          { "path": "tests/project_memory/test_context_tool_evidence.py" }
+        ]
+      },
+      "evidence_id": "ph8-impl-026-t005-context-tool-import",
+      "evidence_type": "automated_test",
+      "description": "Focused fixture-only tests validate deterministic, read-only Repomix, Graphify, and CCE artifact import, provenance/freshness/safety classification, quarantine, atomic output, and non-execution boundaries.",
+      "associated_task_id": "PHASE8-IMPL-026-T005",
+      "is_blocking_defect": false
     }
   ]
 }
