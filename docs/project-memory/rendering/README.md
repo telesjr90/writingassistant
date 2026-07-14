@@ -263,4 +263,21 @@ T004 is decomposed into three bounded children:
 
 - **T004A** — Convergence remediation and human-readable Project Memory architecture (complete/PASS-WITH-FINDINGS)
 - **T004B** — Deterministic Markdown renderer implementation and focused tests (complete/PASS)
-- **T004C** — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout (planned next)
+- **T004C** — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout (complete/PASS-WITH-FINDINGS)
+
+## First Publication Render (T004C)
+
+T004C generated the first publication-mode human-readable Project Memory
+documentation from a clean-HEAD snapshot bound to the T004B commit
+`3f094205253652a14a90a66a7294841af68ff630` on branch `docs/project-memory-foundation`.
+
+- **Render path:** `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/`
+- **Snapshot path:** `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/`
+- **Convergence result:** PASS_WITH_FINDINGS (4 nonblocking source_missing)
+- **Quality-gate result:** PASS_WITH_FINDINGS
+- **Freshness limitation:** The generated pages are current only for the T004B
+  commit. The future T004C closeout commit will make them historical. A
+  post-closeout clean-HEAD refresh is required.
+
+No change to the committed renderer architecture occurred in T004C. The
+publication render used only the committed T004B renderer as-is.

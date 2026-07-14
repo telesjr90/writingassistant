@@ -64,10 +64,12 @@ silently override it.
 3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (complete/PASS-WITH-FINDINGS).
    - T003A (scanner implementation and testing) — complete/PASS.
    - T003B (clean-HEAD snapshot, convergence validation, closeout) — complete/PASS-WITH-FINDINGS.
-4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (in_progress).
+4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (complete/PASS-WITH-FINDINGS).
    - T004A (convergence remediation and rendering architecture) — complete/PASS-WITH-FINDINGS.
    - T004B (Markdown renderer implementation) — complete/PASS.
-   - T004C (clean-HEAD documentation generation and site quality gate) — planned.
+   - T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) — complete/PASS-WITH-FINDINGS.
+   - First publication snapshot at `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/`.
+   - First publication render at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/`.
 5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
 7. `PHASE8-IMPL-026-T007` — LlamaIndex / local-embedding / Qdrant Local pilot
@@ -136,7 +138,9 @@ implemented by T001.
 - Deterministic repository-state scanner, convergence checker, and snapshot builder exist (T003A).
 - First clean-HEAD publication snapshot exists at `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/` bound to `a04b65c` (T003B), 14 findings, none blocking.
 - Deterministic Markdown renderer exists (`scripts/project_memory/render_docs.py`) with 71 focused tests and deterministic/atomic output (T004B). 148 total Project Memory tests pass.
+- First clean-HEAD publication snapshot exists at `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/` bound to `3f09420` (T004C), 4 findings, none blocking.
+- First publication render exists at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` (14 Markdown pages, offline quality gate PASS_WITH_FINDINGS).
 - No retrieval tools exist.
 - No reviewers exist.
-- T001, T002, T003A, T003B, and T004B are the delivered artifacts.
-- The next task is PHASE8-IMPL-026-T004C (Clean-HEAD documentation generation, offline site quality gate, and T004 closeout).
+- T001, T002, T003A, T003B, T004B, and T004C are the delivered artifacts.
+- The next task is PHASE8-IMPL-026-T005 (Existing context-tool integration).

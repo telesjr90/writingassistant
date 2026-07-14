@@ -86,58 +86,9 @@
     "status": "complete/PASS",
     "summary": "Defined the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 normalized tracked registry files; registry manifest; dependency-free standard-library validator; focused tests. Established stable namespaced identifiers, tracked-source vs. generated-snapshot separation, enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity. Resolved Q149 (JSON canonical format) and Q150 (one schema bundle, separate registry files, dependency-free validator)."
   },
-  "t003_status": {
-    "task_id": "PHASE8-IMPL-026-T003",
-    "title": "Deterministic scanners and convergence",
-    "status": "complete/PASS-WITH-FINDINGS",
-    "t003a": {
-      "task_id": "PHASE8-IMPL-026-T003A",
-      "title": "Deterministic repository scanners and snapshot-builder implementation",
-      "status": "complete/PASS",
-      "summary": "Implemented standard-library-only deterministic scanner suite (repository_state.py, convergence.py, build_snapshot.py) with 68 focused tests. Defined 20 convergence finding codes and three result levels (PASS, PASS_WITH_FINDINGS, BLOCKED). Established generated snapshot package contract, clean-HEAD publication rule, atomic output behavior, and source hashing/exclusion rules. No publication snapshot created from the dirty implementation worktree."
-    },
-    "t003b": {
-      "task_id": "PHASE8-IMPL-026-T003B",
-      "title": "Clean-HEAD snapshot, convergence validation, and T003 closeout",
-      "status": "complete/PASS-WITH-FINDINGS",
-      "snapshot_path": ".codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/",
-      "bound_commit": "a04b65cc42ba37fe1357272416828e49479cbce1",
-      "convergence_result": "PASS_WITH_FINDINGS",
-      "finding_count": 14,
-      "depends_on": "PHASE8-IMPL-026-T003A"
-    },
-    "depends_on": "PHASE8-IMPL-026-T002",
-    "status": "complete/PASS-WITH-FINDINGS"
-  },
-  "next_project_memory_task": {
-    "task_id": "PHASE8-IMPL-026-T004C",
-    "title": "Clean-HEAD documentation generation, offline site quality gate, and T004 closeout",
-    "status": "planned next",
-    "depends_on": "PHASE8-IMPL-026-T004B"
-  },
-  "t004_parent": {
-    "task_id": "PHASE8-IMPL-026-T004",
-    "title": "Human-readable Project Memory",
-    "status": "in_progress",
-    "t004a": {
-      "task_id": "PHASE8-IMPL-026-T004A",
-      "title": "Convergence remediation and human-readable Project Memory architecture",
-      "status": "complete/PASS-WITH-FINDINGS",
-      "summary": "Repaired 10 invalid directory source locators in assets.json, features.json, projects.json with tracked regular-file replacements. Preserved 4 cross-branch source_missing findings. Defined rendering architecture, input contract, deterministic page set, freshness rules, build-manifest contract, and MkDocs boundary. Added regression test (9 tests)."
-    },
-    "t004b": {
-      "task_id": "PHASE8-IMPL-026-T004B",
-      "title": "Deterministic Markdown renderer implementation and focused tests",
-      "status": "complete/PASS",
-      "summary": "Implemented deterministic standard-library-only Markdown renderer (scripts/project_memory/render_docs.py, renderer name project_memory_markdown_renderer, version project_memory_markdown_renderer.v1) with 71 focused tests in tests/project_memory/test_render_docs.py. Two explicit modes: publication (clean worktree, matching HEAD, reject stale) and historical_preview (accept valid stale snapshots, mark non-publication). 14 generated Markdown pages plus build-manifest.json, source-snapshot.json, FILE-INVENTORY.txt, SHA256SUMS. Snapshot-package validation, generated-evidence banners on every page, freshness enforcement, mandatory unavailable-source display, Markdown safety (escaping, unsafe-link neutralization), deterministic hashes, and atomic output. 148 total Project Memory tests pass (71 focused + 77 prior). Historical-preview smoke succeeded under /tmp. No publication render or MkDocs site exists."
-    },
-    "t004c": {
-      "task_id": "PHASE8-IMPL-026-T004C",
-      "title": "Clean-HEAD documentation generation, offline site quality gate, and T004 closeout",
-      "status": "planned next"
-    },
-    "depends_on": "PHASE8-IMPL-026-T003"
-  },
+  "t003_status": "complete/PASS-WITH-FINDINGS (T003A: complete/PASS, T003B: complete/PASS-WITH-FINDINGS)",
+  "next_project_memory_task": "PHASE8-IMPL-026-T005 — Existing context-tool integration. Planned/inactive.",
+  "t004_parent": "complete/PASS-WITH-FINDINGS",
   "dependencies": {
     "none_approved": [
       "Serena",
@@ -204,5 +155,6 @@
     "convergence finding vocabulary (20 codes)",
     "generated snapshot package contract",
     "atomic output and path safety"
-  ]
+  ],
+  "t004c_status": "complete/PASS-WITH-FINDINGS"
 }

@@ -18,7 +18,13 @@ T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
 - T003B (clean-HEAD snapshot, convergence validation, and T003 closeout)
   is complete/PASS-WITH-FINDINGS.
 
-Next Project Memory task: PHASE8-IMPL-026-T004C (Clean-HEAD documentation generation, offline site quality gate, and T004 closeout).
+Next Project Memory task: PHASE8-IMPL-026-T005 (Existing context-tool integration).
+
+T004 is complete/PASS-WITH-FINDINGS:
+- T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
+- T004B (Markdown renderer implementation) is complete/PASS.
+- T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) is complete/PASS-WITH-FINDINGS.
+First publication render at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` bound to `3f09420`.
 
 ## Classification
 
@@ -110,7 +116,7 @@ T003 is decomposed into two bounded children:
 
 ### PHASE8-IMPL-026-T004 — Human-readable Project Memory
 
-Status: in_progress. Depends on T003.
+Status: complete/PASS-WITH-FINDINGS. Depends on T003.
 
 Render normalized registries and scanner output into human-readable
 documentation that explains what is implemented, what is planned, what is
@@ -137,7 +143,12 @@ T004 is decomposed into three bounded children:
   Historical-preview smoke succeeded. No publication render or MkDocs
   site exists.
 - **T004C** — Clean-HEAD documentation generation, offline site quality gate,
-  and T004 closeout. Planned after T004B.
+  and T004 closeout. Complete/PASS-WITH-FINDINGS. Generated first publication
+  snapshot from clean T004B HEAD, first publication-mode render (14 pages),
+  and offline quality gate. Snapshot convergence: PASS_WITH_FINDINGS (4
+  nonblocking source_missing). Quality result: PASS_WITH_FINDINGS.
+  MkDocs not available; no installation attempted. Generated output is
+  `generated_evidence` bound to `3f09420`. Post-closeout refresh required.
 
 ### PHASE8-IMPL-026-T005 — Existing context-tool integration
 
