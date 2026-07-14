@@ -86,13 +86,35 @@ Generated pages and built sites are:
 - Never manually edited
 - Never authoritative
 
-## Future Renderer Implementation Paths (T004B)
+## Renderer Implementation (T004B)
 
-- `scripts/project_memory/render_docs.py` — implementation
-- `tests/project_memory/test_render_docs.py` — focused tests
+T004B implemented the deterministic Markdown renderer according to the committed
+T004A architecture contract.
 
-The renderer must be standard-library-only unless a later owner-approved task
-authorizes a dependency. Do not create those files in T004A.
+- **Module:** `scripts/project_memory/render_docs.py`
+- **Tests:** `tests/project_memory/test_render_docs.py` (71 tests)
+- **Renderer name:** `project_memory_markdown_renderer`
+- **Renderer version:** `project_memory_markdown_renderer.v1`
+
+The renderer is standard-library-only. No dependencies were added.
+
+### CLI Contract
+
+```bash
+python3 scripts/project_memory/render_docs.py \
+  --repo-root . \
+  --snapshot-dir <SNAPSHOT_DIR> \
+  --output-root <OUTPUT_ROOT> \
+  --task-id <TASK_ID> \
+  --run-id <RUN_ID> \
+  --generated-at <RFC3339_UTC> \
+  --mode {publication,historical_preview} \
+  --json
+```
+
+### Implementation Status
+
+T004B is complete/PASS. No publication render exists yet.
 
 ## Deterministic Page Set
 
@@ -239,6 +261,6 @@ in the authority hierarchy.
 
 T004 is decomposed into three bounded children:
 
-- **T004A** — Convergence remediation and human-readable Project Memory architecture
-- **T004B** — Deterministic Markdown renderer implementation and focused tests
-- **T004C** — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout
+- **T004A** — Convergence remediation and human-readable Project Memory architecture (complete/PASS-WITH-FINDINGS)
+- **T004B** — Deterministic Markdown renderer implementation and focused tests (complete/PASS)
+- **T004C** — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout (planned next)

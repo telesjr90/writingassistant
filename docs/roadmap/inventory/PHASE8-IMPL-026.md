@@ -66,7 +66,7 @@ silently override it.
    - T003B (clean-HEAD snapshot, convergence validation, closeout) — complete/PASS-WITH-FINDINGS.
 4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (in_progress).
    - T004A (convergence remediation and rendering architecture) — complete/PASS-WITH-FINDINGS.
-   - T004B (Markdown renderer implementation) — planned next.
+   - T004B (Markdown renderer implementation) — complete/PASS.
    - T004C (clean-HEAD documentation generation and site quality gate) — planned.
 5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
@@ -135,9 +135,8 @@ implemented by T001.
 - Dependency-free standard-library validator exists.
 - Deterministic repository-state scanner, convergence checker, and snapshot builder exist (T003A).
 - First clean-HEAD publication snapshot exists at `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/` bound to `a04b65c` (T003B), 14 findings, none blocking.
-- Focused tests exist (68 passing).
-- No renderers exist.
+- Deterministic Markdown renderer exists (`scripts/project_memory/render_docs.py`) with 71 focused tests and deterministic/atomic output (T004B). 148 total Project Memory tests pass.
 - No retrieval tools exist.
 - No reviewers exist.
-- T001, T002, T003A, and T003B are the delivered artifacts.
-- The next task is PHASE8-IMPL-026-T004 (human-readable Project Memory).
+- T001, T002, T003A, T003B, and T004B are the delivered artifacts.
+- The next task is PHASE8-IMPL-026-T004C (Clean-HEAD documentation generation, offline site quality gate, and T004 closeout).

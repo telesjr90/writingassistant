@@ -234,13 +234,75 @@ python3 scripts/project_memory/convergence.py --repo-root . --json
 ## Current Limitations
 
 - Minimal representative seed only; not a complete repository inventory.
-- No human-readable rendered output (T004).
+- No MkDocs integration or published documentation site (T004C).
 - No context-tool integration (T005).
 - No retrieval or AI agent integration (T006-T008).
 - No Plan Integrity engine (T009).
 - No generated publication snapshot existed at T003A. T003B created the first clean-HEAD generated snapshot.
+- No publication render exists yet (T004C planned).
 - No branch synchronization performed yet.
 - Stale memory detection requires future operational automation.
+
+## Deterministic Markdown Renderer
+
+T004B implemented a deterministic, standard-library-only renderer:
+
+- **Module:** `scripts/project_memory/render_docs.py`
+- **Tests:** `tests/project_memory/test_render_docs.py`
+- **CLI shape:**
+
+```bash
+python3 scripts/project_memory/render_docs.py \
+  --repo-root . \
+  --snapshot-dir <SNAPSHOT_DIR> \
+  --output-root <OUTPUT_ROOT> \
+  --task-id <TASK_ID> \
+  --run-id <RUN_ID> \
+  --generated-at <RFC3339_UTC> \
+  --mode {publication,historical_preview} \
+  --json
+```
+
+- **Output package:** 14 Markdown pages under `docs/` plus `build-manifest.json`, `source-snapshot.json`, `FILE-INVENTORY.txt`, and `SHA256SUMS`.
+
+### 14-Page Set
+
+1. `index.md` — Project Memory overview
+2. `application-overview.md` — Application description
+3. `product-boundaries.md` — Non-negotiable safety boundaries
+4. `features.md` — Implemented, partial, and planned features
+5. `capabilities.md` — Implemented and planned capabilities
+6. `current-roadmap.md` — Accepted roadmap with active frontier
+7. `remaining-work.md` — Incomplete and blocked work
+8. `dependencies.md` — Dependency edges
+9. `decisions.md` — Accepted and owner decisions
+10. `assets.md` — Repository assets and fixtures
+11. `evidence.md` — Evidence records
+12. `risks-and-open-questions.md` — Active risks and open questions
+13. `convergence-findings.md` — Snapshot findings
+14. `technical-annex.md` — Schemas, versions, and determinism rules
+
+### Modes
+
+- **publication** — Requires clean worktree, matching HEAD, publication-eligible snapshot. Output under `.codex-context/project-memory/rendered/`. Rejects stale snapshots.
+- **historical_preview** — Accepts valid stale snapshots. Output marked as historical and non-publication. Must not output under publication root.
+
+### Key Behaviors
+
+- **Generated evidence:** Every page carries a banner stating "Generated evidence — not project authority."
+- **Freshness:** Stale snapshots rendered in historical_preview mode display a prominent "Historical preview" banner.
+- **Unavailable sources:** Missing source locators are explicitly labeled rather than silently omitted.
+- **Atomic output:** Built in a temporary directory and atomically renamed. Refuses to overwrite existing runs.
+- **Determinism:** Identical inputs produce byte-identical output. UTF-8, LF endings, sorted JSON keys, stable record ordering.
+- **No external dependencies:** Standard library only.
+
+### T004 Status
+
+- **T004A:** Complete/PASS-WITH-FINDINGS
+- **T004B:** Complete/PASS
+- **T004C:** Planned next — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout.
+
+No publication render exists yet. No MkDocs site, external tool, model, dependency, MCP server, plugin, index, or retrieval system was installed or used.
 
 ## First Clean-HEAD Snapshot
 
@@ -262,8 +324,7 @@ T003B is complete/PASS-WITH-FINDINGS.
 
 ## Next Task
 
-`PHASE8-IMPL-026-T004` — Human-readable Project Memory. Will render
-normalized registries and scanner output into human-readable documentation.
+`PHASE8-IMPL-026-T004C` — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout. Planned next.
 
 T004 is decomposed into three bounded children:
 
@@ -274,8 +335,8 @@ T004 is decomposed into three bounded children:
   page set, freshness rules, build-manifest contract, and MkDocs boundary
   defined in `docs/project-memory/rendering/README.md`.
 - **T004B** — Deterministic Markdown renderer implementation and focused
-  tests. Planned next.
+  tests. Complete/PASS.
 - **T004C** — Clean-HEAD documentation generation, offline site quality gate,
-  and T004 closeout. Planned.
+  and T004 closeout. Planned next.
 
-T004 is in progress; T004B is planned next. T005 remains planned and inactive.
+T004 is in progress; T004B is complete/PASS. T005 remains planned and inactive.

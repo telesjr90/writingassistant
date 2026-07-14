@@ -18,7 +18,7 @@ T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
 - T003B (clean-HEAD snapshot, convergence validation, and T003 closeout)
   is complete/PASS-WITH-FINDINGS.
 
-Next Project Memory task: PHASE8-IMPL-026-T004 (Human-readable Project Memory).
+Next Project Memory task: PHASE8-IMPL-026-T004C (Clean-HEAD documentation generation, offline site quality gate, and T004 closeout).
 
 ## Classification
 
@@ -127,8 +127,15 @@ T004 is decomposed into three bounded children:
   MkDocs boundary defined. Regression test added (9 tests).
   Next: T004B.
 - **T004B** — Deterministic Markdown renderer implementation and focused
-  tests. Planned next. Will implement `scripts/project_memory/render_docs.py`
-  and `tests/project_memory/test_render_docs.py`.
+  tests. Complete/PASS. Implemented `scripts/project_memory/render_docs.py`
+  and `tests/project_memory/test_render_docs.py` (71 focused tests).
+  Renderer name: `project_memory_markdown_renderer`, version `project_memory_markdown_renderer.v1`.
+  14 generated Markdown pages, publication and historical-preview modes,
+  snapshot-package validation, freshness enforcement, generated-evidence
+  banners, unavailable-source display, Markdown safety, deterministic
+  hashes, atomic output. 148 total Project Memory tests pass.
+  Historical-preview smoke succeeded. No publication render or MkDocs
+  site exists.
 - **T004C** — Clean-HEAD documentation generation, offline site quality gate,
   and T004 closeout. Planned after T004B.
 
