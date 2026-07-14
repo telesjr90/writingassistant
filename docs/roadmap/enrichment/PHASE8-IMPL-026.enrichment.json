@@ -112,7 +112,13 @@
   "next_project_memory_task": {
     "task_id": "PHASE8-IMPL-026-T004",
     "title": "Human-readable Project Memory",
-    "status": "planned",
+    "status": "in_progress",
+    "t004a": {
+      "task_id": "PHASE8-IMPL-026-T004A",
+      "title": "Convergence remediation and human-readable Project Memory architecture",
+      "status": "complete/PASS-WITH-FINDINGS",
+      "summary": "Repaired 10 invalid directory source locators in assets.json, features.json, projects.json with tracked regular-file replacements. Preserved 4 cross-branch source_missing findings. Defined rendering architecture, input contract, deterministic page set, freshness rules, build-manifest contract, and MkDocs boundary. Added regression test (9 tests). T004B planned next."
+    },
     "depends_on": "PHASE8-IMPL-026-T003"
   },
   "dependencies": {

@@ -35,7 +35,8 @@
       "provenance": {
         "created_by": "PHASE8-IMPL-023-T023",
         "source_locators": [
-          { "path": "frontend/src/" }
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md" },
+          { "path": "frontend/src/omiGroupedReview.js" }
         ]
       },
       "feature_id": "owner-controlled-candidate-review",
@@ -76,8 +77,8 @@
       "provenance": {
         "created_by": "PHASE8-IMPL-026-T001",
         "source_locators": [
-          { "path": "docs/project-memory/" },
-          { "path": "scripts/project_memory/" }
+          { "path": "docs/project-memory/README.md" },
+          { "path": "scripts/project_memory/validate_registries.py" }
         ]
       },
       "feature_id": "project-memory",

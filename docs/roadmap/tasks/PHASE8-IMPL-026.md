@@ -110,12 +110,27 @@ T003 is decomposed into two bounded children:
 
 ### PHASE8-IMPL-026-T004 — Human-readable Project Memory
 
-Status: planned. Depends on T003.
+Status: in_progress. Depends on T003.
 
 Render normalized registries and scanner output into human-readable
 documentation that explains what is implemented, what is planned, what is
 missing, what conflicts exist, and what requires owner attention. Generated
 sites are build output and are not authority.
+
+T004 is decomposed into three bounded children:
+
+- **T004A** — Convergence remediation and human-readable Project Memory
+  architecture. Complete/PASS-WITH-FINDINGS. All 10 invalid directory source
+  locators repaired with tracked regular-file replacements. 4 cross-branch
+  source_missing findings preserved. Rendering architecture, input contract,
+  deterministic page set, freshness rules, build-manifest contract, and
+  MkDocs boundary defined. Regression test added (9 tests).
+  Next: T004B.
+- **T004B** — Deterministic Markdown renderer implementation and focused
+  tests. Planned next. Will implement `scripts/project_memory/render_docs.py`
+  and `tests/project_memory/test_render_docs.py`.
+- **T004C** — Clean-HEAD documentation generation, offline site quality gate,
+  and T004 closeout. Planned after T004B.
 
 ### PHASE8-IMPL-026-T005 — Existing context-tool integration
 

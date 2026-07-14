@@ -64,7 +64,10 @@ silently override it.
 3. `PHASE8-IMPL-026-T003` — Deterministic scanners and convergence (complete/PASS-WITH-FINDINGS).
    - T003A (scanner implementation and testing) — complete/PASS.
    - T003B (clean-HEAD snapshot, convergence validation, closeout) — complete/PASS-WITH-FINDINGS.
-4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (planned).
+4. `PHASE8-IMPL-026-T004` — Human-readable Project Memory (in_progress).
+   - T004A (convergence remediation and rendering architecture) — complete/PASS-WITH-FINDINGS.
+   - T004B (Markdown renderer implementation) — planned next.
+   - T004C (clean-HEAD documentation generation and site quality gate) — planned.
 5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
 7. `PHASE8-IMPL-026-T007` — LlamaIndex / local-embedding / Qdrant Local pilot

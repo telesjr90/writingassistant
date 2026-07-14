@@ -14,11 +14,11 @@
       "provenance": {
         "created_by": "PHASE7-IMPL-001",
         "source_locators": [
-          { "path": "projects/example/" }
+          { "path": "projects/example/project.json" }
         ]
       },
       "asset_id": "example-project-fixture",
-      "asset_path": "projects/example/",
+      "asset_path": "projects/example/project.json",
       "asset_type": "project_fixture",
       "is_durable_fixture": true,
       "notes": "Current committed fixture used for deterministic and automated tests. Contains owner-authored scene prose and metadata."
@@ -77,7 +77,9 @@
       "provenance": {
         "created_by": "PHASE8-IMPL-005",
         "source_locators": [
-          { "path": "projects/example/" }
+          { "path": "docs/roadmap/project_file_model.md" },
+          { "path": "projects/example/bible.json" },
+          { "path": "projects/example/storyform.json" }
         ]
       },
       "asset_id": "elena-asset-family",

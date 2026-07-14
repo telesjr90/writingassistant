@@ -44,7 +44,7 @@
 
 153. Which embedding model should the LlamaIndex/local-embedding pilot evaluate, and what retrieval benchmark thresholds should determine adoption or rejection?
 
-154. What operational synchronization cadence should govern the Project Memory branch — per-task, per-parent, per-phase, or time-based — and what should trigger a deterministic memory refresh?
+154. What operational synchronization cadence should govern the Project Memory branch — per-task, per-parent, per-phase, or time-based — and what should trigger a deterministic memory refresh? **T004A confirms Q154 remains open.** T004A performs no branch synchronization. Rendering requires explicit snapshot selection and exact freshness checks; this does not resolve the synchronization cadence. The 4 source_missing findings from T003B remain as expected cross-branch absences.
 
 155. ~~What exact Project Memory authority hierarchy, trust classes, freshness model, commit binding, supersession, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization, and product boundaries should T001 define?~~ **Resolved by PHASE8-IMPL-026-T001:** `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md` defines all fifteen decision areas. No schema, scanner, registry, renderer, retrieval tool, or reviewer is implemented by T001.
 

@@ -264,3 +264,18 @@ T003B is complete/PASS-WITH-FINDINGS.
 
 `PHASE8-IMPL-026-T004` — Human-readable Project Memory. Will render
 normalized registries and scanner output into human-readable documentation.
+
+T004 is decomposed into three bounded children:
+
+- **T004A** — Convergence remediation and human-readable Project Memory
+  architecture. Complete/PASS-WITH-FINDINGS. All 10 invalid directory source
+  locators repaired with tracked regular-file replacements. 4 cross-branch
+  source_missing findings preserved. Rendering architecture, input contract,
+  page set, freshness rules, build-manifest contract, and MkDocs boundary
+  defined in `docs/project-memory/rendering/README.md`.
+- **T004B** — Deterministic Markdown renderer implementation and focused
+  tests. Planned next.
+- **T004C** — Clean-HEAD documentation generation, offline site quality gate,
+  and T004 closeout. Planned.
+
+T004 is in progress; T004B is planned next. T005 remains planned and inactive.

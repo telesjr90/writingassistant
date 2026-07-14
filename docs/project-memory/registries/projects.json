@@ -14,8 +14,8 @@
       "provenance": {
         "created_by": "PHASE7-IMPL-001",
         "source_locators": [
-          { "path": "backend/", "symbol": "root_app" },
-          { "path": "frontend/", "symbol": "root_ui" },
+          { "path": "backend/main.py", "symbol": "root_app" },
+          { "path": "frontend/src/App.jsx", "symbol": "root_ui" },
           { "path": "README.md" }
         ]
       },
@@ -36,9 +36,9 @@
         "created_by": "PHASE8-IMPL-026-T001",
         "accepted_by": "PHASE8-IMPL-026-T001",
         "source_locators": [
-          { "path": "docs/project-memory/" },
-          { "path": "scripts/project_memory/" },
-          { "path": "tests/project_memory/" }
+          { "path": "docs/project-memory/README.md" },
+          { "path": "scripts/project_memory/validate_registries.py" },
+          { "path": "tests/project_memory/test_validate_registries.py" }
         ],
         "owner_decision_ref": "owner-decision:pmf-parent-identity"
       },
