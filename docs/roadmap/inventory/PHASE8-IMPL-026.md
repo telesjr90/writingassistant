@@ -68,8 +68,12 @@ silently override it.
    - T004A (convergence remediation and rendering architecture) — complete/PASS-WITH-FINDINGS.
    - T004B (Markdown renderer implementation) — complete/PASS.
    - T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) — complete/PASS-WITH-FINDINGS.
+   - T004C1 (post-closeout task-registry synchronization and current-truth quality-gate repair) — complete/PASS.
    - First publication snapshot at `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/`.
    - First publication render at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/`.
+   - Post-closeout clean-HEAD refresh at `20260714T042826Z` bound to `a415270` produced structurally valid packages but was not accepted (renderer hardcodes index status table).
+   - T004C1 repaired: task-registry synchronization, renderer hardcodes removed, registry-derived task status, semantic validator, fail-closed semantic publication gate, focused regression tests.
+   - No accepted current publication exists yet; a post-T004C1 clean-HEAD refresh is required.
 5. `PHASE8-IMPL-026-T005` — Existing context-tool integration (planned).
 6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
 7. `PHASE8-IMPL-026-T007` — LlamaIndex / local-embedding / Qdrant Local pilot
@@ -142,5 +146,6 @@ implemented by T001.
 - First publication render exists at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` (14 Markdown pages, offline quality gate PASS_WITH_FINDINGS).
 - No retrieval tools exist.
 - No reviewers exist.
-- T001, T002, T003A, T003B, T004B, and T004C are the delivered artifacts.
-- The next task is PHASE8-IMPL-026-T005 (Existing context-tool integration).
+- T001, T002, T003A, T003B, T004B, T004C, and T004C1 are the delivered artifacts.
+- The next operational step is a post-T004C1 clean-HEAD refresh. No accepted current publication exists yet for the current clean HEAD.
+- The next Project Memory task is PHASE8-IMPL-026-T005 (Existing context-tool integration), planned/inactive.

@@ -160,12 +160,14 @@
       "title": "Deterministic scanners and convergence",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "planned"
+        "status": "complete"
       },
       "provenance": {
         "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T003",
         "source_locators": [
-          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 82, "line_end": 88 }
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 16, "line_end": 20 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
         ]
       },
       "task_id": "PHASE8-IMPL-026-T003",
@@ -175,7 +177,138 @@
       "classification": "deterministic scanner",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Next Project Memory task. Will implement read-only deterministic scanners that inspect repository state and produce normalized evidence records."
+      "notes": "Complete/PASS-WITH-FINDINGS. T003A (scanner implementation and testing) complete/PASS; T003B (clean-HEAD snapshot, convergence validation, and T003 closeout) complete/PASS-WITH-FINDINGS. First clean-HEAD publication snapshot at .codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/ bound to a04b65c."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Human-readable Project Memory",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004A",
+        "accepted_by": "PHASE8-IMPL-026-T004C",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 23, "line_end": 27 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T003"],
+      "task_type": "infrastructure",
+      "classification": "documentation and rendering",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. T004A (convergence remediation and rendering architecture) complete/PASS-WITH-FINDINGS; T004B (Markdown renderer implementation) complete/PASS; T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) complete/PASS-WITH-FINDINGS. First publication render at .codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/ bound to 3f09420. T004 is closed as complete/PASS-WITH-FINDINGS."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004A",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Convergence remediation and human-readable Project Memory architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004A",
+        "accepted_by": "PHASE8-IMPL-026-T004A",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 24, "line_end": 24 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004A",
+      "parent_task_id": "PHASE8-IMPL-026-T004",
+      "depends_on": ["PHASE8-IMPL-026-T003"],
+      "task_type": "infrastructure",
+      "classification": "rendering architecture",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. Established the human-readable Project Memory rendering architecture contract. Remediated convergence findings to register available sources and mark unavailable sources as unavailable."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004B",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Markdown renderer implementation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004B",
+        "accepted_by": "PHASE8-IMPL-026-T004B",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 25, "line_end": 25 },
+          { "path": "scripts/project_memory/render_docs.py" },
+          { "path": "tests/project_memory/test_render_docs.py" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004B",
+      "parent_task_id": "PHASE8-IMPL-026-T004",
+      "depends_on": ["PHASE8-IMPL-026-T004A"],
+      "task_type": "runtime",
+      "classification": "deterministic Markdown renderer",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implemented a dependency-free deterministic Markdown renderer (scripts/project_memory/render_docs.py) with 71 focused tests. Generates 14-page publication packages from tracked registries and a selected snapshot. Standard library only. No MkDocs dependency."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004C",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Clean-HEAD documentation generation, offline site quality gate, and T004 closeout",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004C",
+        "accepted_by": "PHASE8-IMPL-026-T004C",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T004C-clean-head-documentation-generation-and-t004-closeout.md" },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 26, "line_end": 27 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004C",
+      "parent_task_id": "PHASE8-IMPL-026-T004",
+      "depends_on": ["PHASE8-IMPL-026-T004B"],
+      "task_type": "closeout",
+      "classification": "documentation generation and quality gate",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. Generated first publication snapshot and render from a clean-HEAD bound to the T004B commit (3f09420). Offline quality gate PASS_WITH_FINDINGS. T004 closeout commit a415270. Four cross-branch nonblocking source_missing findings remain. Post-closeout clean-HEAD refresh at 20260714T042826Z produced structurally valid packages but the renderer's hardcoded index-page status table incorrectly showed T004 as in progress and T004C as planned because the renderer does not read task status from the registry for that table. T004C1 adds the missing registry records."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T005",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Existing context-tool integration",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004C",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 21, "line_end": 21 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T005",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T004"],
+      "task_type": "infrastructure",
+      "classification": "context-tool integration",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Planned next Project Memory task. Inactive — not started. Existing context-tool integration (Repomix, Graphify, LeanCTX). Must not activate before post-T004C1 clean-HEAD refresh."
     }
   ]
 }

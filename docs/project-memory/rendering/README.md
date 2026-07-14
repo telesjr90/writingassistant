@@ -281,3 +281,39 @@ documentation from a clean-HEAD snapshot bound to the T004B commit
 
 No change to the committed renderer architecture occurred in T004C. The
 publication render used only the committed T004B renderer as-is.
+
+## Post-Closeout Current-Truth Requirement (T004C1)
+
+Publication structure and hashes alone are insufficient to accept a render
+as the current accepted publication. Rendered normalized task status must
+converge with accepted roadmap truth.
+
+A contradictory current-task render blocks publication acceptance even when:
+- The snapshot is structurally valid and checksum-clean.
+- The render package is structurally valid and checksum-clean.
+- The bound commit is correct and freshness is current.
+- All banners, links, and unsafe-content checks pass.
+
+The T004C1 post-closeout repair addressed both root causes:
+
+1. **Task registry lag** — `docs/project-memory/registries/tasks.json`
+   now contains current records for T004, T004A, T004B, T004C, and T005.
+2. **Renderer hardcodes** — `_render_index()` and `_render_current_roadmap()`
+   now derive task status from the validated normalized task registry
+   rather than from hardcoded status strings. Status-bearing hardcodes
+   are prohibited.
+
+### Semantic Publication Validation
+
+A reusable semantic rendered-package validator
+(`scripts/project_memory/validate_rendered_docs.py`) now exists. It
+verifies both structural integrity and semantic task-state convergence.
+
+- Structural hashes alone are insufficient to accept a current publication.
+- Rendered task status must match the normalized task registry.
+- Semantic contradiction blocks atomic publication (fail-closed).
+- The renderer refuses atomic finalization when generated pages contradict
+  normalized task truth.
+- Historical-preview mode validates semantic consistency with its selected
+  historical snapshot/registry context.
+- Current publication must be commit-bound and semantically convergent.

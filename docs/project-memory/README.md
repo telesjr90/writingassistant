@@ -328,11 +328,85 @@ First publication render at `.codex-context/project-memory/rendered/PHASE8-IMPL-
 
 No publication render exists yet. No MkDocs site, external tool, model, dependency, MCP server, plugin, index, or retrieval system was installed or used.
 
+## Post-Closeout Clean-HEAD Refresh (20260714T042826Z)
+
+A clean-HEAD refresh was attempted at `20260714T042826Z` bound to the T004C
+closeout commit `a415270b18f978e601a9ffc6d7bcb4ab8a250c42`.
+
+### Status
+
+The refresh generated structurally valid packages:
+
+- **Snapshot:** `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T042826Z/`
+- **Render:** `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T042826Z/`
+- **Quality:** `.codex-context/project-memory/PHASE8-IMPL-026-T004C-quality/20260714T042826Z/`
+
+All packages pass SHA256SUMS. Bound commit is correct. Convergence is
+PASS_WITH_FINDINGS (4 nonblocking source_missing). Publication eligibility is
+true.
+
+### Why not accepted
+
+The rendered documentation incorrectly reported T004 as "in progress" and
+T004C as "planned" because:
+
+1. The task registry (`docs/project-memory/registries/tasks.json`) contained
+   records only through T003 and lacked normalized records for T004, T004A,
+   T004B, T004C, and T005.
+2. The renderer (`scripts/project_memory/render_docs.py`) hardcodes the
+   "Project Memory Workstream Status" table in `_render_index()` (lines
+   718-726) rather than reading task lifecycle status from the registry.
+
+The one-off quality checker returned PASS (false positive) because it did
+not verify rendered task-status convergence with accepted roadmap truth.
+
+### Classification
+
+The `20260714T042826Z` packages are structurally valid generated evidence
+but were not accepted as the current publication. No accepted current
+publication exists for `a415270b18f978e601a9ffc6d7bcb4ab8a250c42`.
+
+## T004C1 Registry Repair
+
+T004C1 is a bounded post-closeout repair that:
+
+- Added normalized task records for T004, T004A, T004B, T004C, and T005
+  to `docs/project-memory/registries/tasks.json`.
+- Updated T003 from "planned" to "complete".
+- Added a T004-depends-on-T003 dependency edge to
+  `docs/project-memory/registries/dependencies.json`.
+- Removed hardcoded task-status strings from `_render_index()` and
+  `_render_current_roadmap()` in `scripts/project_memory/render_docs.py`.
+- Implemented deterministic task-status derivation from the validated
+  normalized task registry.
+- Created a semantic rendered-package validator
+  (`scripts/project_memory/validate_rendered_docs.py`) with CLI.
+- Added a fail-closed semantic publication gate in the renderer:
+  publication rendering refuses atomic finalization when generated pages
+  contradict normalized task truth.
+- Added focused regression coverage across three test files.
+- Updated documentation to record the failed refresh, the repair, and
+  the required next operational step.
+
+### Known renderer defect (RESOLVED)
+
+The renderer no longer hardcodes the index page's "Project Memory
+Workstream Status" table or the current-roadmap child indicator.
+Task status is now derived from the validated task registry.
+
+### Required next steps
+
+1. **Post-repair clean-HEAD refresh** — Generate an accepted current
+   publication snapshot and render bound to the T004C1 commit.
+
+T005 remains next and inactive. It must not start before the post-repair
+clean-HEAD refresh.
+
 ## Next Task
 
 `PHASE8-IMPL-026-T005` — Existing context-tool integration. Planned/inactive.
 
-T004 is closed as complete/PASS-WITH-FINDINGS.
+T004 is closed as complete/PASS-WITH-FINDINGS. T004C1 is complete/PASS.
 
 ## First Clean-HEAD Snapshot
 

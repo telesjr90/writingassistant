@@ -230,6 +230,101 @@ def _group_by_status(
     return groups
 
 
+_PM_PARENT_TASK_ID = "PHASE8-IMPL-026"
+_APP_FRONTIER_TASK_ID = "PHASE8-IMPL-024-T003A"
+
+_PM_TASK_DISPLAY_ORDER = (
+    "PHASE8-IMPL-026-T001",
+    "PHASE8-IMPL-026-T002",
+    "PHASE8-IMPL-026-T003",
+    "PHASE8-IMPL-026-T004",
+    "PHASE8-IMPL-026-T004A",
+    "PHASE8-IMPL-026-T004B",
+    "PHASE8-IMPL-026-T004C",
+    "PHASE8-IMPL-026-T005",
+)
+
+_PM_TASK_LABELS = {
+    "PHASE8-IMPL-026-T001": "T001 (Authority/Lifecycle foundation)",
+    "PHASE8-IMPL-026-T002": "T002 (Schema/registry architecture)",
+    "PHASE8-IMPL-026-T003": "T003 (Scanners/snapshot builder)",
+    "PHASE8-IMPL-026-T004": "T004 (Human-readable memory)",
+    "PHASE8-IMPL-026-T004A": "T004A (Architecture/remediation)",
+    "PHASE8-IMPL-026-T004B": "T004B (Markdown renderer)",
+    "PHASE8-IMPL-026-T004C": "T004C (Clean-HEAD publication)",
+    "PHASE8-IMPL-026-T005": "T005 (Context-tool integration)",
+}
+
+
+def _get_task_by_id(tasks: list[dict[str, Any]], task_id: str) -> dict[str, Any] | None:
+    for t in tasks:
+        if t.get("task_id") == task_id:
+            return t
+    return None
+
+
+def _get_children(tasks: list[dict[str, Any]], parent_task_id: str) -> list[dict[str, Any]]:
+    children = [t for t in tasks if t.get("parent_task_id") == parent_task_id]
+    children.sort(key=lambda t: t.get("task_id", ""))
+    return children
+
+
+def _validate_task_records(tasks: list[dict[str, Any]]) -> list[str]:
+    errors = []
+    seen_ids: dict[str, int] = {}
+    for t in tasks:
+        tid = t.get("task_id", "")
+        if tid in seen_ids:
+            errors.append(f"Duplicate task_id: {tid}")
+        else:
+            seen_ids[tid] = 1
+    for t in tasks:
+        parent = t.get("parent_task_id")
+        if parent and parent not in seen_ids:
+            errors.append(f"Parent task_id '{parent}' not found for task {t.get('task_id', '')}")
+    allowed_lifecycles = frozenset(["planned", "in_progress", "complete", "blocked",
+                                     "deferred", "historical", "superseded", "owner_pending"])
+    for t in tasks:
+        lc_status = t.get("lifecycle", {}).get("status", "")
+        if lc_status not in allowed_lifecycles:
+            errors.append(f"Unsupported lifecycle status '{lc_status}' for task {t.get('task_id', '')}")
+    return errors
+
+
+def _identify_completed_children(
+    tasks: list[dict[str, Any]], parent_task_id: str
+) -> list[dict[str, Any]]:
+    children = _get_children(tasks, parent_task_id)
+    return [c for c in children if c.get("lifecycle", {}).get("status") == "complete"]
+
+
+def _identify_next_planned_child(
+    tasks: list[dict[str, Any]], parent_task_id: str
+) -> dict[str, Any] | None:
+    children = _get_children(tasks, parent_task_id)
+    planned = [c for c in children if c.get("lifecycle", {}).get("status") == "planned"]
+    return planned[0] if planned else None
+
+
+def _derive_task_display_status(task: dict[str, Any]) -> str:
+    lc = task.get("lifecycle", {})
+    status = lc.get("status", "unknown")
+    notes = task.get("notes", "")
+    if status == "complete":
+        if "PASS-WITH-FINDINGS" in notes:
+            return "complete/PASS-WITH-FINDINGS"
+        if "PASS" in notes:
+            return "complete/PASS"
+        return "complete"
+    if status == "planned":
+        if "inactive" in notes.lower() or "Inactive" in notes:
+            return "planned/inactive"
+        return "planned"
+    if status == "in_progress":
+        return "in progress"
+    return status
+
+
 def load_and_validate_inputs(
     repo_root: str,
 ) -> dict[str, Any]:
@@ -713,17 +808,24 @@ def _render_index(model: dict[str, Any]) -> str:
 
     lines.append("## Project Memory Workstream Status")
     lines.append("")
+    tasks = model.get("tasks", [])
+    task_by_id = {t.get("task_id", ""): t for t in tasks}
+    missing = []
+    for tid in _PM_TASK_DISPLAY_ORDER:
+        if tid not in task_by_id:
+            missing.append(tid)
+    if missing:
+        raise ValueError(f"Required PM task records missing from registry: {missing}")
+    parent_rec = task_by_id.get(_PM_PARENT_TASK_ID)
+    parent_label = _derive_task_display_status(parent_rec) if parent_rec else "unknown"
     lines.append("| Task | Status |")
     lines.append("|---|---|")
-    lines.append("| PHASE8-IMPL-026 (published/active) | in progress |")
-    lines.append("| T001 (Authority/Lifecycle foundation) | complete/PASS |")
-    lines.append("| T002 (Schema/registry architecture) | complete/PASS |")
-    lines.append("| T003 (Scanners/snapshot builder) | complete/PASS-WITH-FINDINGS |")
-    lines.append("| T004 (Human-readable memory) | in progress |")
-    lines.append("| T004A (Architecture/remediation) | complete/PASS-WITH-FINDINGS |")
-    lines.append("| T004B (Markdown renderer) | in progress |")
-    lines.append("| T004C (Clean-HEAD publication) | planned |")
-    lines.append("| T005 (Context-tool integration) | planned/inactive |")
+    lines.append(f"| {_sanitize_string(_PM_PARENT_TASK_ID)} (published/active) | {_sanitize_string(parent_label)} |")
+    for tid in _PM_TASK_DISPLAY_ORDER:
+        rec = task_by_id[tid]
+        label = _PM_TASK_LABELS.get(tid, tid)
+        display_status = _derive_task_display_status(rec)
+        lines.append(f"| {_sanitize_string(label)} | {_sanitize_string(display_status)} |")
     lines.append("")
 
     lines.append("## PHASE8-IMPL-025 Status")
@@ -896,7 +998,21 @@ def _render_current_roadmap(model: dict[str, Any]) -> str:
     lines.append(f"**Active application parent:** PHASE8-IMPL-024")
     lines.append(f"**Immediate application frontier:** PHASE8-IMPL-024-T003A")
     lines.append(f"**Active Project Memory parent:** PHASE8-IMPL-026")
-    lines.append(f"**Current Project Memory child:** T004B")
+    tasks = model.get("tasks", [])
+    pm_children = _get_children(tasks, _PM_PARENT_TASK_ID)
+    pm_children = [c for c in pm_children if c.get("task_id", "").startswith(_PM_PARENT_TASK_ID + "-T")]
+    completed_ids = {c["task_id"] for c in pm_children if c.get("lifecycle", {}).get("status") == "complete"}
+    next_child = None
+    for child in pm_children:
+        if child["task_id"] not in completed_ids:
+            next_child = child
+            break
+    if next_child:
+        short_id = next_child["task_id"].replace(_PM_PARENT_TASK_ID + "-", "")
+        next_status = next_child.get("lifecycle", {}).get("status", "")
+        lines.append(f"**Next Project Memory task:** {short_id} ({next_status})")
+    else:
+        lines.append(f"**Next Project Memory task:** (all complete)")
     lines.append(f"**PHASE8-IMPL-025:** published/planned, inactive")
     lines.append("")
 
@@ -1780,6 +1896,25 @@ def render(
         ]:
             if not fpath.exists():
                 raise RuntimeError(f"Missing output file: {fpath}")
+
+        from scripts.project_memory.validate_rendered_docs import (
+            validate_rendered_package,
+            RESULT_BLOCKED,
+        )
+        sem_result = validate_rendered_package(
+            repo_root=repo_root,
+            snapshot_dir=snapshot_dir,
+            render_dir=str(tmp_run_dir),
+            registries=registries,
+            snapshot_bundle=snap_bundle,
+            expected_task_states=None,
+        )
+        if sem_result.get("result") == RESULT_BLOCKED:
+            raise ValueError(
+                "Semantic publication validation BLOCKED: rendered task state "
+                "contradicts normalized task records. "
+                + "; ".join(sem_result.get("errors", [])[:3])
+            )
 
         output_path.mkdir(parents=True, exist_ok=True)
         task_dir = output_path / task_id

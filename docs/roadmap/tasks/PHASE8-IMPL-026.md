@@ -18,13 +18,20 @@ T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
 - T003B (clean-HEAD snapshot, convergence validation, and T003 closeout)
   is complete/PASS-WITH-FINDINGS.
 
-Next Project Memory task: PHASE8-IMPL-026-T005 (Existing context-tool integration).
+Next Project Memory task: PHASE8-IMPL-026-T005 (Existing context-tool integration), planned/inactive.
+A post-T004C1 clean-HEAD refresh is required before T005 can start.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
 - T004B (Markdown renderer implementation) is complete/PASS.
 - T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) is complete/PASS-WITH-FINDINGS.
+- T004C1 (post-closeout task-registry synchronization and current-truth quality-gate repair) is complete/PASS.
 First publication render at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` bound to `3f09420`.
+Post-closeout clean-HEAD refresh at `20260714T042826Z` bound to `a415270` produced structurally valid packages
+but was not accepted as the current publication because the renderer's hardcoded index-page status table
+incorrectly showed T004 as "in progress" and T004C as "planned".
+T004C1 (post-closeout task-registry synchronization and current-truth quality-gate repair) is complete/PASS.
+A separate renderer repair task is required before an accepted post-repair clean-HEAD refresh.
 
 ## Classification
 
@@ -123,7 +130,7 @@ documentation that explains what is implemented, what is planned, what is
 missing, what conflicts exist, and what requires owner attention. Generated
 sites are build output and are not authority.
 
-T004 is decomposed into three bounded children:
+T004 is decomposed into four bounded children:
 
 - **T004A** — Convergence remediation and human-readable Project Memory
   architecture. Complete/PASS-WITH-FINDINGS. All 10 invalid directory source
@@ -149,6 +156,15 @@ T004 is decomposed into three bounded children:
   nonblocking source_missing). Quality result: PASS_WITH_FINDINGS.
   MkDocs not available; no installation attempted. Generated output is
   `generated_evidence` bound to `3f09420`. Post-closeout refresh required.
+
+- **T004C1** — Post-closeout task-registry synchronization and current-truth
+  quality-gate repair. Complete/PASS. Repaired task registry synchronization,
+  removed renderer hardcodes, implemented registry-derived task status,
+  added semantic rendered-package validator, implemented fail-closed
+  semantic publication gate, and added focused regression tests (29 tests,
+  177 total Project Memory tests pass). A post-T004C1 clean-HEAD refresh
+  is required; no accepted current publication exists yet for the current
+  clean HEAD.
 
 ### PHASE8-IMPL-026-T005 — Existing context-tool integration
 
@@ -219,7 +235,7 @@ Document the operator's manual for Project Memory maintenance.
 T001 (authority foundation) — complete/PASS
   -> T002 (schemas and registries) — complete/PASS
   -> T003 (deterministic scanners)
-  -> T004 (human-readable memory)
+  -> T004 (human-readable memory) [complete/PASS-WITH-FINDINGS; T004C1 complete/PASS]
   -> T005 (context-tool integration)
   -> T006 (Serena pilot) [contingent]
   -> T007 (LlamaIndex/Qdrant pilot) [contingent]
