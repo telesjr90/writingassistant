@@ -78,6 +78,17 @@ _REQUIRED_BOUNDARIES = {
     "model-output-not-canon": "model output not treated as truth",
 }
 
+_DELIVERY_ROOTS = (
+    "scripts/",
+    "tests/",
+    "backend/",
+    "frontend/",
+    ".agents/",
+    ".opencode/",
+    "docs/project-memory/",
+)
+_TRUSTED_IMPLEMENTATION_AUTHORITIES = {"authoritative", "accepted_evidence"}
+
 
 def _canonical_json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -198,6 +209,7 @@ def load_implementation_inputs(
         registry_findings = validate_registries.validate()
 
     state = dict(repository_state_override)
+    tracked_files = set(state.get("tracked_files", []))
     source_records: list[dict[str, Any]] = []
     seen: set[tuple[str, str]] = set()
     for registry_name, container in sorted(plan_inputs.get("registries", {}).items()):
@@ -217,7 +229,10 @@ def load_implementation_inputs(
                     "safe": _safe_relative_path(path),
                 }
                 full = root / path
-                if item["safe"] and full.is_file() and not full.is_symlink():
+                regular_file = item["safe"] and full.is_file() and not full.is_symlink()
+                item["regular_file"] = regular_file
+                item["tracked"] = path in tracked_files
+                if regular_file:
                     item.update({"exists": True, "sha256": _sha256_file(full)})
                 else:
                     item["exists"] = False
@@ -337,15 +352,94 @@ def _comparison(
     return result
 
 
-def _implementation_present(record: dict[str, Any], implementation: dict[str, Any]) -> bool:
-    rid = record.get("id", "")
-    prefixes = ("scripts/", "tests/", "backend/", "frontend/")
-    return any(
-        item.get("record_id") == rid
-        and item.get("exists")
-        and item.get("path", "").startswith(prefixes)
-        for item in implementation.get("source_records", [])
+def _record_is_current_and_trusted(record: dict[str, Any]) -> bool:
+    return (
+        record.get("authority_class") in _TRUSTED_IMPLEMENTATION_AUTHORITIES
+        and record.get("lifecycle", {}).get("status") not in {
+            "historical", "superseded", "retired",
+        }
     )
+
+
+def _task_linked_record_ids(
+    task_record: dict[str, Any], plan_inputs: dict[str, Any]
+) -> set[str]:
+    """Return records with an explicit, current structured link to a task."""
+    task_id = task_record.get("task_id", "")
+    linked = {task_record.get("id", "")}
+    for container in plan_inputs.get("registries", {}).values():
+        records = container.get("records", []) if isinstance(container, dict) else []
+        for record in records:
+            if not isinstance(record, dict) or not _record_is_current_and_trusted(record):
+                continue
+            related = (
+                record.get("associated_task_id") == task_id
+                or task_id in record.get("associated_tasks", [])
+                or task_id in record.get("affected_tasks", [])
+            )
+            if related:
+                linked.add(record.get("id", ""))
+    return {value for value in linked if value}
+
+
+def _is_delivery_source(source: dict[str, Any], *, direct_task_link: bool) -> bool:
+    """Classify one task-linked locator as tracked delivery implementation."""
+    path = source.get("path", "")
+    if not (
+        source.get("safe")
+        and source.get("exists")
+        and source.get("regular_file", source.get("exists"))
+        and source.get("tracked")
+        and source.get("authority_class") in _TRUSTED_IMPLEMENTATION_AUTHORITIES
+    ):
+        return False
+    if path == "AGENTS.md":
+        return direct_task_link
+    return path.startswith(_DELIVERY_ROOTS)
+
+
+def _implementation_assessment(
+    task_record: dict[str, Any],
+    plan_inputs: dict[str, Any],
+    implementation: dict[str, Any],
+) -> dict[str, Any]:
+    """Assess implementation from explicit tracked delivery relationships."""
+    task_record_id = task_record.get("id", "")
+    linked_ids = _task_linked_record_ids(task_record, plan_inputs)
+    deliveries = sorted({
+        source.get("path", "")
+        for source in implementation.get("source_records", [])
+        if source.get("record_id") in linked_ids
+        and _is_delivery_source(
+            source, direct_task_link=source.get("record_id") == task_record_id
+        )
+    })
+    accepted_evidence_ids = sorted(
+        record.get("id", "")
+        for record in _registry_records(plan_inputs, "evidence")
+        if record.get("associated_task_id") == task_record.get("task_id")
+        and _record_is_current_and_trusted(record)
+    )
+    accepted = bool(
+        accepted_evidence_ids
+        or task_record.get("provenance", {}).get("accepted_by")
+    )
+    return {
+        "implementation_present": bool(deliveries and accepted),
+        "tracked_delivery_artifacts": deliveries,
+        "accepted_evidence_present": accepted,
+        "accepted_evidence_ids": accepted_evidence_ids,
+    }
+
+
+def _implementation_present(
+    record: dict[str, Any],
+    plan_inputs: dict[str, Any],
+    implementation: dict[str, Any],
+) -> bool:
+    return _implementation_assessment(
+        record, plan_inputs, implementation
+    )["implementation_present"]
 
 
 def _next_actionable(tasks: list[dict[str, Any]]) -> str | None:
@@ -399,11 +493,21 @@ def build_comparisons(
             ))
             continue
         expected_lifecycle = record.get("lifecycle", {}).get("status")
-        present = _implementation_present(record, implementation_inputs)
+        assessment = _implementation_assessment(
+            record, plan_inputs, implementation_inputs
+        )
+        present = assessment["implementation_present"]
         observed_lifecycle = "complete" if present else "planned"
         if task_id in {"PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007"}:
             observed_lifecycle = "planned"
-        classification = classify_claims(expected_lifecycle, observed_lifecycle)
+        required_evidence_present = (
+            expected_lifecycle != "complete" or present
+        )
+        classification = classify_claims(
+            expected_lifecycle,
+            observed_lifecycle,
+            required_evidence_present=required_evidence_present,
+        )
         comparisons.append(_comparison(
             subject_type="task", subject_id=task_id,
             expected={
@@ -415,6 +519,9 @@ def build_comparisons(
             observed={
                 "lifecycle": observed_lifecycle,
                 "implementation_present": present,
+                "tracked_delivery_artifacts": assessment["tracked_delivery_artifacts"],
+                "accepted_evidence_present": assessment["accepted_evidence_present"],
+                "accepted_evidence_ids": assessment["accepted_evidence_ids"],
                 "inactive": expected_lifecycle == "planned",
             },
             classification=classification,
@@ -429,6 +536,7 @@ def build_comparisons(
             ),
             owner_review_required=classification != "matching",
             next_check="Re-read the task registry and its tracked implementation locators.",
+            required_evidence=required_evidence_present,
         ))
 
     expected_next = _next_actionable(tasks)

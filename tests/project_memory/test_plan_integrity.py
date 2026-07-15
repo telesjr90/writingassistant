@@ -116,12 +116,13 @@ def _implementation(repo: Path, plan: dict) -> dict:
             sources.append({
                 "record_id": task["id"], "registry": "tasks", "path": path,
                 "authority_class": "authoritative", "safe": True, "exists": exists,
+                "regular_file": exists, "tracked": exists,
             })
     for boundary in plan["registries"]["boundaries"]["records"]:
         sources.append({
             "record_id": boundary["id"], "registry": "boundaries",
             "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "authority_class": "authoritative",
-            "safe": True, "exists": True,
+            "safe": True, "exists": True, "regular_file": True, "tracked": True,
         })
     return {
         "repository_root": str(repo), "branch": "test", "commit": "a" * 40,
@@ -129,6 +130,38 @@ def _implementation(repo: Path, plan: dict) -> dict:
         "registry_validation_findings": [], "source_records": sources,
         "modified_paths": [], "untracked_paths": [],
     }
+
+
+def _source(
+    record_id: str,
+    path: str,
+    *,
+    registry: str = "tasks",
+    authority_class: str = "authoritative",
+    safe: bool = True,
+    exists: bool = True,
+    regular_file: bool = True,
+    tracked: bool = True,
+) -> dict:
+    return {
+        "record_id": record_id,
+        "registry": registry,
+        "path": path,
+        "authority_class": authority_class,
+        "safe": safe,
+        "exists": exists,
+        "regular_file": regular_file,
+        "tracked": tracked,
+    }
+
+
+def _set_task_source(plan: dict, task_id: str, path: str) -> dict:
+    task = next(
+        item for item in plan["registries"]["tasks"]["records"]
+        if item["task_id"] == task_id
+    )
+    task["provenance"]["source_locators"] = [{"path": path}]
+    return task
 
 
 def _init_repo(tmp_path: Path) -> Path:
@@ -207,6 +240,207 @@ def test_current_lifecycle_deferred_t008_t009_and_t010_next(tmp_path):
     assert by_id["PHASE8-IMPL-026-T008"]["observed_state"]["lifecycle"] == "complete"
     assert by_id["PHASE8-IMPL-026-T009"]["observed_state"]["lifecycle"] == "complete"
     assert by_id["project-memory-next-actionable"]["expected_state"]["task_id"] == "PHASE8-IMPL-026-T010"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "scripts/delivery.py",
+        "tests/test_delivery.py",
+        "backend/delivery.py",
+        "frontend/delivery.ts",
+        "docs/project-memory/delivery.md",
+        ".agents/skills/delivery/SKILL.md",
+        ".opencode/agents/delivery.md",
+    ],
+)
+def test_task_linked_tracked_delivery_roots_prove_implementation(tmp_path, path):
+    plan = _plan()
+    task = _set_task_source(plan, "PHASE8-IMPL-026-T008", path)
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = [_source(task["id"], path)]
+    assessment = integrity._implementation_assessment(task, plan, implementation)
+    assert assessment["implementation_present"] is True
+    assert assessment["tracked_delivery_artifacts"] == [path]
+
+
+def test_root_agents_counts_only_when_directly_task_linked(tmp_path):
+    plan = _plan()
+    task = _set_task_source(plan, "PHASE8-IMPL-026-T008", "AGENTS.md")
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = [_source(task["id"], "AGENTS.md")]
+    assert integrity._implementation_present(task, plan, implementation) is True
+
+    evidence = _record(
+        "evidence:agents", "evidence", "agents",
+        authority_class="accepted_evidence",
+        associated_task_id=task["task_id"],
+    )
+    plan["registries"]["evidence"]["records"] = [evidence]
+    implementation["source_records"] = [
+        _source(
+            evidence["id"], "AGENTS.md", registry="evidence",
+            authority_class="accepted_evidence",
+        )
+    ]
+    assert integrity._implementation_present(task, plan, implementation) is False
+
+
+def test_t008_real_non_code_locator_pattern_is_matching(tmp_path):
+    plan = _plan()
+    task = next(
+        item for item in plan["registries"]["tasks"]["records"]
+        if item["task_id"] == "PHASE8-IMPL-026-T008"
+    )
+    task_paths = [
+        "docs/project-memory/ask-protocol.md",
+        ".agents/skills/project-memory-read/SKILL.md",
+        ".opencode/agents/project-memory-ask.md",
+        "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md",
+    ]
+    task["provenance"]["source_locators"] = [{"path": path} for path in task_paths]
+    evidence = _record(
+        "evidence:t008", "evidence", "T008 evidence",
+        authority_class="accepted_evidence",
+        associated_task_id=task["task_id"],
+        provenance={
+            "created_by": "TEST",
+            "accepted_by": "TEST",
+            "source_locators": [
+                {"path": "tests/project_memory/test_agent_guidance_and_ask.py"},
+                {"path": "scripts/project_memory/validate_agent_guidance.py"},
+            ],
+        },
+    )
+    plan["registries"]["evidence"]["records"] = [evidence]
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = [
+        *[_source(task["id"], path) for path in task_paths],
+        _source(
+            evidence["id"],
+            "tests/project_memory/test_agent_guidance_and_ask.py",
+            registry="evidence", authority_class="accepted_evidence",
+        ),
+        _source(
+            evidence["id"],
+            "scripts/project_memory/validate_agent_guidance.py",
+            registry="evidence", authority_class="accepted_evidence",
+        ),
+    ]
+    comparisons = integrity.build_comparisons(plan, implementation)
+    t008 = next(item for item in comparisons if item["subject_id"] == task["task_id"])
+    findings = integrity.run_plan_integrity_checks(plan, implementation, comparisons)
+    assert t008["classification"] == "matching"
+    assert t008["observed_state"]["lifecycle"] == "complete"
+    assert set(t008["observed_state"]["tracked_delivery_artifacts"]) == {
+        "docs/project-memory/ask-protocol.md",
+        ".agents/skills/project-memory-read/SKILL.md",
+        ".opencode/agents/project-memory-ask.md",
+        "tests/project_memory/test_agent_guidance_and_ask.py",
+        "scripts/project_memory/validate_agent_guidance.py",
+    }
+    assert not any(
+        item["code"] == "task_state_mismatch"
+        and item["subject_id"] == task["task_id"]
+        for item in findings["findings"]
+    )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "docs/roadmap/tasks/PHASE8-IMPL-026.md",
+        "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md",
+        "docs/roadmap/implementation_status.md",
+    ],
+)
+def test_roadmap_and_status_support_alone_do_not_prove_implementation(tmp_path, path):
+    plan = _plan()
+    task = _set_task_source(plan, "PHASE8-IMPL-026-T008", path)
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = [_source(task["id"], path)]
+    comparison = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == task["task_id"]
+    )
+    assert comparison["classification"] == "insufficient_evidence"
+    assert comparison["observed_state"]["implementation_present"] is False
+
+
+def test_registry_lifecycle_and_generated_evidence_alone_do_not_prove_implementation(tmp_path):
+    plan = _plan()
+    task = next(
+        item for item in plan["registries"]["tasks"]["records"]
+        if item["task_id"] == "PHASE8-IMPL-026-T008"
+    )
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = []
+    assert integrity._implementation_present(task, plan, implementation) is False
+
+    implementation["source_records"] = [
+        _source(
+            task["id"], "docs/project-memory/generated.md",
+            authority_class="generated_evidence",
+        )
+    ]
+    assert integrity._implementation_present(task, plan, implementation) is False
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        {"tracked": False},
+        {"exists": False},
+        {"safe": False},
+        {"regular_file": False},
+    ],
+)
+def test_untracked_missing_unsafe_or_directory_locator_does_not_prove_implementation(
+    tmp_path, values
+):
+    plan = _plan()
+    path = "docs/project-memory/delivery.md"
+    task = _set_task_source(plan, "PHASE8-IMPL-026-T008", path)
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = [_source(task["id"], path, **values)]
+    comparison = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == task["task_id"]
+    )
+    assert comparison["classification"] == "insufficient_evidence"
+    assert comparison["observed_state"]["implementation_present"] is False
+
+
+def test_planned_task_with_only_roadmap_document_remains_planned(tmp_path):
+    plan = _plan()
+    implementation = _implementation(tmp_path, plan)
+    task = next(
+        item for item in plan["registries"]["tasks"]["records"]
+        if item["task_id"] == "PHASE8-IMPL-026-T010"
+    )
+    implementation["source_records"].append(
+        _source(task["id"], "docs/roadmap/tasks/PHASE8-IMPL-026.md")
+    )
+    comparison = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == task["task_id"]
+    )
+    assert comparison["classification"] == "matching"
+    assert comparison["observed_state"]["lifecycle"] == "planned"
+
+
+def test_complete_task_with_tracked_non_code_delivery_can_match(tmp_path):
+    plan = _plan()
+    path = "docs/project-memory/implemented-contract.md"
+    task = _set_task_source(plan, "PHASE8-IMPL-026-T008", path)
+    implementation = _implementation(tmp_path, plan)
+    implementation["source_records"] = [_source(task["id"], path)]
+    comparison = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == task["task_id"]
+    )
+    assert comparison["classification"] == "matching"
+    assert comparison["observed_state"]["implementation_present"] is True
 
 
 def test_lifecycle_divergence_and_next_actionable_mismatch(tmp_path):

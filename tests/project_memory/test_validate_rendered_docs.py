@@ -808,25 +808,56 @@ This generated page is authoritative.
         assert result["result"] == RESULT_BLOCKED
         assert any("Next PM task T005 absent" in error for error in result["errors"])
 
-    def test_current_snapshot_registry_hash_drift_is_blocked(self):
-        repo_root = Path(__file__).resolve().parents[2]
-        head = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=repo_root,
-            check=True, capture_output=True, text=True,
-        ).stdout.strip()
+    def test_current_snapshot_registry_hash_drift_is_blocked(self, tmp_path):
+        source_root = Path(__file__).resolve().parents[2]
+        repo_root = tmp_path / "repo"
+        repo_root.mkdir()
+        subprocess.run(
+            ["git", "init", "-b", "docs/project-memory-foundation"],
+            cwd=repo_root, check=True, capture_output=True, text=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "Project Memory Test"],
+            cwd=repo_root, check=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.email", "project-memory-test@example.invalid"],
+            cwd=repo_root, check=True,
+        )
+
         registry_names = [
             "assets.json", "boundaries.json", "capabilities.json", "decisions.json",
             "dependencies.json", "evidence.json", "features.json", "manifest.json",
             "owner-decisions.json", "projects.json", "tasks.json", "tools.json",
         ]
+        registry_root = repo_root / "docs/project-memory/registries"
+        registry_root.mkdir(parents=True)
+        for name in registry_names:
+            shutil.copy2(
+                source_root / "docs/project-memory/registries" / name,
+                registry_root / name,
+            )
+        subprocess.run(
+            ["git", "add", "docs/project-memory/registries"],
+            cwd=repo_root, check=True,
+        )
+        subprocess.run(
+            ["git", "commit", "-m", "test: baseline registries"],
+            cwd=repo_root, check=True, capture_output=True, text=True,
+        )
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=repo_root,
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+
         registry_hashes = {}
         for name in registry_names:
-            path = f"docs/project-memory/registries/{name}"
-            blob = subprocess.run(
-                ["git", "show", f"{head}:{path}"], cwd=repo_root,
+            relative_path = f"docs/project-memory/registries/{name}"
+            committed_blob = subprocess.run(
+                ["git", "show", f"{head}:{relative_path}"], cwd=repo_root,
                 check=True, capture_output=True,
             ).stdout
-            registry_hashes[path] = hashlib.sha256(blob).hexdigest()
+            registry_hashes[relative_path] = hashlib.sha256(committed_blob).hexdigest()
 
         snapshot_bundle = {
             "snapshot": {
@@ -836,18 +867,28 @@ This generated page is authoritative.
             },
             "findings": [],
         }
-        render_dir = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C2/20260714T221454Z"
+
+        drift_path = registry_root / "assets.json"
+        drifted_registry = json.loads(drift_path.read_text(encoding="utf-8"))
+        assert drifted_registry["records"]
+        drifted_registry["records"][0]["notes"] += " Deterministic registry drift."
+        drift_path.write_text(
+            json.dumps(drifted_registry, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        render_dir = source_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C2/20260714T221454Z"
         result = validate_rendered_package(
             repo_root=str(repo_root),
             snapshot_dir=str(repo_root),
             render_dir=str(render_dir),
             snapshot_bundle=snapshot_bundle,
-            registries={"tasks.json": {}},
         )
         assert result["result"] == RESULT_BLOCKED
-        assert any(
-            "Current publication snapshot differs from current tracked registry" in error
-            for error in result["errors"]
+        assert len(result["errors"]) == 1
+        assert (
+            "Current publication snapshot differs from current tracked registry"
+            in result["errors"][0]
         )
 
     def test_preserved_t004c1_packages_are_not_mutated(self):
