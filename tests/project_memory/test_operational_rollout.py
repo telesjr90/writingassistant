@@ -5,7 +5,10 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import tarfile
+import uuid
 from pathlib import Path
+from pathlib import PurePosixPath
 
 import pytest
 
@@ -26,26 +29,183 @@ def _run(repo: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
+def _nul_paths(repo: Path, *args: str) -> tuple[str, ...]:
+    result = subprocess.run(args, cwd=repo, text=True, capture_output=True, check=True)
+    return tuple(path for path in result.stdout.split("\0") if path)
+
+
+def _archive_destination(root: Path, member_name: str) -> Path:
+    member_path = PurePosixPath(member_name)
+    if not member_path.parts or member_path.is_absolute() or ".." in member_path.parts:
+        raise AssertionError(f"unsafe archive member path: {member_name!r}")
+    destination = root.joinpath(*member_path.parts)
+    if not destination.resolve(strict=False).is_relative_to(root.resolve()):
+        raise AssertionError(f"archive member escapes destination: {member_name!r}")
+    return destination
+
+
+def _archive_link_destination(
+    root: Path,
+    member_destination: Path,
+    link_name: str,
+    *,
+    hard_link: bool,
+) -> Path:
+    link_path = PurePosixPath(link_name)
+    if link_path.is_absolute():
+        raise AssertionError(f"unsafe absolute archive link: {link_name!r}")
+    link_base = root if hard_link else member_destination.parent
+    destination = link_base.joinpath(*link_path.parts).resolve(strict=False)
+    if not destination.is_relative_to(root.resolve()):
+        raise AssertionError(f"archive link escapes destination: {link_name!r}")
+    return destination
+
+
+def _extract_tracked_archive(archive_path: Path, destination: Path) -> None:
+    destination.mkdir()
+    with tarfile.open(archive_path, mode="r:") as archive:
+        members = archive.getmembers()
+        seen: set[Path] = set()
+        for member in members:
+            target = _archive_destination(destination, member.name)
+            if target in seen:
+                raise AssertionError(f"duplicate archive member: {member.name!r}")
+            seen.add(target)
+            if member.issym() or member.islnk():
+                _archive_link_destination(
+                    destination,
+                    target,
+                    member.linkname,
+                    hard_link=member.islnk(),
+                )
+            elif not (member.isdir() or member.isfile()):
+                raise AssertionError(f"unsupported archive member: {member.name!r}")
+
+        for member in members:
+            target = _archive_destination(destination, member.name)
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if not target.parent.resolve().is_relative_to(destination.resolve()):
+                raise AssertionError(f"archive parent escapes destination: {member.name!r}")
+            if target.exists() or target.is_symlink():
+                raise AssertionError(f"archive member already exists: {member.name!r}")
+
+            if member.isfile():
+                source = archive.extractfile(member)
+                if source is None:
+                    raise AssertionError(f"archive file has no content: {member.name!r}")
+                with source, target.open("xb") as output:
+                    shutil.copyfileobj(source, output)
+                target.chmod(member.mode & 0o777)
+            elif member.issym():
+                _archive_link_destination(
+                    destination,
+                    target,
+                    member.linkname,
+                    hard_link=False,
+                )
+                target.symlink_to(member.linkname)
+            else:
+                link_target = _archive_link_destination(
+                    destination,
+                    target,
+                    member.linkname,
+                    hard_link=True,
+                )
+                if not link_target.is_file() or link_target.is_symlink():
+                    raise AssertionError(f"unsafe archive hard link: {member.linkname!r}")
+                target.hardlink_to(link_target)
+
+
 def _temporary_repository(tmp_path: Path) -> Path:
-    repo = tmp_path / "repository"
-    ignored = shutil.ignore_patterns(
-        ".git", ".codex-context", "ai_context", "graphify-out", "node_modules",
-        ".venv", "venv", "__pycache__", ".pytest_cache", "projects", ".external_sources",
+    assert _run(SOURCE_ROOT, "git", "rev-parse", "--is-inside-work-tree") == "true"
+    assert Path(_run(SOURCE_ROOT, "git", "rev-parse", "--show-toplevel")).resolve() == SOURCE_ROOT
+    staged = subprocess.run(
+        ("git", "diff", "--cached", "--quiet"),
+        cwd=SOURCE_ROOT,
+        capture_output=True,
+        check=False,
     )
-    shutil.copytree(SOURCE_ROOT, repo, ignore=ignored)
-    for relative in REQUIRED_EXAMPLE_EVIDENCE:
-        source = SOURCE_ROOT / relative
-        destination = repo / relative
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, destination)
+    assert staged.returncode == 0, staged.stderr.decode(errors="replace")
+    unstaged_paths = set(
+        _nul_paths(SOURCE_ROOT, "git", "diff", "--name-only", "-z")
+    )
+    executing_test = Path(__file__).resolve().relative_to(SOURCE_ROOT).as_posix()
+    assert not unstaged_paths or unstaged_paths == {executing_test}
+
+    source_head = _run(SOURCE_ROOT, "git", "rev-parse", "HEAD")
+    source_tree = _run(SOURCE_ROOT, "git", "rev-parse", "HEAD^{tree}")
+    source_paths = set(
+        _nul_paths(SOURCE_ROOT, "git", "ls-tree", "-r", "--name-only", "-z", "HEAD")
+    )
+    archive_path = tmp_path / "tracked-head.tar"
+    repo = tmp_path / "repository"
+    subprocess.run(
+        (
+            "git",
+            "archive",
+            "--format=tar",
+            "--output",
+            str(archive_path),
+            "HEAD",
+        ),
+        cwd=SOURCE_ROOT,
+        capture_output=True,
+        check=True,
+    )
+    _extract_tracked_archive(archive_path, repo)
+    assert not (repo / ".git").exists()
+    assert not (
+        repo / ".codex-context/project-memory/example-run/example.json"
+    ).exists()
+
     _run(repo, "git", "init", "-b", "docs/project-memory-foundation")
     _run(repo, "git", "config", "user.email", "test@example.invalid")
     _run(repo, "git", "config", "user.name", "Project Memory Test")
-    _run(repo, "git", "add", ".")
-    _run(repo, "git", "add", "-f", "--", *REQUIRED_EXAMPLE_EVIDENCE)
+    _run(repo, "git", "add", "--all")
+    staged_paths = set(_nul_paths(repo, "git", "ls-files", "-z"))
+    assert not staged_paths - source_paths
+    ignored_tracked_paths = sorted(source_paths - staged_paths)
+    assert all(
+        (repo / relative).exists() or (repo / relative).is_symlink()
+        for relative in ignored_tracked_paths
+    )
+    if ignored_tracked_paths:
+        _run(repo, "git", "add", "-f", "--", *ignored_tracked_paths)
+    assert set(_nul_paths(repo, "git", "ls-files", "-z")) == source_paths
+    assert _run(repo, "git", "write-tree") == source_tree
+
     for relative in REQUIRED_EXAMPLE_EVIDENCE:
-        assert _run(repo, "git", "ls-files", "--error-unmatch", "--", relative) == relative
+        if relative in source_paths:
+            assert (repo / relative).is_file()
+            assert _run(
+                repo, "git", "ls-files", "--error-unmatch", "--", relative
+            ) == relative
     _run(repo, "git", "commit", "-m", "test: temporary operational fixture")
+    assert _run(repo, "git", "rev-parse", "HEAD^{tree}") == source_tree
+
+    source_git_dir = Path(
+        _run(SOURCE_ROOT, "git", "rev-parse", "--absolute-git-dir")
+    ).resolve()
+    fixture_git_dir = Path(
+        _run(repo, "git", "rev-parse", "--absolute-git-dir")
+    ).resolve()
+    assert fixture_git_dir == (repo / ".git").resolve()
+    assert fixture_git_dir != source_git_dir
+    assert _run(repo, "git", "rev-parse", "--is-inside-work-tree") == "true"
+    assert Path(_run(repo, "git", "rev-parse", "--show-toplevel")).resolve() == repo
+    source_commit_lookup = subprocess.run(
+        ("git", "cat-file", "-e", f"{source_head}^{{commit}}"),
+        cwd=repo,
+        capture_output=True,
+        check=False,
+    )
+    assert source_commit_lookup.returncode != 0
+    assert _run(repo, "git", "remote") == ""
+
     ignored = _run(
         repo,
         "git",
@@ -60,7 +220,44 @@ def _temporary_repository(tmp_path: Path) -> Path:
 
 
 def test_policy_is_event_driven_commit_bound_and_forbids_automatic_mutation(tmp_path):
-    repo = _temporary_repository(tmp_path)
+    token = uuid.uuid4().hex
+    untracked_relative = f".operational-rollout-untracked-{token}"
+    ignored_root = SOURCE_ROOT / ".codex-context"
+    ignored_root_existed = ignored_root.exists()
+    ignored_relative = f".codex-context/operational-rollout-{token}/sentinel.txt"
+    untracked_sentinel = SOURCE_ROOT / untracked_relative
+    ignored_sentinel = SOURCE_ROOT / ignored_relative
+    try:
+        untracked_sentinel.write_text("untracked fixture sentinel\n", encoding="utf-8")
+        ignored_sentinel.parent.mkdir(parents=True, exist_ok=True)
+        ignored_sentinel.write_text("ignored fixture sentinel\n", encoding="utf-8")
+        assert _run(
+            SOURCE_ROOT,
+            "git",
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+            "--",
+            untracked_relative,
+        ) == f"?? {untracked_relative}"
+        ignored_check = subprocess.run(
+            ("git", "check-ignore", "-q", "--", ignored_relative),
+            cwd=SOURCE_ROOT,
+            capture_output=True,
+            check=False,
+        )
+        assert ignored_check.returncode == 0
+
+        repo = _temporary_repository(tmp_path)
+        assert not (repo / untracked_relative).exists()
+        assert not (repo / ignored_relative).exists()
+    finally:
+        untracked_sentinel.unlink(missing_ok=True)
+        ignored_sentinel.unlink(missing_ok=True)
+        ignored_sentinel.parent.rmdir()
+        if not ignored_root_existed:
+            ignored_root.rmdir()
+
     policy = json.loads((repo / "docs/project-memory/operations.json").read_text(encoding="utf-8"))
     assert policy["schema"] == "project-memory-operations.v1"
     assert policy["cadence"] == {
