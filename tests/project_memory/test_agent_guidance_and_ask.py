@@ -87,7 +87,7 @@ def test_t006_t007_are_not_approved_installed_active_complete_or_required_by_t00
     assert by_task["PHASE8-IMPL-026-T008"]["depends_on"] == ["PHASE8-IMPL-026-T004"]
 
 
-def test_t008_t009_complete_and_t010_is_next_while_t011_remains_later():
+def test_t008_t009_t010_complete_and_t011_is_sole_next():
     tasks = _registry("tasks.json")["records"]
     by_task = {record["task_id"]: record for record in tasks}
     behavior = _derive_pm_task_behavior(
@@ -113,29 +113,34 @@ def test_t008_t009_complete_and_t010_is_next_while_t011_remains_later():
     assert behavior["states"]["PHASE8-IMPL-026-T009"]["actionable"] is False
     assert "PHASE8-IMPL-026-T009" not in remaining_task_ids
 
-    assert t010["lifecycle"]["status"] == "planned"
-    assert "planned next and inactive" in t010["notes"].lower()
-    assert behavior["states"]["PHASE8-IMPL-026-T010"]["state"] == "planned_actionable"
-    assert selected_next_ids == ["PHASE8-IMPL-026-T010"]
-    assert all(
-        not locator["path"].startswith(("scripts/", "tests/", "backend/", "frontend/"))
-        for locator in t010["provenance"]["source_locators"]
-    )
+    assert t010["lifecycle"]["status"] == "complete"
+    assert "complete/pass" in t010["notes"].lower()
+    assert behavior["states"]["PHASE8-IMPL-026-T010"]["state"] == "complete"
+    assert "PHASE8-IMPL-026-T010" not in remaining_task_ids
+    delivery_paths = {locator["path"] for locator in t010["provenance"]["source_locators"]}
+    assert {
+        "docs/project-memory/reviewer-protocol.md",
+        ".agents/skills/project-memory-plan-integrity-review/SKILL.md",
+        "scripts/project_memory/validate_reviewer_guidance.py",
+        "scripts/project_memory/reviewer_findings.py",
+        "tests/project_memory/test_plan_integrity_reviewers.py",
+        "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md",
+    } <= delivery_paths
 
     assert t011["lifecycle"]["status"] == "planned"
-    assert "planned and inactive" in t011["notes"].lower()
+    assert "planned next and inactive" in t011["notes"].lower()
     assert behavior["states"]["PHASE8-IMPL-026-T011"]["state"] == "planned_actionable"
     assert behavior["states"]["PHASE8-IMPL-026-T011"]["actionable"] is True
     assert "PHASE8-IMPL-026-T011" in remaining_task_ids
-    assert "PHASE8-IMPL-026-T011" not in selected_next_ids
+    assert selected_next_ids == ["PHASE8-IMPL-026-T011"]
 
     assert "reviewer agent" not in t009["notes"].lower()
     assert t010["lifecycle"]["status"] != "in_progress"
 
 
-def test_t010_t011_remain_planned():
-    for task_id in ("PHASE8-IMPL-026-T010", "PHASE8-IMPL-026-T011"):
-        assert _record("tasks.json", f"task:{task_id}")["lifecycle"]["status"] == "planned"
+def test_t010_complete_and_t011_remains_planned():
+    assert _record("tasks.json", "task:PHASE8-IMPL-026-T010")["lifecycle"]["status"] == "complete"
+    assert _record("tasks.json", "task:PHASE8-IMPL-026-T011")["lifecycle"]["status"] == "planned"
 
 
 def test_dependency_registry_does_not_make_retrieval_pilots_required_by_t008():
@@ -324,3 +329,15 @@ def test_decision_and_evidence_records_are_current_and_cross_referenced():
     assert evidence["lifecycle"]["status"] == "current"
     assert evidence["authority_class"] == "accepted_evidence"
     assert evidence["associated_task_id"] == "PHASE8-IMPL-026-T008"
+
+
+def test_t010_decision_and_evidence_records_are_current_and_non_authoritative_output_is_explicit():
+    decision = _record("decisions.json", "decision:pmf-t010-specialized-reviewers")
+    evidence = _record("evidence.json", "evidence:ph8-impl-026-t010-specialized-reviewers")
+    assert decision["lifecycle"]["status"] == "current"
+    assert decision["authority_class"] == "authoritative"
+    assert evidence["lifecycle"]["status"] == "current"
+    assert evidence["authority_class"] == "accepted_evidence"
+    assert evidence["associated_task_id"] == "PHASE8-IMPL-026-T010"
+    assert "generated_evidence" in decision["selected_option"]
+    assert "without running an agent, model, network" in evidence["description"]

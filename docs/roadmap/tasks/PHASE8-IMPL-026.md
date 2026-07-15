@@ -267,20 +267,30 @@ does not implement or run specialized reviewer agents.
 
 ### PHASE8-IMPL-026-T010 — Specialized Plan Integrity reviewers
 
-Status: planned next/inactive. Depends on T009.
+Status: complete/PASS. Depends on T009.
 
 Implement specialized reviewer agents that inspect specific domains (backend
 contracts, frontend UI, test coverage, roadmap consistency, enrichment
 accuracy, decision coherence) and produce evidence-backed review findings.
 Reviewers may propose findings but may not change authoritative state.
 
+Implemented as six strictly read-only OpenCode reviewer definitions supported
+by one shared protocol and skill, deterministic guidance validation,
+standard-library-only finding validation/normalization, schema definitions, and
+temporary-fixture tests. Reviewer findings remain `generated_evidence`; no
+reviewer or model was invoked, no reviewer is automatically active or scheduled,
+and T009 remains the deterministic readiness authority.
+
 ### PHASE8-IMPL-026-T011 — Synchronization, CI, rebuild, and operational rollout
 
-Status: planned. Depends on T010.
+Status: planned next/inactive and unimplemented. Depends on T010.
 
 Define the operational cadence for branch synchronization, deterministic
 memory refresh, CI integration, rebuild triggers, and stale-index detection.
 Document the operator's manual for Project Memory maintenance.
+
+T011 is the sole next Project Memory task. Q154 remains open; T010 did not
+select or implement an operational synchronization cadence.
 
 ## Implementation sequence
 

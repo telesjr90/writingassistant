@@ -84,6 +84,23 @@ Ask uses accepted repository sources first. Registries and current rendered
 publications are navigation aids, not authority. Generated evidence and model
 output never become truth. T006/T007 retrieval pilots are not required.
 
+## Specialized Plan Integrity Reviewers
+
+T010 defines six bounded read-only reviewer domains: backend contracts,
+frontend UI, test coverage, roadmap consistency, enrichment accuracy, and
+decision coherence. `reviewer-protocol.md` and
+`.agents/skills/project-memory-plan-integrity-review/SKILL.md` provide the
+shared request, evidence, finding, freshness, authority, and fail-closed
+contract. Six OpenCode definitions bind one domain each without embedding
+mutable project truth.
+
+`scripts/project_memory/reviewer_findings.py` validates and normalizes supplied
+structured findings without invoking a model. Output remains
+`generated_evidence`; it cannot alter T009 readiness, select semantic truth,
+create an owner decision, or mutate roadmap, registry, Memory/Canon, candidate,
+promotion, apply-promotion, or story-prose state. Reviewers are not scheduled or
+automatically active.
+
 ## Registry File Roles
 
 | Registry | Record type | Required | Purpose |
@@ -146,6 +163,13 @@ Validate shared guidance:
 ```bash
 python3 scripts/project_memory/validate_agent_guidance.py
 python3 scripts/project_memory/validate_agent_guidance.py --json
+```
+
+Validate specialized reviewer guidance:
+
+```bash
+python3 scripts/project_memory/validate_reviewer_guidance.py
+python3 scripts/project_memory/validate_reviewer_guidance.py --json
 ```
 
 ## Deterministic Scanners

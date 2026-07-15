@@ -889,6 +889,154 @@
       "required": ["authority_class", "branch", "bound_commit", "generated_at", "task_id", "run_id"],
       "additionalProperties": true
     },
+    "PlanIntegrityReviewerDomain": {
+      "type": "string",
+      "enum": [
+        "backend_contracts",
+        "frontend_ui",
+        "test_coverage",
+        "roadmap_consistency",
+        "enrichment_accuracy",
+        "decision_coherence"
+      ]
+    },
+    "PlanIntegrityReviewerRequest": {
+      "type": "object",
+      "properties": {
+        "repository_root": { "type": "string", "minLength": 1 },
+        "expected_branch": { "type": "string", "minLength": 1 },
+        "expected_full_commit": { "$ref": "#/$defs/GitSha" },
+        "reviewer_domain": { "$ref": "#/$defs/PlanIntegrityReviewerDomain" },
+        "task_or_feature_scope": { "type": "string", "minLength": 1 },
+        "maximum_file_scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "allowed_source_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/TrustClass" }
+        },
+        "protected_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "accepted_plan_integrity_report_path": { "type": "string", "minLength": 1 },
+        "freshness_requirement": { "const": "current_clean_head" },
+        "historical_evidence_permission": { "type": "boolean" },
+        "owner_decision_requirement": { "type": "boolean" }
+      },
+      "required": [
+        "repository_root", "expected_branch", "expected_full_commit", "reviewer_domain",
+        "task_or_feature_scope", "maximum_file_scope", "allowed_source_classes",
+        "protected_paths", "accepted_plan_integrity_report_path", "freshness_requirement",
+        "historical_evidence_permission", "owner_decision_requirement"
+      ],
+      "additionalProperties": false
+    },
+    "PlanIntegrityReviewerEvidenceLocator": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "authority_class": { "$ref": "#/$defs/TrustClass" },
+        "freshness": { "enum": ["current", "historical"] },
+        "bound_commit": { "$ref": "#/$defs/GitSha" }
+      },
+      "required": [
+        "path", "line_start", "line_end", "sha256", "authority_class",
+        "freshness", "bound_commit"
+      ],
+      "additionalProperties": false
+    },
+    "PlanIntegrityReviewerFinding": {
+      "type": "object",
+      "properties": {
+        "finding_id": { "type": "string", "pattern": "^review-finding-[0-9a-f]{20}$" },
+        "content_type": { "const": "plan_integrity_review_finding" },
+        "reviewer_domain": { "$ref": "#/$defs/PlanIntegrityReviewerDomain" },
+        "rule_or_concern_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "bounded_claim": { "type": "string", "minLength": 1 },
+        "result": {
+          "enum": ["CONCERN", "NO_CONCERN", "INSUFFICIENT_EVIDENCE", "CONFLICT", "OWNER_REVIEW_REQUIRED"]
+        },
+        "status": { "const": "proposed" },
+        "severity": { "enum": ["info", "warning", "error", "critical"] },
+        "blocking_recommendation": { "type": "boolean" },
+        "affected_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "evidence_locators": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/PlanIntegrityReviewerEvidenceLocator" }
+        },
+        "facts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "inferences": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "uncertainty_or_conflicting_evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "owner_decision_status": {
+          "enum": ["not_required", "accepted_recorded", "owner_pending", "unresolved"]
+        },
+        "recommended_deterministic_follow_up": { "type": "string", "minLength": 1 },
+        "authority_declaration": { "const": "generated_evidence" }
+      },
+      "required": [
+        "finding_id", "content_type", "reviewer_domain", "rule_or_concern_id",
+        "title", "bounded_claim", "result", "status", "severity",
+        "blocking_recommendation", "affected_ids", "evidence_locators", "facts",
+        "inferences", "uncertainty_or_conflicting_evidence", "owner_decision_status",
+        "recommended_deterministic_follow_up", "authority_declaration"
+      ],
+      "additionalProperties": false
+    },
+    "PlanIntegrityReviewerFindingsPackage": {
+      "type": "object",
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/SchemaVersion" },
+        "authority_class": { "const": "generated_evidence" },
+        "bound_branch": { "type": "string", "minLength": 1 },
+        "bound_commit": { "$ref": "#/$defs/GitSha" },
+        "reviewer_domain": { "$ref": "#/$defs/PlanIntegrityReviewerDomain" },
+        "finding_count": { "type": "integer", "minimum": 0 },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PlanIntegrityReviewerFinding" }
+        },
+        "t009_readiness_mutation_performed": { "const": false },
+        "owner_decision_created": { "const": false },
+        "semantic_truth_selected": { "const": false }
+      },
+      "required": [
+        "schema_version", "authority_class", "bound_branch", "bound_commit",
+        "reviewer_domain", "finding_count", "findings",
+        "t009_readiness_mutation_performed", "owner_decision_created",
+        "semantic_truth_selected"
+      ],
+      "additionalProperties": false
+    },
     "ValidationFinding": {
       "type": "object",
       "properties": {

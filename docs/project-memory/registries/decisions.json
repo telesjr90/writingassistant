@@ -120,6 +120,32 @@
       "selected_option": "Use matching, diverging, superseded, conflicting, and insufficient_evidence comparisons; READY, READY_WITH_ADVISORIES, and BLOCKED readiness; exact evidence and confidence bases; six bounded integrity rule groups; and generated_evidence-only atomic reports.",
       "rationale": "Exact rule evaluation provides reproducible plan-versus-implementation evidence without semantic guessing, confidence-as-truth, automatic resolution, or authoritative-state mutation.",
       "affected_tasks": ["PHASE8-IMPL-026-T009", "PHASE8-IMPL-026-T010"]
+    },
+    {
+      "id": "decision:pmf-t010-specialized-reviewers",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Specialized Plan Integrity Reviewers",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T010",
+        "accepted_by": "PHASE8-IMPL-026-T010",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md" },
+          { "path": "docs/project-memory/reviewer-protocol.md" },
+          { "path": "scripts/project_memory/reviewer_findings.py" },
+          { "path": "tests/project_memory/test_plan_integrity_reviewers.py" }
+        ]
+      },
+      "decision_id": "pmf-t010-specialized-reviewers",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md",
+      "question": "How may specialized reviewers surface bounded Plan Integrity concerns without becoming authority or changing T009 readiness?",
+      "selected_option": "Use six strictly read-only OpenCode reviewer definitions backed by one shared protocol and skill plus deterministic guidance and supplied-finding validation; keep every reviewer output generated_evidence and T009 the sole readiness authority.",
+      "rationale": "Bounded permissions, exact evidence binding, deterministic normalization, and explicit non-authority preserve owner control while allowing later operator-invoked domain review without automatic scheduling or semantic truth selection.",
+      "affected_tasks": ["PHASE8-IMPL-026-T010", "PHASE8-IMPL-026-T011"]
     }
   ]
 }

@@ -95,10 +95,12 @@ silently override it.
    (complete/PASS).
    - Exact Q151 classifications, readiness tri-state, six deterministic rule
      groups, and atomic clean-HEAD generated-evidence reporting.
-10. `PHASE8-IMPL-026-T010` — Specialized Plan Integrity reviewers (planned
-    next/inactive; not implemented by T009).
+10. `PHASE8-IMPL-026-T010` — Specialized Plan Integrity reviewers
+    (complete/PASS; six read-only reviewer domains, shared protocol/skill,
+    deterministic guidance validation and finding normalization; no reviewer
+    or model invoked).
 11. `PHASE8-IMPL-026-T011` — Synchronization, CI, rebuild, and operational
-    rollout (planned).
+    rollout (sole next; planned/inactive and unimplemented; Q154 open).
 
 T006 and T007 are owner-deferred because no benchmarkable symbol-navigation,
 retrieval-quality, citation, scale, latency, or maintainability gap has been
