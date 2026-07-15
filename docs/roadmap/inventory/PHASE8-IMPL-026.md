@@ -91,9 +91,12 @@ silently override it.
    - Deterministic Ask protocol, shared read skill, read-only OpenCode agent,
      standard-library contract validator, and focused tests.
    - Ordinary read-only repository access only; no retrieval pilot required.
-9. `PHASE8-IMPL-026-T009` — Deterministic Plan Integrity engine (planned
-   next/inactive).
-10. `PHASE8-IMPL-026-T010` — Specialized Plan Integrity reviewers (planned).
+9. `PHASE8-IMPL-026-T009` — Deterministic Plan Integrity engine
+   (complete/PASS).
+   - Exact Q151 classifications, readiness tri-state, six deterministic rule
+     groups, and atomic clean-HEAD generated-evidence reporting.
+10. `PHASE8-IMPL-026-T010` — Specialized Plan Integrity reviewers (planned
+    next/inactive; not implemented by T009).
 11. `PHASE8-IMPL-026-T011` — Synchronization, CI, rebuild, and operational
     rollout (planned).
 
@@ -163,8 +166,8 @@ implemented by T001.
 - Shared agent guidance and deterministic Project Memory Ask exist (T008); the
   OpenCode agent is read-only and all answers fail closed on unsupported truth
   claims.
-- No retrieval pilot or Plan Integrity reviewer exists.
-- T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, T005, and T008 are delivered.
+- No retrieval pilot or Plan Integrity reviewer exists; the deterministic T009 engine exists without reviewer agents.
+- T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, T005, T008, and T009 are delivered.
 - The accepted current T004C2 publication is the `20260714T221454Z` set bound to `8961b35`.
 - T006/T007 remain owner-deferred, planned/contingent/inactive, and unimplemented.
-- The next Project Memory task is T009, planned/inactive; T010-T011 remain planned.
+- The next Project Memory task is T010, planned/inactive; T011 remains planned/inactive.

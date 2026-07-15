@@ -22,7 +22,8 @@ T005 — Existing context-tool integration — is complete/PASS.
 T006 and T007 are owner-deferred for lack of a measured benchmarkable
 capability gap. Both remain contingent, planned, inactive, and unimplemented.
 T008 — Shared agent guidance and Project Memory Ask — is complete/PASS.
-T009 is the next planned/inactive Project Memory task. T010-T011 remain planned.
+T009 — Deterministic Plan Integrity engine — is complete/PASS.
+T010 is the next planned/inactive Project Memory task. T011 remains planned/inactive.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
@@ -251,16 +252,22 @@ converge with current tracked registries.
 
 ### PHASE8-IMPL-026-T009 — Deterministic Plan Integrity engine
 
-Status: planned next/inactive. Depends on T003.
+Status: complete/PASS. Depends on T003.
 
 Implement a deterministic engine that compares the accepted plan (task
 records, enrichment data, decision log, implementation status) with the
 actual implementation (code, tests, schemas) and produces a Plan Integrity
 report with evidence, confidence, and unresolved discrepancies.
 
+Implemented as a standard-library-only deterministic engine with exact Q151
+classifications, evidence-bound comparisons, six bounded rule groups,
+READY/READY_WITH_ADVISORIES/BLOCKED readiness, deterministic confidence basis
+and ordering, and an exact atomic clean-HEAD generated-evidence package. It
+does not implement or run specialized reviewer agents.
+
 ### PHASE8-IMPL-026-T010 — Specialized Plan Integrity reviewers
 
-Status: planned. Depends on T009.
+Status: planned next/inactive. Depends on T009.
 
 Implement specialized reviewer agents that inspect specific domains (backend
 contracts, frontend UI, test coverage, roadmap consistency, enrichment

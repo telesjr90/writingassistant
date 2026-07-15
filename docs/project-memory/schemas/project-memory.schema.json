@@ -769,6 +769,126 @@
       ],
       "additionalProperties": false
     },
+    "PlanIntegrityEvidenceLocator": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "record_id": { "type": "string" },
+        "authority_class": { "$ref": "#/$defs/TrustClass" }
+      },
+      "required": ["path"],
+      "additionalProperties": false
+    },
+    "PlanIntegrityConfidenceBasis": {
+      "type": "object",
+      "properties": {
+        "method": { "const": "exact_rule_evaluation" },
+        "rule_id": { "type": "string", "minLength": 1 },
+        "evidence_count": { "type": "integer", "minimum": 0 },
+        "required_evidence": { "type": "boolean" },
+        "inputs_complete": { "type": "boolean" },
+        "basis": { "type": "string", "minLength": 1 }
+      },
+      "required": ["method", "rule_id", "evidence_count", "required_evidence", "inputs_complete", "basis"],
+      "additionalProperties": false
+    },
+    "PlanIntegrityComparison": {
+      "type": "object",
+      "properties": {
+        "comparison_id": { "type": "string", "minLength": 1 },
+        "subject_type": { "type": "string", "minLength": 1 },
+        "subject_id": { "type": "string", "minLength": 1 },
+        "classification": {
+          "enum": ["matching", "diverging", "superseded", "conflicting", "insufficient_evidence"]
+        },
+        "expected_state": {},
+        "observed_state": {},
+        "evidence_locators": { "type": "array", "items": { "type": "string" } },
+        "authority_classes": { "type": "array", "items": { "$ref": "#/$defs/TrustClass" } },
+        "branch": { "type": "string" },
+        "commit": { "$ref": "#/$defs/GitSha" },
+        "rule_id": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["info", "warning", "error", "critical"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "confidence_basis": { "$ref": "#/$defs/PlanIntegrityConfidenceBasis" },
+        "blocking": { "type": "boolean" },
+        "explanation": { "type": "string", "minLength": 1 },
+        "owner_review_required": { "type": "boolean" },
+        "next_deterministic_check": { "type": "string", "minLength": 1 }
+      },
+      "required": [
+        "comparison_id", "subject_type", "subject_id", "classification", "expected_state",
+        "observed_state", "evidence_locators", "authority_classes", "branch", "commit", "rule_id",
+        "severity", "confidence", "confidence_basis", "blocking", "explanation",
+        "owner_review_required", "next_deterministic_check"
+      ],
+      "additionalProperties": true
+    },
+    "PlanIntegrityFinding": {
+      "type": "object",
+      "properties": {
+        "finding_id": { "type": "string", "minLength": 1 },
+        "rule_group": { "type": "string", "minLength": 1 },
+        "code": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["info", "warning", "error", "critical"] },
+        "subject_type": { "type": "string", "minLength": 1 },
+        "subject_id": { "type": "string", "minLength": 1 },
+        "classification": {
+          "enum": ["matching", "diverging", "superseded", "conflicting", "insufficient_evidence"]
+        },
+        "evidence_locators": { "type": "array", "items": { "type": "string" } },
+        "blocking": { "type": "boolean" },
+        "explanation": { "type": "string", "minLength": 1 },
+        "owner_review_required": { "type": "boolean" },
+        "next_deterministic_check": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "object" }
+      },
+      "required": [
+        "finding_id", "rule_group", "code", "severity", "subject_type", "subject_id",
+        "classification", "evidence_locators", "blocking", "explanation",
+        "owner_review_required", "next_deterministic_check", "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "PlanIntegrityReadinessResult": {
+      "type": "object",
+      "properties": {
+        "result": { "enum": ["READY", "READY_WITH_ADVISORIES", "BLOCKED"] },
+        "ready": { "type": "boolean" },
+        "blocking_count": { "type": "integer", "minimum": 0 },
+        "advisory_count": { "type": "integer", "minimum": 0 },
+        "finding_count": { "type": "integer", "minimum": 0 },
+        "explanation": { "type": "string", "minLength": 1 },
+        "rule": { "const": "PI-READINESS-001" }
+      },
+      "required": ["result", "ready", "blocking_count", "advisory_count", "finding_count", "explanation", "rule"],
+      "additionalProperties": false
+    },
+    "PlanIntegrityReport": {
+      "type": "object",
+      "properties": {
+        "authority_class": { "const": "generated_evidence" },
+        "comparisons": { "type": "array", "items": { "$ref": "#/$defs/PlanIntegrityComparison" } },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/PlanIntegrityFinding" } },
+        "readiness": { "$ref": "#/$defs/PlanIntegrityReadinessResult" }
+      },
+      "required": ["authority_class", "comparisons", "findings", "readiness"],
+      "additionalProperties": true
+    },
+    "PlanIntegrityGeneratedPackageMetadata": {
+      "type": "object",
+      "properties": {
+        "authority_class": { "const": "generated_evidence" },
+        "branch": { "type": "string" },
+        "bound_commit": { "$ref": "#/$defs/GitSha" },
+        "generated_at": { "$ref": "#/$defs/IsoTimestamp" },
+        "task_id": { "type": "string" },
+        "run_id": { "type": "string" }
+      },
+      "required": ["authority_class", "branch", "bound_commit", "generated_at", "task_id", "run_id"],
+      "additionalProperties": true
+    },
     "ValidationFinding": {
       "type": "object",
       "properties": {

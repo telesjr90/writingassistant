@@ -113,6 +113,31 @@
       "description": "Focused fixture-only and tracked-source tests validate owner deferral, task sequencing, Ask request/response fields, precedence, freshness and uncertainty reporting, fail-closed cases, read-only OpenCode controls, product boundaries, and deterministic guidance validation without running an agent or model.",
       "associated_task_id": "PHASE8-IMPL-026-T008",
       "is_blocking_defect": false
+    },
+    {
+      "id": "evidence:ph8-impl-026-t009-plan-integrity",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "T009 Deterministic Plan Integrity Validation",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T009",
+        "accepted_by": "PHASE8-IMPL-026-T009",
+        "source_locators": [
+          { "path": "tests/project_memory/test_plan_integrity.py" },
+          { "path": "scripts/project_memory/plan_integrity.py" },
+          { "path": "scripts/project_memory/build_plan_integrity_report.py" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T009-deterministic-plan-integrity-engine.md" }
+        ]
+      },
+      "evidence_id": "ph8-impl-026-t009-plan-integrity",
+      "evidence_type": "automated_test",
+      "description": "Focused temporary-repository and fixture tests validate all Q151 classifications, readiness, confidence basis, clean and commit binding, registry failure, task and dependency convergence, decision supersession/conflict, evidence and authority rules, exact-only overlaps, product boundaries, deterministic ordering, atomic package integrity, direct CLI behavior, and non-mutation boundaries.",
+      "associated_task_id": "PHASE8-IMPL-026-T009",
+      "is_blocking_defect": false
     }
   ]
 }

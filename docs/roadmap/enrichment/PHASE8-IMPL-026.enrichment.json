@@ -87,7 +87,7 @@
     "summary": "Defined the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 normalized tracked registry files; registry manifest; dependency-free standard-library validator; focused tests. Established stable namespaced identifiers, tracked-source vs. generated-snapshot separation, enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity. Resolved Q149 (JSON canonical format) and Q150 (one schema bundle, separate registry files, dependency-free validator)."
   },
   "t003_status": "complete/PASS-WITH-FINDINGS (T003A: complete/PASS, T003B: complete/PASS-WITH-FINDINGS)",
-  "next_project_memory_task": "PHASE8-IMPL-026-T009 — Deterministic Plan Integrity engine. Planned next/inactive.",
+  "next_project_memory_task": "PHASE8-IMPL-026-T010 — Specialized Plan Integrity reviewers. Planned next/inactive.",
   "t004_parent": "complete/PASS-WITH-FINDINGS",
   "dependencies": {
     "none_approved": [
@@ -100,7 +100,6 @@
     "live_context_tool_execution_approved": false
   },
   "open_questions": [
-    "convergence criteria for plan-vs-implementation comparison",
     "criteria for Serena adoption",
     "embedding model selection for LlamaIndex pilot",
     "retrieval benchmark thresholds beyond initial planning target",
@@ -109,6 +108,7 @@
   "resolved_questions": {
     "Q149": "Canonical registry storage format: JSON. Resolved by PHASE8-IMPL-026-T002.",
     "Q150": "Schema decomposition: one JSON Schema Draft 2020-12 bundle with typed $defs, 12 separate registry files, one manifest, one dependency-free standard-library validator. Resolved by PHASE8-IMPL-026-T002.",
+    "Q151": "Resolved by PHASE8-IMPL-026-T009: exact matching, diverging, superseded, conflicting, and insufficient_evidence classifications plus READY, READY_WITH_ADVISORIES, and BLOCKED readiness.",
     "T006_T007_owner_deferral": "No measured symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap currently justifies either pilot. Deferral is not rejection or later installation approval. Reconsideration requires a documented benchmarkable gap and a future owner-approved provenance/benchmark task."
   },
   "risks": [
@@ -172,7 +172,10 @@
     "shared bounded Project Memory read skill",
     "strictly read-only OpenCode Project Memory Ask agent",
     "standard-library agent-guidance validator",
-    "focused T008 agent-guidance and Ask contract coverage"
+    "focused T008 agent-guidance and Ask contract coverage",
+    "deterministic Plan Integrity classifications and readiness",
+    "exact comparison, finding, traceability, dependency, and product-boundary checks",
+    "atomic clean-HEAD Plan Integrity generated-evidence package"
   ],
   "t004c_status": "complete/PASS-WITH-FINDINGS",
   "t004c1_status": "complete/PASS (repaired: task-registry synchronization, renderer hardcodes removed, registry-derived task status, semantic rendered-package validator, fail-closed semantic publication gate, focused regression tests)",
@@ -181,12 +184,14 @@
   "t006_status": "owner-deferred; contingent/planned/inactive/unimplemented; no measured benchmarkable capability gap; not rejected or approved for installation",
   "t007_status": "owner-deferred; contingent/planned/inactive/unimplemented; no measured benchmarkable capability gap; not rejected or approved for installation",
   "t008_status": "complete/PASS (deterministic Ask protocol, shared read skill, strictly read-only OpenCode agent, standard-library validator, focused tests; ordinary read-only repository access only)",
-  "t009_status": "planned next/inactive",
+  "t009_status": "complete/PASS (standard-library-only deterministic Plan Integrity engine; exact Q151 classifications; readiness tri-state; six bounded rule groups; atomic clean-HEAD generated-evidence package)",
+  "t010_status": "planned next/inactive; specialized reviewer agents not implemented or activated by T009",
+  "t011_status": "planned/inactive",
   "post_closeout_refresh_042826z": "structurally valid generated evidence; not accepted as current publication (renderer hardcodes index status table)",
   "post_t004c1_refresh_20260714t213628z": "current, publication eligible, correctly commit-bound, and task-state convergent; rejected as accepted current publication because the committed authority validator used a false-positive page-wide keyword rule",
   "renderer_defect_identified": "hardcoded index-page status table in _render_index() and hardcoded PM child indicator in _render_current_roadmap() — repaired by T004C1",
   "accepted_current_publication_for_a415270": null,
   "accepted_current_publication_for_8961b35": ".codex-context/project-memory/PHASE8-IMPL-026-T004C2/20260714T221454Z/",
-  "next_operational_step": "T006/T007 remain owner-deferred and contingent/inactive; T008 is complete/PASS; T009 is planned next/inactive; T010-T011 remain planned",
-  "next_project_memory_task": "PHASE8-IMPL-026-T009 — Deterministic Plan Integrity engine. Planned next/inactive."
+  "next_operational_step": "T006/T007 remain owner-deferred and contingent/inactive; T008 and T009 are complete/PASS; T010 is planned next/inactive; T011 remains planned/inactive",
+  "next_project_memory_task": "PHASE8-IMPL-026-T010 — Specialized Plan Integrity reviewers. Planned next/inactive."
 }

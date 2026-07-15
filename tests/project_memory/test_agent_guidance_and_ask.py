@@ -22,6 +22,7 @@ from scripts.project_memory.validate_agent_guidance import (  # noqa: E402
     REQUIRED_PROTOCOL_TOKENS,
     validate_agent_guidance,
 )
+from scripts.project_memory.render_docs import _derive_pm_task_behavior  # noqa: E402
 
 
 def _text(relative_path: str) -> str:
@@ -86,13 +87,50 @@ def test_t006_t007_are_not_approved_installed_active_complete_or_required_by_t00
     assert by_task["PHASE8-IMPL-026-T008"]["depends_on"] == ["PHASE8-IMPL-026-T004"]
 
 
-def test_t008_is_complete_pass_and_t009_is_next_planned_inactive():
+def test_t008_t009_complete_and_t010_is_next_while_t011_remains_later():
+    tasks = _registry("tasks.json")["records"]
+    by_task = {record["task_id"]: record for record in tasks}
+    behavior = _derive_pm_task_behavior(
+        tasks,
+        _registry("owner-decisions.json")["records"],
+    )
     t008 = _record("tasks.json", "task:PHASE8-IMPL-026-T008")
     t009 = _record("tasks.json", "task:PHASE8-IMPL-026-T009")
+    t010 = by_task["PHASE8-IMPL-026-T010"]
+    t011 = by_task["PHASE8-IMPL-026-T011"]
+    remaining_task_ids = {
+        task_id
+        for task_id, state in behavior["states"].items()
+        if state["state"] != "complete"
+    }
+    selected_next_ids = [behavior["next_actionable_task"]["task_id"]]
+
     assert t008["lifecycle"]["status"] == "complete"
     assert "complete/pass" in t008["notes"].lower()
-    assert t009["lifecycle"]["status"] == "planned"
-    assert "planned next and inactive" in t009["notes"].lower()
+    assert t009["lifecycle"]["status"] == "complete"
+    assert any(result in t009["notes"].lower() for result in ("complete/pass", "complete/pass-with-findings"))
+    assert t009["lifecycle"]["status"] not in {"planned", "in_progress", "current"}
+    assert behavior["states"]["PHASE8-IMPL-026-T009"]["actionable"] is False
+    assert "PHASE8-IMPL-026-T009" not in remaining_task_ids
+
+    assert t010["lifecycle"]["status"] == "planned"
+    assert "planned next and inactive" in t010["notes"].lower()
+    assert behavior["states"]["PHASE8-IMPL-026-T010"]["state"] == "planned_actionable"
+    assert selected_next_ids == ["PHASE8-IMPL-026-T010"]
+    assert all(
+        not locator["path"].startswith(("scripts/", "tests/", "backend/", "frontend/"))
+        for locator in t010["provenance"]["source_locators"]
+    )
+
+    assert t011["lifecycle"]["status"] == "planned"
+    assert "planned and inactive" in t011["notes"].lower()
+    assert behavior["states"]["PHASE8-IMPL-026-T011"]["state"] == "planned_actionable"
+    assert behavior["states"]["PHASE8-IMPL-026-T011"]["actionable"] is True
+    assert "PHASE8-IMPL-026-T011" in remaining_task_ids
+    assert "PHASE8-IMPL-026-T011" not in selected_next_ids
+
+    assert "reviewer agent" not in t009["notes"].lower()
+    assert t010["lifecycle"]["status"] != "in_progress"
 
 
 def test_t010_t011_remain_planned():
@@ -214,7 +252,7 @@ def test_no_automatic_roadmap_memory_promotion_or_prose_mutation_allowed():
             ".opencode/agents/project-memory-ask.md",
         )
     )
-    for boundary in ("activate", "close", "reorder", "Memory/Canon", "promote", "apply promotion", "story prose"):
+    for boundary in ("activate", "close", "reorder", "registries", "Memory/Canon", "promote", "apply promotion", "story prose"):
         assert boundary in combined
 
 

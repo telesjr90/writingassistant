@@ -401,12 +401,16 @@
       "title": "Deterministic Plan Integrity engine",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "planned"
+        "status": "complete"
       },
       "provenance": {
-        "created_by": "PHASE8-IMPL-026-T008",
+        "created_by": "PHASE8-IMPL-026-T009",
+        "accepted_by": "PHASE8-IMPL-026-T009",
         "source_locators": [
-          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+          { "path": "scripts/project_memory/plan_integrity.py" },
+          { "path": "scripts/project_memory/build_plan_integrity_report.py" },
+          { "path": "tests/project_memory/test_plan_integrity.py" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T009-deterministic-plan-integrity-engine.md" }
         ]
       },
       "task_id": "PHASE8-IMPL-026-T009",
@@ -416,7 +420,7 @@
       "classification": "deterministic plan-integrity analysis",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Planned next and inactive. No implementation is present."
+      "notes": "Complete/PASS. Implements the standard-library-only deterministic Plan Integrity engine, exact Q151 classifications, readiness tri-state, six bounded rule groups, deterministic confidence basis and ordering, and an atomic clean-HEAD generated-evidence package with exact inventory and checksums."
     },
     {
       "id": "task:PHASE8-IMPL-026-T010",
@@ -440,7 +444,7 @@
       "classification": "specialized review agents",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Planned and inactive. Reviewers may propose findings but may not change authoritative state."
+      "notes": "Planned next and inactive. Reviewers may propose findings but may not change authoritative state. No reviewer agent is implemented or activated by T009."
     },
     {
       "id": "task:PHASE8-IMPL-026-T011",

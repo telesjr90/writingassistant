@@ -262,8 +262,8 @@ python3 scripts/project_memory/convergence.py --repo-root . --json
 - Minimal representative seed only; not a complete repository inventory.
 - No MkDocs integration or published documentation site (T004C).
 - Read-only existing context-tool evidence import is implemented (T005); no live context-tool runner exists.
-- No retrieval or AI agent integration (T006-T008). T006/T007 remain contingent and inactive.
-- No Plan Integrity engine (T009).
+- No retrieval pilot is active. T006/T007 remain owner-deferred, contingent, and inactive; T008 read-only Ask guidance is implemented without retrieval integration.
+- Deterministic Plan Integrity engine and clean-HEAD generated report package are implemented (T009); specialized reviewer agents (T010) are not implemented.
 - No generated publication snapshot existed at T003A. T003B created the first clean-HEAD generated snapshot.
 - No publication render existed at T004B. T004C generated the first publication render against a clean-HEAD snapshot bound to the T004B commit.
 - No branch synchronization performed yet.
@@ -430,8 +430,9 @@ bound to `8961b35`. T005 is complete/PASS.
 
 ## Next Task
 
-The next sequenced Project Memory task is T006, planned/contingent/inactive and
-not activated. T007 remains contingent/inactive; T008-T011 remain planned.
+T006/T007 remain owner-deferred, planned/contingent/inactive. T008 and T009 are
+complete/PASS. The next sequenced Project Memory task is T010,
+planned/inactive; T011 remains planned/inactive.
 
 T004 is closed as complete/PASS-WITH-FINDINGS. T004C1 and T004C2 are complete/PASS.
 
@@ -481,9 +482,9 @@ T003B is complete/PASS-WITH-FINDINGS.
 
 ## Next Task
 
-T005 is complete/PASS. The next sequenced task is T006,
-planned/contingent/inactive and not activated. T007 remains contingent/inactive;
-T008-T011 remain planned.
+T005, T008, and T009 are complete/PASS. T006/T007 remain owner-deferred,
+planned/contingent/inactive. T010 is next planned/inactive; T011 remains
+planned/inactive.
 
 T004 is complete/PASS-WITH-FINDINGS. T004C is complete/PASS-WITH-FINDINGS.
 
