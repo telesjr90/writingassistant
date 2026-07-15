@@ -1,0 +1,255 @@
+{
+  "registry_type": "dependency",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "dependency:t002-depends-on-t001",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T002 depends on T001",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 76, "line_end": 76 }
+        ]
+      },
+      "dependency_id": "t002-depends-on-t001",
+      "source_id": "task:PHASE8-IMPL-026-T002",
+      "target_id": "task:PHASE8-IMPL-026-T001",
+      "dependency_type": "task_depends_on",
+      "is_separate": false
+    },
+    {
+      "id": "dependency:t003-depends-on-t002",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T003 depends on T002",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 84, "line_end": 84 }
+        ]
+      },
+      "dependency_id": "t003-depends-on-t002",
+      "source_id": "task:PHASE8-IMPL-026-T003",
+      "target_id": "task:PHASE8-IMPL-026-T002",
+      "dependency_type": "task_depends_on",
+      "is_separate": false
+    },
+    {
+      "id": "dependency:impl-025-separate-from-frontier",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "PHASE8-IMPL-025 remains separate from application frontier",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "dependency_id": "impl-025-separate-from-frontier",
+      "source_id": "task:PHASE8-IMPL-025",
+      "target_id": "task:PHASE8-IMPL-024-T003A",
+      "dependency_type": "boundary_constrains",
+      "is_separate": true,
+      "notes": "PHASE8-IMPL-025 is intentionally separate from the application frontier. Its T001/T002 prerequisites are satisfied but T003A is the active frontier and no PHASE8-IMPL-025 child is activated."
+    },
+    {
+      "id": "dependency:pm-does-not-replace-impl-024",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "Project Memory does not replace PHASE8-IMPL-024 sequencing",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 24, "line_end": 25 }
+        ]
+      },
+      "dependency_id": "pm-does-not-replace-impl-024",
+      "source_id": "task:PHASE8-IMPL-026",
+      "target_id": "task:PHASE8-IMPL-024",
+      "dependency_type": "boundary_constrains",
+      "is_separate": true,
+      "notes": "Project Memory normalizes and explains the plan. It cannot activate, close, or reorder application tasks."
+    },
+    {
+      "id": "dependency:t004-depends-on-t003",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T004 depends on T003",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004C1",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 23, "line_end": 23 }
+        ]
+      },
+      "dependency_id": "t004-depends-on-t003",
+      "source_id": "task:PHASE8-IMPL-026-T004",
+      "target_id": "task:PHASE8-IMPL-026-T003",
+      "dependency_type": "task_depends_on",
+      "is_separate": false,
+      "notes": "Human-readable Project Memory requires deterministic scanners and convergence to be operational."
+    },
+    {
+      "id": "dependency:t005-depends-on-t004",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T005 depends on T004",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T005",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "dependency_id": "t005-depends-on-t004",
+      "source_id": "task:PHASE8-IMPL-026-T005",
+      "target_id": "task:PHASE8-IMPL-026-T004",
+      "dependency_type": "task_depends_on",
+      "is_separate": false,
+      "notes": "Existing context-tool evidence import depends on the accepted Project Memory authority, registry, scanner, and human-readable publication foundation."
+    },
+    {
+      "id": "dependency:t006-depends-on-t005",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T006 depends on T005",
+      "authority_class": "authoritative",
+      "lifecycle": { "status": "current" },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" }
+        ]
+      },
+      "dependency_id": "t006-depends-on-t005",
+      "source_id": "task:PHASE8-IMPL-026-T006",
+      "target_id": "task:PHASE8-IMPL-026-T005",
+      "dependency_type": "task_depends_on",
+      "is_separate": false,
+      "notes": "The contingent owner-deferred T006 pilot remains planned/inactive and cannot proceed without a future measured gap and owner-approved benchmark/provenance task."
+    },
+    {
+      "id": "dependency:t007-depends-on-t005",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T007 depends on T005",
+      "authority_class": "authoritative",
+      "lifecycle": { "status": "current" },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" }
+        ]
+      },
+      "dependency_id": "t007-depends-on-t005",
+      "source_id": "task:PHASE8-IMPL-026-T007",
+      "target_id": "task:PHASE8-IMPL-026-T005",
+      "dependency_type": "task_depends_on",
+      "is_separate": false,
+      "notes": "The contingent owner-deferred T007 pilot remains planned/inactive and cannot proceed without a future measured gap and owner-approved benchmark/provenance task."
+    },
+    {
+      "id": "dependency:t008-depends-on-t004",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T008 depends on T004",
+      "authority_class": "authoritative",
+      "lifecycle": { "status": "current" },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "dependency_id": "t008-depends-on-t004",
+      "source_id": "task:PHASE8-IMPL-026-T008",
+      "target_id": "task:PHASE8-IMPL-026-T004",
+      "dependency_type": "task_depends_on",
+      "is_separate": false,
+      "notes": "Shared guidance uses the deterministic registry and human-readable publication foundation and does not depend on T006 or T007."
+    },
+    {
+      "id": "dependency:t009-depends-on-t003",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T009 depends on T003",
+      "authority_class": "authoritative",
+      "lifecycle": { "status": "current" },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "dependency_id": "t009-depends-on-t003",
+      "source_id": "task:PHASE8-IMPL-026-T009",
+      "target_id": "task:PHASE8-IMPL-026-T003",
+      "dependency_type": "task_depends_on",
+      "is_separate": false
+    },
+    {
+      "id": "dependency:t010-depends-on-t009",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T010 depends on T009",
+      "authority_class": "authoritative",
+      "lifecycle": { "status": "current" },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "dependency_id": "t010-depends-on-t009",
+      "source_id": "task:PHASE8-IMPL-026-T010",
+      "target_id": "task:PHASE8-IMPL-026-T009",
+      "dependency_type": "task_depends_on",
+      "is_separate": false
+    },
+    {
+      "id": "dependency:t011-depends-on-t010",
+      "type": "dependency",
+      "schema_version": "1.0.0",
+      "title": "T011 depends on T010",
+      "authority_class": "authoritative",
+      "lifecycle": { "status": "current" },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "dependency_id": "t011-depends-on-t010",
+      "source_id": "task:PHASE8-IMPL-026-T011",
+      "target_id": "task:PHASE8-IMPL-026-T010",
+      "dependency_type": "task_depends_on",
+      "is_separate": false
+    }
+  ]
+}

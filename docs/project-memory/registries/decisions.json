@@ -1,0 +1,177 @@
+{
+  "registry_type": "decision",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "decision:pmf-t001-authority-foundation",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Project Memory Authority, Lifecycle, and Provenance Foundation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "decision_id": "pmf-t001-authority-foundation",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md",
+      "question": "What controlling policies, authority hierarchy, trust classes, freshness model, and provenance rules should govern Project Memory before any schema, scanner, registry, renderer, or retrieval tool exists?",
+      "selected_option": "ACCEPTED as a parallel governance, documentation, and developer infrastructure workstream. Defined seven-tier authority hierarchy, eight trust classes, commit-bound freshness, supersession, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization policy, and product boundaries.",
+      "rationale": "Without normalized controlling policies, context tools, retrieval systems, agent prompts, and generated indexes could silently drift from the authoritative roadmap and live code.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T002", "PHASE8-IMPL-026-T003"]
+    },
+    {
+      "id": "decision:pmf-t002-schema-registry-architecture",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Schema and Normalized-Registry Architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T002-schema-and-normalized-registry-architecture.md" }
+        ]
+      },
+      "decision_id": "pmf-t002-schema-registry-architecture",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T002-schema-and-normalized-registry-architecture.md",
+      "question": "What exact data model, schema standard, registry decomposition, stable identifier contract, and validation architecture should Project Memory adopt?",
+      "selected_option": "JSON as canonical tracked registry format; JSON Schema Draft 2020-12 as formal data contract; one schema bundle with typed $defs; 12 separate normalized registry files; registry manifest; dependency-free standard-library validator; tracked source versus generated snapshot separation; stable namespaced identifiers; enforced trust classes, lifecycle values, and cross-record references.",
+      "rationale": "The architecture must support deterministic comparison between plan and implementation, allow later scanners and renderers to extend records without replacing identifiers, and enforce product safety boundaries through structural validation.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T002", "PHASE8-IMPL-026-T003"]
+    },
+    {
+      "id": "decision:pmf-t006-t007-owner-deferral",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "T006/T007 Owner Deferral for No Measured Capability Gap",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "owner",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "decision_id": "pmf-t006-t007-owner-deferral",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md",
+      "question": "Should T006 or T007 be activated when no benchmarkable capability gap has been measured?",
+      "selected_option": "No. Keep T006 and T007 contingent, planned, inactive, owner-deferred, and unimplemented. T008 proceeds with deterministic Project Memory sources and ordinary read-only repository access.",
+      "rationale": "No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap currently justifies either pilot. T005's zero-artifact result reflects worktree topology, not a Serena or vector-retrieval deficiency.",
+      "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007", "PHASE8-IMPL-026-T008"]
+    },
+    {
+      "id": "decision:pmf-t008-agent-guidance-ask",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Shared Agent Guidance and Project Memory Ask",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md" },
+          { "path": "docs/project-memory/ask-protocol.md" }
+        ]
+      },
+      "decision_id": "pmf-t008-agent-guidance-ask",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md",
+      "question": "How should Codex, OpenCode, and compatible agents ask bounded Project Memory questions without a retrieval pilot?",
+      "selected_option": "Use a deterministic read-only Ask protocol, shared repository skill, and strictly read-only OpenCode agent over accepted repository sources, normalized navigation records, and current generated publications with explicit authority, freshness, conflict, uncertainty, and owner-decision reporting. Derive next-actionable Project Memory work from normalized task records and linked accepted owner decisions, and validate every rendered package against its selected snapshot-bound normalized state.",
+      "rationale": "The repository already provides sufficient deterministic sources and ordinary read-only inspection for the measured need. Fail-closed guidance prevents generated evidence, model output, or agent behavior from mutating project truth. Snapshot-bound semantic validation preserves internally consistent historical publications while current publications still converge with current tracked registries; contingent owner-deferred pilots remain visible without blocking actionable successors.",
+      "affected_tasks": ["PHASE8-IMPL-026-T008", "PHASE8-IMPL-026-T009"]
+    },
+    {
+      "id": "decision:pmf-t009-deterministic-plan-integrity",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Plan Integrity Engine",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T009",
+        "accepted_by": "PHASE8-IMPL-026-T009",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T009-deterministic-plan-integrity-engine.md" },
+          { "path": "scripts/project_memory/plan_integrity.py" },
+          { "path": "tests/project_memory/test_plan_integrity.py" }
+        ]
+      },
+      "decision_id": "pmf-t009-deterministic-plan-integrity",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T009-deterministic-plan-integrity-engine.md",
+      "question": "What exact deterministic classifications, rule groups, evidence requirements, and readiness states govern Plan Integrity?",
+      "selected_option": "Use matching, diverging, superseded, conflicting, and insufficient_evidence comparisons; READY, READY_WITH_ADVISORIES, and BLOCKED readiness; exact evidence and confidence bases; six bounded integrity rule groups; and generated_evidence-only atomic reports.",
+      "rationale": "Exact rule evaluation provides reproducible plan-versus-implementation evidence without semantic guessing, confidence-as-truth, automatic resolution, or authoritative-state mutation.",
+      "affected_tasks": ["PHASE8-IMPL-026-T009", "PHASE8-IMPL-026-T010"]
+    },
+    {
+      "id": "decision:pmf-t010-specialized-reviewers",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Specialized Plan Integrity Reviewers",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T010",
+        "accepted_by": "PHASE8-IMPL-026-T010",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md" },
+          { "path": "docs/project-memory/reviewer-protocol.md" },
+          { "path": "scripts/project_memory/reviewer_findings.py" },
+          { "path": "tests/project_memory/test_plan_integrity_reviewers.py" }
+        ]
+      },
+      "decision_id": "pmf-t010-specialized-reviewers",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md",
+      "question": "How may specialized reviewers surface bounded Plan Integrity concerns without becoming authority or changing T009 readiness?",
+      "selected_option": "Use six strictly read-only OpenCode reviewer definitions backed by one shared protocol and skill plus deterministic guidance and supplied-finding validation; keep every reviewer output generated_evidence and T009 the sole readiness authority.",
+      "rationale": "Bounded permissions, exact evidence binding, deterministic normalization, and explicit non-authority preserve owner control while allowing later operator-invoked domain review without automatic scheduling or semantic truth selection.",
+      "affected_tasks": ["PHASE8-IMPL-026-T010", "PHASE8-IMPL-026-T011"]
+    },
+    {
+      "id": "decision:pmf-t011-operational-rollout",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Synchronization, CI, Rebuild, and Operational Rollout",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "PHASE8-IMPL-026-T011",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" },
+          { "path": "docs/project-memory/operations.json" },
+          { "path": "docs/project-memory/operator-manual.md" }
+        ],
+        "owner_decision_ref": "owner-decision:q154-event-driven-commit-bound-cadence"
+      },
+      "decision_id": "pmf-t011-operational-rollout",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md",
+      "question": "What synchronization cadence, stale-index contract, deterministic refresh, CI rebuild, and publication procedure closes Project Memory operational rollout?",
+      "selected_option": "Use an event-driven commit-bound cadence; owner-controlled complete-commit synchronization; read-only status diagnosis; one-command clean-HEAD refresh; ephemeral exact-commit CI rebuild; deterministic inventories, checksums, bindings, semantic and authority validation, and quality packages; no cron or automatic Git/authority mutation.",
+      "rationale": "Repository divergence rather than elapsed time determines freshness. Deterministic validation and rebuild provide reproducible evidence while preserving owner control and generated-evidence non-authority.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
+    }
+  ]
+}

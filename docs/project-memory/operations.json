@@ -1,0 +1,114 @@
+{
+  "schema": "project-memory-operations.v1",
+  "version": "1.0.0",
+  "cadence": {
+    "kind": "event_driven_commit_bound",
+    "time_based_schedule_required": false,
+    "events": [
+      "accepted_application_commit_synchronized",
+      "project_memory_task_completed",
+      "tracked_project_memory_authority_changed",
+      "tracked_project_memory_registry_changed",
+      "tracked_project_memory_tooling_changed",
+      "parent_or_phase_closeout_publication",
+      "stale_index_detected"
+    ]
+  },
+  "authoritative_branch": "docs/project-memory-foundation",
+  "synchronization": {
+    "operator_controlled": true,
+    "clean_worktree_required": true,
+    "complete_accepted_commits_only": true,
+    "preferred_method": "reviewed_full_merge",
+    "conditional_method": "owner_selected_complete_commit_cherry_pick",
+    "forbidden_methods": [
+      "path_filtered_cherry_pick",
+      "roadmap_only_copy",
+      "reset",
+      "restore",
+      "clean",
+      "stash",
+      "rebase",
+      "amend",
+      "force_push"
+    ],
+    "automatic_git_mutation": false
+  },
+  "trigger_path_groups": {
+    "project_memory_sources": ["docs/project-memory/**", "scripts/project_memory/**", "tests/project_memory/**"],
+    "roadmap_sources": ["docs/roadmap/**"],
+    "application_sources": ["backend/**", "frontend/**", "tests/**"],
+    "guidance_and_reviewers": ["AGENTS.md", ".agents/**", ".opencode/**"],
+    "ci": [".github/workflows/project-memory.yml"]
+  },
+  "clean_state_gates": [
+    "repository_identity",
+    "non_detached_branch_for_local_refresh",
+    "expected_branch",
+    "full_expected_commit",
+    "empty_staging",
+    "clean_worktree"
+  ],
+  "required_checks": [
+    "plan_integrity_report",
+    "snapshot",
+    "publication_render",
+    "semantic_validation",
+    "authority_validation",
+    "quality_gate",
+    "inventory",
+    "checksums",
+    "branch_binding",
+    "full_commit_binding",
+    "registry_hashes",
+    "source_hashes"
+  ],
+  "local_publication_output_root": ".codex-context/project-memory",
+  "ci": {
+    "temporary_output_required": true,
+    "repository_publication_output_forbidden": true,
+    "preexisting_local_evidence_required": false,
+    "generated_output_committed": false
+  },
+  "accepted_readiness": ["READY", "READY_WITH_ADVISORIES"],
+  "accepted_nonblocking_advisory_codes": ["source_missing"],
+  "closed_parent_no_next_task": {
+    "representation": "json_null",
+    "parent_status": "complete",
+    "maintenance_mode": "operational_procedure",
+    "procedure_task_id": "PHASE8-IMPL-026-T011",
+    "application_frontier_required": "PHASE8-IMPL-024-T003A",
+    "accepted_evidence_required": true,
+    "roadmap_convergence_required": true
+  },
+  "stale_state_reasons": [
+    "dirty_worktree",
+    "staged_changes",
+    "branch_mismatch",
+    "commit_mismatch",
+    "accepted_application_commit_mismatch",
+    "missing_required_package",
+    "malformed_metadata",
+    "inventory_mismatch",
+    "checksum_failure",
+    "registry_hash_drift",
+    "source_hash_drift",
+    "non_current_snapshot",
+    "non_publication_eligible_snapshot",
+    "blocked_plan_integrity_readiness",
+    "unsupported_plan_integrity_advisory",
+    "semantic_validation_failure",
+    "authority_validation_failure",
+    "quality_gate_failure"
+  ],
+  "generated_evidence_authority": "generated_evidence",
+  "mutation_boundaries": {
+    "automatic_git_mutation": false,
+    "automatic_roadmap_mutation": false,
+    "automatic_registry_mutation": false,
+    "automatic_memory_canon_mutation": false,
+    "automatic_candidate_promotion": false,
+    "automatic_apply_promotion": false,
+    "automatic_story_prose_mutation": false
+  }
+}

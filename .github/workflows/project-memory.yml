@@ -1,0 +1,92 @@
+name: Project Memory
+
+on:
+  pull_request:
+    paths:
+      - "docs/project-memory/**"
+      - "docs/roadmap/**"
+      - "scripts/project_memory/**"
+      - "tests/project_memory/**"
+      - "backend/**"
+      - "frontend/**"
+      - "tests/**"
+      - "AGENTS.md"
+      - ".gitignore"
+      - ".agents/**"
+      - ".opencode/**"
+      - ".github/workflows/project-memory.yml"
+  push:
+    branches: [docs/project-memory-foundation]
+    paths:
+      - "docs/project-memory/**"
+      - "docs/roadmap/**"
+      - "scripts/project_memory/**"
+      - "tests/project_memory/**"
+      - "backend/**"
+      - "frontend/**"
+      - "tests/**"
+      - "AGENTS.md"
+      - ".gitignore"
+      - ".agents/**"
+      - ".opencode/**"
+      - ".github/workflows/project-memory.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-project-memory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Project Memory Python
+        run: python3 -m compileall -q scripts/project_memory tests/project_memory
+
+      - name: Validate registries and guidance
+        run: |
+          python3 scripts/project_memory/validate_registries.py --json
+          python3 scripts/project_memory/validate_agent_guidance.py --json
+          python3 scripts/project_memory/validate_reviewer_guidance.py --json
+          python3 scripts/project_memory/validate_operational_rollout.py --json
+
+      - name: Validate JSON, enrichment, roadmap, and diff
+        run: |
+          for file in \
+            docs/project-memory/operations.json \
+            docs/project-memory/schemas/project-memory.schema.json \
+            docs/project-memory/registries/*.json \
+            docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json
+          do
+            python3 -m json.tool "$file" >/dev/null
+          done
+          python3 scripts/check_enrichment.py
+          python3 scripts/validate_roadmap.py
+          git diff --check
+
+      - name: Run complete Project Memory tests
+        run: python3 -m pytest tests/project_memory -q -p no:cacheprovider
+
+      - name: Ephemeral clean rebuild
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+        run: |
+          python3 scripts/project_memory/operational_rollout.py ci-check \
+            --repo-root . \
+            --output-root "$RUNNER_TEMP/project-memory" \
+            --task-id PHASE8-IMPL-026-T011 \
+            --expected-branch docs/project-memory-foundation \
+            --expected-commit "$EXPECTED_COMMIT" \
+            --json
+
+      - name: Verify checkout cleanliness
+        run: test -z "$(git status --porcelain=v1)"

@@ -1,3 +1,23 @@
+# PHASE8-IMPL-026 Project Memory and Plan Integrity
+
+- Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature.
+- T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
+- Parent records: `docs/roadmap/tasks/PHASE8-IMPL-026.md`, `docs/roadmap/inventory/PHASE8-IMPL-026.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json`.
+- Application frontier: unchanged — PHASE8-IMPL-024-T003A. PHASE8-IMPL-025 remains published/planned and inactive.
+- PHASE8-IMPL-026 defines controlling policies for authority hierarchy (7 tiers), trust classes (8 classes), freshness (commit-bound), commit binding, supersession, conflicting evidence, owner decisions, generated evidence, memory update approval, roadmap synchronization, stale indexes, tool provenance, prompt-injection boundaries, branch synchronization, and product boundaries.
+- T001 is complete/PASS as the publication and authority-foundation micro-task.
+- T002 is complete/PASS as the schema and normalized-registry architecture micro-task.
+- T003 (deterministic scanners and convergence) is complete/PASS-WITH-FINDINGS: T003A (scanner implementation and testing) is complete/PASS; T003B (clean-HEAD snapshot, convergence validation, and T003 closeout) is complete/PASS-WITH-FINDINGS. First publication snapshot at `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/` bound to `a04b65c`.
+- T004 (human-readable Project Memory) is complete/PASS-WITH-FINDINGS. T004A and T004C are complete/PASS-WITH-FINDINGS; T004B, T004C1, and T004C2 are complete/PASS. The `20260714T213628Z` T004C1 refresh is current and task-state convergent but rejected because of a false-positive authority-keyword gate. T004C2 implements subject-aware authority semantics, allowed-reference classifications, and concrete forbidden-claim page/line diagnostics; renderer wording was unchanged. Accepted current publication is pending a post-T004C2 clean-HEAD refresh.
+- T005 existing context-tool integration is complete/PASS: read-only Repomix, Graphify, and CCE evidence import, deterministic envelopes and quarantine, no live tool execution.
+- T006/T007 owner decision: both pilots are deferred for lack of a measured benchmarkable symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap. They remain contingent, planned, inactive, and unimplemented; deferral is not rejection or installation approval.
+- T008 shared agent guidance and Project Memory Ask, T009 deterministic Plan Integrity, T010 specialized reviewers, and T011 operational rollout are complete/PASS. There is no next Project Memory implementation task; ongoing maintenance follows T011.
+- Workstream status: PHASE8-IMPL-026 is complete/closed as complete/PASS-WITH-FINDINGS. T001/T002/T005/T008/T009/T010/T011 are complete/PASS; T003/T004 are complete/PASS-WITH-FINDINGS. T006/T007 remain owner-deferred/contingent/planned/inactive and unimplemented. Q154 is resolved; Q152/Q153 remain open. The application frontier `PHASE8-IMPL-024-T003A` is the sole next implementation focus.
+- Tool installation is contingent on provenance and benchmark approval. Serena, LlamaIndex, and Qdrant are not approved dependencies.
+- Branch synchronization: owner-controlled complete accepted commits from clean worktrees; reviewed full merge preferred and precise owner-selected complete-commit cherry-pick allowed. Refresh is event-driven after synchronization/tracked changes/closeout gates/drift. Path-filtered cherry-picking, roadmap-only copying, destructive workflows, and cron are rejected.
+- Product boundaries: analysis-only, evidence/provenance-backed, owner-controlled, no generated prose, no automatic truth or Memory/Canon mutation, no automatic promotion or apply-promotion, model output is not canon.
+- Project Memory schemas, scanners, snapshots, rendering, semantic/authority validation, read-only existing-context import, shared read-only Ask guidance, and the deterministic Plan Integrity engine exist through T009. No retrieval pilot or specialized Plan Integrity reviewer exists.
+
 # PHASE8-IMPL-025 Layered Analysis Architecture and Tool Integration Expansion
 
 - Status: published/planned; no implementation child is complete or ready.

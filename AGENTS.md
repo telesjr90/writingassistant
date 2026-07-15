@@ -217,3 +217,21 @@ Final responses should include:
 4. Validation commands and results.
 5. Deferred work.
 6. Confirmation that no staging, commit, or push was performed unless explicitly requested.
+
+## Project Memory consultation
+
+For bounded Project Memory questions, follow
+`docs/project-memory/ask-protocol.md` and the procedure in
+`.agents/skills/project-memory-read/SKILL.md`. Verify repository identity,
+branch, full HEAD, worktree state, and active task first. Consult accepted roadmap
+and decision records before code/tests, accepted validation, Git
+history, normalized registries, or generated publications in their established
+precedence order. Registries and generated evidence are navigation aids, never
+authority.
+
+Cite source paths and line ranges or stable record IDs. Separate facts from
+inference; state authority, freshness, commit binding, uncertainty, conflicts,
+and owner-decision status.
+Fail closed on missing, stale, contradictory, owner-pending, untrusted, or
+out-of-scope evidence. Never automatically mutate roadmap state, Memory/Canon,
+candidates, promotions, or story prose, and never treat model output as truth.

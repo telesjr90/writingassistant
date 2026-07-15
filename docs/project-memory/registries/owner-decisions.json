@@ -1,0 +1,183 @@
+{
+  "registry_type": "owner_decision",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "owner-decision:pmf-parent-identity",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "PHASE8-IMPL-026 Parent Identity",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 28, "line_end": 31 }
+        ]
+      },
+      "owner_decision_id": "pmf-parent-identity",
+      "question": "What roadmap identity should govern Project Memory and Plan Integrity?",
+      "selected_option": "PHASE8-IMPL-026 is the authoritative roadmap parent for Project Memory and Plan Integrity. Classification: hybrid governance, documentation, and developer infrastructure.",
+      "rationale": "A separate parallel governance workstream publishes controlling policies before any schema, scanner, registry, renderer, or retrieval tool exists. Project Memory must not silently override the accepted roadmap.",
+      "affected_tasks": ["PHASE8-IMPL-026"]
+    },
+    {
+      "id": "owner-decision:json-canonical-registry-format",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "JSON Canonical Registry Format",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/project-memory/registries/manifest.json" }
+        ]
+      },
+      "owner_decision_id": "json-canonical-registry-format",
+      "question": "What canonical tracked registry format should Project Memory use?",
+      "selected_option": "JSON as the canonical tracked Project Memory registry format. Reasons: Python standard-library parsing, direct compatibility with JSON Schema, deterministic serialization, no new YAML dependency, exact value types, easier automated validation.",
+      "rationale": "YAML would add a new dependency, complicate diff-based review, and introduce ambiguous type coercion. JSON with JSON Schema Draft 2020-12 provides the formal machine-readable data contract.",
+      "affected_tasks": ["PHASE8-IMPL-026-T002"]
+    },
+    {
+      "id": "owner-decision:tracked-paths",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Tracked Registry Paths",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 50, "line_end": 59 }
+        ]
+      },
+      "owner_decision_id": "tracked-paths",
+      "question": "Where should tracked Project Memory documentation, implementation code, tests, and generated evidence live?",
+      "selected_option": "Tracked decisions: docs/roadmap/decisions/. Tracked documentation and registries: docs/project-memory/. Implementation code: scripts/project_memory/. Tests: tests/project_memory/. Generated evidence and indexes: .codex-context/project-memory/.",
+      "rationale": "Clear separation of tracked source registries and generated index/build output. Generated artifacts are not authority.",
+      "affected_tasks": ["PHASE8-IMPL-026"]
+    },
+    {
+      "id": "owner-decision:generated-evidence-root",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Generated Evidence Root",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 58, "line_end": 59 }
+        ]
+      },
+      "owner_decision_id": "generated-evidence-root",
+      "question": "What directory should hold generated Project Memory evidence and indexes?",
+      "selected_option": ".codex-context/project-memory/ as the generated evidence and index root. Generated documentation sites and indexes are ignored build output and are not authority.",
+      "rationale": "Consistent with existing .codex-context/ conventions. Generated artifacts are evidence only and must not be confused with tracked source registries.",
+      "affected_tasks": ["PHASE8-IMPL-026"]
+    },
+    {
+      "id": "owner-decision:complete-commit-sync",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Complete-Commit Synchronization Policy",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 62, "line_end": 83 }
+        ]
+      },
+      "owner_decision_id": "complete-commit-sync",
+      "question": "What branch synchronization policy should govern Project Memory?",
+      "selected_option": "Complete-commit synchronization from clean worktrees at defined checkpoints. Reject path-filtered cherry-picking, roadmap-only copying, and destructive workflows. Prefer reviewed full merge; complete-commit cherry-pick when owner selects a precise accepted commit. Every memory snapshot records the accepted application commit.",
+      "rationale": "Path-filtered synchronization would leave code and tests stale, making plan-vs-implementation comparison impossible. Complete-commit sync ensures every memory snapshot has a complete known-good state.",
+      "affected_tasks": ["PHASE8-IMPL-026-T011"]
+    },
+    {
+      "id": "owner-decision:tool-pilots-deferred",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Tool Pilots Deferred Until Deterministic Foundation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 275, "line_end": 297 }
+        ]
+      },
+      "owner_decision_id": "tool-pilots-deferred",
+      "question": "When should Serena, LlamaIndex, and Qdrant pilots begin?",
+      "selected_option": "Tool installation work is contingent on provenance and benchmark decisions. Serena, LlamaIndex, and Qdrant are not approved dependencies. Pilots deferred until after deterministic foundation (T001-T005) exists.",
+      "rationale": "Premature dependency declaration could introduce network access, file-write scope, or subprocess behavior without review. The deterministic foundation must exist before retrieval pilots can compare against known-good baseline state.",
+      "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007"]
+    },
+    {
+      "id": "owner-decision:t006-t007-no-measured-gap-deferral",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "T006/T007 Deferred for No Measured Capability Gap",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "owner",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" }
+        ]
+      },
+      "owner_decision_id": "t006-t007-no-measured-gap-deferral",
+      "question": "Should T006 Serena or T007 LlamaIndex/local-embedding/Qdrant Local be activated without a measured capability gap?",
+      "selected_option": "Defer both pilots. Keep T006 and T007 contingent, planned, inactive, and unimplemented. T008 proceeds using deterministic Project Memory sources and ordinary read-only repository access. Deferral is not rejection and does not approve later installation.",
+      "rationale": "No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap has been measured. T005's zero-artifact result reflects worktree topology, not a Serena or vector-retrieval deficiency. Reconsider only after a documented benchmarkable gap is observed and a future owner-approved provenance/benchmark task is opened.",
+      "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007", "PHASE8-IMPL-026-T008"]
+    },
+    {
+      "id": "owner-decision:q154-event-driven-commit-bound-cadence",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Q154 Event-Driven Commit-Bound Operational Cadence",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "owner",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" },
+          { "path": "docs/project-memory/operations.json" }
+        ]
+      },
+      "owner_decision_id": "q154-event-driven-commit-bound-cadence",
+      "question": "What operational synchronization cadence should govern the Project Memory branch and deterministic refresh?",
+      "selected_option": "Use an event-driven, commit-bound cadence. Refresh after every accepted application-commit synchronization, completed Project Memory task or tracked authority/registry/tooling change, before parent/phase closeout publication, and whenever deterministic stale detection reports repository divergence. No cron or time-based schedule is required.",
+      "rationale": "Commit, source, registry, binding, semantic, authority, inventory, checksum, and quality divergence determine freshness. Time passage alone does not stale a commit-bound publication. Synchronization remains an explicit owner/operator-controlled Git action.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
+    }
+  ]
+}

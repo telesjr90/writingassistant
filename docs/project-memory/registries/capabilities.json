@@ -1,0 +1,120 @@
+{
+  "registry_type": "capability",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "capability:story-check-grounding-integrity",
+      "type": "capability",
+      "schema_version": "1.0.0",
+      "title": "Story Check Grounding Integrity",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T002",
+        "accepted_by": "PHASE8-IMPL-024-T002",
+        "source_locators": [
+          { "path": "backend/story_check_grounding_validator.py" },
+          { "path": "tests/test_story_check_grounding.py" }
+        ]
+      },
+      "capability_id": "story-check-grounding-integrity",
+      "description": "Exact-source identity/hash verification for Story Check diagnostics. Every factual warning carries source identity, content hash, verification state (verified/unverified/quarantined), and validator outcome. Unsourced claims are quarantined; unverified structural diagnostics are preserved with correct status.",
+      "implemented": true,
+      "validated": true,
+      "associated_tasks": ["PHASE8-IMPL-024-T002", "PHASE8-IMPL-024-T002A", "PHASE8-IMPL-024-T002B", "PHASE8-IMPL-024-T002C", "PHASE8-IMPL-024-T002D"]
+    },
+    {
+      "id": "capability:roadmap-governance",
+      "type": "capability",
+      "schema_version": "1.0.0",
+      "title": "Roadmap Governance",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/roadmap_index.yaml" },
+          { "path": "docs/roadmap/implementation_status.md" },
+          { "path": "scripts/validate_roadmap.py" },
+          { "path": "scripts/check_enrichment.py" }
+        ]
+      },
+      "capability_id": "roadmap-governance",
+      "description": "Roadmap control layer with immutable parent task IDs, enrichment validation, deterministic roadmap validator, and child-task sequencing. Roadmap truth is controlled by roadmap_index.yaml, implementation_status.md, and validation records.",
+      "implemented": true,
+      "validated": true,
+      "associated_tasks": ["PHASE8-IMPL-026"]
+    },
+    {
+      "id": "capability:project-memory-authority-foundation",
+      "type": "capability",
+      "schema_version": "1.0.0",
+      "title": "Project Memory Authority Foundation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "capability_id": "project-memory-authority-foundation",
+      "description": "Defined seven-tier authority hierarchy, eight trust classes, commit-bound freshness model, supersession rules, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization policy, and product boundaries.",
+      "implemented": true,
+      "validated": true,
+      "associated_tasks": ["PHASE8-IMPL-026-T001"]
+    },
+    {
+      "id": "capability:normalized-registry-architecture",
+      "type": "capability",
+      "schema_version": "1.0.0",
+      "title": "Normalized Registry Architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/project-memory/schemas/project-memory.schema.json" },
+          { "path": "docs/project-memory/registries/manifest.json" },
+          { "path": "scripts/project_memory/validate_registries.py" }
+        ]
+      },
+      "capability_id": "normalized-registry-architecture",
+      "description": "JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 tracked normalized registry files; registry manifest; dependency-free standard-library validator; stable namespaced identifiers; enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity.",
+      "implemented": true,
+      "validated": true,
+      "associated_tasks": ["PHASE8-IMPL-026-T002"]
+    },
+    {
+      "id": "capability:deterministic-scanners",
+      "type": "capability",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Scanners",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 82, "line_end": 88 }
+        ]
+      },
+      "capability_id": "deterministic-scanners",
+      "description": "Read-only deterministic scanners that inspect repository state (code, tests, roadmap decisions, task records, enrichment data) and produce normalized evidence records with convergence criteria for plan-vs-implementation comparison.",
+      "implemented": false,
+      "validated": false,
+      "associated_tasks": ["PHASE8-IMPL-026-T003"]
+    }
+  ]
+}

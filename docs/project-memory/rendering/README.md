@@ -1,0 +1,367 @@
+# Human-Readable Rendering Architecture
+
+This is a tracked architecture and contributor contract, not generated documentation output.
+
+## Purpose
+
+The renderer converts tracked normalized registries and a selected generated snapshot
+into human-readable Markdown documentation that explains what is implemented, what
+is planned, what is missing, what conflicts exist, and what requires owner attention.
+
+## Canonical Inputs
+
+The renderer consumes exactly these inputs in order:
+
+1. Tracked registry manifest (`docs/project-memory/registries/manifest.json`)
+2. Tracked normalized registries (all 12 registry files)
+3. Project Memory schema (`docs/project-memory/schemas/project-memory.schema.json`)
+4. One explicitly selected generated snapshot (complete package under
+   `.codex-context/project-memory/<TASK_ID>/<RUN_ID>/`)
+5. Snapshot convergence findings (`convergence-findings.json`)
+6. Snapshot source inventory and hashes (`source-inventory.json`, `source-hashes.json`)
+
+The renderer does not independently scan the repository. It must reuse T003 scanner
+output rather than create a second competing discovery system.
+
+## Input Acceptance Rules
+
+The renderer rejects these inputs:
+
+- Invalid registries (any `validate_registries.py` failure)
+- Malformed snapshot JSON
+- Snapshot authority other than `generated_evidence`
+- Missing full bound commit (`bound_commit` absent, empty, or non-hex)
+- Nonpublication snapshots for publication output (`publication_eligible: false`)
+- Snapshot task/run identity mismatch
+- Missing required package files
+- Invalid package hashes (any SHA256SUMS mismatch)
+- Absolute or traversal paths in any input
+- Unsupported schema or architecture versions
+
+### Convergence Rules
+
+- A `BLOCKED` convergence snapshot cannot be rendered as current documentation.
+- A `PASS_WITH_FINDINGS` snapshot may be rendered only when:
+  - `publication_eligible` is `true`
+  - No `critical` or `blocks_publication: true` finding exists
+  - Every finding is displayed prominently on the `convergence-findings.md` page
+  - The output status remains `PASS_WITH_FINDINGS`
+
+## Freshness Rules
+
+Every generated page displays:
+
+- `authority_class: generated_evidence`
+- Bound commit (full 40-char SHA)
+- Branch
+- Generation timestamp (ISO 8601 with timezone)
+- Snapshot run ID
+- Snapshot path or identifier
+- Convergence result
+- Freshness state (`current` or `stale`)
+- Known limitations
+
+A snapshot is "current" only when its `bound_commit` exactly matches the target
+repository commit. Stale snapshots may be rendered only as explicitly historical views.
+The renderer cannot infer freshness from timestamps alone.
+
+## Generated Output Boundary
+
+```text
+.codex-context/project-memory/rendered/
+  <TASK_ID>/
+    <RUN_ID>/
+      build-manifest.json
+      source-snapshot.json
+      docs/
+      FILE-INVENTORY.txt
+      SHA256SUMS
+```
+
+Generated pages and built sites are:
+
+- Generated evidence (`generated_evidence`, never `authoritative`)
+- Git-ignored (never tracked)
+- Reproducible (identical inputs produce identical outputs)
+- Never manually edited
+- Never authoritative
+
+## Renderer Implementation (T004B)
+
+T004B implemented the deterministic Markdown renderer according to the committed
+T004A architecture contract.
+
+- **Module:** `scripts/project_memory/render_docs.py`
+- **Tests:** `tests/project_memory/test_render_docs.py` (71 tests)
+- **Renderer name:** `project_memory_markdown_renderer`
+- **Renderer version:** `project_memory_markdown_renderer.v1`
+
+The renderer is standard-library-only. No dependencies were added.
+
+### CLI Contract
+
+```bash
+python3 scripts/project_memory/render_docs.py \
+  --repo-root . \
+  --snapshot-dir <SNAPSHOT_DIR> \
+  --output-root <OUTPUT_ROOT> \
+  --task-id <TASK_ID> \
+  --run-id <RUN_ID> \
+  --generated-at <RFC3339_UTC> \
+  --mode {publication,historical_preview} \
+  --json
+```
+
+### Implementation Status
+
+T004B is complete/PASS. No publication render exists yet.
+
+## Deterministic Page Set
+
+T004B must generate at least these 14 pages in stable navigation order:
+
+1. `index.md` — Project Memory overview
+2. `application-overview.md` — application description and boundaries
+3. `product-boundaries.md` — non-negotiable safety and governance
+4. `features.md` — implemented, partially implemented, and planned features
+5. `capabilities.md` — implemented and planned capabilities with validation status
+6. `current-roadmap.md` — accepted roadmap with active frontier
+7. `remaining-work.md` — planned, blocked, and inactive work
+8. `dependencies.md` — dependency edges and contingent workstreams
+9. `decisions.md` — accepted decisions with rationale
+10. `assets.md` — repository assets, fixtures, and data artifacts
+11. `evidence.md` — accepted evidence records
+12. `risks-and-open-questions.md` — active risks and unresolved questions
+13. `convergence-findings.md` — snapshot findings with severity and disposition
+14. `technical-annex.md` — schemas, registry structure, scanner architecture
+
+### Plain-English Requirements
+
+The primary pages must explain:
+
+- What application is being built
+- What the product does
+- What it must never do
+- What currently exists
+- What has been validated
+- What remains planned
+- What is blocked or unavailable
+- What the active application frontier is
+- Why PHASE8-IMPL-025 remains inactive
+- How Project Memory relates to the application roadmap
+- How evidence and source links support each claim
+
+Technical details belong in `technical-annex.md`.
+Generated story prose must not appear on any page.
+
+### Page Record Presentation
+
+Every rendered record must display or make available:
+
+- Stable record ID
+- Title
+- Record type
+- Authority class
+- Lifecycle status
+- Implementation status where relevant
+- Validation status where relevant
+- Source locators (with link targets)
+- Provenance (creator, acceptor)
+- Supersession (if any)
+- Owner-decision state (if any)
+- Missing/unavailable source state
+- Freshness
+
+Planned must never be presented as implemented.
+Implemented must never be presented as validated unless evidence supports validation.
+Candidate, review-pending, approved, promoted, and canon states must remain distinct.
+
+For Project Memory child-task sequencing, `planned` is not by itself enough to
+make work actionable. The renderer distinguishes planned actionable tasks from
+planned contingent tasks. A contingent task remains visible but inactive and
+non-actionable until its structured activation criteria and accepted owner
+decision permit activation. An accepted owner deferral keeps a contingent task
+planned, inactive, incomplete, and visible while excluding it from deterministic
+next-actionable selection. Explicit active state takes precedence; otherwise the
+first eligible planned non-contingent child in stable task order is next. Multiple
+active children or contradictory deferral/activation state block rendering.
+
+### Linking Rules
+
+Links must:
+
+- Be repository-relative where possible
+- Point to exact source files
+- Include line ranges or JSON Pointers when available
+- Distinguish available links from unavailable source references
+- Never use local absolute paths
+- Never link to ignored mutable evidence as if tracked authority
+- Never silently drop broken links
+
+## Build Manifest
+
+The `build-manifest.json` must include:
+
+- `renderer_name` and `version`
+- `schema_version` and `architecture_version`
+- Exact command used
+- `task_id` and `run_id`
+- Generated timestamp (ISO 8601 with timezone)
+- `branch` and `bound_commit` (full 40-char SHA)
+- Source snapshot path or identifier
+- Snapshot hashes (all from SHA256SUMS)
+- Registry hashes (SHA-256 of each registry file)
+- Page list with per-page SHA-256 hashes
+- Navigation order
+- Convergence result
+- Finding counts by code and severity
+- Exclusions and known limitations
+- `authority_class` fixed to `generated_evidence`
+- `publication_eligibility`
+
+## Determinism
+
+Given identical:
+
+- Renderer version
+- Registries
+- Snapshot package
+- Run ID
+- Generated timestamp
+
+the semantic Markdown, manifest, inventory, and ordering must be identical.
+Use UTF-8, sorted keys, stable record sorting, stable navigation ordering,
+newline at end of every text file, no local absolute paths, no random IDs,
+and no locale-dependent formatting.
+
+## MkDocs Boundary
+
+MkDocs remains the intended human-auditable site layer, but:
+
+- T004A does not install MkDocs, add package dependencies, add `mkdocs.yml`,
+  create a virtual environment, download a theme, use a plugin, run a server,
+  or build a site.
+- T004C performs the approved offline documentation-site integration after
+  provenance, dependency, and reproducibility requirements are verified.
+- The deterministic Markdown renderer must remain independently usable without
+  MkDocs.
+
+## Unavailable Source Display
+
+When a source locator references a file that does not exist in the current
+checkout, the rendered page must display "unavailable in this checkout" rather
+than silently omitting the record. The missing-source classification must be
+visible on the evidence and convergence-findings pages.
+
+## Non-Authoritative Classification
+
+Every generated page carries a prominent banner:
+
+```text
+Generated Evidence — Not Project Authority
+Bound to commit <sha> on branch <branch>.
+Snapshot: .codex-context/project-memory/<TASK_ID>/<RUN_ID>/
+Generated: <ISO 8601 timestamp>
+```
+
+Pages never claim `authoritative` status and never become an additional tier
+in the authority hierarchy.
+
+## T004 Decomposition
+
+T004 is decomposed into three bounded children:
+
+- **T004A** — Convergence remediation and human-readable Project Memory architecture (complete/PASS-WITH-FINDINGS)
+- **T004B** — Deterministic Markdown renderer implementation and focused tests (complete/PASS)
+- **T004C** — Clean-HEAD documentation generation, offline site quality gate, and T004 closeout (complete/PASS-WITH-FINDINGS)
+
+## First Publication Render (T004C)
+
+T004C generated the first publication-mode human-readable Project Memory
+documentation from a clean-HEAD snapshot bound to the T004B commit
+`3f094205253652a14a90a66a7294841af68ff630` on branch `docs/project-memory-foundation`.
+
+- **Render path:** `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/`
+- **Snapshot path:** `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/`
+- **Convergence result:** PASS_WITH_FINDINGS (4 nonblocking source_missing)
+- **Quality-gate result:** PASS_WITH_FINDINGS
+- **Freshness limitation:** The generated pages are current only for the T004B
+  commit. The future T004C closeout commit will make them historical. A
+  post-closeout clean-HEAD refresh is required.
+
+No change to the committed renderer architecture occurred in T004C. The
+publication render used only the committed T004B renderer as-is.
+
+## Post-Closeout Current-Truth Requirement (T004C1)
+
+Publication structure and hashes alone are insufficient to accept a render
+as the current accepted publication. Rendered normalized task status must
+converge with accepted roadmap truth.
+
+A contradictory current-task render blocks publication acceptance even when:
+- The snapshot is structurally valid and checksum-clean.
+- The render package is structurally valid and checksum-clean.
+- The bound commit is correct and freshness is current.
+- All banners, links, and unsafe-content checks pass.
+
+The T004C1 post-closeout repair addressed both root causes:
+
+1. **Task registry lag** — `docs/project-memory/registries/tasks.json`
+   now contains current records for T004, T004A, T004B, T004C, and T005.
+2. **Renderer hardcodes** — `_render_index()` and `_render_current_roadmap()`
+   now derive task status from the validated normalized task registry
+   rather than from hardcoded status strings. Status-bearing hardcodes
+   are prohibited.
+
+### Semantic Publication Validation
+
+A reusable semantic rendered-package validator
+(`scripts/project_memory/validate_rendered_docs.py`) now exists. It
+verifies both structural integrity and semantic task-state convergence.
+
+- Structural hashes alone are insufficient to accept a current publication.
+- Rendered task status must match the normalized task registry.
+- Semantic contradiction blocks atomic publication (fail-closed).
+- The renderer refuses atomic finalization when generated pages contradict
+  normalized task truth.
+- Historical-preview mode validates semantic consistency with its selected
+  historical snapshot/registry context.
+- Current publication must be commit-bound and semantically convergent.
+
+Semantic validation is snapshot-bound. The selected snapshot commit and its
+registry hashes identify the normalized task and owner-decision records used to
+validate the render. A preserved package bound to an older commit is validated
+against those historical records and does not become invalid merely because the
+live registry later gains successor tasks or status updates. The preserved
+package is classified as historical relative to repository HEAD without being
+rewritten.
+
+For a current publication, the stricter convergence rule still applies: the
+snapshot commit must equal repository HEAD, every snapshot registry hash must
+match the current tracked registry, and the render must agree with that
+snapshot-bound normalized state. Missing or malformed snapshot registry data,
+snapshot/render commit disagreement, duplicate task records, semantic
+contradiction, or current tracked-registry drift blocks validation.
+
+## Generated-Evidence Authority Semantics (T004C2)
+
+Authority validation is subject-aware. Words such as `authority`,
+`authoritative`, `truth`, and `canon` do not fail validation by themselves.
+Generated pages may describe tracked-record authority classes, the seven-tier
+authority hierarchy, the eight trust classes, accepted roadmap or owner
+authority, technical validation rules, and historical quotations. Explicit
+non-authority statements are required and allowed.
+
+Validation fails only when a live generated-page statement claims or implies
+that the generated page, render, snapshot, package, documentation, output, or
+publication is authoritative; is project truth or a source of truth; controls
+roadmap/task status; overrides tracked sources; resolves owner decisions;
+establishes canon; automatically approves/promotes candidates; or has equal or
+greater authority than tracked sources.
+
+The deterministic validator normalizes Markdown headings, tables, and links;
+ignores fenced examples and inline-code-only mentions; recognizes clearly
+labeled historical and technical descriptions; and reports forbidden claims
+with page, line, text, rule identifier, classification, and reason. Passing
+authority results include informational `allowed_references` and an empty
+`forbidden_claims` list. T004C2 required no renderer wording change.

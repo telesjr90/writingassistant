@@ -1,0 +1,206 @@
+{
+  "registry_type": "boundary",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "boundary:analysis-only",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "Analysis-Only",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 330, "line_end": 346 }
+        ]
+      },
+      "boundary_id": "analysis-only",
+      "category": "product_safety",
+      "is_non_negotiable": true,
+      "description": "The application analyzes; Project Memory explains the plan. Neither produces story prose or application features beyond analysis."
+    },
+    {
+      "id": "boundary:candidate-first",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "Candidate-First",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 333, "line_end": 333 }
+        ]
+      },
+      "boundary_id": "candidate-first",
+      "category": "product_safety",
+      "is_non_negotiable": true,
+      "description": "No automatic truth or approval. All machine output remains candidate-only until explicit owner review."
+    },
+    {
+      "id": "boundary:evidence-provenance-backed",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "Evidence/Provenance-Backed",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 334, "line_end": 334 }
+        ]
+      },
+      "boundary_id": "evidence-provenance-backed",
+      "category": "provenance",
+      "is_non_negotiable": true,
+      "description": "Every claim in a registry must trace to a source. Evidence records carry source locators, hashes, and provenance."
+    },
+    {
+      "id": "boundary:owner-controlled",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "Owner-Controlled",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 335, "line_end": 335 }
+        ]
+      },
+      "boundary_id": "owner-controlled",
+      "category": "governance",
+      "is_non_negotiable": true,
+      "description": "No automatic mutation of authoritative state. Owner-approved implementation tasks make tracked changes through scoped commits."
+    },
+    {
+      "id": "boundary:no-generated-prose",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "No Generated Prose",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 336, "line_end": 337 }
+        ]
+      },
+      "boundary_id": "no-generated-prose",
+      "category": "product_safety",
+      "is_non_negotiable": true,
+      "description": "Project Memory produces structured metadata, not story prose. No generated or AI-written prose, summaries, continuations, rewrites, or stylistic imitation."
+    },
+    {
+      "id": "boundary:confidence-is-not-truth",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "Confidence Is Not Truth",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 338, "line_end": 339 }
+        ]
+      },
+      "boundary_id": "confidence-is-not-truth",
+      "category": "provenance",
+      "is_non_negotiable": true,
+      "description": "Confidence or support scores are metadata, not approval. High-confidence model output is still candidate-only."
+    },
+    {
+      "id": "boundary:model-output-not-canon",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "Model Output Is Not Canon",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 343, "line_end": 343 }
+        ]
+      },
+      "boundary_id": "model-output-not-canon",
+      "category": "provenance",
+      "is_non_negotiable": true,
+      "description": "Agent output, retrieved summaries, or generated explanations are not authoritative. Model output cannot become durable project truth without explicit owner review."
+    },
+    {
+      "id": "boundary:no-automatic-memory-canon-mutation",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "No Automatic Memory/Canon Mutation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 340, "line_end": 341 }
+        ]
+      },
+      "boundary_id": "no-automatic-memory-canon-mutation",
+      "category": "product_safety",
+      "is_non_negotiable": true,
+      "description": "Project Memory is a read/explain layer over the plan and code. It must not automatically mutate Memory or Canon records."
+    },
+    {
+      "id": "boundary:no-automatic-promotion",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "No Automatic Promotion",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 342, "line_end": 342 }
+        ]
+      },
+      "boundary_id": "no-automatic-promotion",
+      "category": "product_safety",
+      "is_non_negotiable": true,
+      "description": "Promotion records remain audit-only until future apply-promotion exists. No automatic promotion or apply-promotion."
+    },
+    {
+      "id": "boundary:no-auto-apply-promotion",
+      "type": "boundary",
+      "schema_version": "1.0.0",
+      "title": "No Automatic Apply-Promotion",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md", "line_start": 342, "line_end": 343 }
+        ]
+      },
+      "boundary_id": "no-auto-apply-promotion",
+      "category": "product_safety",
+      "is_non_negotiable": true,
+      "description": "Apply-promotion must be explicit, audited, owner-confirmed, and separate from extraction, queue state, confidence, and candidate persistence."
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "registry_type": "feature",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "feature:analysis-workflows",
+      "type": "feature",
+      "schema_version": "1.0.0",
+      "title": "Analysis Workflows",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-023",
+        "source_locators": [
+          { "path": "backend/omi_analysis_orchestrator.py" },
+          { "path": "backend/analysis_engine.py" }
+        ]
+      },
+      "feature_id": "analysis-workflows",
+      "description": "OMI AI tool-assisted analysis orchestrator, adapter contracts, and evidence-backed candidate output. Includes Ollama, spaCy, BookNLP, NCP, Story Check, Subtxt-informed, and dramatica-flow-informed analysis paths.",
+      "parent_task_id": "PHASE8-IMPL-023",
+      "implementation_status": "partially_implemented"
+    },
+    {
+      "id": "feature:owner-controlled-candidate-review",
+      "type": "feature",
+      "schema_version": "1.0.0",
+      "title": "Owner-Controlled Candidate Review",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-023-T023",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md" },
+          { "path": "frontend/src/omiGroupedReview.js" }
+        ]
+      },
+      "feature_id": "owner-controlled-candidate-review",
+      "description": "Grouped owner-review UI for real runtime findings. Shows evidence, provenance, confidence, and uncertainty without implying canon or approval. Server-confirmed owner decisions.",
+      "parent_task_id": "PHASE8-IMPL-023-T023",
+      "implementation_status": "partially_implemented"
+    },
+    {
+      "id": "feature:story-check-diagnostics",
+      "type": "feature",
+      "schema_version": "1.0.0",
+      "title": "Story Check Diagnostics",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T002",
+        "source_locators": [
+          { "path": "backend/analysis_engine.py" },
+          { "path": "backend/story_check_grounding_validator.py" }
+        ]
+      },
+      "feature_id": "story-check-diagnostics",
+      "description": "Diagnostic-only Story Check with exact-source grounding. Every factual warning carries source identity/hash, verification state, and validator outcome. Unsourced claims are quarantined.",
+      "parent_task_id": "PHASE8-IMPL-024-T002",
+      "implementation_status": "implemented"
+    },
+    {
+      "id": "feature:project-memory",
+      "type": "feature",
+      "schema_version": "1.0.0",
+      "title": "Project Memory",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/project-memory/README.md" },
+          { "path": "scripts/project_memory/validate_registries.py" }
+        ]
+      },
+      "feature_id": "project-memory",
+      "description": "Normalized, machine-readable, commit-bound system that records the accepted plan, compares it with implementation, explains discrepancies, and surfaces evidence for owner review.",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "implementation_status": "partially_implemented"
+    },
+    {
+      "id": "feature:plan-integrity-review",
+      "type": "feature",
+      "schema_version": "1.0.0",
+      "title": "Plan Integrity Review",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "feature_id": "plan-integrity-review",
+      "description": "Deterministic engine comparing the accepted plan with actual implementation and producing a Plan Integrity report with evidence, confidence, and unresolved discrepancies.",
+      "parent_task_id": "PHASE8-IMPL-026-T009",
+      "implementation_status": "planned"
+    }
+  ]
+}

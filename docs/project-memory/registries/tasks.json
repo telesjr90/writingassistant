@@ -1,0 +1,492 @@
+{
+  "registry_type": "task",
+  "schema_version": "1.0.0",
+  "records": [
+    {
+      "id": "task:PHASE8-IMPL-024",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Application UI/UX Audit Integrity and Acceptance Repair",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "in_progress"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-024.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-024",
+      "parent_task_id": null,
+      "depends_on": [],
+      "task_type": "runtime",
+      "classification": "application repair",
+      "is_application_frontier": true,
+      "is_blocking": true,
+      "notes": "Active application implementation frontier. T001 and T002 complete/PASS. T003A is the immediate next task."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T003A",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T002",
+        "source_locators": [
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 11, "line_end": 11 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-024-T003A",
+      "parent_task_id": "PHASE8-IMPL-024",
+      "depends_on": ["PHASE8-IMPL-024"],
+      "task_type": "runtime",
+      "classification": "backend-only contract micro-task",
+      "is_application_frontier": true,
+      "is_blocking": false,
+      "notes": "The immediate application implementation frontier. Planned next under T003."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Layered Analysis Architecture and Tool Integration Expansion",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-025-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-025.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-025",
+      "parent_task_id": null,
+      "depends_on": ["PHASE8-IMPL-024"],
+      "task_type": "runtime",
+      "classification": "architecture expansion",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Published/planned and inactive. T001/T002 external prerequisites satisfied but no implementation child activated. Separate from the application frontier."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Project Memory and Plan Integrity",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ],
+        "owner_decision_ref": "owner-decision:pmf-parent-identity"
+      },
+      "task_id": "PHASE8-IMPL-026",
+      "parent_task_id": null,
+      "depends_on": [],
+      "task_type": "governance",
+      "classification": "hybrid governance, documentation, and developer infrastructure",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. Parallel governance workstream closed through T011. Four accepted nonblocking source_missing advisories remain. Ongoing maintenance is the event-driven operational procedure, not a new roadmap child."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T001",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Project Memory authority, lifecycle, and provenance foundation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T001",
+        "accepted_by": "PHASE8-IMPL-026-T001",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T001",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": [],
+      "task_type": "governance",
+      "classification": "authority foundation",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Published the controlling decision defining authority hierarchy, trust classes, freshness model, commit binding, supersession, conflicting-evidence resolution, and all other T001 decision areas."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T002",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Schema and normalized-registry architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T002",
+        "source_locators": [
+          { "path": "docs/project-memory/schemas/project-memory.schema.json" },
+          { "path": "docs/project-memory/registries/manifest.json" }
+        ],
+        "owner_decision_ref": "owner-decision:json-canonical-registry-format"
+      },
+      "task_id": "PHASE8-IMPL-026-T002",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T001"],
+      "task_type": "infrastructure",
+      "classification": "schema and registry architecture",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Established the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle, 12 normalized registry files, registry manifest, dependency-free validator, and focused tests."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T003",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Deterministic scanners and convergence",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T002",
+        "accepted_by": "PHASE8-IMPL-026-T003",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 16, "line_end": 20 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T003",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T002"],
+      "task_type": "infrastructure",
+      "classification": "deterministic scanner",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. T003A (scanner implementation and testing) complete/PASS; T003B (clean-HEAD snapshot, convergence validation, and T003 closeout) complete/PASS-WITH-FINDINGS. First clean-HEAD publication snapshot at .codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/ bound to a04b65c."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Human-readable Project Memory",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004A",
+        "accepted_by": "PHASE8-IMPL-026-T004C",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 23, "line_end": 27 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T003"],
+      "task_type": "infrastructure",
+      "classification": "documentation and rendering",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. T004A (convergence remediation and rendering architecture) complete/PASS-WITH-FINDINGS; T004B (Markdown renderer implementation) complete/PASS; T004C (clean-HEAD documentation generation, offline site quality gate, and T004 closeout) complete/PASS-WITH-FINDINGS. First publication render at .codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/ bound to 3f09420. T004 is closed as complete/PASS-WITH-FINDINGS."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004A",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Convergence remediation and human-readable Project Memory architecture",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004A",
+        "accepted_by": "PHASE8-IMPL-026-T004A",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 24, "line_end": 24 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004A",
+      "parent_task_id": "PHASE8-IMPL-026-T004",
+      "depends_on": ["PHASE8-IMPL-026-T003"],
+      "task_type": "infrastructure",
+      "classification": "rendering architecture",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. Established the human-readable Project Memory rendering architecture contract. Remediated convergence findings to register available sources and mark unavailable sources as unavailable."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004B",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Markdown renderer implementation",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004B",
+        "accepted_by": "PHASE8-IMPL-026-T004B",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 25, "line_end": 25 },
+          { "path": "scripts/project_memory/render_docs.py" },
+          { "path": "tests/project_memory/test_render_docs.py" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004B",
+      "parent_task_id": "PHASE8-IMPL-026-T004",
+      "depends_on": ["PHASE8-IMPL-026-T004A"],
+      "task_type": "runtime",
+      "classification": "deterministic Markdown renderer",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implemented a dependency-free deterministic Markdown renderer (scripts/project_memory/render_docs.py) with 71 focused tests. Generates 14-page publication packages from tracked registries and a selected snapshot. Standard library only. No MkDocs dependency."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T004C",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Clean-HEAD documentation generation, offline site quality gate, and T004 closeout",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004C",
+        "accepted_by": "PHASE8-IMPL-026-T004C",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T004C-clean-head-documentation-generation-and-t004-closeout.md" },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md", "line_start": 26, "line_end": 27 },
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 13, "line_end": 13 }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T004C",
+      "parent_task_id": "PHASE8-IMPL-026-T004",
+      "depends_on": ["PHASE8-IMPL-026-T004B"],
+      "task_type": "closeout",
+      "classification": "documentation generation and quality gate",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS-WITH-FINDINGS. Generated first publication snapshot and render from a clean-HEAD bound to the T004B commit (3f09420). Offline quality gate PASS_WITH_FINDINGS. T004 closeout commit a415270. Four cross-branch nonblocking source_missing findings remain. Post-closeout clean-HEAD refresh at 20260714T042826Z produced structurally valid packages but the renderer's hardcoded index-page status table incorrectly showed T004 as in progress and T004C as planned because the renderer does not read task status from the registry for that table. T004C1 adds the missing registry records."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T005",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Existing context-tool integration",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T004C",
+        "accepted_by": "PHASE8-IMPL-026-T005",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" },
+          { "path": "scripts/project_memory/context_tool_evidence.py" },
+          { "path": "tests/project_memory/test_context_tool_evidence.py" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T005-existing-context-tool-evidence-integration.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T005",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T004"],
+      "task_type": "infrastructure",
+      "classification": "context-tool integration",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implements standard-library-only, read-only import adapters for existing Repomix, Graphify, and CCE artifacts. Generated packs remain generated_evidence; unknown, stale, ambiguous, unsafe, or provenance-incomplete artifacts are quarantined. No context tool was installed or executed. T006 and T007 remain contingent/inactive."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T006",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Serena read-only pilot",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "task_id": "PHASE8-IMPL-026-T006",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T005"],
+      "task_type": "infrastructure",
+      "classification": "contingent retrieval pilot",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Owner-deferred for lack of a measured benchmarkable capability gap. Contingent, planned, inactive, and unimplemented; not rejected, approved, installed, active, complete, or required by T008. Reconsideration requires a documented benchmarkable gap plus a future owner-approved provenance and benchmark task."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T007",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "LlamaIndex / local-embedding / Qdrant Local pilot",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "task_id": "PHASE8-IMPL-026-T007",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T005"],
+      "task_type": "infrastructure",
+      "classification": "contingent vector-retrieval pilot",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Owner-deferred for lack of a measured benchmarkable capability gap. Contingent, planned, inactive, and unimplemented; not rejected, approved, installed, active, complete, or required by T008. Reconsideration requires a documented benchmarkable gap plus a future owner-approved provenance and benchmark task."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T008",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Shared agent guidance and Project Memory Ask",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/project-memory/ask-protocol.md" },
+          { "path": ".agents/skills/project-memory-read/SKILL.md" },
+          { "path": ".opencode/agents/project-memory-ask.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "task_id": "PHASE8-IMPL-026-T008",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T004"],
+      "task_type": "infrastructure",
+      "classification": "shared read-only agent guidance",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Defines the deterministic Project Memory Ask request/response protocol, shared read skill, strictly read-only OpenCode agent, standard-library guidance validator, and focused tests. Requires no retrieval pilot, network, MCP, embedding, server, or live model call."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T009",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Plan Integrity engine",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T009",
+        "accepted_by": "PHASE8-IMPL-026-T009",
+        "source_locators": [
+          { "path": "scripts/project_memory/plan_integrity.py" },
+          { "path": "scripts/project_memory/build_plan_integrity_report.py" },
+          { "path": "tests/project_memory/test_plan_integrity.py" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T009-deterministic-plan-integrity-engine.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T009",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T003"],
+      "task_type": "infrastructure",
+      "classification": "deterministic plan-integrity analysis",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implements the standard-library-only deterministic Plan Integrity engine, exact Q151 classifications, readiness tri-state, six bounded rule groups, deterministic confidence basis and ordering, and an atomic clean-HEAD generated-evidence package with exact inventory and checksums."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T010",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Specialized Plan Integrity reviewers",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T010",
+        "accepted_by": "PHASE8-IMPL-026-T010",
+        "source_locators": [
+          { "path": "docs/project-memory/reviewer-protocol.md" },
+          { "path": ".agents/skills/project-memory-plan-integrity-review/SKILL.md" },
+          { "path": ".opencode/agents/project-memory-backend-contract-reviewer.md" },
+          { "path": ".opencode/agents/project-memory-frontend-ui-reviewer.md" },
+          { "path": ".opencode/agents/project-memory-test-coverage-reviewer.md" },
+          { "path": ".opencode/agents/project-memory-roadmap-consistency-reviewer.md" },
+          { "path": ".opencode/agents/project-memory-enrichment-accuracy-reviewer.md" },
+          { "path": ".opencode/agents/project-memory-decision-coherence-reviewer.md" },
+          { "path": "scripts/project_memory/validate_reviewer_guidance.py" },
+          { "path": "scripts/project_memory/reviewer_findings.py" },
+          { "path": "tests/project_memory/test_plan_integrity_reviewers.py" },
+          { "path": "docs/project-memory/schemas/project-memory.schema.json" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T010",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T009"],
+      "task_type": "infrastructure",
+      "classification": "specialized review agents",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implements six strictly read-only OpenCode reviewer domains with a shared protocol and skill, deterministic guidance validation, standard-library-only supplied-finding validation and normalization, schema contracts, and temporary-fixture tests. Reviewer output remains generated_evidence; no reviewer or model was invoked or automatically scheduled, and T009 readiness remains authoritative."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T011",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Synchronization, CI, rebuild, and operational rollout",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T011",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" },
+          { "path": "docs/project-memory/operations.json" },
+          { "path": "scripts/project_memory/operational_rollout.py" },
+          { "path": ".github/workflows/project-memory.yml" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T011",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T010"],
+      "task_type": "infrastructure",
+      "classification": "operational synchronization and rollout",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implements event-driven commit-bound synchronization policy, read-only stale-state diagnosis, one-command deterministic refresh, ephemeral CI rebuild, deterministic quality packages, workflow integration, and focused tests. Q154 resolved. No synchronization Git action, reviewer/model execution, application-worktree access, or automatic authority mutation occurred."
+    }
+  ]
+}
