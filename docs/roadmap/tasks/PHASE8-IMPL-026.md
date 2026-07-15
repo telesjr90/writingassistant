@@ -23,7 +23,8 @@ T006 and T007 are owner-deferred for lack of a measured benchmarkable
 capability gap. Both remain contingent, planned, inactive, and unimplemented.
 T008 — Shared agent guidance and Project Memory Ask — is complete/PASS.
 T009 — Deterministic Plan Integrity engine — is complete/PASS.
-T010 is the next planned/inactive Project Memory task. T011 remains planned/inactive.
+T010 — Specialized Plan Integrity reviewers — is complete/PASS.
+T011 is the sole next Project Memory task, planned/inactive and unimplemented.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
