@@ -5,9 +5,10 @@ All tests use temporary directories and must not mutate the real repository.
 
 from __future__ import annotations
 
-import json
 import hashlib
 import importlib
+import json
+import os
 import shutil
 import subprocess
 import uuid
@@ -32,8 +33,22 @@ from scripts.project_memory.validate_rendered_docs import (
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VALIDATOR_SCRIPT = REPO_ROOT / "scripts/project_memory/validate_rendered_docs.py"
-PRESERVED_T004C1_SNAPSHOT = REPO_ROOT / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1/20260714T213628Z"
-PRESERVED_T004C1_RENDER = REPO_ROOT / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C1/20260714T213628Z"
+
+_GENERATED_EVIDENCE_BANNER = "# Generated Evidence — Not Project Authority\n\n"
+_HISTORICAL_BRANCH = "docs/project-memory-foundation"
+_SNAPSHOT_FILES = (
+    "run-metadata.json",
+    "repository-state.json",
+    "roadmap-state.json",
+    "registry-validation.json",
+    "source-inventory.json",
+    "source-hashes.json",
+    "convergence-findings.json",
+    "snapshot.json",
+    "summary.md",
+    "FILE-INVENTORY.txt",
+    "SHA256SUMS",
+)
 
 
 def _make_task_record(task_id, status, parent=None, notes=""):
@@ -55,17 +70,126 @@ def _make_task_record(task_id, status, parent=None, notes=""):
     }
 
 
-def _make_minimal_render_dir(base: Path, pages: dict[str, str]) -> Path:
+def _write_json(path: Path, data: dict) -> None:
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _write_sha256_manifest(package_dir: Path) -> None:
+    entries = []
+    for path in sorted(package_dir.rglob("*")):
+        if path.is_file() and path.name != "SHA256SUMS":
+            relative = path.relative_to(package_dir).as_posix()
+            entries.append(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {relative}")
+    (package_dir / "SHA256SUMS").write_text("\n".join(entries) + "\n", encoding="utf-8")
+
+
+def _write_exact_package_metadata(package_dir: Path) -> None:
+    paths = [
+        path.relative_to(package_dir).as_posix()
+        for path in sorted(package_dir.rglob("*"))
+        if path.is_file() and path.name not in {"FILE-INVENTORY.txt", "SHA256SUMS"}
+    ]
+    paths.extend(["FILE-INVENTORY.txt", "SHA256SUMS"])
+    (package_dir / "FILE-INVENTORY.txt").write_text(
+        "\n".join(sorted(paths)) + "\n", encoding="utf-8"
+    )
+    _write_sha256_manifest(package_dir)
+
+
+def _git(repo_root: Path, *args: str) -> str:
+    env = os.environ.copy()
+    env.update(
+        {
+            "GIT_AUTHOR_DATE": "2026-07-14T21:36:28Z",
+            "GIT_COMMITTER_DATE": "2026-07-14T21:36:28Z",
+        }
+    )
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    ).stdout.strip()
+
+
+def _historical_tasks() -> list[dict]:
+    return [
+        _make_task_record("PHASE8-IMPL-026", "in_progress"),
+        _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
+        _make_task_record("PHASE8-IMPL-026-T002", "complete", "PHASE8-IMPL-026"),
+        _make_task_record("PHASE8-IMPL-026-T003", "complete", "PHASE8-IMPL-026"),
+        _make_task_record(
+            "PHASE8-IMPL-026-T004", "complete", "PHASE8-IMPL-026",
+            notes="Complete/PASS-WITH-FINDINGS.",
+        ),
+        _make_task_record(
+            "PHASE8-IMPL-026-T004A", "complete", "PHASE8-IMPL-026-T004",
+            notes="Complete/PASS-WITH-FINDINGS.",
+        ),
+        _make_task_record(
+            "PHASE8-IMPL-026-T004B", "complete", "PHASE8-IMPL-026-T004",
+            notes="Complete/PASS.",
+        ),
+        _make_task_record(
+            "PHASE8-IMPL-026-T004C", "complete", "PHASE8-IMPL-026-T004",
+            notes="Complete/PASS-WITH-FINDINGS.",
+        ),
+        _make_task_record(
+            "PHASE8-IMPL-026-T005", "planned", "PHASE8-IMPL-026",
+            notes="Planned next. Inactive.",
+        ),
+    ]
+
+
+def _historical_pages() -> dict[str, str]:
+    pages = {name: "" for name in RENDERED_PAGE_NAMES}
+    pages["index.md"] = """## Project Memory Workstream Status
+
+| Task | Snapshot-bound state |
+| --- | --- |
+| T001 (Authority/Lifecycle foundation) | complete |
+| T002 (Schema/registry architecture) | complete |
+| T003 (Scanners/snapshot builder) | complete |
+| T004 (Human-readable memory) | complete/PASS-WITH-FINDINGS |
+| T004A (Architecture/remediation) | complete/PASS-WITH-FINDINGS |
+| T004B (Markdown renderer) | complete/PASS |
+| T004C (Clean-HEAD publication) | complete/PASS-WITH-FINDINGS |
+| T005 (Context-tool integration) | planned/inactive |
+
+Application frontier: PHASE8-IMPL-024-T003A
+"""
+    pages["current-roadmap.md"] = """Application frontier: PHASE8-IMPL-024-T003A
+
+**Next Project Memory task:** T005 (planned)
+
+PHASE8-IMPL-025 remains planned and inactive.
+"""
+    pages["remaining-work.md"] = """## Planned
+
+- **T005** — PHASE8-IMPL-026-T005 (planned/inactive)
+"""
+    return pages
+
+
+def _make_minimal_render_dir(
+    base: Path,
+    pages: dict[str, str],
+    *,
+    bound_commit: str = "a415270b18f978e601a9ffc6d7bcb4ab8a250c42",
+    branch: str = _HISTORICAL_BRANCH,
+    output_name: str = "render_out",
+) -> Path:
     """Create a minimal render package structure."""
-    render_dir = base / "render_out"
+    render_dir = base / output_name
     docs_dir = render_dir / "docs"
     docs_dir.mkdir(parents=True, exist_ok=True)
 
-    banner = "# Generated Evidence — Not Project Authority\n\n"
     for name in RENDERED_PAGE_NAMES:
-        content = pages.get(name, banner)
+        content = pages.get(name, _GENERATED_EVIDENCE_BANNER)
         if "Generated Evidence" not in content:
-            content = banner + content
+            content = _GENERATED_EVIDENCE_BANNER + content
         (docs_dir / name).write_text(content, encoding="utf-8")
 
     manifest = {
@@ -73,24 +197,170 @@ def _make_minimal_render_dir(base: Path, pages: dict[str, str]) -> Path:
         "renderer_version": "project_memory_markdown_renderer.v1",
         "authority_class": "generated_evidence",
         "mode": "publication",
-        "target_commit": "a415270b18f978e601a9ffc6d7bcb4ab8a250c42",
-        "target_branch": "docs/project-memory-foundation",
-        "source_snapshot_bound_commit": "a415270b18f978e601a9ffc6d7bcb4ab8a250c42",
+        "target_commit": bound_commit,
+        "target_branch": branch,
+        "source_snapshot_bound_commit": bound_commit,
         "freshness": "current",
         "publication_eligible": True,
         "convergence_result": "PASS_WITH_FINDINGS",
         "page_count": 14,
         "page_navigation_order": list(RENDERED_PAGE_NAMES),
-        "page_hashes": {},
+        "page_hashes": {
+            name: hashlib.sha256((docs_dir / name).read_bytes()).hexdigest()
+            for name in RENDERED_PAGE_NAMES
+        },
     }
-    (render_dir / "build-manifest.json").write_text(json.dumps(manifest, sort_keys=True))
-    (render_dir / "source-snapshot.json").write_text(
-        json.dumps({"bound_commit": "a415270b18f978e601a9ffc6d7bcb4ab8a250c42",
-                      "branch": "docs/project-memory-foundation",
-                      "authority_class": "generated_evidence"}, sort_keys=True))
-    (render_dir / "FILE-INVENTORY.txt").write_text("docs/index.md\n")
-    (render_dir / "SHA256SUMS").write_text("")
+    _write_json(render_dir / "build-manifest.json", manifest)
+    _write_json(
+        render_dir / "source-snapshot.json",
+        {
+            "bound_commit": bound_commit,
+            "branch": branch,
+            "authority_class": "generated_evidence",
+        },
+    )
+    _write_exact_package_metadata(render_dir)
     return render_dir
+
+
+def _materialize_historical_package(
+    tmp_path: Path, case: str, *, advance_head: bool = True
+) -> dict[str, Path | str]:
+    repo_root = tmp_path / f"repo-{case.lower()}"
+    repo_root.mkdir()
+    _git(repo_root, "init", "-b", _HISTORICAL_BRANCH)
+    _git(repo_root, "config", "user.name", "Project Memory Test")
+    _git(repo_root, "config", "user.email", "project-memory-test@example.invalid")
+
+    registry_root = repo_root / "docs/project-memory/registries"
+    registry_root.mkdir(parents=True)
+    tasks_path = registry_root / "tasks.json"
+    owner_decisions_path = registry_root / "owner-decisions.json"
+    _write_json(
+        tasks_path,
+        {
+            "registry_type": "task",
+            "schema_version": "1.0.0",
+            "records": _historical_tasks(),
+        },
+    )
+    _write_json(
+        owner_decisions_path,
+        {
+            "registry_type": "owner-decision",
+            "schema_version": "1.0.0",
+            "records": [],
+        },
+    )
+    _git(repo_root, "add", "docs/project-memory/registries")
+    _git(repo_root, "commit", "-m", f"test: {case} snapshot registry state")
+    bound_commit = _git(repo_root, "rev-parse", "HEAD")
+
+    registry_hashes = {
+        path.relative_to(repo_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in (tasks_path, owner_decisions_path)
+    }
+    findings = [
+        {
+            "authority_class": "generated_evidence",
+            "blocks_publication": False,
+            "code": "source_missing",
+            "finding_id": f"finding:{case.lower()}-source-missing-{index}",
+            "severity": "warning",
+            "title": f"Historical source {index} is unavailable",
+        }
+        for index in range(1, 5)
+    ]
+
+    snapshot_dir = tmp_path / f"snapshot-{case.lower()}"
+    snapshot_dir.mkdir()
+    common_metadata = {"authority_class": "generated_evidence"}
+    for name in (
+        "run-metadata.json",
+        "repository-state.json",
+        "roadmap-state.json",
+        "registry-validation.json",
+        "source-inventory.json",
+        "source-hashes.json",
+    ):
+        _write_json(snapshot_dir / name, common_metadata)
+    _write_json(
+        snapshot_dir / "convergence-findings.json",
+        {
+            "authority_class": "generated_evidence",
+            "result": "PASS_WITH_FINDINGS",
+            "findings": findings,
+        },
+    )
+    _write_json(
+        snapshot_dir / "snapshot.json",
+        {
+            "authority_class": "generated_evidence",
+            "authoritative": False,
+            "bound_commit": bound_commit,
+            "branch": _HISTORICAL_BRANCH,
+            "generated_at": "2026-07-14T21:36:28Z",
+            "publication_eligible": True,
+            "registry_hashes": registry_hashes,
+            "snapshot_id": f"{case}/synthetic-preservation",
+            "task_id": f"PHASE8-IMPL-026-{case}",
+        },
+    )
+    (snapshot_dir / "summary.md").write_text(
+        _GENERATED_EVIDENCE_BANNER + "Deterministic synthetic historical snapshot.\n",
+        encoding="utf-8",
+    )
+    _write_exact_package_metadata(snapshot_dir)
+    assert tuple(sorted(path.name for path in snapshot_dir.iterdir())) == tuple(
+        sorted(_SNAPSHOT_FILES)
+    )
+
+    render_dir = _make_minimal_render_dir(
+        tmp_path,
+        _historical_pages(),
+        bound_commit=bound_commit,
+        output_name=f"render-{case.lower()}",
+    )
+
+    if advance_head:
+        current_tasks = _historical_tasks()
+        next(task for task in current_tasks if task["task_id"] == "PHASE8-IMPL-026-T005")[
+            "lifecycle"
+        ]["status"] = "complete"
+        current_tasks.append(
+            _make_task_record(
+                "PHASE8-IMPL-026-T006", "planned", "PHASE8-IMPL-026",
+                notes="Later current-registry lifecycle state.",
+            )
+        )
+        _write_json(
+            tasks_path,
+            {
+                "registry_type": "task",
+                "schema_version": "1.0.0",
+                "records": current_tasks,
+            },
+        )
+        _git(repo_root, "add", "docs/project-memory/registries/tasks.json")
+        _git(repo_root, "commit", "-m", "test: advance current registry lifecycle")
+
+    return {
+        "repo_root": repo_root,
+        "snapshot_dir": snapshot_dir,
+        "render_dir": render_dir,
+        "bound_commit": bound_commit,
+        "tasks_path": tasks_path,
+    }
+
+
+@pytest.fixture
+def historical_package_factory(tmp_path):
+    def materialize(case: str, *, advance_head: bool = True):
+        return _materialize_historical_package(
+            tmp_path, case, advance_head=advance_head
+        )
+
+    return materialize
 
 
 class TestDirectExecutionBootstrap:
@@ -106,10 +376,14 @@ class TestDirectExecutionBootstrap:
             "--json",
         ]
 
-    def test_direct_cli_from_repository_root_returns_valid_json(self):
+    def test_direct_cli_from_repository_root_returns_valid_json(
+        self, tmp_path, historical_package_factory
+    ):
+        package = historical_package_factory("T004C1")
+        assert package["repo_root"].is_relative_to(tmp_path)
         result = subprocess.run(
             self._direct_command(
-                REPO_ROOT, PRESERVED_T004C1_SNAPSHOT, PRESERVED_T004C1_RENDER
+                package["repo_root"], package["snapshot_dir"], package["render_dir"]
             ),
             cwd=REPO_ROOT,
             check=False,
@@ -123,18 +397,33 @@ class TestDirectExecutionBootstrap:
         assert report["authority"]["forbidden_claims"] == []
         assert all(check["result"] == "pass" for check in report["semantic_checks"])
 
-    def test_direct_cli_outside_repository_uses_explicit_repo_root(self, tmp_path):
+    def test_direct_cli_outside_repository_uses_explicit_repo_root(
+        self, tmp_path, historical_package_factory
+    ):
+        package = historical_package_factory("T004C1")
+        outside_repository = tmp_path / "outside-repository"
+        outside_repository.mkdir()
         result = subprocess.run(
             self._direct_command(
-                REPO_ROOT, PRESERVED_T004C1_SNAPSHOT, PRESERVED_T004C1_RENDER
+                package["repo_root"], package["snapshot_dir"], package["render_dir"]
             ),
-            cwd=tmp_path,
+            cwd=outside_repository,
             check=False,
             capture_output=True,
             text=True,
         )
         assert result.returncode == 0, result.stderr
         assert json.loads(result.stdout)["result"] == RESULT_PASS_WITH_FINDINGS
+
+    def test_source_has_no_fixed_historical_package_dependencies(self):
+        source = Path(__file__).read_text(encoding="utf-8")
+        for case in ("T004C1", "T004C2"):
+            fixed_package_prefix = (
+                ".codex-context/project-memory/"
+                + "PHASE8-IMPL-026-"
+                + case
+            )
+            assert fixed_package_prefix not in source
 
     def test_module_import_remains_available(self):
         module = importlib.import_module("scripts.project_memory.validate_rendered_docs")
@@ -739,14 +1028,25 @@ This generated page is authoritative.
         assert claim["classification"]
         assert claim["reason"]
 
-    def test_preserved_t004c1_render_passes_repaired_authority_gate(self):
-        repo_root = Path(__file__).resolve().parents[2]
-        snapshot_dir = repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1/20260714T213628Z"
-        render_dir = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C1/20260714T213628Z"
+    def test_preserved_t004c1_render_passes_repaired_authority_gate(
+        self, historical_package_factory
+    ):
+        # "Preserved" now means a deterministic synthetic preservation fixture,
+        # not ignored evidence from a source worktree.
+        package = historical_package_factory("T004C1")
+        current_tasks = json.loads(package["tasks_path"].read_text(encoding="utf-8"))[
+            "records"
+        ]
+        assert next(
+            task for task in current_tasks
+            if task["task_id"] == "PHASE8-IMPL-026-T005"
+        )["lifecycle"]["status"] == "complete"
+        assert any(task["task_id"] == "PHASE8-IMPL-026-T006" for task in current_tasks)
+
         result = validate_rendered_package(
-            repo_root=str(repo_root),
-            snapshot_dir=str(snapshot_dir),
-            render_dir=str(render_dir),
+            repo_root=str(package["repo_root"]),
+            snapshot_dir=str(package["snapshot_dir"]),
+            render_dir=str(package["render_dir"]),
         )
         assert result["result"] == RESULT_PASS_WITH_FINDINGS
         assert result["authority_check"] == "pass"
@@ -765,27 +1065,44 @@ This generated page is authoritative.
         assert result["expected_task_states"]["_pm_next_task"]["task_id"] == "PHASE8-IMPL-026-T005"
         assert "PHASE8-IMPL-026-T006" not in result["expected_task_states"]
 
-    def test_preserved_t004c2_render_uses_its_snapshot_bound_task_state(self):
-        repo_root = Path(__file__).resolve().parents[2]
-        snapshot_dir = repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C2/20260714T221454Z"
-        render_dir = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C2/20260714T221454Z"
+    def test_preserved_t004c2_render_uses_its_snapshot_bound_task_state(
+        self, historical_package_factory
+    ):
+        # This synthetic preservation case has a later current-registry commit;
+        # the render must still use the registry state at its own bound commit.
+        package = historical_package_factory("T004C2")
+        current_tasks = json.loads(package["tasks_path"].read_text(encoding="utf-8"))[
+            "records"
+        ]
+        assert next(
+            task for task in current_tasks
+            if task["task_id"] == "PHASE8-IMPL-026-T005"
+        )["lifecycle"]["status"] == "complete"
+        assert any(task["task_id"] == "PHASE8-IMPL-026-T006" for task in current_tasks)
+
         result = validate_rendered_package(
-            repo_root=str(repo_root),
-            snapshot_dir=str(snapshot_dir),
-            render_dir=str(render_dir),
+            repo_root=str(package["repo_root"]),
+            snapshot_dir=str(package["snapshot_dir"]),
+            render_dir=str(package["render_dir"]),
         )
         assert result["result"] == RESULT_PASS_WITH_FINDINGS
         assert result["repository_currentness"] == "historical"
         assert result["expected_task_states"]["_pm_next_task"]["task_id"] == "PHASE8-IMPL-026-T005"
         assert "PHASE8-IMPL-026-T006" not in result["expected_task_states"]
+        assert result["authority_check"] == "pass"
+        assert result["authority"]["forbidden_claims"] == []
+        assert all(check["result"] == "pass" for check in result["semantic_checks"])
         assert len(result["nonblocking_findings"]) == 4
+        assert {f["code"] for f in result["nonblocking_findings"]} == {"source_missing"}
+        assert len(result["warnings"]) == 4
+        assert all(w.startswith("source_missing:") for w in result["warnings"])
 
-    def test_render_contradicting_its_own_snapshot_is_blocked(self, tmp_path):
-        repo_root = Path(__file__).resolve().parents[2]
-        snapshot_dir = repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1/20260714T213628Z"
-        source_render = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C1/20260714T213628Z"
-        render_dir = tmp_path / "render"
-        shutil.copytree(source_render, render_dir)
+    def test_render_contradicting_its_own_snapshot_is_blocked(
+        self, tmp_path, historical_package_factory
+    ):
+        package = historical_package_factory("T004C1")
+        render_dir = tmp_path / "contradictory-render"
+        shutil.copytree(package["render_dir"], render_dir)
 
         roadmap_path = render_dir / "docs/current-roadmap.md"
         roadmap = roadmap_path.read_text(encoding="utf-8").replace(
@@ -798,91 +1115,33 @@ This generated page is authoritative.
         manifest["page_hashes"]["current-roadmap.md"] = hashlib.sha256(
             roadmap_path.read_bytes()
         ).hexdigest()
-        manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        _write_json(manifest_path, manifest)
+        _write_sha256_manifest(render_dir)
 
         result = validate_rendered_package(
-            repo_root=str(repo_root),
-            snapshot_dir=str(snapshot_dir),
+            repo_root=str(package["repo_root"]),
+            snapshot_dir=str(package["snapshot_dir"]),
             render_dir=str(render_dir),
         )
         assert result["result"] == RESULT_BLOCKED
-        assert any("Next PM task T005 absent" in error for error in result["errors"])
-
-    def test_current_snapshot_registry_hash_drift_is_blocked(self, tmp_path):
-        source_root = Path(__file__).resolve().parents[2]
-        repo_root = tmp_path / "repo"
-        repo_root.mkdir()
-        subprocess.run(
-            ["git", "init", "-b", "docs/project-memory-foundation"],
-            cwd=repo_root, check=True, capture_output=True, text=True,
-        )
-        subprocess.run(
-            ["git", "config", "user.name", "Project Memory Test"],
-            cwd=repo_root, check=True,
-        )
-        subprocess.run(
-            ["git", "config", "user.email", "project-memory-test@example.invalid"],
-            cwd=repo_root, check=True,
-        )
-
-        registry_names = [
-            "assets.json", "boundaries.json", "capabilities.json", "decisions.json",
-            "dependencies.json", "evidence.json", "features.json", "manifest.json",
-            "owner-decisions.json", "projects.json", "tasks.json", "tools.json",
+        assert result["errors"] == [
+            "Semantic: Next PM task T005 absent from current-roadmap"
         ]
-        registry_root = repo_root / "docs/project-memory/registries"
-        registry_root.mkdir(parents=True)
-        for name in registry_names:
-            shutil.copy2(
-                source_root / "docs/project-memory/registries" / name,
-                registry_root / name,
-            )
-        subprocess.run(
-            ["git", "add", "docs/project-memory/registries"],
-            cwd=repo_root, check=True,
-        )
-        subprocess.run(
-            ["git", "commit", "-m", "test: baseline registries"],
-            cwd=repo_root, check=True, capture_output=True, text=True,
-        )
-        head = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=repo_root,
-            check=True, capture_output=True, text=True,
-        ).stdout.strip()
+        assert all(check["result"] == "pass" for check in result["structural_checks"])
 
-        registry_hashes = {}
-        for name in registry_names:
-            relative_path = f"docs/project-memory/registries/{name}"
-            committed_blob = subprocess.run(
-                ["git", "show", f"{head}:{relative_path}"], cwd=repo_root,
-                check=True, capture_output=True,
-            ).stdout
-            registry_hashes[relative_path] = hashlib.sha256(committed_blob).hexdigest()
-
-        snapshot_bundle = {
-            "snapshot": {
-                "bound_commit": head,
-                "branch": "docs/project-memory-foundation",
-                "registry_hashes": registry_hashes,
-            },
-            "findings": [],
-        }
-
-        drift_path = registry_root / "assets.json"
-        drifted_registry = json.loads(drift_path.read_text(encoding="utf-8"))
-        assert drifted_registry["records"]
+    def test_current_snapshot_registry_hash_drift_is_blocked(
+        self, historical_package_factory
+    ):
+        package = historical_package_factory("T004C2", advance_head=False)
+        tasks_path = package["tasks_path"]
+        drifted_registry = json.loads(tasks_path.read_text(encoding="utf-8"))
         drifted_registry["records"][0]["notes"] += " Deterministic registry drift."
-        drift_path.write_text(
-            json.dumps(drifted_registry, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
+        _write_json(tasks_path, drifted_registry)
 
-        render_dir = source_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C2/20260714T221454Z"
         result = validate_rendered_package(
-            repo_root=str(repo_root),
-            snapshot_dir=str(repo_root),
-            render_dir=str(render_dir),
-            snapshot_bundle=snapshot_bundle,
+            repo_root=str(package["repo_root"]),
+            snapshot_dir=str(package["snapshot_dir"]),
+            render_dir=str(package["render_dir"]),
         )
         assert result["result"] == RESULT_BLOCKED
         assert len(result["errors"]) == 1
@@ -891,23 +1150,30 @@ This generated page is authoritative.
             in result["errors"][0]
         )
 
-    def test_preserved_t004c1_packages_are_not_mutated(self):
-        repo_root = Path(__file__).resolve().parents[2]
-        roots = [
-            repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1/20260714T213628Z",
-            repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C1/20260714T213628Z",
-            repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1-quality/20260714T213628Z",
-        ]
+    def test_preserved_t004c1_packages_are_not_mutated(
+        self, historical_package_factory
+    ):
+        # Byte preservation now covers real temporary snapshot/render packages,
+        # including both inventories and both checksum manifests.
+        package = historical_package_factory("T004C1")
+        roots = [package["snapshot_dir"], package["render_dir"]]
 
         def package_hashes():
             return {
-                str(path.relative_to(repo_root)): hashlib.sha256(path.read_bytes()).hexdigest()
+                f"{package_root.name}/{path.relative_to(package_root)}": hashlib.sha256(
+                    path.read_bytes()
+                ).hexdigest()
                 for package_root in roots
                 for path in sorted(package_root.rglob("*"))
                 if path.is_file()
             }
 
         before = package_hashes()
-        analyze_authority_claims(roots[1] / "docs")
+        result = validate_rendered_package(
+            repo_root=str(package["repo_root"]),
+            snapshot_dir=str(package["snapshot_dir"]),
+            render_dir=str(package["render_dir"]),
+        )
         after = package_hashes()
+        assert result["result"] == RESULT_PASS_WITH_FINDINGS
         assert after == before
