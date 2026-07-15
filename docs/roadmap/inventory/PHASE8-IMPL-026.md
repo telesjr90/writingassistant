@@ -81,17 +81,26 @@ silently override it.
    - Standard-library-only read adapters for Repomix, Graphify, and CCE evidence.
    - Unknown, ambiguous, stale, historical, unsafe, and provenance-incomplete artifacts are quarantined.
    - No context tool installation or execution; generated output remains `generated_evidence`.
-6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (planned; contingent).
+6. `PHASE8-IMPL-026-T006` — Serena read-only pilot (owner-deferred;
+   planned/contingent/inactive/unimplemented; no measured capability gap).
 7. `PHASE8-IMPL-026-T007` — LlamaIndex / local-embedding / Qdrant Local pilot
-   (planned; contingent).
+   (owner-deferred; planned/contingent/inactive/unimplemented; no measured
+   capability gap).
 8. `PHASE8-IMPL-026-T008` — Shared agent guidance and Project Memory Ask
-   (planned).
-9. `PHASE8-IMPL-026-T009` — Deterministic Plan Integrity engine (planned).
+   (complete/PASS).
+   - Deterministic Ask protocol, shared read skill, read-only OpenCode agent,
+     standard-library contract validator, and focused tests.
+   - Ordinary read-only repository access only; no retrieval pilot required.
+9. `PHASE8-IMPL-026-T009` — Deterministic Plan Integrity engine (planned
+   next/inactive).
 10. `PHASE8-IMPL-026-T010` — Specialized Plan Integrity reviewers (planned).
 11. `PHASE8-IMPL-026-T011` — Synchronization, CI, rebuild, and operational
     rollout (planned).
 
-T006 and T007 are contingent on provenance and benchmark approval. Serena,
+T006 and T007 are owner-deferred because no benchmarkable symbol-navigation,
+retrieval-quality, citation, scale, latency, or maintainability gap has been
+measured. They remain contingent and may be reconsidered only after a documented
+benchmarkable gap and a future owner-approved provenance/benchmark task. Serena,
 LlamaIndex, and Qdrant are not approved dependencies.
 
 ## Dependencies
@@ -151,7 +160,11 @@ implemented by T001.
 - First clean-HEAD publication snapshot exists at `.codex-context/project-memory/PHASE8-IMPL-026-T004C/20260714T033724Z/` bound to `3f09420` (T004C), 4 findings, none blocking.
 - First publication render exists at `.codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C/20260714T033724Z/` (14 Markdown pages, offline quality gate PASS_WITH_FINDINGS).
 - Read-only context-tool evidence import exists; no retrieval tool or live context-tool runner exists.
-- No reviewers exist.
-- T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, and T005 are delivered.
+- Shared agent guidance and deterministic Project Memory Ask exist (T008); the
+  OpenCode agent is read-only and all answers fail closed on unsupported truth
+  claims.
+- No retrieval pilot or Plan Integrity reviewer exists.
+- T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, T005, and T008 are delivered.
 - The accepted current T004C2 publication is the `20260714T221454Z` set bound to `8961b35`.
-- The next sequenced Project Memory task is T006, planned/contingent/inactive and not activated. T007 remains contingent/inactive; T008-T011 remain planned.
+- T006/T007 remain owner-deferred, planned/contingent/inactive, and unimplemented.
+- The next Project Memory task is T009, planned/inactive; T010-T011 remain planned.

@@ -312,6 +312,159 @@
       "is_application_frontier": false,
       "is_blocking": false,
       "notes": "Complete/PASS. Implements standard-library-only, read-only import adapters for existing Repomix, Graphify, and CCE artifacts. Generated packs remain generated_evidence; unknown, stale, ambiguous, unsafe, or provenance-incomplete artifacts are quarantined. No context tool was installed or executed. T006 and T007 remain contingent/inactive."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T006",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Serena read-only pilot",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "task_id": "PHASE8-IMPL-026-T006",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T005"],
+      "task_type": "infrastructure",
+      "classification": "contingent retrieval pilot",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Owner-deferred for lack of a measured benchmarkable capability gap. Contingent, planned, inactive, and unimplemented; not rejected, approved, installed, active, complete, or required by T008. Reconsideration requires a documented benchmarkable gap plus a future owner-approved provenance and benchmark task."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T007",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "LlamaIndex / local-embedding / Qdrant Local pilot",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "task_id": "PHASE8-IMPL-026-T007",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T005"],
+      "task_type": "infrastructure",
+      "classification": "contingent vector-retrieval pilot",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Owner-deferred for lack of a measured benchmarkable capability gap. Contingent, planned, inactive, and unimplemented; not rejected, approved, installed, active, complete, or required by T008. Reconsideration requires a documented benchmarkable gap plus a future owner-approved provenance and benchmark task."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T008",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Shared agent guidance and Project Memory Ask",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "complete"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/project-memory/ask-protocol.md" },
+          { "path": ".agents/skills/project-memory-read/SKILL.md" },
+          { "path": ".opencode/agents/project-memory-ask.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "task_id": "PHASE8-IMPL-026-T008",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T004"],
+      "task_type": "infrastructure",
+      "classification": "shared read-only agent guidance",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Defines the deterministic Project Memory Ask request/response protocol, shared read skill, strictly read-only OpenCode agent, standard-library guidance validator, and focused tests. Requires no retrieval pilot, network, MCP, embedding, server, or live model call."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T009",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Plan Integrity engine",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T009",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T003"],
+      "task_type": "infrastructure",
+      "classification": "deterministic plan-integrity analysis",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Planned next and inactive. No implementation is present."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T010",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Specialized Plan Integrity reviewers",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T010",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T009"],
+      "task_type": "infrastructure",
+      "classification": "specialized review agents",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Planned and inactive. Reviewers may propose findings but may not change authoritative state."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T011",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Synchronization, CI, rebuild, and operational rollout",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T011",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026-T010"],
+      "task_type": "infrastructure",
+      "classification": "operational synchronization and rollout",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Planned and inactive. Operational cadence remains unresolved under Q154."
     }
   ]
 }

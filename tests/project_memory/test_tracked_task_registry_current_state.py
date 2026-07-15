@@ -36,6 +36,7 @@ from scripts.project_memory.render_docs import (
     _get_children,
     _identify_completed_children,
     _identify_next_planned_child,
+    _derive_pm_task_behavior,
     _validate_task_records,
     _PM_PARENT_TASK_ID,
     _PM_TASK_DISPLAY_ORDER,
@@ -220,7 +221,10 @@ def test_remaining_work_excludes_complete_t004():
     when it is set to 'complete' status."""
     tasks_registry = _load_tracked_registry("tasks.json")
     # Build a minimal model with only the tasks we care about
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
 
     # Minimal valid manifest for model builder.
     manifest = {
@@ -247,7 +251,10 @@ def test_remaining_work_excludes_complete_t004():
 def test_remaining_work_excludes_complete_t005_and_preserves_planned_successors():
     """T005 is complete; authoritative roadmap successors remain planned."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -264,16 +271,23 @@ def test_remaining_work_excludes_complete_t005_and_preserves_planned_successors(
     output = _render_remaining_work(model)
 
     assert "task:PHASE8-IMPL-026-T005" not in output
-    for task_id in range(6, 12):
-        assert "Status: planned." in _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}")
-    assert "Contingent on Serena" in _roadmap_task_section("PHASE8-IMPL-026-T006")
-    assert "Contingent on provenance" in _roadmap_task_section("PHASE8-IMPL-026-T007")
+    for task_id in (6, 7, 9, 10, 11):
+        assert "Status: planned" in _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}")
+    assert "Status: complete/PASS" in _roadmap_task_section("PHASE8-IMPL-026-T008")
+    assert "owner-deferred" in _roadmap_task_section("PHASE8-IMPL-026-T006")
+    assert "owner-deferred" in _roadmap_task_section("PHASE8-IMPL-026-T007")
+    assert "Next Actionable Project Memory Task" in output
+    assert "PHASE8-IMPL-026-T009" in output
+    assert "Contingent / Owner-Deferred" in output
 
 
 def test_current_roadmap_distinguishes_frontier_from_pm_next():
     """Prove the roadmap distinguishes application frontier from PM next task."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -353,7 +367,10 @@ def test_render_index_derives_t004_from_registry():
     """Prove _render_index now derives T004 display status from the task registry,
     not from hardcoded strings.  The rendered index must show T004 complete."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -379,7 +396,10 @@ def test_render_index_derives_t004_from_registry():
 def test_render_index_derives_t004c_from_registry():
     """Prove _render_index derives T004C status from registry, not hardcodes."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -400,9 +420,12 @@ def test_render_index_derives_t004c_from_registry():
 
 
 def test_render_current_roadmap_preserves_t005_completion_and_t006_sequence():
-    """Normalized records close T005; accepted roadmap sequences contingent T006."""
+    """Deferred T006/T007 remain visible while actionable sequencing reaches T009."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -418,19 +441,23 @@ def test_render_current_roadmap_preserves_t005_completion_and_t006_sequence():
     model = _build_page_model(registries, manifest, [], {}, {}, set())
     output = _render_current_roadmap(model)
 
-    assert "Next Project Memory task:** (all complete)" in output
+    assert "Next actionable Project Memory task:** T009 (planned/inactive)" in output
     assert "PHASE8-IMPL-026-T005" in output
     assert "Lifecycle:** `complete`" in output
     t006 = _roadmap_task_section("PHASE8-IMPL-026-T006")
-    assert "Status: planned." in t006
-    assert "Contingent on Serena" in t006
+    assert "Status: planned, contingent, inactive, owner-deferred" in t006
+    assert "No concrete symbol-navigation" in t006
+    assert "Task state:** `owner deferred contingent`" in output
     assert "Current Project Memory child" not in output
 
 
 def test_render_index_no_t004_in_progress():
     """The rendered index must never show T004 as 'in progress'."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -454,7 +481,10 @@ def test_render_index_no_t004_in_progress():
 def test_render_index_no_t004c_planned():
     """The rendered index must never show T004C as 'planned'."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -478,7 +508,10 @@ def test_render_index_no_t004c_planned():
 def test_render_current_roadmap_no_t004b_as_current_child():
     """The rendered roadmap must not identify T004B as current child."""
     tasks_registry = _load_tracked_registry("tasks.json")
-    registries = {"tasks.json": tasks_registry}
+    registries = {
+        "tasks.json": tasks_registry,
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -506,7 +539,10 @@ def test_lifecycle_change_changes_rendered_output():
         if r.get("task_id") == "PHASE8-IMPL-026-T004":
             r["lifecycle"]["status"] = "in_progress"
 
-    registries = {"tasks.json": {** _load_tracked_registry("tasks.json"), "records": modified}}
+    registries = {
+        "tasks.json": {**_load_tracked_registry("tasks.json"), "records": modified},
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -524,7 +560,7 @@ def test_lifecycle_change_changes_rendered_output():
 
     for line in output.split("\n"):
         if "T004 (Human-readable memory)" in line:
-            assert "in progress" in line, f"T004 should show in progress after lifecycle change: {line.strip()}"
+            assert "active" in line, f"T004 should show active after lifecycle change: {line.strip()}"
 
 
 def test_renderer_no_hardcode_t004_t004b_t004c_t005():
@@ -535,7 +571,10 @@ def test_renderer_no_hardcode_t004_t004b_t004c_t005():
     because the required PM task records are missing."""
     recs = _tracked_task_records()
     filtered = [r for r in recs if r.get("task_id") != "PHASE8-IMPL-026-T004B"]
-    registries = {"tasks.json": {** _load_tracked_registry("tasks.json"), "records": filtered}}
+    registries = {
+        "tasks.json": {**_load_tracked_registry("tasks.json"), "records": filtered},
+        "owner-decisions.json": _load_tracked_registry("owner-decisions.json"),
+    }
     manifest = {
         "registry_type": "manifest",
         "schema_version": "1.0.0",
@@ -618,18 +657,18 @@ def test_identify_completed_children():
 def test_identify_next_planned_child():
     tasks = _tracked_task_records()
     next_task = _identify_next_planned_child(tasks, _PM_PARENT_TASK_ID)
-    assert next_task is None  # normalized registry is complete through T005
+    assert next_task["task_id"] == "PHASE8-IMPL-026-T009"
 
-    planned_sections = [
-        (f"PHASE8-IMPL-026-T{task_id:03d}", _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}"))
-        for task_id in range(6, 12)
-    ]
-    assert all("Status: planned." in section for _, section in planned_sections)
-    next_roadmap_task = planned_sections[0]
-    assert next_roadmap_task[0] == "PHASE8-IMPL-026-T006"
-    assert "Contingent on Serena" in next_roadmap_task[1]
-    assert "benchmark approval" in next_roadmap_task[1]
-    assert "Contingent on provenance" in planned_sections[1][1]
+
+def test_tracked_behavior_skips_deferred_contingent_tasks_and_selects_t009():
+    behavior = _derive_pm_task_behavior(
+        _tracked_task_records(),
+        _load_tracked_registry("owner-decisions.json")["records"],
+    )
+    assert behavior["states"]["PHASE8-IMPL-026-T006"]["state"] == "owner_deferred_contingent"
+    assert behavior["states"]["PHASE8-IMPL-026-T007"]["state"] == "owner_deferred_contingent"
+    assert behavior["states"]["PHASE8-IMPL-026-T008"]["state"] == "complete"
+    assert behavior["next_actionable_task"]["task_id"] == "PHASE8-IMPL-026-T009"
 
 
 def test_derive_task_display_status_complete_pass_with_findings():

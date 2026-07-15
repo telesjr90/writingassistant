@@ -59,11 +59,30 @@ See the [T001 decision record](../roadmap/decisions/PHASE8-IMPL-026-T001-project
 - Are changed only through owner-approved implementation tasks.
 - Do not need to be rewritten solely because repository HEAD advances.
 
-**Generated commit-bound snapshots** will live under `.codex-context/project-memory/`. They:
+**Generated commit-bound snapshots** live under `.codex-context/project-memory/`. They:
 - Bind tracked registries and discovered repository state to an exact commit.
 - Carry `bound_commit`, source hashes, tool/version, generation time, scope, exclusions, and freshness.
 - Are generated evidence (`generated_evidence`), not authoritative.
-- Are not yet created (planned for T003/T004).
+- Include accepted current publication packages only after clean-HEAD freshness,
+  checksum, authority, convergence, and semantic validation.
+
+## Project Memory Ask
+
+T008 defines a deterministic, read-only consultation contract:
+
+- `ask-protocol.md` defines request/response fields, precedence, citations,
+  freshness, owner-decision reporting, and fail-closed results.
+- `.agents/skills/project-memory-read/SKILL.md` defines bounded source
+  consultation for Codex and compatible agents.
+- `.opencode/agents/project-memory-ask.md` defines a strictly read-only OpenCode
+  subagent with mutation/network access denied and shell limited to explicit
+  read-only Git inspection.
+- `scripts/project_memory/validate_agent_guidance.py` validates these contracts
+  deterministically with the Python standard library.
+
+Ask uses accepted repository sources first. Registries and current rendered
+publications are navigation aids, not authority. Generated evidence and model
+output never become truth. T006/T007 retrieval pilots are not required.
 
 ## Registry File Roles
 
@@ -120,6 +139,13 @@ Run focused tests:
 
 ```bash
 python3 -m pytest tests/project_memory/test_validate_registries.py -q -p no:cacheprovider
+```
+
+Validate shared guidance:
+
+```bash
+python3 scripts/project_memory/validate_agent_guidance.py
+python3 scripts/project_memory/validate_agent_guidance.py --json
 ```
 
 ## Deterministic Scanners

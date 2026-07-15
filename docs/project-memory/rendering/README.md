@@ -176,6 +176,16 @@ Planned must never be presented as implemented.
 Implemented must never be presented as validated unless evidence supports validation.
 Candidate, review-pending, approved, promoted, and canon states must remain distinct.
 
+For Project Memory child-task sequencing, `planned` is not by itself enough to
+make work actionable. The renderer distinguishes planned actionable tasks from
+planned contingent tasks. A contingent task remains visible but inactive and
+non-actionable until its structured activation criteria and accepted owner
+decision permit activation. An accepted owner deferral keeps a contingent task
+planned, inactive, incomplete, and visible while excluding it from deterministic
+next-actionable selection. Explicit active state takes precedence; otherwise the
+first eligible planned non-contingent child in stable task order is next. Multiple
+active children or contradictory deferral/activation state block rendering.
+
 ### Linking Rules
 
 Links must:
@@ -317,6 +327,21 @@ verifies both structural integrity and semantic task-state convergence.
 - Historical-preview mode validates semantic consistency with its selected
   historical snapshot/registry context.
 - Current publication must be commit-bound and semantically convergent.
+
+Semantic validation is snapshot-bound. The selected snapshot commit and its
+registry hashes identify the normalized task and owner-decision records used to
+validate the render. A preserved package bound to an older commit is validated
+against those historical records and does not become invalid merely because the
+live registry later gains successor tasks or status updates. The preserved
+package is classified as historical relative to repository HEAD without being
+rewritten.
+
+For a current publication, the stricter convergence rule still applies: the
+snapshot commit must equal repository HEAD, every snapshot registry hash must
+match the current tracked registry, and the render must agree with that
+snapshot-bound normalized state. Missing or malformed snapshot registry data,
+snapshot/render commit disagreement, duplicate task records, semantic
+contradiction, or current tracked-registry drift blocks validation.
 
 ## Generated-Evidence Authority Semantics (T004C2)
 

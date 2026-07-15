@@ -47,6 +47,54 @@
       "selected_option": "JSON as canonical tracked registry format; JSON Schema Draft 2020-12 as formal data contract; one schema bundle with typed $defs; 12 separate normalized registry files; registry manifest; dependency-free standard-library validator; tracked source versus generated snapshot separation; stable namespaced identifiers; enforced trust classes, lifecycle values, and cross-record references.",
       "rationale": "The architecture must support deterministic comparison between plan and implementation, allow later scanners and renderers to extend records without replacing identifiers, and enforce product safety boundaries through structural validation.",
       "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T002", "PHASE8-IMPL-026-T003"]
+    },
+    {
+      "id": "decision:pmf-t006-t007-owner-deferral",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "T006/T007 Owner Deferral for No Measured Capability Gap",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "owner",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" }
+        ],
+        "owner_decision_ref": "owner-decision:t006-t007-no-measured-gap-deferral"
+      },
+      "decision_id": "pmf-t006-t007-owner-deferral",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md",
+      "question": "Should T006 or T007 be activated when no benchmarkable capability gap has been measured?",
+      "selected_option": "No. Keep T006 and T007 contingent, planned, inactive, owner-deferred, and unimplemented. T008 proceeds with deterministic Project Memory sources and ordinary read-only repository access.",
+      "rationale": "No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap currently justifies either pilot. T005's zero-artifact result reflects worktree topology, not a Serena or vector-retrieval deficiency.",
+      "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007", "PHASE8-IMPL-026-T008"]
+    },
+    {
+      "id": "decision:pmf-t008-agent-guidance-ask",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Shared Agent Guidance and Project Memory Ask",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md" },
+          { "path": "docs/project-memory/ask-protocol.md" }
+        ]
+      },
+      "decision_id": "pmf-t008-agent-guidance-ask",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T008-shared-agent-guidance-and-project-memory-ask.md",
+      "question": "How should Codex, OpenCode, and compatible agents ask bounded Project Memory questions without a retrieval pilot?",
+      "selected_option": "Use a deterministic read-only Ask protocol, shared repository skill, and strictly read-only OpenCode agent over accepted repository sources, normalized navigation records, and current generated publications with explicit authority, freshness, conflict, uncertainty, and owner-decision reporting. Derive next-actionable Project Memory work from normalized task records and linked accepted owner decisions, and validate every rendered package against its selected snapshot-bound normalized state.",
+      "rationale": "The repository already provides sufficient deterministic sources and ordinary read-only inspection for the measured need. Fail-closed guidance prevents generated evidence, model output, or agent behavior from mutating project truth. Snapshot-bound semantic validation preserves internally consistent historical publications while current publications still converge with current tracked registries; contingent owner-deferred pilots remain visible without blocking actionable successors.",
+      "affected_tasks": ["PHASE8-IMPL-026-T008", "PHASE8-IMPL-026-T009"]
     }
   ]
 }

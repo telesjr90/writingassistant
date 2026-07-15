@@ -298,6 +298,12 @@ def _make_snapshot(repo: Path, snapshot_dir: Path) -> None:
         ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=str(repo),
         capture_output=True, text=True,
     ).stdout.strip()
+    registry_root = repo / "docs" / "project-memory" / "registries"
+    registry_hashes = {
+        f"docs/project-memory/registries/{path.name}": hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(registry_root.iterdir())
+        if path.is_file()
+    }
 
     files_to_write = {
         "run-metadata.json": {
@@ -377,6 +383,7 @@ def _make_snapshot(repo: Path, snapshot_dir: Path) -> None:
             "convergence": {"result": "PASS_WITH_FINDINGS", "finding_count": 2},
             "exclusions": [],
             "known_limitations": [],
+            "registry_hashes": registry_hashes,
         },
         "summary.md": "# Test Summary\n\nThis is a test snapshot.\n",
     }
@@ -420,6 +427,121 @@ def _rebuild_sha256_sums(snap_dir: Path) -> None:
         sha_lines.append(f"{h}  {fn}")
     (snap_dir / "SHA256SUMS").write_text(
         "\n".join(sorted(sha_lines)) + "\n", encoding="utf-8")
+
+
+def _behavior_task(task_id: str, status: str, *, contingent: bool = False) -> dict:
+    record = {
+        "id": f"task:{task_id}",
+        "task_id": task_id,
+        "parent_task_id": None if task_id == "PHASE8-IMPL-026" else "PHASE8-IMPL-026",
+        "lifecycle": {"status": status},
+        "provenance": {"created_by": "TEST"},
+        "classification": "contingent test pilot" if contingent else "test task",
+    }
+    if contingent:
+        record["provenance"]["owner_decision_ref"] = "owner-decision:test-contingent"
+    return record
+
+
+def _behavior_decision(selected_option: str, affected_tasks: list[str]) -> dict:
+    return {
+        "id": "owner-decision:test-contingent",
+        "authority_class": "authoritative",
+        "lifecycle": {"status": "current"},
+        "provenance": {"accepted_by": "owner"},
+        "selected_option": selected_option,
+        "affected_tasks": affected_tasks,
+    }
+
+
+class TestNextActionableTaskDerivation:
+
+    def test_deferred_contingent_tasks_are_visible_but_t009_is_next(self):
+        tasks = [
+            _behavior_task("PHASE8-IMPL-026", "in_progress"),
+            _behavior_task("PHASE8-IMPL-026-T006", "planned", contingent=True),
+            _behavior_task("PHASE8-IMPL-026-T007", "planned", contingent=True),
+            _behavior_task("PHASE8-IMPL-026-T008", "complete"),
+            _behavior_task("PHASE8-IMPL-026-T009", "planned"),
+        ]
+        decision = _behavior_decision(
+            "Defer both pilots until a measured gap exists.",
+            ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007"],
+        )
+        behavior = rd._derive_pm_task_behavior(tasks, [decision])
+        assert behavior["states"]["PHASE8-IMPL-026-T006"]["state"] == "owner_deferred_contingent"
+        assert behavior["states"]["PHASE8-IMPL-026-T007"]["state"] == "owner_deferred_contingent"
+        assert behavior["states"]["PHASE8-IMPL-026-T008"]["state"] == "complete"
+        assert behavior["next_actionable_task"]["task_id"] == "PHASE8-IMPL-026-T009"
+
+        rendered = rd._render_remaining_work({"tasks": tasks, "owner_decisions": [decision]})
+        assert "Contingent / Owner-Deferred" in rendered
+        assert "PHASE8-IMPL-026-T006" in rendered
+        assert "PHASE8-IMPL-026-T007" in rendered
+        assert "Next Actionable Project Memory Task" in rendered
+        assert "PHASE8-IMPL-026-T009" in rendered
+        assert "PHASE8-IMPL-026-T008" not in rendered
+
+    def test_activated_contingent_task_requires_accepted_structured_decision(self):
+        tasks = [
+            _behavior_task("PHASE8-IMPL-026", "in_progress"),
+            _behavior_task("PHASE8-IMPL-026-T006", "in_progress", contingent=True),
+        ]
+        decision = _behavior_decision(
+            "Activate the contingent pilot under the accepted benchmark task.",
+            ["PHASE8-IMPL-026-T006"],
+        )
+        behavior = rd._derive_pm_task_behavior(tasks, [decision])
+        assert behavior["active_task"]["task_id"] == "PHASE8-IMPL-026-T006"
+        assert behavior["next_actionable_task"]["task_id"] == "PHASE8-IMPL-026-T006"
+
+        with pytest.raises(ValueError, match="owner_decision_ref must resolve exactly once"):
+            rd._derive_pm_task_behavior(tasks, [])
+
+    def test_multiple_active_tasks_fail_closed(self):
+        tasks = [
+            _behavior_task("PHASE8-IMPL-026", "in_progress"),
+            _behavior_task("PHASE8-IMPL-026-T008", "in_progress"),
+            _behavior_task("PHASE8-IMPL-026-T009", "in_progress"),
+        ]
+        with pytest.raises(ValueError, match="Multiple active"):
+            rd._derive_pm_task_behavior(tasks, [])
+
+    def test_contradictory_deferral_and_activation_fail_closed(self):
+        tasks = [
+            _behavior_task("PHASE8-IMPL-026", "in_progress"),
+            _behavior_task("PHASE8-IMPL-026-T006", "planned", contingent=True),
+        ]
+        decision = _behavior_decision(
+            "Defer and activate the contingent pilot.",
+            ["PHASE8-IMPL-026-T006"],
+        )
+        with pytest.raises(ValueError, match="defers and activates"):
+            rd._derive_pm_task_behavior(tasks, [decision])
+
+    def test_no_actionable_planned_task_is_explicit(self):
+        tasks = [
+            _behavior_task("PHASE8-IMPL-026", "in_progress"),
+            _behavior_task("PHASE8-IMPL-026-T006", "planned", contingent=True),
+            _behavior_task("PHASE8-IMPL-026-T008", "complete"),
+        ]
+        decision = _behavior_decision(
+            "Defer the pilot until a measured gap exists.",
+            ["PHASE8-IMPL-026-T006"],
+        )
+        behavior = rd._derive_pm_task_behavior(tasks, [decision])
+        assert behavior["next_actionable_task"] is None
+        rendered = rd._render_remaining_work({"tasks": tasks, "owner_decisions": [decision]})
+        assert "No actionable planned Project Memory task" in rendered
+
+    def test_all_complete_has_no_next_task(self):
+        tasks = [
+            _behavior_task("PHASE8-IMPL-026", "complete"),
+            _behavior_task("PHASE8-IMPL-026-T008", "complete"),
+            _behavior_task("PHASE8-IMPL-026-T009", "complete"),
+        ]
+        behavior = rd._derive_pm_task_behavior(tasks, [])
+        assert behavior["next_actionable_task"] is None
 
 
 class TestInputLoading:

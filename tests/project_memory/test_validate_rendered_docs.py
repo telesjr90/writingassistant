@@ -7,6 +7,9 @@ from __future__ import annotations
 
 import json
 import hashlib
+import importlib
+import shutil
+import subprocess
 import uuid
 from pathlib import Path
 
@@ -15,7 +18,9 @@ import pytest
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.project_memory.validate_rendered_docs import (
+    _bootstrap_direct_execution_import_path,
     analyze_authority_claims,
+    main,
     validate_rendered_package,
     derive_expected_task_states,
     RESULT_PASS,
@@ -23,6 +28,12 @@ from scripts.project_memory.validate_rendered_docs import (
     RESULT_BLOCKED,
     RENDERED_PAGE_NAMES,
 )
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+VALIDATOR_SCRIPT = REPO_ROOT / "scripts/project_memory/validate_rendered_docs.py"
+PRESERVED_T004C1_SNAPSHOT = REPO_ROOT / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1/20260714T213628Z"
+PRESERVED_T004C1_RENDER = REPO_ROOT / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C1/20260714T213628Z"
 
 
 def _make_task_record(task_id, status, parent=None, notes=""):
@@ -82,6 +93,108 @@ def _make_minimal_render_dir(base: Path, pages: dict[str, str]) -> Path:
     return render_dir
 
 
+class TestDirectExecutionBootstrap:
+
+    @staticmethod
+    def _direct_command(repo_root: Path, snapshot_dir: Path, render_dir: Path) -> list[str]:
+        return [
+            sys.executable,
+            str(VALIDATOR_SCRIPT),
+            "--repo-root", str(repo_root),
+            "--snapshot-dir", str(snapshot_dir),
+            "--render-dir", str(render_dir),
+            "--json",
+        ]
+
+    def test_direct_cli_from_repository_root_returns_valid_json(self):
+        result = subprocess.run(
+            self._direct_command(
+                REPO_ROOT, PRESERVED_T004C1_SNAPSHOT, PRESERVED_T004C1_RENDER
+            ),
+            cwd=REPO_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        report = json.loads(result.stdout)
+        assert report["result"] == RESULT_PASS_WITH_FINDINGS
+        assert report["authority_check"] == "pass"
+        assert report["authority"]["forbidden_claims"] == []
+        assert all(check["result"] == "pass" for check in report["semantic_checks"])
+
+    def test_direct_cli_outside_repository_uses_explicit_repo_root(self, tmp_path):
+        result = subprocess.run(
+            self._direct_command(
+                REPO_ROOT, PRESERVED_T004C1_SNAPSHOT, PRESERVED_T004C1_RENDER
+            ),
+            cwd=tmp_path,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout)["result"] == RESULT_PASS_WITH_FINDINGS
+
+    def test_module_import_remains_available(self):
+        module = importlib.import_module("scripts.project_memory.validate_rendered_docs")
+        assert module.validate_rendered_package is validate_rendered_package
+
+    @pytest.mark.parametrize(
+        ("validation_result", "expected_exit"),
+        [
+            (RESULT_PASS, 0),
+            (RESULT_PASS_WITH_FINDINGS, 0),
+            (RESULT_BLOCKED, 1),
+        ],
+    )
+    def test_main_preserves_result_exit_codes(
+        self, monkeypatch, capsys, validation_result, expected_exit
+    ):
+        monkeypatch.setattr(
+            "scripts.project_memory.validate_rendered_docs.validate_rendered_package",
+            lambda **_kwargs: {
+                "result": validation_result,
+                "errors": ["blocked"] if validation_result == RESULT_BLOCKED else [],
+                "warnings": [],
+            },
+        )
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                str(VALIDATOR_SCRIPT),
+                "--repo-root", ".",
+                "--snapshot-dir", "snapshot",
+                "--render-dir", "render",
+                "--json",
+            ],
+        )
+        assert main() == expected_exit
+        assert json.loads(capsys.readouterr().out)["result"] == validation_result
+
+    def test_direct_cli_invalid_arguments_fail_normally(self, tmp_path):
+        result = subprocess.run(
+            [sys.executable, str(VALIDATOR_SCRIPT)],
+            cwd=tmp_path,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 2
+        assert "required" in result.stderr
+
+    def test_bootstrap_does_not_duplicate_repository_root(self, monkeypatch):
+        repository_root = str(REPO_ROOT)
+        monkeypatch.setattr(
+            "scripts.project_memory.validate_rendered_docs.__package__", ""
+        )
+        monkeypatch.setattr(sys, "path", [repository_root, "sentinel"])
+        _bootstrap_direct_execution_import_path()
+        _bootstrap_direct_execution_import_path()
+        assert sys.path.count(repository_root) == 1
+
+
 class TestDeriveExpectedTaskStates:
 
     def test_t004_is_complete(self):
@@ -113,6 +226,7 @@ class TestDeriveExpectedTaskStates:
 
     def test_next_task_is_t005_when_all_others_complete(self):
         tasks = [
+            _make_task_record("PHASE8-IMPL-026", "in_progress", None),
             _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T002", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T003", "complete", "PHASE8-IMPL-026"),
@@ -125,6 +239,7 @@ class TestDeriveExpectedTaskStates:
 
     def test_no_next_when_all_complete(self):
         tasks = [
+            _make_task_record("PHASE8-IMPL-026", "complete", None),
             _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T005", "complete", "PHASE8-IMPL-026"),
         ]
@@ -307,6 +422,7 @@ class TestSemanticValidation:
 
     def test_accepts_correct_render(self, tmp_path):
         tasks = [
+            _make_task_record("PHASE8-IMPL-026", "in_progress", None),
             _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T002", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T003", "complete", "PHASE8-IMPL-026"),
@@ -333,7 +449,7 @@ class TestSemanticValidation:
 PHASE8-IMPL-024-T003A
 """,
             roadmap="""PHASE8-IMPL-024-T003A
-Next Project Memory task: T005 (planned)
+**Next actionable Project Memory task:** T005 (planned/inactive)
 PHASE8-IMPL-025: published/planned, inactive""",
             remaining="""### Planned
 
@@ -466,6 +582,7 @@ PHASE8-IMPL-025: published/planned, inactive""",
 
     def test_identical_inputs_same_result(self, tmp_path):
         tasks = [
+            _make_task_record("PHASE8-IMPL-026", "in_progress", None),
             _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T002", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T003", "complete", "PHASE8-IMPL-026"),
@@ -479,7 +596,7 @@ PHASE8-IMPL-025: published/planned, inactive""",
         registries = self._reg_with_tasks(tasks)
         pages = self._page_set(
             index="PHASE8-IMPL-024-T003A\n| T004 (Human-readable memory) | complete/PASS-WITH-FINDINGS |\n| T005 | planned/inactive |\n",
-            roadmap="PHASE8-IMPL-024-T003A\nNext Project Memory task: T005 (planned)",
+            roadmap="PHASE8-IMPL-024-T003A\n**Next actionable Project Memory task:** T005 (planned/inactive)",
             remaining="## Planned\n- **T005**\n",
         )
         render_dir = _make_minimal_render_dir(tmp_path, pages)
@@ -511,6 +628,7 @@ class TestCLI:
 
     def test_cli_json_output(self, tmp_path):
         tasks = [
+            _make_task_record("PHASE8-IMPL-026", "in_progress", None),
             _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T002", "complete", "PHASE8-IMPL-026"),
             _make_task_record("PHASE8-IMPL-026-T003", "complete", "PHASE8-IMPL-026"),
@@ -524,7 +642,7 @@ class TestCLI:
         registries = self._reg_with_tasks(tasks)
         pages = self._page_set(
             index="PHASE8-IMPL-024-T003A\n| T004 | complete/PASS-WITH-FINDINGS |\n| T005 | planned/inactive |\n",
-            roadmap="PHASE8-IMPL-024-T003A\nNext Project Memory task: T005 (planned)",
+            roadmap="PHASE8-IMPL-024-T003A\n**Next actionable Project Memory task:** T005 (planned/inactive)",
             remaining="## Planned\n- **T005**\n",
         )
         render_dir = _make_minimal_render_dir(tmp_path, pages)
@@ -643,6 +761,94 @@ This generated page is authoritative.
         assert result["ph8_impl_025_check"] == "pass"
         assert result["remaining_work_check"] == "pass"
         assert all(c["result"] == "pass" for c in result["semantic_checks"])
+        assert result["repository_currentness"] == "historical"
+        assert result["expected_task_states"]["_pm_next_task"]["task_id"] == "PHASE8-IMPL-026-T005"
+        assert "PHASE8-IMPL-026-T006" not in result["expected_task_states"]
+
+    def test_preserved_t004c2_render_uses_its_snapshot_bound_task_state(self):
+        repo_root = Path(__file__).resolve().parents[2]
+        snapshot_dir = repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C2/20260714T221454Z"
+        render_dir = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C2/20260714T221454Z"
+        result = validate_rendered_package(
+            repo_root=str(repo_root),
+            snapshot_dir=str(snapshot_dir),
+            render_dir=str(render_dir),
+        )
+        assert result["result"] == RESULT_PASS_WITH_FINDINGS
+        assert result["repository_currentness"] == "historical"
+        assert result["expected_task_states"]["_pm_next_task"]["task_id"] == "PHASE8-IMPL-026-T005"
+        assert "PHASE8-IMPL-026-T006" not in result["expected_task_states"]
+        assert len(result["nonblocking_findings"]) == 4
+
+    def test_render_contradicting_its_own_snapshot_is_blocked(self, tmp_path):
+        repo_root = Path(__file__).resolve().parents[2]
+        snapshot_dir = repo_root / ".codex-context/project-memory/PHASE8-IMPL-026-T004C1/20260714T213628Z"
+        source_render = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C1/20260714T213628Z"
+        render_dir = tmp_path / "render"
+        shutil.copytree(source_render, render_dir)
+
+        roadmap_path = render_dir / "docs/current-roadmap.md"
+        roadmap = roadmap_path.read_text(encoding="utf-8").replace(
+            "**Next Project Memory task:** T005 (planned)",
+            "**Next Project Memory task:** T999 (planned)",
+        )
+        roadmap_path.write_text(roadmap, encoding="utf-8")
+        manifest_path = render_dir / "build-manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["page_hashes"]["current-roadmap.md"] = hashlib.sha256(
+            roadmap_path.read_bytes()
+        ).hexdigest()
+        manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+        result = validate_rendered_package(
+            repo_root=str(repo_root),
+            snapshot_dir=str(snapshot_dir),
+            render_dir=str(render_dir),
+        )
+        assert result["result"] == RESULT_BLOCKED
+        assert any("Next PM task T005 absent" in error for error in result["errors"])
+
+    def test_current_snapshot_registry_hash_drift_is_blocked(self):
+        repo_root = Path(__file__).resolve().parents[2]
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=repo_root,
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+        registry_names = [
+            "assets.json", "boundaries.json", "capabilities.json", "decisions.json",
+            "dependencies.json", "evidence.json", "features.json", "manifest.json",
+            "owner-decisions.json", "projects.json", "tasks.json", "tools.json",
+        ]
+        registry_hashes = {}
+        for name in registry_names:
+            path = f"docs/project-memory/registries/{name}"
+            blob = subprocess.run(
+                ["git", "show", f"{head}:{path}"], cwd=repo_root,
+                check=True, capture_output=True,
+            ).stdout
+            registry_hashes[path] = hashlib.sha256(blob).hexdigest()
+
+        snapshot_bundle = {
+            "snapshot": {
+                "bound_commit": head,
+                "branch": "docs/project-memory-foundation",
+                "registry_hashes": registry_hashes,
+            },
+            "findings": [],
+        }
+        render_dir = repo_root / ".codex-context/project-memory/rendered/PHASE8-IMPL-026-T004C2/20260714T221454Z"
+        result = validate_rendered_package(
+            repo_root=str(repo_root),
+            snapshot_dir=str(repo_root),
+            render_dir=str(render_dir),
+            snapshot_bundle=snapshot_bundle,
+            registries={"tasks.json": {}},
+        )
+        assert result["result"] == RESULT_BLOCKED
+        assert any(
+            "Current publication snapshot differs from current tracked registry" in error
+            for error in result["errors"]
+        )
 
     def test_preserved_t004c1_packages_are_not_mutated(self):
         repo_root = Path(__file__).resolve().parents[2]

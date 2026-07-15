@@ -19,8 +19,10 @@ T003 — Deterministic scanners and convergence is complete/PASS-WITH-FINDINGS:
   is complete/PASS-WITH-FINDINGS.
 
 T005 — Existing context-tool integration — is complete/PASS.
-The next sequenced Project Memory task is T006, planned/contingent/inactive;
-it is not activated. T007 remains planned/contingent/inactive. T008-T011 remain planned.
+T006 and T007 are owner-deferred for lack of a measured benchmarkable
+capability gap. Both remain contingent, planned, inactive, and unimplemented.
+T008 — Shared agent guidance and Project Memory Ask — is complete/PASS.
+T009 is the next planned/inactive Project Memory task. T010-T011 remain planned.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
@@ -111,7 +113,7 @@ No scanners, renderers, generated snapshots, or retrieval tools were implemented
 
 ### PHASE8-IMPL-026-T003 — Deterministic scanners and convergence
 
-Status: in_progress. Depends on T002.
+Status: complete/PASS-WITH-FINDINGS. Depends on T002.
 
 T003 is decomposed into two bounded children:
 
@@ -195,25 +197,39 @@ remains separate from live-execution approval.
 
 ### PHASE8-IMPL-026-T006 — Serena read-only pilot
 
-Status: planned. Depends on T005. Contingent on Serena provenance and
-benchmark approval.
+Status: planned, contingent, inactive, owner-deferred, and unimplemented.
+Depends on T005.
 
 Evaluate Serena as a read-only retrieval surface over Project Memory
 registries. Produce a bounded pilot with provenance, freshness, and stale-index
 reporting before any persistent integration.
 
+No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or
+maintainability gap currently justifies activation. Reconsideration requires a
+documented benchmarkable gap and a future owner-approved provenance/benchmark
+task. Deferral is not rejection or approval to install later.
+Contingent on Serena provenance and benchmark approval, any future activation
+also requires the measured-gap reconsideration gate above.
+
 ### PHASE8-IMPL-026-T007 — LlamaIndex / local-embedding / Qdrant Local pilot
 
-Status: planned. Depends on T005. Contingent on provenance and benchmark
-approval for each dependency.
+Status: planned, contingent, inactive, owner-deferred, and unimplemented.
+Depends on T005.
 
 Evaluate local embedding and vector retrieval over Project Memory registries
 with provenance, freshness, stale-index, and trust-class filtering before any
 persistent integration.
 
+No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or
+maintainability gap currently justifies activation. Reconsideration requires a
+documented benchmarkable gap and a future owner-approved provenance/benchmark
+task. Deferral is not rejection or approval to install later.
+Contingent on provenance and benchmark approval, any future local retrieval
+activation also requires the measured-gap reconsideration gate above.
+
 ### PHASE8-IMPL-026-T008 — Shared agent guidance and Project Memory Ask
 
-Status: planned. Depends on T004.
+Status: complete/PASS. Depends on T004.
 
 Define shared agent guidance that explains how to query Project Memory, what
 trust classes mean, when to escalate to owner review, and how to interpret
@@ -221,9 +237,21 @@ freshness, supersession, conflict, and uncertainty signals. Define the
 Project Memory Ask protocol for agents to request and receive authoritative
 answers with provenance.
 
+Implemented as deterministic tracked guidance, a repository-source read skill,
+a strictly read-only OpenCode Ask agent, a standard-library validator, and
+focused tests. T008 uses ordinary read-only repository access and does not
+depend on T006, T007, Serena, vector retrieval, embeddings, MCP, a network
+service, or a live model call.
+
+Also repaired deterministic rendered next-actionable selection so the
+owner-deferred contingent T006/T007 pilots remain visible but are skipped in
+favor of T009, and repaired rendered-package validation so historical packages
+use their snapshot-bound normalized task state while current publications still
+converge with current tracked registries.
+
 ### PHASE8-IMPL-026-T009 — Deterministic Plan Integrity engine
 
-Status: planned. Depends on T003.
+Status: planned next/inactive. Depends on T003.
 
 Implement a deterministic engine that compares the accepted plan (task
 records, enrichment data, decision log, implementation status) with the

@@ -22,9 +22,22 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+
+def _bootstrap_direct_execution_import_path() -> None:
+    """Make absolute project imports available only for direct script execution."""
+    if __package__ not in (None, ""):
+        return
+    repository_root = str(Path(__file__).resolve().parents[2])
+    if repository_root not in sys.path:
+        sys.path.insert(0, repository_root)
+
+
+_bootstrap_direct_execution_import_path()
 
 RENDERED_PAGE_NAMES: tuple[str, ...] = (
     "index.md",
@@ -161,6 +174,99 @@ def _compute_sha256(path: Path) -> str:
 
 def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def _run_git(repo_root: Path, args: list[str]) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=str(repo_root),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise ValueError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
+    return result.stdout.rstrip("\n")
+
+
+def _read_git_blob(repo_root: Path, commit: str, path: str) -> bytes:
+    result = subprocess.run(
+        ["git", "show", f"{commit}:{path}"],
+        cwd=str(repo_root),
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.decode("utf-8", errors="replace").strip()
+        raise ValueError(f"Snapshot-bound registry is unavailable: {path}: {detail}")
+    return result.stdout
+
+
+def _load_snapshot_bound_registries(
+    repo_root: Path,
+    snapshot_dir: Path,
+    snapshot_bundle: dict[str, Any] | None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Load and hash-check normalized registries at the snapshot's bound commit."""
+    if snapshot_bundle is None:
+        from scripts.project_memory.render_docs import validate_snapshot_package
+
+        snapshot_bundle = validate_snapshot_package(str(snapshot_dir), repo_root)
+
+    snapshot = snapshot_bundle.get("snapshot", {})
+    if not isinstance(snapshot, dict):
+        raise ValueError("Snapshot package has malformed snapshot.json")
+    bound_commit = snapshot.get("bound_commit", "")
+    branch = snapshot.get("branch", "")
+    registry_hashes = snapshot.get("registry_hashes")
+    if not _GIT_SHA_RE.fullmatch(str(bound_commit)):
+        raise ValueError("Snapshot package has invalid bound_commit")
+    if not isinstance(branch, str) or not branch:
+        raise ValueError("Snapshot package has invalid branch")
+    if not isinstance(registry_hashes, dict) or not registry_hashes:
+        raise ValueError("Snapshot package is missing registry_hashes")
+
+    required_paths = (
+        "docs/project-memory/registries/tasks.json",
+        "docs/project-memory/registries/owner-decisions.json",
+    )
+    loaded: dict[str, Any] = {}
+    for path in required_paths:
+        expected_hash = registry_hashes.get(path)
+        if not isinstance(expected_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
+            raise ValueError(f"Snapshot registry hash missing or malformed: {path}")
+        blob = _read_git_blob(repo_root, bound_commit, path)
+        actual_hash = hashlib.sha256(blob).hexdigest()
+        if actual_hash != expected_hash:
+            raise ValueError(f"Snapshot registry hash mismatch at bound commit: {path}")
+        try:
+            data = json.loads(blob.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"Snapshot-bound registry is malformed: {path}: {exc}") from exc
+        if not isinstance(data, dict) or not isinstance(data.get("records"), list):
+            raise ValueError(f"Snapshot-bound registry has invalid records: {path}")
+        loaded[Path(path).name] = data
+
+    head = _run_git(repo_root, ["rev-parse", "HEAD"])
+    current = bound_commit == head
+    if current:
+        for path, expected_hash in sorted(registry_hashes.items()):
+            if not isinstance(path, str) or not path.startswith("docs/project-memory/registries/"):
+                raise ValueError(f"Unsupported snapshot registry path: {path}")
+            tracked_path = repo_root / path
+            if not tracked_path.is_file():
+                raise ValueError(f"Current tracked registry is missing: {path}")
+            if _compute_sha256(tracked_path) != expected_hash:
+                raise ValueError(
+                    f"Current publication snapshot differs from current tracked registry: {path}"
+                )
+
+    return loaded, {
+        "bound_commit": bound_commit,
+        "branch": branch,
+        "head_commit": head,
+        "repository_currentness": "current" if current else "historical",
+    }
 
 
 def _load_json(path: Path) -> Any:
@@ -350,13 +456,20 @@ def analyze_authority_claims(docs_dir: str | Path) -> dict[str, Any]:
 
 def derive_expected_task_states(
     tasks: list[dict[str, Any]],
+    owner_decisions: list[dict[str, Any]] | None = None,
 ) -> dict[str, dict[str, Any]]:
     expected: dict[str, dict[str, Any]] = {}
     task_by_id: dict[str, dict[str, Any]] = {}
     for t in tasks:
         task_by_id[t.get("task_id", "")] = t
 
-    for tid in _PM_TASK_ORDER:
+    dynamic_order = list(_PM_TASK_ORDER)
+    for task in sorted(tasks, key=lambda item: item.get("task_id", "")):
+        tid = task.get("task_id", "")
+        if tid.startswith(_PM_PARENT + "-T") and tid not in dynamic_order:
+            dynamic_order.append(tid)
+
+    for tid in dynamic_order:
         rec = task_by_id.get(tid)
         if rec is None:
             expected[tid] = {"error": "missing"}
@@ -375,20 +488,24 @@ def derive_expected_task_states(
             "is_in_progress": status == "in_progress",
         }
 
-    pm_children = [t for t in tasks if t.get("parent_task_id") == _PM_PARENT
-                   and t.get("task_id", "").startswith(_PM_PARENT + "-T")]
-    pm_children.sort(key=lambda t: t.get("task_id", ""))
-    completed_ids = {c["task_id"] for c in pm_children
-                     if c.get("lifecycle", {}).get("status") == "complete"}
-    for child in pm_children:
-        if child["task_id"] not in completed_ids:
-            expected["_pm_next_task"] = {
-                "task_id": child["task_id"],
-                "lifecycle": child.get("lifecycle", {}).get("status", ""),
-            }
-            break
-    if "_pm_next_task" not in expected:
-        expected["_pm_next_task"] = {"task_id": None, "lifecycle": "all_complete"}
+    try:
+        from scripts.project_memory.render_docs import _derive_pm_task_behavior
+
+        behavior = _derive_pm_task_behavior(tasks, owner_decisions or [])
+        for tid, derived in behavior["states"].items():
+            if tid in expected:
+                expected[tid].update(derived)
+        next_task = behavior["next_actionable_task"]
+        expected["_pm_next_task"] = {
+            "task_id": next_task.get("task_id") if next_task else None,
+            "lifecycle": (
+                next_task.get("lifecycle", {}).get("status", "")
+                if next_task else "none"
+            ),
+        }
+    except ValueError as exc:
+        expected["_derivation_error"] = {"error": str(exc)}
+        expected["_pm_next_task"] = {"task_id": None, "lifecycle": "invalid"}
 
     ph25 = task_by_id.get("PHASE8-IMPL-025")
     if ph25:
@@ -541,6 +658,12 @@ def validate_rendered_package(
     errors: list[str] = []
     warnings: list[str] = []
     nonblocking_findings: list[dict[str, Any]] = []
+    snapshot_context = {
+        "bound_commit": "",
+        "branch": "",
+        "head_commit": "",
+        "repository_currentness": "unknown",
+    }
 
     if snapshot_bundle is not None:
         convergence_findings = snapshot_bundle.get("findings", [])
@@ -566,20 +689,35 @@ def validate_rendered_package(
                 f"{diagnostic['code']}: {diagnostic['finding_id']}: {diagnostic['title']}"
             )
 
-    if registries is not None:
+    strict_snapshot_binding = registries is None or snapshot_bundle is not None
+    if strict_snapshot_binding:
+        try:
+            bound_registries, snapshot_context = _load_snapshot_bound_registries(
+                root, Path(snapshot_dir), snapshot_bundle
+            )
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            errors.append(f"Snapshot-bound registry validation failed: {exc}")
+            return _blocked_result(errors, warnings, {})
+        tasks_data = bound_registries.get("tasks.json", {})
+        owner_data = bound_registries.get("owner-decisions.json", {})
+    elif registries is not None:
         tasks_data = registries.get("tasks.json", {})
+        owner_data = registries.get("owner-decisions.json", {})
     else:
-        tasks_path = root / "docs" / "project-memory" / "registries" / "tasks.json"
-        if tasks_path.is_file():
-            tasks_data = _load_json(tasks_path)
-        else:
-            tasks_data = {}
+        tasks_data = {}
+        owner_data = {}
 
     task_records = tasks_data.get("records", []) if isinstance(tasks_data, dict) else []
+    owner_records = owner_data.get("records", []) if isinstance(owner_data, dict) else []
     if expected_task_states is None:
-        task_states = derive_expected_task_states(task_records)
+        task_states = derive_expected_task_states(task_records, owner_records)
     else:
         task_states = expected_task_states
+
+    derivation_error = task_states.get("_derivation_error", {}).get("error")
+    if derivation_error:
+        errors.append(f"Task-state derivation failed: {derivation_error}")
+        return _blocked_result(errors, warnings, task_states)
 
     missing_tasks = [tid for tid in _PM_TASK_ORDER
                      if task_states.get(tid, {}).get("error") == "missing"]
@@ -641,6 +779,16 @@ def validate_rendered_package(
         s_branch = ""
         s_commit = ""
 
+    snapshot_commit = snapshot_context.get("bound_commit", "") or s_commit
+    snapshot_branch = snapshot_context.get("branch", "") or s_branch
+    if strict_snapshot_binding:
+        if not r_commit or r_commit != snapshot_commit:
+            errors.append("Render target commit differs from selected snapshot commit")
+        if not s_commit or s_commit != snapshot_commit:
+            errors.append("Render source-snapshot commit differs from selected snapshot commit")
+        if not r_branch or r_branch != snapshot_branch or s_branch != snapshot_branch:
+            errors.append("Render branch differs from selected snapshot branch")
+
     page_count = 0
     for page in RENDERED_PAGE_NAMES:
         if (docs_dir / page).is_file():
@@ -656,7 +804,12 @@ def validate_rendered_package(
     roadmap_text = _read_page("current-roadmap.md")
     remaining_text = _read_page("remaining-work.md")
 
-    for tid in _PM_TASK_ORDER:
+    task_ids_to_check = [
+        tid for tid in task_states
+        if isinstance(tid, str) and tid.startswith(_PM_PARENT + "-T")
+    ]
+    task_ids_to_check.sort()
+    for tid in task_ids_to_check:
         expected = task_states.get(tid, {})
         if not expected or expected.get("error"):
             continue
@@ -682,6 +835,33 @@ def validate_rendered_package(
                 semantic_checks.append({"check": "task:T004C_not_planned", "result": "pass"})
         else:
             semantic_checks.append({"check": "task:T004C_not_planned", "result": "pass"})
+
+        if strict_snapshot_binding:
+            short = tid.replace(_PM_PARENT + "-", "")
+            table_lines = [
+                line for line in index_text.splitlines()
+                if line.startswith(f"| {short} (")
+            ]
+            if len(table_lines) != 1:
+                errors.append(f"Semantic: {tid} must appear exactly once in the index status table")
+                semantic_checks.append({"check": f"task:{tid}_index_state", "result": "fail"})
+            else:
+                line = table_lines[0].lower()
+                state = expected.get("state", "")
+                lifecycle_ok = (
+                    (es == "complete" and "complete" in line and "planned" not in line)
+                    or (es == "planned" and "planned" in line and "complete" not in line)
+                    or (es == "in_progress" and ("active" in line or "in progress" in line))
+                )
+                state_ok = (
+                    state != "owner_deferred_contingent"
+                    or ("contingent" in line and "owner-deferred" in line and "inactive" in line)
+                )
+                if lifecycle_ok and state_ok:
+                    semantic_checks.append({"check": f"task:{tid}_index_state", "result": "pass"})
+                else:
+                    errors.append(f"Semantic: {tid} index status contradicts its snapshot-bound state")
+                    semantic_checks.append({"check": f"task:{tid}_index_state", "result": "fail"})
 
     t4_calls_in_progress = False
     for line in index_text.split("\n"):
@@ -718,13 +898,35 @@ def validate_rendered_package(
     next_tid = next_task.get("task_id", "")
     if next_tid:
         short_next = next_tid.replace(_PM_PARENT + "-", "")
-        if short_next not in roadmap_text:
+        accepted_next_markers = (
+            f"Next Project Memory task:** {short_next}",
+            f"Next actionable Project Memory task:** {short_next}",
+            f"Active Project Memory task:** {short_next}",
+        )
+        if not any(marker in roadmap_text for marker in accepted_next_markers):
             errors.append(f"Semantic: Next PM task {short_next} absent from current-roadmap")
             semantic_checks.append({"check": "next_task_in_roadmap", "result": "fail"})
         else:
             semantic_checks.append({"check": "next_task_in_roadmap", "result": "pass"})
     else:
-        semantic_checks.append({"check": "next_task_in_roadmap", "result": "pass"})
+        if "Next actionable Project Memory task:** none" not in roadmap_text and "all complete" not in roadmap_text:
+            errors.append("Semantic: No actionable PM task is not explicit in current-roadmap")
+            semantic_checks.append({"check": "next_task_none_explicit", "result": "fail"})
+        else:
+            semantic_checks.append({"check": "next_task_none_explicit", "result": "pass"})
+
+    for tid in task_ids_to_check:
+        state = task_states.get(tid, {}).get("state", "")
+        short = tid.replace(_PM_PARENT + "-", "")
+        if state == "owner_deferred_contingent":
+            if short not in roadmap_text or short not in remaining_text:
+                errors.append(f"Semantic: Deferred contingent task {short} is not visible")
+                semantic_checks.append({"check": f"task:{short}_deferred_visible", "result": "fail"})
+            elif next_tid == tid:
+                errors.append(f"Semantic: Deferred contingent task {short} selected as actionable")
+                semantic_checks.append({"check": f"task:{short}_not_actionable", "result": "fail"})
+            else:
+                semantic_checks.append({"check": f"task:{short}_deferred_visible", "result": "pass"})
 
     ph25_active = task_states.get("_ph25_active", False)
     if ph25_active:
@@ -796,8 +998,8 @@ def validate_rendered_package(
         "nonblocking_findings": nonblocking_findings,
         "target_commit": r_commit,
         "target_branch": r_branch,
-        "snapshot_commit": s_commit,
-        "snapshot_branch": s_branch,
+        "snapshot_commit": snapshot_commit,
+        "snapshot_branch": snapshot_branch,
         "render_commit": r_commit,
         "render_branch": r_branch,
         "page_count": page_count,
@@ -810,6 +1012,7 @@ def validate_rendered_package(
         "remaining_work_check": "pass",
         "authority_check": "pass" if authority_ok else "fail",
         "authority": authority,
+        "repository_currentness": snapshot_context.get("repository_currentness", "unknown"),
     }
 
 

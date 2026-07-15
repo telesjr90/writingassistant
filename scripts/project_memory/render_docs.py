@@ -253,7 +253,17 @@ _PM_TASK_LABELS = {
     "PHASE8-IMPL-026-T004B": "T004B (Markdown renderer)",
     "PHASE8-IMPL-026-T004C": "T004C (Clean-HEAD publication)",
     "PHASE8-IMPL-026-T005": "T005 (Context-tool integration)",
+    "PHASE8-IMPL-026-T006": "T006 (Serena read-only pilot)",
+    "PHASE8-IMPL-026-T007": "T007 (Local vector-retrieval pilot)",
+    "PHASE8-IMPL-026-T008": "T008 (Shared agent guidance and Ask)",
+    "PHASE8-IMPL-026-T009": "T009 (Deterministic Plan Integrity engine)",
+    "PHASE8-IMPL-026-T010": "T010 (Specialized Plan Integrity reviewers)",
+    "PHASE8-IMPL-026-T011": "T011 (Synchronization and rollout)",
 }
+
+_PM_CHILD_TASK_RE = re.compile(r"^PHASE8-IMPL-026-T\d{3}[A-Z0-9]*$")
+_DEFER_DECISION_RE = re.compile(r"\bdefer(?:red|s|ring)?\b", re.IGNORECASE)
+_ACTIVATE_DECISION_RE = re.compile(r"\bactivat(?:e|ed|es|ion)\b", re.IGNORECASE)
 
 
 def _get_task_by_id(tasks: list[dict[str, Any]], task_id: str) -> dict[str, Any] | None:
@@ -274,6 +284,11 @@ def _validate_task_records(tasks: list[dict[str, Any]]) -> list[str]:
     seen_ids: dict[str, int] = {}
     for t in tasks:
         tid = t.get("task_id", "")
+        if not isinstance(tid, str) or not tid:
+            errors.append("Task record has missing or invalid task_id")
+            continue
+        if t.get("id") != f"task:{tid}":
+            errors.append(f"Task record ID does not match task_id: {tid}")
         if tid in seen_ids:
             errors.append(f"Duplicate task_id: {tid}")
         else:
@@ -291,6 +306,140 @@ def _validate_task_records(tasks: list[dict[str, Any]]) -> list[str]:
     return errors
 
 
+def _is_contingent_task(task: dict[str, Any]) -> bool:
+    classification = task.get("classification", "")
+    if not isinstance(classification, str):
+        return False
+    normalized = classification.strip().lower()
+    return normalized == "contingent" or normalized.startswith("contingent ")
+
+
+def _owner_decision_state(
+    task: dict[str, Any], owner_decisions: list[dict[str, Any]]
+) -> str:
+    """Return deferred, activated, or unspecified from a linked accepted decision."""
+    provenance = task.get("provenance", {})
+    decision_ref = provenance.get("owner_decision_ref") if isinstance(provenance, dict) else None
+    if not decision_ref:
+        return "unspecified"
+
+    matches = [decision for decision in owner_decisions if decision.get("id") == decision_ref]
+    if len(matches) != 1:
+        raise ValueError(
+            f"Task {task.get('task_id', '')} owner_decision_ref must resolve exactly once: "
+            f"{decision_ref}"
+        )
+    decision = matches[0]
+    lifecycle = decision.get("lifecycle", {})
+    accepted_by = decision.get("provenance", {}).get("accepted_by", "")
+    affected = decision.get("affected_tasks", [])
+    if (
+        decision.get("authority_class") != "authoritative"
+        or not isinstance(lifecycle, dict)
+        or lifecycle.get("status") != "current"
+        or not accepted_by
+        or task.get("task_id") not in affected
+    ):
+        raise ValueError(
+            f"Task {task.get('task_id', '')} references a non-current, unaccepted, "
+            "or unrelated owner decision"
+        )
+
+    selected = decision.get("selected_option", "")
+    if not isinstance(selected, str):
+        raise ValueError(f"Owner decision {decision_ref} has malformed selected_option")
+    deferred = bool(_DEFER_DECISION_RE.search(selected))
+    activated = bool(_ACTIVATE_DECISION_RE.search(selected))
+    if deferred and activated:
+        raise ValueError(
+            f"Owner decision {decision_ref} contradictorily defers and activates "
+            f"{task.get('task_id', '')}"
+        )
+    if deferred:
+        return "deferred"
+    if activated:
+        return "activated"
+    return "unspecified"
+
+
+def _derive_pm_task_behavior(
+    tasks: list[dict[str, Any]], owner_decisions: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Derive deterministic Project Memory task behavior from normalized records."""
+    errors = _validate_task_records(tasks)
+    if errors:
+        raise ValueError("Invalid task records: " + "; ".join(errors))
+
+    children = _get_children(tasks, _PM_PARENT_TASK_ID)
+    children = [
+        child for child in children
+        if _PM_CHILD_TASK_RE.fullmatch(str(child.get("task_id", "")))
+    ]
+    states: dict[str, dict[str, Any]] = {}
+    active: list[dict[str, Any]] = []
+    planned_actionable: list[dict[str, Any]] = []
+
+    for task in children:
+        task_id = task["task_id"]
+        lifecycle = task.get("lifecycle", {}).get("status", "")
+        contingent = _is_contingent_task(task)
+        decision_state = _owner_decision_state(task, owner_decisions) if contingent else "unspecified"
+
+        if lifecycle == "complete":
+            if decision_state == "deferred":
+                raise ValueError(f"Deferred contingent task {task_id} cannot be complete")
+            state = "complete"
+        elif lifecycle == "in_progress":
+            if contingent and decision_state != "activated":
+                raise ValueError(
+                    f"Contingent task {task_id} cannot be active without an accepted "
+                    "activation decision"
+                )
+            state = "active"
+            active.append(task)
+        elif lifecycle == "planned":
+            if contingent:
+                if decision_state == "activated":
+                    raise ValueError(
+                        f"Contingent task {task_id} has an accepted activation decision "
+                        "but remains planned"
+                    )
+                state = (
+                    "owner_deferred_contingent"
+                    if decision_state == "deferred"
+                    else "planned_contingent"
+                )
+            else:
+                state = "planned_actionable"
+                planned_actionable.append(task)
+        elif lifecycle in {"blocked", "owner_pending", "historical", "superseded", "deferred"}:
+            state = "non_actionable"
+        else:
+            raise ValueError(f"Unsupported Project Memory task lifecycle for {task_id}: {lifecycle}")
+
+        states[task_id] = {
+            "state": state,
+            "lifecycle": lifecycle,
+            "contingent": contingent,
+            "owner_decision_state": decision_state,
+            "actionable": state in {"active", "planned_actionable"},
+        }
+
+    if len(active) > 1:
+        raise ValueError(
+            "Multiple active Project Memory child tasks: "
+            + ", ".join(task["task_id"] for task in active)
+        )
+
+    next_task = active[0] if active else (planned_actionable[0] if planned_actionable else None)
+    return {
+        "children": children,
+        "states": states,
+        "active_task": active[0] if active else None,
+        "next_actionable_task": next_task,
+    }
+
+
 def _identify_completed_children(
     tasks: list[dict[str, Any]], parent_task_id: str
 ) -> list[dict[str, Any]]:
@@ -302,11 +451,17 @@ def _identify_next_planned_child(
     tasks: list[dict[str, Any]], parent_task_id: str
 ) -> dict[str, Any] | None:
     children = _get_children(tasks, parent_task_id)
-    planned = [c for c in children if c.get("lifecycle", {}).get("status") == "planned"]
+    planned = [
+        child for child in children
+        if child.get("lifecycle", {}).get("status") == "planned"
+        and not _is_contingent_task(child)
+    ]
     return planned[0] if planned else None
 
 
-def _derive_task_display_status(task: dict[str, Any]) -> str:
+def _derive_task_display_status(
+    task: dict[str, Any], behavior: dict[str, Any] | None = None
+) -> str:
     lc = task.get("lifecycle", {})
     status = lc.get("status", "unknown")
     notes = task.get("notes", "")
@@ -317,11 +472,16 @@ def _derive_task_display_status(task: dict[str, Any]) -> str:
             return "complete/PASS"
         return "complete"
     if status == "planned":
+        state = behavior.get("state") if behavior else ""
+        if state == "owner_deferred_contingent":
+            return "planned/contingent/inactive/owner-deferred"
+        if state == "planned_contingent":
+            return "planned/contingent/inactive"
         if "inactive" in notes.lower() or "Inactive" in notes:
             return "planned/inactive"
         return "planned"
     if status == "in_progress":
-        return "in progress"
+        return "active"
     return status
 
 
@@ -809,6 +969,8 @@ def _render_index(model: dict[str, Any]) -> str:
     lines.append("## Project Memory Workstream Status")
     lines.append("")
     tasks = model.get("tasks", [])
+    pm_behavior = _derive_pm_task_behavior(tasks, model.get("owner_decisions", []))
+    behavior_by_id = pm_behavior["states"]
     task_by_id = {t.get("task_id", ""): t for t in tasks}
     missing = []
     for tid in _PM_TASK_DISPLAY_ORDER:
@@ -824,8 +986,31 @@ def _render_index(model: dict[str, Any]) -> str:
     for tid in _PM_TASK_DISPLAY_ORDER:
         rec = task_by_id[tid]
         label = _PM_TASK_LABELS.get(tid, tid)
-        display_status = _derive_task_display_status(rec)
+        display_status = _derive_task_display_status(rec, behavior_by_id.get(tid))
         lines.append(f"| {_sanitize_string(label)} | {_sanitize_string(display_status)} |")
+    displayed = set(_PM_TASK_DISPLAY_ORDER)
+    for rec in pm_behavior["children"]:
+        tid = rec["task_id"]
+        if tid in displayed:
+            continue
+        short_id = tid.replace(_PM_PARENT_TASK_ID + "-", "")
+        label = _PM_TASK_LABELS.get(tid, f"{short_id} ({rec.get('title', '')})")
+        display_status = _derive_task_display_status(rec, behavior_by_id.get(tid))
+        lines.append(f"| {_sanitize_string(label)} | {_sanitize_string(display_status)} |")
+    lines.append("")
+
+    next_task = pm_behavior["next_actionable_task"]
+    if next_task is None:
+        lines.append("**Next actionable Project Memory task:** none")
+    else:
+        next_id = next_task["task_id"].replace(_PM_PARENT_TASK_ID + "-", "")
+        next_status = _derive_task_display_status(
+            next_task, behavior_by_id.get(next_task["task_id"])
+        )
+        lines.append(
+            f"**Next actionable Project Memory task:** {_sanitize_string(next_id)} "
+            f"({_sanitize_string(next_status)})"
+        )
     lines.append("")
 
     lines.append("## PHASE8-IMPL-025 Status")
@@ -999,20 +1184,17 @@ def _render_current_roadmap(model: dict[str, Any]) -> str:
     lines.append(f"**Immediate application frontier:** PHASE8-IMPL-024-T003A")
     lines.append(f"**Active Project Memory parent:** PHASE8-IMPL-026")
     tasks = model.get("tasks", [])
-    pm_children = _get_children(tasks, _PM_PARENT_TASK_ID)
-    pm_children = [c for c in pm_children if c.get("task_id", "").startswith(_PM_PARENT_TASK_ID + "-T")]
-    completed_ids = {c["task_id"] for c in pm_children if c.get("lifecycle", {}).get("status") == "complete"}
-    next_child = None
-    for child in pm_children:
-        if child["task_id"] not in completed_ids:
-            next_child = child
-            break
+    pm_behavior = _derive_pm_task_behavior(tasks, model.get("owner_decisions", []))
+    next_child = pm_behavior["next_actionable_task"]
     if next_child:
         short_id = next_child["task_id"].replace(_PM_PARENT_TASK_ID + "-", "")
-        next_status = next_child.get("lifecycle", {}).get("status", "")
-        lines.append(f"**Next Project Memory task:** {short_id} ({next_status})")
+        next_status = _derive_task_display_status(
+            next_child, pm_behavior["states"].get(next_child["task_id"])
+        )
+        label = "Active Project Memory task" if pm_behavior["active_task"] else "Next actionable Project Memory task"
+        lines.append(f"**{label}:** {short_id} ({next_status})")
     else:
-        lines.append(f"**Next Project Memory task:** (all complete)")
+        lines.append("**Next actionable Project Memory task:** none")
     lines.append(f"**PHASE8-IMPL-025:** published/planned, inactive")
     lines.append("")
 
@@ -1026,6 +1208,11 @@ def _render_current_roadmap(model: dict[str, Any]) -> str:
         lines.append(f"- **Authority:** {_markdown_code(task.get('authority_class', ''))}")
         lc = task.get("lifecycle", {})
         lines.append(f"- **Lifecycle:** {_markdown_code(lc.get('status', ''))}")
+        derived = pm_behavior["states"].get(tid)
+        if derived:
+            lines.append(
+                f"- **Task state:** {_markdown_code(derived['state'].replace('_', ' '))}"
+            )
         parent = task.get("parent_task_id", "")
         if parent:
             lines.append(f"- **Parent:** {_markdown_code(parent)}")
@@ -1056,6 +1243,8 @@ def _render_remaining_work(model: dict[str, Any]) -> str:
     lines.append("")
 
     tasks = model.get("tasks", [])
+    pm_behavior = _derive_pm_task_behavior(tasks, model.get("owner_decisions", []))
+    behavior_by_id = pm_behavior["states"]
     incomplete: list[dict[str, Any]] = []
     for task in tasks:
         lc = task.get("lifecycle", {})
@@ -1063,7 +1252,71 @@ def _render_remaining_work(model: dict[str, Any]) -> str:
         if isinstance(lc, dict) and st not in ("complete", "superseded", "rejected"):
             incomplete.append(task)
 
-    groups = _group_by_status(incomplete)
+    represented_ids: set[str] = set()
+    active_task = pm_behavior["active_task"]
+    next_task = pm_behavior["next_actionable_task"]
+    if active_task:
+        lines.append("### Active Project Memory Task")
+        lines.append("")
+        lines.append(
+            f"- **{_sanitize_string(active_task.get('title', ''))}** "
+            f"({_markdown_code(active_task.get('id', ''))}) — "
+            f"{_sanitize_string(active_task.get('task_id', ''))}"
+        )
+        lines.append("")
+        represented_ids.add(active_task["task_id"])
+    elif next_task:
+        lines.append("### Next Actionable Project Memory Task")
+        lines.append("")
+        lines.append(
+            f"- **{_sanitize_string(next_task.get('title', ''))}** "
+            f"({_markdown_code(next_task.get('id', ''))}) — "
+            f"{_sanitize_string(next_task.get('task_id', ''))} (planned/inactive)"
+        )
+        lines.append("")
+        represented_ids.add(next_task["task_id"])
+    else:
+        lines.append("_No actionable planned Project Memory task._")
+        lines.append("")
+
+    deferred = [
+        task for task in incomplete
+        if behavior_by_id.get(task.get("task_id", ""), {}).get("state")
+        == "owner_deferred_contingent"
+    ]
+    if deferred:
+        lines.append("### Contingent / Owner-Deferred (Inactive and Non-Actionable)")
+        lines.append("")
+        for task in sorted(deferred, key=lambda item: item.get("task_id", "")):
+            lines.append(
+                f"- **{_sanitize_string(task.get('title', ''))}** "
+                f"({_markdown_code(task.get('id', ''))}) — "
+                f"{_sanitize_string(task.get('task_id', ''))}"
+            )
+            represented_ids.add(task["task_id"])
+        lines.append("")
+
+    contingent = [
+        task for task in incomplete
+        if behavior_by_id.get(task.get("task_id", ""), {}).get("state")
+        == "planned_contingent"
+    ]
+    if contingent:
+        lines.append("### Contingent (Inactive and Non-Actionable)")
+        lines.append("")
+        for task in sorted(contingent, key=lambda item: item.get("task_id", "")):
+            lines.append(
+                f"- **{_sanitize_string(task.get('title', ''))}** "
+                f"({_markdown_code(task.get('id', ''))}) — "
+                f"{_sanitize_string(task.get('task_id', ''))}"
+            )
+            represented_ids.add(task["task_id"])
+        lines.append("")
+
+    other_incomplete = [
+        task for task in incomplete if task.get("task_id", "") not in represented_ids
+    ]
+    groups = _group_by_status(other_incomplete)
     ordered_groups = ["blocked", "in_progress", "planned", "owner_pending", "deferred", "unknown"]
     for group in ordered_groups:
         recs = groups.get(group, [])
@@ -1797,8 +2050,8 @@ def render(
         generated_at=generated_at,
         command=command,
         repo_root_path=str(root),
-        target_branch=target_branch,
-        target_commit=target_commit,
+        target_branch=target_branch if mode == "publication" else snapshot_branch,
+        target_commit=target_commit if mode == "publication" else bound_commit,
         snapshot_task_id=snapshot_task_id,
         snapshot_run_id=snapshot_run_id,
         snapshot_branch=snapshot_branch,
@@ -1835,8 +2088,8 @@ def render(
         conv_result=conv_result,
         freshness=freshness,
         publication_eligible=publication_eligible,
-        target_commit=target_commit,
-        target_branch=target_branch,
+        target_commit=target_commit if mode == "publication" else bound_commit,
+        target_branch=target_branch if mode == "publication" else snapshot_branch,
         registry_hashes=registry_hashes,
         source_hashes=source_inventory.get("source_hashes", {}),
         findings_summary=findings_summary,

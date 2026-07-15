@@ -133,6 +133,28 @@
       "selected_option": "Tool installation work is contingent on provenance and benchmark decisions. Serena, LlamaIndex, and Qdrant are not approved dependencies. Pilots deferred until after deterministic foundation (T001-T005) exists.",
       "rationale": "Premature dependency declaration could introduce network access, file-write scope, or subprocess behavior without review. The deterministic foundation must exist before retrieval pilots can compare against known-good baseline state.",
       "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007"]
+    },
+    {
+      "id": "owner-decision:t006-t007-no-measured-gap-deferral",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "T006/T007 Deferred for No Measured Capability Gap",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "owner",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T006-T007-owner-deferral-no-measured-gap.md" }
+        ]
+      },
+      "owner_decision_id": "t006-t007-no-measured-gap-deferral",
+      "question": "Should T006 Serena or T007 LlamaIndex/local-embedding/Qdrant Local be activated without a measured capability gap?",
+      "selected_option": "Defer both pilots. Keep T006 and T007 contingent, planned, inactive, and unimplemented. T008 proceeds using deterministic Project Memory sources and ordinary read-only repository access. Deferral is not rejection and does not approve later installation.",
+      "rationale": "No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap has been measured. T005's zero-artifact result reflects worktree topology, not a Serena or vector-retrieval deficiency. Reconsider only after a documented benchmarkable gap is observed and a future owner-approved provenance/benchmark task is opened.",
+      "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007", "PHASE8-IMPL-026-T008"]
     }
   ]
 }

@@ -189,6 +189,31 @@
       "provenance_state": "configured",
       "is_approved_dependency": false,
       "notes": "Playwright evidence collector configured for UI/UX audit evidence. Successful reconciliation at 20260712T030010Z is evidence collection, not product-wide PASS. Failed playwright-advanced attempts are excluded. Not an approved Project Memory dependency."
+    },
+    {
+      "id": "tool:agent-guidance-validator",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Project Memory Agent Guidance Validator",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T008",
+        "source_locators": [
+          { "path": "scripts/project_memory/validate_agent_guidance.py" },
+          { "path": "tests/project_memory/test_agent_guidance_and_ask.py" }
+        ]
+      },
+      "tool_id": "agent-guidance-validator",
+      "tool_name": "validate_agent_guidance.py",
+      "tool_type": "validation_script",
+      "tool_path": "scripts/project_memory/validate_agent_guidance.py",
+      "provenance_state": "approved",
+      "is_approved_dependency": true,
+      "notes": "Repository-owned, standard-library-only deterministic validator for the tracked Ask protocol, read skill, root guidance, and read-only OpenCode controls. It performs no network, model, server, retrieval, registry mutation, or external worktree access."
     }
   ]
 }
