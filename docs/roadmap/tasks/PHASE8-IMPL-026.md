@@ -2,8 +2,10 @@
 
 ## Status
 
-Published/active as a parallel governance, documentation, and developer
-infrastructure workstream. Not an application feature.
+Complete/closed as complete/PASS-WITH-FINDINGS. Parallel governance,
+documentation, and developer infrastructure workstream; not an application
+feature. The findings are limited to four accepted nonblocking
+`source_missing` advisories, or fewer if their sources become available.
 
 The application implementation frontier remains PHASE8-IMPL-024-T003A.
 PHASE8-IMPL-025 remains published/planned and inactive.
@@ -24,7 +26,9 @@ capability gap. Both remain contingent, planned, inactive, and unimplemented.
 T008 — Shared agent guidance and Project Memory Ask — is complete/PASS.
 T009 — Deterministic Plan Integrity engine — is complete/PASS.
 T010 — Specialized Plan Integrity reviewers — is complete/PASS.
-T011 is the sole next Project Memory task, planned/inactive and unimplemented.
+T011 — Synchronization, CI, rebuild, and operational rollout — is
+complete/PASS. There is no next Project Memory implementation task; ongoing
+maintenance is the accepted operational procedure.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
@@ -284,14 +288,18 @@ and T009 remains the deterministic readiness authority.
 
 ### PHASE8-IMPL-026-T011 — Synchronization, CI, rebuild, and operational rollout
 
-Status: planned next/inactive and unimplemented. Depends on T010.
+Status: complete/PASS. Depends on T010.
 
 Define the operational cadence for branch synchronization, deterministic
 memory refresh, CI integration, rebuild triggers, and stale-index detection.
 Document the operator's manual for Project Memory maintenance.
 
-T011 is the sole next Project Memory task. Q154 remains open; T010 did not
-select or implement an operational synchronization cadence.
+Implemented an event-driven, commit-bound cadence, machine-readable policy,
+operator manual, read-only status diagnosis, one-command deterministic refresh,
+ephemeral CI rebuild, deterministic quality packages, workflow integration,
+and focused tests. Q154 is resolved. Synchronization remains an explicit
+owner/operator-controlled complete-commit Git action; T011 performs no merge,
+cherry-pick, commit, push, or application-worktree access.
 
 ## Implementation sequence
 
@@ -308,6 +316,10 @@ T001 (authority foundation) — complete/PASS
   -> T010 (specialized reviewers)
   -> T011 (synchronization and rollout)
 ```
+
+All non-contingent Project Memory implementation children are complete. T006
+and T007 remain contingent, owner-deferred, planned, inactive, and
+unimplemented. Ongoing maintenance follows T011 and is not a new roadmap child.
 
 T006 and T007 are contingent on provenance and benchmark approval for their
 respective dependencies. They are not blocked by T002–T005 but must not

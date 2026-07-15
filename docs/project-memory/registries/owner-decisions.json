@@ -155,6 +155,29 @@
       "selected_option": "Defer both pilots. Keep T006 and T007 contingent, planned, inactive, and unimplemented. T008 proceeds using deterministic Project Memory sources and ordinary read-only repository access. Deferral is not rejection and does not approve later installation.",
       "rationale": "No concrete symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap has been measured. T005's zero-artifact result reflects worktree topology, not a Serena or vector-retrieval deficiency. Reconsider only after a documented benchmarkable gap is observed and a future owner-approved provenance/benchmark task is opened.",
       "affected_tasks": ["PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007", "PHASE8-IMPL-026-T008"]
+    },
+    {
+      "id": "owner-decision:q154-event-driven-commit-bound-cadence",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Q154 Event-Driven Commit-Bound Operational Cadence",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "owner",
+        "source_locators": [
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" },
+          { "path": "docs/project-memory/operations.json" }
+        ]
+      },
+      "owner_decision_id": "q154-event-driven-commit-bound-cadence",
+      "question": "What operational synchronization cadence should govern the Project Memory branch and deterministic refresh?",
+      "selected_option": "Use an event-driven, commit-bound cadence. Refresh after every accepted application-commit synchronization, completed Project Memory task or tracked authority/registry/tooling change, before parent/phase closeout publication, and whenever deterministic stale detection reports repository divergence. No cron or time-based schedule is required.",
+      "rationale": "Commit, source, registry, binding, semantic, authority, inventory, checksum, and quality divergence determine freshness. Time passage alone does not stale a commit-bound publication. Synchronization remains an explicit owner/operator-controlled Git action.",
+      "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
     }
   ]
 }

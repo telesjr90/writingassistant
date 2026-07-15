@@ -88,6 +88,38 @@ _DELIVERY_ROOTS = (
     "docs/project-memory/",
 )
 _TRUSTED_IMPLEMENTATION_AUTHORITIES = {"authoritative", "accepted_evidence"}
+_PROJECT_MEMORY_PARENT = "PHASE8-IMPL-026"
+_DEFERRED_PROJECT_MEMORY_TASKS = {
+    "PHASE8-IMPL-026-T006",
+    "PHASE8-IMPL-026-T007",
+}
+_NO_NEXT_ROADMAP_TOKENS = {
+    "docs/roadmap/tasks/PHASE8-IMPL-026.md": (
+        "there is no next project memory implementation task",
+        "ongoing maintenance",
+    ),
+    "docs/roadmap/implementation_status.md": (
+        "there is no next project memory implementation task",
+        "sole next implementation focus",
+    ),
+    "docs/roadmap/task_backlog.md": (
+        "there is no next project memory implementation task",
+        "ongoing maintenance",
+    ),
+    "docs/roadmap/phase_map.md": (
+        "there is no next project memory implementation task",
+        "ongoing maintenance",
+    ),
+    "docs/roadmap/decision_log.md": (
+        "there is no next project memory implementation task",
+        "phase8-impl-024-t003a",
+    ),
+    "docs/roadmap/open_questions.md": (
+        "q152 remains open",
+        "q153 remains open",
+        "resolved by phase8-impl-026-t011",
+    ),
+}
 
 
 def _canonical_json(value: Any) -> str:
@@ -444,11 +476,10 @@ def _implementation_present(
 
 def _next_actionable(tasks: list[dict[str, Any]]) -> str | None:
     by_id = {record.get("task_id"): record for record in tasks}
-    deferred = {"PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007"}
     for number in range(1, 12):
         task_id = f"PHASE8-IMPL-026-T{number:03d}"
         record = by_id.get(task_id)
-        if not record or task_id in deferred:
+        if not record or task_id in _DEFERRED_PROJECT_MEMORY_TASKS:
             continue
         if record.get("lifecycle", {}).get("status") != "planned":
             continue
@@ -458,16 +489,116 @@ def _next_actionable(tasks: list[dict[str, Any]]) -> str | None:
     return None
 
 
-def _declared_next_actionable(plan_inputs: dict[str, Any]) -> str | None:
+def _no_next_project_memory_contract(
+    plan_inputs: dict[str, Any], tasks: list[dict[str, Any]]
+) -> tuple[bool, list[str]]:
+    """Validate the explicit closed-parent state that permits a null next task."""
+    reasons: list[str] = []
+    by_task = {record.get("task_id"): record for record in tasks}
+    parent = by_task.get(_PROJECT_MEMORY_PARENT)
+    if not parent or parent.get("lifecycle", {}).get("status") != "complete":
+        reasons.append("project_memory_parent_not_complete")
+    else:
+        parent_notes = str(parent.get("notes", "")).casefold()
+        if "closed" not in parent_notes or "operational procedure" not in parent_notes:
+            reasons.append("project_memory_parent_closeout_not_explicit")
+
+    for number in range(1, 12):
+        task_id = f"PHASE8-IMPL-026-T{number:03d}"
+        record = by_task.get(task_id)
+        if record is None:
+            reasons.append(f"required_child_missing:{task_id}")
+            continue
+        lifecycle = record.get("lifecycle", {}).get("status")
+        if task_id in _DEFERRED_PROJECT_MEMORY_TASKS:
+            notes = str(record.get("notes", "")).casefold()
+            owner_ref = record.get("provenance", {}).get("owner_decision_ref")
+            if lifecycle != "planned" or not all(
+                token in notes for token in ("owner-deferred", "contingent", "inactive", "unimplemented")
+            ) or owner_ref != "owner-decision:t006-t007-no-measured-gap-deferral":
+                reasons.append(f"contingent_child_not_owner_deferred:{task_id}")
+        elif lifecycle != "complete":
+            reasons.append(f"required_child_not_complete:{task_id}")
+
+    owner_decisions = {
+        record.get("id"): record
+        for record in _registry_records(plan_inputs, "owner-decisions")
+    }
+    deferral = owner_decisions.get("owner-decision:t006-t007-no-measured-gap-deferral", {})
+    if not _record_is_current_and_trusted(deferral) or not _DEFERRED_PROJECT_MEMORY_TASKS <= set(
+        deferral.get("affected_tasks", [])
+    ):
+        reasons.append("owner_deferral_evidence_missing")
+    cadence = owner_decisions.get("owner-decision:q154-event-driven-commit-bound-cadence", {})
+    if (
+        not _record_is_current_and_trusted(cadence)
+        or cadence.get("provenance", {}).get("accepted_by") != "owner"
+        or _PROJECT_MEMORY_PARENT not in cadence.get("affected_tasks", [])
+        or "PHASE8-IMPL-026-T011" not in cadence.get("affected_tasks", [])
+    ):
+        reasons.append("q154_owner_decision_missing")
+
+    closeout_evidence = [
+        record for record in _registry_records(plan_inputs, "evidence")
+        if record.get("associated_task_id") == "PHASE8-IMPL-026-T011"
+        and _record_is_current_and_trusted(record)
+    ]
+    if not closeout_evidence:
+        reasons.append("t011_accepted_evidence_missing")
+
     enrichment = plan_inputs.get("roadmap", {}).get(
         "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json", {}
     )
-    if isinstance(enrichment, dict):
-        value = enrichment.get("next_project_memory_task", "")
-        for task_id in ("PHASE8-IMPL-026-T009", "PHASE8-IMPL-026-T010", "PHASE8-IMPL-026-T011"):
-            if task_id in value:
-                return task_id
-    return None
+    if not isinstance(enrichment, dict):
+        reasons.append("enrichment_missing_or_malformed")
+    else:
+        maintenance = enrichment.get("project_memory_maintenance")
+        if maintenance != {
+            "implementation_task": None,
+            "mode": "operational_procedure",
+            "procedure_task_id": "PHASE8-IMPL-026-T011",
+        }:
+            reasons.append("operational_maintenance_declaration_missing")
+        if enrichment.get("status") != "complete/PASS-WITH-FINDINGS":
+            reasons.append("enrichment_parent_closeout_mismatch")
+        if enrichment.get("sole_next_implementation_focus") != "PHASE8-IMPL-024-T003A":
+            reasons.append("enrichment_application_frontier_mismatch")
+        if "operational" not in str(enrichment.get("next_operational_step", "")).casefold():
+            reasons.append("enrichment_operational_step_missing")
+
+    roadmap = plan_inputs.get("roadmap", {})
+    for path, tokens in _NO_NEXT_ROADMAP_TOKENS.items():
+        value = roadmap.get(path)
+        text = value.casefold() if isinstance(value, str) else ""
+        if not all(token in text for token in tokens):
+            reasons.append(f"roadmap_closeout_mismatch:{path}")
+    roadmap_index = roadmap.get("docs/roadmap/roadmap_index.yaml", {})
+    frontier = roadmap_index.get("active_frontier", {}) if isinstance(roadmap_index, dict) else {}
+    if frontier.get("next_readiness_task_id") != "PHASE8-IMPL-024-T003A":
+        reasons.append("application_frontier_missing")
+
+    return not reasons, sorted(reasons)
+
+
+def _declared_next_actionable(
+    plan_inputs: dict[str, Any], tasks: list[dict[str, Any]]
+) -> tuple[str | None, bool, str, list[str]]:
+    enrichment = plan_inputs.get("roadmap", {}).get(
+        "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json", {}
+    )
+    if not isinstance(enrichment, dict) or "next_project_memory_task" not in enrichment:
+        return None, False, "missing", ["next_project_memory_task_missing"]
+    value = enrichment["next_project_memory_task"]
+    if value is None:
+        valid, reasons = _no_next_project_memory_contract(plan_inputs, tasks)
+        return None, valid, "explicit_null", reasons
+    if not isinstance(value, str) or not value.strip():
+        return None, False, "invalid", ["next_project_memory_task_must_be_task_id_or_null"]
+    for number in range(1, 12):
+        task_id = f"PHASE8-IMPL-026-T{number:03d}"
+        if task_id in value:
+            return task_id, True, "task_id", []
+    return None, False, "invalid", ["next_project_memory_task_unknown"]
 
 
 def build_comparisons(
@@ -540,9 +671,11 @@ def build_comparisons(
         ))
 
     expected_next = _next_actionable(tasks)
-    observed_next = _declared_next_actionable(plan_inputs)
+    observed_next, declaration_valid, declaration_kind, declaration_reasons = (
+        _declared_next_actionable(plan_inputs, tasks)
+    )
     next_classification = classify_claims(
-        expected_next, observed_next, required_evidence_present=observed_next is not None
+        expected_next, observed_next, required_evidence_present=declaration_valid
     )
     comparisons.append(_comparison(
         subject_type="sequence", subject_id="project-memory-next-actionable",
@@ -556,6 +689,14 @@ def build_comparisons(
         explanation="Next-actionable state is derived from lifecycle, dependency, and owner-deferral records.",
         owner_review_required=next_classification != "matching",
         next_check="Derive the next actionable task again from validated task and dependency records.",
+        required_evidence=declaration_valid,
+        extra={
+            "declaration": {
+                "kind": declaration_kind,
+                "valid": declaration_valid,
+                "reasons": declaration_reasons,
+            }
+        },
     ))
 
     roadmap_index = plan_inputs.get("roadmap", {}).get("docs/roadmap/roadmap_index.yaml", {})

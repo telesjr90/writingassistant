@@ -163,6 +163,32 @@
       "description": "Temporary-fixture tests validate all six reviewer domains, exact read-only guidance controls, request/report gates, locator scope/hash/freshness/commit binding, deterministic IDs and ordering, fact/inference separation, prohibited authority/truth/mutation/prose claims, multiple-finding preservation, and non-mutation of T009 readiness without running an agent, model, network, retrieval tool, or external command.",
       "associated_task_id": "PHASE8-IMPL-026-T010",
       "is_blocking_defect": false
+    },
+    {
+      "id": "evidence:ph8-impl-026-t011-operational-rollout",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "T011 Operational Rollout Validation",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {
+        "status": "current"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "PHASE8-IMPL-026-T011",
+        "source_locators": [
+          { "path": "tests/project_memory/test_operational_rollout.py" },
+          { "path": "scripts/project_memory/validate_operational_rollout.py" },
+          { "path": "scripts/project_memory/operational_rollout.py" },
+          { "path": ".github/workflows/project-memory.yml" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" }
+        ]
+      },
+      "evidence_id": "ph8-impl-026-t011-operational-rollout",
+      "evidence_type": "automated_test",
+      "description": "Temporary-Git-repository and temporary-output tests validate event-driven policy, read-only status diagnosis, clean exact-commit refresh, deterministic package construction, stale hash/checksum detection, ephemeral CI rebuild, final cleanliness, no overwrite, and no automatic Git/authority/reviewer/model/application-worktree mutation.",
+      "associated_task_id": "PHASE8-IMPL-026-T011",
+      "is_blocking_defect": false
     }
   ]
 }

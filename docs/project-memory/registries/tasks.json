@@ -83,7 +83,7 @@
       "title": "Project Memory and Plan Integrity",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "in_progress"
+        "status": "complete"
       },
       "provenance": {
         "created_by": "PHASE8-IMPL-026-T001",
@@ -99,7 +99,7 @@
       "classification": "hybrid governance, documentation, and developer infrastructure",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Parallel governance workstream. Not an application feature. Published/active."
+      "notes": "Complete/PASS-WITH-FINDINGS. Parallel governance workstream closed through T011. Four accepted nonblocking source_missing advisories remain. Ongoing maintenance is the event-driven operational procedure, not a new roadmap child."
     },
     {
       "id": "task:PHASE8-IMPL-026-T001",
@@ -466,12 +466,17 @@
       "title": "Synchronization, CI, rebuild, and operational rollout",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "planned"
+        "status": "complete"
       },
       "provenance": {
         "created_by": "PHASE8-IMPL-026-T008",
+        "accepted_by": "PHASE8-IMPL-026-T011",
         "source_locators": [
-          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" }
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-026.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" },
+          { "path": "docs/project-memory/operations.json" },
+          { "path": "scripts/project_memory/operational_rollout.py" },
+          { "path": ".github/workflows/project-memory.yml" }
         ]
       },
       "task_id": "PHASE8-IMPL-026-T011",
@@ -481,7 +486,7 @@
       "classification": "operational synchronization and rollout",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Planned next and inactive; sole next Project Memory task and unimplemented. Operational cadence remains unresolved under Q154 and was not selected by T010."
+      "notes": "Complete/PASS. Implements event-driven commit-bound synchronization policy, read-only stale-state diagnosis, one-command deterministic refresh, ephemeral CI rebuild, deterministic quality packages, workflow integration, and focused tests. Q154 resolved. No synchronization Git action, reviewer/model execution, application-worktree access, or automatic authority mutation occurred."
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "task_id": "PHASE8-IMPL-026",
   "title": "Project Memory and Plan Integrity",
-  "status": "published/active",
+  "status": "complete/PASS-WITH-FINDINGS",
   "task_type": "docs-only",
   "mvp_required": false,
   "classification": "hybrid governance, documentation, and developer infrastructure",
@@ -10,7 +10,7 @@
   "application_frontier_next_task": "PHASE8-IMPL-024-T003A",
   "ph8_impl_025_unchanged": "published/planned, inactive",
   "context_pack": null,
-  "context_pack_status": "not generated; future context-generation task may create .codex-context/PHASE8-IMPL-026/ when implementation begins",
+  "context_pack_status": "generated evidence exists under .codex-context/project-memory/ and remains ignored/non-authoritative",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md",
   "t001_status": {
     "task_id": "PHASE8-IMPL-026-T001",
@@ -78,7 +78,9 @@
       "full deterministic memory refresh after every synchronization",
       "every memory snapshot records the accepted application commit"
     ],
-    "policy_only": true
+    "policy_only": false,
+    "cadence": "event-driven and commit-bound; no cron",
+    "tooling_performs_synchronization": false
   },
   "t002_status": {
     "task_id": "PHASE8-IMPL-026-T002",
@@ -87,7 +89,6 @@
     "summary": "Defined the deterministic, tracked Project Memory data model: JSON Schema Draft 2020-12 schema bundle with typed $defs; 12 normalized tracked registry files; registry manifest; dependency-free standard-library validator; focused tests. Established stable namespaced identifiers, tracked-source vs. generated-snapshot separation, enforced trust classes, lifecycle values, source locator validation, and cross-record reference integrity. Resolved Q149 (JSON canonical format) and Q150 (one schema bundle, separate registry files, dependency-free validator)."
   },
   "t003_status": "complete/PASS-WITH-FINDINGS (T003A: complete/PASS, T003B: complete/PASS-WITH-FINDINGS)",
-  "next_project_memory_task": "PHASE8-IMPL-026-T011 — Synchronization, CI, rebuild, and operational rollout. Sole next; planned/inactive and unimplemented.",
   "t004_parent": "complete/PASS-WITH-FINDINGS",
   "dependencies": {
     "none_approved": [
@@ -102,13 +103,13 @@
   "open_questions": [
     "criteria for Serena adoption",
     "embedding model selection for LlamaIndex pilot",
-    "retrieval benchmark thresholds beyond initial planning target",
-    "operational synchronization cadence"
+    "retrieval benchmark thresholds beyond initial planning target"
   ],
   "resolved_questions": {
     "Q149": "Canonical registry storage format: JSON. Resolved by PHASE8-IMPL-026-T002.",
     "Q150": "Schema decomposition: one JSON Schema Draft 2020-12 bundle with typed $defs, 12 separate registry files, one manifest, one dependency-free standard-library validator. Resolved by PHASE8-IMPL-026-T002.",
     "Q151": "Resolved by PHASE8-IMPL-026-T009: exact matching, diverging, superseded, conflicting, and insufficient_evidence classifications plus READY, READY_WITH_ADVISORIES, and BLOCKED readiness.",
+    "Q154": "Resolved by PHASE8-IMPL-026-T011: event-driven commit-bound refresh after accepted synchronization, tracked Project Memory task/authority/registry/tooling changes, closeout publication gates, or detected repository divergence; no cron or time-based cadence.",
     "T006_T007_owner_deferral": "No measured symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap currently justifies either pilot. Deferral is not rejection or later installation approval. Reconsideration requires a documented benchmarkable gap and a future owner-approved provenance/benchmark task."
   },
   "risks": [
@@ -178,7 +179,14 @@
     "six strictly read-only specialized Plan Integrity reviewer definitions",
     "shared reviewer protocol and read-only reviewer skill",
     "deterministic reviewer-guidance validator",
-    "standard-library supplied-finding validation and normalization"
+    "standard-library supplied-finding validation and normalization",
+    "machine-readable event-driven operational policy",
+    "operator-controlled complete-commit synchronization contract",
+    "read-only operational status and stale-index diagnosis",
+    "one-command deterministic Project Memory refresh",
+    "ephemeral exact-commit CI rebuild",
+    "deterministic operational quality-package builder",
+    "Project Memory GitHub Actions workflow"
   ],
   "t004c_status": "complete/PASS-WITH-FINDINGS",
   "t004c1_status": "complete/PASS (repaired: task-registry synchronization, renderer hardcodes removed, registry-derived task status, semantic rendered-package validator, fail-closed semantic publication gate, focused regression tests)",
@@ -189,12 +197,19 @@
   "t008_status": "complete/PASS (deterministic Ask protocol, shared read skill, strictly read-only OpenCode agent, standard-library validator, focused tests; ordinary read-only repository access only)",
   "t009_status": "complete/PASS (standard-library-only deterministic Plan Integrity engine; exact Q151 classifications; readiness tri-state; six bounded rule groups; atomic clean-HEAD generated-evidence package)",
   "t010_status": "complete/PASS (six read-only reviewer domains, shared protocol/skill, deterministic guidance validation and supplied-finding normalization; no reviewer/model invocation or automatic scheduling; output remains generated_evidence)",
-  "t011_status": "sole next; planned/inactive and unimplemented; Q154 remains open",
+  "t011_status": "complete/PASS (event-driven commit-bound cadence; read-only status; deterministic refresh; ephemeral CI rebuild; quality package; workflow; Q154 resolved)",
   "post_closeout_refresh_042826z": "structurally valid generated evidence; not accepted as current publication (renderer hardcodes index status table)",
   "post_t004c1_refresh_20260714t213628z": "current, publication eligible, correctly commit-bound, and task-state convergent; rejected as accepted current publication because the committed authority validator used a false-positive page-wide keyword rule",
   "renderer_defect_identified": "hardcoded index-page status table in _render_index() and hardcoded PM child indicator in _render_current_roadmap() — repaired by T004C1",
   "accepted_current_publication_for_a415270": null,
   "accepted_current_publication_for_8961b35": ".codex-context/project-memory/PHASE8-IMPL-026-T004C2/20260714T221454Z/",
-  "next_operational_step": "T006/T007 remain owner-deferred and contingent/inactive; T008-T010 are complete/PASS; T011 is the sole next planned/inactive and unimplemented Project Memory task; Q154 remains open",
-  "next_project_memory_task": "PHASE8-IMPL-026-T011 — Synchronization, CI, rebuild, and operational rollout. Sole next; planned/inactive and unimplemented."
+  "next_operational_step": "Maintain Project Memory through the T011 event-driven operational procedure. T006/T007 remain owner-deferred and contingent/inactive. The sole next implementation focus is PHASE8-IMPL-024-T003A.",
+  "next_project_memory_task": null,
+  "project_memory_maintenance": {
+    "implementation_task": null,
+    "mode": "operational_procedure",
+    "procedure_task_id": "PHASE8-IMPL-026-T011"
+  },
+  "parent_closeout": "complete/PASS-WITH-FINDINGS; only four accepted nonblocking source_missing advisories or fewer",
+  "sole_next_implementation_focus": "PHASE8-IMPL-024-T003A"
 }

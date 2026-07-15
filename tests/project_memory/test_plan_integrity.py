@@ -108,6 +108,79 @@ def _plan() -> dict:
     }
 
 
+def _closed_plan() -> dict:
+    plan = _plan()
+    tasks = plan["registries"]["tasks"]["records"]
+    by_task = {record["task_id"]: record for record in tasks}
+    for number in (1, 2, 4):
+        task_id = f"PHASE8-IMPL-026-T{number:03d}"
+        tasks.append(_task(task_id, "complete", source=f"scripts/t{number:03d}.py"))
+    parent = by_task["PHASE8-IMPL-026"]
+    parent["lifecycle"]["status"] = "complete"
+    parent["provenance"]["source_locators"] = [{"path": "scripts/parent.py"}]
+    parent["notes"] = "Complete and closed; ongoing maintenance is the operational procedure."
+    for task_id in ("PHASE8-IMPL-026-T010", "PHASE8-IMPL-026-T011"):
+        record = by_task[task_id]
+        record["lifecycle"]["status"] = "complete"
+        record["provenance"]["source_locators"] = [
+            {"path": f"scripts/{task_id.rsplit('-', 1)[-1].lower()}.py"}
+        ]
+    for task_id in integrity._DEFERRED_PROJECT_MEMORY_TASKS:
+        by_task[task_id]["provenance"]["owner_decision_ref"] = (
+            "owner-decision:t006-t007-no-measured-gap-deferral"
+        )
+        by_task[task_id]["notes"] = "Owner-deferred, contingent, planned, inactive, and unimplemented."
+
+    plan["registries"]["owner-decisions"]["records"] = [
+        _record(
+            "owner-decision:t006-t007-no-measured-gap-deferral",
+            "owner_decision",
+            "deferred pilots",
+            affected_tasks=sorted(integrity._DEFERRED_PROJECT_MEMORY_TASKS),
+        ),
+        _record(
+            "owner-decision:q154-event-driven-commit-bound-cadence",
+            "owner_decision",
+            "Q154 cadence",
+            provenance={"created_by": "TEST", "accepted_by": "owner", "source_locators": []},
+            affected_tasks=["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"],
+        ),
+    ]
+    plan["registries"]["evidence"]["records"] = [
+        _record(
+            "evidence:t011",
+            "evidence",
+            "T011 accepted evidence",
+            authority_class="accepted_evidence",
+            associated_task_id="PHASE8-IMPL-026-T011",
+        )
+    ]
+    enrichment = plan["roadmap"]["docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json"]
+    enrichment.update({
+        "next_project_memory_task": None,
+        "next_operational_step": "Maintain Project Memory through the T011 operational procedure.",
+        "project_memory_maintenance": {
+            "implementation_task": None,
+            "mode": "operational_procedure",
+            "procedure_task_id": "PHASE8-IMPL-026-T011",
+        },
+        "sole_next_implementation_focus": "PHASE8-IMPL-024-T003A",
+        "status": "complete/PASS-WITH-FINDINGS",
+    })
+    closeout = "There is no next Project Memory implementation task; ongoing maintenance is the T011 procedure."
+    plan["roadmap"].update({
+        "docs/roadmap/tasks/PHASE8-IMPL-026.md": closeout,
+        "docs/roadmap/implementation_status.md": closeout + " Sole next implementation focus: PHASE8-IMPL-024-T003A.",
+        "docs/roadmap/task_backlog.md": closeout,
+        "docs/roadmap/phase_map.md": closeout,
+        "docs/roadmap/decision_log.md": closeout + " PHASE8-IMPL-024-T003A.",
+        "docs/roadmap/open_questions.md": (
+            "Q152 remains open. Q153 remains open. Resolved by PHASE8-IMPL-026-T011."
+        ),
+    })
+    return plan
+
+
 def _implementation(repo: Path, plan: dict) -> dict:
     sources = []
     for task in plan["registries"]["tasks"]["records"]:
@@ -240,6 +313,49 @@ def test_current_lifecycle_deferred_t008_t009_and_t010_next(tmp_path):
     assert by_id["PHASE8-IMPL-026-T008"]["observed_state"]["lifecycle"] == "complete"
     assert by_id["PHASE8-IMPL-026-T009"]["observed_state"]["lifecycle"] == "complete"
     assert by_id["project-memory-next-actionable"]["expected_state"]["task_id"] == "PHASE8-IMPL-026-T010"
+
+
+def test_closed_parent_with_explicit_null_next_task_is_matching(tmp_path):
+    plan = _closed_plan()
+    implementation = _implementation(tmp_path, plan)
+    comparisons = integrity.build_comparisons(plan, implementation)
+    sequence = next(
+        item for item in comparisons
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    report = integrity.run_plan_integrity_checks(plan, implementation, comparisons)
+    assert sequence["classification"] == "matching"
+    assert sequence["expected_state"] == {"task_id": None}
+    assert sequence["observed_state"] == {"task_id": None}
+    assert sequence["declaration"] == {
+        "kind": "explicit_null",
+        "valid": True,
+        "reasons": [],
+    }
+    assert report["by_code"] == {"source_missing": 3}
+    assert integrity.derive_readiness(report["findings"])["result"] == "READY_WITH_ADVISORIES"
+
+
+def test_active_parent_with_null_next_task_remains_blocked(tmp_path):
+    plan = _closed_plan()
+    parent = next(
+        item for item in plan["registries"]["tasks"]["records"]
+        if item["task_id"] == "PHASE8-IMPL-026"
+    )
+    parent["lifecycle"]["status"] = "in_progress"
+    implementation = _implementation(tmp_path, plan)
+    comparisons = integrity.build_comparisons(plan, implementation)
+    sequence = next(
+        item for item in comparisons
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    report = integrity.run_plan_integrity_checks(plan, implementation, comparisons)
+    blockers = [item["code"] for item in report["findings"] if item["blocking"]]
+    assert sequence["classification"] == "insufficient_evidence"
+    assert sequence["declaration"]["valid"] is False
+    assert sequence["declaration"]["reasons"] == ["project_memory_parent_not_complete"]
+    assert blockers == ["next_actionable_mismatch"]
+    assert integrity.derive_readiness(report["findings"])["result"] == "BLOCKED"
 
 
 @pytest.mark.parametrize(

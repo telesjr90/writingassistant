@@ -504,11 +504,28 @@ being described as fresh.
 T003 is complete/PASS-WITH-FINDINGS. T003A is complete/PASS.
 T003B is complete/PASS-WITH-FINDINGS.
 
-## Next Task
+## Operational Maintenance
 
-T005, T008, and T009 are complete/PASS. T006/T007 remain owner-deferred,
-planned/contingent/inactive. T010 is next planned/inactive; T011 remains
-planned/inactive.
+T005 and T008-T011 are complete/PASS. T006/T007 remain owner-deferred,
+planned/contingent/inactive and unimplemented. PHASE8-IMPL-026 is closed as
+complete/PASS-WITH-FINDINGS; there is no next Project Memory implementation
+task. Ongoing maintenance follows the event-driven, commit-bound policy in
+`operations.json` and `operator-manual.md`. The application implementation
+frontier remains `PHASE8-IMPL-024-T003A`.
+
+The standard-library-only operational CLI provides:
+
+- `status`/`check`: read-only stale-state, binding, inventory, checksum, hash,
+  readiness, semantic, authority, and quality diagnosis;
+- `refresh`: one-command clean-HEAD Plan Integrity report, snapshot,
+  publication render, semantic/authority validation, and quality package; and
+- `ci-check`: an exact-commit ephemeral rebuild under an explicit temporary
+  directory without repository publication output.
+
+The cadence has no cron component. Refresh follows accepted synchronization,
+Project Memory tracked changes/task completion, closeout gates, or detected
+repository divergence. Synchronization itself remains owner-controlled and is
+never performed by the operational CLI.
 
 T004 is complete/PASS-WITH-FINDINGS. T004C is complete/PASS-WITH-FINDINGS.
 

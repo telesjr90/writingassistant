@@ -77,6 +77,8 @@ artifacts/
 *.tflite
 # AI context/token tooling outputs
 ai_context/
+# Generated Project Memory evidence and publication packages
+.codex-context/
 repomix-output.*
 repomix-*.xml
 repomix-*.md

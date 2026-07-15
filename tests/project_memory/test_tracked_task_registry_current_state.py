@@ -248,8 +248,8 @@ def test_remaining_work_excludes_complete_t004():
     )
 
 
-def test_remaining_work_excludes_complete_t005_t009_and_preserves_planned_successors():
-    """T005/T009 are complete; authoritative later successors remain planned."""
+def test_remaining_work_excludes_complete_t005_t009_t011_and_preserves_deferrals():
+    """T005/T009/T011 are complete; contingent deferrals remain visible."""
     tasks_registry = _load_tracked_registry("tasks.json")
     registries = {
         "tasks.json": tasks_registry,
@@ -272,15 +272,15 @@ def test_remaining_work_excludes_complete_t005_t009_and_preserves_planned_succes
 
     assert "task:PHASE8-IMPL-026-T005" not in output
     assert "task:PHASE8-IMPL-026-T009" not in output
+    assert "task:PHASE8-IMPL-026-T011" not in output
     assert "Status: complete/PASS" in _roadmap_task_section("PHASE8-IMPL-026-T009")
-    for task_id in (6, 7, 11):
+    for task_id in (6, 7):
         assert "Status: planned" in _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}")
-    for task_id in (8, 10):
+    for task_id in (8, 10, 11):
         assert "Status: complete/PASS" in _roadmap_task_section(f"PHASE8-IMPL-026-T{task_id:03d}")
     assert "owner-deferred" in _roadmap_task_section("PHASE8-IMPL-026-T006")
     assert "owner-deferred" in _roadmap_task_section("PHASE8-IMPL-026-T007")
-    assert "Next Actionable Project Memory Task" in output
-    assert "PHASE8-IMPL-026-T011" in output
+    assert "Next Actionable Project Memory Task" not in output
     assert "Contingent / Owner-Deferred" in output
 
 
@@ -422,8 +422,8 @@ def test_render_index_derives_t004c_from_registry():
     assert "complete/PASS-WITH-FINDINGS" in output
 
 
-def test_render_current_roadmap_preserves_t010_completion_and_t011_sequence():
-    """Deferred T006/T007 remain visible while actionable sequencing reaches T011."""
+def test_render_current_roadmap_preserves_t011_completion_and_no_next_task():
+    """Deferred T006/T007 remain visible while no actionable PM child remains."""
     tasks_registry = _load_tracked_registry("tasks.json")
     registries = {
         "tasks.json": tasks_registry,
@@ -444,7 +444,7 @@ def test_render_current_roadmap_preserves_t010_completion_and_t011_sequence():
     model = _build_page_model(registries, manifest, [], {}, {}, set())
     output = _render_current_roadmap(model)
 
-    assert "Next actionable Project Memory task:** T011 (planned/inactive)" in output
+    assert "**Next actionable Project Memory task:** none" in output
     assert "PHASE8-IMPL-026-T005" in output
     assert "Lifecycle:** `complete`" in output
     t006 = _roadmap_task_section("PHASE8-IMPL-026-T006")
@@ -657,13 +657,13 @@ def test_identify_completed_children():
     assert "PHASE8-IMPL-026-T004C" in completed_ids
 
 
-def test_identify_next_planned_child_after_t010():
+def test_identify_next_planned_child_after_t011_is_none():
     tasks = _tracked_task_records()
     next_task = _identify_next_planned_child(tasks, _PM_PARENT_TASK_ID)
-    assert next_task["task_id"] == "PHASE8-IMPL-026-T011"
+    assert next_task is None
 
 
-def test_tracked_behavior_preserves_deferral_and_selects_t011_after_t010():
+def test_tracked_behavior_preserves_deferral_and_closes_actionable_sequence():
     behavior = _derive_pm_task_behavior(
         _tracked_task_records(),
         _load_tracked_registry("owner-decisions.json")["records"],
@@ -679,12 +679,11 @@ def test_tracked_behavior_preserves_deferral_and_selects_t011_after_t010():
     assert behavior["states"]["PHASE8-IMPL-026-T008"]["state"] == "complete"
     assert behavior["states"]["PHASE8-IMPL-026-T009"]["state"] == "complete"
     assert behavior["states"]["PHASE8-IMPL-026-T010"]["state"] == "complete"
-    assert t011_state["state"] == "planned_actionable"
-    assert t011_state["lifecycle"] == "planned"
-    assert t011_state["state"] not in {"active", "current", "complete", "implemented"}
-    assert t011_state["actionable"] is True
+    assert t011_state["state"] == "complete"
+    assert t011_state["lifecycle"] == "complete"
+    assert t011_state["actionable"] is False
     assert behavior["active_task"] is None
-    assert selected_next_ids == ["PHASE8-IMPL-026-T011"]
+    assert selected_next_ids == []
 
 
 def test_derive_task_display_status_complete_pass_with_findings():

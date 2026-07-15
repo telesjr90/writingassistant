@@ -87,7 +87,7 @@ def test_t006_t007_are_not_approved_installed_active_complete_or_required_by_t00
     assert by_task["PHASE8-IMPL-026-T008"]["depends_on"] == ["PHASE8-IMPL-026-T004"]
 
 
-def test_t008_t009_t010_complete_and_t011_is_sole_next():
+def test_t008_through_t011_complete_and_no_project_memory_task_remains():
     tasks = _registry("tasks.json")["records"]
     by_task = {record["task_id"]: record for record in tasks}
     behavior = _derive_pm_task_behavior(
@@ -103,7 +103,11 @@ def test_t008_t009_t010_complete_and_t011_is_sole_next():
         for task_id, state in behavior["states"].items()
         if state["state"] != "complete"
     }
-    selected_next_ids = [behavior["next_actionable_task"]["task_id"]]
+    selected_next_ids = (
+        [behavior["next_actionable_task"]["task_id"]]
+        if behavior["next_actionable_task"] is not None
+        else []
+    )
 
     assert t008["lifecycle"]["status"] == "complete"
     assert "complete/pass" in t008["notes"].lower()
@@ -127,20 +131,20 @@ def test_t008_t009_t010_complete_and_t011_is_sole_next():
         "docs/roadmap/decisions/PHASE8-IMPL-026-T010-specialized-plan-integrity-reviewers.md",
     } <= delivery_paths
 
-    assert t011["lifecycle"]["status"] == "planned"
-    assert "planned next and inactive" in t011["notes"].lower()
-    assert behavior["states"]["PHASE8-IMPL-026-T011"]["state"] == "planned_actionable"
-    assert behavior["states"]["PHASE8-IMPL-026-T011"]["actionable"] is True
-    assert "PHASE8-IMPL-026-T011" in remaining_task_ids
-    assert selected_next_ids == ["PHASE8-IMPL-026-T011"]
+    assert t011["lifecycle"]["status"] == "complete"
+    assert "complete/pass" in t011["notes"].lower()
+    assert behavior["states"]["PHASE8-IMPL-026-T011"]["state"] == "complete"
+    assert behavior["states"]["PHASE8-IMPL-026-T011"]["actionable"] is False
+    assert "PHASE8-IMPL-026-T011" not in remaining_task_ids
+    assert selected_next_ids == []
 
     assert "reviewer agent" not in t009["notes"].lower()
     assert t010["lifecycle"]["status"] != "in_progress"
 
 
-def test_t010_complete_and_t011_remains_planned():
+def test_t010_and_t011_are_complete():
     assert _record("tasks.json", "task:PHASE8-IMPL-026-T010")["lifecycle"]["status"] == "complete"
-    assert _record("tasks.json", "task:PHASE8-IMPL-026-T011")["lifecycle"]["status"] == "planned"
+    assert _record("tasks.json", "task:PHASE8-IMPL-026-T011")["lifecycle"]["status"] == "complete"
 
 
 def test_dependency_registry_does_not_make_retrieval_pilots_required_by_t008():
@@ -341,3 +345,16 @@ def test_t010_decision_and_evidence_records_are_current_and_non_authoritative_ou
     assert evidence["associated_task_id"] == "PHASE8-IMPL-026-T010"
     assert "generated_evidence" in decision["selected_option"]
     assert "without running an agent, model, network" in evidence["description"]
+
+
+def test_t011_decision_evidence_and_owner_cadence_are_current():
+    decision = _record("decisions.json", "decision:pmf-t011-operational-rollout")
+    evidence = _record("evidence.json", "evidence:ph8-impl-026-t011-operational-rollout")
+    owner = _record("owner-decisions.json", "owner-decision:q154-event-driven-commit-bound-cadence")
+    assert decision["lifecycle"]["status"] == "current"
+    assert decision["authority_class"] == "authoritative"
+    assert evidence["authority_class"] == "accepted_evidence"
+    assert evidence["associated_task_id"] == "PHASE8-IMPL-026-T011"
+    assert owner["provenance"]["accepted_by"] == "owner"
+    assert "event-driven" in owner["selected_option"].lower()
+    assert "no cron" in owner["selected_option"].lower()
