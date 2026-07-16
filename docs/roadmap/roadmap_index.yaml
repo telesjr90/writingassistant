@@ -5536,7 +5536,7 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024"],
+      "depends_on": [],
       "boundary_tags": ["owner_authored_prose_storage", "no_model_calls", "no_auto_promotion", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose"],
       "result": "complete/PASS; T001A backend commit 77d9968d1b8eb893a76bdd4f485c0415fb75f907, T001B frontend commit 5bcaed06e429a8d6e1d5f65974c5a08fe7185656, T001C final PASS evidence 20260712T205343Z with prior BLOCKED run preserved as superseded history, and T001D docs/status closeout complete"
     },
