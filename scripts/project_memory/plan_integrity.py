@@ -595,10 +595,20 @@ def _expected_application_frontier(
         if record.get("lifecycle", {}).get("status") not in {"planned", "in_progress"}:
             reasons.append("application_frontier_task_not_actionable")
 
+    def is_descendant(record: dict[str, Any], parent_task_id: str) -> bool:
+        seen: set[str] = set()
+        current = record.get("parent_task_id")
+        while isinstance(current, str) and current not in seen:
+            if current == parent_task_id:
+                return True
+            seen.add(current)
+            current = by_task.get(current, {}).get("parent_task_id")
+        return False
+
     declared_children = sorted(
         record.get("task_id")
         for record in tasks
-        if record.get("parent_task_id") == "PHASE8-IMPL-024"
+        if is_descendant(record, "PHASE8-IMPL-024")
         and record.get("is_application_frontier") is True
     )
     if declared_children != [expected]:

@@ -273,14 +273,26 @@ def _get_task_by_id(tasks: list[dict[str, Any]], task_id: str) -> dict[str, Any]
 
 
 def _get_application_frontier(tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    by_task = {task.get("task_id"): task for task in tasks}
+
+    def is_descendant(task: dict[str, Any], parent_task_id: str) -> bool:
+        seen: set[str] = set()
+        current = task.get("parent_task_id")
+        while isinstance(current, str) and current not in seen:
+            if current == parent_task_id:
+                return True
+            seen.add(current)
+            current = by_task.get(current, {}).get("parent_task_id")
+        return False
+
     matches = [
         task for task in tasks
-        if task.get("parent_task_id") == "PHASE8-IMPL-024"
+        if is_descendant(task, "PHASE8-IMPL-024")
         and task.get("is_application_frontier") is True
     ]
     if len(matches) != 1:
         raise ValueError(
-            "Exactly one PHASE8-IMPL-024 child must be the application frontier"
+            "Exactly one PHASE8-IMPL-024 descendant must be the application frontier"
         )
     return matches[0]
 

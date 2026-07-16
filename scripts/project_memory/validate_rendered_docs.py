@@ -708,15 +708,27 @@ def validate_rendered_package(
 
     task_records = tasks_data.get("records", []) if isinstance(tasks_data, dict) else []
     owner_records = owner_data.get("records", []) if isinstance(owner_data, dict) else []
+    tasks_by_id = {task.get("task_id"): task for task in task_records}
+
+    def is_descendant(task: dict[str, Any], parent_task_id: str) -> bool:
+        seen: set[str] = set()
+        current = task.get("parent_task_id")
+        while isinstance(current, str) and current not in seen:
+            if current == parent_task_id:
+                return True
+            seen.add(current)
+            current = tasks_by_id.get(current, {}).get("parent_task_id")
+        return False
+
     application_frontiers = [
         task.get("task_id")
         for task in task_records
-        if task.get("parent_task_id") == "PHASE8-IMPL-024"
+        if is_descendant(task, "PHASE8-IMPL-024")
         and task.get("is_application_frontier") is True
     ]
     if len(application_frontiers) != 1:
         errors.append(
-            "Task registry must declare exactly one PHASE8-IMPL-024 child as "
+            "Task registry must declare exactly one PHASE8-IMPL-024 descendant as "
             "the application frontier"
         )
         return _blocked_result(errors, warnings, {})
