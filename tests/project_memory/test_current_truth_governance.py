@@ -84,13 +84,13 @@ def test_conflicting_unqualified_next_task_claims_fail(tmp_path: Path, monkeypat
     assert "TRUTH-003" in _codes(report)
 
 
-def test_premature_t012_completion_in_active_task_surface_fails(tmp_path: Path, monkeypatch):
+def test_t012_lifecycle_mismatch_in_active_task_surface_fails(tmp_path: Path, monkeypatch):
     root = _copy_fixture(tmp_path, monkeypatch)
     parent = root / "docs/roadmap/tasks/PHASE8-IMPL-026.md"
     _replace(
         parent,
-        "Status: in progress/validation pending.",
         "Status: complete/PASS.",
+        "Status: in progress/validation pending.",
     )
     report = current_truth.validate_current_truth(root)
     assert "TRUTH-005" in _codes(report)

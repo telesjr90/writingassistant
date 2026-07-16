@@ -176,6 +176,7 @@ def _extract_tracked_archive(archive_path: Path, destination: Path) -> None:
 def _temporary_repository(
     tmp_path: Path,
     proposed_tree_paths: frozenset[str] = T012_PROPOSED_TREE_PATHS,
+    t012_lifecycle: str = "in_progress",
 ) -> Path:
     assert _run(SOURCE_ROOT, "git", "rev-parse", "--is-inside-work-tree") == "true"
     assert Path(_run(SOURCE_ROOT, "git", "rev-parse", "--show-toplevel")).resolve() == SOURCE_ROOT
@@ -229,6 +230,21 @@ def _temporary_repository(
         for relative in proposed_tree_paths
         if (SOURCE_ROOT / relative).is_file() or (SOURCE_ROOT / relative).is_symlink()
     )
+    assert t012_lifecycle in {"in_progress", "complete"}
+    tasks_path = repo / "docs/project-memory/registries/tasks.json"
+    tasks_registry = json.loads(tasks_path.read_text(encoding="utf-8"))
+    t012 = next(
+        item for item in tasks_registry["records"]
+        if item.get("task_id") == "PHASE8-IMPL-026-T012"
+    )
+    t012["lifecycle"]["status"] = t012_lifecycle
+    tasks_path.write_text(json.dumps(tasks_registry, indent=2) + "\n", encoding="utf-8")
+    enrichment_path = repo / "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json"
+    enrichment = json.loads(enrichment_path.read_text(encoding="utf-8"))
+    enrichment["next_project_memory_task"] = (
+        "PHASE8-IMPL-026-T012" if t012_lifecycle == "in_progress" else None
+    )
+    enrichment_path.write_text(json.dumps(enrichment, indent=2) + "\n", encoding="utf-8")
     assert not (repo / ".git").exists()
     assert not (
         repo / ".codex-context/project-memory/example-run/example.json"
@@ -504,6 +520,47 @@ def test_refresh_status_and_ci_check_are_commit_bound_and_ephemeral(tmp_path, mo
         "--porcelain=v1",
         "--untracked-files=all",
     ) == ""
+
+
+def test_refresh_after_t012_completion_has_no_project_memory_task(tmp_path, monkeypatch):
+    repo = _temporary_repository(tmp_path, t012_lifecycle="complete")
+    commit = _run(repo, "git", "rev-parse", "HEAD")
+    monkeypatch.setattr(rollout, "_run_ids", lambda: ("20260715T085000Z", "20260715T085001Z"))
+    refresh = rollout.refresh(
+        repo_root=repo,
+        output_root=repo / ".codex-context/project-memory",
+        task_id=rollout.DEFAULT_TASK_ID,
+        expected_branch="docs/project-memory-foundation",
+        expected_commit=commit,
+    )
+    assert refresh["status"]["result"] == "FRESH"
+    tasks = json.loads(
+        (repo / "docs/project-memory/registries/tasks.json").read_text(encoding="utf-8")
+    )["records"]
+    by_task = {item["task_id"]: item for item in tasks}
+    assert by_task["PHASE8-IMPL-026-T012"]["lifecycle"]["status"] == "complete"
+    assert all(
+        by_task[task_id]["lifecycle"]["status"] == "planned"
+        for task_id in ("PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007")
+    )
+    comparisons = json.loads(
+        (Path(refresh["status"]["packages"]["report"]) / "comparisons.json").read_text(
+            encoding="utf-8"
+        )
+    )["comparisons"]
+    sequence = next(
+        item for item in comparisons
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    assert sequence["expected_state"] == {"task_id": None}
+    assert sequence["observed_state"] == {"task_id": None}
+    assert sequence["classification"] == "matching"
+    frontier = next(
+        item for item in comparisons
+        if item["subject_type"] == "application_frontier"
+    )
+    assert frontier["expected_state"] == {"task_id": "PHASE8-IMPL-024-T003B"}
+    assert frontier["observed_state"] == {"task_id": "PHASE8-IMPL-024-T003B"}
 
 
 def test_status_detects_checksum_and_registry_hash_drift(tmp_path, monkeypatch):

@@ -77,7 +77,7 @@ External SaaS investigation, Dramatica/current-platform investigation, Browsertr
 
 ## Current Deterministic Execution Routing
 
-Remaining-MVP routing publication is defined by the owner-authorized decision pending clean-HEAD acceptance at
+Remaining-MVP routing publication is defined by the accepted owner decision at
 `docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`
 and normalized in `docs/project-memory/registries/execution-routing.json`.
 Every remaining authoritative MVP task resolves to `codex_gpt_5_6_sol`,

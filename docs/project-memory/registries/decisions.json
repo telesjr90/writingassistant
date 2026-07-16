@@ -179,9 +179,10 @@
       "schema_version": "1.0.0",
       "title": "Remaining-MVP Current Truth, Execution Routing, and Shared UI Guidance",
       "authority_class": "authoritative",
-      "lifecycle": {"status": "planned"},
+      "lifecycle": {"status": "current"},
       "provenance": {
         "created_by": "PHASE8-IMPL-026-T012",
+        "accepted_by": "owner",
         "owner_decision_ref": "owner-decision:remaining-mvp-execution-routing",
         "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md"}]
       },

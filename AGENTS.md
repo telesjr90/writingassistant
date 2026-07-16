@@ -48,8 +48,7 @@ does not converge with the execution-truth layer.
 
 Resolve the accepted task through
 `docs/project-memory/registries/execution-routing.json` using
-`scripts/project_memory/execution_routing.py`. The owner-authorized current
-policy, pending T012 closeout acceptance, is
+`scripts/project_memory/execution_routing.py`. The accepted current policy is
 `docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`.
 Missing, conflicting, stale, inapplicable, owner-only, inactive, or
 dependency-ineligible routing fails closed.

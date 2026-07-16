@@ -5942,7 +5942,7 @@
       "id": "PHASE8-IMPL-026-T012",
       "title": "Remaining-MVP Current-Truth, Execution-Routing, and Shared UI-Guidance Maintenance",
       "type": "planning_microtask",
-      "status": "active",
+      "status": "complete",
       "parent": "PHASE8-IMPL-026",
       "depends_on": ["PHASE8-IMPL-026"],
       "boundary_tags": [
@@ -5959,7 +5959,7 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-026-T012.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-026-T012.enrichment.json",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
-      "result": "in progress; governance implementation validation and clean-HEAD Project Memory refresh pending; application frontier unchanged"
+      "result": "complete/PASS; implementation commit f0307ba5d51af252ba3edb9c577ac55ca7998ad4; 486 Project Memory tests passed at closeout; clean-HEAD Plan Integrity READY_WITH_ADVISORIES with zero blockers and four accepted nonblocking source_missing advisories; exact-commit Project Memory FRESH; PHASE8-IMPL-026 remains closed and application frontier remains PHASE8-IMPL-024-T003B"
     },
     {
       "id": "PHASE8-IMPL-027",

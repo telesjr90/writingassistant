@@ -176,10 +176,10 @@ implemented by T001.
 - T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, T005, T008, and T009 are delivered.
 - The accepted current T004C2 publication is the `20260714T221454Z` set bound to `8961b35`.
 - T006/T007 remain owner-deferred, planned/contingent/inactive, and unimplemented.
-- T010/T011 are complete/PASS. T012 is owner-authorized bounded post-closeout
-  maintenance in progress/validation pending. PHASE8-IMPL-026 remains
-  complete/closed as complete/PASS-WITH-FINDINGS. T012 is not an application
-  implementation frontier; after acceptance, maintenance returns to the T011
-  operational procedure. The application
+- T010/T011/T012 are complete/PASS. T012 was an owner-authorized bounded
+  post-closeout maintenance event. PHASE8-IMPL-026 remains complete/closed as
+  complete/PASS-WITH-FINDINGS. T012 is not an application implementation
+  frontier; no next Project Memory task remains and maintenance has returned to
+  the T011 operational procedure. The application
   frontier `PHASE8-IMPL-024-T003B` is the sole next application implementation
   focus.

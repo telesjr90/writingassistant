@@ -1,7 +1,7 @@
 {
   "task_id": "PHASE8-IMPL-026-T012",
   "title": "Remaining-MVP Current-Truth, Execution-Routing, and Shared UI-Guidance Maintenance",
-  "status": "in_progress/validation-pending",
+  "status": "complete/PASS",
   "task_type": "governance maintenance",
   "parent_task_id": "PHASE8-IMPL-026",
   "depends_on": ["PHASE8-IMPL-026"],
@@ -12,6 +12,14 @@
   "routing_classes": ["codex_gpt_5_6_sol", "opencode_go", "owner_decision"],
   "shared_ui_skill": ".agents/skills/writing-assistant-ui-execution/SKILL.md",
   "owner_only_task": "PHASE8-IMPL-024-T007B",
+  "implementation_commit": "f0307ba5d51af252ba3edb9c577ac55ca7998ad4",
+  "project_memory_test_result": "486 passed",
+  "plan_integrity_result": "READY_WITH_ADVISORIES; zero blockers; four accepted nonblocking source_missing advisories",
+  "fresh_status": "FRESH at implementation commit f0307ba5d51af252ba3edb9c577ac55ca7998ad4",
+  "publication_runs": {
+    "report": "20260716T204351Z",
+    "snapshot_render_quality": "20260716T204352Z"
+  },
   "boundaries": [
     "analysis-only",
     "candidate-first",

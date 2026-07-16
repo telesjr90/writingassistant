@@ -2,8 +2,8 @@
 
 ## Status
 
-In progress / validation pending. Owner-authorized post-closeout governance
-maintenance under the event-driven PHASE8-IMPL-026-T011 procedure. The accepted
+Complete/PASS. Owner-authorized post-closeout governance maintenance under the
+event-driven PHASE8-IMPL-026-T011 procedure. The accepted
 T004C1/T004C2 post-closeout repair precedent and the T012 decision's explicit
 one-event supersession permit this child without reopening the PHASE8-IMPL-026
 parent lifecycle or changing the application frontier.
@@ -14,7 +14,7 @@ parent lifecycle or changing the application frontier.
 - Dependency: completed/closed parent `PHASE8-IMPL-026`.
 - Operational basis: `PHASE8-IMPL-026-T011` (complete/PASS); this is the
   governing maintenance procedure, not a second roadmap dependency edge.
-- Owner authorization: the validation-pending decision at
+- Owner authorization and acceptance: the decision at
   `docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`.
 - Application dependency and lifecycle records remain unchanged. The immediate
   application frontier is `PHASE8-IMPL-024-T003B`.
@@ -48,9 +48,12 @@ status, dependency, eligibility, authority, acceptance, or historical result.
 
 ## Closeout gate
 
-T012 becomes complete/PASS only after focused and full validation, a committed
-clean-HEAD Plan Integrity run with zero blockers, an exact-commit Project Memory
-refresh that is `FRESH`, and final closeout publication. PHASE8-IMPL-026 remains
+Satisfied. Focused and full validation passed; the full Project Memory suite is
+486 passed. Implementation commit
+`f0307ba5d51af252ba3edb9c577ac55ca7998ad4` produced a clean-HEAD Plan
+Integrity result `READY_WITH_ADVISORIES` with zero blockers and only the same
+four accepted nonblocking `source_missing` advisories, plus an exact-commit
+Project Memory refresh with status `FRESH`. PHASE8-IMPL-026 remains
 complete/closed as complete/PASS-WITH-FINDINGS; T006/T007 remain owner-deferred,
-contingent, inactive, and unimplemented. T012 is not a standing implementation
-frontier.
+contingent, inactive, and unimplemented. No next Project Memory task remains,
+and T012 is not a standing implementation frontier.

@@ -2,12 +2,20 @@
 
 ## Result
 
-Owner-authorized draft pending implementation validation, commit-bound
-clean-HEAD validation, and a `FRESH` Project Memory refresh. This decision
-authorizes one bounded post-closeout governance-maintenance task and tracked
-roadmap, Project Memory, validator, test, and shared-agent-guidance changes
-only. It does not authorize application implementation or
-`PHASE8-IMPL-024-T003B`.
+Accepted/complete as PASS. This decision authorized one bounded post-closeout
+governance-maintenance task and tracked roadmap, Project Memory, validator,
+test, and shared-agent-guidance changes only. It did not authorize application
+implementation or `PHASE8-IMPL-024-T003B`.
+
+Implementation commit `f0307ba5d51af252ba3edb9c577ac55ca7998ad4`
+passed 485 Project Memory tests and all current-truth, routing, registry, agent,
+reviewer, rollout, enrichment, and roadmap validators. Its clean-HEAD Plan
+Integrity report was `READY_WITH_ADVISORIES` with zero blockers and only the
+same four accepted nonblocking `source_missing` advisories. The exact-commit
+Project Memory refresh was `FRESH`; its report, snapshot, render, and quality
+packages are recorded under the T012 generated-evidence paths for run IDs
+`20260716T204351Z` and `20260716T204352Z`. Final closeout synchronization is a
+separate narrow commit and requires the normal T011 exact-commit refresh.
 
 The owner explicitly authorizes reopening the `PHASE8-IMPL-026` child namespace
 only to record `PHASE8-IMPL-026-T012`. For this single bounded event, this
