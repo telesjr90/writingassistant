@@ -968,10 +968,10 @@ def validate_rendered_package(
 
     t4_rec = task_states.get("PHASE8-IMPL-026-T004", {})
     if t4_rec.get("is_complete"):
-        if "T004" in remaining_text or "PHASE8-IMPL-026-T004" in remaining_text:
+        if "PHASE8-IMPL-026-T004" in remaining_text:
             t4_in_remaining = False
             for line in remaining_text.split("\n"):
-                if ("PHASE8-IMPL-026-T004" in line or "T004" in line) and line.strip().startswith("-"):
+                if "PHASE8-IMPL-026-T004" in line and line.strip().startswith("-"):
                     t4_in_remaining = True
                     break
             if t4_in_remaining:
