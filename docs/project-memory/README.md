@@ -511,7 +511,8 @@ planned/contingent/inactive and unimplemented. PHASE8-IMPL-026 is closed as
 complete/PASS-WITH-FINDINGS; there is no next Project Memory implementation
 task. Ongoing maintenance follows the event-driven, commit-bound policy in
 `operations.json` and `operator-manual.md`. The application implementation
-frontier remains `PHASE8-IMPL-024-T003A`.
+frontier is tracked independently and is `PHASE8-IMPL-024-T003B`; it does not
+derive or reopen a Project Memory implementation task.
 
 The standard-library-only operational CLI provides:
 

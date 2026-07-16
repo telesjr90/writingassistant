@@ -5766,7 +5766,7 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",
       "context_pack": null,
       "classification": "hybrid governance, documentation, and developer infrastructure; parallel workstream, not an application feature",
-      "parallel_governance_note": "PHASE8-IMPL-026 is a parallel governance workstream. The active_frontier application implementation frontier remains PHASE8-IMPL-024 and PHASE8-IMPL-024-T003A. PHASE8-IMPL-025 remains published/planned and inactive. Project Memory normalizes and explains the roadmap; it must not silently override it, and it cannot activate, close, or reorder application tasks."
+      "parallel_governance_note": "PHASE8-IMPL-026 is a parallel governance workstream. The active_frontier application implementation frontier remains PHASE8-IMPL-024 and PHASE8-IMPL-024-T003B. PHASE8-IMPL-025 remains published/planned and inactive. Project Memory has no next implementation task; it normalizes and explains the roadmap, must not silently override it, and cannot activate, close, or reorder application tasks."
     },
     {
       "id": "PHASE8-IMPL-026-T001",

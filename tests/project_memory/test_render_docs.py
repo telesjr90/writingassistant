@@ -137,6 +137,18 @@ def _setup_repo_with_registries(tmp_path: Path, include_findings: bool = True) -
         "tasks.json": {
             "registry_type": "task", "schema_version": "1.0.0",
             "records": [
+                _make_record("task:PHASE8-IMPL-024", "task", "PHASE8-IMPL-024 Application",
+                             status="in_progress",
+                             extra={"task_id": "PHASE8-IMPL-024",
+                                    "parent_task_id": None,
+                                    "task_type": "runtime",
+                                    "is_application_frontier": True}),
+                _make_record("task:PHASE8-IMPL-024-T003B", "task", "Conditional frontend loading",
+                             status="planned",
+                             extra={"task_id": "PHASE8-IMPL-024-T003B",
+                                    "parent_task_id": "PHASE8-IMPL-024",
+                                    "task_type": "runtime",
+                                    "is_application_frontier": True}),
                 _make_record("task:PHASE8-IMPL-026", "task", "PHASE8-IMPL-026 Project Memory",
                              status="in_progress",
                              extra={"task_id": "PHASE8-IMPL-026",
@@ -274,7 +286,7 @@ def _setup_repo_with_registries(tmp_path: Path, include_findings: bool = True) -
         "schema_version": "1.0",
         "active_frontier": {
             "current_parent_task_id": "PHASE8-IMPL-024",
-            "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+            "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
             "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
         },
         "tasks": [{"id": "PHASE8-IMPL-025", "title": "025", "status": "planned"}],
@@ -320,8 +332,8 @@ def _make_snapshot(repo: Path, snapshot_dir: Path) -> None:
             "staged": False, "dirty": False,
         },
         "roadmap-state.json": {
-            "frontier_next_task": "PHASE8-IMPL-024-T003A",
-            "frontier_is_ph8_impl_024_t003a": True,
+            "frontier_next_task": "PHASE8-IMPL-024-T003B",
+            "frontier_is_ph8_impl_024_t003b": True,
             "ph8_impl_025_active": False,
         },
         "registry-validation.json": {
@@ -881,7 +893,7 @@ class TestRendering:
     def test_application_frontier_present(self, tmp_path):
         docs_dir, run_dir, _ = self._render_to_pages(tmp_path)
         content = (docs_dir / "index.md").read_text(encoding="utf-8")
-        assert "PHASE8-IMPL-024-T003A" in content
+        assert "PHASE8-IMPL-024-T003B" in content
 
     def test_ph8_impl_025_inactive(self, tmp_path):
         docs_dir, run_dir, _ = self._render_to_pages(tmp_path)

@@ -307,7 +307,8 @@ def test_current_roadmap_distinguishes_frontier_from_pm_next():
     output = _render_current_roadmap(model)
 
     # Renders task records from the registry.
-    assert "PHASE8-IMPL-024-T003A" in output, "Application frontier not in roadmap"
+    assert "PHASE8-IMPL-024-T003B" in output, "Application frontier not in roadmap"
+    assert "Next actionable Project Memory task:** none" in output
     # T005 appears in the task listing
     assert "PHASE8-IMPL-026-T005" in output or "Existing context-tool" in output, (
         "T005 not in roadmap task listing"
@@ -317,11 +318,14 @@ def test_current_roadmap_distinguishes_frontier_from_pm_next():
 # ---- application-frontier tests ----
 
 
-def test_application_frontier_unchanged():
+def test_application_frontier_is_t003b_after_t003a_completion():
     recs = _tracked_task_records()
-    r = _record_by_id(recs, "task:PHASE8-IMPL-024-T003A")
-    assert r is not None, "PHASE8-IMPL-024-T003A not in task registry"
-    assert r.get("is_application_frontier") is True
+    t003a = _record_by_id(recs, "task:PHASE8-IMPL-024-T003A")
+    frontier = _record_by_id(recs, "task:PHASE8-IMPL-024-T003B")
+    assert t003a["lifecycle"]["status"] == "complete"
+    assert t003a.get("is_application_frontier") is False
+    assert frontier["lifecycle"]["status"] == "planned"
+    assert frontier.get("is_application_frontier") is True
     t005 = _record_by_id(recs, "task:PHASE8-IMPL-026-T005")
     assert t005.get("is_application_frontier") is False
 

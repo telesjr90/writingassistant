@@ -287,7 +287,7 @@ def build_snapshot(
                 "frontier_next_task": roadmap_state.get("frontier_next_task"),
                 "frontier_title": roadmap_state.get("frontier_title"),
                 "planned_parent": roadmap_state.get("planned_parent"),
-                "frontier_is_ph8_impl_024_t003a": roadmap_state.get("frontier_is_ph8_impl_024_t003a"),
+                "frontier_is_ph8_impl_024_t003b": roadmap_state.get("frontier_is_ph8_impl_024_t003b"),
                 "ph8_impl_025_active": roadmap_state.get("ph8_impl_025_active"),
             },
             "convergence": {

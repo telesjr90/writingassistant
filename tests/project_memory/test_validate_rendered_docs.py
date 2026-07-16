@@ -51,7 +51,7 @@ _SNAPSHOT_FILES = (
 )
 
 
-def _make_task_record(task_id, status, parent=None, notes=""):
+def _make_task_record(task_id, status, parent=None, notes="", is_frontier=False):
     return {
         "id": f"task:{task_id}",
         "type": "task",
@@ -64,7 +64,7 @@ def _make_task_record(task_id, status, parent=None, notes=""):
         "parent_task_id": parent,
         "depends_on": [],
         "task_type": "infrastructure",
-        "is_application_frontier": False,
+        "is_application_frontier": is_frontier,
         "is_blocking": False,
         "notes": notes,
     }
@@ -116,6 +116,14 @@ def _git(repo_root: Path, *args: str) -> str:
 
 def _historical_tasks() -> list[dict]:
     return [
+        _make_task_record(
+            "PHASE8-IMPL-024", "in_progress", None,
+            notes="Historical application parent.", is_frontier=True,
+        ),
+        _make_task_record(
+            "PHASE8-IMPL-024-T003A", "planned", "PHASE8-IMPL-024",
+            notes="Historical application frontier.", is_frontier=True,
+        ),
         _make_task_record("PHASE8-IMPL-026", "in_progress"),
         _make_task_record("PHASE8-IMPL-026-T001", "complete", "PHASE8-IMPL-026"),
         _make_task_record("PHASE8-IMPL-026-T002", "complete", "PHASE8-IMPL-026"),
@@ -540,6 +548,18 @@ class TestDeriveExpectedTaskStates:
 class TestSemanticValidation:
 
     def _reg_with_tasks(self, tasks):
+        if not any(task.get("task_id") == "PHASE8-IMPL-024" for task in tasks):
+            tasks = [
+                _make_task_record(
+                    "PHASE8-IMPL-024", "in_progress", None,
+                    notes="Active application parent.", is_frontier=True,
+                ),
+                _make_task_record(
+                    "PHASE8-IMPL-024-T003B", "planned", "PHASE8-IMPL-024",
+                    notes="Next application task.", is_frontier=True,
+                ),
+                *tasks,
+            ]
         return {"tasks.json": {"registry_type": "task", "schema_version": "1.0.0",
                                 "records": tasks}}
 
@@ -676,7 +696,14 @@ class TestSemanticValidation:
 
     def test_rejects_app_frontier_drift(self, tmp_path):
         tasks = [
-            _make_task_record("PHASE8-IMPL-024-T003A", "planned", "PHASE8-IMPL-024"),
+            _make_task_record(
+                "PHASE8-IMPL-024", "in_progress", None,
+                notes="Active application parent.", is_frontier=True,
+            ),
+            _make_task_record(
+                "PHASE8-IMPL-024-T003B", "planned", "PHASE8-IMPL-024",
+                notes="Next application task.", is_frontier=True,
+            ),
         ]
         registries = self._reg_with_tasks(tasks)
         pages = self._page_set(
@@ -735,9 +762,9 @@ class TestSemanticValidation:
 | T004C (Clean-HEAD publication) | complete/PASS-WITH-FINDINGS |
 | T005 (Context-tool integration) | planned/inactive |
 
-PHASE8-IMPL-024-T003A
+PHASE8-IMPL-024-T003B
 """,
-            roadmap="""PHASE8-IMPL-024-T003A
+            roadmap="""PHASE8-IMPL-024-T003B
 **Next actionable Project Memory task:** T005 (planned/inactive)
 PHASE8-IMPL-025: published/planned, inactive""",
             remaining="""### Planned
@@ -884,8 +911,8 @@ PHASE8-IMPL-025: published/planned, inactive""",
         ]
         registries = self._reg_with_tasks(tasks)
         pages = self._page_set(
-            index="PHASE8-IMPL-024-T003A\n| T004 (Human-readable memory) | complete/PASS-WITH-FINDINGS |\n| T005 | planned/inactive |\n",
-            roadmap="PHASE8-IMPL-024-T003A\n**Next actionable Project Memory task:** T005 (planned/inactive)",
+            index="PHASE8-IMPL-024-T003B\n| T004 (Human-readable memory) | complete/PASS-WITH-FINDINGS |\n| T005 | planned/inactive |\n",
+            roadmap="PHASE8-IMPL-024-T003B\n**Next actionable Project Memory task:** T005 (planned/inactive)",
             remaining="## Planned\n- **T005**\n",
         )
         render_dir = _make_minimal_render_dir(tmp_path, pages)
@@ -903,6 +930,17 @@ PHASE8-IMPL-025: published/planned, inactive""",
 class TestCLI:
 
     def _reg_with_tasks(self, tasks):
+        tasks = [
+            _make_task_record(
+                "PHASE8-IMPL-024", "in_progress", None,
+                notes="Active application parent.", is_frontier=True,
+            ),
+            _make_task_record(
+                "PHASE8-IMPL-024-T003B", "planned", "PHASE8-IMPL-024",
+                notes="Next application task.", is_frontier=True,
+            ),
+            *tasks,
+        ]
         return {"tasks.json": {"registry_type": "task", "schema_version": "1.0.0",
                                 "records": tasks}}
 
@@ -930,8 +968,8 @@ class TestCLI:
         ]
         registries = self._reg_with_tasks(tasks)
         pages = self._page_set(
-            index="PHASE8-IMPL-024-T003A\n| T004 | complete/PASS-WITH-FINDINGS |\n| T005 | planned/inactive |\n",
-            roadmap="PHASE8-IMPL-024-T003A\n**Next actionable Project Memory task:** T005 (planned/inactive)",
+            index="PHASE8-IMPL-024-T003B\n| T004 | complete/PASS-WITH-FINDINGS |\n| T005 | planned/inactive |\n",
+            roadmap="PHASE8-IMPL-024-T003B\n**Next actionable Project Memory task:** T005 (planned/inactive)",
             remaining="## Planned\n- **T005**\n",
         )
         render_dir = _make_minimal_render_dir(tmp_path, pages)

@@ -56,7 +56,7 @@ class TestConvergenceResult:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [
@@ -89,7 +89,7 @@ class TestConvergenceResult:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [
@@ -157,7 +157,7 @@ class TestConvergenceResult:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [
@@ -187,7 +187,7 @@ class TestConvergenceResult:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [
@@ -215,7 +215,7 @@ class TestConvergenceResult:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [
@@ -242,7 +242,7 @@ class TestConvergenceResult:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [

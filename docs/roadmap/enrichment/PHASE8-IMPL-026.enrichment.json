@@ -7,7 +7,7 @@
   "classification": "hybrid governance, documentation, and developer infrastructure",
   "parallel_workstream": true,
   "application_frontier_unchanged": "PHASE8-IMPL-024",
-  "application_frontier_next_task": "PHASE8-IMPL-024-T003A",
+  "application_frontier_next_task": "PHASE8-IMPL-024-T003B",
   "ph8_impl_025_unchanged": "published/planned, inactive",
   "context_pack": null,
   "context_pack_status": "generated evidence exists under .codex-context/project-memory/ and remains ignored/non-authoritative",
@@ -203,7 +203,7 @@
   "renderer_defect_identified": "hardcoded index-page status table in _render_index() and hardcoded PM child indicator in _render_current_roadmap() — repaired by T004C1",
   "accepted_current_publication_for_a415270": null,
   "accepted_current_publication_for_8961b35": ".codex-context/project-memory/PHASE8-IMPL-026-T004C2/20260714T221454Z/",
-  "next_operational_step": "Maintain Project Memory through the T011 event-driven operational procedure. T006/T007 remain owner-deferred and contingent/inactive. The sole next implementation focus is PHASE8-IMPL-024-T003A.",
+  "next_operational_step": "Maintain Project Memory through the T011 event-driven operational procedure. T006/T007 remain owner-deferred and contingent/inactive. The sole next application implementation focus is PHASE8-IMPL-024-T003B; no Project Memory implementation task remains.",
   "next_project_memory_task": null,
   "project_memory_maintenance": {
     "implementation_task": null,
@@ -211,5 +211,5 @@
     "procedure_task_id": "PHASE8-IMPL-026-T011"
   },
   "parent_closeout": "complete/PASS-WITH-FINDINGS; only four accepted nonblocking source_missing advisories or fewer",
-  "sole_next_implementation_focus": "PHASE8-IMPL-024-T003A"
+  "sole_next_implementation_focus": "PHASE8-IMPL-024-T003B"
 }

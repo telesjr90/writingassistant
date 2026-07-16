@@ -441,7 +441,7 @@ class TestRoadmapPreservation:
 
     def test_application_frontier_is_preserved(self):
         text = (REPO_ROOT / "docs" / "roadmap" / "implementation_status.md").read_text()
-        assert "PHASE8-IMPL-024-T003A" in text
+        assert "PHASE8-IMPL-024-T003B" in text
 
     def test_ph8_impl_025_remains_published_planned_and_inactive(self):
         tasks = json.loads((REPO_ROOT / "docs" / "project-memory" / "registries" / "tasks.json").read_text())

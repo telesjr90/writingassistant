@@ -101,7 +101,6 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         "parent_status": "complete",
         "maintenance_mode": "operational_procedure",
         "procedure_task_id": "PHASE8-IMPL-026-T011",
-        "application_frontier_required": "PHASE8-IMPL-024-T003A",
         "accepted_evidence_required": True,
         "roadmap_convergence_required": True,
     }:

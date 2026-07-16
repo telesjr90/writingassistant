@@ -7,7 +7,8 @@ documentation, and developer infrastructure workstream; not an application
 feature. The findings are limited to four accepted nonblocking
 `source_missing` advisories, or fewer if their sources become available.
 
-The application implementation frontier remains PHASE8-IMPL-024-T003A.
+The application implementation frontier is PHASE8-IMPL-024-T003B. This is
+independent of the explicit absence of a next Project Memory implementation task.
 PHASE8-IMPL-025 remains published/planned and inactive.
 
 T001 — Project Memory authority, lifecycle, and provenance foundation —

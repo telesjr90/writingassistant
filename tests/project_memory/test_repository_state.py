@@ -287,7 +287,7 @@ class TestRoadmapState:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [
@@ -300,8 +300,8 @@ class TestRoadmapState:
             json.dumps(index), encoding="utf-8"
         )
         state = rst.parse_roadmap_state(str(tmp_path))
-        assert state["frontier_is_ph8_impl_024_t003a"] is True
-        assert state["frontier_next_task"] == "PHASE8-IMPL-024-T003A"
+        assert state["frontier_is_ph8_impl_024_t003b"] is True
+        assert state["frontier_next_task"] == "PHASE8-IMPL-024-T003B"
         assert state["ph8_impl_025_active"] is False
 
     def test_missing_roadmap_file(self, tmp_path):

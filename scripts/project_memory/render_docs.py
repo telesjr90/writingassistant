@@ -231,7 +231,6 @@ def _group_by_status(
 
 
 _PM_PARENT_TASK_ID = "PHASE8-IMPL-026"
-_APP_FRONTIER_TASK_ID = "PHASE8-IMPL-024-T003A"
 
 _PM_TASK_DISPLAY_ORDER = (
     "PHASE8-IMPL-026-T001",
@@ -271,6 +270,19 @@ def _get_task_by_id(tasks: list[dict[str, Any]], task_id: str) -> dict[str, Any]
         if t.get("task_id") == task_id:
             return t
     return None
+
+
+def _get_application_frontier(tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    matches = [
+        task for task in tasks
+        if task.get("parent_task_id") == "PHASE8-IMPL-024"
+        and task.get("is_application_frontier") is True
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            "Exactly one PHASE8-IMPL-024 child must be the application frontier"
+        )
+    return matches[0]
 
 
 def _get_children(tasks: list[dict[str, Any]], parent_task_id: str) -> list[dict[str, Any]]:
@@ -950,6 +962,7 @@ def _get_field(rec: dict[str, Any], field: str) -> str:
 
 def _render_index(model: dict[str, Any]) -> str:
     lines: list[str] = []
+    tasks = model.get("tasks", [])
     lines.append("## Purpose of Project Memory")
     lines.append("")
     lines.append("Project Memory is a normalized, machine-readable, commit-bound system that records the accepted plan, compares it with actual implementation, explains discrepancies with evidence, and surfaces confidence and provenance for owner review.")
@@ -963,12 +976,15 @@ def _render_index(model: dict[str, Any]) -> str:
 
     lines.append("## Active Application Frontier")
     lines.append("")
-    lines.append(f"`PHASE8-IMPL-024-T003A` — Context-availability/readiness contract")
+    app_frontier = _get_application_frontier(tasks)
+    lines.append(
+        f"`{_sanitize_string(app_frontier.get('task_id', ''))}` — "
+        f"{_sanitize_string(app_frontier.get('title', ''))}"
+    )
     lines.append("")
 
     lines.append("## Project Memory Workstream Status")
     lines.append("")
-    tasks = model.get("tasks", [])
     pm_behavior = _derive_pm_task_behavior(tasks, model.get("owner_decisions", []))
     behavior_by_id = pm_behavior["states"]
     task_by_id = {t.get("task_id", ""): t for t in tasks}
@@ -1178,12 +1194,16 @@ def _render_capabilities(model: dict[str, Any]) -> str:
 
 def _render_current_roadmap(model: dict[str, Any]) -> str:
     lines: list[str] = []
+    tasks = model.get("tasks", [])
+    app_frontier = _get_application_frontier(tasks)
     lines.append("## Roadmap Tasks")
     lines.append("")
     lines.append(f"**Active application parent:** PHASE8-IMPL-024")
-    lines.append(f"**Immediate application frontier:** PHASE8-IMPL-024-T003A")
+    lines.append(
+        f"**Immediate application frontier:** "
+        f"{_sanitize_string(app_frontier.get('task_id', ''))}"
+    )
     lines.append(f"**Active Project Memory parent:** PHASE8-IMPL-026")
-    tasks = model.get("tasks", [])
     pm_behavior = _derive_pm_task_behavior(tasks, model.get("owner_decisions", []))
     next_child = pm_behavior["next_actionable_task"]
     if next_child:

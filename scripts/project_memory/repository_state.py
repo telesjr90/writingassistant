@@ -363,8 +363,8 @@ def parse_roadmap_state(repo_root: str) -> dict[str, Any]:
 
     result["ph8_impl_026_tasks"] = ph8_impl_026_tasks
     result["ph8_impl_025_active"] = False
-    result["frontier_is_ph8_impl_024_t003a"] = (
-        result.get("frontier_next_task") == "PHASE8-IMPL-024-T003A"
+    result["frontier_is_ph8_impl_024_t003b"] = (
+        result.get("frontier_next_task") == "PHASE8-IMPL-024-T003B"
     )
 
     return result

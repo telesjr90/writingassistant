@@ -90,9 +90,11 @@ non-contingent children are complete; T006/T007 remain explicitly
 owner-deferred, contingent, inactive, and unimplemented; T011 accepted evidence
 and the Q154 owner decision exist; the roadmap closeout records converge;
 ongoing work is explicitly the T011 operational procedure; and the application
-frontier remains `PHASE8-IMPL-024-T003A`. A missing or null next task while the
-parent is active, an eligible child remains, or required evidence conflicts is
-blocking.
+frontier is validated independently. The current application frontier is
+`PHASE8-IMPL-024-T003B`; advancing a valid application frontier does not reopen
+Project Memory work. A missing or null next task while the Project Memory parent
+is active, an eligible Project Memory child remains, or required evidence
+conflicts is blocking.
 
 ## CI verification
 

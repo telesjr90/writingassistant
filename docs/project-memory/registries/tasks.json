@@ -25,7 +25,7 @@
       "classification": "application repair",
       "is_application_frontier": true,
       "is_blocking": true,
-      "notes": "Active application implementation frontier. T001 and T002 complete/PASS. T003A is the immediate next task."
+      "notes": "Active application implementation parent. T001 and T002 complete/PASS. T003A is complete/PASS; T003 remains active with T003B as the immediate next task and T003C planned."
     },
     {
       "id": "task:PHASE8-IMPL-024-T003A",
@@ -34,22 +34,49 @@
       "title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "planned"
+        "status": "complete"
       },
       "provenance": {
         "created_by": "PHASE8-IMPL-024-T002",
+        "accepted_by": "PHASE8-IMPL-024-T003A",
         "source_locators": [
-          { "path": "docs/roadmap/implementation_status.md", "line_start": 11, "line_end": 11 }
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 11, "line_end": 11 },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md" }
         ]
       },
       "task_id": "PHASE8-IMPL-024-T003A",
       "parent_task_id": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024"],
+      "depends_on": [],
       "task_type": "runtime",
       "classification": "backend-only contract micro-task",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Complete/PASS. Implements the deterministic read-only project context-readiness contract. T003 remains active; T003B is next and T003C remains planned."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T003B",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
+      "authority_class": "authoritative",
+      "lifecycle": {
+        "status": "planned"
+      },
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T003A",
+        "source_locators": [
+          { "path": "docs/roadmap/implementation_status.md", "line_start": 12, "line_end": 12 },
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-024.md" }
+        ]
+      },
+      "task_id": "PHASE8-IMPL-024-T003B",
+      "parent_task_id": "PHASE8-IMPL-024",
+      "depends_on": ["PHASE8-IMPL-024-T003A"],
+      "task_type": "runtime",
+      "classification": "frontend integration micro-task",
       "is_application_frontier": true,
       "is_blocking": false,
-      "notes": "The immediate application implementation frontier. Planned next under T003."
+      "notes": "The sole next application implementation task under active T003. Planned and not started; T003C remains planned."
     },
     {
       "id": "task:PHASE8-IMPL-025",

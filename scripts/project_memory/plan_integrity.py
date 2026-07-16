@@ -110,10 +110,6 @@ _NO_NEXT_ROADMAP_TOKENS = {
         "there is no next project memory implementation task",
         "ongoing maintenance",
     ),
-    "docs/roadmap/decision_log.md": (
-        "there is no next project memory implementation task",
-        "phase8-impl-024-t003a",
-    ),
     "docs/roadmap/open_questions.md": (
         "q152 remains open",
         "q153 remains open",
@@ -561,8 +557,6 @@ def _no_next_project_memory_contract(
             reasons.append("operational_maintenance_declaration_missing")
         if enrichment.get("status") != "complete/PASS-WITH-FINDINGS":
             reasons.append("enrichment_parent_closeout_mismatch")
-        if enrichment.get("sole_next_implementation_focus") != "PHASE8-IMPL-024-T003A":
-            reasons.append("enrichment_application_frontier_mismatch")
         if "operational" not in str(enrichment.get("next_operational_step", "")).casefold():
             reasons.append("enrichment_operational_step_missing")
 
@@ -572,12 +566,44 @@ def _no_next_project_memory_contract(
         text = value.casefold() if isinstance(value, str) else ""
         if not all(token in text for token in tokens):
             reasons.append(f"roadmap_closeout_mismatch:{path}")
-    roadmap_index = roadmap.get("docs/roadmap/roadmap_index.yaml", {})
-    frontier = roadmap_index.get("active_frontier", {}) if isinstance(roadmap_index, dict) else {}
-    if frontier.get("next_readiness_task_id") != "PHASE8-IMPL-024-T003A":
-        reasons.append("application_frontier_missing")
-
     return not reasons, sorted(reasons)
+
+
+def _expected_application_frontier(
+    plan_inputs: dict[str, Any], tasks: list[dict[str, Any]]
+) -> tuple[str | None, bool, list[str]]:
+    """Return the authoritative application frontier independently of PM sequencing."""
+    reasons: list[str] = []
+    enrichment = plan_inputs.get("roadmap", {}).get(
+        "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json", {}
+    )
+    expected = (
+        enrichment.get("application_frontier_next_task")
+        if isinstance(enrichment, dict)
+        else None
+    )
+    if not isinstance(expected, str) or not expected.strip():
+        return None, False, ["application_frontier_declaration_missing"]
+
+    by_task = {record.get("task_id"): record for record in tasks}
+    record = by_task.get(expected)
+    if record is None:
+        reasons.append("application_frontier_task_missing")
+    else:
+        if record.get("is_application_frontier") is not True:
+            reasons.append("application_frontier_task_not_marked")
+        if record.get("lifecycle", {}).get("status") not in {"planned", "in_progress"}:
+            reasons.append("application_frontier_task_not_actionable")
+
+    declared_children = sorted(
+        record.get("task_id")
+        for record in tasks
+        if record.get("parent_task_id") == "PHASE8-IMPL-024"
+        and record.get("is_application_frontier") is True
+    )
+    if declared_children != [expected]:
+        reasons.append("application_frontier_registry_mismatch")
+    return expected, not reasons, sorted(reasons)
 
 
 def _declared_next_actionable(
@@ -699,22 +725,38 @@ def build_comparisons(
         },
     ))
 
+    expected_frontier, frontier_declaration_valid, frontier_reasons = (
+        _expected_application_frontier(plan_inputs, tasks)
+    )
     roadmap_index = plan_inputs.get("roadmap", {}).get("docs/roadmap/roadmap_index.yaml", {})
     frontier = roadmap_index.get("active_frontier", {}) if isinstance(roadmap_index, dict) else {}
     observed_frontier = frontier.get("next_readiness_task_id") if isinstance(frontier, dict) else None
     frontier_class = classify_claims(
-        "PHASE8-IMPL-024-T003A", observed_frontier,
-        required_evidence_present=observed_frontier is not None,
+        expected_frontier, observed_frontier,
+        required_evidence_present=(
+            frontier_declaration_valid and observed_frontier is not None
+        ),
     )
     comparisons.append(_comparison(
-        subject_type="application_frontier", subject_id="PHASE8-IMPL-024-T003A",
-        expected={"task_id": "PHASE8-IMPL-024-T003A"}, observed={"task_id": observed_frontier},
-        classification=frontier_class, locators=["docs/roadmap/roadmap_index.yaml"],
+        subject_type="application_frontier", subject_id=expected_frontier or "application-frontier",
+        expected={"task_id": expected_frontier}, observed={"task_id": observed_frontier},
+        classification=frontier_class, locators=[
+            "docs/project-memory/registries/tasks.json",
+            "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",
+            "docs/roadmap/roadmap_index.yaml",
+        ],
         authority_classes=["authoritative"], branch=branch, commit=commit,
         rule_id="PI-TASK-003", severity="critical" if frontier_class != "matching" else "info",
-        blocking=frontier_class != "matching", explanation="Application frontier must remain unchanged.",
+        blocking=frontier_class != "matching", explanation="Application frontier must match authoritative application sequencing.",
         owner_review_required=frontier_class != "matching",
         next_check="Inspect active_frontier.next_readiness_task_id in roadmap_index.yaml.",
+        required_evidence=(frontier_declaration_valid and observed_frontier is not None),
+        extra={
+            "declaration": {
+                "valid": frontier_declaration_valid,
+                "reasons": frontier_reasons,
+            }
+        },
     ))
 
     impl025 = by_task.get("PHASE8-IMPL-025", {})

@@ -61,10 +61,10 @@
       },
       "dependency_id": "impl-025-separate-from-frontier",
       "source_id": "task:PHASE8-IMPL-025",
-      "target_id": "task:PHASE8-IMPL-024-T003A",
+      "target_id": "task:PHASE8-IMPL-024-T003B",
       "dependency_type": "boundary_constrains",
       "is_separate": true,
-      "notes": "PHASE8-IMPL-025 is intentionally separate from the application frontier. Its T001/T002 prerequisites are satisfied but T003A is the active frontier and no PHASE8-IMPL-025 child is activated."
+      "notes": "PHASE8-IMPL-025 is intentionally separate from the application frontier. Its T001/T002 prerequisites are satisfied but T003B is the active frontier and no PHASE8-IMPL-025 child is activated."
     },
     {
       "id": "dependency:pm-does-not-replace-impl-024",

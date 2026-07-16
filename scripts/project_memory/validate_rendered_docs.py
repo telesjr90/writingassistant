@@ -164,7 +164,6 @@ _PM_TASK_ORDER: tuple[str, ...] = (
     "PHASE8-IMPL-026-T005",
 )
 
-_EXPECTED_APP_FRONTIER = "PHASE8-IMPL-024-T003A"
 _PM_PARENT = "PHASE8-IMPL-026"
 
 
@@ -709,6 +708,19 @@ def validate_rendered_package(
 
     task_records = tasks_data.get("records", []) if isinstance(tasks_data, dict) else []
     owner_records = owner_data.get("records", []) if isinstance(owner_data, dict) else []
+    application_frontiers = [
+        task.get("task_id")
+        for task in task_records
+        if task.get("parent_task_id") == "PHASE8-IMPL-024"
+        and task.get("is_application_frontier") is True
+    ]
+    if len(application_frontiers) != 1:
+        errors.append(
+            "Task registry must declare exactly one PHASE8-IMPL-024 child as "
+            "the application frontier"
+        )
+        return _blocked_result(errors, warnings, {})
+    expected_app_frontier = application_frontiers[0]
     if expected_task_states is None:
         task_states = derive_expected_task_states(task_records, owner_records)
     else:
@@ -935,9 +947,9 @@ def validate_rendered_package(
     else:
         semantic_checks.append({"check": "ph25_inactive", "result": "pass"})
 
-    app_frontier_ok = _EXPECTED_APP_FRONTIER in roadmap_text or _EXPECTED_APP_FRONTIER in index_text
+    app_frontier_ok = expected_app_frontier in roadmap_text or expected_app_frontier in index_text
     if not app_frontier_ok:
-        errors.append(f"Semantic: Application frontier {_EXPECTED_APP_FRONTIER} not found in rendered pages")
+        errors.append(f"Semantic: Application frontier {expected_app_frontier} not found in rendered pages")
         semantic_checks.append({"check": "app_frontier", "result": "fail"})
     else:
         semantic_checks.append({"check": "app_frontier", "result": "pass"})

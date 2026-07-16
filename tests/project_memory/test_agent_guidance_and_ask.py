@@ -266,8 +266,11 @@ def test_no_automatic_roadmap_memory_promotion_or_prose_mutation_allowed():
 
 
 def test_application_frontier_and_ph8_impl_025_remain_unchanged():
-    frontier = _record("tasks.json", "task:PHASE8-IMPL-024-T003A")
+    completed = _record("tasks.json", "task:PHASE8-IMPL-024-T003A")
+    frontier = _record("tasks.json", "task:PHASE8-IMPL-024-T003B")
     ph25 = _record("tasks.json", "task:PHASE8-IMPL-025")
+    assert completed["is_application_frontier"] is False
+    assert completed["lifecycle"]["status"] == "complete"
     assert frontier["is_application_frontier"] is True
     assert frontier["lifecycle"]["status"] == "planned"
     assert ph25["lifecycle"]["status"] == "planned"

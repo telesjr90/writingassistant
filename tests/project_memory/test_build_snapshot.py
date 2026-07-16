@@ -65,7 +65,7 @@ class TestSnapshotBuilder:
             "schema_version": "1.0",
             "active_frontier": {
                 "current_parent_task_id": "PHASE8-IMPL-024",
-                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
             },
             "tasks": [{"id": "PHASE8-IMPL-025", "title": "025", "status": "planned"}],
@@ -307,7 +307,7 @@ class TestCLI:
         (tmp_path / "docs" / "roadmap" / "roadmap_index.yaml").write_text(json.dumps({
             "schema_version": "1.0",
             "active_frontier": {"current_parent_task_id": "PHASE8-IMPL-024",
-                                "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
+                                "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
                                 "planned_architecture_parent_task_id": "PHASE8-IMPL-025"},
             "tasks": [{"id": "PHASE8-IMPL-025", "title": "025", "status": "planned"}],
         }), encoding="utf-8")

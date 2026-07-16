@@ -6,7 +6,8 @@
 - Title: Project Memory and Plan Integrity
 - Classification: hybrid governance, documentation, and developer infrastructure
 - Status: complete/closed as complete/PASS-WITH-FINDINGS
-- Application frontier and sole next implementation focus: PHASE8-IMPL-024-T003A
+- Application frontier and sole next application implementation focus: PHASE8-IMPL-024-T003B
+- Next Project Memory implementation task: none
 - PHASE8-IMPL-025: unchanged — published/planned, inactive
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`
 
@@ -175,4 +176,5 @@ implemented by T001.
 - T010/T011 are complete/PASS. PHASE8-IMPL-026 is complete/closed as
   complete/PASS-WITH-FINDINGS. There is no next Project Memory implementation
   task; maintenance follows the T011 operational procedure. The application
-  frontier `PHASE8-IMPL-024-T003A` is the sole next implementation focus.
+  frontier `PHASE8-IMPL-024-T003B` is the sole next application implementation
+  focus; no Project Memory implementation task remains.
