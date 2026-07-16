@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 REGISTRIES_DIR = ROOT / "docs" / "project-memory" / "registries"
 SCHEMA_PATH = ROOT / "docs" / "project-memory" / "schemas" / "project-memory.schema.json"
 MANIFEST_PATH = REGISTRIES_DIR / "manifest.json"
+ROADMAP_INDEX_PATH = ROOT / "docs" / "roadmap" / "roadmap_index.yaml"
 
 TRUST_CLASSES = frozenset([
     "authoritative",
@@ -148,10 +149,16 @@ def _record_label(rec: dict[str, Any]) -> str:
     return f"{rtype}:{rid}"
 
 
-def validate(registries_dir: Path | None = None) -> list[dict[str, str]]:
+def validate(
+    registries_dir: Path | None = None,
+    roadmap_index_path: Path | None = None,
+) -> list[dict[str, str]]:
     """Validate all registries. Returns list of findings (empty = PASS)."""
+    use_tracked_registries = registries_dir is None
     if registries_dir is None:
         registries_dir = REGISTRIES_DIR
+    if roadmap_index_path is None and use_tracked_registries:
+        roadmap_index_path = ROADMAP_INDEX_PATH
     manifest_path = registries_dir / "manifest.json"
 
     findings: list[dict[str, str]] = []
@@ -253,6 +260,7 @@ def validate(registries_dir: Path | None = None) -> list[dict[str, str]]:
     # 3. Validate each registry container and its records
     all_ids: dict[str, str] = {}  # id -> filename
     all_record_types: dict[str, str] = {}  # id -> type
+    task_records_by_task_id: dict[str, dict[str, Any]] = {}
 
     for fn in sorted(declared_filenames):
         data = registries.get(fn)
@@ -318,6 +326,23 @@ def validate(registries_dir: Path | None = None) -> list[dict[str, str]]:
 
             if rid:
                 all_record_types[rid] = (rtype or "")
+
+            if rtype == "task":
+                task_id = record.get("task_id")
+                if not isinstance(task_id, str) or not task_id:
+                    findings.append(_finding(
+                        "error", "MISSING_TASK_ID",
+                        f"{rec_label}: task record missing non-empty task_id",
+                        registry_file=fn, record_id=(rid or ""),
+                    ))
+                elif task_id in task_records_by_task_id:
+                    findings.append(_finding(
+                        "error", "DUPLICATE_TASK_IDENTITY",
+                        f"{rec_label}: duplicate task_id '{task_id}'",
+                        registry_file=fn, record_id=(rid or ""),
+                    ))
+                else:
+                    task_records_by_task_id[task_id] = record
 
             # schema_version
             rsv = record.get("schema_version")
@@ -517,35 +542,163 @@ def validate(registries_dir: Path | None = None) -> list[dict[str, str]]:
                                                  f"{rec_label}: {field_name} '{value}' is not a valid full Git SHA",
                                                  registry_file=fn, record_id=rid))
 
-    # 5. Detect direct dependency cycles in task records
-    for fn in sorted(declared_filenames):
-        data = registries.get(fn)
-        if data is None:
-            continue
-        records = data.get("records", [])
-        for record in records:
-            if not isinstance(record, dict):
+    # 5. Detect dependency cycles of any length in normalized task records.
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(task_id: str, trail: tuple[str, ...]) -> None:
+        if task_id in visited:
+            return
+        if task_id in visiting:
+            cycle = trail[trail.index(task_id):] + (task_id,)
+            findings.append(_finding(
+                "error", "TASK_DEPENDENCY_CYCLE",
+                "task dependency cycle: " + " -> ".join(cycle),
+                registry_file="tasks.json", record_id=f"task:{task_id}",
+            ))
+            return
+        visiting.add(task_id)
+        record = task_records_by_task_id.get(task_id, {})
+        dependencies = record.get("depends_on", [])
+        if isinstance(dependencies, list):
+            for dependency in dependencies:
+                if isinstance(dependency, str) and dependency in task_records_by_task_id:
+                    visit(dependency, trail + (task_id,))
+        visiting.remove(task_id)
+        visited.add(task_id)
+
+    for task_id in sorted(task_records_by_task_id):
+        visit(task_id, ())
+
+    # 6. Prove complete normalized coverage for the roadmap-declared remaining
+    # MVP parent set. The validator derives descendants and edges generically;
+    # generated evidence is never an input to this authority comparison.
+    if roadmap_index_path is not None:
+        try:
+            roadmap = _parse_json(roadmap_index_path)
+        except Exception as exc:
+            findings.append(_finding(
+                "error", "ROADMAP_INDEX_PARSE_ERROR",
+                f"failed to parse roadmap index: {exc}",
+                registry_file="tasks.json",
+            ))
+            return _sort_findings(findings)
+
+        roadmap_tasks = roadmap.get("tasks") if isinstance(roadmap, dict) else None
+        frontier = roadmap.get("active_frontier") if isinstance(roadmap, dict) else None
+        roots = frontier.get("remaining_mvp_parent_task_ids") if isinstance(frontier, dict) else None
+        if not isinstance(roadmap_tasks, list) or not isinstance(roots, list) or not roots:
+            findings.append(_finding(
+                "error", "MISSING_REMAINING_MVP_SCOPE",
+                "roadmap index must declare tasks and non-empty active_frontier.remaining_mvp_parent_task_ids",
+                registry_file="tasks.json",
+            ))
+            return _sort_findings(findings)
+
+        roadmap_by_id: dict[str, dict[str, Any]] = {}
+        for item in roadmap_tasks:
+            if not isinstance(item, dict):
                 continue
-            if record.get("type") != "task":
+            task_id = item.get("id")
+            if not isinstance(task_id, str) or not task_id:
                 continue
-            rid = record.get("id", "")
-            task_id = record.get("task_id", "")
-            depends_on = record.get("depends_on", [])
-            if isinstance(depends_on, list):
-                for dep in depends_on:
-                    dep_rec_id = f"task:{dep}"
-                    if dep_rec_id in all_ids:
-                        dep_fn = all_ids[dep_rec_id]
-                        dep_data = registries.get(dep_fn)
-                        if dep_data:
-                            for dep_record in dep_data.get("records", []):
-                                if dep_record.get("id") == dep_rec_id:
-                                    dep_deps = dep_record.get("depends_on", [])
-                                    if isinstance(dep_deps, list) and task_id in dep_deps:
-                                        findings.append(_finding("error", "TASK_DEPENDENCY_CYCLE",
-                                                                 f"direct dependency cycle: {dep_rec_id} <-> {rid}",
-                                                                 registry_file=fn, record_id=rid))
-                                    break
+            if task_id in roadmap_by_id:
+                findings.append(_finding(
+                    "error", "DUPLICATE_ROADMAP_TASK_IDENTITY",
+                    f"duplicate roadmap task id '{task_id}'",
+                    registry_file="tasks.json", record_id=f"task:{task_id}",
+                ))
+            else:
+                roadmap_by_id[task_id] = item
+
+        root_set = {item for item in roots if isinstance(item, str)}
+        for root_id in sorted(root_set):
+            if root_id not in roadmap_by_id:
+                findings.append(_finding(
+                    "error", "UNKNOWN_REMAINING_MVP_PARENT",
+                    f"remaining MVP parent '{root_id}' is not a roadmap task",
+                    registry_file="tasks.json", record_id=f"task:{root_id}",
+                ))
+
+        def is_remaining_mvp_task(task_id: str) -> bool:
+            seen: set[str] = set()
+            current = task_id
+            while current and current not in seen:
+                if current in root_set:
+                    return True
+                seen.add(current)
+                item = roadmap_by_id.get(current, {})
+                parent = item.get("parent")
+                current = parent if isinstance(parent, str) else ""
+            return False
+
+        dependency_edges = {
+            (record.get("source_id"), record.get("target_id"))
+            for record in registries.get("dependencies.json", {}).get("records", [])
+            if isinstance(record, dict) and record.get("type") == "dependency"
+        }
+        lifecycle_map = {
+            "active": "in_progress",
+            "published/active": "in_progress",
+            "planned": "planned",
+            "complete": "complete",
+            "done": "complete",
+            "historical": "historical",
+            "deferred": "deferred",
+        }
+
+        for task_id, roadmap_task in sorted(roadmap_by_id.items()):
+            if not is_remaining_mvp_task(task_id):
+                continue
+            normalized = task_records_by_task_id.get(task_id)
+            if normalized is None or normalized.get("authority_class") != "authoritative":
+                findings.append(_finding(
+                    "error", "MISSING_NORMALIZED_MVP_TASK",
+                    f"roadmap remaining-MVP task '{task_id}' lacks exactly one authoritative normalized task record",
+                    registry_file="tasks.json", record_id=f"task:{task_id}",
+                ))
+                continue
+
+            expected_parent = roadmap_task.get("parent")
+            if normalized.get("parent_task_id") != expected_parent:
+                findings.append(_finding(
+                    "error", "MVP_TASK_PARENT_MISMATCH",
+                    f"{task_id}: roadmap parent {expected_parent!r} != normalized parent {normalized.get('parent_task_id')!r}",
+                    registry_file="tasks.json", record_id=f"task:{task_id}",
+                ))
+
+            roadmap_dependencies = roadmap_task.get("depends_on", [])
+            normalized_dependencies = normalized.get("depends_on", [])
+            if isinstance(roadmap_dependencies, list) and isinstance(normalized_dependencies, list):
+                if sorted(roadmap_dependencies) != sorted(normalized_dependencies):
+                    findings.append(_finding(
+                        "error", "MVP_TASK_DEPENDENCY_MISMATCH",
+                        f"{task_id}: roadmap dependencies {sorted(roadmap_dependencies)!r} != normalized dependencies {sorted(normalized_dependencies)!r}",
+                        registry_file="tasks.json", record_id=f"task:{task_id}",
+                    ))
+                for dependency in roadmap_dependencies:
+                    if dependency not in task_records_by_task_id:
+                        findings.append(_finding(
+                            "error", "MISSING_NORMALIZED_MVP_DEPENDENCY",
+                            f"{task_id}: dependency '{dependency}' lacks a normalized task record",
+                            registry_file="tasks.json", record_id=f"task:{task_id}",
+                        ))
+                    edge = (f"task:{task_id}", f"task:{dependency}")
+                    if edge not in dependency_edges:
+                        findings.append(_finding(
+                            "error", "MISSING_NORMALIZED_MVP_DEPENDENCY_EDGE",
+                            f"{task_id}: dependency '{dependency}' lacks a normalized dependency record",
+                            registry_file="dependencies.json", record_id=f"task:{task_id}",
+                        ))
+
+            expected_lifecycle = lifecycle_map.get(roadmap_task.get("status"))
+            actual_lifecycle = normalized.get("lifecycle", {}).get("status")
+            if expected_lifecycle is not None and actual_lifecycle != expected_lifecycle:
+                findings.append(_finding(
+                    "error", "MVP_TASK_LIFECYCLE_MISMATCH",
+                    f"{task_id}: roadmap status {roadmap_task.get('status')!r} expects {expected_lifecycle!r}, got {actual_lifecycle!r}",
+                    registry_file="tasks.json", record_id=f"task:{task_id}",
+                ))
 
     return _sort_findings(findings)
 

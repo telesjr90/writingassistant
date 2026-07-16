@@ -153,8 +153,9 @@ unsupported-output handling, and no automatic truth or canon.
 
 ### Story Check
 
-The PHASE8-IMPL-024 P0 grounding repair remains authoritative and immediate.
-Story Check becomes an evidence-bounded diagnostic consumer that identifies
+The PHASE8-IMPL-024 P0 grounding repair is complete/PASS and remains
+authoritative. PHASE8-IMPL-025 consumes it without reopening or duplicating
+the completed repair. Story Check becomes an evidence-bounded diagnostic consumer that identifies
 the exact source and hash, includes direct evidence for factual warnings,
 validates factual claims deterministically, quarantines unsupported output,
 and fails closed on source mismatch.
@@ -210,7 +211,7 @@ as deletion without explicit owner action.
 - Real local spaCy extraction is complete/PASS.
 - Real Ollama/qwen3:8b structured candidate extraction is complete/PASS.
 - Story Check runs through the existing analysis engine and Ollama; its P0
-  factual-grounding repair remains required.
+  factual-grounding repair is complete/PASS and is preserved as foundation.
 - Real BookNLP character/location findings and the narrow compatibility repair
   are complete/PASS.
 - Owner-selected NCP JSON validation/import produces candidate-only findings.
@@ -226,12 +227,11 @@ or the new PHASE8-IMPL-025 workstreams are complete.
 ## Planned parent and sequencing
 
 `PHASE8-IMPL-025 — Layered Analysis Architecture and Tool Integration
-Expansion` is published/planned. It does not replace the immediate P0 order:
+Expansion` is published/planned and inactive. T001/T002 are already
+complete/PASS. Activation waits for full PHASE8-IMPL-024 parent closeout,
+passing closeout validation, and an accepted `FRESH` Project Memory refresh.
 
-1. `PHASE8-IMPL-024-T001` OMI-guided creation integrity;
-2. `PHASE8-IMPL-024-T002` Story Check grounding integrity.
-
-After those workstreams close, PHASE8-IMPL-025 proceeds through the
+After that boundary, PHASE8-IMPL-025 proceeds through the
 tool-role/orchestration contract, source identity/run manifest, immutable
 evidence ledger, BookNLP expansion, full Subtxt inventory/contracts, full
 Subtxt integration, evidence-bounded Ollama/Story Check, cross-adapter semantic

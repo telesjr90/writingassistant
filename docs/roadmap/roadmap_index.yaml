@@ -10,14 +10,18 @@
     "next_readiness_task_type": "frontend integration micro-task",
     "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
     "planned_architecture_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
-    "planned_architecture_activation_after": ["PHASE8-IMPL-024-T001", "PHASE8-IMPL-024-T002"],
+    "planned_architecture_activation_after": ["PHASE8-IMPL-024"],
+    "planned_architecture_activation_condition": "PHASE8-IMPL-024 complete/closed, closeout validation PASS, and accepted post-closeout Project Memory refresh FRESH",
+    "remaining_mvp_parent_task_ids": ["PHASE8-IMPL-024", "PHASE8-IMPL-025", "PHASE8-IMPL-027"],
+    "terminal_mvp_task_id": "PHASE8-IMPL-027",
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS. PHASE8-IMPL-024 is the active repair parent; T003A backend context readiness is complete/PASS; PHASE8-IMPL-024-T003B is the immediate frontier under active T003; T003C remains planned. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A and T023B remain historically complete/PASS, T023 remains in progress, and T024-T026 remain reserved and incomplete. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and failure/recovery workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
+    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS. PHASE8-IMPL-024 is the active repair parent; T003A backend context readiness is complete/PASS; PHASE8-IMPL-024-T003B is the immediate frontier under active T003; T003C remains planned. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and failure/recovery workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
     "parent_task_pattern": "PHASE[0-9]+-(IMPL|UX)-[0-9]{3}",
     "child_task_pattern": "PHASE[0-9]+-(IMPL|UX)-[0-9]{3}-T[0-9]{3}",
+    "nested_child_task_pattern": "PHASE[0-9]+-(IMPL|UX)-[0-9]{3}-T[0-9]{3}[A-Z][0-9]*",
     "rules": [
       "Never reuse a parent implementation ID for validation work.",
       "Never renumber parent IDs after publication.",
@@ -5463,7 +5467,7 @@
       "id": "PHASE8-IMPL-023",
       "title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
       "type": "runtime",
-      "status": "active",
+      "status": "historical",
       "parent": null,
       "depends_on": [
         "PHASE8-UX-003"
@@ -5491,7 +5495,7 @@
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned",
-      "result": "published/active historical concurrent parent; T023A and T023B complete/PASS; T023 remains in progress; T023C/T023D and reserved T024-T026 remain planned and incomplete; PHASE8-IMPL-024 T001/T002/T003A are complete/PASS, T003B is the immediate application frontier, and broad owner acceptance and parent closeout remain blocked"
+      "result": "published historical foundation; T023A/T023B remain complete/PASS; current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; T003B remains the immediate application frontier"
     },
     {
       "id": "PHASE8-IMPL-024",
@@ -5517,12 +5521,13 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-024.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
+      "controlling_child_order": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T008"],
       "latest_child_task": "PHASE8-IMPL-024-T003A",
       "latest_child_status": "complete/PASS",
       "next_child_task": "PHASE8-IMPL-024-T003B",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
-      "architecture_follow_on_status": "planned; T001/T002 prerequisites satisfied; no child activated",
+      "architecture_follow_on_status": "planned/inactive; activation waits for full PHASE8-IMPL-024 closeout, passing closeout validation, and accepted FRESH refresh",
       "result": "published/active release-blocker repair parent; T001 and T002 complete/PASS; T003A complete/PASS; T003 active/in progress with T003B next and T003C planned; P0-A and P0-B repaired/closed; broad owner acceptance and MVP readiness remain blocked"
     },
     {
@@ -5556,14 +5561,56 @@
       "result": "active/in-progress workstream; T003A context-availability/readiness contract complete/PASS; T003B conditional frontend loading is next; T003C console/network regression validation remains planned"
     },
     {
+      "id": "PHASE8-IMPL-024-T003A",
+      "title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T003",
+      "depends_on": ["PHASE8-IMPL-024-T002"],
+      "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "complete/PASS; deterministic project_context_readiness.v1 backend contract"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T003B",
+      "title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-024-T003",
+      "depends_on": ["PHASE8-IMPL-024-T003A"],
+      "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "sole next application implementation task; planned and unimplemented"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T003C",
+      "title": "Console and network regression validation",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-024-T003",
+      "depends_on": ["PHASE8-IMPL-024-T003B"],
+      "boundary_tags": ["validation", "read_only", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "planned browser console/network regression closeout for optional-resource handling"
+    },
+    {
       "id": "PHASE8-IMPL-024-T004",
       "title": "Responsive containment",
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T003"],
+      "depends_on": ["PHASE8-IMPL-024-T007C"],
       "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
       "result": "planned workstream; document overflow, native-control containment, OMI grid/table containment, wider contextual workspace, and six-width validation"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T004A", "title": "Document overflow repair and native-control containment", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T007C"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T007C"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T004B", "title": "OMI containment and contextual workspace", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T004A"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T004A"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T004C", "title": "Six-width responsive validation", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T004B"],
+      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned responsive validation at the six authoritative widths"
     },
     {
       "id": "PHASE8-IMPL-024-T005",
@@ -5571,9 +5618,21 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T004"],
+      "depends_on": ["PHASE8-IMPL-024-T004C"],
       "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
       "result": "planned workstream; heading hierarchy, standards-aware 24px minimum versus preferred 44px touch policy, coarse-pointer sizing, checkbox hit areas, focus visibility, and manual keyboard validation"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T005A", "title": "Heading hierarchy and minimum operable-target policy", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T004C"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T004C"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T005B", "title": "Coarse-pointer sizing, hit areas, and focus visibility", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T005A"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T005A"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T005C", "title": "Manual keyboard validation", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T005B"],
+      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T005B"
     },
     {
       "id": "PHASE8-IMPL-024-T006",
@@ -5581,9 +5640,21 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T005"],
+      "depends_on": ["PHASE8-IMPL-024-T003"],
       "boundary_tags": ["candidate_only", "review_ui_planning", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
       "result": "planned workstream; resettable dashboard navigation, repeated inner-view navigation, implemented destinations only, and unavailable workflows as honest status rows"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T006A", "title": "Resettable OMI Dashboard navigation and state-owner decision", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T003C"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T003C"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T006B", "title": "Repeated inner-view navigation and truthful enabled actions", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006A"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T006A"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T006C", "title": "Navigation regression validation and closeout", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006B"],
+      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T006B"
     },
     {
       "id": "PHASE8-IMPL-024-T007",
@@ -5593,7 +5664,19 @@
       "parent": "PHASE8-IMPL-024",
       "depends_on": ["PHASE8-IMPL-024-T006"],
       "boundary_tags": ["candidate_only", "evidence_first", "review_ui_planning", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned after functional and responsive repairs; owner-attention prioritization, progressive disclosure, shared boundary/metadata/status/state/action components, and preserved provenance/safety access"
+      "result": "planned after T006 functional navigation and before T004 responsive/T005 accessibility work; owner-attention prioritization, progressive disclosure, shared boundary/metadata/status/state/action components, and preserved provenance/safety access"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T007A", "title": "Evidence-based Impeccable UI review", "type": "planning_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T006C"],
+      "boundary_tags": ["review_ui_planning", "evidence_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned evidence review; does not select a component library"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T007B", "title": "Owner component-foundation decision", "type": "planning_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007A"],
+      "boundary_tags": ["owner_review_required", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "explicit later owner decision; no library selected or installed"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T007C", "title": "Design-system and shared-component standardization", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007B"],
+      "boundary_tags": ["review_ui_planning", "candidate_only", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned only after the T007B owner decision"
     },
     {
       "id": "PHASE8-IMPL-024-T008",
@@ -5601,9 +5684,33 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T007"],
+      "depends_on": ["PHASE8-IMPL-024-T005C"],
       "boundary_tags": ["candidate_only", "evidence_first", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
       "result": "planned isolated suites for guided persistence, candidate lifecycle/grouped review, promotion handoff, apply-promotion, review commands, and non-mutating resilience/accessibility; each mutation suite uses a separate disposable project and apply-promotion is never combined with read-only or candidate-decision validation"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T008A", "title": "Guided-creation persistence suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "boundary_tags": ["validation", "owner_authored_prose_storage", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "reusable validation baseline"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T008B", "title": "Candidate lifecycle and grouped-review owner-decision suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "reusable baseline separate from apply-promotion"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T008C", "title": "Promotion creation and handoff suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "reusable isolated disposable-project baseline"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T008D", "title": "Apply-promotion suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "boundary_tags": ["validation", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "reusable isolated suite; never combined with read-only or candidate-decision validation"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T008E", "title": "Review-queue command suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "reusable separate disposable-project baseline"
+    },
+    {
+      "id": "PHASE8-IMPL-024-T008F", "title": "Non-mutating resilience and accessibility suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "boundary_tags": ["validation", "read_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "reusable loading, degraded, failure, retry, recovery, focus, keyboard, zoom, and screen-reader baseline"
     },
     {
       "id": "PHASE8-IMPL-025",
@@ -5611,7 +5718,7 @@
       "type": "runtime",
       "status": "planned",
       "parent": null,
-      "depends_on": ["PHASE8-IMPL-024-T002"],
+      "depends_on": ["PHASE8-IMPL-024"],
       "boundary_tags": ["candidate_only", "evidence_first", "owner_review_required", "raw_artifacts_non_canon", "no_auto_promotion", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose", "generated_prose_permanently_forbidden", "no_rewrite", "no_continuation", "local_first"],
       "task_record": "docs/roadmap/tasks/PHASE8-IMPL-025.md",
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-025.md",
@@ -5620,9 +5727,9 @@
       "context_pack_status": "not generated; requires a separate owner-authorized context-generation task before implementation activation",
       "latest_child_task": null,
       "latest_child_status": null,
-      "next_child_task": "PHASE8-IMPL-025-T001",
+      "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "result": "published/planned architecture-integration parent; T001/T002 external prerequisites satisfied; no PHASE8-IMPL-025 implementation child is complete or ready; PHASE8-IMPL-024-T003A is complete/PASS and PHASE8-IMPL-024-T003B is the immediate active frontier"
+      "result": "published/planned/inactive architecture-integration parent; activation waits for PHASE8-IMPL-024 complete/closed, closeout validation PASS, and accepted post-closeout FRESH Project Memory refresh; T003B is the current application frontier"
     },
     {
       "id": "PHASE8-IMPL-025-T001",
@@ -5652,7 +5759,27 @@
       "parent": "PHASE8-IMPL-025",
       "depends_on": ["PHASE8-IMPL-025-T002"],
       "boundary_tags": ["evidence_first", "raw_artifacts_non_canon", "raw_artifacts_non_candidate", "storage_contract_first", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned immutable artifacts/hashes, exact evidence offsets/excerpts, transformation lineage, quarantine states, retention/cleanup, and replay/tamper validation"
+      "result": "planned immutable artifacts/hashes, evidence offsets/excerpts, transformation lineage, quarantine states, retention/cleanup, replay/tamper validation, live-run API/control plane, and persisted-data compatibility"
+    },
+    {
+      "id": "PHASE8-IMPL-025-T003F",
+      "title": "Application-owned layered live-analysis API and control plane",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-025-T003",
+      "depends_on": ["PHASE8-IMPL-025-T003"],
+      "boundary_tags": ["orchestration_contract", "candidate_only", "evidence_first", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "planned canonical OMI preflight, selection, submission, stable run identity, status/result, timeout/cancel where supported, idempotency, partial/unavailable states, controlled errors, provenance, manifest, and ledger references"
+    },
+    {
+      "id": "PHASE8-IMPL-025-T003G",
+      "title": "Existing persisted-data compatibility",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-025-T003",
+      "depends_on": ["PHASE8-IMPL-025-T003"],
+      "boundary_tags": ["storage_contract_first", "evidence_first", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "planned version detection and deterministic compatible reads or explicit migration for old/new/mixed/malformed candidate, artifact, review, audit, manifest, and ledger data with provenance and owner continuity"
     },
     {
       "id": "PHASE8-IMPL-025-T004",
@@ -5670,9 +5797,9 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T004"],
+      "depends_on": ["PHASE8-IMPL-025-T003"],
       "boundary_tags": ["source_inventory_before_implementation", "read_only_external_sources_only", "orchestration_contract", "evidence_first", "candidate_only", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned authorized runtime/interface inventory, official analysis allowlist, generation/rewrite/mutation blocklist, read-only preflight, request/result contracts, and official provenance contract"
+      "result": "planned authorized runtime/interface inventory, supported versions and callable interfaces, installation/access/discovery/configuration/compatibility contract, allowlist/blocklist, accurate missing/incompatible/unavailable preflight, request/result contracts, and official provenance"
     },
     {
       "id": "PHASE8-IMPL-025-T006",
@@ -5682,7 +5809,7 @@
       "parent": "PHASE8-IMPL-025",
       "depends_on": ["PHASE8-IMPL-025-T005"],
       "boundary_tags": ["mvp_required_analysis_runtime", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose"],
-      "result": "planned official/full Subtxt adapter, normalization, ledger integration, guardrail seam, deterministic/mocked/real validation, candidate-only persistence, grouped review, and closeout; distinct from subtxt_informed_rubric"
+      "result": "planned official/full Subtxt adapter, normalization, ledger integration, guardrail seam, timeout/output validation, current-machine version/discovery/preflight/real-input matrix, candidate-only persistence, grouped review, and closeout; distinct from subtxt_informed_rubric"
     },
     {
       "id": "PHASE8-IMPL-025-T007",
@@ -5690,7 +5817,7 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T006", "PHASE8-IMPL-024-T002"],
+      "depends_on": ["PHASE8-IMPL-025-T003"],
       "boundary_tags": ["mvp_required_model_assisted_extraction", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
       "result": "planned exact-source Ollama extraction and normalized-evidence interpretation roles plus Story Check grounding integration, quarantine, regression fixtures, and live validation"
     },
@@ -5700,7 +5827,7 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T007"],
+      "depends_on": ["PHASE8-IMPL-025-T004", "PHASE8-IMPL-025-T006", "PHASE8-IMPL-025-T007"],
       "boundary_tags": ["evidence_first", "candidate_only", "review_safe_pipeline", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
       "result": "planned supported/unsupported/ambiguous/subject-matter-only/author-intent-dependent/insufficient-evidence classification over adapter claims with original output preserved"
     },
@@ -5720,9 +5847,19 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T009"],
+      "depends_on": ["PHASE8-IMPL-025-T008"],
       "boundary_tags": ["owner_supplied_material", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned immutable import artifact, explicit NCP mappings, JSON-pointer/value-hash provenance, candidate review, approved-context export, validation, and round-trip tests"
+      "result": "planned immutable import artifact, explicit NCP mappings, JSON-pointer/value-hash provenance, candidate review, approved-context export, validation, round-trip tests, and owner UI after T009 diagnostics and backend contracts"
+    },
+    {
+      "id": "PHASE8-IMPL-025-T010H",
+      "title": "NCP and diagnostics owner UI",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-025-T010",
+      "depends_on": ["PHASE8-IMPL-025-T009", "PHASE8-IMPL-025-T010"],
+      "boundary_tags": ["owner_action_workflow_planning", "candidate_only", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "planned NCP import/export, safe destination selection, validation feedback, scoped diagnostics, full state/retry/confirmation coverage, accessibility/responsive/browser validation, and preserved later owner semantic gates"
     },
     {
       "id": "PHASE8-IMPL-025-T011",
@@ -5730,9 +5867,19 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T010"],
+      "depends_on": ["PHASE8-IMPL-025-T008"],
       "boundary_tags": ["owner_action_workflow_planning", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose"],
-      "result": "planned bounded approve/reject/needs-evidence, merge, split, rename/source-link correction, supersede/owner correction, rerun, grouped-review, and audit slices"
+      "result": "planned bounded approve/reject/needs-evidence, merge, split, correction, rerun, grouped-review/audit slices, plus separate owner live-run workflow using the completed PHASE8-IMPL-024 component foundation"
+    },
+    {
+      "id": "PHASE8-IMPL-025-T011H",
+      "title": "Owner-facing live-run workflow",
+      "type": "runtime_microtask",
+      "status": "planned",
+      "parent": "PHASE8-IMPL-025-T011",
+      "depends_on": ["PHASE8-IMPL-025-T003F", "PHASE8-IMPL-024-T007C"],
+      "boundary_tags": ["owner_action_workflow_planning", "candidate_only", "owner_review_required", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "result": "planned readiness, selection, submission, progress, partial/unavailable/failure/timeout/retry/recovery, result/provenance/manifest/ledger inspection, candidate handoff, explicit apply boundary, and browser validation"
     },
     {
       "id": "PHASE8-IMPL-025-T012",
@@ -5740,15 +5887,15 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T011"],
+      "depends_on": ["PHASE8-IMPL-025-T003F", "PHASE8-IMPL-025-T003G", "PHASE8-IMPL-025-T009", "PHASE8-IMPL-025-T010", "PHASE8-IMPL-025-T010H", "PHASE8-IMPL-025-T011", "PHASE8-IMPL-025-T011H"],
       "boundary_tags": ["validation", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_generated_prose"],
-      "result": "planned isolated suites for source/run identity, raw extraction/evidence, interpretation, guardrails, fusion, persistence, owner decisions, promotion handoff, apply-promotion, and NCP approved export; apply-promotion remains isolated"
+      "result": "planned layered-runtime and integration deltas over reusable PHASE8-IMPL-024-T008 baselines, including live browser-to-HTTP, compatibility, provisioning, negative paths, manifests/ledgers, owner workflows, and isolated apply-promotion; no duplicate terminal suite"
     },
     {
       "id": "PHASE8-IMPL-026",
       "title": "Project Memory and Plan Integrity",
       "type": "docs-only",
-      "status": "published/active",
+      "status": "complete",
       "parent": null,
       "depends_on": [],
       "boundary_tags": [
@@ -5766,7 +5913,7 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",
       "context_pack": null,
       "classification": "hybrid governance, documentation, and developer infrastructure; parallel workstream, not an application feature",
-      "parallel_governance_note": "PHASE8-IMPL-026 is a parallel governance workstream. The active_frontier application implementation frontier remains PHASE8-IMPL-024 and PHASE8-IMPL-024-T003B. PHASE8-IMPL-025 remains published/planned and inactive. Project Memory has no next implementation task; it normalizes and explains the roadmap, must not silently override it, and cannot activate, close, or reorder application tasks."
+      "parallel_governance_note": "PHASE8-IMPL-026 is complete/closed as a parallel governance workstream. The application frontier remains PHASE8-IMPL-024-T003B. PHASE8-IMPL-025 remains planned/inactive until the parent-closeout boundary. Project Memory has no next implementation task."
     },
     {
       "id": "PHASE8-IMPL-026-T001",
@@ -5788,6 +5935,21 @@
         "no_runtime_feature_scope"
       ],
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md"
+    },
+    {
+      "id": "PHASE8-IMPL-027",
+      "title": "Current Full-MVP Owner Acceptance and Closeout",
+      "type": "validation",
+      "status": "planned",
+      "parent": null,
+      "depends_on": ["PHASE8-IMPL-025-T012"],
+      "boundary_tags": ["validation", "owner_review_required", "candidate_only", "evidence_first", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "task_record": "docs/roadmap/tasks/PHASE8-IMPL-027.md",
+      "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-027.md",
+      "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-027.enrichment.json",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-027-whole-remaining-mvp-plan-integrity-owner-acceptance.md",
+      "next_child_task": null,
+      "result": "published/planned/inactive single terminal current-MVP real-project/browser/live-runtime owner accept-reject-defer gate with authoritative closeout and mandatory final Project Memory refresh"
     }
   ]
 }

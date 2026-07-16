@@ -178,6 +178,24 @@
       "selected_option": "Use an event-driven, commit-bound cadence. Refresh after every accepted application-commit synchronization, completed Project Memory task or tracked authority/registry/tooling change, before parent/phase closeout publication, and whenever deterministic stale detection reports repository divergence. No cron or time-based schedule is required.",
       "rationale": "Commit, source, registry, binding, semantic, authority, inventory, checksum, and quality divergence determine freshness. Time passage alone does not stale a commit-bound publication. Synchronization remains an explicit owner/operator-controlled Git action.",
       "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
+    },
+    {
+      "id": "owner-decision:whole-remaining-mvp-plan-integrity",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Whole Remaining MVP Plan Integrity Conclusions",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-027",
+        "accepted_by": "owner",
+        "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-027-whole-remaining-mvp-plan-integrity-owner-acceptance.md"}]
+      },
+      "owner_decision_id": "whole-remaining-mvp-plan-integrity",
+      "question": "Which bounded council planning conclusions should become authoritative roadmap and Project Memory state?",
+      "selected_option": "Accept the consolidated PHASE8-IMPL-024 order, PHASE8-IMPL-025 activation and branched dependency model, bounded API/UI/compatibility/NCP additions, T005/T006 provisioning, validation reuse, and PHASE8-IMPL-027 terminal acceptance gate. Preserve later component, migration, export, retention/deletion, destructive-operation, candidate-bundle, and final accept/reject/defer decisions as pending.",
+      "rationale": "The checksum-verified council package is advisory generated evidence; the owner's explicit bounded acceptance supplies authority without accepting unrelated implications or authorizing implementation.",
+      "affected_tasks": ["PHASE8-IMPL-023", "PHASE8-IMPL-024", "PHASE8-IMPL-025", "PHASE8-IMPL-027"]
     }
   ]
 }

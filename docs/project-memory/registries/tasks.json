@@ -3,6 +3,23 @@
   "schema_version": "1.0.0",
   "records": [
     {
+      "id": "task:PHASE8-IMPL-023",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "historical"},
+      "provenance": {"created_by": "PHASE8-IMPL-023", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-023.md"}]},
+      "task_id": "PHASE8-IMPL-023",
+      "parent_task_id": null,
+      "depends_on": [],
+      "task_type": "runtime",
+      "classification": "historical MVP foundation",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "Historical foundation. T023A/T023B remain complete/PASS; current lifecycle, validation, and closeout intent is incorporated into PHASE8-IMPL-025-T011/T012 and PHASE8-IMPL-027."
+    },
+    {
       "id": "task:PHASE8-IMPL-024",
       "type": "task",
       "schema_version": "1.0.0",
@@ -28,6 +45,33 @@
       "notes": "Active application implementation parent. T001 and T002 complete/PASS. T003A is complete/PASS; T003 remains active with T003B as the immediate next task and T003C planned."
     },
     {
+      "id": "task:PHASE8-IMPL-024-T001",
+      "type": "task", "schema_version": "1.0.0", "title": "OMI-guided creation integrity", "authority_class": "authoritative",
+      "lifecycle": {"status": "complete"},
+      "provenance": {"created_by": "PHASE8-IMPL-024-T001", "accepted_by": "PHASE8-IMPL-024-T001", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T001", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024"],
+      "task_type": "runtime", "classification": "application integrity", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Complete/PASS through T001A-T001D; guided-creation P0 repaired/closed."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T002",
+      "type": "task", "schema_version": "1.0.0", "title": "Story Check grounding integrity", "authority_class": "authoritative",
+      "lifecycle": {"status": "complete"},
+      "provenance": {"created_by": "PHASE8-IMPL-024-T002", "accepted_by": "PHASE8-IMPL-024-T002", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T002", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T001"],
+      "task_type": "runtime", "classification": "application integrity", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Complete/PASS through T002A-T002E; Story Check grounding P0 repaired/closed and reused by PHASE8-IMPL-025-T007."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T003",
+      "type": "task", "schema_version": "1.0.0", "title": "Optional-resource handling", "authority_class": "authoritative",
+      "lifecycle": {"status": "in_progress"},
+      "provenance": {"created_by": "PHASE8-IMPL-024-T003A", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T003", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T002"],
+      "task_type": "runtime", "classification": "optional-resource workstream", "is_application_frontier": true, "is_blocking": true,
+      "notes": "Active/in progress. T003A complete/PASS; T003B next and unimplemented; T003C planned."
+    },
+    {
       "id": "task:PHASE8-IMPL-024-T003A",
       "type": "task",
       "schema_version": "1.0.0",
@@ -45,8 +89,8 @@
         ]
       },
       "task_id": "PHASE8-IMPL-024-T003A",
-      "parent_task_id": "PHASE8-IMPL-024",
-      "depends_on": [],
+      "parent_task_id": "PHASE8-IMPL-024-T003",
+      "depends_on": ["PHASE8-IMPL-024-T002"],
       "task_type": "runtime",
       "classification": "backend-only contract micro-task",
       "is_application_frontier": false,
@@ -70,13 +114,121 @@
         ]
       },
       "task_id": "PHASE8-IMPL-024-T003B",
-      "parent_task_id": "PHASE8-IMPL-024",
+      "parent_task_id": "PHASE8-IMPL-024-T003",
       "depends_on": ["PHASE8-IMPL-024-T003A"],
       "task_type": "runtime",
       "classification": "frontend integration micro-task",
       "is_application_frontier": true,
       "is_blocking": false,
       "notes": "The sole next application implementation task under active T003. Planned and not started; T003C remains planned."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T003C",
+      "type": "task", "schema_version": "1.0.0", "title": "Console and network regression validation", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-024-T003A", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T003C", "parent_task_id": "PHASE8-IMPL-024-T003", "depends_on": ["PHASE8-IMPL-024-T003B"],
+      "task_type": "validation", "classification": "browser regression", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Planned after T003B; closes optional-resource console/network validation."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T006",
+      "type": "task", "schema_version": "1.0.0", "title": "Truthful OMI navigation", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-024", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T006", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T003"],
+      "task_type": "runtime", "classification": "frontend navigation", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Planned immediately after T003 closes."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T007",
+      "type": "task", "schema_version": "1.0.0", "title": "Evidence-based UI review, component decision, and foundation", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-024", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T007", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T006"],
+      "task_type": "runtime", "classification": "owner-gated component foundation", "is_application_frontier": false, "is_blocking": false,
+      "notes": "T007A evidence review -> owner decision T007B -> T007C implementation; no component library is preselected."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T004",
+      "type": "task", "schema_version": "1.0.0", "title": "Responsive containment", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-024", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T004", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T007C"],
+      "task_type": "runtime", "classification": "responsive UI", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Planned after T007C component foundation."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T005",
+      "type": "task", "schema_version": "1.0.0", "title": "Accessibility semantics and target sizing", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-024", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T005", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T004C"],
+      "task_type": "runtime", "classification": "accessible UI", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Planned after responsive containment."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008",
+      "type": "task", "schema_version": "1.0.0", "title": "Remaining validation suites", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-024", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
+      "task_id": "PHASE8-IMPL-024-T008", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T005C"],
+      "task_type": "validation", "classification": "reusable UI/readiness baseline", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Reusable baseline for PHASE8-IMPL-025-T012 deltas; closes PHASE8-IMPL-024 and triggers mandatory post-closeout refresh."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T006A", "type": "task", "schema_version": "1.0.0", "title": "Resettable OMI Dashboard navigation and state-owner decision", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T006A", "parent_task_id": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T003C"], "task_type": "runtime", "classification": "navigation child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T006B", "type": "task", "schema_version": "1.0.0", "title": "Repeated inner-view navigation and truthful enabled actions", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T006B", "parent_task_id": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006A"], "task_type": "runtime", "classification": "navigation child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T006C", "type": "task", "schema_version": "1.0.0", "title": "Navigation regression validation and closeout", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T006C", "parent_task_id": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006B"], "task_type": "validation", "classification": "navigation child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T007A", "type": "task", "schema_version": "1.0.0", "title": "Evidence-based Impeccable UI review", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T007A", "parent_task_id": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T006C"], "task_type": "planning", "classification": "component evidence review", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T007B", "type": "task", "schema_version": "1.0.0", "title": "Owner component-foundation decision", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T007B", "parent_task_id": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007A"], "task_type": "planning", "classification": "pending owner decision", "is_application_frontier": false, "is_blocking": false, "notes": "No component library is selected or authorized by this plan synchronization."
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T007C", "type": "task", "schema_version": "1.0.0", "title": "Design-system and shared-component standardization", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T007C", "parent_task_id": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007B"], "task_type": "runtime", "classification": "component foundation", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T004A", "type": "task", "schema_version": "1.0.0", "title": "Document overflow repair and native-control containment", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T004A", "parent_task_id": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T007C"], "task_type": "runtime", "classification": "responsive child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T004B", "type": "task", "schema_version": "1.0.0", "title": "OMI containment and contextual workspace", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T004B", "parent_task_id": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T004A"], "task_type": "runtime", "classification": "responsive child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T004C", "type": "task", "schema_version": "1.0.0", "title": "Six-width responsive validation", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T004C", "parent_task_id": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T004B"], "task_type": "validation", "classification": "responsive child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T005A", "type": "task", "schema_version": "1.0.0", "title": "Heading hierarchy and minimum operable-target policy", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T005A", "parent_task_id": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T004C"], "task_type": "runtime", "classification": "accessibility child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T005B", "type": "task", "schema_version": "1.0.0", "title": "Coarse-pointer sizing, hit areas, and focus visibility", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T005B", "parent_task_id": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T005A"], "task_type": "runtime", "classification": "accessibility child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T005C", "type": "task", "schema_version": "1.0.0", "title": "Manual keyboard validation", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T005C", "parent_task_id": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T005B"], "task_type": "validation", "classification": "accessibility child", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008A", "type": "task", "schema_version": "1.0.0", "title": "Guided-creation persistence suite", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T008A", "parent_task_id": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"], "task_type": "validation", "classification": "reusable baseline", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008B", "type": "task", "schema_version": "1.0.0", "title": "Candidate lifecycle and grouped-review owner-decision suite", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T008B", "parent_task_id": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"], "task_type": "validation", "classification": "reusable baseline", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008C", "type": "task", "schema_version": "1.0.0", "title": "Promotion creation and handoff suite", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T008C", "parent_task_id": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"], "task_type": "validation", "classification": "reusable baseline", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008D", "type": "task", "schema_version": "1.0.0", "title": "Apply-promotion suite", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T008D", "parent_task_id": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"], "task_type": "validation", "classification": "isolated reusable baseline", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008E", "type": "task", "schema_version": "1.0.0", "title": "Review-queue command suite", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T008E", "parent_task_id": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"], "task_type": "validation", "classification": "reusable baseline", "is_application_frontier": false, "is_blocking": false
+    },
+    {
+      "id": "task:PHASE8-IMPL-024-T008F", "type": "task", "schema_version": "1.0.0", "title": "Non-mutating resilience and accessibility suite", "authority_class": "authoritative", "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]}, "task_id": "PHASE8-IMPL-024-T008F", "parent_task_id": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"], "task_type": "validation", "classification": "reusable baseline", "is_application_frontier": false, "is_blocking": false
     },
     {
       "id": "task:PHASE8-IMPL-025",
@@ -101,7 +253,94 @@
       "classification": "architecture expansion",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Published/planned and inactive. T001/T002 external prerequisites satisfied but no implementation child activated. Separate from the application frontier."
+      "notes": "Published/planned and inactive. Activates only after PHASE8-IMPL-024 complete/closed, closeout validation PASS, and accepted post-closeout FRESH refresh."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T001", "type": "task", "schema_version": "1.0.0", "title": "Tool-role and layered-orchestration contract", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T001", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025"], "task_type": "planning", "classification": "shared contract", "is_application_frontier": false, "is_blocking": false, "notes": "Planned/inactive shared orchestration contract."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T002", "type": "task", "schema_version": "1.0.0", "title": "Source identity and AnalysisRunManifest", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T002", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T001"], "task_type": "runtime", "classification": "shared schema", "is_application_frontier": false, "is_blocking": false, "notes": "Planned/inactive source/run identity contract."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T003", "type": "task", "schema_version": "1.0.0", "title": "Immutable raw artifact and evidence ledger", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T003", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T002"], "task_type": "runtime", "classification": "shared evidence/control contracts", "is_application_frontier": false, "is_blocking": false, "notes": "Planned/inactive; includes T003F control plane and T003G compatibility."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T003F", "type": "task", "schema_version": "1.0.0", "title": "Application-owned layered live-analysis API and control plane", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T003F", "parent_task_id": "PHASE8-IMPL-025-T003", "depends_on": ["PHASE8-IMPL-025-T003"], "task_type": "runtime", "classification": "live-run control plane", "is_application_frontier": false, "is_blocking": false, "notes": "Planned canonical OMI preflight/submission/status/result/idempotency/timeout/partial/provenance contract; candidate-only and non-mutating."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T003G", "type": "task", "schema_version": "1.0.0", "title": "Existing persisted-data compatibility", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T003G", "parent_task_id": "PHASE8-IMPL-025-T003", "depends_on": ["PHASE8-IMPL-025-T003"], "task_type": "runtime", "classification": "persisted-data compatibility", "is_application_frontier": false, "is_blocking": false, "notes": "Planned compatible reads or explicit owner-reviewed physical migration with provenance and continuity."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T004", "type": "task", "schema_version": "1.0.0", "title": "BookNLP extraction expansion", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T004", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T003"], "task_type": "runtime", "classification": "contributor branch", "is_application_frontier": false, "is_blocking": false, "notes": "Independent contributor branch after shared contracts."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T005", "type": "task", "schema_version": "1.0.0", "title": "Full Subtxt runtime inventory and contracts", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T005", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T003"], "task_type": "runtime", "classification": "runtime inventory/provisioning", "is_application_frontier": false, "is_blocking": false, "notes": "Independent Subtxt branch; includes supported interfaces/versions, installation/access, discovery, configuration, compatibility, and Q136-Q139."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T006", "type": "task", "schema_version": "1.0.0", "title": "Full Subtxt adapter, integration, and validation", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T006", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T005"], "task_type": "runtime", "classification": "runtime contributor", "is_application_frontier": false, "is_blocking": false, "notes": "Includes current-machine evidence matrix and bounded real-input validation."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T007", "type": "task", "schema_version": "1.0.0", "title": "Evidence-bounded Ollama and Story Check", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T007", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T003"], "task_type": "runtime", "classification": "contributor branch", "is_application_frontier": false, "is_blocking": false, "notes": "Independent contributor branch reusing completed PHASE8-IMPL-024-T002 grounding."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T008", "type": "task", "schema_version": "1.0.0", "title": "Cross-adapter semantic guardrails", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T008", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T004", "PHASE8-IMPL-025-T006", "PHASE8-IMPL-025-T007"], "task_type": "runtime", "classification": "contributor join/guardrail", "is_application_frontier": false, "is_blocking": false, "notes": "Joins required contributor outputs without truth selection."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T009", "type": "task", "schema_version": "1.0.0", "title": "Read-only project-level narrative diagnostics", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T009", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T008"], "task_type": "runtime", "classification": "integration branch", "is_application_frontier": false, "is_blocking": false, "notes": "Read-only diagnostics branch after guardrails."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T010", "type": "task", "schema_version": "1.0.0", "title": "Full NCP gateway", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T010", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T008"], "task_type": "runtime", "classification": "integration branch", "is_application_frontier": false, "is_blocking": false, "notes": "NCP backend branch including later T010H owner UI."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T010H", "type": "task", "schema_version": "1.0.0", "title": "NCP and diagnostics owner UI", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T010H", "parent_task_id": "PHASE8-IMPL-025-T010", "depends_on": ["PHASE8-IMPL-025-T009", "PHASE8-IMPL-025-T010"], "task_type": "runtime", "classification": "owner UI", "is_application_frontier": false, "is_blocking": false, "notes": "Planned after diagnostics and NCP backend contracts; owner semantic gates remain pending."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T011", "type": "task", "schema_version": "1.0.0", "title": "Candidate review lifecycle expansion", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T011", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T008"], "task_type": "runtime", "classification": "integration branch", "is_application_frontier": false, "is_blocking": false, "notes": "Lifecycle branch including separate T011H live-run owner workflow."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T011H", "type": "task", "schema_version": "1.0.0", "title": "Owner-facing live-run workflow", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T011H", "parent_task_id": "PHASE8-IMPL-025-T011", "depends_on": ["PHASE8-IMPL-025-T003F", "PHASE8-IMPL-024-T007C"], "task_type": "runtime", "classification": "owner live-run UI", "is_application_frontier": false, "is_blocking": false, "notes": "Separate frontend workflow with complete state, accessibility, responsive, provenance, and browser validation."
+    },
+    {
+      "id": "task:PHASE8-IMPL-025-T012", "type": "task", "schema_version": "1.0.0", "title": "Layered end-to-end validation", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"}, "provenance": {"created_by": "PHASE8-IMPL-025", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-025.md"}]},
+      "task_id": "PHASE8-IMPL-025-T012", "parent_task_id": "PHASE8-IMPL-025", "depends_on": ["PHASE8-IMPL-025-T003F", "PHASE8-IMPL-025-T003G", "PHASE8-IMPL-025-T009", "PHASE8-IMPL-025-T010", "PHASE8-IMPL-025-T010H", "PHASE8-IMPL-025-T011", "PHASE8-IMPL-025-T011H"], "task_type": "validation", "classification": "all-path join and layered deltas", "is_application_frontier": false, "is_blocking": false, "notes": "Reuses PHASE8-IMPL-024-T008; all control-plane, compatibility, diagnostics, gateway, review, and owner-UI paths join here before terminal acceptance."
+    },
+    {
+      "id": "task:PHASE8-IMPL-027", "type": "task", "schema_version": "1.0.0", "title": "Current Full-MVP Owner Acceptance and Closeout", "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-027.md"}, {"path": "docs/roadmap/decisions/PHASE8-IMPL-027-whole-remaining-mvp-plan-integrity-owner-acceptance.md"}], "owner_decision_ref": "owner-decision:whole-remaining-mvp-plan-integrity"},
+      "task_id": "PHASE8-IMPL-027", "parent_task_id": null, "depends_on": ["PHASE8-IMPL-025-T012"], "task_type": "terminal_acceptance", "classification": "single current full-MVP gate", "is_application_frontier": false, "is_blocking": false,
+      "notes": "Published/planned/inactive terminal real-project/browser/live-runtime owner accept/reject/defer gate with authoritative closeout and mandatory final Project Memory refresh."
     },
     {
       "id": "task:PHASE8-IMPL-026",

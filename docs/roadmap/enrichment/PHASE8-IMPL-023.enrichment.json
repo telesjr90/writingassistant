@@ -1,7 +1,7 @@
 {
   "task_id": "PHASE8-IMPL-023",
   "title": "OMI AI Tool-Assisted Analysis Candidate Review MVP",
-  "status": "published/active",
+  "status": "published/historical foundation",
   "task_type": "implementation parent",
   "parent_title": "PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP",
   "mvp_required": true,
@@ -29,7 +29,7 @@
     "preserved_completion": [
       "real spaCy",
       "real Ollama qwen3:8b",
-      "real Story Check with P0 grounding repair still required",
+      "real Story Check with P0 grounding repair complete/PASS",
       "real BookNLP character/location findings",
       "owner-selected NCP candidate import",
       "app-owned Subtxt-informed and dramatica-flow-informed rubrics",
@@ -53,7 +53,7 @@
   "current_gap": [
     "Real spaCy, Ollama, Story Check, BookNLP, and owner-selected NCP import paths now exist and remain valid within their completed scopes.",
     "The app-owned Subtxt-informed and dramatica-flow-informed rubric paths, deterministic fusion, candidate-only persistence, and grouped review are implemented foundations.",
-    "Story Check factual grounding remains a P0 integrity repair under PHASE8-IMPL-024-T002.",
+    "Story Check factual grounding is complete/PASS under PHASE8-IMPL-024-T002 and must not be reopened or duplicated.",
     "Stable source/run identity, immutable evidence lineage, expanded BookNLP, official/full authorized Subtxt runtime, shared semantic guardrails, project-level diagnostics, full NCP gateway/export, expanded correction workflows, and layered validation remain unimplemented.",
     "Full Subtxt licensing/authorization is resolved and may not be used as an owner-blocked or licensing-blocked closeout path; the official runtime work remains planned, not complete."
   ],
@@ -947,14 +947,14 @@
   "latest_child_task": "PHASE8-IMPL-023-T023B",
   "latest_child_status": "complete/PASS",
   "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md",
-  "next_child_task": "PHASE8-IMPL-024-T001A",
-  "next_child_title": "Backend OMI-guided creation contract and storage",
-  "next_child_status": "ready",
-  "parent_status": "published/active",
-  "full_mvp_completion_status": "blocked by PHASE8-IMPL-024 P0 guided-creation persistence and Story Check grounding integrity repairs, plus remaining PHASE8-IMPL-023 validation and closeout work",
+  "next_child_task": "PHASE8-IMPL-024-T003B",
+  "next_child_title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
+  "next_child_status": "planned/next/unimplemented",
+  "parent_status": "published/historical foundation",
+  "full_mvp_completion_status": "blocked by remaining PHASE8-IMPL-024 work, planned/inactive PHASE8-IMPL-025 layered delivery, and terminal PHASE8-IMPL-027 acceptance",
   "owner_gate_status": "accepted historically, not full MVP completion",
   "latest_child_title": "Grouped-review React UI and owner-decision integration",
-  "latest_child_summary": "T023B remains complete/PASS and T023 remains in progress. The application-wide UI/UX reconciliation does not downgrade completed work, but it verified P0-A guided-creation input loss and P0-B ungrounded Story Check findings. PHASE8-IMPL-024 now preempts the release frontier; backend-only T001A is ready next. T023C/T023D and T024-T026 remain planned/incomplete.",
+  "latest_child_summary": "T023A/T023B remain complete/PASS historical foundation. Completed PHASE8-IMPL-024 T001/T002/T003A repairs are not reopened. T003B is the application frontier. Current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027.",
   "latest_verified_evidence": {
     "run_id": "20260712T030010Z",
     "classification": "successful evidence collection, not product-wide pass",
@@ -964,18 +964,18 @@
     "failed_advanced_collectors": "excluded from readiness evidence"
   },
   "blocker_summary": [
-    "P0-A: guided creation confirms owner-authored idea and notes but submits only title, persists neither, and returns creation_method blank",
-    "P0-B: Story Check can return contradictory factual warnings without deterministic grounding against the exact selected scene",
+    "P0-A guided-creation integrity is repaired/closed by PHASE8-IMPL-024-T001 complete/PASS",
+    "P0-B Story Check grounding integrity is repaired/closed by PHASE8-IMPL-024-T002 complete/PASS",
     "Broad owner acceptance and MVP readiness remain blocked"
   ],
   "repair_dependency": {
     "parent": "PHASE8-IMPL-024",
-    "next_task": "PHASE8-IMPL-024-T001A",
-    "ordering": ["T001 guided-creation integrity", "T002 Story Check grounding", "T003 optional resources", "T004 responsive containment", "T005 accessibility", "T006 truthful navigation", "T007 OMI information architecture/components", "T008 isolated validation suites"],
+    "next_task": "PHASE8-IMPL-024-T003B",
+    "ordering": ["T001 guided-creation integrity complete/PASS", "T002 Story Check grounding complete/PASS", "T003 optional resources with T003B next", "T006 truthful navigation", "T007 evidence/owner-decision/component foundation", "T004 responsive containment", "T005 accessibility", "T008 reusable validation baseline and parent closeout"],
     "architecture_follow_on": {
       "parent": "PHASE8-IMPL-025",
       "status": "published/planned",
-      "activation_after": ["PHASE8-IMPL-024-T001", "PHASE8-IMPL-024-T002"],
+      "activation_after": ["PHASE8-IMPL-024 parent complete/closed", "closeout validation PASS", "accepted post-closeout Project Memory refresh FRESH"],
       "first_task": "PHASE8-IMPL-025-T001",
       "first_task_status": "planned"
     }

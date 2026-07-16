@@ -4,11 +4,13 @@
 
 - ID: `PHASE8-IMPL-023`
 - Title: OMI AI Tool-Assisted Analysis Candidate Review MVP
-- Status: published/active
+- Status: published/historical foundation
 - Latest completed child: `PHASE8-IMPL-023-T023B`
-- Current child parent: `PHASE8-IMPL-023-T023` (`in_progress`)
-- Remaining children: T023C/T023D and reserved T024-T026 (`planned`)
-- Immediate release-blocker frontier: `PHASE8-IMPL-024-T001A` (`ready`)
+- Current obligations: T023C/T023D incorporated into PHASE8-IMPL-025-T011;
+  T024 incorporated into T012; T025/T026 incorporated into terminal
+  PHASE8-IMPL-027. Historical identities/evidence remain preserved.
+- Immediate release-blocker frontier: `PHASE8-IMPL-024-T003B`
+  (`planned/next/unimplemented`)
 
 ## Owner Override Sources
 
@@ -33,7 +35,10 @@ The MVP target is not deterministic-marker-only extraction. `PHASE8-IMPL-023-T00
 - Full Subtxt licensing/authorization is resolved. Official/full Subtxt runtime is authorized and planned separately under PHASE8-IMPL-025 T005/T006.
 - The completed app-owned `subtxt_informed_rubric` remains distinct, valid, supplemental, deterministic, and non-official.
 - Missing layers include stable source/run identity, immutable evidence lineage, richer BookNLP mappings, evidence-bounded interpretation/grounding, shared semantic guardrails, project-level diagnostics, the full NCP gateway, expanded owner corrections, and isolated layered validation.
-- PHASE8-IMPL-024-T001A remains the immediate implementation frontier; PHASE8-IMPL-024 T001/T002 precede PHASE8-IMPL-025.
+- PHASE8-IMPL-024 T001/T002/T003A are complete/PASS and T003B is the
+  immediate implementation frontier. PHASE8-IMPL-025 remains inactive until
+  full PHASE8-IMPL-024 closeout, passing closeout validation, and an accepted
+  `FRESH` refresh.
 
 ## Current Known Limitation
 
@@ -101,7 +106,8 @@ This inventory is the implemented independent-adapter foundation. The accepted P
 ## Tool Boundary Inventory
 
 - Ollama/model: completed exact-source structured extraction plus a planned distinct normalized-evidence interpretation role; neither selects truth.
-- Story Check: real runtime path exists; P0 exact-source factual grounding remains planned under PHASE8-IMPL-024 T002.
+- Story Check: real runtime and PHASE8-IMPL-024 T002 exact-source factual
+  grounding repair are complete/PASS; layered work reuses rather than reopens it.
 - BookNLP/spaCy: evidence producers; BookNLP expansion, offsets, immutable artifacts, manifests, and uncertainty metadata remain planned.
 - NCP: gateway role; imports are candidates and exports default to approved context only.
 - Official/full Subtxt: authorized/planned, distinct from app-owned rubric identity.
@@ -151,9 +157,12 @@ This inventory is the implemented independent-adapter foundation. The accepted P
 - `PHASE8-IMPL-023-T021`: cross-tool fusion validation using real runtime outputs.
 - `PHASE8-IMPL-023-T022`: candidate-only persistence validation using real runtime outputs.
 - `PHASE8-IMPL-023-T023`: grouped owner-review UI for real runtime findings.
-- `PHASE8-IMPL-023-T024`: automated end-to-end live OMI test.
-- `PHASE8-IMPL-023-T025`: manual Cyber Detective Story live OMI test.
-- `PHASE8-IMPL-023-T026`: historical closeout identity retained; current closeout must include PHASE8-IMPL-024 P0 integrity and PHASE8-IMPL-025 layered gates. Full Subtxt licensing/authorization is resolved and cannot be used as an owner-blocked closeout branch.
+- `PHASE8-IMPL-023-T024`: historical automated end-to-end intent incorporated
+  into PHASE8-IMPL-025-T012.
+- `PHASE8-IMPL-023-T025`: historical manual live-project intent incorporated
+  into PHASE8-IMPL-027.
+- `PHASE8-IMPL-023-T026`: historical closeout identity superseded for current
+  full-MVP closeout by PHASE8-IMPL-027.
 
 ## UI/UX Audit Reconciliation Dependency
 

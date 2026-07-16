@@ -581,3 +581,89 @@ def test_supersession_asymmetry_fails(tmp_path: Path, monkeypatch):
 
     findings = validate_registries.validate(registries_dir)
     assert _has_error(findings, "SUPERSESSION_ASYMMETRY"), "supersession asymmetry should fail"
+
+
+def _write_remaining_mvp_fixture(
+    tmp_path: Path,
+    *,
+    child_authority: str = "authoritative",
+    include_child: bool = True,
+) -> tuple[Path, Path]:
+    registries_dir = tmp_path / "registries"
+    registries_dir.mkdir()
+    manifest = _build_manifest([
+        {"filename": "tasks.json", "record_type": "task", "required": True,
+         "tracked_or_generated": "tracked", "validation_order": 0},
+        {"filename": "dependencies.json", "record_type": "dependency", "required": True,
+         "tracked_or_generated": "tracked", "validation_order": 1},
+    ])
+    _write_registry(registries_dir, "manifest.json", manifest)
+    task_records = [
+        _build_task_record(
+            "task:MVP-PARENT", "MVP-PARENT", status="planned",
+            parent_task_id=None, depends_on=[],
+        )
+    ]
+    if include_child:
+        task_records.append(_build_task_record(
+            "task:MVP-CHILD", "MVP-CHILD", status="planned",
+            authority_class=child_authority,
+            parent_task_id="MVP-PARENT", depends_on=["MVP-PARENT"],
+        ))
+    _write_registry(registries_dir, "tasks.json", _build_registry("task", task_records))
+    dependency_records = []
+    if include_child:
+        dependency_records.append(_build_record(
+            "dependency:mvp-child-on-parent", "dependency",
+            dependency_id="mvp-child-on-parent",
+            source_id="task:MVP-CHILD", target_id="task:MVP-PARENT",
+            dependency_type="task_depends_on", is_separate=False,
+        ))
+    _write_registry(
+        registries_dir, "dependencies.json",
+        _build_registry("dependency", dependency_records),
+    )
+    roadmap_path = tmp_path / "roadmap_index.yaml"
+    roadmap_path.write_text(json.dumps({
+        "active_frontier": {"remaining_mvp_parent_task_ids": ["MVP-PARENT"]},
+        "tasks": [
+            {"id": "MVP-PARENT", "status": "planned", "parent": None, "depends_on": []},
+            {"id": "MVP-CHILD", "status": "planned", "parent": "MVP-PARENT", "depends_on": ["MVP-PARENT"]},
+        ],
+    }), encoding="utf-8")
+    return registries_dir, roadmap_path
+
+
+def test_remaining_mvp_roadmap_and_registry_fixture_pass(tmp_path: Path):
+    registries_dir, roadmap_path = _write_remaining_mvp_fixture(tmp_path)
+    findings = validate_registries.validate(registries_dir, roadmap_path)
+    assert not [f for f in findings if f["level"] == "error"], findings
+
+
+def test_remaining_mvp_task_omission_fails(tmp_path: Path):
+    registries_dir, roadmap_path = _write_remaining_mvp_fixture(
+        tmp_path, include_child=False,
+    )
+    findings = validate_registries.validate(registries_dir, roadmap_path)
+    assert _has_error(findings, "MISSING_NORMALIZED_MVP_TASK", "MVP-CHILD")
+
+
+def test_generated_evidence_cannot_satisfy_remaining_mvp_task(tmp_path: Path):
+    registries_dir, roadmap_path = _write_remaining_mvp_fixture(
+        tmp_path, child_authority="generated_evidence",
+    )
+    findings = validate_registries.validate(registries_dir, roadmap_path)
+    assert _has_error(findings, "MISSING_NORMALIZED_MVP_TASK", "MVP-CHILD")
+    assert _has_error(findings, "UNAUTHORITATIVE_RECORD")
+
+
+def test_duplicate_task_identity_fails(tmp_path: Path):
+    registries_dir, _ = _write_remaining_mvp_fixture(tmp_path)
+    tasks_path = registries_dir / "tasks.json"
+    tasks = json.loads(tasks_path.read_text(encoding="utf-8"))
+    duplicate = dict(tasks["records"][1])
+    duplicate["id"] = "task:MVP-CHILD-DUPLICATE"
+    tasks["records"].append(duplicate)
+    tasks_path.write_text(json.dumps(tasks), encoding="utf-8")
+    findings = validate_registries.validate(registries_dir)
+    assert _has_error(findings, "DUPLICATE_TASK_IDENTITY", "MVP-CHILD")

@@ -502,3 +502,12 @@ The decision must assess accessibility, migration cost, styling ownership,
 dependency impact, React/Vite compatibility, and the existing application
 architecture. No option is pre-authorized.
 <!-- PHASE8-IMPL-024-UI-ORDER:END -->
+160. What exact NCP export destination semantics should the owner select before PHASE8-IMPL-025-T010H closes, including safe destination selection and confirmation behavior? **Owner decision intentionally pending.**
+
+159. What retention or deletion behavior should apply to NCP artifacts, layered raw artifacts, manifests, and ledgers when owner-visible continuity and surviving provenance may be affected? **Owner decision intentionally pending.**
+
+158. Which destructive NCP or diagnostics operations, if any, should exist, and what confirmation/audit/rollback policy must guard them? **Owner decision intentionally pending; no destructive operation is authorized by the planning synchronization.**
+
+157. Should NCP export offer a separately labeled candidate-review bundle, and what exact contents/status semantics should it use without implying local approval? **Owner decision intentionally pending.**
+
+156. Should PHASE8-IMPL-025-T003G use compatible reads or a physical migration for existing persisted data? **Compatible reads require no new owner decision. A physical migration requires owner review only if it changes owner-visible stored structures.**

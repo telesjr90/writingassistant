@@ -45,7 +45,7 @@
   "current_implemented_foundation": [
     "real local spaCy evidence extraction",
     "real Ollama qwen3:8b structured candidate extraction",
-    "real Story Check through analysis_engine and Ollama, with P0 grounding repair still required",
+    "real Story Check through analysis_engine and Ollama, with P0 grounding repair complete/PASS",
     "real BookNLP character/location findings after narrow compatibility repair",
     "explicit owner-selected NCP JSON candidate import validation",
     "app-owned subtxt_informed_rubric",
@@ -61,21 +61,23 @@
     "expanded BookNLP mappings and precise offset translation",
     "official/full authorized Subtxt runtime inventory, contracts, adapter, and validation",
     "two-role evidence-bounded Ollama contract",
-    "completed Story Check factual grounding and layered integration",
+    "layered reuse of the completed Story Check factual-grounding repair",
     "cross-adapter semantic guardrails",
     "read-only project-level narrative diagnostics",
     "full NCP import/export gateway and round-trip provenance",
     "expanded owner correction, merge, split, and rerun lifecycle",
-    "isolated layered end-to-end validation"
+    "live-run API/control plane and owner workflow",
+    "existing persisted-data compatibility",
+    "runtime provisioning and current-machine compatibility matrix",
+    "NCP and diagnostics owner UI",
+    "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
   ],
   "activation": {
     "status": "planned",
-    "depends_on": [
-      "PHASE8-IMPL-024-T001",
-      "PHASE8-IMPL-024-T002"
-    ],
-    "immediate_next_task": "PHASE8-IMPL-024-T001A",
-    "immediate_next_task_status": "ready",
+    "depends_on": ["PHASE8-IMPL-024"],
+    "activation_condition": "PHASE8-IMPL-024 complete/closed, closeout validation PASS, accepted post-closeout Project Memory refresh FRESH",
+    "immediate_next_task": "PHASE8-IMPL-024-T003B",
+    "immediate_next_task_status": "planned/next/unimplemented",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "planned"
   },
@@ -96,35 +98,32 @@
   "child_task_ordering": {
     "T001": ["T001A", "T001B", "T001C", "T001D"],
     "T002": ["T002A", "T002B", "T002C", "T002D", "T002E"],
-    "T003": ["T003A", "T003B", "T003C", "T003D", "T003E"],
+    "T003": ["T003A", "T003B", "T003C", "T003D", "T003E", "T003F", "T003G"],
     "T004": ["T004A", "T004B", "T004C", "T004D", "T004E", "T004F", "T004G"],
-    "T005": ["T005A", "T005B", "T005C", "T005D", "T005E", "T005F", "T005G"],
-    "T006": ["T006A", "T006B", "T006C", "T006D", "T006E", "T006F", "T006G", "T006H", "T006I", "T006J"],
+    "T005": ["T005A", "T005B", "T005C", "T005D", "T005E", "T005F", "T005G", "T005H"],
+    "T006": ["T006A", "T006B", "T006C", "T006D", "T006E", "T006F", "T006G", "T006H", "T006I", "T006J", "T006K"],
     "T007": ["T007A", "T007B", "T007C", "T007D", "T007E"],
     "T008": ["T008A", "T008B", "T008C", "T008D", "T008E"],
     "T009": ["T009A", "T009B", "T009C", "T009D", "T009E", "T009F", "T009G"],
-    "T010": ["T010A", "T010B", "T010C", "T010D", "T010E", "T010F", "T010G"],
-    "T011": ["T011A", "T011B", "T011C", "T011D", "T011E", "T011F", "T011G"],
-    "T012": ["T012A", "T012B", "T012C", "T012D", "T012E", "T012F", "T012G", "T012H", "T012I", "T012J"]
+    "T010": ["T010A", "T010B", "T010C", "T010D", "T010E", "T010F", "T010G", "T010H"],
+    "T011": ["T011A", "T011B", "T011C", "T011D", "T011E", "T011F", "T011G", "T011H"],
+    "T012": ["T012A", "T012B", "T012C", "T012D", "T012E", "T012F", "T012G", "T012H", "T012I", "T012J", "T012K"]
   },
   "dependencies": {
     "external": {
-      "PHASE8-IMPL-025": ["PHASE8-IMPL-024-T002"],
-      "PHASE8-IMPL-025-T007": ["PHASE8-IMPL-024-T002", "PHASE8-IMPL-025-T006"]
+      "PHASE8-IMPL-025": ["PHASE8-IMPL-024"],
+      "PHASE8-IMPL-025-T011H": ["PHASE8-IMPL-024-T007C", "PHASE8-IMPL-025-T003F"]
     },
-    "internal_chain": [
+    "shared_contract_chain": [
       "T001 -> T002",
-      "T002 -> T003",
-      "T003 -> T004",
-      "T004 -> T005",
-      "T005 -> T006",
-      "T006 -> T007",
-      "T007 -> T008",
-      "T008 -> T009",
-      "T009 -> T010",
-      "T010 -> T011",
-      "T011 -> T012"
-    ]
+      "T002 -> T003"
+    ],
+    "contributor_branches": ["T003 -> T004", "T003 -> T005 -> T006", "T003 -> T007"],
+    "shared_contract_children": ["T003 -> T003F", "T003 -> T003G"],
+    "guardrail_join": "T004 + T006 + T007 -> T008",
+    "integration_branches": ["T008 -> T009", "T008 -> T010", "T008 -> T011"],
+    "owner_ui_dependencies": ["T009 + T010 -> T010H", "T003F + PHASE8-IMPL-024-T007C -> T011H"],
+    "final_join": "T003F + T003G + T009 + T010 + T010H + T011 + T011H -> T012 -> PHASE8-IMPL-027"
   },
   "full_subtxt_runtime_path": {
     "status": "planned",
@@ -137,7 +136,8 @@
       "input source identity and hash",
       "analysis operation",
       "transformation into app candidate records"
-    ]
+    ],
+    "provisioning_and_compatibility": "supported callable interfaces and versions; installation/access, discovery, configuration, compatibility, missing/incompatible/unavailable states, preflight accuracy, timeouts, output validation, current-machine evidence, and bounded real-input operation"
   },
   "risks": [
     "source-to-candidate traceability gaps",
@@ -191,7 +191,8 @@
       "project-level diagnostics",
       "full NCP approved export and round trip",
       "expanded correction workflows",
-      "isolated layered end-to-end suites"
+      "layered-runtime and integration deltas over PHASE8-IMPL-024-T008",
+      "terminal PHASE8-IMPL-027 owner acceptance"
     ],
     "apply_promotion_isolated": true,
     "partial_or_failed_collectors_are_not_completion": true

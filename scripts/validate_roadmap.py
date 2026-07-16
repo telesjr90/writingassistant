@@ -21,6 +21,7 @@ INDEX_PATH = ROOT / "docs" / "roadmap" / "roadmap_index.yaml"
 PARENT_RE = re.compile(r"^PHASE[0-9]+-IMPL-[0-9]{3}$")
 UX_PARENT_RE = re.compile(r"^PHASE[0-9]+-UX-[0-9]{3}$")
 CHILD_RE = re.compile(r"^(PHASE[0-9]+-IMPL-[0-9]{3})-T[0-9]{3}$")
+NESTED_CHILD_RE = re.compile(r"^((?:PHASE[0-9]+-IMPL-[0-9]{3})-T[0-9]{3})[A-Z][0-9]*$")
 
 PARENT_TASK_TYPES = {"runtime", "validation", "docs-only"}
 CHILD_TASK_TYPES = {"planning_microtask", "runtime_microtask", "validation_microtask"}
@@ -82,6 +83,12 @@ def validate_registry(data: dict[str, Any]) -> list[str]:
     seen: set[str] = set()
     duplicate_ids: set[str] = set()
     tasks_by_id: dict[str, dict[str, Any]] = {}
+    active_frontier = data.get("active_frontier")
+    terminal_mvp_task_id = (
+        active_frontier.get("terminal_mvp_task_id")
+        if isinstance(active_frontier, dict)
+        else None
+    )
 
     for index, task in enumerate(tasks):
         if not isinstance(task, dict):
@@ -119,8 +126,9 @@ def validate_registry(data: dict[str, Any]) -> list[str]:
         parent_match = PARENT_RE.match(task_id)
         ux_parent_match = UX_PARENT_RE.match(task_id)
         child_match = CHILD_RE.match(task_id)
+        nested_child_match = NESTED_CHILD_RE.match(task_id)
         require(
-            bool(parent_match or ux_parent_match or child_match),
+            bool(parent_match or ux_parent_match or child_match or nested_child_match),
             errors,
             f"{task_id} does not match parent or child task ID policy",
         )
@@ -130,8 +138,8 @@ def validate_registry(data: dict[str, Any]) -> list[str]:
             if isinstance(dep, str):
                 require(dep in tasks_by_id, errors, f"{task_id} depends on unknown task {dep}")
 
-        if child_match:
-            implied_parent = child_match.group(1)
+        if child_match or nested_child_match:
+            implied_parent = (nested_child_match or child_match).group(1)
             require(implied_parent in tasks_by_id, errors, f"{task_id} has missing parent task {implied_parent}")
             require(
                 task.get("parent") == implied_parent,
@@ -163,7 +171,8 @@ def validate_registry(data: dict[str, Any]) -> list[str]:
             require(
                 task_id == "PHASE7-IMPL-010"
                 or task.get("parent") == "PHASE7-IMPL-010"
-                or task_id.startswith("PHASE7-IMPL-004-T"),
+                or task_id.startswith("PHASE7-IMPL-004-T")
+                or task_id == terminal_mvp_task_id,
                 errors,
                 f"{task_id} is validation work but is not PHASE7-IMPL-010, a child of PHASE7-IMPL-010, or a PHASE7-IMPL-004 compatibility test micro-task",
             )

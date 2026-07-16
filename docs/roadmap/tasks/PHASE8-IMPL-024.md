@@ -60,6 +60,11 @@ order establish execution sequence:
 - Accessibility semantics, target sizing, and keyboard validation: `T005`.
 - Remaining validation suites: `T008`.
 
+The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
+T005 -> T008`. T003B and T003C close T003 before T006 begins. T007 follows
+T006, and T007C must complete before either T004 or T005 begins. This order is
+already owner-approved and does not require another decision gate.
+
 This ordering prevents premature visual polish, avoids selecting a component
 library without evidence, and avoids repeating responsive and accessibility
 work after shared components are replaced.
@@ -141,6 +146,14 @@ The policy must distinguish the WCAG 2.2 24 CSS-pixel minimum target requirement
 - `PHASE8-IMPL-024-T008F` - Non-mutating resilience and accessibility suite (`planned`; loading, degraded, failure, retry, recovery, evidence-drawer focus restoration, complete keyboard navigation, browser zoom, and screen-reader behavior).
 
 Every future mutation suite must use its own disposable `uiux-audit-*` project; capture API and filesystem manifests before and after; reject writes outside that project; preserve all existing projects; package evidence before cleanup; and remove only the exact disposable project. Apply-promotion validation must never be combined with read-only or candidate-decision validation.
+
+T008 is the reusable UI/readiness regression baseline for later layered work.
+PHASE8-IMPL-025-T012 adds only layered-runtime and integration deltas. Candidate
+lifecycle, promotion, apply-promotion, review-queue, and owner-decision
+assertions must be reused from these suites rather than independently
+reimplemented. T008 closeout must validate and close the PHASE8-IMPL-024 parent;
+the accepted post-closeout Project Memory refresh must be `FRESH` before
+PHASE8-IMPL-025 may activate.
 
 ## Evidence Classifications
 

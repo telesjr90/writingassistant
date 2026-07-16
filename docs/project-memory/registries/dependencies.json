@@ -48,7 +48,7 @@
       "id": "dependency:impl-025-separate-from-frontier",
       "type": "dependency",
       "schema_version": "1.0.0",
-      "title": "PHASE8-IMPL-025 remains separate from application frontier",
+      "title": "PHASE8-IMPL-025 activates only after PHASE8-IMPL-024 closeout",
       "authority_class": "authoritative",
       "lifecycle": {
         "status": "current"
@@ -61,10 +61,10 @@
       },
       "dependency_id": "impl-025-separate-from-frontier",
       "source_id": "task:PHASE8-IMPL-025",
-      "target_id": "task:PHASE8-IMPL-024-T003B",
-      "dependency_type": "boundary_constrains",
+      "target_id": "task:PHASE8-IMPL-024",
+      "dependency_type": "task_depends_on",
       "is_separate": true,
-      "notes": "PHASE8-IMPL-025 is intentionally separate from the application frontier. Its T001/T002 prerequisites are satisfied but T003B is the active frontier and no PHASE8-IMPL-025 child is activated."
+      "notes": "One parent-closeout activation boundary: PHASE8-IMPL-024 complete/closed, closeout validation PASS, and accepted post-closeout FRESH refresh."
     },
     {
       "id": "dependency:pm-does-not-replace-impl-024",
@@ -250,6 +250,174 @@
       "target_id": "task:PHASE8-IMPL-026-T010",
       "dependency_type": "task_depends_on",
       "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t001-on-parent", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-024 T001 depends on parent", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t001-on-parent", "source_id": "task:PHASE8-IMPL-024-T001", "target_id": "task:PHASE8-IMPL-024", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t002-on-t001", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-024 T002 depends on T001", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t002-on-t001", "source_id": "task:PHASE8-IMPL-024-T002", "target_id": "task:PHASE8-IMPL-024-T001", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t003-on-t002", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-024 T003 depends on T002", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t003-on-t002", "source_id": "task:PHASE8-IMPL-024-T003", "target_id": "task:PHASE8-IMPL-024-T002", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t003a-on-t002", "type": "dependency", "schema_version": "1.0.0", "title": "T003A depends on T002", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t003a-on-t002", "source_id": "task:PHASE8-IMPL-024-T003A", "target_id": "task:PHASE8-IMPL-024-T002", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t003b-on-t003a", "type": "dependency", "schema_version": "1.0.0", "title": "T003B depends on T003A", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t003b-on-t003a", "source_id": "task:PHASE8-IMPL-024-T003B", "target_id": "task:PHASE8-IMPL-024-T003A", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t003c-on-t003b", "type": "dependency", "schema_version": "1.0.0", "title": "T003C depends on T003B", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t003c-on-t003b", "source_id": "task:PHASE8-IMPL-024-T003C", "target_id": "task:PHASE8-IMPL-024-T003B", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t006-on-t003", "type": "dependency", "schema_version": "1.0.0", "title": "T006 depends on T003", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t006-on-t003", "source_id": "task:PHASE8-IMPL-024-T006", "target_id": "task:PHASE8-IMPL-024-T003", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t007-on-t006", "type": "dependency", "schema_version": "1.0.0", "title": "T007 depends on T006", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t007-on-t006", "source_id": "task:PHASE8-IMPL-024-T007", "target_id": "task:PHASE8-IMPL-024-T006", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t004-on-t007c", "type": "dependency", "schema_version": "1.0.0", "title": "T004 depends on T007C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t004-on-t007c", "source_id": "task:PHASE8-IMPL-024-T004", "target_id": "task:PHASE8-IMPL-024-T007C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t005-on-t004c", "type": "dependency", "schema_version": "1.0.0", "title": "T005 depends on T004C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t005-on-t004c", "source_id": "task:PHASE8-IMPL-024-T005", "target_id": "task:PHASE8-IMPL-024-T004C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008 depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t006a-on-t003c", "type": "dependency", "schema_version": "1.0.0", "title": "T006A depends on T003C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t006a-on-t003c", "source_id": "task:PHASE8-IMPL-024-T006A", "target_id": "task:PHASE8-IMPL-024-T003C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t006b-on-t006a", "type": "dependency", "schema_version": "1.0.0", "title": "T006B depends on T006A", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t006b-on-t006a", "source_id": "task:PHASE8-IMPL-024-T006B", "target_id": "task:PHASE8-IMPL-024-T006A", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t006c-on-t006b", "type": "dependency", "schema_version": "1.0.0", "title": "T006C depends on T006B", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t006c-on-t006b", "source_id": "task:PHASE8-IMPL-024-T006C", "target_id": "task:PHASE8-IMPL-024-T006B", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t007a-on-t006c", "type": "dependency", "schema_version": "1.0.0", "title": "T007A depends on T006C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t007a-on-t006c", "source_id": "task:PHASE8-IMPL-024-T007A", "target_id": "task:PHASE8-IMPL-024-T006C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t007b-on-t007a", "type": "dependency", "schema_version": "1.0.0", "title": "T007B depends on T007A", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t007b-on-t007a", "source_id": "task:PHASE8-IMPL-024-T007B", "target_id": "task:PHASE8-IMPL-024-T007A", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t007c-on-t007b", "type": "dependency", "schema_version": "1.0.0", "title": "T007C depends on T007B", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t007c-on-t007b", "source_id": "task:PHASE8-IMPL-024-T007C", "target_id": "task:PHASE8-IMPL-024-T007B", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t004a-on-t007c", "type": "dependency", "schema_version": "1.0.0", "title": "T004A depends on T007C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t004a-on-t007c", "source_id": "task:PHASE8-IMPL-024-T004A", "target_id": "task:PHASE8-IMPL-024-T007C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t004b-on-t004a", "type": "dependency", "schema_version": "1.0.0", "title": "T004B depends on T004A", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t004b-on-t004a", "source_id": "task:PHASE8-IMPL-024-T004B", "target_id": "task:PHASE8-IMPL-024-T004A", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t004c-on-t004b", "type": "dependency", "schema_version": "1.0.0", "title": "T004C depends on T004B", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t004c-on-t004b", "source_id": "task:PHASE8-IMPL-024-T004C", "target_id": "task:PHASE8-IMPL-024-T004B", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t005a-on-t004c", "type": "dependency", "schema_version": "1.0.0", "title": "T005A depends on T004C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t005a-on-t004c", "source_id": "task:PHASE8-IMPL-024-T005A", "target_id": "task:PHASE8-IMPL-024-T004C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t005b-on-t005a", "type": "dependency", "schema_version": "1.0.0", "title": "T005B depends on T005A", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t005b-on-t005a", "source_id": "task:PHASE8-IMPL-024-T005B", "target_id": "task:PHASE8-IMPL-024-T005A", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t005c-on-t005b", "type": "dependency", "schema_version": "1.0.0", "title": "T005C depends on T005B", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t005c-on-t005b", "source_id": "task:PHASE8-IMPL-024-T005C", "target_id": "task:PHASE8-IMPL-024-T005B", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008a-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008A depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008a-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008A", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008b-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008B depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008b-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008B", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008c-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008C depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008c-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008C", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008d-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008D depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008d-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008D", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008e-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008E depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008e-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008E", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl024-t008f-on-t005c", "type": "dependency", "schema_version": "1.0.0", "title": "T008F depends on T005C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl024-t008f-on-t005c", "source_id": "task:PHASE8-IMPL-024-T008F", "target_id": "task:PHASE8-IMPL-024-T005C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t001-on-parent", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-025 T001 depends on parent", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t001-on-parent", "source_id": "task:PHASE8-IMPL-025-T001", "target_id": "task:PHASE8-IMPL-025", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t002-on-t001", "type": "dependency", "schema_version": "1.0.0", "title": "T002 depends on T001", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t002-on-t001", "source_id": "task:PHASE8-IMPL-025-T002", "target_id": "task:PHASE8-IMPL-025-T001", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t003-on-t002", "type": "dependency", "schema_version": "1.0.0", "title": "T003 depends on T002", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t003-on-t002", "source_id": "task:PHASE8-IMPL-025-T003", "target_id": "task:PHASE8-IMPL-025-T002", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t003f-on-t003", "type": "dependency", "schema_version": "1.0.0", "title": "T003F depends on T003", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t003f-on-t003", "source_id": "task:PHASE8-IMPL-025-T003F", "target_id": "task:PHASE8-IMPL-025-T003", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t003g-on-t003", "type": "dependency", "schema_version": "1.0.0", "title": "T003G depends on T003", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t003g-on-t003", "source_id": "task:PHASE8-IMPL-025-T003G", "target_id": "task:PHASE8-IMPL-025-T003", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t004-on-t003", "type": "dependency", "schema_version": "1.0.0", "title": "T004 depends on T003", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t004-on-t003", "source_id": "task:PHASE8-IMPL-025-T004", "target_id": "task:PHASE8-IMPL-025-T003", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t005-on-t003", "type": "dependency", "schema_version": "1.0.0", "title": "T005 depends on T003", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t005-on-t003", "source_id": "task:PHASE8-IMPL-025-T005", "target_id": "task:PHASE8-IMPL-025-T003", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t006-on-t005", "type": "dependency", "schema_version": "1.0.0", "title": "T006 depends on T005", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t006-on-t005", "source_id": "task:PHASE8-IMPL-025-T006", "target_id": "task:PHASE8-IMPL-025-T005", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t007-on-t003", "type": "dependency", "schema_version": "1.0.0", "title": "T007 depends on T003", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t007-on-t003", "source_id": "task:PHASE8-IMPL-025-T007", "target_id": "task:PHASE8-IMPL-025-T003", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t008-on-t004", "type": "dependency", "schema_version": "1.0.0", "title": "T008 depends on T004", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t008-on-t004", "source_id": "task:PHASE8-IMPL-025-T008", "target_id": "task:PHASE8-IMPL-025-T004", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t008-on-t006", "type": "dependency", "schema_version": "1.0.0", "title": "T008 depends on T006", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t008-on-t006", "source_id": "task:PHASE8-IMPL-025-T008", "target_id": "task:PHASE8-IMPL-025-T006", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t008-on-t007", "type": "dependency", "schema_version": "1.0.0", "title": "T008 depends on T007", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t008-on-t007", "source_id": "task:PHASE8-IMPL-025-T008", "target_id": "task:PHASE8-IMPL-025-T007", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t009-on-t008", "type": "dependency", "schema_version": "1.0.0", "title": "T009 depends on T008", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t009-on-t008", "source_id": "task:PHASE8-IMPL-025-T009", "target_id": "task:PHASE8-IMPL-025-T008", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t010-on-t008", "type": "dependency", "schema_version": "1.0.0", "title": "T010 depends on T008", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t010-on-t008", "source_id": "task:PHASE8-IMPL-025-T010", "target_id": "task:PHASE8-IMPL-025-T008", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t010h-on-t009", "type": "dependency", "schema_version": "1.0.0", "title": "T010H depends on T009", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t010h-on-t009", "source_id": "task:PHASE8-IMPL-025-T010H", "target_id": "task:PHASE8-IMPL-025-T009", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t010h-on-t010", "type": "dependency", "schema_version": "1.0.0", "title": "T010H depends on T010 backend contracts", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t010h-on-t010", "source_id": "task:PHASE8-IMPL-025-T010H", "target_id": "task:PHASE8-IMPL-025-T010", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t011-on-t008", "type": "dependency", "schema_version": "1.0.0", "title": "T011 depends on T008", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t011-on-t008", "source_id": "task:PHASE8-IMPL-025-T011", "target_id": "task:PHASE8-IMPL-025-T008", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t011h-on-t003f", "type": "dependency", "schema_version": "1.0.0", "title": "T011H depends on T003F", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t011h-on-t003f", "source_id": "task:PHASE8-IMPL-025-T011H", "target_id": "task:PHASE8-IMPL-025-T003F", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t011h-on-impl024-t007c", "type": "dependency", "schema_version": "1.0.0", "title": "T011H depends on PHASE8-IMPL-024 T007C", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t011h-on-impl024-t007c", "source_id": "task:PHASE8-IMPL-025-T011H", "target_id": "task:PHASE8-IMPL-024-T007C", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t009", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T009", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t009", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T009", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t010", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T010", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t010", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T010", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t011", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T011", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t011", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T011", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t003f", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T003F", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t003f", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T003F", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t003g", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T003G", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t003g", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T003G", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t010h", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T010H", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t010h", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T010H", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl025-t012-on-t011h", "type": "dependency", "schema_version": "1.0.0", "title": "T012 depends on T011H", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl025-t012-on-t011h", "source_id": "task:PHASE8-IMPL-025-T012", "target_id": "task:PHASE8-IMPL-025-T011H", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl027-on-impl025-t012", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-027 depends on PHASE8-IMPL-025 T012", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl027-on-impl025-t012", "source_id": "task:PHASE8-IMPL-027", "target_id": "task:PHASE8-IMPL-025-T012", "dependency_type": "task_depends_on", "is_separate": false
     }
   ]
 }

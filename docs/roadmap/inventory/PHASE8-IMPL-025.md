@@ -5,9 +5,10 @@
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
 - Status: published/planned
-- Immediate implementation frontier: unchanged at
-  `PHASE8-IMPL-024-T001A` (`ready`)
-- Activation dependency: PHASE8-IMPL-024 T001 and T002 complete
+- Immediate implementation frontier: `PHASE8-IMPL-024-T003B`
+  (`planned/next/unimplemented`)
+- Activation dependency: PHASE8-IMPL-024 fully complete/closed, closeout
+  validation PASS, and accepted post-closeout Project Memory refresh `FRESH`
 - Controlling decision:
   `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`
 
@@ -27,7 +28,7 @@
 1. Real local spaCy extraction.
 2. Real Ollama/qwen3:8b structured candidate extraction.
 3. Real Story Check through the existing analysis engine/Ollama, with P0
-   grounding repair still required.
+   grounding repair complete/PASS.
 4. Real BookNLP character/location findings and compatibility repair.
 5. Explicit owner-selected NCP JSON candidate import validation.
 6. App-owned Subtxt-informed and dramatica-flow-informed rubrics.
@@ -67,21 +68,29 @@ layers or official/full Subtxt runtime path.
 11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion.
 12. `PHASE8-IMPL-025-T012` — Layered end-to-end validation.
 
+Accepted bounded additions: T003F live-run API/control plane; T003G persisted-
+data compatibility; T005H/T006K provisioning and current-machine runtime
+compatibility; T010H NCP/diagnostics owner UI; T011H owner live-run workflow;
+T012K layered integration deltas. PHASE8-IMPL-027 is the terminal gate.
+
 All are planned. Lettered bounded slices are defined in the parent task record.
 
 ## Dependencies
 
 ```text
-PHASE8-IMPL-024-T001
-  -> PHASE8-IMPL-024-T002
-  -> PHASE8-IMPL-025
-  -> T001 -> T002 -> T003 -> T004 -> T005 -> T006
-  -> T007 -> T008 -> T009 -> T010 -> T011 -> T012
+PHASE8-IMPL-024 closeout + validation PASS + accepted FRESH refresh
+  -> PHASE8-IMPL-025 -> T001 -> T002 -> T003
+  -> [T004] + [T005 -> T006] + [T007]
+  -> T008
+  -> [T009] + [T010] + [T011]
+  -> T012 -> PHASE8-IMPL-027
 ```
 
-T007 consumes PHASE8-IMPL-024-T002's Story Check grounding work and must not
-duplicate or conflict with it. T012I apply-promotion validation remains an
-isolated suite.
+T007 consumes PHASE8-IMPL-024-T002's completed Story Check grounding work and
+must not duplicate it. T010H waits for T009 and T010 backend contracts; T011H
+waits for T003F and the completed PHASE8-IMPL-024 component foundation. T012
+reuses PHASE8-IMPL-024-T008 and adds only layered deltas. T012I apply-promotion
+validation remains isolated.
 
 ## Open technical questions
 

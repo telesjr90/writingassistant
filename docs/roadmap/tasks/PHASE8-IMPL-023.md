@@ -2,13 +2,21 @@
 
 ## Status
 
-Published and active.
+Published historical foundation. It is no longer the current application
+frontier.
 
 Latest completed child: `PHASE8-IMPL-023-T023B - Grouped-review React UI and owner-decision integration`.
 
-T023 remains in progress. T023C and T023D remain planned. T024-T026 remain reserved and incomplete.
+T023A and T023B remain complete/PASS. The still-current T023C/T023D lifecycle
+intent is incorporated into PHASE8-IMPL-025-T011; T024 automated end-to-end
+intent is incorporated into PHASE8-IMPL-025-T012; and T025/T026 manual and
+closeout intent is incorporated into terminal PHASE8-IMPL-027. Their historical
+identities and evidence are preserved, but they are not competing active tasks,
+test suites, closeouts, or owner gates.
 
-The immediate release-blocker frontier is now the separate `PHASE8-IMPL-024` parent, beginning with backend-only `PHASE8-IMPL-024-T001A`. The UI/UX audit does not invalidate or downgrade T023A/T023B, but broad owner acceptance and PHASE8-IMPL-023 closeout are blocked until the PHASE8-IMPL-024 P0 integrity repairs and their focused validation pass.
+The immediate release-blocker frontier is the separate `PHASE8-IMPL-024`
+parent at `PHASE8-IMPL-024-T003B`. T001/T002 and T003A are complete/PASS;
+T003B is next and unimplemented; T003C remains planned.
 
 Full MVP completion closeout remains blocked by the PHASE8-IMPL-024 P0 integrity work and the missing layered-architecture gates now owned by PHASE8-IMPL-025. Scoped real-runtime fusion, candidate-only persistence, and grouped-review foundations already exist and remain valid; they are not proof that the full target is complete. Subtxt licensing/authorization is resolved and cannot be used as an owner-blocked closeout exception.
 
@@ -33,13 +41,21 @@ MVP OMI requires tool-assisted analysis that can use Ollama/local AI models, Sto
 - Full Subtxt licensing and authorization concerns are resolved. Full runtime is authorized and planned separately in PHASE8-IMPL-025 T005/T006.
 - T019C-T019F remain complete/PASS for the app-owned `subtxt_informed_rubric`; they are not official/full Subtxt execution and are not downgraded.
 - T023A and T023B remain complete/PASS. Existing persisted findings remain pending, unapproved, promotion-ineligible, candidate-only, and non-canon.
-- The immediate implementation task remains `PHASE8-IMPL-024-T001A`; PHASE8-IMPL-024 T001/T002 precede PHASE8-IMPL-025 activation.
+- The immediate implementation task is `PHASE8-IMPL-024-T003B`.
+  PHASE8-IMPL-025 remains inactive until the entire PHASE8-IMPL-024 parent
+  closes, closeout validation passes, and the accepted post-closeout Project
+  Memory refresh is `FRESH`.
 
 ## Current Gap
 
 The current OMI path includes real spaCy, Ollama, Story Check, BookNLP, and NCP-import execution; both app-owned rubrics; deterministic fusion/conflict/uncertainty; candidate-only persistence; and grouped-review UI foundations. The deterministic marker extractor remains fallback-only, and fixture contracts remain schema/safety evidence rather than substitutes for live proof.
 
-The immediate gaps are P0 guided-creation integrity and Story Check factual grounding. The subsequent architecture gaps are stable source/run identity, immutable raw/evidence lineage, expanded BookNLP output, official/full authorized Subtxt runtime, evidence-bounded interpretation, shared semantic guardrails, read-only project diagnostics, full NCP approved export/round trip, expanded owner corrections, and isolated end-to-end validation.
+The P0 guided-creation and Story Check grounding repairs are complete/PASS, as
+is the T003A readiness contract. The immediate gap is T003B/T003C optional-
+resource frontend handling and validation. Subsequent architecture gaps are
+the accepted PHASE8-IMPL-025 API/UI/compatibility/provisioning/layered work and
+terminal PHASE8-IMPL-027 acceptance; completed repair work must not be reopened
+or duplicated.
 
 Technical unavailability must remain explicit and fail closed. Full Subtxt runtime work is planned and may not be omitted or reclassified as owner-blocked for licensing/authorization reasons.
 
@@ -98,7 +114,9 @@ This architecture is an implemented independent-contributor foundation, not the 
 ## Tool Boundaries
 
 - Ollama/model: the completed exact-source structured extraction path remains valid; PHASE8-IMPL-025 adds a distinct evidence-bounded interpretation role over normalized evidence. Both are source/hash/evidence/provenance-bound and non-canon.
-- Story Check: real runtime execution is complete/PASS, but PHASE8-IMPL-024 T002 remains the P0 exact-source/hash/factual-grounding/quarantine repair. PHASE8-IMPL-025 consumes that repair without duplicating it.
+- Story Check: real runtime execution and PHASE8-IMPL-024 T002 exact-source,
+  hash, factual-grounding, quarantine, and fail-closed repair are complete/PASS.
+  PHASE8-IMPL-025 consumes that result without reopening or duplicating it.
 - BookNLP/spaCy: evidence producers only. Current real character/location/entity-style findings remain valid; BookNLP alias/coreference, quotes/speakers, events, possessions, richer entity types, offsets, artifacts, and run manifests remain planned.
 - NCP: primarily an explicit import/export gateway. The current owner-selected candidate-import validator is a valid narrow foundation; external status is not local approval and approved-context export remains planned.
 - Official/full Subtxt: authorized and planned separately under PHASE8-IMPL-025 T005/T006 with official identity/version/model/provider provenance, analysis allowlist, generation/rewrite/mutation blocklist, source hashes, evidence ledger, candidate-only persistence, and grouped-review validation.
@@ -174,13 +192,23 @@ This architecture is an implemented independent-contributor foundation, not the 
 - `PHASE8-IMPL-023-T021` - Cross-tool fusion validation using real runtime outputs.
 - `PHASE8-IMPL-023-T022` - Candidate-only persistence validation using real runtime outputs.
 - `PHASE8-IMPL-023-T023` - Grouped owner-review UI for real runtime findings.
-- `PHASE8-IMPL-023-T024` - Automated end-to-end live OMI test.
-- `PHASE8-IMPL-023-T025` - Manual Cyber Detective Story live OMI test.
-- `PHASE8-IMPL-023-T026` - Historical closeout identity retained; current closeout must also account for PHASE8-IMPL-024 P0 integrity and PHASE8-IMPL-025 layered gates. Subtxt licensing/authorization cannot satisfy the historical owner-blocked branch.
+- `PHASE8-IMPL-023-T024` - Historical automated end-to-end intent retained and
+  incorporated into PHASE8-IMPL-025-T012; not a competing terminal suite.
+- `PHASE8-IMPL-023-T025` - Historical manual live-project intent retained and
+  incorporated into PHASE8-IMPL-027.
+- `PHASE8-IMPL-023-T026` - Historical closeout identity retained and
+  superseded for current full-MVP closeout by PHASE8-IMPL-027. Subtxt
+  licensing/authorization cannot satisfy the historical owner-blocked branch.
 
-Audit-reconciliation dependency: T023C/T023D and T024-T026 retain their identities and planned status. They do not satisfy guided-creation persistence, Story Check grounding, or product-wide validation. `PHASE8-IMPL-024-T001A` is the next implementation task before broad readiness work resumes.
+Audit-reconciliation dependency: historical T023C/T023D and T024-T026 retain
+their identities and evidence, while their current obligations are incorporated
+into PHASE8-IMPL-025-T011/T012 and PHASE8-IMPL-027. They do not reopen completed
+guided-creation or Story Check repairs. `PHASE8-IMPL-024-T003B` is next.
 
-Architecture-reconciliation dependency: PHASE8-IMPL-025 is a separate planned non-UI parent. It does not overload PHASE8-IMPL-024's repair children or downgrade PHASE8-IMPL-023 results. It adds the missing source/run/evidence layers, full Subtxt runtime, expanded BookNLP/NCP/guardrail/diagnostic/review work, and layered validation after PHASE8-IMPL-024 T001/T002.
+Architecture-reconciliation dependency: PHASE8-IMPL-025 is a separate planned
+and inactive parent. It does not overload PHASE8-IMPL-024's repair children or
+downgrade PHASE8-IMPL-023 results. It activates only after PHASE8-IMPL-024
+parent closeout, closeout validation, and an accepted `FRESH` refresh.
 
 ## Non-Goals
 

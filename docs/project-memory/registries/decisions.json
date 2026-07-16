@@ -172,6 +172,26 @@
       "selected_option": "Use an event-driven commit-bound cadence; owner-controlled complete-commit synchronization; read-only status diagnosis; one-command clean-HEAD refresh; ephemeral exact-commit CI rebuild; deterministic inventories, checksums, bindings, semantic and authority validation, and quality packages; no cron or automatic Git/authority mutation.",
       "rationale": "Repository divergence rather than elapsed time determines freshness. Deterministic validation and rebuild provide reproducible evidence while preserving owner control and generated-evidence non-authority.",
       "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
+    },
+    {
+      "id": "decision:whole-remaining-mvp-plan-integrity",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Whole Remaining MVP Plan Integrity Owner Acceptance",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-027",
+        "accepted_by": "owner",
+        "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-027-whole-remaining-mvp-plan-integrity-owner-acceptance.md"}],
+        "owner_decision_ref": "owner-decision:whole-remaining-mvp-plan-integrity"
+      },
+      "decision_id": "whole-remaining-mvp-plan-integrity",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-027-whole-remaining-mvp-plan-integrity-owner-acceptance.md",
+      "question": "What authoritative remaining-MVP order, activation boundary, dependency graph, missing deliverables, validation reuse, and terminal gate should govern delivery after the bound council review?",
+      "selected_option": "Accept the bounded consolidated planning changes: PHASE8-IMPL-024 order T003->T006->T007->T004->T005->T008; PHASE8-IMPL-025 activation only after full parent closeout plus FRESH refresh; shared contracts then contributor branches and joins; API/UI/compatibility/NCP obligations; provisioning in T005/T006; reusable T008 baseline and T012 deltas; terminal PHASE8-IMPL-027 owner gate.",
+      "rationale": "The owner accepted only the bounded planning conclusions from the checksum-verified generated-evidence package. Explicit tracked authority resolves contradictory order, activation, dependency, completeness, and terminal-gate records without authorizing application implementation.",
+      "affected_tasks": ["PHASE8-IMPL-023", "PHASE8-IMPL-024", "PHASE8-IMPL-025", "PHASE8-IMPL-027"]
     }
   ]
 }

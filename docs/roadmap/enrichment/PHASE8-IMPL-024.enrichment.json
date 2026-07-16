@@ -12,13 +12,12 @@
     "follow_on_status": "published/planned",
     "controlling_architecture_decision": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
     "activation_after": [
-      "PHASE8-IMPL-024-T001",
-      "PHASE8-IMPL-024-T002"
+      "PHASE8-IMPL-024"
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
     "immediate_next_task": "PHASE8-IMPL-024-T003B",
-    "activation_state": "T001 and T002 are complete/PASS; T003A is complete/PASS; T003 remains active with T003B next and T003C planned; PHASE8-IMPL-025 prerequisites are satisfied but no PHASE8-IMPL-025 child is activated"
+    "activation_state": "T001/T002/T003A are complete/PASS; T003B is next and T003C planned. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed, closeout validation passes, and the accepted post-closeout Project Memory refresh is FRESH"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -137,6 +136,8 @@
     "PHASE8-IMPL-024-T005 Accessibility semantics and target sizing after responsive repair",
     "PHASE8-IMPL-024-T008 Remaining validation suites"
   ],
+  "controlling_indexed_order": ["T003", "T006", "T007", "T004", "T005", "T008"],
+  "t008_reuse": "Reusable UI/readiness regression baseline; PHASE8-IMPL-025-T012 adds layered-runtime and integration deltas without reimplementing candidate lifecycle, promotion, apply-promotion, review-command, or owner-decision assertions",
   "child_task_ordering": {
     "T001": [
       "T001A",

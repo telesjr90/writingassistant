@@ -1,0 +1,32 @@
+{
+  "task_id": "PHASE8-IMPL-027",
+  "title": "Current Full-MVP Owner Acceptance and Closeout",
+  "status": "published/planned/inactive",
+  "task_type": "terminal acceptance parent",
+  "mvp_required": true,
+  "depends_on": ["PHASE8-IMPL-025-T012"],
+  "activation": "after PHASE8-IMPL-025 and T012 are complete/PASS",
+  "owner_gate": "accept/reject/defer required",
+  "mandatory_refresh": true,
+  "required_evidence": [
+    "current application and real owner project data",
+    "browser-to-HTTP live invocation",
+    "required available runtime matrix with fixture/deferred/unavailable/owner-blocked classifications",
+    "installation/version/discovery/configuration/preflight matrix",
+    "raw artifact/hash/manifest/evidence-ledger/candidate validation",
+    "failure/timeout/unavailable/partial/retry/recovery paths",
+    "clean browser console/network plus accessibility/responsive evidence",
+    "filesystem diff proving no unauthorized mutation",
+    "limitations and support evidence",
+    "authoritative closeout publication and final Project Memory refresh"
+  ],
+  "boundaries": [
+    "analysis-only",
+    "candidate-only outputs",
+    "no generated prose",
+    "no automatic promotion",
+    "no automatic apply-promotion",
+    "no automatic Memory/Canon mutation",
+    "explicit owner control"
+  ]
+}
