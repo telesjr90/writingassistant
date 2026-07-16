@@ -102,6 +102,9 @@ silently override it.
     or model invoked).
 11. `PHASE8-IMPL-026-T011` — Synchronization, CI, rebuild, and operational
     rollout (complete/PASS; Q154 resolved by event-driven commit-bound policy).
+12. `PHASE8-IMPL-026-T012` — Remaining-MVP current-truth,
+    execution-routing, and shared UI-guidance maintenance (complete/PASS;
+    explicit post-closeout governance maintenance, no application scope).
 
 T006 and T007 are owner-deferred because no benchmarkable symbol-navigation,
 retrieval-quality, citation, scale, latency, or maintainability gap has been
@@ -115,7 +118,7 @@ LlamaIndex, and Qdrant are not approved dependencies.
 PHASE8-IMPL-026-T001 (complete/PASS)
   -> T002 (complete/PASS) -> T003 -> T004 -> T005 (complete/PASS) -> T006 [contingent]
                                    -> T007 [contingent]
-                            -> T008 -> T009 -> T010 -> T011
+                            -> T008 -> T009 -> T010 -> T011 -> T012
 ```
 
 ## Safety inventory
@@ -173,8 +176,10 @@ implemented by T001.
 - T001, T002, T003A, T003B, T004B, T004C, T004C1, T004C2, T005, T008, and T009 are delivered.
 - The accepted current T004C2 publication is the `20260714T221454Z` set bound to `8961b35`.
 - T006/T007 remain owner-deferred, planned/contingent/inactive, and unimplemented.
-- T010/T011 are complete/PASS. PHASE8-IMPL-026 is complete/closed as
-  complete/PASS-WITH-FINDINGS. There is no next Project Memory implementation
-  task; maintenance follows the T011 operational procedure. The application
+- T010/T011 are complete/PASS. T012 is owner-authorized bounded post-closeout
+  maintenance in progress/validation pending. PHASE8-IMPL-026 remains
+  complete/closed as complete/PASS-WITH-FINDINGS. T012 is not an application
+  implementation frontier; after acceptance, maintenance returns to the T011
+  operational procedure. The application
   frontier `PHASE8-IMPL-024-T003B` is the sole next application implementation
-  focus; no Project Memory implementation task remains.
+  focus.

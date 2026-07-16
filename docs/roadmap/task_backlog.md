@@ -1,3 +1,17 @@
+# Task Backlog — Current Repository Truth
+
+<!-- CURRENT-REPOSITORY-TRUTH:START -->
+- Active application parent: `PHASE8-IMPL-024`
+- Immediate application frontier: `PHASE8-IMPL-024-T003B`
+- Planned architecture parent: `PHASE8-IMPL-025`
+- Terminal MVP gate: `PHASE8-IMPL-027`
+- Current routing source: `docs/project-memory/registries/execution-routing.json`
+<!-- CURRENT-REPOSITORY-TRUTH:END -->
+
+This block is the current summary. All later backlog snapshots and “next task”
+statements are historical at the commits represented by their adjacent records
+unless explicitly classified as current.
+
 # PHASE8-IMPL-026 Project Memory and Plan Integrity
 
 - Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature.
@@ -11,8 +25,8 @@
 - T004 (human-readable Project Memory) is complete/PASS-WITH-FINDINGS. T004A and T004C are complete/PASS-WITH-FINDINGS; T004B, T004C1, and T004C2 are complete/PASS. The `20260714T213628Z` T004C1 refresh is current and task-state convergent but rejected because of a false-positive authority-keyword gate. T004C2 implements subject-aware authority semantics, allowed-reference classifications, and concrete forbidden-claim page/line diagnostics; renderer wording was unchanged. Accepted current publication is pending a post-T004C2 clean-HEAD refresh.
 - T005 existing context-tool integration is complete/PASS: read-only Repomix, Graphify, and CCE evidence import, deterministic envelopes and quarantine, no live tool execution.
 - T006/T007 owner decision: both pilots are deferred for lack of a measured benchmarkable symbol-navigation, retrieval-quality, citation, scale, latency, or maintainability gap. They remain contingent, planned, inactive, and unimplemented; deferral is not rejection or installation approval.
-- T008 shared agent guidance and Project Memory Ask, T009 deterministic Plan Integrity, T010 specialized reviewers, and T011 operational rollout are complete/PASS. There is no next Project Memory implementation task; ongoing maintenance follows T011.
-- Workstream status: PHASE8-IMPL-026 is complete/closed as complete/PASS-WITH-FINDINGS. T001/T002/T005/T008/T009/T010/T011 are complete/PASS; T003/T004 are complete/PASS-WITH-FINDINGS. T006/T007 remain owner-deferred/contingent/planned/inactive and unimplemented. Q154 is resolved; Q152/Q153 remain open. The application frontier `PHASE8-IMPL-024-T003B` is the sole next implementation focus.
+- T008 shared agent guidance and Project Memory Ask, T009 deterministic Plan Integrity, T010 specialized reviewers, and T011 operational rollout are complete/PASS. T012 bounded current-truth/routing/UI-guidance maintenance is owner-authorized and validation-pending; it does not reopen PHASE8-IMPL-026. After T012 acceptance there is no next Project Memory implementation task, and ongoing maintenance returns to T011.
+- Workstream status: PHASE8-IMPL-026 remains complete/closed as complete/PASS-WITH-FINDINGS. T001/T002/T005/T008/T009/T010/T011 are complete/PASS; T012 is in progress/validation pending; T003/T004 are complete/PASS-WITH-FINDINGS. T006/T007 remain owner-deferred/contingent/planned/inactive and unimplemented. Q154 is resolved; Q152/Q153 remain open. The application frontier `PHASE8-IMPL-024-T003B` is the sole next application implementation focus.
 - Tool installation is contingent on provenance and benchmark approval. Serena, LlamaIndex, and Qdrant are not approved dependencies.
 - Branch synchronization: owner-controlled complete accepted commits from clean worktrees; reviewed full merge preferred and precise owner-selected complete-commit cherry-pick allowed. Refresh is event-driven after synchronization/tracked changes/closeout gates/drift. Path-filtered cherry-picking, roadmap-only copying, destructive workflows, and cron are rejected.
 - Product boundaries: analysis-only, evidence/provenance-backed, owner-controlled, no generated prose, no automatic truth or Memory/Canon mutation, no automatic promotion or apply-promotion, model output is not canon.
@@ -353,7 +367,7 @@
 - Future sequence: `PHASE8-IMPL-020` is complete/PASS through `PHASE8-IMPL-020-T007` parent closeout; `PHASE8-IMPL-020-T001` through `PHASE8-IMPL-020-T007` are complete/PASS; `PHASE8-IMPL-021` is the recommended next MVP-required parent after review; `PHASE8-IMPL-022` remains future MVP-required; fine-tuning remains deferred after MVP; generated prose/prose-production paths remain permanently forbidden.
 - UX reference: PHASE8-UX-001 was used only as a read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and was not edited.
 
-# Task Backlog
+# Task Backlog — Historical Entries
 
 - Completed: `PHASE8-IMPL-023-T022A - Persistence adapter-identity allowlist repair` is complete/PASS. T022 remains blocked/in_progress; T022B is planned next and T023 remains planned after T022.
 - Next: `PHASE8-IMPL-023-T022B - Resume candidate-only persistence using preserved real T022 findings` (planned). Do not implement T022B here.

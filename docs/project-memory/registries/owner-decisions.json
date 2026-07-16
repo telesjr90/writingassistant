@@ -180,6 +180,23 @@
       "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
     },
     {
+      "id": "owner-decision:remaining-mvp-execution-routing",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Remaining-MVP Deterministic Execution Routing and Shared UI Guidance",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T012",
+        "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md"}]
+      },
+      "owner_decision_id": "remaining-mvp-execution-routing",
+      "question": "Which executor class, model category, reasoning/risk lane, owner-only boundary, and shared UI guidance govern each remaining authoritative MVP task?",
+      "selected_option": "Use the accepted owner classifications normalized in execution-routing.json; keep T007B owner-only; require the shared Impeccable-backed UI skill for every UI task; fail closed on missing, conflicting, stale, inapplicable, inactive, or dependency-ineligible resolution.",
+      "rationale": "A committed resolver prevents agent judgment, conversation memory, generated recommendations, or historical routing from silently choosing execution authority.",
+      "affected_tasks": ["PHASE8-IMPL-024", "PHASE8-IMPL-024-T007B", "PHASE8-IMPL-025", "PHASE8-IMPL-026-T012", "PHASE8-IMPL-027"]
+    },
+    {
       "id": "owner-decision:whole-remaining-mvp-plan-integrity",
       "type": "owner_decision",
       "schema_version": "1.0.0",

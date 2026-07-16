@@ -28,8 +28,12 @@ T008 — Shared agent guidance and Project Memory Ask — is complete/PASS.
 T009 — Deterministic Plan Integrity engine — is complete/PASS.
 T010 — Specialized Plan Integrity reviewers — is complete/PASS.
 T011 — Synchronization, CI, rebuild, and operational rollout — is
-complete/PASS. There is no next Project Memory implementation task; ongoing
-maintenance is the accepted operational procedure.
+complete/PASS. T012 — Remaining-MVP current-truth, execution-routing, and shared
+UI-guidance maintenance — is in progress/validation pending as an explicit
+bounded post-closeout maintenance event. It is the only actionable Project
+Memory maintenance child while validation is pending; after acceptance, ongoing
+maintenance returns to the accepted T011 operational procedure with no next
+Project Memory implementation task.
 
 T004 is complete/PASS-WITH-FINDINGS:
 - T004A (convergence remediation and rendering architecture) is complete/PASS-WITH-FINDINGS.
@@ -302,6 +306,21 @@ and focused tests. Q154 is resolved. Synchronization remains an explicit
 owner/operator-controlled complete-commit Git action; T011 performs no merge,
 cherry-pick, commit, push, or application-worktree access.
 
+### PHASE8-IMPL-026-T012 — Remaining-MVP Current-Truth, Execution-Routing, and Shared UI-Guidance Maintenance
+
+Status: in progress/validation pending. Operationally governed by T011 after
+the completed/closed parent. This is the smallest explicit owner-authorized
+post-closeout maintenance child; it does not reopen the closed parent or create
+a new Project Memory implementation frontier.
+
+Reconcile current roadmap truth, publish deterministic remaining-MVP routing,
+bind every UI-related task to the shared Impeccable wrapper, align Codex and
+OpenCode guidance, and add fail-closed validators/tests. The proposed task,
+inventory, enrichment, and decision records are the T012-specific files. No
+application behavior, application test, dependency, runtime, candidate,
+promotion, apply-promotion, Memory/Canon, model, dataset, or story-prose scope is
+included.
+
 ## Implementation sequence
 
 ```text
@@ -316,11 +335,15 @@ T001 (authority foundation) — complete/PASS
   -> T009 (Plan Integrity engine)
   -> T010 (specialized reviewers)
   -> T011 (synchronization and rollout)
+  -> T012 (bounded current-truth/routing/UI-guidance maintenance) — in progress/validation pending
 ```
 
-All non-contingent Project Memory implementation children are complete. T006
+All standing Project Memory implementation children are complete. T006
 and T007 remain contingent, owner-deferred, planned, inactive, and
-unimplemented. Ongoing maintenance follows T011 and is not a new roadmap child.
+unimplemented. T012 records this explicitly owner-authorized bounded maintenance
+event and is validation-pending; it is not an application implementation task or
+standing Project Memory frontier. After T012 acceptance, further maintenance
+returns to the event-driven T011 procedure unless separately authorized.
 
 T006 and T007 are contingent on provenance and benchmark approval for their
 respective dependencies. They are not blocked by T002–T005 but must not

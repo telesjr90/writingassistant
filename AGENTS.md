@@ -32,21 +32,54 @@ Do not call Ollama, live models, Story Check, extraction tools, or Dramatica-spe
 
 Do not stage, commit, or push unless the user explicitly asks.
 
-## OpenCode Go platform recommendation
+## Current execution routing
 
-This repo uses **OpenCode Go** as the selected low-cost coding-agent platform for remaining MVP implementation work (T014–T026).
+Remaining-MVP execution routing is committed metadata, not an agent choice.
+Read `docs/roadmap/roadmap_index.yaml` directly as the current structured
+roadmap source for task identities, dependencies, activation boundaries, the
+application frontier, and indexed routing references. Read accepted owner
+decision files first when they control the question, and use
+`docs/roadmap/implementation_status.md` as the current human-readable status
+surface that must converge with the index and those decisions. Older roadmap
+chronology and explicitly historical or superseded entries cannot override
+current accepted sources; generated Project Memory evidence is navigation and
+support only. Any unresolved conflict fails closed, including a frontier that
+does not converge with the execution-truth layer.
 
-- **Cursor remains the editor**; OpenCode Go runs from the Cursor integrated terminal.
-- Normal model for docs/status and small scoped edits: `opencode-go/deepseek-v4-flash`.
-- Escalation for runtime/debugging: `opencode-go/minimax-m3`, `opencode-go/kimi-k2.7-code`, Qwen/GLM options, or `opencode-go/deepseek-v4-pro`.
-- Final review/hard blockers: `opencode-go/deepseek-v4-pro` or `opencode-go/minimax-m3`.
-- Excluded from this implementation workflow: OpenAI, Anthropic, Google, GPT, Claude, Gemini, Google-hosted Gemma.
+Resolve the accepted task through
+`docs/project-memory/registries/execution-routing.json` using
+`scripts/project_memory/execution_routing.py`. The owner-authorized current
+policy, pending T012 closeout acceptance, is
+`docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`.
+Missing, conflicting, stale, inapplicable, owner-only, inactive, or
+dependency-ineligible routing fails closed.
 
-Model-routing rules:
-- Cheap models (deepseek-v4-flash) are acceptable only when prompts are small, focused, scoped, and tests-first.
-- Use stronger models (minimax-m3, kimi-k2.7-code, deepseek-v4-pro) only for blockers, multi-file runtime debugging, and closeout review.
+Before executing a task, verify the exact repository root, expected branch and
+full commit, clean worktree, empty staging area, current Project Memory status
+`FRESH`, zero Plan Integrity blockers, current frontier, and dependency
+eligibility. A generated prompt must state the resolved task ID, execution
+class, model category, reasoning level, risk class, owner-only status,
+rationale, escalation conditions, and authoritative routing source near its
+beginning. Do not execute beyond the active accepted task.
 
-See `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md` for the full model-routing plan and T014–T026 subtask structure.
+The earlier OpenCode Go routing decision at
+`docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md`
+remains historical authority only for its original T014–T026 execution scope.
+It does not select the executor for the remaining MVP roadmap and must not be
+used to exclude Codex or GPT from a task assigned to `codex_gpt_5_6_sol`.
+
+Every frontend/UI/UX audit, plan, implementation, test, validation, or closeout
+task must use `.agents/skills/writing-assistant-ui-execution/SKILL.md`, which
+applies the installed Impeccable guidance within current task scope. UI work
+still requires committed routing and eligibility first.
+
+Use this authority order: current accepted owner decisions; current roadmap
+execution records and task definitions; tracked code, schemas, tests, and
+fixtures within their declared roles; current commit-bound Project Memory;
+clearly labeled historical or superseded records; generated evidence. Fail
+closed on missing or unresolved authority. Preserve product safety and Git
+safety; routing never authorizes story-prose generation, automatic promotion or
+apply-promotion, automatic Memory/Canon mutation, staging, commit, or push.
 
 ## Default task mode: implementation micro-task
 

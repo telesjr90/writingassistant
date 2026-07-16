@@ -12,7 +12,8 @@ Use this skill only for bounded, read-only Project Memory questions. Follow
 
 1. Verify the requested repository root, current branch, full HEAD, staged and
    worktree state, worktree identity, and active task/frontier with read-only Git
-   inspection.
+   inspection. Require a clean worktree, empty staging, `FRESH` Project Memory,
+   and zero Plan Integrity blockers for the exact commit.
 2. Read `AGENTS.md`, `docs/roadmap/roadmap_index.yaml`, and the relevant section
    of `docs/roadmap/implementation_status.md`.
 3. Read the scoped task record under `docs/roadmap/tasks/` and accepted decision
@@ -36,6 +37,13 @@ Do not copy the roadmap or schema into this skill.
   tools only within `maximum_scope`; do not broadly scan the repository.
 - Verify task status and the application frontier against accepted roadmap and
   decision records before consulting registries or rendered summaries.
+- Verify dependency eligibility and resolve execution-related questions through
+  `docs/project-memory/registries/execution-routing.json`. Fail closed rather
+  than selecting an executor from historical routing, a generated source, or
+  model judgment.
+- For any frontend/UI/UX question, use
+  `.agents/skills/writing-assistant-ui-execution/SKILL.md` in audit mode and
+  apply the installed Impeccable guidance within the request scope.
 - Read registry records by stable `id`/`task_id`/`decision_id`; check lifecycle,
   authority class, provenance locators, dependencies, and owner-decision refs.
 - Treat a registry conflict with a higher-tier source as stale or invalid.

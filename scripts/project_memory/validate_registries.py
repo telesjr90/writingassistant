@@ -55,13 +55,14 @@ _ISO8601_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$"
 )
 _STABLE_ID_RE = re.compile(
-    r"^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision):"
+    r"^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision|routing):"
     r"[a-zA-Z0-9][a-zA-Z0-9._-]*$"
 )
 
 _VALID_RECORD_TYPES = frozenset([
     "project", "feature", "boundary", "task", "decision",
     "capability", "asset", "evidence", "dependency", "tool", "owner_decision",
+    "execution_routing",
 ])
 
 _SOURCE_LOCATOR_VALID_KEYS = frozenset([
@@ -436,7 +437,7 @@ def validate(
             # Generated/authoritativeness checks
             if ac in ("generated_evidence", "untrusted"):
                 if rtype in ("project", "feature", "boundary", "task", "decision",
-                             "capability", "dependency", "owner_decision"):
+                             "capability", "dependency", "owner_decision", "execution_routing"):
                     if ac != "generated_evidence" or rtype != "evidence":
                         findings.append(_finding("error", "UNAUTHORITATIVE_RECORD",
                                                  f"{rec_label}: record with authority_class '{ac}' cannot carry default-authority record type '{rtype}'",
@@ -699,6 +700,26 @@ def validate(
                     f"{task_id}: roadmap status {roadmap_task.get('status')!r} expects {expected_lifecycle!r}, got {actual_lifecycle!r}",
                     registry_file="tasks.json", record_id=f"task:{task_id}",
                 ))
+
+    if use_tracked_registries:
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        from scripts.project_memory.execution_routing import validate_execution_routing
+
+        routing_report = validate_execution_routing(ROOT)
+        for routing_finding in routing_report["findings"]:
+            findings.append(_finding(
+                "error",
+                routing_finding["rule_id"],
+                (
+                    f"{routing_finding['classification']}: "
+                    f"{routing_finding['offending_value']!r}; expected "
+                    f"{routing_finding['expected_value']!r}. "
+                    f"{routing_finding['next_action']}"
+                ),
+                registry_file=routing_finding["file"],
+                record_id=routing_finding["locator"],
+            ))
 
     return _sort_findings(findings)
 

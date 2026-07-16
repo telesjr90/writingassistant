@@ -11,6 +11,7 @@ from typing import Iterable
 
 PROTOCOL_PATH = "docs/project-memory/reviewer-protocol.md"
 SKILL_PATH = ".agents/skills/project-memory-plan-integrity-review/SKILL.md"
+UI_SKILL_PATH = ".agents/skills/writing-assistant-ui-execution/SKILL.md"
 REVIEWER_AGENTS = {
     "backend_contracts": ".opencode/agents/project-memory-backend-contract-reviewer.md",
     "frontend_ui": ".opencode/agents/project-memory-frontend-ui-reviewer.md",
@@ -19,7 +20,7 @@ REVIEWER_AGENTS = {
     "enrichment_accuracy": ".opencode/agents/project-memory-enrichment-accuracy-reviewer.md",
     "decision_coherence": ".opencode/agents/project-memory-decision-coherence-reviewer.md",
 }
-REQUIRED_FILES = (PROTOCOL_PATH, SKILL_PATH, *REVIEWER_AGENTS.values())
+REQUIRED_FILES = (PROTOCOL_PATH, SKILL_PATH, UI_SKILL_PATH, *REVIEWER_AGENTS.values())
 
 REQUIRED_REQUEST_TOKENS = (
     "`repository_root`",
@@ -79,6 +80,10 @@ REQUIRED_BOUNDARIES = (
     "Git mutation",
     "nested agents",
     "retrieval tool",
+    "FRESH",
+    "zero Plan Integrity blockers",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/project-memory/registries/execution-routing.json",
 )
 
 
@@ -138,6 +143,14 @@ def validate_reviewer_guidance(repo_root: str | Path) -> dict:
             "detail": token,
         })
 
+    ui_skill = contents.get(UI_SKILL_PATH, "")
+    for token in _missing_tokens(ui_skill, ("Impeccable", "UI audit mode", "UI implementation mode", "UI validation mode", "PHASE8-IMPL-024-T007B")):
+        findings.append({
+            "code": "missing_ui_skill_contract",
+            "path": UI_SKILL_PATH,
+            "detail": token,
+        })
+
     forbidden_grants = (
         "write: true",
         "edit: true",
@@ -148,7 +161,10 @@ def validate_reviewer_guidance(repo_root: str | Path) -> dict:
     )
     for domain, relative_path in REVIEWER_AGENTS.items():
         agent = contents.get(relative_path, "")
-        for token in _missing_tokens(agent, (*REQUIRED_CONTROLS, domain, PROTOCOL_PATH, SKILL_PATH)):
+        required_agent_tokens = [*REQUIRED_CONTROLS, domain, PROTOCOL_PATH, SKILL_PATH]
+        if domain == "frontend_ui":
+            required_agent_tokens.extend((UI_SKILL_PATH, "Impeccable", "UI audit mode"))
+        for token in _missing_tokens(agent, required_agent_tokens):
             findings.append({
                 "code": "missing_reviewer_control",
                 "path": relative_path,

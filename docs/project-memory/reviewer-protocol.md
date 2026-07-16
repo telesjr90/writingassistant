@@ -48,6 +48,12 @@ full commit, staged state, and dirty state. When `current_clean_head` is
 required, both staged and dirty must be false. The accepted Plan Integrity
 package must be structurally present, `generated_evidence`, bound to the expected
 branch and full commit, and have `READY` or `READY_WITH_ADVISORIES` readiness.
+Project Memory must be `FRESH`, Plan Integrity must have zero blockers, and the
+task/frontier and dependency eligibility must agree with
+`docs/roadmap/roadmap_index.yaml`. Execution-related review must resolve the
+task through `docs/project-memory/registries/execution-routing.json` and fail
+closed on missing, conflicting, stale, inapplicable, owner-only, inactive, or
+dependency-ineligible routing.
 
 ## Source and inspection rules
 
@@ -62,6 +68,13 @@ Historical sources may be described only when permission is true, their
 historical status is explicit, and their full bound commit is recorded. Missing,
 unsafe, external, symlinked, stale, unbound, conflicting, quarantined, untrusted,
 or owner-pending evidence cannot support a truth claim.
+
+The `frontend_ui` domain must use
+`.agents/skills/writing-assistant-ui-execution/SKILL.md` in UI audit mode and
+apply the installed Impeccable guidance. The shared UI skill is guidance only:
+it cannot widen scope, select a component foundation, authorize tools or
+dependencies, establish truth or acceptance, or override the owner-only
+`PHASE8-IMPL-024-T007B` boundary.
 
 ## Finding contract
 

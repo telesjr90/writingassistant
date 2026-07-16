@@ -90,7 +90,8 @@ def _collect_source_locators(registries):
 
 def test_registries_parse_successfully():
     registries, _ = _load_registries()
-    assert len(registries) == 12
+    manifest = registries["manifest.json"]
+    assert len(registries) == len(manifest["registries"]) + 1
     for fname, data in registries.items():
         assert isinstance(data, dict), f"{fname} is not a dict"
         assert "registry_type" in data, f"{fname} missing registry_type"

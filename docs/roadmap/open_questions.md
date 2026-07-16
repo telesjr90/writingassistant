@@ -1,3 +1,17 @@
+# Open Questions — Current Repository Truth
+
+<!-- CURRENT-REPOSITORY-TRUTH:START -->
+- Active application parent: `PHASE8-IMPL-024`
+- Immediate application frontier: `PHASE8-IMPL-024-T003B`
+- Planned architecture parent: `PHASE8-IMPL-025`
+- Terminal MVP gate: `PHASE8-IMPL-027`
+- Current routing source: `docs/project-memory/registries/execution-routing.json`
+<!-- CURRENT-REPOSITORY-TRUTH:END -->
+
+This block is the current summary. Numbered questions retain chronological
+evidence; resolved or superseded “next” claims are historical and cannot set the
+current frontier.
+
 147. What exact owner-correction and candidate merge/split lifecycle should PHASE8-IMPL-025-T011 use for approve, reject, needs-more-evidence, merge, split, rename, source-link correction, supersession, owner-authored correction, and selected-source rerun while keeping review status non-canon and promotion separate?
 
 146. What exact project-level narrative-diagnostic context contract should PHASE8-IMPL-025-T009 consume across multiple source snapshots and approved-context records, and how should it represent causal/thread/information/relationship/emotional/promise-payoff/hook uncertainty without settling project truth?
@@ -213,7 +227,7 @@
 
 66d. ~~Open for `PHASE8-IMPL-021-T007`: parent closeout.~~ **Resolved in `PHASE8-IMPL-021-T007`:** PHASE8-IMPL-021 is complete/PASS. Final artifacts are `docs/roadmap/decisions/PHASE8-IMPL-021-analysis-only-runtime-integration-boundary-allowlist-decision.md`, `backend/story_knowledge/analysis_runtime_integration.py`, `tests/test_writer_assistant_core_analysis_runtime_integration_contract.py`, `tests/test_writer_assistant_core_analysis_runtime_integration_handoff_contract.py`, and `tests/test_writer_assistant_core_analysis_runtime_integration_safety_regression.py`. `PHASE8-IMPL-022` is the recommended next MVP-required parent after review.
 
-# Open Questions
+# Open Questions — Historical Entries
 
 - `PHASE8-IMPL-023-T022A` is resolved/PASS: persistence now accepts the two current app-owned rubric adapter identities through the existing explicit allowlist, preserves candidate-only metadata and exact provenance matching, reuses mixed candidate IDs on replay, and rejects unknown identities without writes. `PHASE8-IMPL-023-T022` remains blocked/in_progress; T022B is planned to consume the preserved exact 113 findings without a new live adapter call. Full MVP completion remains blocked.
 - `PHASE8-IMPL-023-T021` is complete/PASS through T021B. The original safely blocked attempt remains historical evidence; T021A repaired the NCP Node validator no-op; T021B completed the same-six runtime and fusion validation. T022A repaired the persistence identity mismatch without consuming the preserved real findings. T022B is planned next, and full MVP completion remains blocked.

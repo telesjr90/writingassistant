@@ -1,3 +1,17 @@
+# Risk Register — Current Repository Truth
+
+<!-- CURRENT-REPOSITORY-TRUTH:START -->
+- Active application parent: `PHASE8-IMPL-024`
+- Immediate application frontier: `PHASE8-IMPL-024-T003B`
+- Planned architecture parent: `PHASE8-IMPL-025`
+- Terminal MVP gate: `PHASE8-IMPL-027`
+- Current routing source: `docs/project-memory/registries/execution-routing.json`
+<!-- CURRENT-REPOSITORY-TRUTH:END -->
+
+This block is the current summary. Resolved, superseded, and chronological risk
+narratives below are historical records, not current routing or frontier
+authority.
+
 | Existing context-tool artifacts are attributed from filenames alone | Mitigated by T005 | High | Repomix-, Graphify-, or CCE-like filenames can be renamed, copied, mixed, or produced by unrelated tooling. Silent filename attribution could make unknown output appear trustworthy. | T005 requires deterministic manifest, command, metadata, or tracked-convention evidence. Unknown and conflicting origins are classified `unknown_generated_context` and quarantined. | Mitigated |
 | Read-only context import is mistaken for approval to install or execute collectors | Mitigated by T005; live execution remains unapproved | High | Consumers could treat permission to inspect an existing artifact as permission to install, index, query, update, or run its producing tool. | T005 records separate `read_import_approved` and `live_execution_approved` fields. Repomix, Graphify, and CCE live execution remains false/unapproved. | Active |
 | Unsafe or stale generated context is consumed by default | Mitigated by T005 | High | Generated roots can contain stale, unknown, checksum-invalid, sensitive, escaping, oversized, or authority-claiming content. | T005 applies root/path/symlink/special-file/secret/cache/model/dataset/nested-pack safety checks, commit-and-branch freshness, declared checksums, bounded scope, non-authority enforcement, and default quarantine. | Active |
@@ -84,7 +98,7 @@
 | PHASE8-IMPL-019 raw artifact leakage into canon/training | Active | High | Raw artifacts could be copied into approved memory/canon or training artifacts outside the owner-approved workflow. | Raw artifacts remain PHASE8-IMPL-018 support data only, not canon, not candidates by themselves, not training data. PHASE8-IMPL-019 forbids training/JSONL/dataset/model artifacts and requires no memory/canon mutation and no automatic canon. |
 | PHASE8-IMPL-019 apply-promotion bypass | Active | High | Runtime extraction or review handoff could bypass the separate PHASE8-IMPL-017 owner-confirmed apply-promotion path. | PHASE8-IMPL-019 explicitly forbids apply-promotion, promotion side effects, and memory/canon mutation; apply-promotion remains separate, audited, owner-confirmed, and outside extraction. |
 | PHASE8-IMPL-019 generated prose reintroduced as future scope | Active | High | Runtime extraction, model-assisted follow-ons, or UX wording could accidentally add prose-production features. | PHASE8-IMPL-019, PHASE8-IMPL-020 through PHASE8-IMPL-022, and the master plan keep generated prose/prose-production permanently forbidden; PHASE8-UX-001 is terms-only and cannot authorize UX implementation. |
-# Risk Register
+# Risk Register — Historical Entries
 
 ## PHASE8-IMPL-025 layered-architecture risks
 

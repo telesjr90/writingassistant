@@ -308,7 +308,11 @@ def test_current_roadmap_distinguishes_frontier_from_pm_next():
 
     # Renders task records from the registry.
     assert "PHASE8-IMPL-024-T003B" in output, "Application frontier not in roadmap"
-    assert "Next actionable Project Memory task:** none" in output
+    t012 = _record_by_id(tasks_registry["records"], "task:PHASE8-IMPL-026-T012")
+    if t012["lifecycle"]["status"] == "complete":
+        assert "Next actionable Project Memory task:** none" in output
+    else:
+        assert "Active Project Memory task:** T012" in output
     # T005 appears in the task listing
     assert "PHASE8-IMPL-026-T005" in output or "Existing context-tool" in output, (
         "T005 not in roadmap task listing"
@@ -426,8 +430,8 @@ def test_render_index_derives_t004c_from_registry():
     assert "complete/PASS-WITH-FINDINGS" in output
 
 
-def test_render_current_roadmap_preserves_t011_completion_and_no_next_task():
-    """Deferred T006/T007 remain visible while no actionable PM child remains."""
+def test_render_current_roadmap_preserves_t011_and_bounded_t012_lifecycle():
+    """Deferred T006/T007 remain visible while T012 follows its bounded lifecycle."""
     tasks_registry = _load_tracked_registry("tasks.json")
     registries = {
         "tasks.json": tasks_registry,
@@ -448,7 +452,11 @@ def test_render_current_roadmap_preserves_t011_completion_and_no_next_task():
     model = _build_page_model(registries, manifest, [], {}, {}, set())
     output = _render_current_roadmap(model)
 
-    assert "**Next actionable Project Memory task:** none" in output
+    t012 = _record_by_id(tasks_registry["records"], "task:PHASE8-IMPL-026-T012")
+    if t012["lifecycle"]["status"] == "complete":
+        assert "**Next actionable Project Memory task:** none" in output
+    else:
+        assert "**Active Project Memory task:** T012" in output
     assert "PHASE8-IMPL-026-T005" in output
     assert "Lifecycle:** `complete`" in output
     t006 = _roadmap_task_section("PHASE8-IMPL-026-T006")
@@ -545,6 +553,8 @@ def test_lifecycle_change_changes_rendered_output():
     for r in modified:
         if r.get("task_id") == "PHASE8-IMPL-026-T004":
             r["lifecycle"]["status"] = "in_progress"
+        elif r.get("task_id") == "PHASE8-IMPL-026-T012":
+            r["lifecycle"]["status"] = "complete"
 
     registries = {
         "tasks.json": {**_load_tracked_registry("tasks.json"), "records": modified},
@@ -673,6 +683,7 @@ def test_tracked_behavior_preserves_deferral_and_closes_actionable_sequence():
         _load_tracked_registry("owner-decisions.json")["records"],
     )
     t011_state = behavior["states"]["PHASE8-IMPL-026-T011"]
+    t012_state = behavior["states"]["PHASE8-IMPL-026-T012"]
     selected_next_ids = (
         [behavior["next_actionable_task"]["task_id"]]
         if behavior["next_actionable_task"] is not None
@@ -686,8 +697,13 @@ def test_tracked_behavior_preserves_deferral_and_closes_actionable_sequence():
     assert t011_state["state"] == "complete"
     assert t011_state["lifecycle"] == "complete"
     assert t011_state["actionable"] is False
-    assert behavior["active_task"] is None
-    assert selected_next_ids == []
+    if t012_state["lifecycle"] == "complete":
+        assert behavior["active_task"] is None
+        assert selected_next_ids == []
+    else:
+        assert t012_state["state"] == "active"
+        assert behavior["active_task"]["task_id"] == "PHASE8-IMPL-026-T012"
+        assert selected_next_ids == ["PHASE8-IMPL-026-T012"]
 
 
 def test_derive_task_display_status_complete_pass_with_findings():

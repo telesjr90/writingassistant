@@ -134,7 +134,7 @@ def _plan() -> dict:
         },
         "roadmap": {
             "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json": {
-                "next_project_memory_task": "PHASE8-IMPL-026-T010 — next planned/inactive",
+                "next_project_memory_task": "PHASE8-IMPL-026-T010",
                 "application_frontier_next_task": "PHASE8-IMPL-024-T003B",
             },
             "docs/roadmap/roadmap_index.yaml": {
@@ -414,6 +414,71 @@ def test_generated_inputs_cannot_derive_project_memory_task_from_application_fro
     assert sequence["expected_state"] == {"task_id": None}
     assert sequence["observed_state"] == {"task_id": None}
     assert sequence["classification"] == "matching"
+
+
+def test_no_active_project_memory_child_before_t012(tmp_path):
+    plan = _closed_plan()
+    implementation = _implementation(tmp_path, plan)
+    sequence = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    assert sequence["expected_state"] == {"task_id": None}
+    assert sequence["observed_state"] == {"task_id": None}
+    assert sequence["classification"] == "matching"
+    assert plan["roadmap"]["docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json"][
+        "application_frontier_next_task"
+    ] == "PHASE8-IMPL-024-T003B"
+
+
+def test_t012_is_actionable_while_validation_pending(tmp_path):
+    plan = _closed_plan()
+    plan["registries"]["tasks"]["records"].append(
+        _task(
+            "PHASE8-IMPL-026-T012",
+            "in_progress",
+            ["PHASE8-IMPL-026"],
+            source="scripts/t012.py",
+            notes="In progress / validation pending governance maintenance.",
+        )
+    )
+    enrichment = plan["roadmap"][
+        "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json"
+    ]
+    enrichment["next_project_memory_task"] = "PHASE8-IMPL-026-T012"
+    implementation = _implementation(tmp_path, plan)
+    sequence = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    assert sequence["expected_state"] == {"task_id": "PHASE8-IMPL-026-T012"}
+    assert sequence["observed_state"] == {"task_id": "PHASE8-IMPL-026-T012"}
+    assert sequence["classification"] == "matching"
+    assert enrichment["application_frontier_next_task"] == "PHASE8-IMPL-024-T003B"
+
+
+def test_no_project_memory_task_actionable_after_t012_completion(tmp_path):
+    plan = _closed_plan()
+    plan["registries"]["tasks"]["records"].append(
+        _task(
+            "PHASE8-IMPL-026-T012",
+            "complete",
+            ["PHASE8-IMPL-026"],
+            source="scripts/t012.py",
+            notes="Complete/PASS bounded governance maintenance.",
+        )
+    )
+    implementation = _implementation(tmp_path, plan)
+    sequence = next(
+        item for item in integrity.build_comparisons(plan, implementation)
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    assert sequence["expected_state"] == {"task_id": None}
+    assert sequence["observed_state"] == {"task_id": None}
+    assert sequence["classification"] == "matching"
+    assert plan["roadmap"]["docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json"][
+        "application_frontier_next_task"
+    ] == "PHASE8-IMPL-024-T003B"
 
 
 def test_active_parent_with_null_next_task_remains_blocked(tmp_path):

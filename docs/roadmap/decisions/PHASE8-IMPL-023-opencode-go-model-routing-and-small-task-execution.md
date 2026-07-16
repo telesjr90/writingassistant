@@ -1,5 +1,14 @@
 # PHASE8-IMPL-023 OpenCode Go Model Routing and Small-Task Execution
 
+> Applicability and supersession notice: this accepted record remains
+> historical authority for its original PHASE8-IMPL-023 T014–T026 execution
+> scope. It does not determine current remaining-MVP routing. Current routing is
+> governed by
+> `docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`
+> and `docs/project-memory/registries/execution-routing.json`. Do not use this
+> historical record to exclude Codex/GPT from a current assignment or to select
+> the current application frontier.
+
 ## Result
 
 Accepted as the controlling implementation-platform and model-routing decision for remaining PHASE8-IMPL-023 MVP live-runtime integration (T014–T026).

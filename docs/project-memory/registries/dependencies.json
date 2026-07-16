@@ -415,6 +415,9 @@
     },
     {
       "id": "dependency:impl027-on-impl025-t012", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-027 depends on PHASE8-IMPL-025 T012", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-027", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl027-on-impl025-t012", "source_id": "task:PHASE8-IMPL-027", "target_id": "task:PHASE8-IMPL-025-T012", "dependency_type": "task_depends_on", "is_separate": false
+    },
+    {
+      "id": "dependency:impl026-t012-on-parent-closeout", "type": "dependency", "schema_version": "1.0.0", "title": "PHASE8-IMPL-026 T012 depends on parent closeout", "authority_class": "authoritative", "lifecycle": {"status": "current"}, "provenance": {"created_by": "PHASE8-IMPL-026-T012", "source_locators": [{"path": "docs/roadmap/roadmap_index.yaml"}]}, "dependency_id": "impl026-t012-on-parent-closeout", "source_id": "task:PHASE8-IMPL-026-T012", "target_id": "task:PHASE8-IMPL-026", "dependency_type": "task_depends_on", "is_separate": false
     }
   ]
 }

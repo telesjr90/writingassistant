@@ -17,7 +17,7 @@
     },
     "StableId": {
       "type": "string",
-      "pattern": "^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision):[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+      "pattern": "^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision|routing):[a-zA-Z0-9][a-zA-Z0-9._-]*$",
       "description": "Namespaced stable identifier. No path traversal, whitespace, control characters, or absolute paths allowed."
     },
     "TrustClass": {
@@ -290,7 +290,7 @@
             "type": { "const": "task" },
             "task_id": {
               "type": "string",
-              "pattern": "^PHASE[0-9]+-(IMPL|UX)-[0-9]{3}(-T[0-9]{3}[A-Z]?)?$"
+              "pattern": "^PHASE[0-9]+-(IMPL|UX)-[0-9]{3}(-T[0-9]{3}[A-Z][0-9]*|-T[0-9]{3})?$"
             },
             "parent_task_id": {
               "type": "string"
@@ -611,6 +611,84 @@
         }
       ]
     },
+    "ExecutionRoutingRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "execution_routing" },
+            "task_id": { "type": "string", "minLength": 1 },
+            "execution_class": {
+              "type": "string",
+              "enum": ["codex_gpt_5_6_sol", "opencode_go", "owner_decision"]
+            },
+            "model_category": {
+              "type": "string",
+              "enum": ["gpt_5_6_sol", "opencode_go_narrow_tests_first", "opencode_go_strongest_suitable", "owner_only"]
+            },
+            "reasoning_level": {
+              "type": "string",
+              "enum": ["focused", "high", "owner"]
+            },
+            "risk_class": {
+              "type": "string",
+              "enum": ["moderate", "high", "critical", "owner_only"]
+            },
+            "rationale": { "type": "string", "minLength": 1 },
+            "escalation_conditions": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1
+            },
+            "owner_only": { "type": "boolean" },
+            "delegation_eligible": { "type": "boolean" },
+            "authoritative_source_locator": { "$ref": "#/$defs/SourceLocator" },
+            "applicability_scope_id": { "type": "string", "minLength": 1 },
+            "capability_tags": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true
+            },
+            "required_skills": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true
+            },
+            "inheritance": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "eligible_children": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "uniqueItems": true
+                },
+                "allow_explicit_overrides": { "type": "boolean" }
+              },
+              "required": ["enabled", "eligible_children", "allow_explicit_overrides"],
+              "additionalProperties": false
+            },
+            "parent_override": {
+              "type": "object",
+              "properties": {
+                "enabled": { "const": true },
+                "rationale": { "type": "string", "minLength": 1 }
+              },
+              "required": ["enabled", "rationale"],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "task_id", "execution_class", "model_category", "reasoning_level",
+            "risk_class", "rationale", "escalation_conditions", "owner_only",
+            "delegation_eligible", "authoritative_source_locator",
+            "applicability_scope_id", "capability_tags", "required_skills",
+            "inheritance"
+          ]
+        }
+      ]
+    },
     "RegistryManifest": {
       "type": "object",
       "properties": {
@@ -680,6 +758,9 @@
         },
         "schema_version": {
           "$ref": "#/$defs/SchemaVersion"
+        },
+        "metadata": {
+          "type": "object"
         },
         "records": {
           "type": "array",

@@ -23,6 +23,59 @@ REQUIRED_EXAMPLE_EVIDENCE = (
     "projects/example/storyform.json",
 )
 
+T012_PROPOSED_TREE_PATHS = frozenset({
+    ".agents/skills/project-memory-plan-integrity-review/SKILL.md",
+    ".agents/skills/project-memory-read/SKILL.md",
+    ".agents/skills/writing-assistant-ui-execution/SKILL.md",
+    ".opencode/agents/project-memory-ask.md",
+    ".opencode/agents/project-memory-frontend-ui-reviewer.md",
+    "AGENTS.md",
+    "docs/master_plan.md",
+    "docs/project-memory/ask-protocol.md",
+    "docs/project-memory/registries/decisions.json",
+    "docs/project-memory/registries/dependencies.json",
+    "docs/project-memory/registries/execution-routing.json",
+    "docs/project-memory/registries/manifest.json",
+    "docs/project-memory/registries/owner-decisions.json",
+    "docs/project-memory/registries/tasks.json",
+    "docs/project-memory/registries/tools.json",
+    "docs/project-memory/reviewer-protocol.md",
+    "docs/project-memory/schemas/project-memory.schema.json",
+    "docs/roadmap/decision_log.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
+    "docs/roadmap/enrichment/PHASE8-IMPL-026-T012.enrichment.json",
+    "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",
+    "docs/roadmap/implementation_status.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-026-T012.md",
+    "docs/roadmap/inventory/PHASE8-IMPL-026.md",
+    "docs/roadmap/open_questions.md",
+    "docs/roadmap/phase_map.md",
+    "docs/roadmap/risk_register.md",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/roadmap/task_backlog.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-026-T012.md",
+    "docs/roadmap/tasks/PHASE8-IMPL-026.md",
+    "scripts/project_memory/execution_routing.py",
+    "scripts/project_memory/plan_integrity.py",
+    "scripts/project_memory/render_docs.py",
+    "scripts/project_memory/validate_agent_guidance.py",
+    "scripts/project_memory/validate_current_truth.py",
+    "scripts/project_memory/validate_operational_rollout.py",
+    "scripts/project_memory/validate_registries.py",
+    "scripts/project_memory/validate_reviewer_guidance.py",
+    "tests/project_memory/test_agent_guidance_and_ask.py",
+    "tests/project_memory/test_current_truth_governance.py",
+    "tests/project_memory/test_current_truth_invocation.py",
+    "tests/project_memory/test_execution_routing.py",
+    "tests/project_memory/test_operational_rollout.py",
+    "tests/project_memory/test_plan_integrity.py",
+    "tests/project_memory/test_remaining_mvp_plan.py",
+    "tests/project_memory/test_tracked_registry_source_locators.py",
+    "tests/project_memory/test_tracked_task_registry_current_state.py",
+    "tests/project_memory/test_validate_registries.py",
+})
+
 
 def _run(repo: Path, *args: str) -> str:
     result = subprocess.run(args, cwd=repo, text=True, capture_output=True, check=True)
@@ -120,7 +173,10 @@ def _extract_tracked_archive(archive_path: Path, destination: Path) -> None:
                 target.hardlink_to(link_target)
 
 
-def _temporary_repository(tmp_path: Path) -> Path:
+def _temporary_repository(
+    tmp_path: Path,
+    proposed_tree_paths: frozenset[str] = T012_PROPOSED_TREE_PATHS,
+) -> Path:
     assert _run(SOURCE_ROOT, "git", "rev-parse", "--is-inside-work-tree") == "true"
     assert Path(_run(SOURCE_ROOT, "git", "rev-parse", "--show-toplevel")).resolve() == SOURCE_ROOT
     staged = subprocess.run(
@@ -130,14 +186,12 @@ def _temporary_repository(tmp_path: Path) -> Path:
         check=False,
     )
     assert staged.returncode == 0, staged.stderr.decode(errors="replace")
-    unstaged_paths = set(
-        _nul_paths(SOURCE_ROOT, "git", "diff", "--name-only", "-z")
-    )
-    executing_test = Path(__file__).resolve().relative_to(SOURCE_ROOT).as_posix()
-    assert not unstaged_paths or unstaged_paths == {executing_test}
+    for relative in proposed_tree_paths:
+        path = PurePosixPath(relative)
+        assert path.parts and not path.is_absolute() and ".." not in path.parts
+        assert not relative.startswith(".codex-context/")
 
     source_head = _run(SOURCE_ROOT, "git", "rev-parse", "HEAD")
-    source_tree = _run(SOURCE_ROOT, "git", "rev-parse", "HEAD^{tree}")
     source_paths = set(
         _nul_paths(SOURCE_ROOT, "git", "ls-tree", "-r", "--name-only", "-z", "HEAD")
     )
@@ -157,6 +211,24 @@ def _temporary_repository(tmp_path: Path) -> Path:
         check=True,
     )
     _extract_tracked_archive(archive_path, repo)
+    for relative in sorted(proposed_tree_paths):
+        source = SOURCE_ROOT / relative
+        target = repo / relative
+        if source.is_file() or source.is_symlink():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists() or target.is_symlink():
+                target.unlink()
+            if source.is_symlink():
+                target.symlink_to(source.readlink())
+            else:
+                shutil.copy2(source, target)
+        elif target.exists() or target.is_symlink():
+            target.unlink()
+    source_paths.update(
+        relative
+        for relative in proposed_tree_paths
+        if (SOURCE_ROOT / relative).is_file() or (SOURCE_ROOT / relative).is_symlink()
+    )
     assert not (repo / ".git").exists()
     assert not (
         repo / ".codex-context/project-memory/example-run/example.json"
@@ -176,7 +248,7 @@ def _temporary_repository(tmp_path: Path) -> Path:
     if ignored_tracked_paths:
         _run(repo, "git", "add", "-f", "--", *ignored_tracked_paths)
     assert set(_nul_paths(repo, "git", "ls-files", "-z")) == source_paths
-    assert _run(repo, "git", "write-tree") == source_tree
+    fixture_tree = _run(repo, "git", "write-tree")
 
     for relative in REQUIRED_EXAMPLE_EVIDENCE:
         if relative in source_paths:
@@ -185,7 +257,7 @@ def _temporary_repository(tmp_path: Path) -> Path:
                 repo, "git", "ls-files", "--error-unmatch", "--", relative
             ) == relative
     _run(repo, "git", "commit", "-m", "test: temporary operational fixture")
-    assert _run(repo, "git", "rev-parse", "HEAD^{tree}") == source_tree
+    assert _run(repo, "git", "rev-parse", "HEAD^{tree}") == fixture_tree
 
     source_git_dir = Path(
         _run(SOURCE_ROOT, "git", "rev-parse", "--absolute-git-dir")
@@ -219,16 +291,25 @@ def _temporary_repository(tmp_path: Path) -> Path:
     return repo
 
 
-def test_policy_is_event_driven_commit_bound_and_forbids_automatic_mutation(tmp_path):
+def test_fixture_is_hermetic_and_policy_forbids_automatic_mutation(tmp_path):
     token = uuid.uuid4().hex
+    source_status_before = _run(
+        SOURCE_ROOT, "git", "status", "--porcelain=v1", "--untracked-files=all"
+    )
     untracked_relative = f".operational-rollout-untracked-{token}"
+    unrelated_tracked_relative = "docs/project-memory/operator-manual.md"
     ignored_root = SOURCE_ROOT / ".codex-context"
     ignored_root_existed = ignored_root.exists()
     ignored_relative = f".codex-context/operational-rollout-{token}/sentinel.txt"
     untracked_sentinel = SOURCE_ROOT / untracked_relative
+    unrelated_tracked = SOURCE_ROOT / unrelated_tracked_relative
+    unrelated_tracked_original = unrelated_tracked.read_bytes()
     ignored_sentinel = SOURCE_ROOT / ignored_relative
     try:
         untracked_sentinel.write_text("untracked fixture sentinel\n", encoding="utf-8")
+        unrelated_tracked.write_bytes(
+            unrelated_tracked_original + f"\nfixture-{token}\n".encode()
+        )
         ignored_sentinel.parent.mkdir(parents=True, exist_ok=True)
         ignored_sentinel.write_text("ignored fixture sentinel\n", encoding="utf-8")
         assert _run(
@@ -251,12 +332,21 @@ def test_policy_is_event_driven_commit_bound_and_forbids_automatic_mutation(tmp_
         repo = _temporary_repository(tmp_path)
         assert not (repo / untracked_relative).exists()
         assert not (repo / ignored_relative).exists()
+        assert (repo / unrelated_tracked_relative).read_bytes() == unrelated_tracked_original
+        ui_wrapper = ".agents/skills/writing-assistant-ui-execution/SKILL.md"
+        assert (repo / ui_wrapper).read_bytes() == (SOURCE_ROOT / ui_wrapper).read_bytes()
+        assert _run(repo, "git", "ls-files", "--error-unmatch", "--", ui_wrapper) == ui_wrapper
     finally:
         untracked_sentinel.unlink(missing_ok=True)
+        unrelated_tracked.write_bytes(unrelated_tracked_original)
         ignored_sentinel.unlink(missing_ok=True)
         ignored_sentinel.parent.rmdir()
         if not ignored_root_existed:
             ignored_root.rmdir()
+
+    assert _run(
+        SOURCE_ROOT, "git", "status", "--porcelain=v1", "--untracked-files=all"
+    ) == source_status_before
 
     policy = json.loads((repo / "docs/project-memory/operations.json").read_text(encoding="utf-8"))
     assert policy["schema"] == "project-memory-operations.v1"
@@ -316,6 +406,17 @@ def test_refresh_rejects_dirty_or_mismatched_repository(tmp_path):
 def test_refresh_status_and_ci_check_are_commit_bound_and_ephemeral(tmp_path, monkeypatch):
     repo = _temporary_repository(tmp_path)
     commit = _run(repo, "git", "rev-parse", "HEAD")
+    tasks = json.loads(
+        (repo / "docs/project-memory/registries/tasks.json").read_text(encoding="utf-8")
+    )["records"]
+    by_task = {item["task_id"]: item for item in tasks}
+    assert by_task["PHASE8-IMPL-026"]["lifecycle"]["status"] == "complete"
+    assert by_task["PHASE8-IMPL-026-T012"]["lifecycle"]["status"] == "in_progress"
+    assert all(
+        by_task[task_id]["lifecycle"]["status"] == "planned"
+        and "owner-deferred" in by_task[task_id]["notes"].lower()
+        for task_id in ("PHASE8-IMPL-026-T006", "PHASE8-IMPL-026-T007")
+    )
     monkeypatch.setattr(rollout, "_run_ids", lambda: ("20260715T070000Z", "20260715T070001Z"))
     refresh = rollout.refresh(
         repo_root=repo,
@@ -337,6 +438,22 @@ def test_refresh_status_and_ci_check_are_commit_bound_and_ephemeral(tmp_path, mo
     assert ".codex-context/" in ignored
 
     explicit = refresh["status"]["packages"]
+    comparisons = json.loads(
+        (Path(explicit["report"]) / "comparisons.json").read_text(encoding="utf-8")
+    )["comparisons"]
+    sequence = next(
+        item for item in comparisons
+        if item["subject_id"] == "project-memory-next-actionable"
+    )
+    assert sequence["expected_state"] == {"task_id": "PHASE8-IMPL-026-T012"}
+    assert sequence["observed_state"] == {"task_id": "PHASE8-IMPL-026-T012"}
+    assert sequence["classification"] == "matching"
+    frontier = next(
+        item for item in comparisons
+        if item["subject_type"] == "application_frontier"
+    )
+    assert frontier["expected_state"] == {"task_id": "PHASE8-IMPL-024-T003B"}
+    assert frontier["observed_state"] == {"task_id": "PHASE8-IMPL-024-T003B"}
     checked = rollout.check_status(
         repo_root=repo,
         expected_branch="docs/project-memory-foundation",
@@ -349,6 +466,21 @@ def test_refresh_status_and_ci_check_are_commit_bound_and_ephemeral(tmp_path, mo
         quality_dir=explicit["quality"],
     )
     assert checked["result"] == "FRESH"
+
+    stale_binding = rollout.check_status(
+        repo_root=repo,
+        expected_branch="docs/project-memory-foundation",
+        expected_commit="0" * 40,
+        output_root=repo / ".codex-context/project-memory",
+        task_id=rollout.DEFAULT_TASK_ID,
+        report_dir=explicit["report"],
+        snapshot_dir=explicit["snapshot"],
+        render_dir=explicit["render"],
+        quality_dir=explicit["quality"],
+    )
+    assert stale_binding["result"] == "STALE"
+    assert "commit_mismatch" in stale_binding["reasons"]
+    assert stale_binding["refresh_required"] is True
 
     ci_root = tmp_path / "ci-output"
     monkeypatch.setattr(rollout, "_run_ids", lambda: ("20260715T080000Z", "20260715T080001Z"))

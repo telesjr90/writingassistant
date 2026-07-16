@@ -472,7 +472,21 @@ def _implementation_present(
 
 def _next_actionable(tasks: list[dict[str, Any]]) -> str | None:
     by_id = {record.get("task_id"): record for record in tasks}
-    for number in range(1, 12):
+    active = sorted(
+        task_id
+        for task_id, record in by_id.items()
+        if isinstance(task_id, str)
+        and task_id.startswith("PHASE8-IMPL-026-T")
+        and task_id not in _DEFERRED_PROJECT_MEMORY_TASKS
+        and record.get("parent_task_id") == _PROJECT_MEMORY_PARENT
+        and record.get("lifecycle", {}).get("status") == "in_progress"
+    )
+    if len(active) == 1:
+        return active[0]
+    if len(active) > 1:
+        return None
+
+    for number in range(1, 13):
         task_id = f"PHASE8-IMPL-026-T{number:03d}"
         record = by_id.get(task_id)
         if not record or task_id in _DEFERRED_PROJECT_MEMORY_TASKS:
@@ -515,6 +529,12 @@ def _no_next_project_memory_contract(
                 reasons.append(f"contingent_child_not_owner_deferred:{task_id}")
         elif lifecycle != "complete":
             reasons.append(f"required_child_not_complete:{task_id}")
+
+    bounded_maintenance = by_task.get("PHASE8-IMPL-026-T012")
+    if bounded_maintenance is not None and bounded_maintenance.get(
+        "lifecycle", {}
+    ).get("status") != "complete":
+        reasons.append("required_child_not_complete:PHASE8-IMPL-026-T012")
 
     owner_decisions = {
         record.get("id"): record
@@ -630,10 +650,17 @@ def _declared_next_actionable(
         return None, valid, "explicit_null", reasons
     if not isinstance(value, str) or not value.strip():
         return None, False, "invalid", ["next_project_memory_task_must_be_task_id_or_null"]
-    for number in range(1, 12):
-        task_id = f"PHASE8-IMPL-026-T{number:03d}"
-        if task_id in value:
-            return task_id, True, "task_id", []
+    record = next(
+        (
+            item
+            for item in tasks
+            if item.get("task_id") == value
+            and item.get("parent_task_id") == _PROJECT_MEMORY_PARENT
+        ),
+        None,
+    )
+    if record is not None:
+        return value, True, "task_id", []
     return None, False, "invalid", ["next_project_memory_task_unknown"]
 
 

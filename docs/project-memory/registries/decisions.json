@@ -174,6 +174,25 @@
       "affected_tasks": ["PHASE8-IMPL-026", "PHASE8-IMPL-026-T011"]
     },
     {
+      "id": "decision:remaining-mvp-execution-routing",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "Remaining-MVP Current Truth, Execution Routing, and Shared UI Guidance",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "planned"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T012",
+        "owner_decision_ref": "owner-decision:remaining-mvp-execution-routing",
+        "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md"}]
+      },
+      "decision_id": "remaining-mvp-execution-routing",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
+      "question": "How should current repository truth, remaining-MVP execution routing, and shared UI guidance be made deterministic without changing application status or authority?",
+      "selected_option": "Publish one normalized fail-closed routing registry, delimited current-truth blocks, shared Codex/OpenCode guidance, and an Impeccable-backed UI wrapper; preserve the older PHASE8-IMPL-023 routing only as historical authority for its original scope.",
+      "rationale": "Committed structured metadata and context-aware validation prevent executor selection or frontier claims from drifting while preserving task authority, dependencies, eligibility, owner-only decisions, and historical execution results.",
+      "affected_tasks": ["PHASE8-IMPL-024", "PHASE8-IMPL-025", "PHASE8-IMPL-026-T012", "PHASE8-IMPL-027"]
+    },
+    {
       "id": "decision:whole-remaining-mvp-plan-integrity",
       "type": "decision",
       "schema_version": "1.0.0",

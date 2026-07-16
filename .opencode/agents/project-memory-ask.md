@@ -37,10 +37,18 @@ model/tool runner, or run arbitrary shell commands. Do not use or require
 Serena, LlamaIndex, Qdrant, embeddings, MCP, or another retrieval system.
 
 Verify repository, branch, full HEAD, worktree state, active task, and frontier
-before answering. Consult accepted roadmap and decision records before code,
+before answering. Require a clean worktree, empty staging, `FRESH` Project
+Memory, zero Plan Integrity blockers, dependency eligibility from
+`docs/roadmap/roadmap_index.yaml`, and committed routing from
+`docs/project-memory/registries/execution-routing.json` when execution is in
+scope. Consult accepted roadmap and decision records before code,
 tests, accepted validation, exact Git history, registries, or generated
 publications in their established precedence order. Registries and generated
 publications are navigation aids, not authority.
+
+For frontend/UI/UX scope, follow the shared
+`.agents/skills/writing-assistant-ui-execution/SKILL.md` in audit mode; do not
+create separate OpenCode UI policy.
 
 Return every Ask response with the required fields and result vocabulary.
 Separate facts from inference. Cite repository-relative files and line ranges

@@ -87,7 +87,7 @@ def test_t006_t007_are_not_approved_installed_active_complete_or_required_by_t00
     assert by_task["PHASE8-IMPL-026-T008"]["depends_on"] == ["PHASE8-IMPL-026-T004"]
 
 
-def test_t008_through_t011_complete_and_no_project_memory_task_remains():
+def test_t008_through_t011_complete_and_t012_lifecycle_controls_maintenance_selection():
     tasks = _registry("tasks.json")["records"]
     by_task = {record["task_id"]: record for record in tasks}
     behavior = _derive_pm_task_behavior(
@@ -98,6 +98,7 @@ def test_t008_through_t011_complete_and_no_project_memory_task_remains():
     t009 = _record("tasks.json", "task:PHASE8-IMPL-026-T009")
     t010 = by_task["PHASE8-IMPL-026-T010"]
     t011 = by_task["PHASE8-IMPL-026-T011"]
+    t012 = by_task["PHASE8-IMPL-026-T012"]
     remaining_task_ids = {
         task_id
         for task_id, state in behavior["states"].items()
@@ -136,7 +137,13 @@ def test_t008_through_t011_complete_and_no_project_memory_task_remains():
     assert behavior["states"]["PHASE8-IMPL-026-T011"]["state"] == "complete"
     assert behavior["states"]["PHASE8-IMPL-026-T011"]["actionable"] is False
     assert "PHASE8-IMPL-026-T011" not in remaining_task_ids
-    assert selected_next_ids == []
+    if t012["lifecycle"]["status"] == "complete":
+        assert selected_next_ids == []
+        assert behavior["states"]["PHASE8-IMPL-026-T012"]["actionable"] is False
+    else:
+        assert t012["lifecycle"]["status"] == "in_progress"
+        assert selected_next_ids == ["PHASE8-IMPL-026-T012"]
+        assert behavior["states"]["PHASE8-IMPL-026-T012"]["actionable"] is True
 
     assert "reviewer agent" not in t009["notes"].lower()
     assert t010["lifecycle"]["status"] != "in_progress"

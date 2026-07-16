@@ -102,6 +102,15 @@
       "allowed_authority_classes": ["authoritative"],
       "validation_order": 10,
       "cross_reference_policy": "allow_all"
+    },
+    {
+      "filename": "execution-routing.json",
+      "record_type": "execution_routing",
+      "required": true,
+      "tracked_or_generated": "tracked",
+      "allowed_authority_classes": ["authoritative"],
+      "validation_order": 11,
+      "cross_reference_policy": "allow_all"
     }
   ],
   "generated_snapshot_output_root": ".codex-context/project-memory/"

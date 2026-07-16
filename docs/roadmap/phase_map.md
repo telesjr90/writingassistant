@@ -1,3 +1,16 @@
+# Phase Map — Current Repository Truth
+
+<!-- CURRENT-REPOSITORY-TRUTH:START -->
+- Active application parent: `PHASE8-IMPL-024`
+- Immediate application frontier: `PHASE8-IMPL-024-T003B`
+- Planned architecture parent: `PHASE8-IMPL-025`
+- Terminal MVP gate: `PHASE8-IMPL-027`
+- Current routing source: `docs/project-memory/registries/execution-routing.json`
+<!-- CURRENT-REPOSITORY-TRUTH:END -->
+
+This block is the current summary. Later phase snapshots remain historical at
+the commits they describe and do not establish the current frontier.
+
 # PHASE8-IMPL-026 Project Memory and Plan Integrity
 
 - Status: complete/closed as complete/PASS-WITH-FINDINGS. Parallel governance, documentation, and developer infrastructure workstream; not an application feature.
@@ -7,7 +20,7 @@
 - T003 (deterministic scanners and convergence) is complete/PASS-WITH-FINDINGS: T003A complete/PASS, T003B complete/PASS-WITH-FINDINGS. First publication snapshot at `.codex-context/project-memory/PHASE8-IMPL-026-T003B/20260713T230207Z/` bound to `a04b65c`.
 - T004 (human-readable memory) is complete/PASS-WITH-FINDINGS: T004A and T004C are complete/PASS-WITH-FINDINGS; T004B, T004C1, and T004C2 are complete/PASS. The accepted current T004C2 publication is the `20260714T221454Z` set bound to `8961b35`.
 - Workstream status: authority foundation (T001, complete/PASS), schemas and registries (T002, complete/PASS), deterministic scanners (T003, complete/PASS-WITH-FINDINGS), human-readable memory (T004, complete/PASS-WITH-FINDINGS; T004C1/T004C2 complete/PASS), context-tool integration (T005, complete/PASS; import-only, no live execution), Serena pilot (T006, owner-deferred/contingent/planned/inactive), LlamaIndex/Qdrant pilot (T007, owner-deferred/contingent/planned/inactive), agent guidance and Ask (T008, complete/PASS), Plan Integrity engine (T009, complete/PASS), specialized reviewers (T010, complete/PASS), synchronization and rollout (T011, complete/PASS).
-- T006/T007 are owner-deferred because no benchmarkable capability gap has been measured; reconsideration requires documented evidence and a future owner-approved benchmark/provenance task. There is no next Project Memory implementation task; ongoing maintenance follows T011.
+- T006/T007 are owner-deferred because no benchmarkable capability gap has been measured; reconsideration requires documented evidence and a future owner-approved benchmark/provenance task. T012 bounded current-truth/routing/UI-guidance maintenance is owner-authorized and validation-pending without reopening the complete/closed parent. After T012 acceptance there is no next Project Memory implementation task; ongoing maintenance remains event-driven under T011.
 - Application frontier: PHASE8-IMPL-024-T003B. T003A is complete/PASS; T003 remains active/in progress; PHASE8-IMPL-025 remains published/planned and inactive.
 - This is a parallel governance workstream; it does not replace the application roadmap. Project Memory normalizes and explains the plan. It cannot activate, close, or reorder application tasks.
 - Project Memory schemas/registries, deterministic scanners, clean-HEAD snapshots, 14-page rendering, semantic/authority gates, context-evidence import, read-only Ask guidance, deterministic Plan Integrity, specialized reviewer definitions, and event-driven operational rollout exist through T011. No retrieval pilot or live context-tool runner exists. T006/T007 remain owner-deferred/contingent/inactive. Q154 is resolved; Q152/Q153 remain open. `PHASE8-IMPL-024-T003B` is the sole next implementation focus.
@@ -281,7 +294,7 @@
 - Future sequence: `PHASE8-IMPL-020` is complete/PASS through `PHASE8-IMPL-020-T007`; `PHASE8-IMPL-020-T001` through `PHASE8-IMPL-020-T007` are complete/PASS; `PHASE8-IMPL-021` is the recommended next MVP-required parent after review; `PHASE8-IMPL-022` remains future MVP-required; fine-tuning remains deferred after MVP; generated prose/prose-production paths remain permanently forbidden.
 - UX reference: PHASE8-UX-001 was used only as a read-only terminology/boundary reference for labels such as review, candidate, evidence, provenance, source locator, raw artifact, approved memory/canon, owner action, unavailable/quarantined state, and no automatic canon. PHASE8-UX-001 is not roadmap truth, does not override master_plan, implementation_status, roadmap_index, or PHASE8-IMPL parent boundaries, and was not edited.
 
-# Phase Map
+# Phase Map — Historical Entries
 
 - Current PHASE8-IMPL-023 reading: T022/T022B and T023A/T023B remain
   historical complete/PASS foundation. T023C/T023D intent is incorporated into

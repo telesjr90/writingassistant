@@ -79,11 +79,21 @@ historical or superseded evidence.
 
 ## Freshness and owner decisions
 
-Before answering, record repository root, branch, full HEAD, index/worktree
-state, and the active task/frontier. A generated package is current only when
+Before answering, record repository root, branch, full HEAD, clean worktree,
+empty staging area, and the active task/frontier from
+`docs/roadmap/roadmap_index.yaml`. Require current Project Memory status
+`FRESH`, zero Plan Integrity blockers, and dependency eligibility. Resolve any
+question about task execution through
+`docs/project-memory/registries/execution-routing.json`; do not infer routing
+from historical records or conversation context. A generated package is current only when
 its branch and full bound commit match the required repository state and its
 checksums and semantic validation pass. Stale or historical evidence may be
 described only when the request permits it and every claim is labeled.
+
+Every frontend/UI/UX consultation must also use
+`.agents/skills/writing-assistant-ui-execution/SKILL.md` and the installed
+Impeccable guidance in audit mode. That guidance remains generated evidence and
+cannot override scope, routing, owner-only decisions, or accepted authority.
 
 Owner-pending state is never resolved by inference. If an answer depends on an
 unaccepted owner choice, list the exact decision and return `PARTIAL` or
@@ -107,6 +117,9 @@ Return a refusal or non-answer result when:
   (`INSUFFICIENT_EVIDENCE`);
 - required evidence is missing, contradictory, owner-pending, or outside the
   protected-path boundary (`INSUFFICIENT_EVIDENCE`).
+- committed execution routing is missing, conflicting, stale, inapplicable,
+  owner-only, inactive, or dependency-ineligible (`INSUFFICIENT_EVIDENCE` or
+  `OUT_OF_SCOPE`).
 
 The response must state the limitation and recommend the smallest deterministic
 read-only check that could resolve it. It must not automatically activate,

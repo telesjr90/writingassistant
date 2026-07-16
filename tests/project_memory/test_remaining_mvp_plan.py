@@ -84,11 +84,16 @@ def test_current_frontier_and_project_memory_state_are_preserved():
     assert tasks["PHASE8-IMPL-024-T003B"]["lifecycle"]["status"] == "planned"
     assert tasks["PHASE8-IMPL-025"]["lifecycle"]["status"] == "planned"
     assert tasks["PHASE8-IMPL-026"]["lifecycle"]["status"] == "complete"
-    assert not any(
-        item["task_id"].startswith("PHASE8-IMPL-026-")
-        and item["lifecycle"]["status"] == "in_progress"
+    active_pm_maintenance = {
+        item["task_id"]
         for item in tasks.values()
-    )
+        if item["task_id"].startswith("PHASE8-IMPL-026-")
+        and item["lifecycle"]["status"] == "in_progress"
+    }
+    assert active_pm_maintenance <= {"PHASE8-IMPL-026-T012"}
+    if active_pm_maintenance:
+        assert tasks["PHASE8-IMPL-026-T012"]["task_type"] == "governance"
+        assert tasks["PHASE8-IMPL-026-T012"]["is_application_frontier"] is False
 
 
 def test_tracked_registry_has_complete_remaining_mvp_coverage():

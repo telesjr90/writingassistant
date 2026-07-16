@@ -1,6 +1,21 @@
 # Decision Log
 
+## Owner-Authorized Decision Pending Clean-HEAD Acceptance
+
+- PHASE8-IMPL-026-T012 remaining-MVP current-truth, execution-routing, and
+  shared UI-guidance maintenance is in progress under the owner-authorized draft
+  at `docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`.
+  Acceptance requires focused and full validation, committed clean-HEAD Plan
+  Integrity with zero blockers, and an exact-commit `FRESH` Project Memory
+  refresh. PHASE8-IMPL-026 remains complete/closed; PHASE8-IMPL-024-T003B
+  remains the application frontier; PHASE8-IMPL-025 remains inactive.
+
 ## Accepted Decisions
+
+Entries preserve the accepted state at the commit/time they document. The first
+applicable current entry and explicit supersession notices control current
+planning; older “next task” language is historical and must not be used as the
+current frontier.
 
 - PHASE8-IMPL-024-T003A context-availability/readiness contract: accepted `docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md`. T003A is complete/PASS. It adds the canonical deterministic read-only `project_context_readiness.v1` response at `GET /api/projects/{project_name}/context-readiness` for Bible, storyform, and derived storyform-context. Stable states are `absent`, `invalid`, `unavailable`, `ready`, with `not_applicable` reserved for evidence-proven cases; stable reason codes, bounded diagnostics, and safe project-relative locators distinguish normal absence, malformed/unsupported/schema-invalid resources, unavailable deterministic validation/context prerequisites, and genuine 400/404/500 request failures. Existing direct resource endpoints retain prior behavior. No frontend conditional loading or browser validation is included. T003 remains active/in progress; T003B is next; T003C and T004+ remain planned; PHASE8-IMPL-025 remains published/planned and inactive; broad owner acceptance and MVP readiness remain blocked. The implementation is local-first, deterministic, read-only, model/tool-runtime-free, candidate-neutral, non-canon, non-mutating, and generates no story prose.
 

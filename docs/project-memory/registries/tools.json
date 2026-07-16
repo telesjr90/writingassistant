@@ -214,6 +214,38 @@
       "provenance_state": "approved",
       "is_approved_dependency": true,
       "notes": "Repository-owned, standard-library-only deterministic validator for the tracked Ask protocol, read skill, root guidance, and read-only OpenCode controls. It performs no network, model, server, retrieval, registry mutation, or external worktree access."
+    },
+    {
+      "id": "tool:execution-routing-resolver",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Deterministic Execution Routing Resolver",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {"created_by": "PHASE8-IMPL-026-T012", "source_locators": [{"path": "scripts/project_memory/execution_routing.py"}, {"path": "tests/project_memory/test_execution_routing.py"}]},
+      "tool_id": "execution-routing-resolver",
+      "tool_name": "execution_routing.py",
+      "tool_type": "validation_script",
+      "tool_path": "scripts/project_memory/execution_routing.py",
+      "provenance_state": "approved",
+      "is_approved_dependency": true,
+      "notes": "Standard-library-only fail-closed routing validation, resolution, eligibility, owner-only enforcement, and prompt-header rendering."
+    },
+    {
+      "id": "tool:current-truth-validator",
+      "type": "tool",
+      "schema_version": "1.0.0",
+      "title": "Current Repository Truth Validator",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {"created_by": "PHASE8-IMPL-026-T012", "source_locators": [{"path": "scripts/project_memory/validate_current_truth.py"}, {"path": "tests/project_memory/test_current_truth_governance.py"}]},
+      "tool_id": "current-truth-validator",
+      "tool_name": "validate_current_truth.py",
+      "tool_type": "validation_script",
+      "tool_path": "scripts/project_memory/validate_current_truth.py",
+      "provenance_state": "approved",
+      "is_approved_dependency": true,
+      "notes": "Context-aware validation for delimited active truth blocks, shared guidance bindings, historical allowances, and execution routing."
     }
   ]
 }

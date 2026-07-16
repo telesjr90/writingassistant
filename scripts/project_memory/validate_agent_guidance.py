@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Iterable
 
@@ -12,8 +13,12 @@ from typing import Iterable
 REQUIRED_FILES = (
     "AGENTS.md",
     "docs/project-memory/ask-protocol.md",
+    "docs/project-memory/reviewer-protocol.md",
     ".agents/skills/project-memory-read/SKILL.md",
+    ".agents/skills/project-memory-plan-integrity-review/SKILL.md",
+    ".agents/skills/writing-assistant-ui-execution/SKILL.md",
     ".opencode/agents/project-memory-ask.md",
+    ".opencode/agents/project-memory-frontend-ui-reviewer.md",
 )
 
 REQUIRED_PROTOCOL_TOKENS = (
@@ -53,6 +58,13 @@ REQUIRED_SHARED_TOKENS = (
     "Memory/Canon",
     "story prose",
     "model output",
+    "docs/roadmap/roadmap_index.yaml",
+    "docs/project-memory/registries/execution-routing.json",
+    "FRESH",
+    "Plan Integrity",
+    "dependency eligibility",
+    "writing-assistant-ui-execution",
+    "Impeccable",
 )
 
 
@@ -63,6 +75,26 @@ def _read(repo_root: Path, relative_path: str) -> str:
 def _missing_tokens(text: str, tokens: Iterable[str]) -> list[str]:
     lowered = text.lower()
     return sorted(token for token in tokens if token.lower() not in lowered)
+
+
+def _active_policy_text(text: str) -> str:
+    """Blank locally classified historical/superseded Markdown sections."""
+    kept: list[str] = []
+    excluded_level: int | None = None
+    heading_pattern = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+    for line in text.splitlines():
+        heading = heading_pattern.match(line)
+        if heading:
+            level = len(heading.group(1))
+            title = heading.group(2).lower()
+            if excluded_level is not None and level <= excluded_level:
+                excluded_level = None
+            if "historical" in title or "superseded" in title:
+                excluded_level = level
+                kept.append("")
+                continue
+        kept.append(line if excluded_level is None else "")
+    return "\n".join(kept)
 
 
 def validate_agent_guidance(repo_root: str | Path) -> dict:
@@ -97,6 +129,20 @@ def validate_agent_guidance(repo_root: str | Path) -> dict:
             "path": "<guidance-set>",
             "detail": token,
         })
+
+    obsolete_patterns = (
+        "opencode go as the selected low-cost coding-agent platform for remaining mvp",
+        "excluded from this implementation workflow: openai",
+    )
+    for relative_path, text in contents.items():
+        lowered = _active_policy_text(text).lower()
+        for phrase in obsolete_patterns:
+            if phrase in lowered:
+                findings.append({
+                    "code": "obsolete_active_execution_guidance",
+                    "path": relative_path,
+                    "detail": phrase,
+                })
 
     agent = contents.get(".opencode/agents/project-memory-ask.md", "")
     required_agent_controls = (

@@ -753,6 +753,31 @@
       "is_application_frontier": false,
       "is_blocking": false,
       "notes": "Complete/PASS. Implements event-driven commit-bound synchronization policy, read-only stale-state diagnosis, one-command deterministic refresh, ephemeral CI rebuild, deterministic quality packages, workflow integration, and focused tests. Q154 resolved. No synchronization Git action, reviewer/model execution, application-worktree access, or automatic authority mutation occurred."
+    },
+    {
+      "id": "task:PHASE8-IMPL-026-T012",
+      "type": "task",
+      "schema_version": "1.0.0",
+      "title": "Remaining-MVP Current-Truth, Execution-Routing, and Shared UI-Guidance Maintenance",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "in_progress"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T012",
+        "owner_decision_ref": "owner-decision:remaining-mvp-execution-routing",
+        "source_locators": [
+          {"path": "docs/roadmap/tasks/PHASE8-IMPL-026-T012.md"},
+          {"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md"},
+          {"path": "docs/project-memory/registries/execution-routing.json"}
+        ]
+      },
+      "task_id": "PHASE8-IMPL-026-T012",
+      "parent_task_id": "PHASE8-IMPL-026",
+      "depends_on": ["PHASE8-IMPL-026"],
+      "task_type": "governance",
+      "classification": "bounded post-closeout current-truth, execution-routing, and shared UI-guidance maintenance",
+      "is_application_frontier": false,
+      "is_blocking": false,
+      "notes": "In progress / validation pending governance maintenance only. The PHASE8-IMPL-026 parent remains complete/closed; the application frontier remains PHASE8-IMPL-024-T003B."
     }
   ]
 }

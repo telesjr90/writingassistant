@@ -105,7 +105,7 @@ _CTRL_CHARS_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _LF_RE = re.compile(r"\r\n|\r")
 
 _STABLE_ID_RE = re.compile(
-    r"^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision):"
+    r"^(project|feature|boundary|task|decision|capability|asset|evidence|dependency|tool|owner-decision|routing):"
     r"[a-zA-Z0-9][a-zA-Z0-9._-]*$"
 )
 
@@ -769,6 +769,7 @@ def _build_page_model(
     model["dependencies"] = records_by_type.get("dependency", [])
     model["tools"] = records_by_type.get("tool", [])
     model["owner_decisions"] = records_by_type.get("owner_decision", [])
+    model["execution_routing"] = records_by_type.get("execution_routing", [])
     model["findings"] = findings
     model["all_records"] = all_records
     model["records_by_id"] = records_by_id
@@ -1210,7 +1211,8 @@ def _render_current_roadmap(model: dict[str, Any]) -> str:
     app_frontier = _get_application_frontier(tasks)
     lines.append("## Roadmap Tasks")
     lines.append("")
-    lines.append(f"**Active application parent:** PHASE8-IMPL-024")
+    active_parent = app_frontier.get("parent_task_id", "")
+    lines.append(f"**Active application parent:** {_sanitize_string(active_parent)}")
     lines.append(
         f"**Immediate application frontier:** "
         f"{_sanitize_string(app_frontier.get('task_id', ''))}"
@@ -1228,6 +1230,31 @@ def _render_current_roadmap(model: dict[str, Any]) -> str:
     else:
         lines.append("**Next actionable Project Memory task:** none")
     lines.append(f"**PHASE8-IMPL-025:** published/planned, inactive")
+    lines.append("")
+
+    lines.append("### Current Execution Routing")
+    lines.append("")
+    lines.append(
+        "Canonical source: "
+        "`docs/project-memory/registries/execution-routing.json`. "
+        "Routing does not change task status, dependencies, eligibility, authority, or acceptance."
+    )
+    lines.append("")
+    lines.append("| Task | Execution class | Model category | Reasoning | Risk | Owner-only |")
+    lines.append("| --- | --- | --- | --- | --- | --- |")
+    for route in sorted(model.get("execution_routing", []), key=lambda rec: rec.get("task_id", "")):
+        lines.append(
+            "| "
+            + " | ".join([
+                _markdown_code(route.get("task_id", "")),
+                _markdown_code(route.get("execution_class", "")),
+                _markdown_code(route.get("model_category", "")),
+                _markdown_code(route.get("reasoning_level", "")),
+                _markdown_code(route.get("risk_class", "")),
+                str(bool(route.get("owner_only", False))),
+            ])
+            + " |"
+        )
     lines.append("")
 
     tasks = _sort_records(model.get("tasks", []))

@@ -88,6 +88,7 @@ _FULL_MANIFEST_DECLS = [
     {"filename": "dependencies.json", "record_type": "dependency", "required": True, "tracked_or_generated": "tracked", "validation_order": 8},
     {"filename": "tools.json", "record_type": "tool", "required": True, "tracked_or_generated": "tracked", "validation_order": 9},
     {"filename": "owner-decisions.json", "record_type": "owner_decision", "required": True, "tracked_or_generated": "tracked", "validation_order": 10},
+    {"filename": "execution-routing.json", "record_type": "execution_routing", "required": True, "tracked_or_generated": "tracked", "validation_order": 11},
 ]
 
 

@@ -154,8 +154,35 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         findings.append(_finding("malformed_enrichment", str(enrichment_path.relative_to(root)), str(exc)))
         enrichment = {}
-    if enrichment.get("next_project_memory_task", "missing") is not None:
-        findings.append(_finding("no_next_representation_mismatch", str(enrichment_path.relative_to(root)), "next_project_memory_task must be JSON null"))
+    tasks_path = root / "docs/project-memory/registries/tasks.json"
+    try:
+        task_records = json.loads(tasks_path.read_text(encoding="utf-8")).get("records", [])
+    except (OSError, UnicodeError, json.JSONDecodeError, AttributeError) as exc:
+        findings.append(_finding("malformed_task_registry", str(tasks_path.relative_to(root)), str(exc)))
+        task_records = []
+    t012 = next(
+        (
+            item for item in task_records
+            if isinstance(item, dict) and item.get("task_id") == "PHASE8-IMPL-026-T012"
+        ),
+        None,
+    )
+    t012_status = (t012 or {}).get("lifecycle", {}).get("status")
+    expected_next = (
+        "PHASE8-IMPL-026-T012" if t012_status == "in_progress" else None
+    )
+    if t012_status not in {None, "in_progress", "complete"}:
+        findings.append(_finding(
+            "t012_lifecycle_invalid",
+            str(tasks_path.relative_to(root)),
+            f"expected absent, in_progress, or complete; observed {t012_status!r}",
+        ))
+    if enrichment.get("next_project_memory_task", "missing") != expected_next:
+        findings.append(_finding(
+            "next_task_representation_mismatch",
+            str(enrichment_path.relative_to(root)),
+            f"expected {expected_next!r} for T012 lifecycle {t012_status!r}",
+        ))
     if enrichment.get("project_memory_maintenance") != {
         "implementation_task": None,
         "mode": "operational_procedure",
