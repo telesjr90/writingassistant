@@ -5,14 +5,14 @@
     "current_track": "Application UI/UX audit integrity and owner-acceptance repair",
     "current_parent_task_id": "PHASE8-IMPL-024",
     "current_parent_task_title": "Application UI/UX Audit Integrity and Acceptance Repair",
-    "next_readiness_task_id": "PHASE8-IMPL-024-T003A",
-    "next_readiness_task_title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
-    "next_readiness_task_type": "backend-only contract micro-task",
+    "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
+    "next_readiness_task_title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
+    "next_readiness_task_type": "frontend integration micro-task",
     "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
     "planned_architecture_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
     "planned_architecture_activation_after": ["PHASE8-IMPL-024-T001", "PHASE8-IMPL-024-T002"],
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS. PHASE8-IMPL-024 is the active repair parent and PHASE8-IMPL-024-T003A is the immediate frontier under planned T003. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A and T023B remain historically complete/PASS, T023 remains in progress, and T024-T026 remain reserved and incomplete. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and failure/recovery workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
+    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS. PHASE8-IMPL-024 is the active repair parent; T003A backend context readiness is complete/PASS; PHASE8-IMPL-024-T003B is the immediate frontier under active T003; T003C remains planned. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A and T023B remain historically complete/PASS, T023 remains in progress, and T024-T026 remain reserved and incomplete. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and failure/recovery workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5487,11 +5487,11 @@
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
       "latest_child_task": "PHASE8-IMPL-023-T023B",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-024-T003A",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
+      "next_child_task": "PHASE8-IMPL-024-T003B",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned",
-      "result": "published/active; T023A and T023B complete/PASS; T023 remains in progress; T023C/T023D and reserved T024-T026 remain planned and incomplete; PHASE8-IMPL-024 T001 is complete/PASS, T002A is the immediate frontier, and broad owner acceptance and parent closeout remain blocked"
+      "result": "published/active historical concurrent parent; T023A and T023B complete/PASS; T023 remains in progress; T023C/T023D and reserved T024-T026 remain planned and incomplete; PHASE8-IMPL-024 T001/T002/T003A are complete/PASS, T003B is the immediate application frontier, and broad owner acceptance and parent closeout remain blocked"
     },
     {
       "id": "PHASE8-IMPL-024",
@@ -5517,13 +5517,13 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-024.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
-      "latest_child_task": "PHASE8-IMPL-024-T002E",
+      "latest_child_task": "PHASE8-IMPL-024-T003A",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-024-T003A",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md",
+      "next_child_task": "PHASE8-IMPL-024-T003B",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned; T001/T002 prerequisites satisfied; no child activated",
-      "result": "published/active release-blocker repair parent; T001A-T001D and T001 complete/PASS; T002A-T002E and T002 complete/PASS; T003A is the immediate frontier; P0-A and P0-B repaired/closed; broad owner acceptance and MVP readiness remain blocked"
+      "result": "published/active release-blocker repair parent; T001 and T002 complete/PASS; T003A complete/PASS; T003 active/in progress with T003B next and T003C planned; P0-A and P0-B repaired/closed; broad owner acceptance and MVP readiness remain blocked"
     },
     {
       "id": "PHASE8-IMPL-024-T001",
@@ -5549,11 +5549,11 @@
       "id": "PHASE8-IMPL-024-T003",
       "title": "Optional-resource handling",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "active",
       "parent": "PHASE8-IMPL-024",
       "depends_on": ["PHASE8-IMPL-024-T002"],
       "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned workstream; T003A context-availability/readiness contract is next; conditional loading, absent-invalid-failure distinction, and console/network regression validation follow"
+      "result": "active/in-progress workstream; T003A context-availability/readiness contract complete/PASS; T003B conditional frontend loading is next; T003C console/network regression validation remains planned"
     },
     {
       "id": "PHASE8-IMPL-024-T004",
@@ -5622,7 +5622,7 @@
       "latest_child_status": null,
       "next_child_task": "PHASE8-IMPL-025-T001",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "result": "published/planned architecture-integration parent; T001/T002 external prerequisites satisfied; no PHASE8-IMPL-025 implementation child is complete or ready; PHASE8-IMPL-024-T003A is the immediate active frontier"
+      "result": "published/planned architecture-integration parent; T001/T002 external prerequisites satisfied; no PHASE8-IMPL-025 implementation child is complete or ready; PHASE8-IMPL-024-T003A is complete/PASS and PHASE8-IMPL-024-T003B is the immediate active frontier"
     },
     {
       "id": "PHASE8-IMPL-025-T001",

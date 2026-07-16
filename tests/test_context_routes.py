@@ -8,13 +8,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 class _FakeFastAPI:
+    def __init__(self, *args, **kwargs):
+        pass
+
     def add_middleware(self, *args, **kwargs):
         return None
+
+    def include_router(self, *args, **kwargs):
+        return None
+
+    def add_api_route(self, *args, **kwargs):
+        return None
+
+    def middleware(self, *args, **kwargs):
+        return self._decorator
 
     def get(self, *args, **kwargs):
         return self._decorator
 
     def post(self, *args, **kwargs):
+        return self._decorator
+
+    def patch(self, *args, **kwargs):
         return self._decorator
 
     def put(self, *args, **kwargs):
@@ -23,6 +38,10 @@ class _FakeFastAPI:
     @staticmethod
     def _decorator(func):
         return func
+
+
+class _FakeAPIRouter(_FakeFastAPI):
+    pass
 
 
 class _FakeHTTPException(Exception):
@@ -37,17 +56,22 @@ class _FakeBaseModel:
 
 
 fake_fastapi = types.ModuleType("fastapi")
+fake_fastapi.APIRouter = _FakeAPIRouter
 fake_fastapi.FastAPI = _FakeFastAPI
 fake_fastapi.HTTPException = _FakeHTTPException
+fake_fastapi.Request = object
 fake_middleware = types.ModuleType("fastapi.middleware")
 fake_cors = types.ModuleType("fastapi.middleware.cors")
 fake_cors.CORSMiddleware = object
+fake_responses = types.ModuleType("fastapi.responses")
+fake_responses.JSONResponse = dict
 fake_pydantic = types.ModuleType("pydantic")
 fake_pydantic.BaseModel = _FakeBaseModel
 
 sys.modules.setdefault("fastapi", fake_fastapi)
 sys.modules.setdefault("fastapi.middleware", fake_middleware)
 sys.modules.setdefault("fastapi.middleware.cors", fake_cors)
+sys.modules.setdefault("fastapi.responses", fake_responses)
 sys.modules.setdefault("pydantic", fake_pydantic)
 
 from backend import main

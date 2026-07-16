@@ -48,7 +48,7 @@
 
 155. ~~What exact Project Memory authority hierarchy, trust classes, freshness model, commit binding, supersession, conflicting-evidence resolution, owner-decision representation, generated-evidence requirements, memory-update approval, roadmap synchronization, stale-index behavior, tool provenance, prompt-injection boundaries, branch synchronization, and product boundaries should T001 define?~~ **Resolved by PHASE8-IMPL-026-T001:** `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md` defines all fifteen decision areas. No schema, scanner, registry, renderer, retrieval tool, or reviewer is implemented by T001.
 
-131. Should optional Bible/storyform/storyform-context availability be included in project metadata or exposed through a dedicated read-only context-readiness endpoint?
+131. ~~Should optional Bible/storyform/storyform-context availability be included in project metadata or exposed through a dedicated read-only context-readiness endpoint?~~ **Resolved by PHASE8-IMPL-024-T003A:** use the dedicated read-only `GET /api/projects/{project_name}/context-readiness` endpoint and `project_context_readiness.v1` response. It reports stable per-resource absent/invalid/unavailable/ready states and reason codes without changing project-list metadata or the established direct resource endpoints. T003B consumes the contract conditionally; T003C validates browser console/network behavior.
 
 130. Which OMI destinations are MVP-required and implemented, and which are intentionally unavailable and therefore must render as honest status rows rather than enabled actions?
 

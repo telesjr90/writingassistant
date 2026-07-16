@@ -8,9 +8,11 @@ T001 OMI-guided creation integrity is complete/PASS through T001A-T001D.
 
 T002 Story Check grounding integrity is complete/PASS through T002A-T002E. Live validation evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z` (PASS, 22 diagnostics: 17 unverified + 5 quarantined, exact source identity/hash matched, fail-closed on unsupported claims, non-mutating).
 
-Next implementation task: `PHASE8-IMPL-024-T003A - Context-availability/readiness contract for Bible, storyform, and storyform-context` (first bounded child of planned T003).
+Latest completed child: `PHASE8-IMPL-024-T003A - Context-availability/readiness contract for Bible, storyform, and storyform-context` (`complete/PASS`).
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect. T003 optional-resource handling remains planned and T003A is the immediate frontier.
+Next implementation task: `PHASE8-IMPL-024-T003B - Conditional frontend loading with distinct absent, invalid, and request-failure states`. T003 remains active/in progress; T003C remains planned.
+
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003A has implemented the backend readiness contract. T003B conditional frontend loading and T003C console/network validation remain incomplete.
 
 ## Controlling Evidence
 
@@ -89,11 +91,11 @@ Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/h
 
 ### `PHASE8-IMPL-024-T003` - Optional-resource handling
 
-- `PHASE8-IMPL-024-T003A` - Context-availability/readiness contract for Bible, storyform, and storyform-context (`next; T003 pending`; depends on T002E).
-- `PHASE8-IMPL-024-T003B` - Conditional frontend loading with distinct absent, invalid, and request-failure states (`planned`; depends on T003A).
+- `PHASE8-IMPL-024-T003A` - Context-availability/readiness contract for Bible, storyform, and storyform-context (`complete/PASS`; depends on T002E). Decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md`.
+- `PHASE8-IMPL-024-T003B` - Conditional frontend loading with distinct absent, invalid, and request-failure states (`next`; depends on T003A).
 - `PHASE8-IMPL-024-T003C` - Console/network regression validation (`planned`; depends on T003B).
 
-Normal absence must not generate repeated noisy 404s or obscure genuine invalid-resource and request-failure errors.
+T003A provides the deterministic `project_context_readiness.v1` backend contract at `GET /api/projects/{project_name}/context-readiness`. Normal optional-resource absence returns an explicit successful readiness result; invalid resources remain distinct; unsafe IDs/locators, missing projects, permission failures, and unexpected failures retain transport-error semantics. Existing direct resource endpoints retain their prior behavior. T003B owns conditional frontend use of this contract, and T003C owns console/network regression validation.
 
 ### `PHASE8-IMPL-024-T006` - Truthful OMI navigation
 
@@ -144,7 +146,7 @@ Every future mutation suite must use its own disposable `uiux-audit-*` project; 
 
 Verified working behavior is limited to the successful reconciliation collector's actual coverage: read-only existing-project navigation, correct selected Story Check source transport, regular disposable project creation and owner-authored scene/note/material writes, unsaved-switch confirmation, staged guided-creation UI progression, and preservation of existing projects during that run.
 
-Verified defects are P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s.
+Verified defects are P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s. T003A supplies the backend contract needed to repair the 404 behavior; the frontend behavior remains open under T003B/T003C.
 
 Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, undersized-control standards triage, misleading enabled actions, and OMI internal reset ambiguity.
 

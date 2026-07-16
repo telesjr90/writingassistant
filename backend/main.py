@@ -13,10 +13,11 @@ except ImportError:  # pragma: no cover - supports lightweight route-test fakes
 from urllib.parse import unquote
 
 try:
-    from . import omi_runtime_preflight, project_manager, storyform
+    from . import context_readiness, omi_runtime_preflight, project_manager, storyform
     from .routes import apply_promotion, review_queue
     _analysis_module = importlib.import_module(__package__ + ".analysis_" + "engine")
 except ImportError:  # pragma: no cover - supports uvicorn main:app from backend/
+    import context_readiness
     import omi_runtime_preflight
     import project_manager
     import storyform
@@ -382,6 +383,29 @@ def get_storyform_context(project_name: str) -> dict[str, str]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return {"context": loaded_storyform.to_prompt_context()}
+
+
+@app.get("/api/projects/{project_name}/context-readiness")
+def get_project_context_readiness(project_name: str) -> dict:
+    try:
+        return context_readiness.build_project_context_readiness(project_name)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Project not found") from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid project or context resource locator",
+        ) from exc
+    except (PermissionError, OSError) as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to inspect project context readiness",
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to inspect project context readiness",
+        ) from exc
 
 
 @app.get("/api/projects/{project_name}/omi")

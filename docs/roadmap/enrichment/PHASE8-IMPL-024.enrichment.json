@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -17,8 +17,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T003A",
-    "activation_state": "T001 and T002 are complete/PASS; PHASE8-IMPL-025 prerequisites satisfied; T003A is the immediate active implementation frontier; no PHASE8-IMPL-025 child is activated"
+    "immediate_next_task": "PHASE8-IMPL-024-T003B",
+    "activation_state": "T001 and T002 are complete/PASS; T003A is complete/PASS; T003 remains active with T003B next and T003C planned; PHASE8-IMPL-025 prerequisites are satisfied but no PHASE8-IMPL-025 child is activated"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -93,6 +93,25 @@
     "resolved_questions": [132, 133],
     "unrelated_test_harness_defect": "tests/test_context_routes.py FastAPI synthetic stub missing Request; pre-existing, not modified by T002A-T002D"
   },
+  "t003a_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "active/in_progress",
+    "canonical_endpoint": "GET /api/projects/{project_name}/context-readiness",
+    "schema_version": "project_context_readiness.v1",
+    "states": [
+      "absent",
+      "invalid",
+      "not_applicable",
+      "ready",
+      "unavailable"
+    ],
+    "normal_absence": "successful readiness response with an explicit absent state; no direct resource request required",
+    "invalid_resource": "present but malformed, unsupported, schema-invalid, or validation-unavailable resources fail closed with stable reason codes and bounded diagnostics",
+    "request_failure_boundary": "unsafe project IDs or locators remain 400; missing projects remain 404; permission/read and unexpected failures remain 500",
+    "storyform_context": "derived read-only from a present schema-valid storyform and deterministic validator/context construction inputs; no Storyform values are fabricated",
+    "next_task": "PHASE8-IMPL-024-T003B",
+    "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md"
+  },
   "latest_verified_evidence": {
     "classification": "successful evidence collection, not product-wide pass",
     "run_id": "20260712T030010Z",
@@ -103,10 +122,10 @@
     "failed_advanced_collectors": "excluded from product evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T003A",
-    "title": "Context-availability/readiness contract for Bible, storyform, and storyform-context",
-    "status": "next; T003 pending",
-    "scope": "Define the context-availability/readiness contract and distinct absent/invalid/failure states for optional resources without implementing later T003 children or creating unnecessary endpoints"
+    "task_id": "PHASE8-IMPL-024-T003B",
+    "title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
+    "status": "next; T003 active/in progress",
+    "scope": "Consume the T003A readiness contract in the frontend, conditionally load ready resources, and present absent, invalid, and request-failure states without implementing T003C browser validation"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -176,12 +195,13 @@
       "guided-creation dedicated backend/frontend contract with exact owner text preservation, linked OMI idea and Notes storage, atomic failure semantics, and blank-route isolation",
       "guided-creation deterministic and disposable API/browser validation PASS at 20260712T205343Z",
       "existing-project preservation during the reconciliation run",
-      "Story Check grounded diagnostics: exact source identity/hash, deterministic verification-state classification, quarantined unsupported factual claims, source-mismatch fail-closed, non-mutating, live validation PASS at 20260713T022337Z (22 diagnostics: 17 unverified + 5 quarantined, identity matched, no false verification)"
+      "Story Check grounded diagnostics: exact source identity/hash, deterministic verification-state classification, quarantined unsupported factual claims, source-mismatch fail-closed, non-mutating, live validation PASS at 20260713T022337Z (22 diagnostics: 17 unverified + 5 quarantined, identity matched, no false verification)",
+      "T003A project_context_readiness.v1 backend contract for Bible, storyform, and derived storyform-context with stable absent/invalid/unavailable/ready states, bounded diagnostics, safe relative locators, genuine transport-failure boundaries, deterministic responses, and no mutation/model/tool runtime"
     ],
     "verified_defects": [
       "captured document-level horizontal overflow",
       "captured OMI heading hierarchy skip",
-      "repeated 404s for normally absent Bible/storyform/storyform-context resources"
+      "frontend still performs direct speculative requests that produce repeated 404s for normally absent Bible/storyform/storyform-context resources; T003A backend contract is complete and T003B/T003C remain"
     ],
     "likely_manual_review": [
       "OMI workspace density and weak next-task prioritization",
@@ -209,7 +229,7 @@
   "risks": [
     "misleading enabled UI actions",
     "hidden content caused by document overflow",
-    "optional-resource absence obscuring real errors",
+    "optional-resource absence obscuring real errors until T003B consumes the completed T003A backend contract and T003C validates network/console behavior",
     "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
     "failed collectors mistaken for product evidence",
     "guided review focus and immediate selected-project presentation advisories",
@@ -218,7 +238,6 @@
     "responsive and accessibility rework caused by replacing shared components after those repairs are completed"
   ],
   "open_questions": [
-    "optional-resource availability in project metadata versus a dedicated read-only endpoint",
     "MVP-required versus intentionally unavailable OMI destinations",
     "minimum desktop width and touch-target policy",
     "advanced mutation validation sequencing relative to MVP acceptance",
