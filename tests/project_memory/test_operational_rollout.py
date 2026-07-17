@@ -43,6 +43,7 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "docs/project-memory/schemas/project-memory.schema.json",
     "docs/roadmap/decision_log.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md",
     "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-026-T012.enrichment.json",
     "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",

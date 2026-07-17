@@ -7,6 +7,17 @@ applicable current entry and explicit supersession notices control current
 planning; older “next task” language is historical and must not be used as the
 current frontier.
 
+- PHASE8-IMPL-026-T011 operational-maintenance event for inherited-leaf
+  execution routing: accepted
+  `docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md`.
+  The resolver now derives `delegation_eligible: true` only for an exact
+  allowlisted inherited leaf after direct-parent, leaf, conflict, and
+  owner-boundary validation. Inheritance-providing aggregate records and T007B
+  remain nondelegable; lifecycle, dependency, frontier, stale/applicability,
+  and executor gates remain fail-closed. The T012 policy and routing registry
+  metadata are unchanged. No T013 child is created, and T003B remains the
+  unimplemented application frontier.
+
 - PHASE8-IMPL-026-T012 remaining-MVP current-truth, execution-routing, and
   shared UI-guidance maintenance: accepted
   `docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`.

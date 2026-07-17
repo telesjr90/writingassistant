@@ -198,6 +198,24 @@
       "affected_tasks": ["PHASE8-IMPL-024", "PHASE8-IMPL-024-T007B", "PHASE8-IMPL-025", "PHASE8-IMPL-026-T012", "PHASE8-IMPL-027"]
     },
     {
+      "id": "owner-decision:inherited-leaf-execution-routing-repair",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Inherited-Leaf Execution-Routing Repair",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "owner",
+        "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md"}]
+      },
+      "owner_decision_id": "inherited-leaf-execution-routing-repair",
+      "question": "May a validated allowlisted leaf inherit a delegable executor route from a correctly nondelegable aggregate record?",
+      "selected_option": "Yes. Set delegation eligibility on the resolved leaf after validating exact inheritance, leaf status, conflicts, and owner boundaries; keep the aggregate and owner-only records nondelegable and preserve every later fail-closed eligibility gate.",
+      "rationale": "This implements the T012 assignment for T003B/T003C and the same accepted T004/T005/T006 pattern without an explicit one-off record or any weakening of ROUTING-012.",
+      "affected_tasks": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T003B", "PHASE8-IMPL-024-T003C", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007B", "PHASE8-IMPL-026-T011"]
+    },
+    {
       "id": "owner-decision:whole-remaining-mvp-plan-integrity",
       "type": "owner_decision",
       "schema_version": "1.0.0",

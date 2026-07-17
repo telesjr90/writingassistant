@@ -319,6 +319,18 @@ application behavior, application test, dependency, runtime, candidate,
 promotion, apply-promotion, Memory/Canon, model, dataset, or story-prose scope is
 included.
 
+### Post-closeout T011 operational-maintenance event — inherited-leaf execution-routing repair
+
+Status: complete/PASS. This is an event under the existing T011 procedure, not
+a new child or Project Memory implementation frontier. The accepted decision is
+`docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md`.
+
+The event repairs the resolver's inherited-leaf delegation semantics while
+keeping inheritance-providing aggregate records and owner-only tasks
+nondelegable. T012 remains complete/PASS and remains the controlling routing
+policy. The routing registry and schema are unchanged. T003B remains the sole
+application frontier and is not implemented by this maintenance event.
+
 ## Implementation sequence
 
 ```text
@@ -341,7 +353,8 @@ and T007 remain contingent, owner-deferred, planned, inactive, and
 unimplemented. T012 records this explicitly owner-authorized completed bounded
 maintenance event; it is not an application implementation task or standing
 Project Memory frontier. Further maintenance follows the event-driven T011
-procedure unless separately authorized.
+procedure unless separately authorized. The inherited-leaf routing repair is
+one such accepted T011 operational-maintenance event and does not add T013.
 
 T006 and T007 are contingent on provenance and benchmark approval for their
 respective dependencies. They are not blocked by T002–T005 but must not

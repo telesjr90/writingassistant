@@ -257,7 +257,12 @@ def _resolve_record(
                     "model_category",
                     "reasoning_level",
                     "risk_class",
+                    "rationale",
+                    "escalation_conditions",
                     "owner_only",
+                    "applicability_scope_id",
+                    "capability_tags",
+                    "required_skills",
                 )
             )
             valid_override = (
@@ -298,6 +303,16 @@ def _resolve_record(
             "Add an explicit route or list the child in safe inheritance metadata.",
             f"Task {task_id} is not covered by safe parent inheritance.",
         )
+    if any(item.get("parent") == task_id for item in tasks.values()):
+        raise _resolution_error(
+            "ROUTING-005",
+            task_id,
+            "aggregate child",
+            "allowlisted leaf task",
+            "unsafe_parent_inheritance",
+            "Add an explicit nondelegable aggregate route or inherit only to a leaf task.",
+            f"Task {task_id} cannot inherit an executor route because it is not a leaf task.",
+        )
     if parent_record.get("owner_only") or "owner_review_required" in set(
         tasks.get(task_id, {}).get("boundary_tags", [])
     ):
@@ -316,6 +331,11 @@ def _resolve_record(
     inherited["authoritative_source_locator"] = dict(
         parent_record["authoritative_source_locator"]
     )
+    # Aggregate records remain nondelegable, but their exact allowlisted leaf
+    # children are delegable after the inheritance and owner-boundary checks
+    # above. Execution eligibility is still evaluated separately from the
+    # child's own lifecycle, dependencies, and active-frontier status.
+    inherited["delegation_eligible"] = True
     return inherited, "inherited"
 
 
@@ -442,6 +462,15 @@ def validate_execution_routing(
                 "owner_only_executor_mismatch",
                 "Make owner_only and execution_class consistent.",
                 f"Routing record {task_id} misstates owner-only status.",
+            ))
+        provides_inheritance = _mapping(record.get("inheritance")).get("enabled") is True
+        if (provides_inheritance or expected_owner) and record.get("delegation_eligible") is not False:
+            findings.append(_finding(
+                "ROUTING-012", ROUTING_SOURCE, f"{locator}/delegation_eligible",
+                record.get("delegation_eligible"), False,
+                "delegation_eligibility_mismatch",
+                "Keep inheritance-providing aggregate records and owner-only tasks nondelegable.",
+                f"Routing record {task_id} misstates delegation eligibility for its own task type.",
             ))
         source = _mapping(record.get("authoritative_source_locator"))
         if source.get("path") != ROUTING_SOURCE or source.get("symbol") != task_id:

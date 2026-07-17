@@ -194,6 +194,26 @@
       "affected_tasks": ["PHASE8-IMPL-024", "PHASE8-IMPL-025", "PHASE8-IMPL-026-T012", "PHASE8-IMPL-027"]
     },
     {
+      "id": "decision:pmf-t011-inherited-leaf-execution-routing-repair",
+      "type": "decision",
+      "schema_version": "1.0.0",
+      "title": "T011 Operational Maintenance: Inherited-Leaf Execution-Routing Repair",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "owner",
+        "owner_decision_ref": "owner-decision:inherited-leaf-execution-routing-repair",
+        "source_locators": [{"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md"}]
+      },
+      "decision_id": "pmf-t011-inherited-leaf-execution-routing-repair",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md",
+      "question": "How should exact allowlisted inherited leaves become delegable without making aggregate parents or owner-only tasks delegable or weakening lifecycle, dependency, frontier, conflict, freshness, or applicability gates?",
+      "selected_option": "Derive inherited-leaf delegation eligibility only after validated direct-parent, exact-allowlist, leaf, conflict, and owner-boundary checks; preserve all later execution-eligibility gates and keep the T012 registry metadata unchanged.",
+      "rationale": "The resolver copied correct aggregate nondelegability into inherited leaves. Deriving the leaf value after the accepted inheritance checks repairs every governed family without a one-off route or a weaker global gate.",
+      "affected_tasks": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T003B", "PHASE8-IMPL-024-T003C", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007B", "PHASE8-IMPL-026-T011"]
+    },
+    {
       "id": "decision:whole-remaining-mvp-plan-integrity",
       "type": "decision",
       "schema_version": "1.0.0",

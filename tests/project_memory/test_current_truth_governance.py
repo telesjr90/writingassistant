@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -205,3 +206,43 @@ def test_current_task_and_decision_source_locators_exist():
     assert "docs/roadmap/tasks/PHASE8-IMPL-026-T012.md" in inventory_text
     assert "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md" in inventory_text
     assert "docs/project-memory/registries/execution-routing.json" in inventory_text
+
+
+def test_t011_routing_repair_is_an_operational_event_not_a_new_child():
+    decision_path = (
+        REPO_ROOT
+        / "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md"
+    )
+    roadmap = json.loads(
+        (REPO_ROOT / "docs/roadmap/roadmap_index.yaml").read_text(encoding="utf-8")
+    )
+    decisions = json.loads(
+        (REPO_ROOT / "docs/project-memory/registries/decisions.json").read_text(encoding="utf-8")
+    )
+    owner_decisions = json.loads(
+        (REPO_ROOT / "docs/project-memory/registries/owner-decisions.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    enrichment = json.loads(
+        (REPO_ROOT / "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert decision_path.is_file()
+    assert not any(item.get("id") == "PHASE8-IMPL-026-T013" for item in roadmap["tasks"])
+    assert any(
+        item.get("decision_id") == "pmf-t011-inherited-leaf-execution-routing-repair"
+        for item in decisions["records"]
+    )
+    assert any(
+        item.get("owner_decision_id") == "inherited-leaf-execution-routing-repair"
+        for item in owner_decisions["records"]
+    )
+    assert enrichment["next_project_memory_task"] is None
+    event = enrichment["operational_maintenance_events"][-1]
+    assert event["procedure_task_id"] == "PHASE8-IMPL-026-T011"
+    assert event["new_roadmap_child"] is False
+    assert event["application_frontier"] == "PHASE8-IMPL-024-T003B"
+    assert event["application_implementation"] is False

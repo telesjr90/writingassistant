@@ -106,6 +106,15 @@ silently override it.
     execution-routing, and shared UI-guidance maintenance (complete/PASS;
     explicit post-closeout governance maintenance, no application scope).
 
+Post-closeout operational maintenance remains under T011 and is not a new
+numbered roadmap child. The accepted inherited-leaf execution-routing repair is
+recorded at
+`docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md`.
+It changes only the routing resolver, systemic Project Memory tests, normalized
+decision records, and concise governance synchronization. T012 and the parent
+remain complete/closed; T003B remains unimplemented and the application
+frontier.
+
 T006 and T007 are owner-deferred because no benchmarkable symbol-navigation,
 retrieval-quality, citation, scale, latency, or maintainability gap has been
 measured. They remain contingent and may be reconsidered only after a documented
