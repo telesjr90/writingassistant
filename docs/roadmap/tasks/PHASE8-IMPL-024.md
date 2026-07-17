@@ -8,11 +8,11 @@ T001 OMI-guided creation integrity is complete/PASS through T001A-T001D.
 
 T002 Story Check grounding integrity is complete/PASS through T002A-T002E. Live validation evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z` (PASS, 22 diagnostics: 17 unverified + 5 quarantined, exact source identity/hash matched, fail-closed on unsupported claims, non-mutating).
 
-Latest completed child: `PHASE8-IMPL-024-T003A - Context-availability/readiness contract for Bible, storyform, and storyform-context` (`complete/PASS`).
+T003A context-availability/readiness backend contract and T003B conditional frontend loading are both complete/PASS. T003C console/network regression validation is now the next readiness task/application frontier. T003 remains active/in progress.
 
-Next implementation task: `PHASE8-IMPL-024-T003B - Conditional frontend loading with distinct absent, invalid, and request-failure states`. T003 remains active/in progress; T003C remains planned.
+Next implementation task: `PHASE8-IMPL-024-T003C - Console/network regression validation`. T003 remains active/in progress; T003C is planned, dependency on T003B is satisfied, and it is now the next readiness task/application frontier.
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003A has implemented the backend readiness contract. T003B conditional frontend loading and T003C console/network validation remain incomplete.
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003A has implemented the backend readiness contract; T003B has implemented the conditional frontend integration. T003C console/network validation remains incomplete.
 
 ## Controlling Evidence
 
@@ -97,10 +97,10 @@ Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/h
 ### `PHASE8-IMPL-024-T003` - Optional-resource handling
 
 - `PHASE8-IMPL-024-T003A` - Context-availability/readiness contract for Bible, storyform, and storyform-context (`complete/PASS`; depends on T002E). Decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md`.
-- `PHASE8-IMPL-024-T003B` - Conditional frontend loading with distinct absent, invalid, and request-failure states (`next`; depends on T003A).
-- `PHASE8-IMPL-024-T003C` - Console/network regression validation (`planned`; depends on T003B).
+- `PHASE8-IMPL-024-T003B` - Conditional frontend loading with distinct absent, invalid, and request-failure states (`complete/PASS`; depends on T003A). Final implementation commit: `83de5db8a8b017bdcc55f22876024219fdb4be3e`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md`.
+- `PHASE8-IMPL-024-T003C` - Console/network regression validation (`planned`; depends on T003B; dependency satisfied). T003C is now the next readiness task/application frontier.
 
-T003A provides the deterministic `project_context_readiness.v1` backend contract at `GET /api/projects/{project_name}/context-readiness`. Normal optional-resource absence returns an explicit successful readiness result; invalid resources remain distinct; unsafe IDs/locators, missing projects, permission failures, and unexpected failures retain transport-error semantics. Existing direct resource endpoints retain their prior behavior. T003B owns conditional frontend use of this contract, and T003C owns console/network regression validation.
+T003A provides the deterministic `project_context_readiness.v1` backend contract at `GET /api/projects/{project_name}/context-readiness`. Normal optional-resource absence returns an explicit successful readiness result; invalid resources remain distinct; unsafe IDs/locators, missing projects, permission failures, and unexpected failures retain transport-error semantics. Existing direct resource endpoints retain their prior behavior. T003B consumed this contract in the frontend with readiness-first conditional loading, distinct absent/invalid/unavailable/readiness-failure/direct-failure states, stale-operation and session-generation guards, ABA rejection, project-switch reset, Retry, and independent unrelated loading. T003B is complete/PASS. T003C owns console/network regression validation.
 
 ### `PHASE8-IMPL-024-T006` - Truthful OMI navigation
 

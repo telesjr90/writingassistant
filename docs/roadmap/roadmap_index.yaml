@@ -5,9 +5,9 @@
     "current_track": "Application UI/UX audit integrity and owner-acceptance repair",
     "current_parent_task_id": "PHASE8-IMPL-024",
     "current_parent_task_title": "Application UI/UX Audit Integrity and Acceptance Repair",
-    "next_readiness_task_id": "PHASE8-IMPL-024-T003B",
-    "next_readiness_task_title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
-    "next_readiness_task_type": "frontend integration micro-task",
+    "next_readiness_task_id": "PHASE8-IMPL-024-T003C",
+    "next_readiness_task_title": "Console and network regression validation",
+    "next_readiness_task_type": "browser regression",
     "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
     "planned_architecture_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
     "planned_architecture_activation_after": ["PHASE8-IMPL-024"],
@@ -17,7 +17,7 @@
     "current_execution_routing_source": "docs/project-memory/registries/execution-routing.json",
     "current_execution_routing_decision": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS. PHASE8-IMPL-024 is the active repair parent; T003A backend context readiness is complete/PASS; T003B implementation is complete (commit 22d7737) and remains the immediate frontier under active T003; T003C console/network regression validation remains planned. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and failure/recovery workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
+    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS. PHASE8-IMPL-024 is the active repair parent; T003A backend context readiness is complete/PASS; T003B conditional frontend loading is complete/PASS (final commit 83de5db); T003C console/network regression validation is planned and is now the immediate frontier. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and failure/recovery workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5524,13 +5524,13 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
       "controlling_child_order": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T008"],
-      "latest_child_task": "PHASE8-IMPL-024-T003A",
+      "latest_child_task": "PHASE8-IMPL-024-T003B",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-024-T003B",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
+      "next_child_task": "PHASE8-IMPL-024-T003C",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned/inactive; activation waits for full PHASE8-IMPL-024 closeout, passing closeout validation, and accepted FRESH refresh",
-      "result": "published/active release-blocker repair parent; T001 and T002 complete/PASS; T003A complete/PASS; T003 active/in progress with T003B next and T003C planned; P0-A and P0-B repaired/closed; broad owner acceptance and MVP readiness remain blocked"
+      "result": "published/active release-blocker repair parent; T001 and T002 complete/PASS; T003A complete/PASS; T003B complete/PASS; T003 active/in progress with T003C next/planned; P0-A and P0-B repaired/closed; broad owner acceptance and MVP readiness remain blocked"
     },
     {
       "id": "PHASE8-IMPL-024-T001",
@@ -5560,7 +5560,7 @@
       "parent": "PHASE8-IMPL-024",
       "depends_on": ["PHASE8-IMPL-024-T002"],
       "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "active/in-progress workstream; T003A context-availability/readiness contract complete/PASS; T003B conditional frontend loading implementation complete (commit 22d7737), T003C console/network regression validation remains planned"
+      "result": "active/in-progress workstream; T003A context-availability/readiness contract complete/PASS; T003B conditional frontend loading complete/PASS (final commit 83de5db); T003C console/network regression validation remains planned (next frontier)"
     },
     {
       "id": "PHASE8-IMPL-024-T003A",
@@ -5576,11 +5576,11 @@
       "id": "PHASE8-IMPL-024-T003B",
       "title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-024-T003",
       "depends_on": ["PHASE8-IMPL-024-T003A"],
       "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "implementation complete (commit 22d7737df72e70ba4feb44b69d370114bb8ceebd); readiness-first conditional frontend loading with distinct states; 11 API + 18 wiring tests passed; full frontend regression 56 passed; build PASS; T003C validation remains planned"
+      "result": "complete/PASS (final commit 83de5db8a8b017bdcc55f22876024219fdb4be3e); readiness-first conditional frontend loading with distinct absent/invalid/unavailable/readiness-failure/direct-failure states; stale-operation session-generation guards; ABA rejection; project-switch reset; Retry; independent unrelated loading; 62 focused tests passed; full frontend regression 89 passed; build PASS; T003C validation remains planned"
     },
     {
       "id": "PHASE8-IMPL-024-T003C",

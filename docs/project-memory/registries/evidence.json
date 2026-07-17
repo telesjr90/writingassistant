@@ -3,6 +3,28 @@
   "schema_version": "1.0.0",
   "records": [
     {
+      "id": "evidence:ph8-impl-024-t003b-conditional-frontend-closeout",
+      "type": "evidence",
+      "schema_version": "1.0.0",
+      "title": "T003B Conditional Frontend Loading Closeout Validation PASS",
+      "authority_class": "accepted_evidence",
+      "lifecycle": {"status": "current"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-024-T003B",
+        "accepted_by": "PHASE8-IMPL-024-T003B",
+        "source_locators": [
+          {"path": "docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md"},
+          {"path": "frontend/tests/contextReadinessApi.test.mjs"},
+          {"path": "frontend/tests/contextReadinessWiring.test.mjs"}
+        ]
+      },
+      "evidence_id": "ph8-impl-024-t003b-conditional-frontend-closeout",
+      "evidence_type": "automated_test",
+      "description": "T003B closeout validation: 62 focused context-readiness tests passed (11 API + 51 wiring), 89 total frontend tests passed, production build PASS. Final implementation commit: 83de5db8a8b017bdcc55f22876024219fdb4be3e.",
+      "associated_task_id": "PHASE8-IMPL-024-T003B",
+      "is_blocking_defect": false
+    },
+    {
       "id": "evidence:ph8-impl-024-t002d-story-check-grounding",
       "type": "evidence",
       "schema_version": "1.0.0",

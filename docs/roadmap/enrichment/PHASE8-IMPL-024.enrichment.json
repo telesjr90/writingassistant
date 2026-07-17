@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T003B",
-    "activation_state": "T001/T002/T003A are complete/PASS; T003B is next and T003C planned. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed, closeout validation passes, and the accepted post-closeout Project Memory refresh is FRESH"
+    "immediate_next_task": "PHASE8-IMPL-024-T003C",
+    "activation_state": "T001/T002/T003A/T003B are complete/PASS; T003C is planned (next frontier). PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed, closeout validation passes, and the accepted post-closeout Project Memory refresh is FRESH"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -111,6 +111,38 @@
     "next_task": "PHASE8-IMPL-024-T003B",
     "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md"
   },
+  "t003b_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "active/in_progress",
+    "final_implementation_commit": "83de5db8a8b017bdcc55f22876024219fdb4be3e",
+    "earlier_commit": "22d7737df72e70ba4feb44b69d370114bb8ceebd",
+    "earlier_commit_note": "Initial T003B implementation; superseded by 83de5db which added project-scoped async finalization guards",
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md",
+    "behavior": [
+      "Readiness-first conditional frontend loading via fetchProjectContextReadiness",
+      "Distinct absent, invalid, unavailable, readiness-failure, and direct-failure UI states",
+      "Absent Bible and storyform remain owner-editable and saveable",
+      "Stale-operation session-generation guards (createOperationGuard with immutable snapshot)",
+      "Monotonically increasing projectGenRef on project switch",
+      "ABA operation rejection via generation mismatch",
+      "Project-switch reset of isSavingStoryform, retrying, contextReadinessError, and directResourceErrors",
+      "Retry handler for both readiness and direct-resource failures",
+      "Independent scenes/notes/materials/OMI loading from optional-context readiness"
+    ],
+    "changed_files": [
+      "frontend/src/App.jsx",
+      "frontend/src/components/ProjectContext.jsx",
+      "frontend/tests/contextReadinessApi.test.mjs",
+      "frontend/tests/contextReadinessWiring.test.mjs"
+    ],
+    "test_results": {
+      "focused": { "passed": 62, "failed": 0 },
+      "full_frontend": { "passed": 89, "failed": 0 },
+      "build": "PASS"
+    },
+    "safety": "No model/runtime, Story Check, candidate, promotion, apply-promotion, Memory/Canon, or story-prose mutation",
+    "t003c_status": "planned; dependency satisfied; next readiness task/application frontier"
+  },
   "latest_verified_evidence": {
     "classification": "successful evidence collection, not product-wide pass",
     "run_id": "20260712T030010Z",
@@ -121,10 +153,10 @@
     "failed_advanced_collectors": "excluded from product evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T003B",
-    "title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
-    "status": "next; T003 active/in progress",
-    "scope": "Consume the T003A readiness contract in the frontend, conditionally load ready resources, and present absent, invalid, and request-failure states without implementing T003C browser validation"
+    "task_id": "PHASE8-IMPL-024-T003C",
+    "title": "Console and network regression validation",
+    "status": "planned; dependency on T003B satisfied; next readiness task/application frontier",
+    "scope": "Browser console/network/Playwright validation of the T003B frontend integration without implementation"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",

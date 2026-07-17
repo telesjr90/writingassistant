@@ -2,7 +2,7 @@
 
 <!-- CURRENT-REPOSITORY-TRUTH:START -->
 - Active application parent: `PHASE8-IMPL-024`
-- Immediate application frontier: `PHASE8-IMPL-024-T003B`
+- Immediate application frontier: `PHASE8-IMPL-024-T003C`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current routing source: `docs/project-memory/registries/execution-routing.json`

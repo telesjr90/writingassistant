@@ -42,7 +42,7 @@
       "classification": "application repair",
       "is_application_frontier": true,
       "is_blocking": true,
-      "notes": "Active application implementation parent. T001 and T002 complete/PASS. T003A complete/PASS; T003B implementation complete, T003C planned."
+      "notes": "Active application implementation parent. T001 and T002 complete/PASS. T003A complete/PASS; T003B complete/PASS; T003C planned (next frontier)."
     },
     {
       "id": "task:PHASE8-IMPL-024-T001",
@@ -69,7 +69,7 @@
       "provenance": {"created_by": "PHASE8-IMPL-024-T003A", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
       "task_id": "PHASE8-IMPL-024-T003", "parent_task_id": "PHASE8-IMPL-024", "depends_on": ["PHASE8-IMPL-024-T002"],
       "task_type": "runtime", "classification": "optional-resource workstream", "is_application_frontier": false, "is_blocking": true,
-      "notes": "Active/in progress. T003A complete/PASS; T003B implementation complete, T003C planned."
+      "notes": "Active/in progress. T003A complete/PASS; T003B complete/PASS; T003C planned (next frontier)."
     },
     {
       "id": "task:PHASE8-IMPL-024-T003A",
@@ -95,7 +95,7 @@
       "classification": "backend-only contract micro-task",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Complete/PASS. Implements the deterministic read-only project context-readiness contract. T003B implementation complete; T003C remains planned."
+      "notes": "Complete/PASS. Implements the deterministic read-only project context-readiness contract. T003B complete/PASS; T003C remains planned (next frontier)."
     },
     {
       "id": "task:PHASE8-IMPL-024-T003B",
@@ -104,13 +104,15 @@
       "title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
       "authority_class": "authoritative",
       "lifecycle": {
-        "status": "in_progress"
+        "status": "complete"
       },
       "provenance": {
         "created_by": "PHASE8-IMPL-024-T003A",
+        "accepted_by": "PHASE8-IMPL-024-T003B",
         "source_locators": [
           { "path": "docs/roadmap/implementation_status.md", "line_start": 12, "line_end": 12 },
-          { "path": "docs/roadmap/tasks/PHASE8-IMPL-024.md" }
+          { "path": "docs/roadmap/tasks/PHASE8-IMPL-024.md" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md" }
         ]
       },
       "task_id": "PHASE8-IMPL-024-T003B",
@@ -118,9 +120,9 @@
       "depends_on": ["PHASE8-IMPL-024-T003A"],
       "task_type": "runtime",
       "classification": "frontend integration micro-task",
-      "is_application_frontier": true,
+      "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Implementation complete (commit 22d7737df72e70ba4feb44b69d370114bb8ceebd). Readiness-first conditional frontend loading with distinct absent, invalid, unavailable, readiness-failure, and direct-failure states. 11 API + 18 wiring + 27 existing tests passed (56 total); build PASS. T003C validation remains planned; not yet accepted as complete."
+      "notes": "Complete/PASS. Final implementation commit: 83de5db8a8b017bdcc55f22876024219fdb4be3e. Readiness-first conditional frontend loading with distinct absent, invalid, unavailable, readiness-failure, and direct-failure states. Stale-operation session-generation guards, ABA rejection, project-switch reset, Retry, and independent unrelated loading. 62 focused tests + 27 existing passed (89 total); build PASS. T003C validation remains planned."
     },
     {
       "id": "task:PHASE8-IMPL-024-T003C",
@@ -128,8 +130,8 @@
       "lifecycle": {"status": "planned"},
       "provenance": {"created_by": "PHASE8-IMPL-024-T003A", "source_locators": [{"path": "docs/roadmap/tasks/PHASE8-IMPL-024.md"}]},
       "task_id": "PHASE8-IMPL-024-T003C", "parent_task_id": "PHASE8-IMPL-024-T003", "depends_on": ["PHASE8-IMPL-024-T003B"],
-      "task_type": "validation", "classification": "browser regression", "is_application_frontier": false, "is_blocking": false,
-      "notes": "Planned after T003B acceptance; closes optional-resource console/network validation."
+      "task_type": "validation", "classification": "browser regression", "is_application_frontier": true, "is_blocking": false,
+      "notes": "Planned after T003B complete/PASS; dependency satisfied. T003C is now the next readiness task/application frontier. Closes optional-resource console/network validation."
     },
     {
       "id": "task:PHASE8-IMPL-024-T006",
