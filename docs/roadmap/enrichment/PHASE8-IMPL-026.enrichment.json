@@ -7,7 +7,7 @@
   "classification": "hybrid governance, documentation, and developer infrastructure",
   "parallel_workstream": true,
   "application_frontier_unchanged": "PHASE8-IMPL-024",
-  "application_frontier_next_task": "PHASE8-IMPL-024-T003C",
+  "application_frontier_next_task": "PHASE8-IMPL-024-T003B",
   "ph8_impl_025_unchanged": "published/planned, inactive",
   "context_pack": null,
   "context_pack_status": "generated evidence exists under .codex-context/project-memory/ and remains ignored/non-authoritative",
@@ -210,7 +210,7 @@
       "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md",
       "status": "complete/PASS",
       "new_roadmap_child": false,
-      "application_frontier": "PHASE8-IMPL-024-T003C",
+      "application_frontier": "PHASE8-IMPL-024-T003B",
       "application_implementation": false
     }
   ],
