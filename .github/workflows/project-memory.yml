@@ -1,0 +1,32 @@
+name: Project Memory
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Supervision profile"
+        required: true
+        default: implementation
+        type: choice
+        options:
+          - implementation
+          - closeout
+          - governance
+      task_id:
+        description: "Validated task ID; blank resolves the current frontier or T011 governance procedure"
+        required: false
+        type: string
+
+permissions: {}
+
+jobs:
+  registration:
+    name: Project Memory workflow registration
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Explain bootstrap workflow
+        run: |
+          echo "This default-branch file registers manual Project Memory dispatch."
+          echo "Select the implementation branch when starting the workflow."
