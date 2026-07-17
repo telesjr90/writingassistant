@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -115,7 +116,22 @@ def _git_branch(root: Path) -> str:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    return result.stdout.strip()
+    branch = result.stdout.strip()
+    if branch or os.environ.get("GITHUB_ACTIONS") != "true":
+        return branch
+    event_branch = os.environ.get("GITHUB_HEAD_REF") or os.environ.get("GITHUB_REF_NAME")
+    event_sha = os.environ.get("GITHUB_SHA", "")
+    head = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=True,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    ).stdout.strip()
+    if event_branch and event_sha == head:
+        return event_branch
+    return ""
 
 
 def _roadmap_by_id(roadmap: dict[str, Any]) -> dict[str, dict[str, Any]]:

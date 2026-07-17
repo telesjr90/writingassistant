@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import tarfile
@@ -540,6 +541,30 @@ def test_clean_detached_github_refresh_uses_the_trusted_expected_branch(tmp_path
     _run(repo, "git", "checkout", "--detach", commit)
     assert _run(repo, "git", "branch", "--show-current") == ""
     assert not (repo / ".codex-context").exists()
+    github_env = os.environ.copy()
+    github_env.update({
+        "GITHUB_ACTIONS": "true",
+        "GITHUB_REF_NAME": expected_branch,
+        "GITHUB_SHA": commit,
+    })
+    for command in (
+        ("python3", "scripts/project_memory/validate_registries.py", "--json"),
+        ("python3", "scripts/project_memory/execution_routing.py", "validate", "--repo-root", "."),
+    ):
+        validation = subprocess.run(
+            command, cwd=repo, env=github_env, text=True, capture_output=True, check=False
+        )
+        assert validation.returncode == 0, validation.stdout + validation.stderr
+    unbound_env = dict(github_env, GITHUB_SHA="0" * 40)
+    unbound = subprocess.run(
+        ("python3", "scripts/project_memory/execution_routing.py", "validate", "--repo-root", "."),
+        cwd=repo,
+        env=unbound_env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert unbound.returncode == 1
     result = subprocess.run(
         (
             "python3", "scripts/project_memory/operational_rollout.py", "refresh",
@@ -551,6 +576,7 @@ def test_clean_detached_github_refresh_uses_the_trusted_expected_branch(tmp_path
             "--allow-detached", "--json",
         ),
         cwd=repo,
+        env=github_env,
         text=True,
         capture_output=True,
         check=False,
