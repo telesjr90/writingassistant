@@ -188,13 +188,13 @@ def compute_convergence(
 
     rmap = roadmap_state or {}
     frontier_next = rmap.get("frontier_next_task", "")
-    if frontier_next and frontier_next != "PHASE8-IMPL-024-T003B":
+    if frontier_next and frontier_next != "PHASE8-IMPL-024-T003C":
         finding = make_finding(
             code="frontier_mismatch",
             severity="critical",
             title="Application frontier mismatch",
-            explanation=f"Expected PHASE8-IMPL-024-T003B but found '{frontier_next}'.",
-            evidence={"expected": "PHASE8-IMPL-024-T003B", "actual": frontier_next},
+            explanation=f"Expected PHASE8-IMPL-024-T003C but found '{frontier_next}'.",
+            evidence={"expected": "PHASE8-IMPL-024-T003C", "actual": frontier_next},
             blocks_publication=True,
             owner_review_required=True,
             suggested_action="Investigate why the application frontier changed.",
