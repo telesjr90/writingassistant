@@ -6,7 +6,7 @@
   "parent_task_id": "PHASE8-IMPL-026",
   "depends_on": ["PHASE8-IMPL-026"],
   "operational_basis": "PHASE8-IMPL-026-T011",
-  "application_frontier": "PHASE8-IMPL-024-T003B",
+  "application_frontier": "PHASE8-IMPL-024-T003C",
   "application_implementation": false,
   "routing_source": "docs/project-memory/registries/execution-routing.json",
   "routing_classes": ["codex_gpt_5_6_sol", "opencode_go", "owner_decision"],

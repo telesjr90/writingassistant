@@ -947,7 +947,7 @@
   "latest_child_task": "PHASE8-IMPL-023-T023B",
   "latest_child_status": "complete/PASS",
   "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md",
-  "next_child_task": "PHASE8-IMPL-024-T003B",
+  "next_child_task": "PHASE8-IMPL-024-T003C",
   "next_child_title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
   "next_child_status": "planned/next/unimplemented",
   "parent_status": "published/historical foundation",
