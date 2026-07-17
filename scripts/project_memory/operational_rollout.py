@@ -262,8 +262,9 @@ def _iso_from_run_id(run_id: str) -> str:
 @contextlib.contextmanager
 def _trusted_detached_branch(expected_branch: str) -> Iterator[None]:
     """Report a trusted CI branch to existing read-only builders in detached mode."""
-    from scripts.project_memory import repository_state, validate_rendered_docs
+    from scripts.project_memory import execution_routing, repository_state, validate_rendered_docs
 
+    original_routing_branch = execution_routing._git_branch
     original_repo_git = repository_state._run_git
     original_render_git = render_docs._run_git
     original_validate_git = validate_rendered_docs._run_git
@@ -272,6 +273,9 @@ def _trusted_detached_branch(expected_branch: str) -> Iterator[None]:
         if args == ["rev-parse", "--abbrev-ref", "HEAD"]:
             return expected_branch
         return original_repo_git(args, repo_root, timeout)
+
+    def routing_branch(repo_root: Path) -> str:
+        return expected_branch
 
     def render_git(args: list[str], repo_root: Path, timeout: int = 30) -> str:
         if args == ["rev-parse", "--abbrev-ref", "HEAD"]:
@@ -283,12 +287,14 @@ def _trusted_detached_branch(expected_branch: str) -> Iterator[None]:
             return expected_branch
         return original_validate_git(repo_root, args)
 
+    execution_routing._git_branch = routing_branch
     repository_state._run_git = repo_git
     render_docs._run_git = render_git
     validate_rendered_docs._run_git = validate_git
     try:
         yield
     finally:
+        execution_routing._git_branch = original_routing_branch
         repository_state._run_git = original_repo_git
         render_docs._run_git = original_render_git
         validate_rendered_docs._run_git = original_validate_git
@@ -362,6 +368,28 @@ def refresh(
             require_clean=True, nonpublication=False,
         )
         snapshot_dir = Path(snapshot["output_directory"])
+        if snapshot.get("result") == "BLOCKED":
+            convergence_path = snapshot_dir / "convergence-findings.json"
+            convergence = _json(convergence_path)
+            blockers = [
+                {
+                    "finding_id": item.get("finding_id"),
+                    "code": item.get("code"),
+                    "source_locators": item.get("source_locators", []),
+                }
+                for item in convergence.get("findings", [])
+                if item.get("blocks_publication")
+            ]
+            raise OperationalError(
+                "Snapshot convergence blocked refresh: "
+                + json.dumps(
+                    {
+                        "blocking_findings": blockers,
+                        "findings_path": str(convergence_path),
+                    },
+                    sort_keys=True,
+                )
+            )
         render = render_docs.render(
             repo_root=str(root), snapshot_dir=str(snapshot_dir),
             output_root=f"{policy['local_publication_output_root']}/rendered",

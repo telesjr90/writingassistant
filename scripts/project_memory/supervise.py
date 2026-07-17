@@ -36,6 +36,7 @@ EVIDENCE_SCHEMA = "project-memory-supervision-evidence.v1"
 AUTHORITY_CLASS = "generated_evidence"
 MODES = ("implementation", "closeout", "governance")
 RESULTS = ("READY", "READY_WITH_ADVISORIES", "BLOCKED")
+WORKFLOW_OUTCOMES = ("success", "failure", "cancelled", "skipped")
 TASK_ID_PATTERN = re.compile(r"^PHASE[0-9]+-(?:IMPL|UX)-[0-9]{3}(?:-T[0-9]{3}[A-Z0-9]*)?$")
 FULL_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 HANDOFF_FILES = (
@@ -160,6 +161,13 @@ def evaluate_gate(inputs: dict[str, Any]) -> dict[str, Any]:
     routing = inputs.get("routing")
     blockers: list[dict[str, str]] = []
     advisories: list[dict[str, str]] = []
+
+    if inputs.get("collection_error"):
+        _add_unique(
+            blockers,
+            "supervision_input_collection_failed",
+            str(inputs["collection_error"]),
+        )
 
     if not repository.get("clean") or repository.get("staged"):
         _add_unique(blockers, "repository_not_clean", "A clean worktree and empty staging are required.")
@@ -475,17 +483,36 @@ def validate_evidence(path: Path | None, root: Path, task_id: str, commit: str) 
         if value.get("task_id") != task_id or value.get("commit") != commit:
             raise SupervisionError("Evidence task or commit binding mismatch")
         checks = value.get("checks")
-        if not isinstance(checks, list) or any(
+        if not isinstance(checks, list) or len(checks) > 32 or any(
             not isinstance(item, dict)
             or not isinstance(item.get("name"), str)
+            or not item.get("name")
+            or len(item["name"]) > 160
             or item.get("result") not in {"PASS", "FAIL"}
             for item in checks
         ):
             raise SupervisionError("Malformed evidence checks")
-        sanitized = [
-            {"name": item["name"][:160], "result": item["result"]}
-            for item in sorted(checks, key=lambda item: item["name"])
-        ]
+        if len({item["name"] for item in checks}) != len(checks):
+            raise SupervisionError("Duplicate evidence checks")
+        sanitized = []
+        for item in sorted(checks, key=lambda item: item["name"]):
+            check = {"name": item["name"], "result": item["result"]}
+            if "exit_code" in item:
+                exit_code = item["exit_code"]
+                if isinstance(exit_code, bool) or not isinstance(exit_code, int) or not 0 <= exit_code <= 255:
+                    raise SupervisionError("Malformed evidence exit code")
+                check["exit_code"] = exit_code
+            if "outcome" in item:
+                outcome = item["outcome"]
+                if outcome not in WORKFLOW_OUTCOMES:
+                    raise SupervisionError("Malformed evidence outcome")
+                check["outcome"] = outcome
+            if "output_tail" in item:
+                output_tail = item["output_tail"]
+                if not isinstance(output_tail, str) or len(output_tail) > 8_000 or "\x00" in output_tail:
+                    raise SupervisionError("Malformed bounded evidence output")
+                check["output_tail"] = output_tail
+            sanitized.append(check)
         return {"status": "FAIL" if any(item["result"] == "FAIL" for item in sanitized) else "PASS", "checks": sanitized}
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError, SupervisionError) as exc:
         return {"status": "BLOCKED", "checks": [], "error": str(exc)}
@@ -758,18 +785,125 @@ def collect_inputs(
     }
 
 
+def evaluate_workflow_outcomes(
+    *,
+    mode: str,
+    validation_outcome: str,
+    refresh_outcome: str,
+    supervision_outcome: str,
+    artifact_outcome: str,
+) -> dict[str, Any]:
+    """Return the final workflow truth table without weakening an earlier gate."""
+    if mode not in MODES:
+        raise SupervisionError(f"Unsupported mode: {mode!r}")
+    supplied = {
+        "validation": validation_outcome,
+        "strict_refresh": refresh_outcome,
+        "supervision": supervision_outcome,
+        "artifact": artifact_outcome,
+    }
+    if any(value not in WORKFLOW_OUTCOMES for value in supplied.values()):
+        raise SupervisionError("Unsupported workflow step outcome")
+    required = {
+        "validation": "success",
+        "strict_refresh": "skipped" if mode == "implementation" else "success",
+        "supervision": "success",
+        "artifact": "success",
+    }
+    failed = [name for name in sorted(required) if supplied[name] != required[name]]
+    return {
+        "schema": "project-memory-workflow-enforcement.v1",
+        "pass": not failed,
+        "mode": mode,
+        "failed_gates": failed,
+        "outcomes": supplied,
+    }
+def _blocked_fallback_inputs(
+    *,
+    repo_root: str | Path,
+    mode: str,
+    task_id: str | None,
+    evidence_path: Path | None,
+    error: Exception,
+) -> dict[str, Any]:
+    """Bind an emergency BLOCKED handoff when authoritative collection fails."""
+    root = Path(repo_root).resolve(strict=True)
+    if not isinstance(task_id, str) or not TASK_ID_PATTERN.fullmatch(task_id):
+        raise SupervisionError("A validated task ID is required for fallback handoff")
+    state = _repo_state(root)
+    if not FULL_SHA_PATTERN.fullmatch(state["commit"]):
+        raise SupervisionError("Fallback handoff requires a full Git SHA")
+    detail = str(error).replace(str(root), "<REPO_ROOT>")[:2_000]
+    return {
+        "mode": mode,
+        "repository": state,
+        "task": {
+            "task_id": task_id,
+            "status": "unresolved",
+            "roadmap_status": "unresolved",
+            "frontier": None,
+            "is_frontier": False,
+            "dependencies": [],
+            "required_sources_present": False,
+            "application_task": mode != "governance",
+        },
+        "routing": None,
+        "routing_error": {"classification": "input_collection_failed"},
+        "changed_paths": [],
+        "memory": {
+            "status": "STALE",
+            "package_commit": None,
+            "package_branch": state["branch"],
+            "reasons": ["input_collection_failed"],
+            "baseline_is_ancestor": False,
+            "packages": {},
+        },
+        "plan_integrity": {
+            "blocking_count": 1,
+            "advisory_count": 0,
+            "advisory_codes": [],
+            "evaluation_error": True,
+        },
+        "validation_evidence": validate_evidence(
+            evidence_path, root, task_id, state["commit"]
+        ),
+        "validators": {"result": "BLOCKED", "checks": []},
+        "conflicts": [],
+        "collection_error": detail or error.__class__.__name__,
+    }
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=MODES, required=True)
     parser.add_argument("--repo-root", default=".")
     parser.add_argument("--task-id")
     parser.add_argument("--evidence-json", type=Path)
+    parser.add_argument("--enforce-workflow", action="store_true")
+    parser.add_argument("--validation-outcome", choices=WORKFLOW_OUTCOMES)
+    parser.add_argument("--refresh-outcome", choices=WORKFLOW_OUTCOMES)
+    parser.add_argument("--supervision-outcome", choices=WORKFLOW_OUTCOMES)
+    parser.add_argument("--artifact-outcome", choices=WORKFLOW_OUTCOMES)
     parser.add_argument("--json", action="store_true")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.enforce_workflow:
+        try:
+            outcomes = evaluate_workflow_outcomes(
+                mode=args.mode,
+                validation_outcome=args.validation_outcome,
+                refresh_outcome=args.refresh_outcome,
+                supervision_outcome=args.supervision_outcome,
+                artifact_outcome=args.artifact_outcome,
+            )
+        except Exception as exc:
+            print(f"RESULT=BLOCKED\nERROR={exc}")
+            return 2
+        print(_canonical_json(outcomes), end="")
+        return 0 if outcomes["pass"] else 1
     try:
         inputs = collect_inputs(
             repo_root=args.repo_root,
@@ -796,8 +930,34 @@ def main(argv: list[str] | None = None) -> int:
             }), end="")
         return 1 if gate["result"] == "BLOCKED" else 0
     except Exception as exc:
-        print(f"RESULT=BLOCKED\nERROR={exc}")
-        return 2
+        try:
+            inputs = _blocked_fallback_inputs(
+                repo_root=args.repo_root,
+                mode=args.mode,
+                task_id=args.task_id,
+                evidence_path=args.evidence_json,
+                error=exc,
+            )
+            gate = evaluate_gate(inputs)
+            package = write_handoff_package(args.repo_root, build_payload(inputs, gate))
+            markdown = package / HANDOFF_FILES[0]
+            json_path = package / HANDOFF_FILES[1]
+            sums = package / HANDOFF_FILES[2]
+            print(f"HANDOFF_MARKDOWN={markdown}")
+            print(f"HANDOFF_JSON={json_path}")
+            print(f"HANDOFF_CHECKSUMS={sums}")
+            print("RESULT=BLOCKED")
+            if args.json:
+                print(_canonical_json({
+                    "result": "BLOCKED",
+                    "markdown": str(markdown),
+                    "json": str(json_path),
+                    "checksums": str(sums),
+                }), end="")
+            return 1
+        except Exception as fallback_exc:
+            print(f"RESULT=BLOCKED\nERROR={exc}\nFALLBACK_ERROR={fallback_exc}")
+            return 2
 
 
 if __name__ == "__main__":

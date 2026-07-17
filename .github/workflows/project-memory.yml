@@ -59,13 +59,14 @@ jobs:
       PROJECT_MEMORY_BASELINE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
     steps:
       - name: Check out exact event SHA with full history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Use Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -101,60 +102,129 @@ jobs:
       - name: Compile and validate Project Memory
         id: validation
         continue-on-error: true
-        run: |
-          python3 -m compileall -q scripts/project_memory tests/project_memory
-          python3 scripts/project_memory/validate_registries.py --json
-          python3 scripts/project_memory/validate_current_truth.py
-          python3 scripts/project_memory/validate_agent_guidance.py --json
-          python3 scripts/project_memory/validate_reviewer_guidance.py --json
-          python3 scripts/project_memory/validate_operational_rollout.py --json
-          python3 scripts/project_memory/execution_routing.py validate --repo-root .
-          python3 scripts/check_enrichment.py
-          python3 scripts/validate_roadmap.py
-          python3 -m pytest tests/project_memory -q -p no:cacheprovider
-          git diff --check
-
-      - name: Record bounded validation evidence
-        env:
-          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
-          TASK_ID: ${{ steps.identity.outputs.task_id }}
-          HEAD_SHA: ${{ steps.identity.outputs.head_sha }}
+        shell: bash
         run: |
           mkdir -p .codex-context/project-memory/workflow
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          result = "PASS" if os.environ["VALIDATION_OUTCOME"] == "success" else "FAIL"
-          payload = {
-              "schema": "project-memory-supervision-evidence.v1",
-              "task_id": os.environ["TASK_ID"],
-              "commit": os.environ["HEAD_SHA"],
-              "checks": [{"name": "project_memory_validation_suite", "result": result}],
-          }
-          Path(".codex-context/project-memory/workflow/evidence.json").write_text(
-              json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-          )
-          PY
+          set +e
+          (
+            set -euo pipefail
+            python3 -m compileall -q scripts/project_memory tests/project_memory
+            python3 scripts/project_memory/validate_registries.py --json
+            python3 scripts/project_memory/validate_current_truth.py
+            python3 scripts/project_memory/validate_agent_guidance.py --json
+            python3 scripts/project_memory/validate_reviewer_guidance.py --json
+            python3 scripts/project_memory/validate_operational_rollout.py --json
+            python3 scripts/project_memory/execution_routing.py validate --repo-root .
+            python3 scripts/check_enrichment.py
+            python3 scripts/validate_roadmap.py
+            python3 -m pytest tests/project_memory -q -p no:cacheprovider
+            git diff --check
+          ) > .codex-context/project-memory/workflow/validation.log 2>&1
+          status=$?
+          set -e
+          cat .codex-context/project-memory/workflow/validation.log
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Build strict exact-commit Project Memory baseline
+        id: strict_refresh
         if: env.SUPERVISION_MODE != 'implementation'
+        continue-on-error: true
+        shell: bash
         env:
           EXPECTED_BRANCH: ${{ github.head_ref || github.ref_name }}
           HEAD_SHA: ${{ steps.identity.outputs.head_sha }}
         run: |
-          python3 scripts/project_memory/operational_rollout.py refresh \
-            --repo-root . \
-            --output-root .codex-context/project-memory \
-            --task-id PHASE8-IMPL-026-T011 \
-            --expected-branch "$EXPECTED_BRANCH" \
-            --expected-commit "$HEAD_SHA" \
-            --allow-detached \
-            --json
+          mkdir -p .codex-context/project-memory/workflow
+          set +e
+          (
+            set -euo pipefail
+            python3 scripts/project_memory/operational_rollout.py refresh \
+              --repo-root . \
+              --output-root .codex-context/project-memory \
+              --task-id PHASE8-IMPL-026-T011 \
+              --expected-branch "$EXPECTED_BRANCH" \
+              --expected-commit "$HEAD_SHA" \
+              --allow-detached \
+              --json
+          ) > .codex-context/project-memory/workflow/strict-refresh.log 2>&1
+          status=$?
+          set -e
+          cat .codex-context/project-memory/workflow/strict-refresh.log
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
+      - name: Record bounded validation and refresh evidence
+        id: evidence
+        if: always()
+        continue-on-error: true
+        env:
+          MODE: ${{ env.SUPERVISION_MODE }}
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          VALIDATION_EXIT_CODE: ${{ steps.validation.outputs.exit_code }}
+          REFRESH_OUTCOME: ${{ steps.strict_refresh.outcome }}
+          REFRESH_EXIT_CODE: ${{ steps.strict_refresh.outputs.exit_code }}
+          TASK_ID: ${{ steps.identity.outputs.task_id }}
+          HEAD_SHA: ${{ steps.identity.outputs.head_sha }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          workflow_root = Path(".codex-context/project-memory/workflow")
+          workflow_root.mkdir(parents=True, exist_ok=True)
+
+          def bounded_tail(path):
+              if not path.is_file():
+                  return ""
+              value = path.read_text(encoding="utf-8", errors="replace")[-6000:]
+              value = value.replace(str(root), "<REPO_ROOT>")
+              return re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", value)
+
+          def exit_code(value, outcome):
+              if value.isdigit():
+                  return min(int(value), 255)
+              return 0 if outcome in {"success", "skipped"} else 1
+
+          validation_outcome = os.environ["VALIDATION_OUTCOME"]
+          refresh_outcome = os.environ["REFRESH_OUTCOME"]
+          refresh_passed = (
+              refresh_outcome == "success"
+              or (os.environ["MODE"] == "implementation" and refresh_outcome == "skipped")
+          )
+          checks = [
+              {
+                  "name": "project_memory_validation_suite",
+                  "result": "PASS" if validation_outcome == "success" else "FAIL",
+                  "exit_code": exit_code(os.environ.get("VALIDATION_EXIT_CODE", ""), validation_outcome),
+                  "outcome": validation_outcome,
+                  "output_tail": bounded_tail(workflow_root / "validation.log"),
+              },
+              {
+                  "name": "strict_exact_commit_refresh",
+                  "result": "PASS" if refresh_passed else "FAIL",
+                  "exit_code": exit_code(os.environ.get("REFRESH_EXIT_CODE", ""), refresh_outcome),
+                  "outcome": refresh_outcome,
+                  "output_tail": bounded_tail(workflow_root / "strict-refresh.log"),
+              },
+          ]
+          payload = {
+              "schema": "project-memory-supervision-evidence.v1",
+              "task_id": os.environ["TASK_ID"],
+              "commit": os.environ["HEAD_SHA"],
+              "checks": checks,
+          }
+          (workflow_root / "evidence.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
 
       - name: Run deterministic supervision
         id: supervise
+        if: always()
         continue-on-error: true
         env:
           TASK_ID: ${{ steps.identity.outputs.task_id }}
@@ -165,6 +235,43 @@ jobs:
             --task-id "$TASK_ID" \
             --evidence-json .codex-context/project-memory/workflow/evidence.json \
             --json
+
+      - name: Stage the exact verified handoff inventory
+        id: stage_handoff
+        if: always()
+        continue-on-error: true
+        env:
+          TASK_ID: ${{ steps.identity.outputs.task_id }}
+          HEAD_SHA: ${{ steps.identity.outputs.head_sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import shutil
+          import tempfile
+          from pathlib import Path
+          from scripts.project_memory import supervise
+
+          source = (
+              Path(".codex-context/project-memory/handoff")
+              / os.environ["TASK_ID"]
+              / os.environ["HEAD_SHA"]
+              / os.environ["SUPERVISION_MODE"]
+          )
+          verification = supervise.verify_handoff_package(source)
+          if verification["result"] != "PASS":
+              raise SystemExit("Handoff verification failed: " + "; ".join(verification["errors"]))
+          final = Path("project-memory-handoff-artifact")
+          if final.exists() or final.is_symlink():
+              raise SystemExit("Artifact staging target already exists")
+          temporary = Path(tempfile.mkdtemp(prefix=".handoff-artifact-", dir="."))
+          try:
+              for name in supervise.HANDOFF_FILES:
+                  shutil.copy2(source / name, temporary / name)
+              os.rename(temporary, final)
+          finally:
+              if temporary.exists():
+                  shutil.rmtree(temporary)
+          PY
 
       - name: Append handoff to job summary
         if: always()
@@ -178,20 +285,34 @@ jobs:
           fi
 
       - name: Upload complete handoff artifact
+        id: artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
         with:
           name: project-memory-handoff-${{ github.run_id }}
-          path: .codex-context/project-memory/handoff/
+          path: |
+            project-memory-handoff-artifact/project-memory-handoff.md
+            project-memory-handoff-artifact/project-memory-handoff.json
+            project-memory-handoff-artifact/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
 
       - name: Enforce gate and validation result
         if: always()
-        shell: bash
+        env:
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          REFRESH_OUTCOME: ${{ steps.strict_refresh.outcome }}
+          SUPERVISION_OUTCOME: ${{ steps.supervise.outcome }}
+          ARTIFACT_OUTCOME: ${{ steps.artifact.outcome }}
         run: |
-          test "${{ steps.validation.outcome }}" = "success"
-          test "${{ steps.supervise.outcome }}" = "success"
+          python3 scripts/project_memory/supervise.py \
+            --mode "$SUPERVISION_MODE" \
+            --enforce-workflow \
+            --validation-outcome "$VALIDATION_OUTCOME" \
+            --refresh-outcome "$REFRESH_OUTCOME" \
+            --supervision-outcome "$SUPERVISION_OUTCOME" \
+            --artifact-outcome "$ARTIFACT_OUTCOME"
 
   pr-comment:
     name: Project Memory PR handoff comment
@@ -207,13 +328,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Download handoff artifact without checking out PR code
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: project-memory-handoff-${{ github.run_id }}
           path: handoff-artifact
 
       - name: Create or update one stable-marker comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');

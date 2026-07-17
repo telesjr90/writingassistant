@@ -63,6 +63,7 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "docs/roadmap/tasks/PHASE8-IMPL-026-T012.md",
     "docs/roadmap/tasks/PHASE8-IMPL-026.md",
     "scripts/project_memory/execution_routing.py",
+    "scripts/project_memory/operational_rollout.py",
     "scripts/project_memory/plan_integrity.py",
     "scripts/project_memory/render_docs.py",
     "scripts/project_memory/supervise.py",
@@ -530,6 +531,43 @@ def test_refresh_status_and_ci_check_are_commit_bound_and_ephemeral(tmp_path, mo
     ) == ""
 
 
+def test_clean_detached_github_refresh_uses_the_trusted_expected_branch(tmp_path):
+    """A full-history detached checkout must validate routing against its event branch."""
+    repo = _temporary_repository(tmp_path)
+    expected_branch = "docs/opencode-go-routing-small-task-execution"
+    _run(repo, "git", "branch", "-m", expected_branch)
+    commit = _run(repo, "git", "rev-parse", "HEAD")
+    _run(repo, "git", "checkout", "--detach", commit)
+    assert _run(repo, "git", "branch", "--show-current") == ""
+    assert not (repo / ".codex-context").exists()
+    result = subprocess.run(
+        (
+            "python3", "scripts/project_memory/operational_rollout.py", "refresh",
+            "--repo-root", ".",
+            "--output-root", ".codex-context/project-memory",
+            "--task-id", rollout.DEFAULT_TASK_ID,
+            "--expected-branch", expected_branch,
+            "--expected-commit", commit,
+            "--allow-detached", "--json",
+        ),
+        cwd=repo,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    refresh = json.loads(result.stdout)
+    assert refresh["status"]["result"] == "FRESH"
+    snapshot = json.loads(
+        (Path(refresh["snapshot"]["output_directory"]) / "convergence-findings.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert snapshot["blocked"] is False
+    assert "registry_validation_failed" not in snapshot["finding_codes"]
+    assert _run(repo, "git", "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
 def test_refresh_after_t012_completion_has_no_project_memory_task(tmp_path, monkeypatch):
     repo = _temporary_repository(tmp_path, t012_lifecycle="complete")
     commit = _run(repo, "git", "rev-parse", "HEAD")
@@ -622,7 +660,11 @@ def test_workflow_has_safe_supervision_publication_boundaries(tmp_path):
     assert "schedule:" not in workflow
     assert "cron:" not in workflow
     assert "pip install" not in workflow
-    assert "actions/upload-artifact@v4" in workflow
+    assert "actions/checkout@v7" in workflow
+    assert "actions/setup-python@v6" in workflow
+    assert "actions/upload-artifact@v7" in workflow
+    assert "actions/download-artifact@v8" in workflow
+    assert "actions/github-script@v9" in workflow
     assert "scripts/project_memory/supervise.py" in workflow
     assert "GITHUB_STEP_SUMMARY" in workflow
     assert "<!-- project-memory-supervision -->" in workflow
@@ -631,3 +673,11 @@ def test_workflow_has_safe_supervision_publication_boundaries(tmp_path):
     assert "pull-requests: write" in workflow
     assert "git push" not in workflow
     assert workflow.count('- ".gitignore"') == 2
+    assert "id: strict_refresh" in workflow
+    assert "id: supervise" in workflow
+    assert "if: always()" in workflow
+    assert "if-no-files-found: error" in workflow
+    assert "project-memory-handoff-artifact/project-memory-handoff.md" in workflow
+    assert "project-memory-handoff-artifact/project-memory-handoff.json" in workflow
+    assert "project-memory-handoff-artifact/SHA256SUMS" in workflow
+    assert ".codex-context/project-memory/handoff/\n" not in workflow

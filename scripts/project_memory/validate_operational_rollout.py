@@ -159,8 +159,15 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         "validate_registries.py --json", "validate_agent_guidance.py --json",
         "validate_reviewer_guidance.py --json", "validate_operational_rollout.py --json",
         "python3 -m pytest tests/project_memory", "scripts/project_memory/supervise.py",
-        "actions/upload-artifact@v4", "GITHUB_STEP_SUMMARY",
+        "actions/checkout@v7", "actions/setup-python@v6",
+        "actions/upload-artifact@v7", "actions/download-artifact@v8",
+        "actions/github-script@v9", "GITHUB_STEP_SUMMARY",
         "<!-- project-memory-supervision -->", "pull-requests: write",
+        "id: validation", "id: strict_refresh", "id: supervise", "if: always()",
+        "if-no-files-found: error",
+        "project-memory-handoff-artifact/project-memory-handoff.md",
+        "project-memory-handoff-artifact/project-memory-handoff.json",
+        "project-memory-handoff-artifact/SHA256SUMS",
     ):
         if token not in workflow:
             findings.append(_finding("workflow_contract_missing", ".github/workflows/project-memory.yml", token))
@@ -168,7 +175,10 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         findings.append(_finding("time_based_trigger_forbidden", ".github/workflows/project-memory.yml", "schedule/cron"))
     if "pip install" in workflow:
         findings.append(_finding("workflow_dependency_install_forbidden", ".github/workflows/project-memory.yml", "dependency install"))
-    for forbidden in ("pull_request_target", "contents: write", "git push"):
+    for forbidden in (
+        "pull_request_target", "contents: write", "git push", "git commit",
+        "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION", "secrets.",
+    ):
         if forbidden in workflow:
             findings.append(_finding("workflow_security_boundary", ".github/workflows/project-memory.yml", forbidden))
     if "permissions: {}" not in workflow:

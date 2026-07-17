@@ -206,6 +206,81 @@ def test_output_is_deterministic_atomic_and_checksums_verify(tmp_path, monkeypat
     assert not expected.exists()
 
 
+@pytest.mark.parametrize("failed_check", ["project_memory_validation_suite", "strict_exact_commit_refresh"])
+def test_failed_workflow_gate_still_creates_a_blocked_handoff(tmp_path, failed_check):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    inputs = _inputs(mode="governance")
+    inputs["validation_evidence"] = {
+        "status": "FAIL",
+        "checks": [{"name": failed_check, "result": "FAIL", "exit_code": 1}],
+    }
+    if failed_check == "strict_exact_commit_refresh":
+        inputs["memory"].update({
+            "status": "STALE",
+            "package_commit": BASELINE_SHA,
+            "reasons": ["commit_mismatch"],
+        })
+
+    gate = supervise.evaluate_gate(inputs)
+    package = supervise.write_handoff_package(repo, supervise.build_payload(inputs, gate))
+
+    assert gate["result"] == "BLOCKED"
+    assert sorted(path.name for path in package.iterdir()) == sorted(supervise.HANDOFF_FILES)
+    assert supervise.verify_handoff_package(package)["result"] == "PASS"
+    assert json.loads((package / "project-memory-handoff.json").read_text())["result"] == "BLOCKED"
+
+
+def test_successful_governance_creates_exact_complete_handoff_inventory(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    inputs = _inputs(mode="governance")
+
+    gate = supervise.evaluate_gate(inputs)
+    package = supervise.write_handoff_package(repo, supervise.build_payload(inputs, gate))
+
+    assert gate["result"] == "READY"
+    assert sorted(path.name for path in package.iterdir()) == sorted(supervise.HANDOFF_FILES)
+    assert supervise.verify_handoff_package(package) == {"result": "PASS", "errors": []}
+
+
+def test_input_collection_failure_still_writes_generated_blocked_handoff(tmp_path, monkeypatch):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / ".gitignore").write_text(".codex-context/\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-b", "test"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=repo, check=True)
+    subprocess.run(["git", "add", ".gitignore"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "fixture"], cwd=repo, check=True, capture_output=True)
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=repo, check=True, text=True, capture_output=True
+    ).stdout.strip()
+    monkeypatch.setattr(
+        supervise,
+        "collect_inputs",
+        lambda **kwargs: (_ for _ in ()).throw(supervise.SupervisionError("registry malformed")),
+    )
+
+    exit_code = supervise.main([
+        "--mode", "governance", "--repo-root", str(repo),
+        "--task-id", "PHASE8-IMPL-026-T011", "--json",
+    ])
+
+    package = (
+        repo / ".codex-context/project-memory/handoff/PHASE8-IMPL-026-T011"
+        / commit / "governance"
+    )
+    assert exit_code == 1
+    assert supervise.verify_handoff_package(package)["result"] == "PASS"
+    payload = json.loads((package / "project-memory-handoff.json").read_text())
+    assert payload["result"] == "BLOCKED"
+    assert "supervision_input_collection_failed" in _codes(payload["blockers"])
+    assert subprocess.run(
+        ["git", "status", "--porcelain"], cwd=repo, check=True, text=True, capture_output=True
+    ).stdout == ""
+
+
 def test_symlink_escape_and_malformed_evidence_fail_closed(tmp_path):
     repo = tmp_path / "repo"
     repo.mkdir()
@@ -223,6 +298,61 @@ def test_symlink_escape_and_malformed_evidence_fail_closed(tmp_path):
     result = supervise.validate_evidence(evidence, repo, TASK_ID, SHA)
     assert result["status"] == "BLOCKED"
     assert result["checks"] == []
+
+
+def test_bounded_workflow_evidence_preserves_exit_status_and_sanitized_output(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    evidence = repo / "evidence.json"
+    evidence.write_text(json.dumps({
+        "schema": supervise.EVIDENCE_SCHEMA,
+        "task_id": TASK_ID,
+        "commit": SHA,
+        "checks": [{
+            "name": "strict_exact_commit_refresh",
+            "result": "FAIL",
+            "exit_code": 3,
+            "outcome": "failure",
+            "output_tail": "ROUTING-001 detached branch mismatch",
+        }],
+    }) + "\n", encoding="utf-8")
+
+    result = supervise.validate_evidence(evidence, repo, TASK_ID, SHA)
+
+    assert result == {
+        "status": "FAIL",
+        "checks": [{
+            "name": "strict_exact_commit_refresh",
+            "result": "FAIL",
+            "exit_code": 3,
+            "outcome": "failure",
+            "output_tail": "ROUTING-001 detached branch mismatch",
+        }],
+    }
+
+
+@pytest.mark.parametrize(
+    ("mode", "validation", "refresh", "supervision", "artifact", "expected"),
+    [
+        ("governance", "failure", "success", "success", "success", False),
+        ("governance", "success", "failure", "success", "success", False),
+        ("governance", "success", "success", "failure", "success", False),
+        ("governance", "success", "success", "success", "failure", False),
+        ("governance", "success", "success", "success", "success", True),
+        ("implementation", "success", "skipped", "success", "success", True),
+    ],
+)
+def test_workflow_final_enforcement_truth_table(
+    mode, validation, refresh, supervision, artifact, expected
+):
+    result = supervise.evaluate_workflow_outcomes(
+        mode=mode,
+        validation_outcome=validation,
+        refresh_outcome=refresh,
+        supervision_outcome=supervision,
+        artifact_outcome=artifact,
+    )
+    assert result["pass"] is expected
 
 
 def test_local_handoff_has_no_network_or_authority_mutation(tmp_path):
@@ -304,3 +434,18 @@ def test_workflow_permissions_triggers_and_comment_boundary_are_safe():
     assert "permissions: {}" in workflow
     assert "git push" not in workflow
     assert "workflow_dispatch.inputs" not in workflow
+    assert "actions/checkout@v7" in workflow
+    assert "actions/setup-python@v6" in workflow
+    assert "actions/upload-artifact@v7" in workflow
+    assert "actions/download-artifact@v8" in workflow
+    assert "actions/github-script@v9" in workflow
+    assert "id: validation" in workflow
+    assert "id: strict_refresh" in workflow
+    assert "id: supervise" in workflow
+    assert "if-no-files-found: error" in workflow
+    assert "project-memory-handoff-artifact/project-memory-handoff.md" in workflow
+    assert "project-memory-handoff-artifact/project-memory-handoff.json" in workflow
+    assert "project-memory-handoff-artifact/SHA256SUMS" in workflow
+    assert "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION" not in workflow
+    assert "secrets." not in workflow
+    assert "git commit" not in workflow
