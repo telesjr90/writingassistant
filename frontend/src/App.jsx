@@ -424,6 +424,7 @@ export default function App() {
     setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
 
     async function loadInitialData() {
+      const capturedProjectId = activeProjectId;
       setContextReadinessLoading(true);
       setContextReadinessError('');
       setBibleReadinessState('loading');
@@ -440,57 +441,21 @@ export default function App() {
       setNotesError('');
       setMaterialsError('');
 
-      let readiness;
-      try {
-        readiness = await fetchProjectContextReadiness(activeProjectId);
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-        const message = error instanceof Error ? error.message : 'Failed to check context availability.';
-        setContextReadinessError(message);
-        setBibleReadinessState('error');
-        setStoryformReadinessState('error');
-        setStoryformContextReadinessState('error');
-        setBibleStatus('Availability could not be checked.');
-        setStoryformStatus('Availability could not be checked.');
-        setStoryformContext('');
-        setContextReadinessLoading(false);
-        setIsLoadingScenes(false);
-        setIsLoadingNotes(false);
-        setIsLoadingMaterials(false);
-        setIsLoadingOMI(false);
-        return;
-      }
-
-      if (!isMounted) {
-        return;
-      }
-
-      const bibleRes = readiness.resources.bible;
-      const storyformRes = readiness.resources.storyform;
-      const contextRes = readiness.resources.storyform_context;
-
-      setBibleReadinessState(bibleRes.state);
-      setBibleReadinessReason(bibleRes.reason_code || '');
-      setStoryformReadinessState(storyformRes.state);
-      setStoryformReadinessReason(storyformRes.reason_code || '');
-      setStoryformContextReadinessState(contextRes.state);
-      setStoryformContextReadinessReason(contextRes.reason_code || '');
-
       const [
         sceneResult,
         notesResult,
         materialsResult,
         omiResult,
+        readinessResult,
       ] = await Promise.allSettled([
-        fetchScenes(activeProjectId),
-        fetchNotes(activeProjectId),
-        fetchMaterials(activeProjectId),
-        getOMI(activeProjectId),
+        fetchScenes(capturedProjectId),
+        fetchNotes(capturedProjectId),
+        fetchMaterials(capturedProjectId),
+        getOMI(capturedProjectId),
+        fetchProjectContextReadiness(capturedProjectId),
       ]);
 
-      if (!isMounted) {
+      if (!isMounted || activeProjectId !== capturedProjectId) {
         return;
       }
 
@@ -537,10 +502,41 @@ export default function App() {
         setOmiError(message);
       }
 
+      if (readinessResult.status === 'rejected') {
+        const message = readinessResult.reason instanceof Error
+          ? readinessResult.reason.message
+          : 'Failed to check context availability.';
+        setContextReadinessError(message);
+        setBibleReadinessState('error');
+        setStoryformReadinessState('error');
+        setStoryformContextReadinessState('error');
+        setBibleStatus('Availability could not be checked.');
+        setStoryformStatus('Availability could not be checked.');
+        setStoryformContext('');
+        setContextReadinessLoading(false);
+        setIsLoadingScenes(false);
+        setIsLoadingNotes(false);
+        setIsLoadingMaterials(false);
+        setIsLoadingOMI(false);
+        return;
+      }
+
+      const readiness = readinessResult.value;
+      const bibleRes = readiness.resources.bible;
+      const storyformRes = readiness.resources.storyform;
+      const contextRes = readiness.resources.storyform_context;
+
+      setBibleReadinessState(bibleRes.state);
+      setBibleReadinessReason(bibleRes.reason_code || '');
+      setStoryformReadinessState(storyformRes.state);
+      setStoryformReadinessReason(storyformRes.reason_code || '');
+      setStoryformContextReadinessState(contextRes.state);
+      setStoryformContextReadinessReason(contextRes.reason_code || '');
+
       if (bibleRes.ready && bibleRes.state === 'ready') {
         try {
-          const biblePayload = await fetchBible(activeProjectId);
-          if (!isMounted) {
+          const biblePayload = await fetchBible(capturedProjectId);
+          if (!isMounted || activeProjectId !== capturedProjectId) {
             return;
           }
           const formattedBible = formatJson(biblePayload);
@@ -548,7 +544,7 @@ export default function App() {
           setLastSavedBibleText(formattedBible);
           setBibleStatus('Saved');
         } catch (error) {
-          if (!isMounted) {
+          if (!isMounted || activeProjectId !== capturedProjectId) {
             return;
           }
           const message = error instanceof Error ? error.message : 'Failed to load Bible.';
@@ -576,8 +572,8 @@ export default function App() {
 
       if (storyformRes.ready && storyformRes.state === 'ready') {
         try {
-          const storyformPayload = await fetchStoryform(activeProjectId);
-          if (!isMounted) {
+          const storyformPayload = await fetchStoryform(capturedProjectId);
+          if (!isMounted || activeProjectId !== capturedProjectId) {
             return;
           }
           const formattedStoryform = formatJson(storyformPayload);
@@ -585,7 +581,7 @@ export default function App() {
           setLastSavedStoryformText(formattedStoryform);
           setStoryformStatus('Saved');
         } catch (error) {
-          if (!isMounted) {
+          if (!isMounted || activeProjectId !== capturedProjectId) {
             return;
           }
           const message = error instanceof Error ? error.message : 'Failed to load storyform.';
@@ -613,13 +609,13 @@ export default function App() {
 
       if (contextRes.ready && contextRes.state === 'ready') {
         try {
-          const contextPayload = await fetchStoryformContext(activeProjectId);
-          if (!isMounted) {
+          const contextPayload = await fetchStoryformContext(capturedProjectId);
+          if (!isMounted || activeProjectId !== capturedProjectId) {
             return;
           }
           setStoryformContext(contextPayload.context ?? '');
         } catch (error) {
-          if (!isMounted) {
+          if (!isMounted || activeProjectId !== capturedProjectId) {
             return;
           }
           const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
@@ -1141,20 +1137,27 @@ export default function App() {
         setStoryformContextReadinessReason(contextRes.reason_code || '');
 
         if (contextRes.ready && contextRes.state === 'ready') {
-          const contextPayload = await fetchStoryformContext(activeProjectId);
-          setStoryformContext(contextPayload.context ?? '');
-          setStoryformContextDirectError('');
+          try {
+            const contextPayload = await fetchStoryformContext(activeProjectId);
+            setStoryformContext(contextPayload.context ?? '');
+            setStoryformContextDirectError('');
+          } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
+            setStoryformContext('');
+            setStoryformContextDirectError(message);
+          }
         } else if (contextRes.state === 'unavailable') {
           setStoryformContext('');
           setStoryformContextDirectError('');
         } else {
           setStoryformContext('');
         }
+        setContextReadinessError('');
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Context refresh failed.';
-        setStoryformStatus(`Saved; prompt context refresh failed: ${message}`);
+        const message = error instanceof Error ? error.message : 'Failed to check context availability.';
+        setContextReadinessError(message);
         setStoryformContext('');
-        setStoryformContextDirectError(message);
+        setStoryformContextDirectError('');
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Save failed.';
@@ -1169,6 +1172,7 @@ export default function App() {
       return;
     }
 
+    const capturedProjectId = activeProjectId;
     setIsRetryingContextReadiness(true);
     setContextReadinessError('');
     setBibleDirectError('');
@@ -1182,7 +1186,11 @@ export default function App() {
     setStoryformStatus('Checking availability...');
 
     try {
-      const readiness = await fetchProjectContextReadiness(activeProjectId);
+      const readiness = await fetchProjectContextReadiness(capturedProjectId);
+
+      if (activeProjectId !== capturedProjectId) {
+        return;
+      }
 
       const bibleRes = readiness.resources.bible;
       const storyformRes = readiness.resources.storyform;
@@ -1197,12 +1205,18 @@ export default function App() {
 
       if (bibleRes.ready && bibleRes.state === 'ready') {
         try {
-          const biblePayload = await fetchBible(activeProjectId);
+          const biblePayload = await fetchBible(capturedProjectId);
+          if (activeProjectId !== capturedProjectId) {
+            return;
+          }
           const formattedBible = formatJson(biblePayload);
           setBibleText(formattedBible);
           setLastSavedBibleText(formattedBible);
           setBibleStatus('Saved');
         } catch (error) {
+          if (activeProjectId !== capturedProjectId) {
+            return;
+          }
           const message = error instanceof Error ? error.message : 'Failed to load Bible.';
           setBibleText('{}');
           setLastSavedBibleText('{}');
@@ -1228,12 +1242,18 @@ export default function App() {
 
       if (storyformRes.ready && storyformRes.state === 'ready') {
         try {
-          const storyformPayload = await fetchStoryform(activeProjectId);
+          const storyformPayload = await fetchStoryform(capturedProjectId);
+          if (activeProjectId !== capturedProjectId) {
+            return;
+          }
           const formattedStoryform = formatJson(storyformPayload);
           setStoryformText(formattedStoryform);
           setLastSavedStoryformText(formattedStoryform);
           setStoryformStatus('Saved');
         } catch (error) {
+          if (activeProjectId !== capturedProjectId) {
+            return;
+          }
           const message = error instanceof Error ? error.message : 'Failed to load storyform.';
           setStoryformText('{}');
           setLastSavedStoryformText('{}');
@@ -1259,10 +1279,16 @@ export default function App() {
 
       if (contextRes.ready && contextRes.state === 'ready') {
         try {
-          const contextPayload = await fetchStoryformContext(activeProjectId);
+          const contextPayload = await fetchStoryformContext(capturedProjectId);
+          if (activeProjectId !== capturedProjectId) {
+            return;
+          }
           setStoryformContext(contextPayload.context ?? '');
           setStoryformContextDirectError('');
         } catch (error) {
+          if (activeProjectId !== capturedProjectId) {
+            return;
+          }
           const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
           setStoryformContext('');
           setStoryformContextDirectError(message);

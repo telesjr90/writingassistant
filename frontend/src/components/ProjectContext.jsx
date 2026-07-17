@@ -61,7 +61,7 @@ function ContextJsonEditor({
   readOnly,
 }) {
   const displayedStatus = isSaving ? 'Saving...' : status;
-  const readOnlyMode = readOnly || readinessState === 'absent' || readinessState === 'invalid' || readinessState === 'unavailable' || readinessState === 'error' || !!directError;
+  const readOnlyMode = readOnly || readinessState === 'invalid' || readinessState === 'unavailable' || readinessState === 'error' || !!directError;
 
   return (
     <section className="context-editor">
@@ -119,10 +119,16 @@ export default function ProjectContext({
   onRetryReadiness = () => {},
 }) {
   const hasReadinessError = readinessError && !isRetryingReadiness;
+  const hasDirectError = (
+    bibleDirectError
+    || storyformDirectError
+    || storyformContextDirectError
+  );
   const showRetry = (
     bibleReadinessState === 'error'
     || storyformReadinessState === 'error'
     || hasReadinessError
+    || hasDirectError
   );
 
   function storyformContextDisplay() {
@@ -192,7 +198,7 @@ export default function ProjectContext({
           onSave={onSaveBible}
           readinessState={bibleReadinessState}
           directError={bibleDirectError}
-          readOnly={bibleReadinessState !== 'ready' || !!bibleDirectError}
+          readOnly={bibleReadinessState !== 'ready' && bibleReadinessState !== 'absent' || !!bibleDirectError}
         />
         <ContextJsonEditor
           label="Storyform JSON"
@@ -203,7 +209,7 @@ export default function ProjectContext({
           onSave={onSaveStoryform}
           readinessState={storyformReadinessState}
           directError={storyformDirectError}
-          readOnly={storyformReadinessState !== 'ready' || !!storyformDirectError}
+          readOnly={storyformReadinessState !== 'ready' && storyformReadinessState !== 'absent' || !!storyformDirectError}
         />
       </div>
 

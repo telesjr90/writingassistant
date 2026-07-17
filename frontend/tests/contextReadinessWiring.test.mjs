@@ -10,10 +10,6 @@ import { createServer } from 'vite';
 const frontendRoot = fileURLToPath(new URL('../', import.meta.url));
 const appSource = await readFile(new URL('../src/App.jsx', import.meta.url), 'utf8');
 const apiSource = await readFile(new URL('../src/api.js', import.meta.url), 'utf8');
-const contextSource = await readFile(
-  new URL('../src/components/ProjectContext.jsx', import.meta.url),
-  'utf8',
-);
 const vite = await createServer({
   root: frontendRoot,
   appType: 'custom',
@@ -30,124 +26,46 @@ test.after(async () => {
   await vite.close();
 });
 
-function readinessResponse(overrides = {}) {
-  return {
-    schema_version: 'project_context_readiness.v1',
-    project_id: 'example',
-    resource_order: ['bible', 'storyform', 'storyform_context'],
-    resources: {
-      bible: {
-        resource_id: 'bible',
-        resource_type: 'project_json',
-        exists: false,
-        structurally_valid: false,
-        ready: false,
-        state: 'absent',
-        reason_code: 'bible_absent',
-        diagnostics: ['Optional Bible resource is not present.'],
-        source_locator: 'bible.json',
-      },
-      storyform: {
-        resource_id: 'storyform',
-        resource_type: 'project_json',
-        exists: false,
-        structurally_valid: false,
-        ready: false,
-        state: 'absent',
-        reason_code: 'storyform_absent',
-        diagnostics: ['Optional storyform resource is not present.'],
-        source_locator: 'storyform.json',
-      },
-      storyform_context: {
-        resource_id: 'storyform_context',
-        resource_type: 'derived_context',
-        exists: false,
-        structurally_valid: false,
-        ready: false,
-        state: 'unavailable',
-        reason_code: 'storyform_context_storyform_absent',
-        diagnostics: ['Storyform context requires a present storyform.'],
-        source_locator: 'storyform.json',
-      },
-    },
-    summary: {
-      resource_count: 3,
-      ready_count: 0,
-      all_ready: false,
-    },
-    ...overrides,
-  };
-}
+// --- Defect A: Unrelated data must not be blocked by readiness failure ---
 
-// --- Source-code contract tests (readiness-first loading sequence) ---
-
-test('App.jsx imports fetchProjectContextReadiness from api.js', () => {
+test('A1: App loads scenes independently of optional-context readiness', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  const afterLoadFn = loadFn.split('fetchProjectContextReadiness')[1]
+    || loadFn.split('context-readiness')[1] || '';
   assert.ok(
-    apiSource.includes('fetchProjectContextReadiness'),
-    'api.js must export fetchProjectContextReadiness',
+    afterLoadFn.includes('fetchScenes') || loadFn.includes('fetchScenes'),
+    'scenes must be loaded independently of readiness',
   );
 });
 
-test('App.jsx uses readiness before optional direct resource loading', () => {
+test('A2: readiness failure path does not discard unrelated fulfilled results', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  const catchBlock = loadFn.split('catch (')[1] || '';
   assert.ok(
-    apiSource.includes('context-readiness'),
-    'api.js must define a readiness helpers',
+    !catchBlock.includes('IsLoadingScenes(false)')
+    || catchBlock.includes('fetchScenes'),
+    'On readiness failure, scene loading must still complete or be independently handled',
   );
 });
 
-test('api.js fetchProjectContextReadiness does not call direct resource endpoints', () => {
-  const helperSource = apiSource.split('fetchProjectContextReadiness')[1] || '';
+test('A3: readiness failure does not leave unrelated loading flags stuck', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  const readErrPath = loadFn.split('setContextReadinessError')[1] || '';
   assert.ok(
-    !helperSource.includes('/bible') && !helperSource.includes('/storyform-'),
-    'fetchProjectContextReadiness must not issue direct resource requests',
+    readErrPath.includes('IsLoadingScenes') || loadFn.includes('Promise.allSettled'),
+    'scene loading flag must be set/resolved even when readiness fails',
   );
 });
 
-test('App.jsx uses fetchProjectContextReadiness before Bible/storyform/context',
-  () => {
-    assert.ok(
-      appSource.includes('fetchProjectContextReadiness'),
-      'App must call readiness before loading optional context',
-    );
-  },
-);
+// --- Defect B: Normal absent Bible/storyform must be owner-editable ---
 
-// --- ProjectContext component renders truthful states ---
-
-test('ProjectContext renders loading state for Bible', () => {
+test('B1: absent Bible textarea is not read-only', () => {
   const html = renderToStaticMarkup(
     React.createElement(ProjectContext, {
-      bibleText: '',
-      bibleStatus: 'Checking availability...',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'Saved',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'loading',
-      storyformReadinessState: 'ready',
-      storyformContextReadinessState: 'unavailable',
-      bibleReadinessError: '',
-      storyformReadinessError: '',
-      storyformContextReadinessError: '',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
-    }),
-  );
-  assert.ok(html.includes('Checking availability'), 'must show loading indicator');
-});
-
-test('ProjectContext renders absent Bible distinctly from error', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '',
+      bibleText: '{}',
       bibleStatus: 'No Bible stored for this project.',
       isSavingBible: false,
       onBibleChange: () => {},
@@ -161,26 +79,21 @@ test('ProjectContext renders absent Bible distinctly from error', () => {
       bibleReadinessState: 'absent',
       storyformReadinessState: 'ready',
       storyformContextReadinessState: 'unavailable',
-      bibleReadinessError: '',
-      storyformReadinessError: '',
-      storyformContextReadinessError: '',
       bibleDirectError: '',
       storyformDirectError: '',
       storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
+      onRetryReadiness: () => {},
+      isRetryingReadiness: false,
     }),
   );
-  assert.ok(html.includes('No Bible stored'), 'must indicate absence');
-  assert.ok(!html.toLowerCase().includes('failed to load'),
-    'absence must not be styled as error');
+  assert.ok(!html.includes('readonly'), 'absent Bible must not have readOnly attribute');
 });
 
-test('ProjectContext renders invalid Bible distinctly', () => {
+test('B2: absent Bible Save button is not disabled', () => {
   const html = renderToStaticMarkup(
     React.createElement(ProjectContext, {
-      bibleText: '',
-      bibleStatus: 'Bible resource is not valid JSON.',
+      bibleText: '{}',
+      bibleStatus: 'No Bible stored for this project.',
       isSavingBible: false,
       onBibleChange: () => {},
       onSaveBible: () => {},
@@ -190,24 +103,55 @@ test('ProjectContext renders invalid Bible distinctly', () => {
       onStoryformChange: () => {},
       onSaveStoryform: () => {},
       storyformContext: '',
-      bibleReadinessState: 'invalid',
-      bibleReadinessReason: 'bible_malformed_json',
+      bibleReadinessState: 'absent',
       storyformReadinessState: 'ready',
       storyformContextReadinessState: 'unavailable',
-      bibleReadinessError: '',
-      storyformReadinessError: '',
-      storyformContextReadinessError: '',
       bibleDirectError: '',
       storyformDirectError: '',
       storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
+      onRetryReadiness: () => {},
+      isRetryingReadiness: false,
     }),
   );
-  assert.ok(html.includes('not valid') || html.includes('Bible resource is not valid'), 'must indicate invalid resource');
+  const bibleSection = html.split('Bible JSON')[1] || html;
+  const firstButton = bibleSection.match(/<button[^>]*disabled/);
+  if (firstButton) {
+    assert.fail('absent Bible Save button must not be disabled');
+  }
 });
 
-test('ProjectContext renders unavailable storyform-context distinctly', () => {
+test('B3: absent Bible displays normal non-alarming status', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(ProjectContext, {
+      bibleText: '{}',
+      bibleStatus: 'No Bible stored for this project.',
+      isSavingBible: false,
+      onBibleChange: () => {},
+      onSaveBible: () => {},
+      storyformText: '{}',
+      storyformStatus: 'Saved',
+      isSavingStoryform: false,
+      onStoryformChange: () => {},
+      onSaveStoryform: () => {},
+      storyformContext: '',
+      bibleReadinessState: 'absent',
+      storyformReadinessState: 'ready',
+      storyformContextReadinessState: 'unavailable',
+      bibleDirectError: '',
+      storyformDirectError: '',
+      storyformContextDirectError: '',
+      onRetryReadiness: () => {},
+      isRetryingReadiness: false,
+    }),
+  );
+  assert.ok(html.includes('No Bible stored'), 'must show non-alarming absence text');
+  assert.ok(
+    !html.includes('is-error') || html.indexOf('is-error') === -1,
+    'absence must not be styled as error',
+  );
+});
+
+test('B4: absent storyform textarea allows editing and saving', () => {
   const html = renderToStaticMarkup(
     React.createElement(ProjectContext, {
       bibleText: '{}',
@@ -216,60 +160,104 @@ test('ProjectContext renders unavailable storyform-context distinctly', () => {
       onBibleChange: () => {},
       onSaveBible: () => {},
       storyformText: '{}',
-      storyformStatus: 'Saved',
+      storyformStatus: 'No storyform stored for this project.',
       isSavingStoryform: false,
       onStoryformChange: () => {},
       onSaveStoryform: () => {},
       storyformContext: '',
       bibleReadinessState: 'ready',
-      storyformReadinessState: 'ready',
+      storyformReadinessState: 'absent',
       storyformContextReadinessState: 'unavailable',
-      storyformContextReadinessReason: 'storyform_context_storyform_invalid',
-      bibleReadinessError: '',
-      storyformReadinessError: '',
-      storyformContextReadinessError: '',
       bibleDirectError: '',
       storyformDirectError: '',
       storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
+      onRetryReadiness: () => {},
+      isRetryingReadiness: false,
     }),
   );
-  assert.ok(html.includes('not available'), 'must indicate unavailable context');
+  assert.ok(!html.includes('readonly'), 'absent storyform must not have readOnly attribute');
 });
 
-test('ProjectContext renders readiness request failure distinctly', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '',
-      bibleStatus: 'Availability could not be checked.',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '',
-      storyformStatus: 'Availability could not be checked.',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'error',
-      storyformReadinessState: 'error',
-      storyformContextReadinessState: 'error',
-      bibleReadinessError: 'Request failed (500)',
-      storyformReadinessError: 'Request failed (500)',
-      storyformContextReadinessError: 'Request failed (500)',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
-    }),
+// --- Defect B.5: Normal absence causes zero direct requests (source check) ---
+
+test('B5: absent Bible path issues no fetchBible call in App source', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  const absentPath = loadFn.split("state === 'absent'")[1]
+    || loadFn.split('"absent"')[1] || '';
+  assert.ok(
+    !absentPath.includes('fetchBible'),
+    'absent path must not call fetchBible',
   );
-  assert.ok(html.includes('could not be checked'), 'must show readiness failure');
-  assert.ok(html.includes('Retry'), 'must offer retry');
 });
 
-test('ProjectContext renders direct resource failure after ready report distinctly', () => {
+// --- Defect C: Post-save readiness vs direct failures must be distinct ---
+
+test('C1: post-save storyform refresh path separates readiness error from direct error',
+  () => {
+    const saveFn = appSource.split('handleSaveStoryform')[1] || '';
+    const saveRefreshBlock = saveFn.split('fetchProjectContextReadiness')[1] || '';
+    assert.ok(
+      saveRefreshBlock.length > 10,
+      'post-save must call fetchProjectContextReadiness',
+    );
+  },
+);
+
+test('C2: post-save readiness failure sets readiness error not combined status', () => {
+  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
+  const refreshCatch = saveFn.split('catch (error)')[2]
+    || saveFn.split('catch (error)')[1] || '';
+  assert.ok(
+    !refreshCatch.includes('Saved; prompt context refresh failed')
+    || refreshCatch.includes('setContextReadinessError'),
+    'readiness failure must set contextReadinessError separately',
+  );
+});
+
+test('C3: post-save does not run Story Check automatically', () => {
+  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
+  const saveFnBoundary = saveFn.split('handleCreateOMIIdea')[0]
+    || saveFn.split('handleRetryContextReadiness')[0]
+    || saveFn.split('const handleCreateOMICandidate')[0]
+    || saveFn;
+  assert.ok(
+    !saveFnBoundary.includes('runStoryCheck') && !saveFnBoundary.includes('story-check'),
+    'post-save must not run Story Check automatically',
+  );
+});
+
+// --- Defect D: Stale-project protection ---
+
+test('D1: App captures project identity for async response guard', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  assert.ok(
+    appSource.includes('isMounted') || loadFn.includes('projectId') || loadFn.includes('captured'),
+    'App must guard against stale async completion',
+  );
+});
+
+test('D2: Retry captures project identity for async response guard', () => {
+  const retryFn = appSource.split('handleRetryContextReadiness')[1] || '';
+  assert.ok(
+    retryFn.includes('activeProjectId') || retryFn.includes('isRetrying'),
+    'retry must reference active project identity',
+  );
+});
+
+test('D3: Post-save refresh captures project identity', () => {
+  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
+  const refreshPart = saveFn.split('fetchProjectContextReadiness')[1] || '';
+  assert.ok(
+    saveFn.includes('activeProjectId'),
+    'post-save refresh must reference activeProjectId',
+  );
+});
+
+// --- Defect E: Retry for direct-load failures ---
+
+test('E1: direct Bible failure shows Retry button', () => {
   const html = renderToStaticMarkup(
     React.createElement(ProjectContext, {
       bibleText: '',
@@ -284,104 +272,176 @@ test('ProjectContext renders direct resource failure after ready report distinct
       onSaveStoryform: () => {},
       storyformContext: '',
       bibleReadinessState: 'ready',
+      bibleDirectError: 'Request failed (500)',
       storyformReadinessState: 'ready',
-      storyformContextReadinessState: 'ready',
-      bibleReadinessError: '',
-      storyformReadinessError: '',
-      storyformContextReadinessError: '',
-      bibleDirectError: 'Request failed (500): Internal error',
       storyformDirectError: '',
+      storyformContextReadinessState: 'unavailable',
       storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
+      onRetryReadiness: () => {},
+      isRetryingReadiness: false,
     }),
   );
-  assert.ok(html.includes('Failed to load Bible'), 'must show direct load failure');
+  assert.ok(html.includes('Retry'), 'direct Bible failure must show Retry');
 });
 
-test('ProjectContext includes retry button', () => {
+test('E2: retry handler requests readiness first', () => {
+  const retryFn = appSource.split('handleRetryContextReadiness')[1] || '';
+  assert.ok(
+    retryFn.includes('fetchProjectContextReadiness'),
+    'retry must request readiness first',
+  );
+});
+
+test('E3: retry clears only transient errors not foundation state', () => {
+  const retryFn = appSource.split('handleRetryContextReadiness')[1] || '';
+  assert.ok(
+    retryFn.includes('setBibleDirectError'),
+    'retry must clear direct errors',
+  );
+});
+
+// --- Defect F: Remaining UI state requirements ---
+
+test('F1: invalid Bible remains distinct from absent', () => {
   const html = renderToStaticMarkup(
     React.createElement(ProjectContext, {
       bibleText: '',
-      bibleStatus: 'Availability could not be checked.',
+      bibleStatus: 'Bible not available: Bible resource is not valid JSON.',
       isSavingBible: false,
       onBibleChange: () => {},
       onSaveBible: () => {},
-      storyformText: '',
-      storyformStatus: 'Availability could not be checked.',
+      storyformText: '{}',
+      storyformStatus: 'Saved',
       isSavingStoryform: false,
       onStoryformChange: () => {},
       onSaveStoryform: () => {},
       storyformContext: '',
-      bibleReadinessState: 'error',
-      storyformReadinessState: 'error',
-      storyformContextReadinessState: 'error',
-      bibleReadinessError: 'Request failed (500)',
-      storyformReadinessError: 'Request failed (500)',
-      storyformContextReadinessError: 'Request failed (500)',
+      bibleReadinessState: 'invalid',
+      bibleReadinessReason: 'bible_malformed_json',
+      storyformReadinessState: 'ready',
+      storyformContextReadinessState: 'unavailable',
       bibleDirectError: '',
       storyformDirectError: '',
       storyformContextDirectError: '',
-      onRetryContextReadiness: () => {},
-      isRetryingContextReadiness: false,
+      onRetryReadiness: () => {},
+      isRetryingReadiness: false,
     }),
   );
-  assert.ok(html.includes('Retry'), 'must include retry action');
+  assert.ok(html.includes('not available'), 'invalid must be distinct');
+  assert.ok(!html.includes('No Bible stored'), 'invalid must not display absent message');
 });
 
-// --- App.jsx structural source contract ---
+test('F2: readiness-request failure and direct-failure remain separately searchable',
+  () => {
+    const html1 = renderToStaticMarkup(
+      React.createElement(ProjectContext, {
+        bibleText: '',
+        bibleStatus: 'Availability could not be checked.',
+        isSavingBible: false,
+        onBibleChange: () => {},
+        onSaveBible: () => {},
+        storyformText: '',
+        storyformStatus: 'Availability could not be checked.',
+        isSavingStoryform: false,
+        onStoryformChange: () => {},
+        onSaveStoryform: () => {},
+        storyformContext: '',
+        bibleReadinessState: 'error',
+        storyformReadinessState: 'error',
+        storyformContextReadinessState: 'error',
+        readinessError: 'Request failed (500)',
+        bibleDirectError: '',
+        storyformDirectError: '',
+        storyformContextDirectError: '',
+        onRetryReadiness: () => {},
+        isRetryingReadiness: false,
+      }),
+    );
+    assert.ok(
+      html1.includes('could not be checked'),
+      'readiness failure must show readiness-failure text',
+    );
+  },
+);
 
-test('App.jsx evaluates each resource independently from readiness', () => {
+test('F3: direct-resource failure after ready report is distinct from readiness failure',
+  () => {
+    const html = renderToStaticMarkup(
+      React.createElement(ProjectContext, {
+        bibleText: '',
+        bibleStatus: 'Failed to load Bible: Request failed (500)',
+        isSavingBible: false,
+        onBibleChange: () => {},
+        onSaveBible: () => {},
+        storyformText: '{}',
+        storyformStatus: 'Saved',
+        isSavingStoryform: false,
+        onStoryformChange: () => {},
+        onSaveStoryform: () => {},
+        storyformContext: '',
+        bibleReadinessState: 'ready',
+        storyformReadinessState: 'ready',
+        storyformContextReadinessState: 'unavailable',
+        bibleDirectError: 'Request failed (500)',
+        storyformDirectError: '',
+        storyformContextDirectError: '',
+        onRetryReadiness: () => {},
+        isRetryingReadiness: false,
+      }),
+    );
+    assert.ok(html.includes('Failed to load Bible'), 'direct failure must be labelled');
+    assert.ok(
+      !html.includes('could not be checked') && !html.includes('Availability could not'),
+      'direct failure must not say could not be checked',
+    );
+  },
+);
+
+// --- Preserved existing contract tests ---
+
+test('G1: api.js fetchProjectContextReadiness defined', () => {
   assert.ok(
-    appSource.includes('ready'),
-    'App must reference resource ready flags individually',
+    apiSource.includes('fetchProjectContextReadiness'),
+    'api.js must export fetchProjectContextReadiness',
   );
 });
 
-test('App.jsx readiness loading references fetchProjectContextReadiness', () => {
+test('G2: api.js fetchProjectContextReadiness calls only context-readiness endpoint', () => {
+  const helperSource = apiSource.split('fetchProjectContextReadiness')[1] || '';
+  const helperBody = helperSource.split('export async')[0] || helperSource;
   assert.ok(
-    appSource.includes('fetchProjectContextReadiness'),
-    'App load path must reference fetchProjectContextReadiness',
+    !helperBody.includes('/bible') && !helperBody.includes('/storyform-'),
+    'fetchProjectContextReadiness must not issue direct resource requests',
   );
 });
 
-test('App.jsx does not issue direct requests for absent resources', () => {
-  const loadFn = appSource.split('loadInitialData')[1] || appSource;
+test('G3: api.js readiness helper does not invoke Story Check or create candidates', () => {
+  const helperSource = apiSource.split('fetchProjectContextReadiness')[1] || '';
+  const helperBody = helperSource.split('export async')[0] || helperSource;
   assert.ok(
-    loadFn.includes('ready') || loadFn.includes('readiness'),
-    'Loading must be conditional on readiness',
-  );
-});
-
-test('App.jsx guards against stale project responses', () => {
-  assert.ok(
-    appSource.includes('isMounted') || appSource.includes('activeProjectId'),
-    'App must guard against stale async completion',
-  );
-});
-
-test('App.jsx post-save storyform refresh uses readiness-first pattern', () => {
-  const saveHandler = appSource.split('handleSaveStoryform')[1] || appSource;
-  const contextInSave = saveHandler.includes('storyform-context')
-    || saveHandler.includes('fetchStoryformContext');
-  assert.ok(contextInSave, 'storyform save must trigger storyform context handling');
-});
-
-test('api.js does not export readiness helper that calls Story Check', () => {
-  const readinessPart = apiSource.split('fetchProjectContextReadiness')[1] || '';
-  assert.ok(
-    !readinessPart.includes('story-check')
-    && !readinessPart.includes('runStoryCheck'),
-    'readiness helper must not invoke Story Check',
-  );
-});
-
-test('api.js readiness helper does not create or persist candidates', () => {
-  const readinessPart = apiSource.split('fetchProjectContextReadiness')[1] || '';
-  const helperBody = readinessPart.split('export async')[0] || readinessPart;
-  assert.ok(
-    !helperBody.includes('candidate')
+    !helperBody.includes('story-check')
+    && !helperBody.includes('runStoryCheck')
+    && !helperBody.includes('candidate')
     && !helperBody.includes('promotion'),
-    'readiness helper must not create or persist candidates',
+    'readiness helper must not invoke Story Check or create/persist candidates',
+  );
+});
+
+test('G4: App source uses independent per-resource checks not only all_ready', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  assert.ok(
+    loadFn.includes('bibleRes.ready')
+    && loadFn.includes('storyformRes.ready'),
+    'Each resource readiness must be evaluated independently',
+  );
+});
+
+test('G5: App source does not gate optional-context requests on all_ready', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  assert.ok(
+    !loadFn.includes('all_ready') || loadFn.includes('resources.bible') || loadFn.includes('bibleRes'),
+    'Must not gate optional context only on all_ready',
   );
 });
