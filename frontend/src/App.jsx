@@ -150,12 +150,14 @@ function parseJsonObject(text, label) {
   return parsed;
 }
 
-export function createStaleGuard(getCurrentProjectId) {
-  const originatingProjectId = getCurrentProjectId();
+export function createOperationGuard(getCurrentSession) {
+  const session = getCurrentSession();
   return {
-    originatingProjectId,
-    isStale() {
-      return getCurrentProjectId() !== this.originatingProjectId;
+    session,
+    isCurrent() {
+      const current = getCurrentSession();
+      return current.projectId === this.session.projectId
+        && current.generation === this.session.generation;
     },
   };
 }
@@ -164,6 +166,7 @@ export default function App() {
   const [activeProjectId, setActiveProjectId] = useState(PROJECT_ID);
   const currentProjectIdRef = useRef(activeProjectId);
   currentProjectIdRef.current = activeProjectId;
+  const projectGenRef = useRef(0);
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [projectsError, setProjectsError] = useState('');
@@ -435,6 +438,9 @@ export default function App() {
     setOmiStatus('Loading OMI status...');
     setOmiError('');
     setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
+
+    projectGenRef.current += 1;
+    setIsSavingStoryform(false);
 
     async function loadInitialData() {
       const capturedProjectId = activeProjectId;
@@ -1128,15 +1134,17 @@ export default function App() {
       return;
     }
 
+    const saveGuard = createOperationGuard(() => ({
+      projectId: currentProjectIdRef.current,
+      generation: projectGenRef.current,
+    }));
     setIsSavingStoryform(true);
-
-    const originatingProjectId = activeProjectId;
 
     try {
       const parsed = parseJsonObject(storyformText, 'Storyform');
-      await saveStoryform(parsed, originatingProjectId);
+      await saveStoryform(parsed, saveGuard.session.projectId);
 
-      if (currentProjectIdRef.current !== originatingProjectId) {
+      if (!saveGuard.isCurrent()) {
         return;
       }
 
@@ -1147,9 +1155,9 @@ export default function App() {
       setStoryformDirectError('');
 
       try {
-        const readiness = await fetchProjectContextReadiness(originatingProjectId);
+        const readiness = await fetchProjectContextReadiness(saveGuard.session.projectId);
 
-        if (currentProjectIdRef.current !== originatingProjectId) {
+        if (!saveGuard.isCurrent()) {
           return;
         }
 
@@ -1160,16 +1168,16 @@ export default function App() {
 
         if (contextRes.ready && contextRes.state === 'ready') {
           try {
-            const contextPayload = await fetchStoryformContext(originatingProjectId);
+            const contextPayload = await fetchStoryformContext(saveGuard.session.projectId);
 
-            if (currentProjectIdRef.current !== originatingProjectId) {
+            if (!saveGuard.isCurrent()) {
               return;
             }
 
             setStoryformContext(contextPayload.context ?? '');
             setStoryformContextDirectError('');
           } catch (error) {
-            if (currentProjectIdRef.current !== originatingProjectId) {
+            if (!saveGuard.isCurrent()) {
               return;
             }
             const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
@@ -1184,7 +1192,7 @@ export default function App() {
         }
         setContextReadinessError('');
       } catch (error) {
-        if (currentProjectIdRef.current !== originatingProjectId) {
+        if (!saveGuard.isCurrent()) {
           return;
         }
         const message = error instanceof Error ? error.message : 'Failed to check context availability.';
@@ -1193,13 +1201,13 @@ export default function App() {
         setStoryformContextDirectError('');
       }
     } catch (error) {
-      if (currentProjectIdRef.current !== originatingProjectId) {
+      if (!saveGuard.isCurrent()) {
         return;
       }
       const message = error instanceof Error ? error.message : 'Save failed.';
       setStoryformStatus(`Save failed: ${message}`);
     } finally {
-      if (currentProjectIdRef.current === originatingProjectId) {
+      if (saveGuard.isCurrent()) {
         setIsSavingStoryform(false);
       }
     }
@@ -1210,7 +1218,10 @@ export default function App() {
       return;
     }
 
-    const capturedProjectId = activeProjectId;
+    const retryGuard = createOperationGuard(() => ({
+      projectId: currentProjectIdRef.current,
+      generation: projectGenRef.current,
+    }));
     setIsRetryingContextReadiness(true);
     setContextReadinessError('');
     setBibleDirectError('');
@@ -1224,9 +1235,9 @@ export default function App() {
     setStoryformStatus('Checking availability...');
 
     try {
-      const readiness = await fetchProjectContextReadiness(capturedProjectId);
+      const readiness = await fetchProjectContextReadiness(retryGuard.session.projectId);
 
-      if (currentProjectIdRef.current !== capturedProjectId) {
+      if (!retryGuard.isCurrent()) {
         return;
       }
 
@@ -1243,8 +1254,8 @@ export default function App() {
 
       if (bibleRes.ready && bibleRes.state === 'ready') {
         try {
-          const biblePayload = await fetchBible(capturedProjectId);
-          if (currentProjectIdRef.current !== capturedProjectId) {
+          const biblePayload = await fetchBible(retryGuard.session.projectId);
+          if (!retryGuard.isCurrent()) {
             return;
           }
           const formattedBible = formatJson(biblePayload);
@@ -1252,7 +1263,7 @@ export default function App() {
           setLastSavedBibleText(formattedBible);
           setBibleStatus('Saved');
         } catch (error) {
-          if (currentProjectIdRef.current !== capturedProjectId) {
+          if (!retryGuard.isCurrent()) {
             return;
           }
           const message = error instanceof Error ? error.message : 'Failed to load Bible.';
@@ -1280,8 +1291,8 @@ export default function App() {
 
       if (storyformRes.ready && storyformRes.state === 'ready') {
         try {
-          const storyformPayload = await fetchStoryform(capturedProjectId);
-          if (currentProjectIdRef.current !== capturedProjectId) {
+          const storyformPayload = await fetchStoryform(retryGuard.session.projectId);
+          if (!retryGuard.isCurrent()) {
             return;
           }
           const formattedStoryform = formatJson(storyformPayload);
@@ -1289,7 +1300,7 @@ export default function App() {
           setLastSavedStoryformText(formattedStoryform);
           setStoryformStatus('Saved');
         } catch (error) {
-          if (currentProjectIdRef.current !== capturedProjectId) {
+          if (!retryGuard.isCurrent()) {
             return;
           }
           const message = error instanceof Error ? error.message : 'Failed to load storyform.';
@@ -1317,14 +1328,14 @@ export default function App() {
 
       if (contextRes.ready && contextRes.state === 'ready') {
         try {
-          const contextPayload = await fetchStoryformContext(capturedProjectId);
-          if (currentProjectIdRef.current !== capturedProjectId) {
+          const contextPayload = await fetchStoryformContext(retryGuard.session.projectId);
+          if (!retryGuard.isCurrent()) {
             return;
           }
           setStoryformContext(contextPayload.context ?? '');
           setStoryformContextDirectError('');
         } catch (error) {
-          if (currentProjectIdRef.current !== capturedProjectId) {
+          if (!retryGuard.isCurrent()) {
             return;
           }
           const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
@@ -1338,7 +1349,7 @@ export default function App() {
 
       setContextReadinessError('');
     } catch (error) {
-      if (currentProjectIdRef.current !== capturedProjectId) {
+      if (!retryGuard.isCurrent()) {
         return;
       }
       const message = error instanceof Error ? error.message : 'Failed to check context availability.';
@@ -1354,10 +1365,10 @@ export default function App() {
       setStoryformStatus('Availability could not be checked.');
       setStoryformContext('');
     } finally {
-      if (currentProjectIdRef.current === capturedProjectId) {
+      if (retryGuard.isCurrent()) {
         setContextReadinessLoading(false);
+        setIsRetryingContextReadiness(false);
       }
-      setIsRetryingContextReadiness(false);
     }
   }, [activeProjectId, isRetryingContextReadiness]);
 

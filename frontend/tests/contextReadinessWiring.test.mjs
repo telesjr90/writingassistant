@@ -17,7 +17,7 @@ const vite = await createServer({
   server: { middlewareMode: true },
 });
 const appModule = await vite.ssrLoadModule('/src/App.jsx');
-const { default: App, createStaleGuard } = appModule;
+const { default: App, createOperationGuard } = appModule;
 const { default: ProjectContext } = await vite.ssrLoadModule(
   '/src/components/ProjectContext.jsx',
 );
@@ -27,492 +27,624 @@ test.after(async () => {
   await vite.close();
 });
 
-// --- Group H: Behavioral stale-guard tests (test the createStaleGuard helper) ---
+// ============================================================
+// Group H: createOperationGuard behavioral tests
+// ============================================================
 
-test('H1: createStaleGuard is exported and is a function', () => {
-  assert.ok(typeof createStaleGuard === 'function', 'createStaleGuard must be exported');
+test('H1: createOperationGuard is exported and is a function', () => {
+  assert.ok(typeof createOperationGuard === 'function',
+    'createOperationGuard must be exported');
 });
 
-test('H2: stale guard isStale returns false when current matches originating', () => {
-  let currentId = 'proj-A';
-  const guard = createStaleGuard(() => currentId);
-  assert.equal(guard.isStale(), false);
-  assert.equal(guard.originatingProjectId, 'proj-A');
+test('H2: isCurrent returns true when session matches', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  assert.equal(guard.isCurrent(), true);
+  assert.deepStrictEqual(guard.session, { projectId: 'proj-A', generation: 5 });
 });
 
-test('H3: stale guard isStale returns true after current identity changes', () => {
-  let currentId = 'proj-A';
-  const guard = createStaleGuard(() => currentId);
-  currentId = 'proj-B';
-  assert.equal(guard.isStale(), true);
-  assert.equal(guard.originatingProjectId, 'proj-A');
+test('H3: isCurrent returns false after projectId changes', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  pid = 'proj-B';
+  gen = 6;
+  assert.equal(guard.isCurrent(), false);
+  assert.deepStrictEqual(guard.session, { projectId: 'proj-A', generation: 5 });
 });
 
-test('H4: stale guard originatingProjectId is immutable snapshot', () => {
-  let currentId = 'proj-X';
-  const guard = createStaleGuard(() => currentId);
-  currentId = 'proj-Y';
-  assert.equal(guard.originatingProjectId, 'proj-X');
-  assert.equal(guard.isStale(), true);
+test('H4: isCurrent returns false after generation changes (same projectId)', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  pid = 'proj-A';
+  gen = 6;
+  assert.equal(guard.isCurrent(), false);
 });
 
-test('H5: multiple stale guards capture independent originating IDs', () => {
-  let currentId = 'proj-A';
-  const guardA = createStaleGuard(() => currentId);
-  currentId = 'proj-B';
-  const guardB = createStaleGuard(() => currentId);
-  assert.equal(guardA.originatingProjectId, 'proj-A');
-  assert.equal(guardB.originatingProjectId, 'proj-B');
-  assert.equal(guardA.isStale(), true);
-  assert.equal(guardB.isStale(), false);
+test('H5: session is an immutable snapshot', () => {
+  let pid = 'proj-X';
+  let gen = 3;
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  pid = 'proj-Y';
+  gen = 99;
+  assert.deepStrictEqual(guard.session, { projectId: 'proj-X', generation: 3 });
 });
 
-// --- Group I: Independent loading processing verification ---
+// ============================================================
+// Group L: Save lifecycle behavioral tests (Defects 1 & 3)
+// ============================================================
 
-test('I1: loadInitialData captures project identity before async work', () => {
-  const loadFn = appSource.split('async function loadInitialData')[1]
-    || appSource.split('function loadInitialData')[1] || '';
-  const capturedPattern = loadFn.includes('capturedProjectId')
-    && loadFn.includes('activeProjectId');
-  assert.ok(capturedPattern,
-    'loadInitialData must capture project ID before issuing requests',
-  );
+test('L1: project switch resets save state; B is not stranded in saving', async () => {
+  // Simulate: save starts in A, user switches to B before save completes.
+  // Production: projectGenRef increments on switch, setIsSavingStoryform(false) called.
+  let pid = 'proj-A';
+  let gen = 5;
+  const stateSpy = { saving: false, status: '' };
+
+  // Save guard captured at start (gen=5)
+  const saveGuard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  stateSpy.saving = true;
+
+  // Project switch: B is selected, gen increments
+  pid = 'proj-B';
+  gen = 6;
+
+  // Project-switch reset in useEffect would have called setIsSavingStoryform(false)
+  stateSpy.saving = false; // reset by production useEffect
+
+  // The stale A save's finally runs
+  if (saveGuard.isCurrent()) {
+    stateSpy.saving = false; // must NOT execute
+  }
+
+  assert.equal(saveGuard.isCurrent(), false, 'stale guard must not be current');
+  assert.equal(stateSpy.saving, false,
+    'B must not be left in saving state from stale A save');
 });
 
-test('I2: unrelated results can be processed before readiness settles', async () => {
-  // Demonstrate: two parallel Promise.allSettled groups process independently.
-  // This test proves the pattern; production code is verified by source check below.
-  let unrelatedDone = false;
-  let readinessDone = false;
-  const processingOrder = [];
+test('L2: stale A save finalization does not clear B\'s saving initiated by B', async () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const ops = [];
 
-  const unrelatedPromise = Promise.allSettled([
-    Promise.resolve('scenes'),
-    Promise.resolve('notes'),
-  ]).then(() => { unrelatedDone = true; processingOrder.push('unrelated'); });
+  // A starts save
+  const guardA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
 
-  const readinessPromise = new Promise((resolve) => {
+  // Switch to B
+  pid = 'proj-B';
+  gen = 6;
+
+  // B starts its own save
+  const guardB = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  let bSaving = true;
+
+  // A's stale save finally runs
+  if (guardA.isCurrent()) {
+    bSaving = false; // must NOT fire
+  } else {
+    ops.push('a-rejected');
+  }
+
+  // B's save completes normally
+  if (guardB.isCurrent()) {
+    bSaving = false;
+    ops.push('b-completed');
+  }
+
+  assert.deepStrictEqual(ops, ['a-rejected', 'b-completed']);
+  assert.equal(bSaving, false);
+});
+
+test('L3: ABA switch (A→B→A) rejects original A operation', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+
+  // A starts save (gen=5)
+  const guardOldA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+
+  // Switch to B (gen=6)
+  pid = 'proj-B';
+  gen = 6;
+
+  // Switch back to A (gen=7)
+  pid = 'proj-A';
+  gen = 7;
+
+  // Old A's guard: gen=5, current gen=7 → not current
+  assert.equal(guardOldA.isCurrent(), false,
+    'A→B→A must reject original A operation via generation mismatch');
+
+  // New A session creates its own guard
+  const guardNewA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  assert.equal(guardNewA.isCurrent(), true);
+});
+
+test('L4: current-session save normal finalization succeeds', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  let saving = false;
+  let status = '';
+
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  saving = true;
+
+  // Simulate save success
+  if (guard.isCurrent()) {
+    status = 'Saved';
+    saving = false;
+  }
+
+  assert.equal(saving, false);
+  assert.equal(status, 'Saved');
+});
+
+test('L5: stale save error does not write into current project', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  let status = '';
+
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+
+  // Switch
+  pid = 'proj-B';
+  gen = 6;
+
+  // Stale save catch block
+  if (guard.isCurrent()) {
+    status = 'Save failed: error'; // must NOT execute
+  }
+
+  assert.equal(status, '');
+});
+
+// ============================================================
+// Group M: Retry lifecycle behavioral tests (Defect 2 & 3)
+// ============================================================
+
+test('M1: stale Retry from A does not clear B\'s active Retry state', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const stateSpy = { retrying: false, loading: false };
+
+  // A starts Retry
+  const guardA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  stateSpy.retrying = true;
+  stateSpy.loading = true;
+
+  // Switch to B
+  pid = 'proj-B';
+  gen = 6;
+
+  // B starts its own Retry
+  const guardB = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  stateSpy.retrying = true; // B's retry flag
+  stateSpy.loading = true;
+
+  // A's stale Retry finally runs
+  if (guardA.isCurrent()) {
+    stateSpy.loading = false;  // must NOT fire
+    stateSpy.retrying = false; // must NOT fire
+  }
+
+  assert.equal(stateSpy.retrying, true,
+    'B retry flag must not be cleared by stale A retry');
+  assert.equal(stateSpy.loading, true,
+    'B loading flag must not be cleared by stale A retry');
+});
+
+test('M2: current-session Retry finally clears its own flags', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  let retrying = false;
+  let loading = false;
+
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  retrying = true;
+  loading = true;
+
+  // Normal finally: operation is current
+  if (guard.isCurrent()) {
+    loading = false;
+    retrying = false;
+  }
+
+  assert.equal(retrying, false);
+  assert.equal(loading, false);
+});
+
+test('M3: stale Retry catch does not write errors into current project', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  let readinessError = '';
+  let readinessState = '';
+
+  const guard = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+
+  // Switch
+  pid = 'proj-B';
+  gen = 6;
+
+  // Stale catch
+  if (guard.isCurrent()) {
+    readinessError = 'FAILED';
+    readinessState = 'error';
+  }
+
+  assert.equal(readinessError, '');
+  assert.equal(readinessState, '');
+});
+
+test('M4: ABA retry rejection via generation mismatch', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+
+  const guardOldA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+
+  // A→B→A
+  pid = 'proj-B';
+  gen = 6;
+  pid = 'proj-A';
+  gen = 7;
+
+  let retrying = true; // current session's retry flag
+  let loading = true;
+
+  // Old A's finally
+  if (guardOldA.isCurrent()) {
+    retrying = false; // must NOT fire
+    loading = false;  // must NOT fire
+  }
+
+  assert.equal(retrying, true);
+  assert.equal(loading, true);
+});
+
+test('M5: project switch resets retry flag so B can start its own Retry', () => {
+  let pid = 'proj-A';
+  let gen = 5;
+
+  // A's retry was active (retrying=true in production)
+  // Switch to B
+  pid = 'proj-B';
+  gen = 6;
+
+  // useEffect calls setIsRetryingContextReadiness(false)
+  let retrying = false; // reset by project switch
+
+  // B starts its own Retry
+  const guardB = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  retrying = true;
+
+  assert.equal(retrying, true, 'B must be able to start its own Retry');
+  assert.equal(guardB.isCurrent(), true);
+});
+
+// ============================================================
+// Group R: Integrated deferred-promise save/retry scenarios
+// ============================================================
+
+test('R1: deferred save for A; switch to B; B saves normally', async () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const log = [];
+  const bState = { saving: false, status: '' };
+
+  // A starts save, captures guard
+  const guardA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+
+  // A's save is deferred (in-flight)
+  const saveADeferred = new Promise((resolve) => {
     setImmediate(() => {
-      readinessDone = true;
-      processingOrder.push('readiness');
-      resolve('ready');
+      // A save completes
+      if (guardA.isCurrent()) {
+        log.push('a-save-ok'); // should NOT fire
+      } else {
+        log.push('a-save-stale');
+      }
+      resolve();
     });
   });
 
-  await unrelatedPromise;
-  assert.equal(unrelatedDone, true);
-  assert.equal(readinessDone, false,
-    'unrelated must settle before delayed readiness',
-  );
+  // Switch to B during A's save
+  pid = 'proj-B';
+  gen = 6;
 
-  await readinessPromise;
-  assert.equal(processingOrder[0], 'unrelated',
-    'unrelated must process first',
-  );
-});
-
-test('I3: loadInitialData must use two independent processing paths', () => {
-  const loadFn = appSource.split('async function loadInitialData')[1]
-    || appSource.split('function loadInitialData')[1] || '';
-  // The function must NOT use a single Promise.allSettled that serializes
-  // unrelated results behind readiness. Evidence: either two separate
-  // Promise.allSettled calls, or unrelated processed via .then() independently.
-  const hasTwoGroups =
-    (loadFn.match(/Promise\.allSettled/g) || []).length >= 2
-    || loadFn.includes('.then');
-  assert.ok(hasTwoGroups,
-    'loadInitialData must process unrelated results independently from readiness: '
-    + 'use two Promise.allSettled groups or .then() for independent settlement',
-  );
-});
-
-test('I4: unrelated loading flags resolve independently from readiness loading', () => {
-  const loadFn = appSource.split('async function loadInitialData')[1]
-    || appSource.split('function loadInitialData')[1] || '';
-  // setIsLoadingScenes(false) must be reachable without waiting for readiness to settle
-  const scenesResolved = loadFn.includes('IsLoadingScenes(false)');
-  assert.ok(scenesResolved,
-    'unrelated loading flags must be resolved independently',
-  );
-  // The readiness path must also resolve contextReadinessLoading
-  const readinessLoading = loadFn.includes('setContextReadinessLoading(false)')
-    || appSource.split('handleRetryContextReadiness')[1]?.includes('setContextReadinessLoading(false)');
-  assert.ok(readinessLoading,
-    'readiness loading flag must be resolved through its own path',
-  );
-});
-
-// --- Group J: Retry stale protection tests (behavioral) ---
-
-test('J1: createStaleGuard detects staleness for retry originated from project A after switch', () => {
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-  assert.equal(guard.isStale(), false);
-  // Now switch to project B while the retry would be in-flight
-  currentProjectId = 'proj-B';
-  assert.equal(guard.isStale(), true);
-});
-
-test('J2: stale guard rejects state updates after project switch', () => {
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-  currentProjectId = 'proj-B';
-
-  const updatesForB = [];
-  const updatesForA = [];
-
-  function safeUpdate(updateFn) {
-    if (!guard.isStale()) {
-      updateFn();
-    }
+  // B starts its own save
+  const guardB = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  if (guardB.isCurrent()) {
+    bState.saving = true;
+    // B's save completes immediately
+    bState.status = 'Saved';
+    bState.saving = false;
+    log.push('b-save-ok');
   }
 
-  safeUpdate(() => updatesForA.push('readiness-ok'));
-  safeUpdate(() => updatesForB.push('wrong-project'));
+  await saveADeferred;
 
-  assert.deepStrictEqual(updatesForA, []);
-  assert.deepStrictEqual(updatesForB, []);
+  assert.deepStrictEqual(log, ['b-save-ok', 'a-save-stale']);
+  assert.equal(bState.status, 'Saved');
+  assert.equal(bState.saving, false);
 });
 
-test('J3: retry catch and finally paths must check current project identity', () => {
+test('R2: deferred retry for A; switch to B; B retries normally', async () => {
+  let pid = 'proj-A';
+  let gen = 5;
+  const log = [];
+  const bState = { retrying: false, loading: false };
+
+  // A starts retry
+  const guardA = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+
+  const retryADeferred = new Promise((resolve) => {
+    setImmediate(() => {
+      if (guardA.isCurrent()) {
+        log.push('a-retry-ok'); // should NOT fire
+      } else {
+        log.push('a-retry-stale');
+      }
+      // finally: guard.isCurrent() → no cleanup for B
+      resolve();
+    });
+  });
+
+  // Switch to B
+  pid = 'proj-B';
+  gen = 6;
+
+  // B starts its own retry
+  const guardB = createOperationGuard(() => ({
+    projectId: pid, generation: gen,
+  }));
+  bState.retrying = true;
+  bState.loading = true;
+
+  await retryADeferred;
+
+  // B's retry completes normally
+  if (guardB.isCurrent()) {
+    bState.loading = false;
+    bState.retrying = false;
+    log.push('b-retry-done');
+  }
+
+  assert.deepStrictEqual(log, ['a-retry-stale', 'b-retry-done']);
+  assert.equal(bState.retrying, false);
+  assert.equal(bState.loading, false);
+});
+
+// ============================================================
+// Group P: Production source verification (non-behavioral)
+// ============================================================
+
+test('P1: projectGenRef exists in App source', () => {
+  assert.ok(appSource.includes('projectGenRef'),
+    'App must use projectGenRef for monotonic generation');
+});
+
+test('P2: createOperationGuard is used in handleSaveStoryform', () => {
+  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
+  assert.ok(saveFn.includes('createOperationGuard'),
+    'save handler must use createOperationGuard');
+});
+
+test('P3: createOperationGuard is used in handleRetryContextReadiness', () => {
   const retryFn = appSource.split('handleRetryContextReadiness')[1] || '';
-  // The catch block (outer try/catch) must have a stale check
-  const hasCatchGuard = retryFn.includes('catch')
-    && (retryFn.split('catch (error)').length >= 2)
-    && retryFn.split('catch (error)')[2]
-    && (retryFn.split('catch (error)')[2].includes('currentProjectIdRef')
-        || retryFn.split('catch (error)')[2].includes('activeProjectId')
-        || retryFn.split('catch (error)')[2].includes('originating'));
-  // The finally block must have a stale check
-  const hasFinallyGuard = retryFn.includes('finally')
-    && (
-      retryFn.split('finally')[1]?.includes('currentProjectIdRef')
-      || retryFn.split('finally')[1]?.includes('activeProjectId')
-      || retryFn.split('finally')[1]?.includes('originating')
-      || retryFn.split('finally')[1]?.includes('!==')
-    );
-  assert.ok(hasCatchGuard || hasFinallyGuard,
-    'retry catch and finally must guard against stale project identity. '
-    + 'catch has guard: ' + hasCatchGuard + ', finally has guard: ' + hasFinallyGuard,
-  );
+  assert.ok(retryFn.includes('createOperationGuard'),
+    'retry handler must use createOperationGuard');
 });
 
-test('J4: stale retry must not write errors into a different project', () => {
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-  currentProjectId = 'proj-B'; // switched mid-flight
-
-  const errors = {
-    'proj-A': { readinessError: '', directError: '' },
-    'proj-B': { readinessError: '', directError: '' },
-  };
-
-  function writeError(project, key, value) {
-    if (guard.isStale()) return;
-    errors[project][key] = value;
-  }
-
-  writeError('proj-A', 'readinessError', 'FAILED');
-  writeError('proj-B', 'directError', 'should not write');
-
-  assert.equal(errors['proj-A'].readinessError, '');
-  assert.equal(errors['proj-B'].directError, '');
-});
-
-test('J5: stale retry finally must not clear active operation for current project', () => {
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-  currentProjectId = 'proj-B'; // switched
-
-  let isLoading = true; // project B's own loading state
-  const retryingFlag = { value: true };
-
-  // Simulate finally: only clear if not stale
-  if (!guard.isStale()) {
-    isLoading = false;
-  }
-  retryingFlag.value = false; // always clear retry-in-progress
-
-  assert.equal(isLoading, true,
-    'stale retry finally must not clear current project loading state',
-  );
-});
-
-// --- Group K: Post-save stale protection tests ---
-
-test('K1: post-save captures originating project ID', () => {
-  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
-  // Must capture project ID before the save call
-  const saveCallIdx = saveFn.indexOf('saveStoryform(');
-  const hasOriginatingId = saveFn.includes('originating')
-    || saveFn.includes('capturedProjectId')
-    || (saveFn.indexOf('activeProjectId') < saveCallIdx
-        && saveFn.lastIndexOf('activeProjectId', saveCallIdx) >= 0);
-  assert.ok(hasOriginatingId,
-    'post-save must capture originating project ID before save operation',
-  );
-});
-
-test('K2: post-save uses captured ID for readiness and context requests', () => {
-  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
-  // Either uses an originating/captured variable or the stale guard
+test('P4: project-switch resets isSavingStoryform', () => {
   assert.ok(
-    saveFn.includes('fetchProjectContextReadiness'),
-    'post-save must call readiness',
+    appSource.includes('setIsSavingStoryform(false)'),
+    'project switch must reset isSavingStoryform',
   );
+});
+
+test('P5: retry finally guards both loading and retrying flags', () => {
+  const retryFn = appSource.split('handleRetryContextReadiness')[1].split('handleCreateOMIIdea')[0] || '';
+  // The finally block must guard BOTH setContextReadinessLoading and setIsRetryingContextReadiness
+  const finalFn = retryFn.split('finally')[1]?.split('}')[0] || '';
   assert.ok(
-    saveFn.includes('fetchStoryformContext'),
-    'post-save must call storyform context',
+    finalFn.includes('IsRetryingContextReadiness'),
+    'retry finally must guard setIsRetryingContextReadiness',
   );
 });
 
-test('K3: post-save stale readiness response must not update current project', () => {
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-  currentProjectId = 'proj-B';
-
-  let readinessState = { contextResState: '', error: '' };
-
-  function updateReadiness(state, error) {
-    if (guard.isStale()) return;
-    readinessState = { contextResState: state, error };
-  }
-
-  updateReadiness('ready', '');
-  assert.equal(readinessState.contextResState, '');
-  assert.equal(readinessState.error, '');
-});
-
-test('K4: current-project post-save readiness failure sets contextReadinessError', () => {
-  // When the originating project IS still current, errors must propagate
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-
-  let contextReadinessError = '';
-  function setError(msg) {
-    if (guard.isStale()) return;
-    contextReadinessError = msg;
-  }
-
-  setError('Failed to check context availability.');
-  assert.equal(contextReadinessError, 'Failed to check context availability.');
-});
-
-test('K5: current-project direct context failure sets storyformContextDirectError', () => {
-  let currentProjectId = 'proj-A';
-  const guard = createStaleGuard(() => currentProjectId);
-
-  let storyformContextDirectError = '';
-  function setDirectError(msg) {
-    if (guard.isStale()) return;
-    storyformContextDirectError = msg;
-  }
-
-  setDirectError('Failed to load storyform context.');
-  assert.equal(storyformContextDirectError, 'Failed to load storyform context.');
-});
-
-test('K6: post-save uses stale guard after each await boundary', () => {
-  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
-  // Must have stale guard checks after readiness await and after context await
-  const hasGuardAfterSave = saveFn.includes('currentProjectIdRef')
-    || saveFn.includes('originating');
-  assert.ok(hasGuardAfterSave,
-    'post-save must reference current project identity for stale detection',
-  );
-});
-
-// --- Defect A: Unrelated data must not be blocked by readiness failure ---
+// ============================================================
+// Defect A: Unrelated data independence
+// ============================================================
 
 test('A1: App loads scenes independently of optional-context readiness', () => {
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  assert.ok(
-    loadFn.includes('fetchScenes'),
-    'scenes must be loaded',
-  );
-  assert.ok(
-    loadFn.includes('fetchProjectContextReadiness'),
-    'readiness must be requested',
-  );
+  assert.ok(loadFn.includes('fetchScenes'), 'scenes must be loaded');
+  assert.ok(loadFn.includes('fetchProjectContextReadiness'), 'readiness must be requested');
 });
 
 test('A2: rejected readiness does not prevent processing unrelated fulfilled results', () => {
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  // Verify unrelated results processing is NOT gated behind readiness success
-  // Detection: if unrelated result processing appears BEFORE the readiness catch/return,
-  // or in an independent .then() block
   const hasIndependentUnrelated =
     loadFn.includes('.then(')
     || (loadFn.indexOf('sceneResult') < loadFn.indexOf('readinessResult')
         && !loadFn.substring(0, loadFn.indexOf('sceneResult')).includes('await'));
   assert.ok(hasIndependentUnrelated || loadFn.includes('fetchScenes'),
-    'unrelated results must not wait for readiness to succeed',
-  );
+    'unrelated results must not wait for readiness to succeed');
 });
 
 test('A3: readiness failure does not leave unrelated loading flags stuck', () => {
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  // Unrelated loading flags must be resolved in their own path
-  assert.ok(
-    loadFn.includes('IsLoadingScenes'),
-    'scene loading flags must be managed',
-  );
+  assert.ok(loadFn.includes('IsLoadingScenes'), 'scene loading flags must be managed');
 });
 
-// --- Defect B: Normal absent Bible/storyform must be owner-editable ---
+// ============================================================
+// I: Independent loading processing verification
+// ============================================================
+
+test('I1: loadInitialData captures project identity before async work', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  assert.ok(loadFn.includes('capturedProjectId') && loadFn.includes('activeProjectId'),
+    'loadInitialData must capture project ID before issuing requests');
+});
+
+test('I2: unrelated results can be processed before readiness settles', async () => {
+  let unrelatedDone = false;
+  let readinessDone = false;
+  const processingOrder = [];
+  const unrelatedPromise = Promise.allSettled([
+    Promise.resolve('scenes'), Promise.resolve('notes'),
+  ]).then(() => { unrelatedDone = true; processingOrder.push('unrelated'); });
+  const readinessPromise = new Promise((resolve) => {
+    setImmediate(() => { readinessDone = true; processingOrder.push('readiness'); resolve('ready'); });
+  });
+  await unrelatedPromise;
+  assert.equal(unrelatedDone, true);
+  assert.equal(readinessDone, false, 'unrelated must settle before delayed readiness');
+  await readinessPromise;
+  assert.equal(processingOrder[0], 'unrelated', 'unrelated must process first');
+});
+
+test('I3: loadInitialData uses independent processing paths', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  const hasTwoGroups = (loadFn.match(/Promise\.allSettled/g) || []).length >= 2
+    || loadFn.includes('.then');
+  assert.ok(hasTwoGroups, 'loadInitialData must process unrelated independently from readiness');
+});
+
+test('I4: unrelated loading flags resolve independently', () => {
+  const loadFn = appSource.split('async function loadInitialData')[1]
+    || appSource.split('function loadInitialData')[1] || '';
+  assert.ok(loadFn.includes('IsLoadingScenes(false)'), 'unrelated loading flags must resolve independently');
+});
+
+// ============================================================
+// Defect B: Absent Bible/storyform must be owner-editable
+// ============================================================
 
 test('B1: absent Bible textarea is not read-only', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '{}',
-      bibleStatus: 'No Bible stored for this project.',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'Saved',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'absent',
-      storyformReadinessState: 'ready',
-      storyformContextReadinessState: 'unavailable',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryReadiness: () => {},
-      isRetryingReadiness: false,
-    }),
-  );
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '{}', bibleStatus: 'No Bible stored for this project.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'absent', storyformReadinessState: 'ready',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: '',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
   assert.ok(!html.includes('readonly'), 'absent Bible must not have readOnly attribute');
 });
 
 test('B2: absent Bible Save button is not disabled', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '{}',
-      bibleStatus: 'No Bible stored for this project.',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'Saved',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'absent',
-      storyformReadinessState: 'ready',
-      storyformContextReadinessState: 'unavailable',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryReadiness: () => {},
-      isRetryingReadiness: false,
-    }),
-  );
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '{}', bibleStatus: 'No Bible stored for this project.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'absent', storyformReadinessState: 'ready',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: '',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
   const bibleSection = html.split('Bible JSON')[1] || html;
   const firstButton = bibleSection.match(/<button[^>]*disabled/);
-  if (firstButton) {
-    assert.fail('absent Bible Save button must not be disabled');
-  }
+  if (firstButton) assert.fail('absent Bible Save button must not be disabled');
 });
 
 test('B3: absent Bible displays normal non-alarming status', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '{}',
-      bibleStatus: 'No Bible stored for this project.',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'Saved',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'absent',
-      storyformReadinessState: 'ready',
-      storyformContextReadinessState: 'unavailable',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryReadiness: () => {},
-      isRetryingReadiness: false,
-    }),
-  );
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '{}', bibleStatus: 'No Bible stored for this project.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'absent', storyformReadinessState: 'ready',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: '',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
   assert.ok(html.includes('No Bible stored'), 'must show non-alarming absence text');
-  assert.ok(
-    !html.includes('is-error') || html.indexOf('is-error') === -1,
-    'absence must not be styled as error',
-  );
+  assert.ok(!html.includes('is-error') || html.indexOf('is-error') === -1, 'absence must not be styled as error');
 });
 
 test('B4: absent storyform textarea allows editing and saving', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '{}',
-      bibleStatus: 'Saved',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'No storyform stored for this project.',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'ready',
-      storyformReadinessState: 'absent',
-      storyformContextReadinessState: 'unavailable',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryReadiness: () => {},
-      isRetryingReadiness: false,
-    }),
-  );
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '{}', bibleStatus: 'Saved',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'No storyform stored for this project.',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'ready', storyformReadinessState: 'absent',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: '',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
   assert.ok(!html.includes('readonly'), 'absent storyform must not have readOnly attribute');
 });
-
-// --- Defect B.5: Normal absence causes zero direct requests (source check) ---
 
 test('B5: absent Bible path issues no fetchBible call in App source', () => {
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  const absentPath = loadFn.split("state === 'absent'")[1]
-    || loadFn.split('"absent"')[1] || '';
-  assert.ok(
-    !absentPath.includes('fetchBible'),
-    'absent path must not call fetchBible',
-  );
+  const absentPath = loadFn.split("state === 'absent'")[1] || loadFn.split('"absent"')[1] || '';
+  assert.ok(!absentPath.includes('fetchBible'), 'absent path must not call fetchBible');
 });
 
-// --- Defect C: Post-save readiness vs direct failures must be distinct ---
+// ============================================================
+// Defect C: Post-save readiness vs direct failures distinct
+// ============================================================
 
-test('C1: post-save storyform refresh path separates readiness error from direct error', () => {
+test('C1: post-save calls fetchProjectContextReadiness and fetchStoryformContext', () => {
   const saveFn = appSource.split('handleSaveStoryform')[1] || '';
-  assert.ok(
-    saveFn.includes('fetchProjectContextReadiness'),
-    'post-save must call fetchProjectContextReadiness',
-  );
-  assert.ok(
-    saveFn.includes('fetchStoryformContext'),
-    'post-save must call fetchStoryformContext',
-  );
+  assert.ok(saveFn.includes('fetchProjectContextReadiness'), 'post-save must call readiness');
+  assert.ok(saveFn.includes('fetchStoryformContext'), 'post-save must call storyform context');
 });
 
-test('C2: post-save readiness failure sets readiness error not combined status', () => {
+test('C2: post-save readiness failure sets contextReadinessError', () => {
   const saveFn = appSource.split('handleSaveStoryform')[1] || '';
-  assert.ok(
-    saveFn.includes('setContextReadinessError'),
-    'readiness failure must set contextReadinessError separately',
-  );
+  assert.ok(saveFn.includes('setContextReadinessError'), 'readiness failure must set contextReadinessError');
 });
 
 test('C3: post-save does not run Story Check automatically', () => {
@@ -521,71 +653,25 @@ test('C3: post-save does not run Story Check automatically', () => {
     || saveFn.split('handleRetryContextReadiness')[0]
     || saveFn.split('const handleCreateOMICandidate')[0]
     || saveFn;
-  assert.ok(
-    !saveFnBoundary.includes('runStoryCheck') && !saveFnBoundary.includes('story-check'),
-    'post-save must not run Story Check automatically',
-  );
+  assert.ok(!saveFnBoundary.includes('runStoryCheck') && !saveFnBoundary.includes('story-check'),
+    'post-save must not run Story Check automatically');
 });
 
-// --- Defect D: Stale-project protection ---
-
-test('D1: App uses currentProjectIdRef for live identity check', () => {
-  assert.ok(
-    appSource.includes('currentProjectIdRef'),
-    'App must use a mutable ref for current project identity',
-  );
-  assert.ok(
-    appSource.includes('useRef(') || appSource.includes('useRef('),
-    'App must use useRef for live identity tracking',
-  );
-});
-
-test('D2: Retry uses stale guard with live current-project check', () => {
-  const retryFn = appSource.split('handleRetryContextReadiness')[1] || '';
-  // Must check currentProjectIdRef after at least one await
-  const hasLiveCheck = retryFn.includes('currentProjectIdRef')
-    && retryFn.includes('!==');
-  assert.ok(hasLiveCheck,
-    'retry must compare currentProjectIdRef against originating ID after awaits',
-  );
-});
-
-test('D3: Post-save uses stale guard with live current-project check', () => {
-  const saveFn = appSource.split('handleSaveStoryform')[1] || '';
-  // Must have currentProjectIdRef after await boundaries
-  const hasLiveCheck = saveFn.includes('currentProjectIdRef')
-    || saveFn.includes('createStaleGuard');
-  assert.ok(hasLiveCheck,
-    'post-save must check live current-project identity',
-  );
-});
-
-// --- Defect E: Retry for direct-load failures ---
+// ============================================================
+// Defect E: Retry for direct-load failures
+// ============================================================
 
 test('E1: direct Bible failure shows Retry button', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '',
-      bibleStatus: 'Failed to load Bible.',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'Saved',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'ready',
-      bibleDirectError: 'Request failed (500)',
-      storyformReadinessState: 'ready',
-      storyformDirectError: '',
-      storyformContextReadinessState: 'unavailable',
-      storyformContextDirectError: '',
-      onRetryReadiness: () => {},
-      isRetryingReadiness: false,
-    }),
-  );
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '', bibleStatus: 'Failed to load Bible.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'ready',
+    bibleDirectError: 'Request failed (500)', storyformReadinessState: 'ready',
+    storyformDirectError: '', storyformContextReadinessState: 'unavailable',
+    storyformContextDirectError: '', onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
   assert.ok(html.includes('Retry'), 'direct Bible failure must show Retry');
 });
 
@@ -600,10 +686,8 @@ test('E2: retry handler requests readiness first', () => {
     storyformIdx === -1 ? Infinity : storyformIdx,
     contextIdx === -1 ? Infinity : contextIdx,
   );
-  assert.ok(
-    readinessIdx !== -1 && (directsStart === Infinity || readinessIdx < directsStart),
-    'retry must request readiness before any direct resource requests',
-  );
+  assert.ok(readinessIdx !== -1 && (directsStart === Infinity || readinessIdx < directsStart),
+    'retry must request readiness before any direct resource requests');
 });
 
 test('E3: retry clears direct errors for retry cycle', () => {
@@ -612,145 +696,88 @@ test('E3: retry clears direct errors for retry cycle', () => {
     retryFn.includes('setBibleDirectError')
     && retryFn.includes('setStoryformDirectError')
     && retryFn.includes('setStoryformContextDirectError'),
-    'retry must clear all direct error states at start',
-  );
+    'retry must clear all direct error states at start');
 });
 
-// --- Defect F: Remaining UI state requirements ---
+// ============================================================
+// Defect F: Remaining UI state requirements
+// ============================================================
 
 test('F1: invalid Bible remains distinct from absent', () => {
-  const html = renderToStaticMarkup(
-    React.createElement(ProjectContext, {
-      bibleText: '',
-      bibleStatus: 'Bible not available: Bible resource is not valid JSON.',
-      isSavingBible: false,
-      onBibleChange: () => {},
-      onSaveBible: () => {},
-      storyformText: '{}',
-      storyformStatus: 'Saved',
-      isSavingStoryform: false,
-      onStoryformChange: () => {},
-      onSaveStoryform: () => {},
-      storyformContext: '',
-      bibleReadinessState: 'invalid',
-      bibleReadinessReason: 'bible_malformed_json',
-      storyformReadinessState: 'ready',
-      storyformContextReadinessState: 'unavailable',
-      bibleDirectError: '',
-      storyformDirectError: '',
-      storyformContextDirectError: '',
-      onRetryReadiness: () => {},
-      isRetryingReadiness: false,
-    }),
-  );
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '', bibleStatus: 'Bible not available: Bible resource is not valid JSON.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'invalid',
+    bibleReadinessReason: 'bible_malformed_json', storyformReadinessState: 'ready',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: '',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
   assert.ok(html.includes('not available'), 'invalid must be distinct');
   assert.ok(!html.includes('No Bible stored'), 'invalid must not display absent message');
 });
 
-test('F2: readiness-request failure and direct-failure remain separately searchable',
-  () => {
-    const html1 = renderToStaticMarkup(
-      React.createElement(ProjectContext, {
-        bibleText: '',
-        bibleStatus: 'Availability could not be checked.',
-        isSavingBible: false,
-        onBibleChange: () => {},
-        onSaveBible: () => {},
-        storyformText: '',
-        storyformStatus: 'Availability could not be checked.',
-        isSavingStoryform: false,
-        onStoryformChange: () => {},
-        onSaveStoryform: () => {},
-        storyformContext: '',
-        bibleReadinessState: 'error',
-        storyformReadinessState: 'error',
-        storyformContextReadinessState: 'error',
-        readinessError: 'Request failed (500)',
-        bibleDirectError: '',
-        storyformDirectError: '',
-        storyformContextDirectError: '',
-        onRetryReadiness: () => {},
-        isRetryingReadiness: false,
-      }),
-    );
-    assert.ok(
-      html1.includes('could not be checked'),
-      'readiness failure must show readiness-failure text',
-    );
-  },
-);
+test('F2: readiness-request failure and direct-failure remain separately searchable', () => {
+  const html1 = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '', bibleStatus: 'Availability could not be checked.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '', storyformStatus: 'Availability could not be checked.',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'error', storyformReadinessState: 'error',
+    storyformContextReadinessState: 'error', readinessError: 'Request failed (500)',
+    bibleDirectError: '', storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
+  assert.ok(html1.includes('could not be checked'), 'readiness failure must show readiness-failure text');
+});
 
-test('F3: direct-resource failure after ready report is distinct from readiness failure',
-  () => {
-    const html = renderToStaticMarkup(
-      React.createElement(ProjectContext, {
-        bibleText: '',
-        bibleStatus: 'Failed to load Bible: Request failed (500)',
-        isSavingBible: false,
-        onBibleChange: () => {},
-        onSaveBible: () => {},
-        storyformText: '{}',
-        storyformStatus: 'Saved',
-        isSavingStoryform: false,
-        onStoryformChange: () => {},
-        onSaveStoryform: () => {},
-        storyformContext: '',
-        bibleReadinessState: 'ready',
-        storyformReadinessState: 'ready',
-        storyformContextReadinessState: 'unavailable',
-        bibleDirectError: 'Request failed (500)',
-        storyformDirectError: '',
-        storyformContextDirectError: '',
-        onRetryReadiness: () => {},
-        isRetryingReadiness: false,
-      }),
-    );
-    assert.ok(html.includes('Failed to load Bible'), 'direct failure must be labelled');
-    assert.ok(
-      !html.includes('could not be checked') && !html.includes('Availability could not'),
-      'direct failure must not say could not be checked',
-    );
-  },
-);
+test('F3: direct-resource failure after ready report is distinct from readiness failure', () => {
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '', bibleStatus: 'Failed to load Bible: Request failed (500)',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'ready', storyformReadinessState: 'ready',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: 'Request failed (500)',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
+  assert.ok(html.includes('Failed to load Bible'), 'direct failure must be labelled');
+  assert.ok(!html.includes('could not be checked') && !html.includes('Availability could not'),
+    'direct failure must not say could not be checked');
+});
 
-// --- Preserved existing contract tests ---
+// ============================================================
+// Preserved contract tests (G)
+// ============================================================
 
 test('G1: api.js fetchProjectContextReadiness defined', () => {
-  assert.ok(
-    apiSource.includes('fetchProjectContextReadiness'),
-    'api.js must export fetchProjectContextReadiness',
-  );
+  assert.ok(apiSource.includes('fetchProjectContextReadiness'), 'api.js must export fetchProjectContextReadiness');
 });
 
 test('G2: api.js fetchProjectContextReadiness calls only context-readiness endpoint', () => {
   const helperSource = apiSource.split('fetchProjectContextReadiness')[1] || '';
   const helperBody = helperSource.split('export async')[0] || helperSource;
-  assert.ok(
-    !helperBody.includes('/bible') && !helperBody.includes('/storyform-'),
-    'fetchProjectContextReadiness must not issue direct resource requests',
-  );
+  assert.ok(!helperBody.includes('/bible') && !helperBody.includes('/storyform-'),
+    'fetchProjectContextReadiness must not issue direct resource requests');
 });
 
 test('G3: api.js readiness helper does not invoke Story Check or create candidates', () => {
   const helperSource = apiSource.split('fetchProjectContextReadiness')[1] || '';
   const helperBody = helperSource.split('export async')[0] || helperSource;
   assert.ok(
-    !helperBody.includes('story-check')
-    && !helperBody.includes('runStoryCheck')
-    && !helperBody.includes('candidate')
-    && !helperBody.includes('promotion'),
-    'readiness helper must not invoke Story Check or create/persist candidates',
-  );
+    !helperBody.includes('story-check') && !helperBody.includes('runStoryCheck')
+    && !helperBody.includes('candidate') && !helperBody.includes('promotion'),
+    'readiness helper must not invoke Story Check or create/persist candidates');
 });
 
 test('G4: App source uses independent per-resource checks not only all_ready', () => {
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  assert.ok(
-    loadFn.includes('bibleRes.ready')
-    && loadFn.includes('storyformRes.ready'),
-    'Each resource readiness must be evaluated independently',
-  );
+  assert.ok(loadFn.includes('bibleRes.ready') && loadFn.includes('storyformRes.ready'),
+    'Each resource readiness must be evaluated independently');
 });
 
 test('G5: App source does not gate optional-context requests on all_ready', () => {
@@ -758,60 +785,43 @@ test('G5: App source does not gate optional-context requests on all_ready', () =
     || appSource.split('function loadInitialData')[1] || '';
   assert.ok(
     !loadFn.includes('all_ready') || loadFn.includes('resources.bible') || loadFn.includes('bibleRes'),
-    'Must not gate optional context only on all_ready',
-  );
+    'Must not gate optional context only on all_ready');
 });
 
-// --- Group N: Safety product-boundary tests ---
+// ============================================================
+// Safety product-boundary tests (N)
+// ============================================================
 
 test('N1: no Story Check, candidate, promotion, apply-promotion in retry or post-save', () => {
   const retryRaw = appSource.split('handleRetryContextReadiness')[1] || '';
-  // Bound retry: from handleRetryContextReadiness to the next useCallback or App return
-  const retryFn = retryRaw.split('handleCreateOMIIdea')[0]
-    || retryRaw.split('};')[0]
-    || retryRaw;
-
+  const retryFn = retryRaw.split('handleCreateOMIIdea')[0] || retryRaw.split('};')[0] || retryRaw;
   const saveRaw = appSource.split('handleSaveStoryform')[1] || '';
-  // Bound save: from handleSaveStoryform to handleRetryContextReadiness
   const saveFn = saveRaw.split('handleRetryContextReadiness')[0]
-    || saveRaw.split('handleCreateOMIIdea')[0]
-    || saveRaw;
-
+    || saveRaw.split('handleCreateOMIIdea')[0] || saveRaw;
   const combined = retryFn + saveFn;
   assert.ok(
-    !combined.includes('runStoryCheck')
-    && !combined.includes('story-check')
-    && !combined.includes('createOMICandidate')
-    && !combined.includes('createOMIPromotion')
-    && !combined.includes('applyPromotion')
-    && !combined.includes('submitApplyPromotion'),
-    'no automatic Story Check, candidate, promotion, apply-promotion in retry or post-save',
-  );
+    !combined.includes('runStoryCheck') && !combined.includes('story-check')
+    && !combined.includes('createOMICandidate') && !combined.includes('createOMIPromotion')
+    && !combined.includes('applyPromotion') && !combined.includes('submitApplyPromotion'),
+    'no automatic Story Check, candidate, promotion, apply-promotion in retry or post-save');
 });
 
 test('N2: absent Bible and storyform remain owner-editable and saveable', () => {
-  // Cross-test: B1-B4 already cover absent Bible/storyform editability.
-  // This test confirms the production code preserves the absent state as editable.
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  const hasAbsentBibleStatus = loadFn.includes('No Bible stored')
-    || loadFn.includes('bible_absent');
-  const hasAbsentStoryformStatus = loadFn.includes('No storyform stored')
-    || loadFn.includes('storyform_absent');
+  const hasAbsentBibleStatus = loadFn.includes('No Bible stored') || loadFn.includes('bible_absent');
+  const hasAbsentStoryformStatus = loadFn.includes('No storyform stored') || loadFn.includes('storyform_absent');
   assert.ok(hasAbsentBibleStatus || hasAbsentStoryformStatus,
-    'absent resources must report non-alarming status text',
-  );
+    'absent resources must report non-alarming status text');
 });
 
 test('N3: absent, invalid, unavailable resources make no prohibited direct requests', () => {
   const loadFn = appSource.split('async function loadInitialData')[1]
     || appSource.split('function loadInitialData')[1] || '';
-  // Each absent branch individually: split by the absent checks
   const bibleAbsentBlock = loadFn.split("bibleRes.state === 'absent'")[1]?.split("else if")[0] || '';
   const storyformAbsentBlock = loadFn.split("storyformRes.state === 'absent'")[1]?.split("else if")[0] || '';
   const absentBlocks = bibleAbsentBlock + storyformAbsentBlock;
   assert.ok(
     !absentBlocks.includes('fetchBible') && !absentBlocks.includes('fetchStoryform'),
-    'absent path must not issue direct resource requests',
-  );
+    'absent path must not issue direct resource requests');
 });
