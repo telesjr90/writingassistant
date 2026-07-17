@@ -328,7 +328,7 @@ def test_application_frontier_is_t003b_after_t003a_completion():
     frontier = _record_by_id(recs, "task:PHASE8-IMPL-024-T003B")
     assert t003a["lifecycle"]["status"] == "complete"
     assert t003a.get("is_application_frontier") is False
-    assert frontier["lifecycle"]["status"] == "planned"
+    assert frontier["lifecycle"]["status"] == "in_progress"
     assert frontier.get("is_application_frontier") is True
     t005 = _record_by_id(recs, "task:PHASE8-IMPL-026-T005")
     assert t005.get("is_application_frontier") is False

@@ -12,12 +12,16 @@ REQUIRED_FILES = (
     ".gitignore",
     "docs/project-memory/operations.json",
     "docs/project-memory/operator-manual.md",
+    "docs/project-memory/chatgpt-github-supervision-policy.md",
     "scripts/project_memory/operational_rollout.py",
+    "scripts/project_memory/supervise.py",
     "scripts/project_memory/build_quality_package.py",
     "scripts/project_memory/validate_operational_rollout.py",
     "tests/project_memory/test_operational_rollout.py",
+    "tests/project_memory/test_supervise.py",
     ".github/workflows/project-memory.yml",
     "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md",
 )
 
 REQUIRED_STALE_REASONS = {
@@ -74,7 +78,7 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         policy = {}
     expected_scalars = {
         "schema": "project-memory-operations.v1",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "authoritative_branch": "docs/project-memory-foundation",
         "generated_evidence_authority": "generated_evidence",
     }
@@ -95,6 +99,34 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         findings.append(_finding("readiness_mismatch", "docs/project-memory/operations.json", "accepted readiness values"))
     if policy.get("accepted_nonblocking_advisory_codes") != ["source_missing"]:
         findings.append(_finding("advisory_allowlist_mismatch", "docs/project-memory/operations.json", "only source_missing is accepted"))
+    supervision = policy.get("supervision", {})
+    profiles = supervision.get("gate_profiles", {})
+    if set(profiles) != {"implementation", "closeout", "governance"}:
+        findings.append(_finding("supervision_profiles_mismatch", "docs/project-memory/operations.json", "three exact gate profiles required"))
+    implementation = profiles.get("implementation", {})
+    if (
+        implementation.get("application_commit_lag_advisory") != "project_memory_commit_lag_application_only"
+        or implementation.get("exact_commit_fresh_required") is not False
+        or implementation.get("full_refresh_performed") is not False
+        or implementation.get("task_acceptance_allowed") is not False
+        or implementation.get("frontier_mutation_allowed") is not False
+    ):
+        findings.append(_finding("implementation_profile_mismatch", "docs/project-memory/operations.json", "bounded advisory and non-mutation contract"))
+    for strict_mode in ("closeout", "governance"):
+        profile = profiles.get(strict_mode, {})
+        if profile.get("exact_commit_fresh_required") is not True or profile.get("plan_integrity_zero_blockers_required") is not True:
+            findings.append(_finding("strict_profile_mismatch", "docs/project-memory/operations.json", strict_mode))
+    handoff = supervision.get("handoff", {})
+    if handoff != {
+        "schema": "project-memory-supervision-handoff.v1",
+        "authority_class": "generated_evidence",
+        "output_root": ".codex-context/project-memory/handoff",
+        "files": ["project-memory-handoff.md", "project-memory-handoff.json", "SHA256SUMS"],
+        "atomic": True,
+        "network_required": False,
+        "tracked_state_mutation": False,
+    }:
+        findings.append(_finding("handoff_policy_mismatch", "docs/project-memory/operations.json", "deterministic local generated-evidence handoff"))
     no_next = policy.get("closed_parent_no_next_task", {})
     if no_next != {
         "representation": "json_null",
@@ -115,6 +147,8 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         "publication acceptance", "historical evidence retention", "stale-state diagnosis",
         "no cron", "generated evidence", "path-filtered",
         "json", "null", "no next project memory implementation task",
+        "supervision gate profiles", "project_memory_commit_lag_application_only",
+        "chatgpt-github-supervision-policy.md", "fallback/bootstrap",
     ):
         if token not in manual:
             findings.append(_finding("manual_contract_missing", "docs/project-memory/operator-manual.md", token))
@@ -124,15 +158,21 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         "pull_request:", "push:", "workflow_dispatch:", "fetch-depth: 0",
         "validate_registries.py --json", "validate_agent_guidance.py --json",
         "validate_reviewer_guidance.py --json", "validate_operational_rollout.py --json",
-        "python3 -m pytest tests/project_memory", "operational_rollout.py ci-check",
-        "git status --porcelain=v1",
+        "python3 -m pytest tests/project_memory", "scripts/project_memory/supervise.py",
+        "actions/upload-artifact@v4", "GITHUB_STEP_SUMMARY",
+        "<!-- project-memory-supervision -->", "pull-requests: write",
     ):
         if token not in workflow:
             findings.append(_finding("workflow_contract_missing", ".github/workflows/project-memory.yml", token))
     if "schedule:" in workflow or "cron:" in workflow:
         findings.append(_finding("time_based_trigger_forbidden", ".github/workflows/project-memory.yml", "schedule/cron"))
-    if "pip install" in workflow or "upload-artifact" in workflow:
-        findings.append(_finding("workflow_side_effect_forbidden", ".github/workflows/project-memory.yml", "dependency install or artifact upload"))
+    if "pip install" in workflow:
+        findings.append(_finding("workflow_dependency_install_forbidden", ".github/workflows/project-memory.yml", "dependency install"))
+    for forbidden in ("pull_request_target", "contents: write", "git push"):
+        if forbidden in workflow:
+            findings.append(_finding("workflow_security_boundary", ".github/workflows/project-memory.yml", forbidden))
+    if "permissions: {}" not in workflow:
+        findings.append(_finding("workflow_permissions_mismatch", ".github/workflows/project-memory.yml", "deny by default permissions required"))
     if workflow.count('- ".gitignore"') != 2:
         findings.append(_finding(
             "workflow_ignore_trigger_mismatch",
@@ -147,6 +187,13 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
     for command in ("git merge", "git cherry-pick", "git reset", "git restore", "git clean", "git stash", "git rebase", "git commit", "git push"):
         if command in operational:
             findings.append(_finding("forbidden_git_command", "scripts/project_memory/operational_rollout.py", command))
+    supervisor = contents.get("scripts/project_memory/supervise.py", "")
+    for token in ("implementation", "closeout", "governance", "project_memory_commit_lag_application_only", "SHA256SUMS", "acceptance_claimed"):
+        if token not in supervisor:
+            findings.append(_finding("supervisor_contract_missing", "scripts/project_memory/supervise.py", token))
+    for token in ("urllib", "requests", "http.client", "socket."):
+        if token in supervisor:
+            findings.append(_finding("supervisor_network_boundary", "scripts/project_memory/supervise.py", token))
 
     enrichment_path = root / "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json"
     try:

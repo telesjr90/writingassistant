@@ -34,6 +34,44 @@ Parent and phase checkpoints are additional publication gates, not substitutes
 for per-sync refresh. There is no cron or time-based schedule. Time passage
 alone does not stale a commit-bound publication; repository divergence does.
 
+An ordinary mid-task application commit is not task acceptance. While the same
+eligible application task remains active and the frontier, implementation
+supervision may classify exact ancestor-commit lag as
+`project_memory_commit_lag_application_only` when every intervening path is
+bounded application code or a directly related test and all live authority,
+routing, dependency, frontier, safety, and Plan Integrity checks still pass.
+That state is `READY_WITH_ADVISORIES`, never `FRESH`, and does not run a full
+refresh. Full refresh remains mandatory at strict baseline, task closeout, and
+governance boundaries.
+
+## Supervision gate profiles
+
+The repository-owned, standard-library entry point is:
+
+```bash
+python3 scripts/project_memory/supervise.py --mode implementation --repo-root . --task-id PHASE8-IMPL-024-T003B
+python3 scripts/project_memory/supervise.py --mode closeout --repo-root . --task-id PHASE8-IMPL-024-T003B
+python3 scripts/project_memory/supervise.py --mode governance --repo-root . --task-id PHASE8-IMPL-026-T011
+```
+
+Implementation mode is the fast application gate. It preserves normal task,
+dependency, frontier, routing, product-safety, changed-path, and validation
+checks but permits only the bounded commit-lag advisory above. A control-plane,
+authority, task, dependency, frontier, workflow, Project Instructions, shared
+skill/agent, schema, registry, routing, or Project Memory protocol change is
+blocking.
+
+Closeout mode requires explicitly synchronized complete task state, expected
+frontier advancement, supplied passing task-test evidence, zero Plan Integrity
+blockers, and exact-commit `FRESH` packages. Governance mode requires the same
+strict freshness plus registry, current-truth, routing, agent, reviewer, and
+operational-policy validation. Neither mode edits tracked state or claims
+acceptance.
+
+Every run writes an atomic checksum-verified generated-evidence package under
+`.codex-context/project-memory/handoff/<task>/<sha>/<mode>/`. The core has no
+network dependency. GitHub publication is a separate workflow layer.
+
 ## Deterministic refresh
 
 From a clean, non-detached `docs/project-memory-foundation` checkout at the
@@ -106,10 +144,18 @@ confirms both the source and ephemeral checkouts remain clean. It does not
 require local ignored evidence and does not write publication evidence into the
 tracked checkout.
 
-CI runs on relevant pull requests, relevant pushes to the Project Memory
-branch, and manual dispatch. CI output is generated evidence only. It is not
-uploaded, committed, accepted automatically, or treated as publication
-authority.
+CI runs on relevant pull requests, pushes, and manual dispatch. Implementation
+is the default; manual dispatch may select implementation, closeout, or
+governance. The checksum-verified handoff is uploaded as a workflow artifact
+and its Markdown is appended to the step summary. Same-repository pull requests
+receive one updated stable-marker comment. Comment-permission failure is
+advisory; the gate result remains visible. CI output is generated evidence
+only. It is never committed, pushed, accepted automatically, or treated as
+publication authority.
+
+The copy-ready ChatGPT/GitHub operating contract is maintained in
+`docs/project-memory/chatgpt-github-supervision-policy.md`. Project Sources are
+a fallback/bootstrap mechanism, not commit-by-commit replication.
 
 ## Publication acceptance
 

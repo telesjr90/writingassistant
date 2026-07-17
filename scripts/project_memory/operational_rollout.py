@@ -516,6 +516,7 @@ def _parser() -> argparse.ArgumentParser:
     refresh_parser.add_argument("--task-id", default=DEFAULT_TASK_ID)
     refresh_parser.add_argument("--expected-branch")
     refresh_parser.add_argument("--expected-commit")
+    refresh_parser.add_argument("--allow-detached", action="store_true")
     refresh_parser.add_argument("--json", action="store_true")
     ci_parser = subparsers.add_parser("ci-check")
     ci_parser.add_argument("--repo-root", default=".")
@@ -547,6 +548,7 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root=args.repo_root, output_root=args.output_root,
                 task_id=args.task_id, expected_branch=expected_branch,
                 expected_commit=expected_commit,
+                allow_detached=args.allow_detached,
             )
             exit_code = 0
         else:

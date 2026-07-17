@@ -192,3 +192,8 @@ implemented by T001.
   the T011 operational procedure. The application
   frontier `PHASE8-IMPL-024-T003B` is the sole next application implementation
   focus.
+- T011 operational maintenance now provides deterministic implementation,
+  closeout, and governance supervision plus atomic local/GitHub handoff.
+  Application-only ancestor-commit lag may be advisory during the same active
+  task; strict closeout/governance still require exact-commit `FRESH` evidence.
+  This maintenance created no T013 and did not reopen T012.

@@ -212,6 +212,15 @@
       "new_roadmap_child": false,
       "application_frontier": "PHASE8-IMPL-024-T003B",
       "application_implementation": false
+    },
+    {
+      "procedure_task_id": "PHASE8-IMPL-026-T011",
+      "decision_id": "pmf-t011-project-memory-gate-decoupling-github-handoff",
+      "decision_path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md",
+      "status": "complete/PASS",
+      "new_roadmap_child": false,
+      "application_frontier": "PHASE8-IMPL-024-T003B",
+      "application_implementation": false
     }
   ],
   "post_closeout_refresh_042826z": "structurally valid generated evidence; not accepted as current publication (renderer hardcodes index status table)",

@@ -81,7 +81,7 @@ def test_current_frontier_and_project_memory_state_are_preserved():
     roadmap = _load("docs/roadmap/roadmap_index.yaml")
     tasks = _normalized_tasks()
     assert roadmap["active_frontier"]["next_readiness_task_id"] == "PHASE8-IMPL-024-T003B"
-    assert tasks["PHASE8-IMPL-024-T003B"]["lifecycle"]["status"] == "planned"
+    assert tasks["PHASE8-IMPL-024-T003B"]["lifecycle"]["status"] == "in_progress"
     assert tasks["PHASE8-IMPL-025"]["lifecycle"]["status"] == "planned"
     assert tasks["PHASE8-IMPL-026"]["lifecycle"]["status"] == "complete"
     active_pm_maintenance = {

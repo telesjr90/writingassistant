@@ -53,10 +53,18 @@ Resolve the accepted task through
 Missing, conflicting, stale, inapplicable, owner-only, inactive, or
 dependency-ineligible routing fails closed.
 
-Before executing a task, verify the exact repository root, expected branch and
-full commit, clean worktree, empty staging area, current Project Memory status
-`FRESH`, zero Plan Integrity blockers, current frontier, and dependency
-eligibility. A generated prompt must state the resolved task ID, execution
+At task baseline, closeout, and every governance/control-plane acceptance
+boundary, verify the exact repository root, expected branch and full commit,
+clean worktree, empty staging area, exact-commit Project Memory status `FRESH`,
+zero Plan Integrity blockers, current frontier, and dependency eligibility.
+During ordinary same-task application implementation only,
+`scripts/project_memory/supervise.py --mode implementation` may return
+`READY_WITH_ADVISORIES` for `project_memory_commit_lag_application_only` when
+the accepted package commit is an ancestor on the same branch and all
+intervening changes are bounded application code/direct tests with no
+control-plane change or authoritative conflict. That state is never `FRESH`;
+closeout and governance remain exact-commit strict. A generated prompt must
+state the resolved task ID, execution
 class, model category, reasoning level, risk class, owner-only status,
 rationale, escalation conditions, and authoritative routing source near its
 beginning. Do not execute beyond the active accepted task.

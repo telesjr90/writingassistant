@@ -1,6 +1,6 @@
 {
   "schema": "project-memory-operations.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "cadence": {
     "kind": "event_driven_commit_bound",
     "time_based_schedule_required": false,
@@ -72,6 +72,83 @@
   },
   "accepted_readiness": ["READY", "READY_WITH_ADVISORIES"],
   "accepted_nonblocking_advisory_codes": ["source_missing"],
+  "supervision": {
+    "schema": "project-memory-supervision-policy.v1",
+    "entry_point": "scripts/project_memory/supervise.py",
+    "gate_profiles": {
+      "implementation": {
+        "purpose": "fast_same_task_application_supervision",
+        "exact_commit_fresh_required": false,
+        "full_refresh_performed": false,
+        "application_commit_lag_advisory": "project_memory_commit_lag_application_only",
+        "control_plane_changes_allowed": false,
+        "task_acceptance_allowed": false,
+        "frontier_mutation_allowed": false
+      },
+      "closeout": {
+        "purpose": "strict_application_task_acceptance_boundary",
+        "exact_commit_fresh_required": true,
+        "plan_integrity_zero_blockers_required": true,
+        "task_test_evidence_required": true,
+        "synchronized_status_and_frontier_required": true,
+        "automatic_task_mutation": false
+      },
+      "governance": {
+        "purpose": "strict_control_plane_acceptance_boundary",
+        "exact_commit_fresh_required": true,
+        "plan_integrity_zero_blockers_required": true,
+        "authority_and_guidance_validation_required": true,
+        "automatic_authority_mutation": false
+      }
+    },
+    "governance_maintenance_route": {
+      "execution_class": "codex_gpt_5_6_sol",
+      "model_category": "gpt_5_6_sol",
+      "reasoning_level": "high",
+      "risk_class": "critical",
+      "owner_only": false,
+      "delegation_eligible": true,
+      "authoritative_source_locator": {
+        "path": "docs/project-memory/operations.json",
+        "symbol": "supervision.governance_maintenance_route"
+      },
+      "rationale": "Owner-authorized T011 operational maintenance changes Project Memory control-plane supervision and GitHub handoff without application work.",
+      "escalation_conditions": [
+        "unresolved authority or lifecycle conflict",
+        "required application-code change",
+        "workflow security boundary cannot remain minimal",
+        "routing, safety, eligibility, or closeout gate would be weakened"
+      ]
+    },
+    "changed_path_categories": {
+      "application_code": ["backend/**", "frontend/**"],
+      "application_test": ["tests/**", "frontend/tests/**"],
+      "task_dependency_frontier_authority": ["docs/roadmap/roadmap_index.yaml", "docs/roadmap/implementation_status.md", "docs/roadmap/tasks/**", "docs/roadmap/inventory/**", "docs/roadmap/enrichment/**"],
+      "routing_control_plane": ["docs/project-memory/registries/execution-routing.json", "scripts/project_memory/execution_routing.py"],
+      "project_memory_schema_registry": ["docs/project-memory/schemas/**", "docs/project-memory/registries/**"],
+      "project_memory_tooling_validator": ["scripts/project_memory/**", "tests/project_memory/**"],
+      "project_instructions_agent_guidance": ["AGENTS.md", ".agents/skills/**", ".opencode/agents/**"],
+      "workflow_operational_policy": [".github/workflows/**", "docs/project-memory/operations.json", "docs/project-memory/operator-manual.md"],
+      "authority_decision": ["docs/roadmap/decisions/**"],
+      "unrelated_or_unsafe": ["everything_not_explicitly_classified"]
+    },
+    "handoff": {
+      "schema": "project-memory-supervision-handoff.v1",
+      "authority_class": "generated_evidence",
+      "output_root": ".codex-context/project-memory/handoff",
+      "files": ["project-memory-handoff.md", "project-memory-handoff.json", "SHA256SUMS"],
+      "atomic": true,
+      "network_required": false,
+      "tracked_state_mutation": false
+    },
+    "premature_closeout_guards": {
+      "implementation_can_complete_task": false,
+      "implementation_can_activate_dependency": false,
+      "implementation_can_advance_frontier": false,
+      "passing_tests_claim_acceptance": false,
+      "generated_evidence_can_mutate_authority": false
+    }
+  },
   "closed_parent_no_next_task": {
     "representation": "json_null",
     "parent_status": "complete",

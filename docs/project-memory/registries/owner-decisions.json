@@ -216,6 +216,26 @@
       "affected_tasks": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T003B", "PHASE8-IMPL-024-T003C", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007B", "PHASE8-IMPL-026-T011"]
     },
     {
+      "id": "owner-decision:project-memory-gate-decoupling-github-handoff",
+      "type": "owner_decision",
+      "schema_version": "1.0.0",
+      "title": "Project Memory Gate Decoupling and Automated GitHub Handoff",
+      "authority_class": "authoritative",
+      "lifecycle": {"status": "current"},
+      "provenance": {
+        "created_by": "PHASE8-IMPL-026-T011",
+        "accepted_by": "owner",
+        "source_locators": [
+          {"path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md"}
+        ]
+      },
+      "owner_decision_id": "project-memory-gate-decoupling-github-handoff",
+      "question": "May Project Memory implementation and closeout gates be decoupled and exact-SHA GitHub/local handoffs replace repeated mid-task Project Source rotation?",
+      "selected_option": "Yes, under three deterministic profiles: bounded application-only commit lag is advisory during the same task; closeout and governance remain exact-commit strict; tracked files remain authority; generated handoffs never mutate or accept tasks.",
+      "rationale": "This reduces supervision friction without weakening routing, eligibility, owner-only, product-safety, authority, or acceptance gates.",
+      "affected_tasks": ["PHASE8-IMPL-024-T003B", "PHASE8-IMPL-024-T003C", "PHASE8-IMPL-026-T011"]
+    },
+    {
       "id": "owner-decision:whole-remaining-mvp-plan-integrity",
       "type": "owner_decision",
       "schema_version": "1.0.0",

@@ -331,6 +331,20 @@ nondelegable. T012 remains complete/PASS and remains the controlling routing
 policy. The routing registry and schema are unchanged. T003B remains the sole
 application frontier and is not implemented by this maintenance event.
 
+### Post-closeout T011 operational-maintenance event — gate decoupling and GitHub handoff
+
+Status: complete/PASS. This is an event under the existing T011 procedure, not
+a new child or Project Memory implementation frontier. The accepted decision is
+`docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md`.
+
+The event separates fast same-task application implementation supervision from
+strict task closeout and governance supervision. Only bounded application-only
+ancestor-commit lag can be advisory; it is never `FRESH`. The deterministic
+local handoff and GitHub artifact/comment layer remain generated evidence and
+cannot mutate or accept tasks. T003B remains active/in progress and the sole
+frontier; T003C remains planned and dependency-ineligible. T012 remains closed,
+no T013 is created, and the application routing registry is unchanged.
+
 ## Implementation sequence
 
 ```text

@@ -16,7 +16,6 @@ on:
       - ".opencode/**"
       - ".github/workflows/project-memory.yml"
   push:
-    branches: [docs/project-memory-foundation]
     paths:
       - "docs/project-memory/**"
       - "docs/roadmap/**"
@@ -31,62 +30,217 @@ on:
       - ".opencode/**"
       - ".github/workflows/project-memory.yml"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Supervision profile"
+        required: true
+        default: implementation
+        type: choice
+        options:
+          - implementation
+          - closeout
+          - governance
+      task_id:
+        description: "Validated task ID; blank resolves the current frontier or T011 governance procedure"
+        required: false
+        type: string
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  deterministic-project-memory:
+  supervision:
+    name: Project Memory supervision
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      SUPERVISION_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'implementation' }}
+      SUPERVISION_TASK_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.task_id || '' }}
+      PROJECT_MEMORY_BASELINE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
     steps:
-      - name: Check out full history
+      - name: Check out exact event SHA with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Use Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Compile Project Memory Python
-        run: python3 -m compileall -q scripts/project_memory tests/project_memory
-
-      - name: Validate registries and guidance
+      - name: Resolve validated task identity
+        id: identity
+        shell: bash
         run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          mode = os.environ["SUPERVISION_MODE"]
+          task_id = os.environ.get("SUPERVISION_TASK_ID", "").strip()
+          if not task_id:
+              if mode == "governance":
+                  task_id = "PHASE8-IMPL-026-T011"
+              else:
+                  roadmap = json.loads(Path("docs/roadmap/roadmap_index.yaml").read_text())
+                  task_id = roadmap["active_frontier"]["next_readiness_task_id"]
+          if not re.fullmatch(r"PHASE[0-9]+-(?:IMPL|UX)-[0-9]{3}(?:-T[0-9]{3}[A-Z0-9]*)?", task_id):
+              raise SystemExit("Invalid task ID")
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"task_id={task_id}\n")
+              head_sha = subprocess.check_output(
+                  ["git", "rev-parse", "HEAD"], text=True
+              ).strip()
+              output.write(f"head_sha={head_sha}\n")
+          PY
+
+      - name: Compile and validate Project Memory
+        id: validation
+        continue-on-error: true
+        run: |
+          python3 -m compileall -q scripts/project_memory tests/project_memory
           python3 scripts/project_memory/validate_registries.py --json
+          python3 scripts/project_memory/validate_current_truth.py
           python3 scripts/project_memory/validate_agent_guidance.py --json
           python3 scripts/project_memory/validate_reviewer_guidance.py --json
           python3 scripts/project_memory/validate_operational_rollout.py --json
-
-      - name: Validate JSON, enrichment, roadmap, and diff
-        run: |
-          for file in \
-            docs/project-memory/operations.json \
-            docs/project-memory/schemas/project-memory.schema.json \
-            docs/project-memory/registries/*.json \
-            docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json
-          do
-            python3 -m json.tool "$file" >/dev/null
-          done
+          python3 scripts/project_memory/execution_routing.py validate --repo-root .
           python3 scripts/check_enrichment.py
           python3 scripts/validate_roadmap.py
+          python3 -m pytest tests/project_memory -q -p no:cacheprovider
           git diff --check
 
-      - name: Run complete Project Memory tests
-        run: python3 -m pytest tests/project_memory -q -p no:cacheprovider
-
-      - name: Ephemeral clean rebuild
+      - name: Record bounded validation evidence
         env:
-          EXPECTED_COMMIT: ${{ github.sha }}
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          TASK_ID: ${{ steps.identity.outputs.task_id }}
+          HEAD_SHA: ${{ steps.identity.outputs.head_sha }}
         run: |
-          python3 scripts/project_memory/operational_rollout.py ci-check \
+          mkdir -p .codex-context/project-memory/workflow
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = "PASS" if os.environ["VALIDATION_OUTCOME"] == "success" else "FAIL"
+          payload = {
+              "schema": "project-memory-supervision-evidence.v1",
+              "task_id": os.environ["TASK_ID"],
+              "commit": os.environ["HEAD_SHA"],
+              "checks": [{"name": "project_memory_validation_suite", "result": result}],
+          }
+          Path(".codex-context/project-memory/workflow/evidence.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Build strict exact-commit Project Memory baseline
+        if: env.SUPERVISION_MODE != 'implementation'
+        env:
+          EXPECTED_BRANCH: ${{ github.head_ref || github.ref_name }}
+          HEAD_SHA: ${{ steps.identity.outputs.head_sha }}
+        run: |
+          python3 scripts/project_memory/operational_rollout.py refresh \
             --repo-root . \
-            --output-root "$RUNNER_TEMP/project-memory" \
+            --output-root .codex-context/project-memory \
             --task-id PHASE8-IMPL-026-T011 \
-            --expected-branch docs/project-memory-foundation \
-            --expected-commit "$EXPECTED_COMMIT" \
+            --expected-branch "$EXPECTED_BRANCH" \
+            --expected-commit "$HEAD_SHA" \
+            --allow-detached \
             --json
 
-      - name: Verify checkout cleanliness
-        run: test -z "$(git status --porcelain=v1)"
+      - name: Run deterministic supervision
+        id: supervise
+        continue-on-error: true
+        env:
+          TASK_ID: ${{ steps.identity.outputs.task_id }}
+        run: |
+          python3 scripts/project_memory/supervise.py \
+            --mode "$SUPERVISION_MODE" \
+            --repo-root . \
+            --task-id "$TASK_ID" \
+            --evidence-json .codex-context/project-memory/workflow/evidence.json \
+            --json
+
+      - name: Append handoff to job summary
+        if: always()
+        shell: bash
+        run: |
+          handoff=".codex-context/project-memory/handoff/${{ steps.identity.outputs.task_id }}/${{ steps.identity.outputs.head_sha }}/$SUPERVISION_MODE/project-memory-handoff.md"
+          if test -f "$handoff"; then
+            cat "$handoff" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Project Memory supervision did not produce a handoff." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload complete handoff artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-memory-handoff-${{ github.run_id }}
+          path: .codex-context/project-memory/handoff/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce gate and validation result
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.validation.outcome }}" = "success"
+          test "${{ steps.supervise.outcome }}" = "success"
+
+  pr-comment:
+    name: Project Memory PR handoff comment
+    needs: supervision
+    if: >-
+      always() &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download handoff artifact without checking out PR code
+        uses: actions/download-artifact@v4
+        with:
+          name: project-memory-handoff-${{ github.run_id }}
+          path: handoff-artifact
+
+      - name: Create or update one stable-marker comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const marker = '<!-- project-memory-supervision -->';
+            function findMarkdown(directory) {
+              for (const entry of fs.readdirSync(directory, {withFileTypes: true})) {
+                const candidate = path.join(directory, entry.name);
+                if (entry.isDirectory()) {
+                  const nested = findMarkdown(candidate);
+                  if (nested) return nested;
+                } else if (entry.name === 'project-memory-handoff.md') {
+                  return candidate;
+                }
+              }
+              return null;
+            }
+            const markdownPath = findMarkdown('handoff-artifact');
+            if (!markdownPath) core.setFailed('Handoff Markdown is missing');
+            const body = fs.readFileSync(markdownPath, 'utf8').slice(0, 7900);
+            if (!body.startsWith(marker)) core.setFailed('Stable marker is missing');
+            const {owner, repo} = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {owner, repo, issue_number, per_page: 100});
+            const prior = comments.find(comment => comment.body && comment.body.includes(marker));
+            if (prior) {
+              await github.rest.issues.updateComment({owner, repo, comment_id: prior.id, body});
+            } else {
+              await github.rest.issues.createComment({owner, repo, issue_number, body});
+            }

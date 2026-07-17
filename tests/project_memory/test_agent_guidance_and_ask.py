@@ -279,7 +279,7 @@ def test_application_frontier_and_ph8_impl_025_remain_unchanged():
     assert completed["is_application_frontier"] is False
     assert completed["lifecycle"]["status"] == "complete"
     assert frontier["is_application_frontier"] is True
-    assert frontier["lifecycle"]["status"] == "planned"
+    assert frontier["lifecycle"]["status"] == "in_progress"
     assert ph25["lifecycle"]["status"] == "planned"
     assert "inactive" in ph25["notes"].lower()
 

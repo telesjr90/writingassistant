@@ -24,6 +24,7 @@ REQUIRED_EXAMPLE_EVIDENCE = (
 )
 
 T012_PROPOSED_TREE_PATHS = frozenset({
+    ".github/workflows/project-memory.yml",
     ".agents/skills/project-memory-plan-integrity-review/SKILL.md",
     ".agents/skills/project-memory-read/SKILL.md",
     ".agents/skills/writing-assistant-ui-execution/SKILL.md",
@@ -32,6 +33,9 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "AGENTS.md",
     "docs/master_plan.md",
     "docs/project-memory/ask-protocol.md",
+    "docs/project-memory/chatgpt-github-supervision-policy.md",
+    "docs/project-memory/operations.json",
+    "docs/project-memory/operator-manual.md",
     "docs/project-memory/registries/decisions.json",
     "docs/project-memory/registries/dependencies.json",
     "docs/project-memory/registries/execution-routing.json",
@@ -44,6 +48,7 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "docs/roadmap/decision_log.md",
     "docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md",
     "docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md",
+    "docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md",
     "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
     "docs/roadmap/enrichment/PHASE8-IMPL-026-T012.enrichment.json",
     "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",
@@ -60,6 +65,7 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "scripts/project_memory/execution_routing.py",
     "scripts/project_memory/plan_integrity.py",
     "scripts/project_memory/render_docs.py",
+    "scripts/project_memory/supervise.py",
     "scripts/project_memory/validate_agent_guidance.py",
     "scripts/project_memory/validate_current_truth.py",
     "scripts/project_memory/validate_operational_rollout.py",
@@ -72,6 +78,7 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "tests/project_memory/test_operational_rollout.py",
     "tests/project_memory/test_plan_integrity.py",
     "tests/project_memory/test_remaining_mvp_plan.py",
+    "tests/project_memory/test_supervise.py",
     "tests/project_memory/test_tracked_registry_source_locators.py",
     "tests/project_memory/test_tracked_task_registry_current_state.py",
     "tests/project_memory/test_validate_registries.py",
@@ -314,7 +321,7 @@ def test_fixture_is_hermetic_and_policy_forbids_automatic_mutation(tmp_path):
         SOURCE_ROOT, "git", "status", "--porcelain=v1", "--untracked-files=all"
     )
     untracked_relative = f".operational-rollout-untracked-{token}"
-    unrelated_tracked_relative = "docs/project-memory/operator-manual.md"
+    unrelated_tracked_relative = ".gitignore"
     ignored_root = SOURCE_ROOT / ".codex-context"
     ignored_root_existed = ignored_root.exists()
     ignored_relative = f".codex-context/operational-rollout-{token}/sentinel.txt"
@@ -609,12 +616,18 @@ def test_cli_status_uses_meaningful_stale_exit_code(tmp_path):
     assert exit_code == 2
 
 
-def test_workflow_has_no_schedule_or_dependency_install(tmp_path):
+def test_workflow_has_safe_supervision_publication_boundaries(tmp_path):
     repo = _temporary_repository(tmp_path)
     workflow = (repo / ".github/workflows/project-memory.yml").read_text(encoding="utf-8")
     assert "schedule:" not in workflow
     assert "cron:" not in workflow
     assert "pip install" not in workflow
-    assert "upload-artifact" not in workflow
-    assert "operational_rollout.py ci-check" in workflow
+    assert "actions/upload-artifact@v4" in workflow
+    assert "scripts/project_memory/supervise.py" in workflow
+    assert "GITHUB_STEP_SUMMARY" in workflow
+    assert "<!-- project-memory-supervision -->" in workflow
+    assert "pull_request_target" not in workflow
+    assert "contents: write" not in workflow
+    assert "pull-requests: write" in workflow
+    assert "git push" not in workflow
     assert workflow.count('- ".gitignore"') == 2

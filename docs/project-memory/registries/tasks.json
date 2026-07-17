@@ -742,6 +742,8 @@
           { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md" },
           { "path": "docs/project-memory/operations.json" },
           { "path": "scripts/project_memory/operational_rollout.py" },
+          { "path": "scripts/project_memory/supervise.py" },
+          { "path": "docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md" },
           { "path": ".github/workflows/project-memory.yml" }
         ]
       },
@@ -752,7 +754,7 @@
       "classification": "operational synchronization and rollout",
       "is_application_frontier": false,
       "is_blocking": false,
-      "notes": "Complete/PASS. Implements event-driven commit-bound synchronization policy, read-only stale-state diagnosis, one-command deterministic refresh, ephemeral CI rebuild, deterministic quality packages, workflow integration, and focused tests. Q154 resolved. No synchronization Git action, reviewer/model execution, application-worktree access, or automatic authority mutation occurred."
+      "notes": "Complete/PASS. Implements event-driven commit-bound synchronization policy, read-only stale-state diagnosis, one-command deterministic refresh, three-profile supervision, atomic local/GitHub handoff, ephemeral CI rebuild, deterministic quality packages, workflow integration, and focused tests. Same-task application-only ancestor lag is advisory only; closeout/governance remain exact-commit strict. Q154 resolved. No synchronization Git action, reviewer/model execution, application-worktree access, task/frontier mutation, or automatic authority mutation occurred."
     },
     {
       "id": "task:PHASE8-IMPL-026-T012",
