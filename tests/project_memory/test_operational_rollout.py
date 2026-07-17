@@ -78,6 +78,7 @@ T012_PROPOSED_TREE_PATHS = frozenset({
     "tests/project_memory/test_current_truth_invocation.py",
     "tests/project_memory/test_execution_routing.py",
     "tests/project_memory/test_operational_rollout.py",
+    "tests/project_memory/requirements-ci.txt",
     "tests/project_memory/test_plan_integrity.py",
     "tests/project_memory/test_remaining_mvp_plan.py",
     "tests/project_memory/test_supervise.py",
@@ -397,6 +398,44 @@ def test_operational_validator_accepts_complete_tracked_contract(tmp_path):
     }
 
 
+@pytest.mark.parametrize(
+    ("relative", "old", "new", "expected_code"),
+    [
+        (
+            ".github/workflows/project-memory.yml",
+            "python3 -m pip install",
+            "python3 -m pip check",
+            "workflow_contract_missing",
+        ),
+        (
+            "tests/project_memory/requirements-ci.txt",
+            "pytest==9.1.1",
+            "pytest>=9.1.1",
+            "workflow_test_dependency_mismatch",
+        ),
+        (
+            ".github/workflows/project-memory.yml",
+            "tests/project_memory/requirements-ci.txt",
+            "backend/requirements.txt",
+            "workflow_dependency_install_forbidden",
+        ),
+    ],
+)
+def test_operational_validator_rejects_missing_unpinned_or_application_dependency_installs(
+    tmp_path, relative, old, new, expected_code
+):
+    repo = _temporary_repository(tmp_path)
+    path = repo / relative
+    contents = path.read_text(encoding="utf-8")
+    assert old in contents
+    path.write_text(contents.replace(old, new, 1), encoding="utf-8")
+
+    result = validator.validate_operational_rollout(repo)
+
+    assert result["result"] == "BLOCKED"
+    assert expected_code in {finding["code"] for finding in result["findings"]}
+
+
 def test_status_is_read_only_and_reports_missing_package_and_dirty_state(tmp_path):
     repo = _temporary_repository(tmp_path)
     commit = _run(repo, "git", "rev-parse", "HEAD")
@@ -685,7 +724,7 @@ def test_workflow_has_safe_supervision_publication_boundaries(tmp_path):
     workflow = (repo / ".github/workflows/project-memory.yml").read_text(encoding="utf-8")
     assert "schedule:" not in workflow
     assert "cron:" not in workflow
-    assert "pip install" not in workflow
+    assert "python3 -m pip install pytest" not in workflow
     assert "actions/checkout@v7" in workflow
     assert "actions/setup-python@v6" in workflow
     assert "actions/upload-artifact@v7" in workflow

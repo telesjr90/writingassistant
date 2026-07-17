@@ -19,6 +19,7 @@ REQUIRED_FILES = (
     "scripts/project_memory/validate_operational_rollout.py",
     "tests/project_memory/test_operational_rollout.py",
     "tests/project_memory/test_supervise.py",
+    "tests/project_memory/requirements-ci.txt",
     ".github/workflows/project-memory.yml",
     "docs/roadmap/decisions/PHASE8-IMPL-026-T011-synchronization-ci-rebuild-operational-rollout.md",
     "docs/roadmap/decisions/PHASE8-IMPL-026-T011-project-memory-gate-decoupling-and-github-handoff.md",
@@ -159,6 +160,8 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
         "validate_registries.py --json", "validate_agent_guidance.py --json",
         "validate_reviewer_guidance.py --json", "validate_operational_rollout.py --json",
         "python3 -m pytest tests/project_memory", "scripts/project_memory/supervise.py",
+        "python3 -m pip install", "--disable-pip-version-check", "--no-input",
+        "-r tests/project_memory/requirements-ci.txt",
         "actions/checkout@v7", "actions/setup-python@v6",
         "actions/upload-artifact@v7", "actions/download-artifact@v8",
         "actions/github-script@v9", "GITHUB_STEP_SUMMARY",
@@ -173,8 +176,36 @@ def validate_operational_rollout(repo_root: str | Path = ".") -> dict[str, Any]:
             findings.append(_finding("workflow_contract_missing", ".github/workflows/project-memory.yml", token))
     if "schedule:" in workflow or "cron:" in workflow:
         findings.append(_finding("time_based_trigger_forbidden", ".github/workflows/project-memory.yml", "schedule/cron"))
-    if "pip install" in workflow:
-        findings.append(_finding("workflow_dependency_install_forbidden", ".github/workflows/project-memory.yml", "dependency install"))
+    if workflow.count("python3 -m pip install") != 1:
+        findings.append(_finding(
+            "workflow_dependency_install_mismatch",
+            ".github/workflows/project-memory.yml",
+            "exactly one python3 -m pip install command is required",
+        ))
+    for forbidden_install in (
+        "python3 -m pip install pytest",
+        "backend/requirements",
+        "training/requirements",
+        "frontend/requirements",
+    ):
+        if forbidden_install in workflow:
+            findings.append(_finding(
+                "workflow_dependency_install_forbidden",
+                ".github/workflows/project-memory.yml",
+                forbidden_install,
+            ))
+    requirements = contents.get("tests/project_memory/requirements-ci.txt", "")
+    requirement_lines = [
+        line.strip()
+        for line in requirements.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if requirement_lines != ["pytest==9.1.1"]:
+        findings.append(_finding(
+            "workflow_test_dependency_mismatch",
+            "tests/project_memory/requirements-ci.txt",
+            "expected the sole exact pin pytest==9.1.1",
+        ))
     for forbidden in (
         "pull_request_target", "contents: write", "git push", "git commit",
         "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION", "secrets.",

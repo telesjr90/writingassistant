@@ -70,6 +70,13 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install pinned Project Memory CI test dependencies
+        run: |
+          python3 -m pip install \
+            --disable-pip-version-check \
+            --no-input \
+            -r tests/project_memory/requirements-ci.txt
+
       - name: Resolve validated task identity
         id: identity
         shell: bash

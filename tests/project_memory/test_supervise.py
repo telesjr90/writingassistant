@@ -449,3 +449,37 @@ def test_workflow_permissions_triggers_and_comment_boundary_are_safe():
     assert "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION" not in workflow
     assert "secrets." not in workflow
     assert "git commit" not in workflow
+
+
+def test_workflow_installs_only_pinned_project_memory_test_dependencies_before_validation():
+    workflow = (supervise.ROOT / ".github/workflows/project-memory.yml").read_text(encoding="utf-8")
+    requirements_relative = "tests/project_memory/requirements-ci.txt"
+    requirements = (supervise.ROOT / requirements_relative).read_text(encoding="utf-8").splitlines()
+
+    assert requirements == ["pytest==9.1.1"]
+    assert all(line and "==" in line for line in requirements)
+
+    setup_index = workflow.index("uses: actions/setup-python@v6")
+    install_index = workflow.index("- name: Install pinned Project Memory CI test dependencies")
+    validation_index = workflow.index("- name: Compile and validate Project Memory")
+    assert setup_index < install_index < validation_index
+
+    install_step = workflow[install_index:validation_index]
+    assert "python3 -m pip install \\\n" in install_step
+    assert "--disable-pip-version-check \\\n" in install_step
+    assert "--no-input \\\n" in install_step
+    assert f"-r {requirements_relative}" in install_step
+    assert "continue-on-error" not in install_step
+    assert "backend/requirements" not in install_step
+    assert "training/requirements" not in install_step
+    assert "frontend" not in install_step
+    assert "python3 -m pip install pytest" not in workflow
+
+    assert "python3 -m pytest tests/project_memory -q -p no:cacheprovider" in workflow
+    assert "- name: Enforce gate and validation result" in workflow
+    assert "--validation-outcome \"$VALIDATION_OUTCOME\"" in workflow
+    assert "pull_request_target" not in workflow
+    assert "contents: write" not in workflow
+    assert "secrets." not in workflow
+    assert "git commit" not in workflow
+    assert "git push" not in workflow
