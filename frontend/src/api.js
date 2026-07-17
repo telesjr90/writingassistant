@@ -228,6 +228,10 @@ export async function fetchStoryformContext(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/storyform-context`));
 }
 
+export async function fetchProjectContextReadiness(projectId = PROJECT_ID) {
+  return requestData(() => client.get(`/projects/${projectId}/context-readiness`));
+}
+
 export async function getOMI(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/omi`));
 }

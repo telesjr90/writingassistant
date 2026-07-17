@@ -34,6 +34,7 @@ import {
   fetchMaterials,
   fetchMaterial,
   fetchNotes,
+  fetchProjectContextReadiness,
   fetchRawArtifactEvidenceStatus,
   fetchNote,
   fetchScene,
@@ -162,6 +163,18 @@ export default function App() {
   const [sceneContent, setSceneContent] = useState('');
   const [lastSavedContent, setLastSavedContent] = useState('');
   const [storyformContext, setStoryformContext] = useState('');
+  const [contextReadinessLoading, setContextReadinessLoading] = useState(true);
+  const [contextReadinessError, setContextReadinessError] = useState('');
+  const [bibleReadinessState, setBibleReadinessState] = useState('loading');
+  const [bibleReadinessReason, setBibleReadinessReason] = useState('');
+  const [bibleDirectError, setBibleDirectError] = useState('');
+  const [storyformReadinessState, setStoryformReadinessState] = useState('loading');
+  const [storyformReadinessReason, setStoryformReadinessReason] = useState('');
+  const [storyformDirectError, setStoryformDirectError] = useState('');
+  const [storyformContextReadinessState, setStoryformContextReadinessState] = useState('loading');
+  const [storyformContextReadinessReason, setStoryformContextReadinessReason] = useState('');
+  const [storyformContextDirectError, setStoryformContextDirectError] = useState('');
+  const [isRetryingContextReadiness, setIsRetryingContextReadiness] = useState(false);
   const [bibleText, setBibleText] = useState('{}');
   const [lastSavedBibleText, setLastSavedBibleText] = useState('{}');
   const [storyformText, setStoryformText] = useState('{}');
@@ -389,17 +402,36 @@ export default function App() {
     setMaterials([]);
     setBibleText('{}');
     setLastSavedBibleText('{}');
-    setBibleStatus('No bible JSON for this project yet.');
+    setBibleStatus('Checking availability...');
+    setBibleDirectError('');
     setStoryformText('{}');
     setLastSavedStoryformText('{}');
-    setStoryformStatus('No storyform JSON for this project yet.');
+    setStoryformStatus('Checking availability...');
+    setStoryformDirectError('');
     setStoryformContext('');
+    setStoryformContextDirectError('');
+    setContextReadinessLoading(true);
+    setContextReadinessError('');
+    setBibleReadinessState('loading');
+    setBibleReadinessReason('');
+    setStoryformReadinessState('loading');
+    setStoryformReadinessReason('');
+    setStoryformContextReadinessState('loading');
+    setStoryformContextReadinessReason('');
     setOmiData({ index: null, ideas: [], candidates: [], promotions: [] });
     setOmiStatus('Loading OMI status...');
     setOmiError('');
     setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW);
 
     async function loadInitialData() {
+      setContextReadinessLoading(true);
+      setContextReadinessError('');
+      setBibleReadinessState('loading');
+      setStoryformReadinessState('loading');
+      setStoryformContextReadinessState('loading');
+      setBibleDirectError('');
+      setStoryformDirectError('');
+      setStoryformContextDirectError('');
       setIsLoadingScenes(true);
       setIsLoadingNotes(true);
       setIsLoadingMaterials(true);
@@ -408,21 +440,53 @@ export default function App() {
       setNotesError('');
       setMaterialsError('');
 
+      let readiness;
+      try {
+        readiness = await fetchProjectContextReadiness(activeProjectId);
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+        const message = error instanceof Error ? error.message : 'Failed to check context availability.';
+        setContextReadinessError(message);
+        setBibleReadinessState('error');
+        setStoryformReadinessState('error');
+        setStoryformContextReadinessState('error');
+        setBibleStatus('Availability could not be checked.');
+        setStoryformStatus('Availability could not be checked.');
+        setStoryformContext('');
+        setContextReadinessLoading(false);
+        setIsLoadingScenes(false);
+        setIsLoadingNotes(false);
+        setIsLoadingMaterials(false);
+        setIsLoadingOMI(false);
+        return;
+      }
+
+      if (!isMounted) {
+        return;
+      }
+
+      const bibleRes = readiness.resources.bible;
+      const storyformRes = readiness.resources.storyform;
+      const contextRes = readiness.resources.storyform_context;
+
+      setBibleReadinessState(bibleRes.state);
+      setBibleReadinessReason(bibleRes.reason_code || '');
+      setStoryformReadinessState(storyformRes.state);
+      setStoryformReadinessReason(storyformRes.reason_code || '');
+      setStoryformContextReadinessState(contextRes.state);
+      setStoryformContextReadinessReason(contextRes.reason_code || '');
+
       const [
         sceneResult,
         notesResult,
         materialsResult,
-        bibleResult,
-        storyformResult,
-        contextResult,
         omiResult,
       ] = await Promise.allSettled([
         fetchScenes(activeProjectId),
         fetchNotes(activeProjectId),
         fetchMaterials(activeProjectId),
-        fetchBible(activeProjectId),
-        fetchStoryform(activeProjectId),
-        fetchStoryformContext(activeProjectId),
         getOMI(activeProjectId),
       ]);
 
@@ -460,37 +524,6 @@ export default function App() {
         setMaterialsError(message);
       }
 
-      if (bibleResult.status === 'fulfilled') {
-        const biblePayload = bibleResult.value;
-        const formattedBible = formatJson(biblePayload);
-        setBibleText(formattedBible);
-        setLastSavedBibleText(formattedBible);
-        setBibleStatus('Saved');
-      } else {
-        setBibleText('{}');
-        setLastSavedBibleText('{}');
-        setBibleStatus('No bible JSON for this project yet.');
-      }
-
-      if (storyformResult.status === 'fulfilled') {
-        const storyformPayload = storyformResult.value;
-        const formattedStoryform = formatJson(storyformPayload);
-        setStoryformText(formattedStoryform);
-        setLastSavedStoryformText(formattedStoryform);
-        setStoryformStatus('Saved');
-      } else {
-        setStoryformText('{}');
-        setLastSavedStoryformText('{}');
-        setStoryformStatus('No storyform JSON for this project yet.');
-      }
-
-      if (contextResult.status === 'fulfilled') {
-        const contextPayload = contextResult.value;
-        setStoryformContext(contextPayload.context ?? '');
-      } else {
-        setStoryformContext('');
-      }
-
       if (omiResult.status === 'fulfilled') {
         const omiPayload = omiResult.value;
         setOmiData(omiPayload);
@@ -504,10 +537,106 @@ export default function App() {
         setOmiError(message);
       }
 
+      if (bibleRes.ready && bibleRes.state === 'ready') {
+        try {
+          const biblePayload = await fetchBible(activeProjectId);
+          if (!isMounted) {
+            return;
+          }
+          const formattedBible = formatJson(biblePayload);
+          setBibleText(formattedBible);
+          setLastSavedBibleText(formattedBible);
+          setBibleStatus('Saved');
+        } catch (error) {
+          if (!isMounted) {
+            return;
+          }
+          const message = error instanceof Error ? error.message : 'Failed to load Bible.';
+          setBibleText('{}');
+          setLastSavedBibleText('{}');
+          setBibleStatus(`Failed to load Bible: ${message}`);
+          setBibleDirectError(message);
+        }
+      } else if (bibleRes.state === 'absent') {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        setBibleStatus('No Bible stored for this project.');
+      } else if (bibleRes.state === 'invalid') {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        const reasonMsg = bibleRes.diagnostics && bibleRes.diagnostics[0]
+          ? bibleRes.diagnostics[0]
+          : 'Bible resource is invalid.';
+        setBibleStatus(`Bible not available: ${reasonMsg}`);
+      } else {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        setBibleStatus('Bible is not available.');
+      }
+
+      if (storyformRes.ready && storyformRes.state === 'ready') {
+        try {
+          const storyformPayload = await fetchStoryform(activeProjectId);
+          if (!isMounted) {
+            return;
+          }
+          const formattedStoryform = formatJson(storyformPayload);
+          setStoryformText(formattedStoryform);
+          setLastSavedStoryformText(formattedStoryform);
+          setStoryformStatus('Saved');
+        } catch (error) {
+          if (!isMounted) {
+            return;
+          }
+          const message = error instanceof Error ? error.message : 'Failed to load storyform.';
+          setStoryformText('{}');
+          setLastSavedStoryformText('{}');
+          setStoryformStatus(`Failed to load storyform: ${message}`);
+          setStoryformDirectError(message);
+        }
+      } else if (storyformRes.state === 'absent') {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        setStoryformStatus('No storyform stored for this project.');
+      } else if (storyformRes.state === 'invalid') {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        const reasonMsg = storyformRes.diagnostics && storyformRes.diagnostics[0]
+          ? storyformRes.diagnostics[0]
+          : 'Storyform resource is invalid.';
+        setStoryformStatus(`Storyform not available: ${reasonMsg}`);
+      } else {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        setStoryformStatus('Storyform is not available.');
+      }
+
+      if (contextRes.ready && contextRes.state === 'ready') {
+        try {
+          const contextPayload = await fetchStoryformContext(activeProjectId);
+          if (!isMounted) {
+            return;
+          }
+          setStoryformContext(contextPayload.context ?? '');
+        } catch (error) {
+          if (!isMounted) {
+            return;
+          }
+          const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
+          setStoryformContext('');
+          setStoryformContextDirectError(message);
+        }
+      } else if (contextRes.state === 'unavailable') {
+        setStoryformContext('');
+      } else {
+        setStoryformContext('');
+      }
+
       setIsLoadingScenes(false);
       setIsLoadingNotes(false);
       setIsLoadingMaterials(false);
       setIsLoadingOMI(false);
+      setContextReadinessLoading(false);
     }
 
     loadInitialData();
@@ -1002,13 +1131,30 @@ export default function App() {
       setStoryformText(formatted);
       setLastSavedStoryformText(formatted);
       setStoryformStatus('Saved');
+      setStoryformDirectError('');
 
       try {
-        const contextPayload = await fetchStoryformContext(activeProjectId);
-        setStoryformContext(contextPayload.context ?? '');
+        const readiness = await fetchProjectContextReadiness(activeProjectId);
+        const contextRes = readiness.resources.storyform_context;
+
+        setStoryformContextReadinessState(contextRes.state);
+        setStoryformContextReadinessReason(contextRes.reason_code || '');
+
+        if (contextRes.ready && contextRes.state === 'ready') {
+          const contextPayload = await fetchStoryformContext(activeProjectId);
+          setStoryformContext(contextPayload.context ?? '');
+          setStoryformContextDirectError('');
+        } else if (contextRes.state === 'unavailable') {
+          setStoryformContext('');
+          setStoryformContextDirectError('');
+        } else {
+          setStoryformContext('');
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Context refresh failed.';
         setStoryformStatus(`Saved; prompt context refresh failed: ${message}`);
+        setStoryformContext('');
+        setStoryformContextDirectError(message);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Save failed.';
@@ -1017,6 +1163,134 @@ export default function App() {
       setIsSavingStoryform(false);
     }
   }, [activeProjectId, isSavingStoryform, storyformText]);
+
+  const handleRetryContextReadiness = useCallback(async () => {
+    if (isRetryingContextReadiness) {
+      return;
+    }
+
+    setIsRetryingContextReadiness(true);
+    setContextReadinessError('');
+    setBibleDirectError('');
+    setStoryformDirectError('');
+    setStoryformContextDirectError('');
+    setContextReadinessLoading(true);
+    setBibleReadinessState('loading');
+    setStoryformReadinessState('loading');
+    setStoryformContextReadinessState('loading');
+    setBibleStatus('Checking availability...');
+    setStoryformStatus('Checking availability...');
+
+    try {
+      const readiness = await fetchProjectContextReadiness(activeProjectId);
+
+      const bibleRes = readiness.resources.bible;
+      const storyformRes = readiness.resources.storyform;
+      const contextRes = readiness.resources.storyform_context;
+
+      setBibleReadinessState(bibleRes.state);
+      setBibleReadinessReason(bibleRes.reason_code || '');
+      setStoryformReadinessState(storyformRes.state);
+      setStoryformReadinessReason(storyformRes.reason_code || '');
+      setStoryformContextReadinessState(contextRes.state);
+      setStoryformContextReadinessReason(contextRes.reason_code || '');
+
+      if (bibleRes.ready && bibleRes.state === 'ready') {
+        try {
+          const biblePayload = await fetchBible(activeProjectId);
+          const formattedBible = formatJson(biblePayload);
+          setBibleText(formattedBible);
+          setLastSavedBibleText(formattedBible);
+          setBibleStatus('Saved');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to load Bible.';
+          setBibleText('{}');
+          setLastSavedBibleText('{}');
+          setBibleStatus(`Failed to load Bible: ${message}`);
+          setBibleDirectError(message);
+        }
+      } else if (bibleRes.state === 'absent') {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        setBibleStatus('No Bible stored for this project.');
+      } else if (bibleRes.state === 'invalid') {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        const reasonMsg = bibleRes.diagnostics && bibleRes.diagnostics[0]
+          ? bibleRes.diagnostics[0]
+          : 'Bible resource is invalid.';
+        setBibleStatus(`Bible not available: ${reasonMsg}`);
+      } else {
+        setBibleText('{}');
+        setLastSavedBibleText('{}');
+        setBibleStatus('Bible is not available.');
+      }
+
+      if (storyformRes.ready && storyformRes.state === 'ready') {
+        try {
+          const storyformPayload = await fetchStoryform(activeProjectId);
+          const formattedStoryform = formatJson(storyformPayload);
+          setStoryformText(formattedStoryform);
+          setLastSavedStoryformText(formattedStoryform);
+          setStoryformStatus('Saved');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to load storyform.';
+          setStoryformText('{}');
+          setLastSavedStoryformText('{}');
+          setStoryformStatus(`Failed to load storyform: ${message}`);
+          setStoryformDirectError(message);
+        }
+      } else if (storyformRes.state === 'absent') {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        setStoryformStatus('No storyform stored for this project.');
+      } else if (storyformRes.state === 'invalid') {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        const reasonMsg = storyformRes.diagnostics && storyformRes.diagnostics[0]
+          ? storyformRes.diagnostics[0]
+          : 'Storyform resource is invalid.';
+        setStoryformStatus(`Storyform not available: ${reasonMsg}`);
+      } else {
+        setStoryformText('{}');
+        setLastSavedStoryformText('{}');
+        setStoryformStatus('Storyform is not available.');
+      }
+
+      if (contextRes.ready && contextRes.state === 'ready') {
+        try {
+          const contextPayload = await fetchStoryformContext(activeProjectId);
+          setStoryformContext(contextPayload.context ?? '');
+          setStoryformContextDirectError('');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to load storyform context.';
+          setStoryformContext('');
+          setStoryformContextDirectError(message);
+        }
+      } else {
+        setStoryformContext('');
+        setStoryformContextDirectError('');
+      }
+
+      setContextReadinessError('');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to check context availability.';
+      setContextReadinessError(message);
+      setBibleReadinessState('error');
+      setStoryformReadinessState('error');
+      setStoryformContextReadinessState('error');
+      setBibleText('{}');
+      setLastSavedBibleText('{}');
+      setBibleStatus('Availability could not be checked.');
+      setStoryformText('{}');
+      setLastSavedStoryformText('{}');
+      setStoryformStatus('Availability could not be checked.');
+      setStoryformContext('');
+    } finally {
+      setContextReadinessLoading(false);
+      setIsRetryingContextReadiness(false);
+    }
+  }, [activeProjectId, isRetryingContextReadiness]);
 
   const handleCreateOMIIdea = useCallback(async (rawIdea) => {
     if (isCreatingOMIIdea) {
@@ -1368,6 +1642,19 @@ export default function App() {
               onStoryformChange={handleStoryformTextChange}
               onSaveStoryform={handleSaveStoryform}
               storyformContext={storyformContext}
+              bibleReadinessState={bibleReadinessState}
+              bibleReadinessReason={bibleReadinessReason}
+              bibleDirectError={bibleDirectError}
+              storyformReadinessState={storyformReadinessState}
+              storyformReadinessReason={storyformReadinessReason}
+              storyformDirectError={storyformDirectError}
+              storyformContextReadinessState={storyformContextReadinessState}
+              storyformContextReadinessReason={storyformContextReadinessReason}
+              storyformContextDirectError={storyformContextDirectError}
+              readinessError={contextReadinessError}
+              isLoadingReadiness={contextReadinessLoading}
+              isRetryingReadiness={isRetryingContextReadiness}
+              onRetryReadiness={handleRetryContextReadiness}
             />
 
             <OMIPanel
