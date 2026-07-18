@@ -607,7 +607,8 @@ test('B3: absent Bible displays normal non-alarming status', () => {
     storyformDirectError: '', storyformContextDirectError: '',
     onRetryReadiness: () => {}, isRetryingReadiness: false,
   }));
-  assert.ok(html.includes('No Bible stored'), 'must show non-alarming absence text');
+  assert.ok(html.includes('Not stored'), 'absent Bible must show canonical readiness label');
+  assert.ok(html.includes('No Bible stored'), 'operational absence detail may remain visible');
   assert.ok(!html.includes('is-error') || html.indexOf('is-error') === -1, 'absence must not be styled as error');
 });
 
@@ -622,7 +623,11 @@ test('B4: absent storyform textarea allows editing and saving', () => {
     storyformDirectError: '', storyformContextDirectError: '',
     onRetryReadiness: () => {}, isRetryingReadiness: false,
   }));
+  assert.ok(html.includes('Not stored'), 'absent storyform must show canonical readiness label');
   assert.ok(!html.includes('readonly'), 'absent storyform must not have readOnly attribute');
+  const storyformSection = html.split('Storyform JSON')[1] || html;
+  assert.ok(!storyformSection.match(/<button[^>]*disabled/),
+    'absent storyform Save button must not be disabled');
 });
 
 test('B5: absent Bible path issues no fetchBible call in App source', () => {
@@ -672,6 +677,8 @@ test('E1: direct Bible failure shows Retry button', () => {
     storyformDirectError: '', storyformContextReadinessState: 'unavailable',
     storyformContextDirectError: '', onRetryReadiness: () => {}, isRetryingReadiness: false,
   }));
+  assert.ok(html.includes('Load failed'), 'direct Bible failure must show canonical label');
+  assert.ok(html.includes('Request failed (500)'), 'direct Bible failure reason must remain visible');
   assert.ok(html.includes('Retry'), 'direct Bible failure must show Retry');
 });
 
@@ -715,7 +722,9 @@ test('F1: invalid Bible remains distinct from absent', () => {
     storyformDirectError: '', storyformContextDirectError: '',
     onRetryReadiness: () => {}, isRetryingReadiness: false,
   }));
-  assert.ok(html.includes('not available'), 'invalid must be distinct');
+  assert.ok(html.includes('Invalid'), 'invalid must show canonical readiness label');
+  assert.ok(html.includes('bible_malformed_json'), 'invalid readiness reason must be visible');
+  assert.ok(!html.includes('Not stored'), 'invalid must not display canonical absent label');
   assert.ok(!html.includes('No Bible stored'), 'invalid must not display absent message');
 });
 
@@ -744,9 +753,51 @@ test('F3: direct-resource failure after ready report is distinct from readiness 
     storyformDirectError: '', storyformContextDirectError: '',
     onRetryReadiness: () => {}, isRetryingReadiness: false,
   }));
-  assert.ok(html.includes('Failed to load Bible'), 'direct failure must be labelled');
+  assert.ok(html.includes('Load failed'), 'direct failure must show canonical readiness label');
+  assert.ok(html.includes('Request failed (500)'), 'direct failure reason must remain visible');
+  assert.ok(!html.includes('Not stored'), 'direct failure must not show canonical absent label');
   assert.ok(!html.includes('could not be checked') && !html.includes('Availability could not'),
     'direct failure must not say could not be checked');
+});
+
+test('F4: unavailable Bible shows canonical label and reason while remaining fail-closed', () => {
+  const html = renderToStaticMarkup(React.createElement(ProjectContext, {
+    bibleText: '', bibleStatus: 'Bible is not available.',
+    isSavingBible: false, onBibleChange: () => {}, onSaveBible: () => {},
+    storyformText: '{}', storyformStatus: 'Saved',
+    isSavingStoryform: false, onStoryformChange: () => {}, onSaveStoryform: () => {},
+    storyformContext: '', bibleReadinessState: 'unavailable',
+    bibleReadinessReason: 'bible_source_unavailable', storyformReadinessState: 'ready',
+    storyformContextReadinessState: 'unavailable', bibleDirectError: '',
+    storyformDirectError: '', storyformContextDirectError: '',
+    onRetryReadiness: () => {}, isRetryingReadiness: false,
+  }));
+  assert.ok(html.includes('Unavailable'), 'unavailable must show canonical readiness label');
+  assert.ok(html.includes('bible_source_unavailable'), 'unavailable readiness reason must be visible');
+  assert.ok(!html.includes('Not stored'), 'unavailable must not display canonical absent label');
+  const bibleHeading = '<h3>Bible JSON</h3>';
+  const storyformHeading = '<h3>Storyform JSON</h3>';
+  const bibleStart = html.indexOf(bibleHeading);
+  const storyformStart = html.indexOf(
+    storyformHeading,
+    bibleStart + bibleHeading.length,
+  );
+  assert.notEqual(bibleStart, -1, 'Bible editor heading must be rendered');
+  assert.notEqual(storyformStart, -1, 'Storyform editor heading must follow the Bible editor');
+  assert.ok(storyformStart > bibleStart, 'Bible editor must precede Storyform editor');
+  const bibleSection = html.slice(bibleStart, storyformStart);
+  const bibleTextarea = bibleSection.match(/<textarea\b[^>]*>/i)?.[0] || '';
+  assert.ok(bibleTextarea, 'unavailable Bible textarea must be rendered');
+  assert.match(
+    bibleTextarea,
+    /\sreadonly(?:=""|(?=\s|>))/i,
+    'unavailable Bible must remain read-only',
+  );
+  assert.match(
+    bibleSection,
+    /<button\b[^>]*\sdisabled(?:=""|(?=\s|>))[^>]*>/i,
+    'unavailable Bible Save button must remain disabled',
+  );
 });
 
 // ============================================================

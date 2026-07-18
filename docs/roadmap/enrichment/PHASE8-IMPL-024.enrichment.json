@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T003C",
-    "activation_state": "T001/T002/T003A/T003B are complete/PASS; T003C is planned (next frontier). PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed, closeout validation passes, and the accepted post-closeout Project Memory refresh is FRESH"
+    "immediate_next_task": "PHASE8-IMPL-024-T006A",
+    "activation_state": "T001/T002/T003 are complete/PASS; T006A is the next planned application frontier. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -141,22 +141,54 @@
       "build": "PASS"
     },
     "safety": "No model/runtime, Story Check, candidate, promotion, apply-promotion, Memory/Canon, or story-prose mutation",
-    "t003c_status": "planned; dependency satisfied; next readiness task/application frontier"
+    "t003c_status": "complete/PASS; accepted aggregate evidence 20260718T042148Z + 20260718T045420Z"
+  },
+  "t003_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "complete/PASS",
+    "children": {
+      "T003A": "complete/PASS",
+      "T003B": "complete/PASS",
+      "T003C": "complete/PASS"
+    },
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md",
+    "accepted_aggregate_evidence": {
+      "scenarios_1_through_4_tests_and_build": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z",
+      "scenario_5_completion": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z"
+    },
+    "validation": {
+      "browser_scenarios_passed": 5,
+      "backend_focused_passed": 16,
+      "frontend_focused_passed": 63,
+      "frontend_build": "PASS",
+      "unexpected_application_console_errors": 0,
+      "page_errors": 0,
+      "unexpected_http_failures": 0,
+      "request_failures": 0,
+      "mutation_requests": 0
+    },
+    "accepted_labels": [
+      "Available",
+      "Not stored",
+      "Invalid",
+      "Unavailable",
+      "Load failed"
+    ],
+    "next_task": "PHASE8-IMPL-024-T006A"
   },
   "latest_verified_evidence": {
-    "classification": "successful evidence collection, not product-wide pass",
-    "run_id": "20260712T030010Z",
-    "summary": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/evidence-summary.md",
-    "collector_report": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/collector-report.json",
-    "project_manifest_diff": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/project-manifest-diff.json",
-    "phases": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/phases/",
-    "failed_advanced_collectors": "excluded from product evidence"
+    "classification": "T003C accepted aggregate PASS; not product-wide acceptance",
+    "aggregate_run_ids": ["20260718T042148Z", "20260718T045420Z"],
+    "scenarios_1_through_4": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z",
+    "scenario_5": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z",
+    "historical_reconciliation": ".codex-context/application-uiux-audit/playwright-reconciliation/20260712T030010Z/",
+    "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T003C",
-    "title": "Console and network regression validation",
-    "status": "planned; dependency on T003B satisfied; next readiness task/application frontier",
-    "scope": "Browser console/network/Playwright validation of the T003B frontend integration without implementation"
+    "task_id": "PHASE8-IMPL-024-T006A",
+    "title": "Resettable OMI Dashboard navigation and App.jsx/OMIShell.jsx state-owner decision",
+    "status": "planned; dependency on T003C satisfied; next application frontier",
+    "scope": "Bounded truthful OMI navigation implementation; not begun by T003 closeout"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -229,12 +261,12 @@
       "guided-creation deterministic and disposable API/browser validation PASS at 20260712T205343Z",
       "existing-project preservation during the reconciliation run",
       "Story Check grounded diagnostics: exact source identity/hash, deterministic verification-state classification, quarantined unsupported factual claims, source-mismatch fail-closed, non-mutating, live validation PASS at 20260713T022337Z (22 diagnostics: 17 unverified + 5 quarantined, identity matched, no false verification)",
-      "T003A project_context_readiness.v1 backend contract for Bible, storyform, and derived storyform-context with stable absent/invalid/unavailable/ready states, bounded diagnostics, safe relative locators, genuine transport-failure boundaries, deterministic responses, and no mutation/model/tool runtime"
+      "T003A project_context_readiness.v1 backend contract for Bible, storyform, and derived storyform-context with stable absent/invalid/unavailable/ready states, bounded diagnostics, safe relative locators, genuine transport-failure boundaries, deterministic responses, and no mutation/model/tool runtime",
+      "T003B/T003C readiness-first conditional loading with canonical Available/Not stored/Invalid/Unavailable/Load failed presentation; all five browser scenarios PASS from aggregate evidence 20260718T042148Z + 20260718T045420Z; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations"
     ],
     "verified_defects": [
       "captured document-level horizontal overflow",
-      "captured OMI heading hierarchy skip",
-      "frontend still performs direct speculative requests that produce repeated 404s for normally absent Bible/storyform/storyform-context resources; T003A backend contract is complete and T003B/T003C remain"
+      "captured OMI heading hierarchy skip"
     ],
     "likely_manual_review": [
       "OMI workspace density and weak next-task prioritization",
@@ -256,13 +288,12 @@
       "evidence-drawer focus restoration",
       "complete keyboard navigation",
       "browser zoom and screen-reader behavior",
-      "controlled loading, degraded, failure, retry, and recovery states"
+      "broader T008 resilience and accessibility states beyond the optional-resource failure/recovery contract validated by T003C"
     ]
   },
   "risks": [
     "misleading enabled UI actions",
     "hidden content caused by document overflow",
-    "optional-resource absence obscuring real errors until T003B consumes the completed T003A backend contract and T003C validates network/console behavior",
     "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
     "failed collectors mistaken for product evidence",
     "guided review focus and immediate selected-project presentation advisories",

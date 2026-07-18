@@ -7,7 +7,11 @@ function getStatusClass(status) {
     return 'context-status is-unsaved';
   }
 
-  if (status.startsWith('Failed to load') || status.startsWith('Availability could not')) {
+  if (
+    status.startsWith('Failed to load')
+    || status.startsWith('Load failed')
+    || status.startsWith('Availability could not')
+  ) {
     return 'context-status is-error';
   }
 
@@ -57,9 +61,19 @@ function ContextJsonEditor({
   onChange,
   onSave,
   readinessState,
+  readinessReason,
   directError,
   readOnly,
 }) {
+  const readinessLabel = getResourceReadinessLabel(
+    readinessState,
+    readinessReason,
+    directError,
+  );
+  const readinessDetail = directError || getResourceReadinessReason(
+    readinessState,
+    readinessReason,
+  );
   const displayedStatus = isSaving ? 'Saving...' : status;
   const readOnlyMode = readOnly || readinessState === 'invalid' || readinessState === 'unavailable' || readinessState === 'error' || !!directError;
 
@@ -68,7 +82,15 @@ function ContextJsonEditor({
       <header className="context-editor-header">
         <h3>{label}</h3>
         <div className="context-actions">
-          {displayedStatus && (
+          {readinessLabel && (
+            <span className={getStatusClass(readinessLabel)}>{readinessLabel}</span>
+          )}
+          {readinessDetail && (
+            <span className={getStatusClass(readinessLabel)}>{readinessDetail}</span>
+          )}
+          {displayedStatus
+            && displayedStatus !== readinessLabel
+            && displayedStatus !== readinessDetail && (
             <span className={getStatusClass(displayedStatus)}>{displayedStatus}</span>
           )}
           <button
@@ -197,6 +219,7 @@ export default function ProjectContext({
           onChange={onBibleChange}
           onSave={onSaveBible}
           readinessState={bibleReadinessState}
+          readinessReason={bibleReadinessReason}
           directError={bibleDirectError}
           readOnly={bibleReadinessState !== 'ready' && bibleReadinessState !== 'absent' || !!bibleDirectError}
         />
@@ -208,6 +231,7 @@ export default function ProjectContext({
           onChange={onStoryformChange}
           onSave={onSaveStoryform}
           readinessState={storyformReadinessState}
+          readinessReason={storyformReadinessReason}
           directError={storyformDirectError}
           readOnly={storyformReadinessState !== 'ready' && storyformReadinessState !== 'absent' || !!storyformDirectError}
         />

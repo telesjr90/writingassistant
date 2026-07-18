@@ -8,11 +8,11 @@ T001 OMI-guided creation integrity is complete/PASS through T001A-T001D.
 
 T002 Story Check grounding integrity is complete/PASS through T002A-T002E. Live validation evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z` (PASS, 22 diagnostics: 17 unverified + 5 quarantined, exact source identity/hash matched, fail-closed on unsupported claims, non-mutating).
 
-T003A context-availability/readiness backend contract and T003B conditional frontend loading are both complete/PASS. T003C console/network regression validation is now the next readiness task/application frontier. T003 remains active/in progress.
+T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T003C aggregate evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z` (Scenarios 1-4, focused tests, and build) plus `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z` (Scenario 5 direct-failure/recovery completion).
 
-Next implementation task: `PHASE8-IMPL-024-T003C - Console/network regression validation`. T003 remains active/in progress; T003C is planned, dependency on T003B is satisfied, and it is now the next readiness task/application frontier.
+Next planned implementation task: `PHASE8-IMPL-024-T006A - Resettable OMI Dashboard navigation and App.jsx/OMIShell.jsx state-owner decision`. Its dependency on T003C is satisfied. This closeout does not begin T006A.
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003A has implemented the backend readiness contract; T003B has implemented the conditional frontend integration. T003C console/network validation remains incomplete.
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; and T003 has repaired and validated optional-resource handling. T006 and later workstreams remain incomplete.
 
 ## Controlling Evidence
 
@@ -27,6 +27,8 @@ The failed `playwright-advanced` runs are excluded from product evidence. They a
 T001 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T205343Z`. The prior BLOCKED locator-ambiguity run at `.codex-context/PHASE8-IMPL-024/manual-validation/T001C-guided-creation/20260712T203726Z` remains preserved as superseded validation history. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T001-omi-guided-creation-integrity-closeout.md`.
 
 T002 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z`. The prior BLOCKED missing-storyform run at `20260712T235515Z` and the validation-script-failure run at `20260713T021350Z` remain preserved as superseded validation history. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md`.
+
+T003/T003C final PASS evidence is the accepted aggregate of `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z` (Scenarios 1-4, 16 backend tests, 63 frontend tests, build PASS) and `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z` (Scenario 5 direct Bible failure/recovery PASS). Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md`.
 
 ## Release Blockers
 
@@ -61,7 +63,7 @@ order establish execution sequence:
 - Remaining validation suites: `T008`.
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
-T005 -> T008`. T003B and T003C close T003 before T006 begins. T007 follows
+T005 -> T008`. T003B and T003C have closed T003; T006A is next planned. T007 follows
 T006, and T007C must complete before either T004 or T005 begins. This order is
 already owner-approved and does not require another decision gate.
 
@@ -98,9 +100,9 @@ Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/h
 
 - `PHASE8-IMPL-024-T003A` - Context-availability/readiness contract for Bible, storyform, and storyform-context (`complete/PASS`; depends on T002E). Decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003A-context-availability-readiness-contract.md`.
 - `PHASE8-IMPL-024-T003B` - Conditional frontend loading with distinct absent, invalid, and request-failure states (`complete/PASS`; depends on T003A). Final implementation commit: `83de5db8a8b017bdcc55f22876024219fdb4be3e`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003B-conditional-frontend-loading-closeout.md`.
-- `PHASE8-IMPL-024-T003C` - Console/network regression validation (`planned`; depends on T003B; dependency satisfied). T003C is now the next readiness task/application frontier.
+- `PHASE8-IMPL-024-T003C` - Console/network regression validation (`complete/PASS`; depends on T003B; accepted aggregate evidence `20260718T042148Z` + `20260718T045420Z`). Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md`.
 
-T003A provides the deterministic `project_context_readiness.v1` backend contract at `GET /api/projects/{project_name}/context-readiness`. Normal optional-resource absence returns an explicit successful readiness result; invalid resources remain distinct; unsafe IDs/locators, missing projects, permission failures, and unexpected failures retain transport-error semantics. Existing direct resource endpoints retain their prior behavior. T003B consumed this contract in the frontend with readiness-first conditional loading, distinct absent/invalid/unavailable/readiness-failure/direct-failure states, stale-operation and session-generation guards, ABA rejection, project-switch reset, Retry, and independent unrelated loading. T003B is complete/PASS. T003C owns console/network regression validation.
+T003A provides the deterministic `project_context_readiness.v1` backend contract at `GET /api/projects/{project_name}/context-readiness`. Normal optional-resource absence returns an explicit successful readiness result; invalid resources remain distinct; unsafe IDs/locators, missing projects, permission failures, and unexpected failures retain transport-error semantics. Existing direct resource endpoints retain their prior behavior. T003B consumed this contract in the frontend with readiness-first conditional loading, canonical readiness labels, distinct absent/invalid/unavailable/readiness-failure/direct-failure states, stale-operation and session-generation guards, ABA rejection, project-switch reset, Retry, and independent unrelated loading. T003C validated the console/network, request-ordering, failure/recovery, and non-mutation contract. T003 is complete/PASS.
 
 ### `PHASE8-IMPL-024-T006` - Truthful OMI navigation
 
@@ -160,11 +162,11 @@ Project Memory is not an activation or closeout gate while the accepted
 
 Verified working behavior is limited to the successful reconciliation collector's actual coverage: read-only existing-project navigation, correct selected Story Check source transport, regular disposable project creation and owner-authored scene/note/material writes, unsaved-switch confirmation, staged guided-creation UI progression, and preservation of existing projects during that run.
 
-Verified defects are P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s. T003A supplies the backend contract needed to repair the 404 behavior; the frontend behavior remains open under T003B/T003C.
+Verified defects were P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s. T001, T002, and T003 have repaired and closed the first, second, and optional-resource defects respectively. The captured overflow and OMI heading skip remain open in later workstreams.
 
 Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, undersized-control standards triage, misleading enabled actions, and OMI internal reset ambiguity.
 
-The following remain `NOT_YET_TESTED`: grouped-review owner-decision mutation; candidate lifecycle mutations beyond existing evidence; promotion creation/audit persistence; apply-promotion; approved Memory/Canon mutation; review-queue commands; evidence-drawer focus restoration; complete keyboard navigation; browser zoom and screen-reader behavior; and controlled loading, degraded, failure, retry, and recovery states.
+The following remain `NOT_YET_TESTED`: grouped-review owner-decision mutation; candidate lifecycle mutations beyond existing evidence; promotion creation/audit persistence; apply-promotion; approved Memory/Canon mutation; review-queue commands; evidence-drawer focus restoration; complete keyboard navigation; browser zoom and screen-reader behavior; and broader T008 resilience/accessibility behavior beyond the optional-resource states validated by T003C.
 
 ## Product Boundaries
 
