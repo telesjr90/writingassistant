@@ -5,15 +5,20 @@
 - Immediate application frontier: `PHASE8-IMPL-024-T003C`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
-- Current routing source: `docs/project-memory/registries/execution-routing.json`
+- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
 
 This block is the current summary. Later phase snapshots remain historical at
 the commits they describe and do not establish the current frontier.
 
+Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
+and execution routing remain preserved but are paused and nonblocking as
+application implementation and closeout gates. No task status, dependency, or
+frontier changes under this policy.
+
 # PHASE8-IMPL-026 Project Memory and Plan Integrity
 
-- Status: complete/closed as complete/PASS-WITH-FINDINGS. Parallel governance, documentation, and developer infrastructure workstream; not an application feature.
+- Status: complete/closed as complete/PASS-WITH-FINDINGS. Parallel governance, documentation, and developer infrastructure workstream; not an application feature. Its application-gate role is paused under the accepted 2026-07-17 owner decision.
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
 - T001 (authority, lifecycle, provenance, and roadmap foundation) is complete/PASS.
 - T002 (schema and normalized-registry architecture) is complete/PASS.
@@ -32,7 +37,7 @@ the commits they describe and do not establish the current frontier.
 - Accepted architecture: parallel independent contributors plus sequential layers for source identity, raw extraction, immutable run evidence, interpretation, grounding/semantic guardrails, fusion, candidate review, explicit promotion, and the NCP gateway.
 - Owner Subtxt decision: licensing/authorization is resolved; full Subtxt runtime is authorized and planned under T005/T006, distinct from the completed app-owned `subtxt_informed_rubric` fallback/supplemental guardrail.
 - Preserved foundation: real spaCy, Ollama, Story Check, BookNLP, NCP import, both app-owned rubrics, fusion, candidate-only persistence, grouped review, and T023A/T023B remain valid within their completed scopes.
-- Dependency boundary: PHASE8-IMPL-024 T001/T002/T003A are complete/PASS; T003B is the immediate frontier and T003C remains planned. PHASE8-IMPL-025 remains inactive until the full PHASE8-IMPL-024 parent closes, closeout validation passes, and the accepted post-closeout Project Memory refresh is `FRESH`.
+- Dependency boundary: PHASE8-IMPL-024 T001/T002/T003A are complete/PASS; T003B is the immediate frontier and T003C remains planned. PHASE8-IMPL-025 remains inactive until the full PHASE8-IMPL-024 parent closes and application closeout validation passes.
 - Branched delivery map: T001 -> T002 -> T003; then T004, T005->T006, and T007 branches; T008 joins them; T009/T010/T011 branch and join at T012; PHASE8-IMPL-027 is the terminal owner-acceptance/closeout gate. T003F/T003G, T010H, and T011H carry the accepted API, compatibility, NCP/diagnostics UI, and live-run UI obligations.
 - Read-only/safety boundary: project-level diagnostics never settle truth; review status alone never changes canon; apply-promotion is isolated; no generated prose or automatic truth/promotion/Memory-Canon mutation is authorized.
 

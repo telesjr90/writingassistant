@@ -1,5 +1,10 @@
 # Project Memory Specialized Reviewer Protocol
 
+> **Operational status — paused for ordinary application implementation.**
+> Use this protocol only for explicit owner-requested Project Memory governance
+> or review. It is not an application implementation or closeout gate while the
+> accepted 2026-07-17 pause decision remains current.
+
 Specialized Plan Integrity review is a bounded, read-only analysis contract.
 Reviewer output is always `generated_evidence`; it is not authoritative project
 truth, an owner decision, or a mutation instruction. Reviewers do not replace or

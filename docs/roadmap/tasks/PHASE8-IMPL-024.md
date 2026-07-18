@@ -152,8 +152,9 @@ PHASE8-IMPL-025-T012 adds only layered-runtime and integration deltas. Candidate
 lifecycle, promotion, apply-promotion, review-queue, and owner-decision
 assertions must be reused from these suites rather than independently
 reimplemented. T008 closeout must validate and close the PHASE8-IMPL-024 parent;
-the accepted post-closeout Project Memory refresh must be `FRESH` before
-PHASE8-IMPL-025 may activate.
+PHASE8-IMPL-025 may activate after that application closeout validation passes.
+Project Memory is not an activation or closeout gate while the accepted
+2026-07-17 pause decision remains current.
 
 ## Evidence Classifications
 

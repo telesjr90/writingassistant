@@ -5,7 +5,7 @@
 - Immediate application frontier: `PHASE8-IMPL-024-T003C`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
-- Current routing source: `docs/project-memory/registries/execution-routing.json`
+- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
 
 This delimited block is the current summary. Later chronological task narratives
@@ -13,13 +13,20 @@ are historical at the commits they describe unless a section explicitly says it
 is current. Do not use an older unqualified “next” or “recommended next” claim
 to determine the current frontier.
 
+Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
+and execution routing are preserved but are not implementation, validation,
+acceptance, or closeout gates for ordinary application work. Application work
+uses current owner decisions, current roadmap/task documents, tracked
+application evidence, saved context outputs, and focused direct reads. See the
+current application policy linked above.
+
 ## 1. Project Overview
 
 The product vision is a local-first writing assistant that helps a writer focus on writing by identifying, organizing, connecting, and annotating story knowledge from the writer's own text without taking over authorship. The working product name can remain Dramatica-Informed Writing Assistant, but the near-term roadmap is no longer Dramatica-first. The MVP now requires a usable Writer Assistant Core path: real BookNLP/spaCy install/run/import, runtime extraction, raw artifact persistence, candidate review, frontend owner-action execution, apply-promotion, approved memory/canon mutation, model-assisted evidence-backed extraction, and analysis-only NCP/Subtxt/dramatica-flow runtime integration.
 
 The accepted analysis architecture is now layered plus parallel. Existing independent adapters, normalization, fusion/conflict/uncertainty, candidate-only persistence, and grouped owner review remain valid implemented foundations, but they are not the complete target. Trustworthy interpretation must follow stable source identity, exact source snapshots/hashes/maps, an immutable `AnalysisRunManifest`, and an immutable raw-artifact/evidence ledger. Full Subtxt runtime implementation is authorized and planned separately from the existing app-owned `subtxt_informed_rubric`; licensing and owner authorization are resolved and are not active risks or blockers. The rubric remains a valid deterministic fallback, supplemental contributor, and future semantic guardrail.
 
-The Project Workspace Foundation and Writer Assistant Core implementation sequence are complete through `PHASE8-IMPL-023`, but the application is not ready for broad owner acceptance or MVP readiness. The active release-blocker parent is `PHASE8-IMPL-024 - Application UI/UX Audit Integrity and Acceptance Repair`. T001, T002, and T003A are complete/PASS; the immediate application frontier is `PHASE8-IMPL-024-T003B`. T003C is planned after T003B, and the controlling parent order remains `T003 -> T006 -> T007 -> T004 -> T005 -> T008`, with T007C complete before T004 or T005. `PHASE8-IMPL-025` is published/planned but inactive until PHASE8-IMPL-024 is complete and closed, closeout validation passes, and the accepted post-closeout Project Memory refresh is `FRESH`. `PHASE8-IMPL-027` remains the single terminal full-MVP owner-acceptance and closeout gate.
+The Project Workspace Foundation and Writer Assistant Core implementation sequence are complete through `PHASE8-IMPL-023`, but the application is not ready for broad owner acceptance or MVP readiness. The active release-blocker parent is `PHASE8-IMPL-024 - Application UI/UX Audit Integrity and Acceptance Repair`. T001, T002, and T003A are complete/PASS; the immediate application frontier is `PHASE8-IMPL-024-T003B`. T003C is planned after T003B, and the controlling parent order remains `T003 -> T006 -> T007 -> T004 -> T005 -> T008`, with T007C complete before T004 or T005. `PHASE8-IMPL-025` is published/planned but inactive until PHASE8-IMPL-024 is complete and closed and its application closeout validation passes. `PHASE8-IMPL-027` remains the single terminal full-MVP owner-acceptance and closeout gate.
 
 The product is analysis-only. It must never write, rewrite, continue, imitate, polish, improve, expand, outline, draft, revise, or produce story prose. The app may store, edit, and organize prose only when the prose is owner-authored.
 
@@ -75,20 +82,18 @@ Historical MVP readiness after `PHASE8-IMPL-022`: owner acceptance evidence reac
 
 External SaaS investigation, Dramatica/current-platform investigation, Browsertrix, Crawlee, Stagehand, Playwright against external SaaS, controlled external experiments, and authorized non-black-box external reference collection are post-MVP/deferred unless the owner explicitly opens a separate post-MVP research task. `PHASE8-UX-002-T002A` is post-MVP/deferred only and is not part of the active MVP child sequence.
 
-## Current Deterministic Execution Routing
+## Current Application Execution Policy
 
-Remaining-MVP routing publication is defined by the accepted owner decision at
-`docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md`
-and normalized in `docs/project-memory/registries/execution-routing.json`.
-Every remaining authoritative MVP task resolves to `codex_gpt_5_6_sol`,
-`opencode_go`, or `owner_decision`; missing or conflicting resolution fails
-closed. The prior PHASE8-IMPL-023 OpenCode Go decision remains historically
-valid only for its original T014–T026 execution scope and does not control the
-remaining roadmap.
+Execution routing is preserved as historical and structured repository evidence
+but is not an application gate while implementation-only mode is active. Task
+authority and eligibility come from current explicit owner decisions and the
+current roadmap/task documents. Application acceptance comes from task
+requirements, relevant application tests, required integration/runtime
+evidence, reviewed scope, and repository state.
 
-Every UI-related task, regardless of executor, must use
+Every UI-related task must use
 `.agents/skills/writing-assistant-ui-execution/SKILL.md` and the installed
-Impeccable guidance. `PHASE8-IMPL-024-T007B` remains owner-only; routing and UI
+Impeccable guidance. `PHASE8-IMPL-024-T007B` remains owner-only; policy and UI
 guidance cannot select its component foundation.
 
 ## 1.1 Pre-Dramatica Project Workspace Foundation

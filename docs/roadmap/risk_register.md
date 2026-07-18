@@ -5,15 +5,20 @@
 - Immediate application frontier: `PHASE8-IMPL-024-T003C`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
-- Current routing source: `docs/project-memory/registries/execution-routing.json`
+- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
 
 This block is the current summary. Resolved, superseded, and chronological risk
 narratives below are historical records, not current routing or frontier
 authority.
 
+Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
+and execution routing are paused as application gates. Context tools may run
+only in explicit context-generation mode; application agents consume saved
+outputs.
+
 | Existing context-tool artifacts are attributed from filenames alone | Mitigated by T005 | High | Repomix-, Graphify-, or CCE-like filenames can be renamed, copied, mixed, or produced by unrelated tooling. Silent filename attribution could make unknown output appear trustworthy. | T005 requires deterministic manifest, command, metadata, or tracked-convention evidence. Unknown and conflicting origins are classified `unknown_generated_context` and quarantined. | Mitigated |
-| Read-only context import is mistaken for approval to install or execute collectors | Mitigated by T005; live execution remains unapproved | High | Consumers could treat permission to inspect an existing artifact as permission to install, index, query, update, or run its producing tool. | T005 records separate `read_import_approved` and `live_execution_approved` fields. Repomix, Graphify, and CCE live execution remains false/unapproved. | Active |
+| Read-only context import is mistaken for standing approval to install or execute collectors | Mitigated by T005 and implementation/context-generation mode separation | High | Consumers could treat permission to inspect an existing artifact as standing permission to install, index, query, update, or run its producing tool. | T005's historical import classifications remain preserved. The accepted 2026-07-17 owner decision permits Repomix, Graphify, LeanCTX, `generate_ai_context.sh`, and `context_health_check.sh` only in an explicit context-generation task; ordinary implementation consumes saved outputs. | Active |
 | Unsafe or stale generated context is consumed by default | Mitigated by T005 | High | Generated roots can contain stale, unknown, checksum-invalid, sensitive, escaping, oversized, or authority-claiming content. | T005 applies root/path/symlink/special-file/secret/cache/model/dataset/nested-pack safety checks, commit-and-branch freshness, declared checksums, bounded scope, non-authority enforcement, and default quarantine. | Active |
 | Invalid registry source locators point to directories instead of regular files | Mitigated by T004A | Medium | Registry source locators that reference directories cannot be validated as filesystem evidence. Directory-valued locators were flagged by T003B convergence (10 findings). | T004A replaced all 10 directory-valued locators with tracked regular-file replacements that directly substantiate each record. Regression test locks in regular-file requirement. | Active |
 | Registry source locators claim missing files as current evidence | Accepted nonblocking finding after T011 | Medium | 4 source_missing findings remain from cross-branch evidence not present on docs/project-memory-foundation. Accepted application evidence is intact but unavailable. | T004A classified all 4 as expected cross-branch absences. T004B displays them explicitly. T011 stale detection and event-driven refresh preserve the finding until a future accepted complete-commit synchronization makes a source available; tooling does not perform synchronization. | Accepted / nonblocking |

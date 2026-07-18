@@ -7,6 +7,19 @@ applicable current entry and explicit supersession notices control current
 planning; older “next task” language is historical and must not be used as the
 current frontier.
 
+- Project Memory paused as an application implementation gate: accepted/current
+  owner decision dated 2026-07-17 at
+  `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`.
+  Implementation-only mode is active. Project Memory remains preserved but is
+  paused and nonblocking for application implementation, validation,
+  acceptance, and closeout; Plan Integrity and execution routing are not
+  application gates. Context tools remain available only in explicit
+  context-generation mode. Application acceptance uses current task authority
+  and application evidence. Product and Git safety are unchanged. No task,
+  status, dependency, frontier, or structured routing assignment changes, and
+  historical Project Memory records remain accurate. Reactivation requires a
+  later explicit owner decision.
+
 - PHASE8-IMPL-026-T011 operational-maintenance event for inherited-leaf
   execution routing: accepted
   `docs/roadmap/decisions/PHASE8-IMPL-026-T011-inherited-leaf-execution-routing-repair.md`.

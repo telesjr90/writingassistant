@@ -5,16 +5,20 @@
 - Immediate application frontier: `PHASE8-IMPL-024-T003C`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
-- Current routing source: `docs/project-memory/registries/execution-routing.json`
+- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
 
 This block is the current summary. All later backlog snapshots and “next task”
 statements are historical at the commits represented by their adjacent records
 unless explicitly classified as current.
 
+Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
+and execution routing are paused as application gates without changing any task
+status, dependency, or frontier.
+
 # PHASE8-IMPL-026 Project Memory and Plan Integrity
 
-- Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature.
+- Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature. Its implementation-gate role is currently paused and nonblocking under the accepted 2026-07-17 owner decision.
 - T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
 - Parent records: `docs/roadmap/tasks/PHASE8-IMPL-026.md`, `docs/roadmap/inventory/PHASE8-IMPL-026.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json`.
 - Application frontier: PHASE8-IMPL-024-T003B. T003A is complete/PASS; T003 remains active/in progress; PHASE8-IMPL-025 remains published/planned and inactive.
@@ -40,7 +44,7 @@ unless explicitly classified as current.
 - Owner authorization: Subtxt licensing and authorization are resolved. Full Subtxt runtime implementation is authorized and required as a path distinct from the completed app-owned `subtxt_informed_rubric`.
 - Supersession scope: later backlog entries that quote T019's former `OWNER-BLOCKED`, reference-only, licensing-open, or permission-reopening language are historical completion records only and are superseded for current planning; they must not limit PHASE8-IMPL-025 T005/T006.
 - Historical preservation: real spaCy, Ollama/qwen3:8b, Story Check, BookNLP, owner-selected NCP import, both app-owned rubrics, fusion, candidate-only persistence, grouped review, and T023A/T023B remain complete/PASS within their recorded scopes. The current implementation is valid foundation, not the complete layered architecture.
-- Immediate sequence: PHASE8-IMPL-024 T001/T002/T003A are complete/PASS. T003B is next, T003C remains planned, and the controlling remainder is `T003 -> T006 -> T007 -> T004 -> T005 -> T008`. PHASE8-IMPL-025 stays inactive until PHASE8-IMPL-024 closeout, closeout validation PASS, and accepted `FRESH` refresh.
+- Immediate sequence: PHASE8-IMPL-024 T001/T002/T003A are complete/PASS. T003B is next, T003C remains planned, and the controlling remainder is `T003 -> T006 -> T007 -> T004 -> T005 -> T008`. PHASE8-IMPL-025 stays inactive until PHASE8-IMPL-024 closeout and application closeout validation PASS.
 - Planned graph: T001 -> T002 -> T003 shared contracts; independent T004, T005->T006, and T007 contributor branches; T008 join; parallel T009/T010/T011 integration branches; T012 join; terminal PHASE8-IMPL-027. Accepted additions are T003F live-run API/control plane, T003G persisted-data compatibility, provisioning/compatibility in T005/T006, T010H NCP/diagnostics UI, T011H live-run UI, and T012 layered deltas reusing PHASE8-IMPL-024-T008.
 - NCP is primarily a gateway. Standard export contains approved context only; an optional candidate review bundle is separately labeled. Imported external `complete` status is source metadata, never local approval, and omitted fields are never deletions without explicit owner action.
 - Apply-promotion remains an isolated T012 suite and the only approved mutation path. No generated prose, automatic truth, automatic approval, automatic promotion, or direct tool/model Memory/Canon mutation is introduced.
@@ -52,7 +56,8 @@ unless explicitly classified as current.
   invocation, required available runtime matrix, artifacts/hashes/manifests/
   ledgers/candidates, negative paths, clean browser evidence, accessibility,
   responsive behavior, filesystem non-mutation proof, owner accept/reject/defer,
-  authoritative closeout, and mandatory final Project Memory refresh.
+  authoritative application closeout. Project Memory is not an application
+  closeout gate while the accepted pause decision remains current.
 - Historical PHASE8-IMPL-023-T024-T026 intent is incorporated as baseline; no
   competing terminal suite or owner gate remains.
 

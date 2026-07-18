@@ -1,5 +1,10 @@
 # Project Memory Ask Protocol
 
+> **Operational status — paused for ordinary application implementation.**
+> Use this protocol only for explicit owner-requested Project Memory
+> consultation. It is not an application implementation or closeout gate while
+> the accepted 2026-07-17 pause decision remains current.
+
 Project Memory Ask is a deterministic, read-only question-and-evidence contract.
 It uses tracked repository sources and ordinary repository search/read access. It
 is not a live chat service, retrieval system, roadmap mutation path, or source of

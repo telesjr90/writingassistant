@@ -17,25 +17,28 @@ Before UI inspection or execution:
 
 1. Verify the exact repository root, expected branch, full commit, clean
    worktree, and empty staging area.
-2. Require current Project Memory status `FRESH` and zero Plan Integrity
-   blockers for that exact clean commit.
-3. Read `docs/roadmap/roadmap_index.yaml` for the current application frontier,
-   task status, dependencies, activation boundary, and accepted task sources.
-4. Resolve the task through
-   `docs/project-memory/registries/execution-routing.json` using
-   `scripts/project_memory/execution_routing.py`. Fail closed for missing,
-   conflicting, stale, inapplicable, owner-only, inactive, or
-   dependency-ineligible routing.
-5. Read the accepted task and decision records, then read the installed
+2. Read the current explicit owner decisions and current roadmap/task documents
+   for the task scope, status, dependencies, activation boundary, and accepted
+   sources.
+3. Review the relevant tracked frontend/application code, schemas, fixtures,
+   and tests, using saved context outputs only as non-authoritative navigation.
+4. Read the accepted task and decision records, then read the installed
    Impeccable skill. Use only the applicable guidance within the task's
    allowlist and explicit tool permissions.
 
+Implementation-only mode is active under
+`docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`.
+Do not require or invoke Project Memory freshness, supervision, Plan Integrity,
+execution-routing resolution, Project Memory scripts, or Project Memory tests
+for ordinary UI work. Project Memory remains preserved and may be used only
+when the owner explicitly requests bounded Project Memory work.
+
 Authority remains, in order: current accepted owner decisions; current roadmap
 execution records and task definitions; tracked code, schemas, tests, and
-fixtures within their declared roles; current commit-bound Project Memory;
-clearly labeled historical or superseded records; generated evidence. The
-Impeccable skill and its output are guidance and generated evidence, never
-project truth or task authority.
+fixtures within their declared roles; saved context outputs as supporting
+navigation; focused direct reads; clearly labeled historical or superseded
+records. The Impeccable skill and its output are guidance and generated
+evidence, never project truth or task authority.
 
 ## Modes
 
@@ -70,7 +73,7 @@ that role to the check.
   servers require explicit task authorization. Stop when authorization is
   absent.
 - Do not execute beyond the active task, alter task status or dependencies,
-  create an owner decision, or use historical/superseded routing as current.
+  create an owner decision, or use historical/superseded records as current.
 - Preserve the analysis-only, candidate-first, evidence/provenance-backed,
   owner-controlled product boundary. Never generate story prose, automatically
   promote or apply promotion, or automatically mutate Memory/Canon.

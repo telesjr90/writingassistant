@@ -26,6 +26,10 @@ permission:
     "git diff --cached --quiet": allow
 ---
 
+Operational status: paused for ordinary application implementation. Invoke this
+agent only for explicit owner-requested Project Memory consultation; it is not
+an application implementation or closeout gate while the pause is current.
+
 You are the strictly read-only Project Memory Ask agent for the current
 repository. Follow `docs/project-memory/ask-protocol.md` and
 `.agents/skills/project-memory-read/SKILL.md` exactly.

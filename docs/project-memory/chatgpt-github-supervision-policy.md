@@ -1,5 +1,11 @@
 # ChatGPT and GitHub Project Memory Supervision Policy
 
+> **Operational status — paused for ordinary application implementation.**
+> Supervision and handoffs remain preserved for explicit owner-requested Project
+> Memory work but are not application implementation, validation, acceptance,
+> or closeout gates while the accepted 2026-07-17 pause decision remains
+> current.
+
 This copy-ready policy governs Project Memory binding during application work.
 It does not change ChatGPT settings and does not make generated evidence
 authoritative.

@@ -1,5 +1,12 @@
 # Project Memory
 
+> **Operational status — paused for ordinary application implementation.**
+> Project Memory remains preserved and may be used only when the owner
+> explicitly requests consultation, maintenance, publication, governance, or
+> reactivation. It is not an application implementation, validation,
+> acceptance, or closeout gate while the accepted 2026-07-17 pause decision
+> remains current.
+
 ## What Project Memory Is
 
 Project Memory is a normalized, machine-readable, commit-bound system that:

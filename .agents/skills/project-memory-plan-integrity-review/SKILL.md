@@ -5,6 +5,11 @@ description: Read-only, bounded specialized review over a current accepted Plan 
 
 # Project Memory Plan Integrity Review
 
+Operational status: paused for ordinary application implementation. Use this
+skill only when the owner explicitly requests bounded Project Memory governance
+or Plan Integrity review. It is not an application implementation, validation,
+acceptance, or closeout gate while the accepted pause decision remains current.
+
 Use this skill only for an explicitly requested specialized review in one of
 the six domains defined by `docs/project-memory/reviewer-protocol.md`. Follow
 that protocol exactly. Reviewer output is `generated_evidence`, never project

@@ -1,5 +1,11 @@
 # Project Memory Operator Manual
 
+> **Operational status — paused for ordinary application implementation.**
+> This manual is retained for explicit owner-requested Project Memory
+> maintenance, publication, governance, or reactivation. Its procedures are not
+> application implementation or closeout gates while the accepted 2026-07-17
+> pause decision remains current.
+
 ## Purpose
 
 This manual governs owner-controlled synchronization, deterministic refresh,

@@ -5,6 +5,11 @@ description: Read-only, evidence-backed consultation of tracked Project Memory s
 
 # Project Memory Read
 
+Operational status: paused for ordinary application implementation. Use this
+skill only when the owner explicitly requests bounded Project Memory
+consultation. It is not an application implementation, validation, acceptance,
+or closeout gate while the accepted pause decision remains current.
+
 Use this skill only for bounded, read-only Project Memory questions. Follow
 `docs/project-memory/ask-protocol.md` for the request and response contract.
 

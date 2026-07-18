@@ -4,6 +4,16 @@ Dramatica-Informed Writing Assistant is a local-first writing assistant for stru
 
 This is an analysis-only tool, not a prose generation tool.
 
+## Implementation Policy
+
+Implementation-only mode is active. Project Memory is preserved but paused as
+an application implementation, validation, acceptance, and closeout gate under
+the accepted owner decision in
+`docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`.
+Ordinary application work uses current owner decisions, roadmap/task documents,
+tracked application sources and tests, saved context outputs, and focused direct
+reads. Product safety and Git safety remain unchanged.
+
 ## MVP Status
 
 The App MVP is local-ready with notes.
@@ -145,7 +155,7 @@ Backend:
 
 ```bash
 cd /home/tjrpirateking/projects/WritingAssistantApplication
-.venv-unsloth-clean/bin/python -m pytest tests -q
+python3 -m pytest -q tests --ignore=tests/project_memory
 ```
 
 Frontend build:

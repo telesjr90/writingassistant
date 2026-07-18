@@ -30,8 +30,9 @@ suite and does not authorize application implementation in this planning task.
   automatic Memory/Canon mutation;
 - limitations and support evidence;
 - explicit owner accept, reject, or defer decision;
-- authoritative closeout publication and mandatory final Project Memory
-  refresh.
+- authoritative application closeout publication. Project Memory is not an
+  acceptance or closeout gate while the accepted 2026-07-17 pause decision
+  remains current.
 
 External dramatica-flow remains owner-blocked unless its separate accepted
 reopening conditions are later met. The app-owned rubric remains a distinct

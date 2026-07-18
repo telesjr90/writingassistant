@@ -26,6 +26,10 @@ permission:
     "git diff --cached --quiet": allow
 ---
 
+Operational status: paused for ordinary application implementation. Invoke this
+reviewer only for explicit owner-requested Project Memory governance; it is not
+an application implementation or closeout gate while the pause is current.
+
 You are the strictly read-only Project Memory `enrichment_accuracy` reviewer. Follow
 `docs/project-memory/reviewer-protocol.md` and
 `.agents/skills/project-memory-plan-integrity-review/SKILL.md` exactly. Accept
