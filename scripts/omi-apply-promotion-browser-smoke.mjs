@@ -388,8 +388,17 @@ async function openApplyPromotionConfirmation() {
   await entry.click();
   await page.locator('[data-testid="omi-dashboard"]').waitFor({ state: 'visible', timeout: 15000 });
 
-  const handoff = page.getByRole('button', { name: /Open handoff queue for Promotion Handoff Readiness/i }).first();
-  await handoff.click();
+  const handoffRow = page
+    .getByRole('row', { name: /Promotion Handoff Readiness/i })
+    .first();
+  const handoff = handoffRow.getByRole('button');
+  const buttonCount = await handoff.count();
+  assertEvidence(
+    'Promotion Handoff Readiness exposes exactly one actionable destination',
+    buttonCount === 1,
+    { buttonCount },
+  );
+  await handoff.first().click();
   await page.locator('[data-testid="omi-apply-promotion-confirmation"]').waitFor({ state: 'visible', timeout: 15000 });
   await page.waitForTimeout(250);
   logAction('omi_apply_promotion_confirmation_opened');
@@ -454,11 +463,13 @@ async function assertConfirmationEvidence(viewName) {
     'Audit Preview',
     'Owner Final Confirmation',
     'Cancel / Return',
-    'This is the only screen that may lead to Memory/Canon mutation.',
-    'Candidate approval, queue presence, confidence, and promotion audit records are not enough.',
-    'Ready means the handoff packet is complete. Memory/Canon has not changed.',
-    'Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete.',
-    'This remains a candidate until apply-promotion is separately confirmed and completed.',
+    'This is a candidate-only, no-canon handoff.',
+    'Queue presence is not approval. Confidence is not truth.',
+    'Candidate persistence is not canon. Raw artifacts are support data, not canon.',
+    'Apply-Promotion is the only approved Memory/Canon mutation path.',
+    'Final owner confirmation is required before Apply-Promotion.',
+    'Memory/Canon Unchanged',
+    'Promotion audit records are audit-only until apply-promotion succeeds.',
     'Memory/Canon Unchanged',
   ]) {
     assertEvidence(`${viewName}: required confirmation copy visible: ${requiredText}`, text.includes(requiredText), {});

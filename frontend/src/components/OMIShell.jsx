@@ -34,6 +34,7 @@ export default function OMIShell({
   error = '',
   dashboardResetRequest = 0,
   onUpdateCandidateDecision = async () => null,
+  onOpenMemoryCanon = () => {},
 }) {
   const summary = getOMIDashboardSummary(omiData, { isLoading, error });
   const [omiView, setOmiView] = useState('dashboard');
@@ -59,19 +60,37 @@ export default function OMIShell({
     if (destination === 'candidates') {
       const firstCandidateId = getCandidateId(candidates[0]);
       setSelectedCandidateId(firstCandidateId);
+      setSelectedEvidence(null);
+      evidenceOpenerRef.current = null;
       setOmiView('candidate-detail');
       return;
     }
 
     if (destination === 'promotion-handoff') {
-      const firstCandidateId = selectedCandidateId || getCandidateId(candidates[0]);
-      setSelectedCandidateId(firstCandidateId);
+      const selectedCandidateIsCurrent = candidates.some(
+        (candidate) => getCandidateId(candidate) === selectedCandidateId,
+      );
+      const candidateId = selectedCandidateIsCurrent
+        ? selectedCandidateId
+        : getCandidateId(candidates[0]);
+      setSelectedCandidateId(candidateId);
+      setSelectedEvidence(null);
+      evidenceOpenerRef.current = null;
       setOmiView('apply-promotion');
       return;
     }
 
     if (destination === 'grouped-review') {
+      setSelectedCandidateId('');
+      setSelectedEvidence(null);
+      evidenceOpenerRef.current = null;
       setOmiView('grouped-review');
+      return;
+    }
+
+    if (destination === 'approved-memory-canon') {
+      handleBackToDashboard();
+      onOpenMemoryCanon();
       return;
     }
 

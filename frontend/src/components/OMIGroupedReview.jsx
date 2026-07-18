@@ -280,6 +280,9 @@ export default function OMIGroupedReview({
     return (
       <section className="omi-grouped-review" data-testid="omi-grouped-review">
         <p className="omi-loading-state" role="status">Loading grouped owner review.</p>
+        <button className="secondary-button" type="button" onClick={onBackToDashboard}>
+          Back to OMI Dashboard
+        </button>
       </section>
     );
   }

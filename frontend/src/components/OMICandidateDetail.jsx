@@ -247,6 +247,9 @@ export default function OMICandidateDetail({
     return (
       <section className="omi-candidate-detail" data-testid="omi-candidate-detail" aria-label="OMI Candidate Detail">
         <p className="omi-loading-state" role="status">Loading candidate.</p>
+        <button className="secondary-button" type="button" onClick={onBackToDashboard}>
+          Back to OMI Dashboard
+        </button>
       </section>
     );
   }
@@ -257,6 +260,9 @@ export default function OMICandidateDetail({
         <section className="omi-error-state" role="alert">
           <h2>Candidate schema unsupported or partially corrupt.</h2>
           <p>{error}</p>
+          <button className="secondary-button" type="button" onClick={onBackToDashboard}>
+            Back to OMI Dashboard
+          </button>
         </section>
       </section>
     );

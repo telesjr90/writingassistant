@@ -11,14 +11,18 @@ export default function OMIWorkflowStatusRow({ row }) {
       <td>{row.blockers}</td>
       <td>{row.evidence}</td>
       <td>
-        <button
-          className="secondary-button omi-row-action"
-          type="button"
-          aria-label={`${row.action} for ${row.area}`}
-          onClick={row.onAction}
-        >
-          {row.action}
-        </button>
+        {row.onAction && row.action ? (
+          <button
+            className="secondary-button omi-row-action"
+            type="button"
+            aria-label={`${row.action} for ${row.area}`}
+            onClick={row.onAction}
+          >
+            {row.action}
+          </button>
+        ) : (
+          <span className="muted-copy">{row.unavailable}</span>
+        )}
       </td>
       <td>{row.disabledReason}</td>
     </tr>

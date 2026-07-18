@@ -5877,3 +5877,31 @@ class TestOmiDashboardResetOwnership:
             app_source.index("/>", app_source.index("<OMIShell"))
         ]
         assert "dashboardResetRequest={omiDashboardResetRequest}" in shell_call
+
+    def test_app_owns_memory_canon_workspace_selection_and_delegates_it_to_shell(
+        self, app_source: str, omi_shell_source: str
+    ) -> None:
+        memory_handler = app_source.split(
+            "const handleSelectMemoryCanon = useCallback(() => {", 1
+        )[1].split("const handleSelectOMIDashboard", 1)[0]
+        shell_call = app_source[
+            app_source.index("<OMIShell"):
+            app_source.index("/>", app_source.index("<OMIShell"))
+        ]
+
+        assert "setActiveWorkspaceView(WORKSPACE_VIEWS.MEMORY_CANON)" in memory_handler
+        assert "onOpenMemoryCanon={handleSelectMemoryCanon}" in shell_call
+        assert "setActiveWorkspaceView" not in omi_shell_source
+        assert "onOpenMemoryCanon();" in omi_shell_source
+
+    def test_inner_navigation_state_remains_owned_only_by_omi_shell(
+        self, app_source: str, omi_shell_source: str
+    ) -> None:
+        for shell_owned_state in (
+            "const [omiView, setOmiView]",
+            "const [selectedCandidateId, setSelectedCandidateId]",
+            "const [selectedEvidence, setSelectedEvidence]",
+            "const evidenceOpenerRef = useRef(null)",
+        ):
+            assert shell_owned_state not in app_source
+            assert shell_owned_state in omi_shell_source

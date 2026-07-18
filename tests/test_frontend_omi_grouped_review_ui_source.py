@@ -10,7 +10,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_SRC = REPO_ROOT / "frontend" / "src"
 APP = FRONTEND_SRC / "App.jsx"
 SHELL = FRONTEND_SRC / "components" / "OMIShell.jsx"
+DASHBOARD = FRONTEND_SRC / "components" / "OMIDashboard.jsx"
+WORKFLOW_STATUS_ROW = FRONTEND_SRC / "components" / "OMIWorkflowStatusRow.jsx"
+CANDIDATE_DETAIL = FRONTEND_SRC / "components" / "OMICandidateDetail.jsx"
 GROUPED_REVIEW = FRONTEND_SRC / "components" / "OMIGroupedReview.jsx"
+APPLY_PROMOTION_ROUTE = FRONTEND_SRC / "components" / "OMIApplyPromotionRoute.jsx"
 
 UNCHANGED_SHA256 = {
     FRONTEND_SRC / "omiGroupedReview.js": "0f813c6aaf06f1747ac64c87ee2383cbeafc1ae057d75b241029d1779606973c",
@@ -23,6 +27,14 @@ UNCHANGED_SHA256 = {
 
 def source(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def dashboard_row(dashboard: str, area: str) -> str:
+    start = dashboard.index(f"area: '{area}'")
+    end = dashboard.find("\n    {\n      area:", start)
+    if end == -1:
+        end = dashboard.index("\n  ];", start)
+    return dashboard[start:end]
 
 
 def test_shell_recognizes_and_renders_grouped_review() -> None:
@@ -73,6 +85,155 @@ def test_shell_keeps_inner_navigation_state_and_back_cancel_wiring_local() -> No
     assert shell.count("onBackToDashboard={handleBackToDashboard}") == 2
     navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
     assert "handleBackToDashboard();" in navigate
+
+
+def test_dashboard_enables_only_implemented_destination_controls() -> None:
+    dashboard = source(DASHBOARD)
+
+    enabled_rows = {
+        "Candidates": "candidates",
+        "Grouped Review": "grouped-review",
+        "Promotion Handoff Readiness": "promotion-handoff",
+    }
+    for area, destination in enabled_rows.items():
+        row = dashboard_row(dashboard, area)
+        assert "action:" in row
+        assert f"onAction: () => onNavigate('{destination}')" in row
+        assert "Unavailable in this version" not in row
+
+    assert "onClick={() => onNavigate('approved-memory-canon')}" in dashboard
+    assert 'aria-label="Open Approved Memory/Canon"' in dashboard
+    assert "Review promotion readiness" in dashboard
+    assert "Open handoff queue" not in dashboard
+    assert dashboard.count("onAction: () => onNavigate(") == 3
+
+
+def test_unavailable_dashboard_rows_are_status_only_without_callbacks() -> None:
+    dashboard = source(DASHBOARD)
+
+    for area in (
+        "Owner Input",
+        "Duplicate Decisions",
+        "Promotion Audit Records",
+        "Deferred Categories",
+        "Warnings / Health",
+    ):
+        row = dashboard_row(dashboard, area)
+        assert "unavailable: 'Unavailable in this version'" in row
+        assert "onAction:" not in row
+
+    for unsupported_destination in (
+        "owner-input",
+        "duplicate-decisions",
+        "promotion-audits",
+        "deferred-categories",
+        "health",
+    ):
+        assert f"onNavigate('{unsupported_destination}')" not in dashboard
+
+
+def test_workflow_status_row_renders_button_only_for_actionable_rows() -> None:
+    row = source(WORKFLOW_STATUS_ROW)
+
+    assert "row.onAction && row.action ?" in row
+    assert row.count("<button") == 1
+    assert "onClick={row.onAction}" in row
+    assert '<span className="muted-copy">{row.unavailable}</span>' in row
+
+
+def test_inner_navigation_clears_navigation_scoped_shell_state() -> None:
+    shell = source(SHELL)
+    navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
+    candidates = navigate[
+        navigate.index("destination === 'candidates'"):
+        navigate.index("destination === 'promotion-handoff'")
+    ]
+    promotion = navigate[
+        navigate.index("destination === 'promotion-handoff'"):
+        navigate.index("destination === 'grouped-review'")
+    ]
+    grouped = navigate[
+        navigate.index("destination === 'grouped-review'"):
+        navigate.index("destination === 'approved-memory-canon'")
+    ]
+
+    assert "const firstCandidateId = getCandidateId(candidates[0])" in candidates
+    assert "setSelectedCandidateId(firstCandidateId)" in candidates
+    for branch in (candidates, promotion, grouped):
+        assert "setSelectedEvidence(null)" in branch
+        assert "evidenceOpenerRef.current = null" in branch
+
+    assert "setSelectedCandidateId('')" in grouped
+    assert "setOmiView('grouped-review')" in grouped
+    assert "candidates.some(" in promotion
+    assert "getCandidateId(candidate) === selectedCandidateId" in promotion
+    assert "? selectedCandidateId" in promotion
+    assert ": getCandidateId(candidates[0])" in promotion
+    assert "setOmiView('apply-promotion')" in promotion
+
+
+def test_memory_canon_and_unknown_destinations_fail_closed_through_reset() -> None:
+    shell = source(SHELL)
+    navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
+    memory = navigate[navigate.index("destination === 'approved-memory-canon'"):]
+
+    assert "handleBackToDashboard();" in memory
+    assert "onOpenMemoryCanon();" in memory
+    assert memory.index("handleBackToDashboard();") < memory.index("onOpenMemoryCanon();")
+    assert navigate.rstrip().endswith("handleBackToDashboard();\n  }")
+
+
+def test_missing_loading_and_error_return_paths_use_existing_back_callback() -> None:
+    candidate = source(CANDIDATE_DETAIL)
+    grouped = source(GROUPED_REVIEW)
+    candidate_loading = candidate[
+        candidate.index("if (isLoading)"):
+        candidate.index("if (error)")
+    ]
+    candidate_error = candidate[
+        candidate.index("if (error)"):
+        candidate.index("if (storedCandidates.length === 0)")
+    ]
+    grouped_loading = grouped[
+        grouped.index("if (isLoading)"):
+        grouped.index("\n  return (\n    <section\n", grouped.index("if (isLoading)"))
+    ]
+
+    for state in (candidate_loading, candidate_error, grouped_loading):
+        assert "onClick={onBackToDashboard}" in state
+        assert "Back to OMI Dashboard" in state
+
+
+def test_apply_promotion_route_remains_review_only_and_unavailable() -> None:
+    route = source(APPLY_PROMOTION_ROUTE)
+
+    assert "applyPromotionAvailable={false}" in route
+    assert "onCancel={onCancel}" in route
+    assert "submitApplyPromotion" not in source(SHELL)
+
+
+def test_t006b_navigation_adds_no_runtime_or_mutation_calls() -> None:
+    navigation_sources = "\n".join(
+        source(path)
+        for path in (SHELL, DASHBOARD, WORKFLOW_STATUS_ROW, CANDIDATE_DETAIL)
+    )
+
+    for forbidden in (
+        "fetch(",
+        "axios",
+        "callModel",
+        "ollama",
+        "runStoryCheck",
+        "extractOMICandidates",
+        "createOMICandidate",
+        "createOMIPromotion",
+        "submitApplyPromotion",
+        "saveMemory",
+        "saveCanon",
+        "updateMemory",
+        "updateCanon",
+    ):
+        assert forbidden not in navigation_sources
 
 
 def test_current_inner_route_identities_and_non_mutating_boundary_remain() -> None:

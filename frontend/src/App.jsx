@@ -1710,6 +1710,7 @@ export default function App() {
             error={omiError}
             dashboardResetRequest={omiDashboardResetRequest}
             onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
+            onOpenMemoryCanon={handleSelectMemoryCanon}
           />
         ) : (
           <>

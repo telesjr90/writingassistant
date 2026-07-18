@@ -200,9 +200,8 @@ export default function OMIDashboard({
         degraded,
         fallback: ZERO_STATE_OWNER_INPUT,
       }),
-      action: 'Open owner input',
+      unavailable: 'Unavailable in this version',
       disabledReason: 'No risky action in row',
-      onAction: () => onNavigate('owner-input'),
     },
     {
       area: 'Candidates',
@@ -236,9 +235,8 @@ export default function OMIDashboard({
       status: degraded ? 'Unavailable' : duplicateCount === 0 ? 'No Pending Duplicates' : 'Pending',
       blockers: degraded ? 'Unavailable' : duplicateCount === 0 ? 'None recorded' : `${formatCount(duplicateCount, false)} decisions`,
       evidence: degraded ? 'Unavailable' : 'Provenance required before handoff',
-      action: 'Resolve duplicates',
+      unavailable: 'Unavailable in this version',
       disabledReason: 'Duplicate decisions are review metadata only',
-      onAction: () => onNavigate('duplicate-decisions'),
     },
     {
       area: 'Promotion Handoff Readiness',
@@ -246,7 +244,7 @@ export default function OMIDashboard({
       status: degraded ? 'Unavailable' : handoffReadyCount === 0 ? 'Not Ready' : 'Ready for Handoff',
       blockers: degraded ? 'Unavailable' : handoffReadyCount === 0 ? 'Requirements incomplete' : 'No stored blockers',
       evidence: degraded ? 'Unavailable' : 'Ready means packet complete; Memory/Canon has not changed',
-      action: 'Open handoff queue',
+      action: 'Review promotion readiness',
       disabledReason: OMI_DISABLED_APPLY_REASON,
       onAction: () => onNavigate('promotion-handoff'),
     },
@@ -256,9 +254,8 @@ export default function OMIDashboard({
       status: degraded ? 'Unavailable' : promotionAuditCount === 0 ? 'No Audit Records' : 'Promotion Audit Record',
       blockers: degraded ? 'Unavailable' : 'Audit-only',
       evidence: degraded ? 'Unavailable' : 'Not Applied to Memory/Canon',
-      action: 'View audit records',
+      unavailable: 'Unavailable in this version',
       disabledReason: 'Audit records are not canon changes',
-      onAction: () => onNavigate('promotion-audits'),
     },
     {
       area: 'Deferred Categories',
@@ -266,9 +263,8 @@ export default function OMIDashboard({
       status: degraded ? 'Unavailable' : deferred.length === 0 ? 'None Deferred' : 'Deferred',
       blockers: degraded ? 'Unavailable' : 'Owner review required later',
       evidence: degraded ? 'Unavailable' : 'Source retained when available',
-      action: 'Open deferred categories',
+      unavailable: 'Unavailable in this version',
       disabledReason: 'Deferred categories do not mutate Memory/Canon',
-      onAction: () => onNavigate('deferred-categories'),
     },
     {
       area: 'Warnings / Health',
@@ -277,9 +273,8 @@ export default function OMIDashboard({
       statusTone: degraded || warnings.length > 0 ? 'is-error' : '',
       blockers: degraded ? 'No inferred counts' : warnings.length === 0 ? 'None recorded' : 'Review warnings',
       evidence: degraded ? error : 'Dashboard counts show review status only',
-      action: 'Open health review',
+      unavailable: 'Unavailable in this version',
       disabledReason: 'Health review cannot apply promotion',
-      onAction: () => onNavigate('health'),
     },
   ];
 
