@@ -10,9 +10,11 @@ T002 Story Check grounding integrity is complete/PASS through T002A-T002E. Live 
 
 T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T003C aggregate evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z` (Scenarios 1-4, focused tests, and build) plus `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z` (Scenario 5 direct-failure/recovery completion).
 
-Next planned implementation task: `PHASE8-IMPL-024-T006A - Resettable OMI Dashboard navigation and App.jsx/OMIShell.jsx state-owner decision`. Its dependency on T003C is satisfied. This closeout does not begin T006A.
+T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; and T003 has repaired and validated optional-resource handling. T006 and later workstreams remain incomplete.
+Next planned task: `PHASE8-IMPL-024-T007A - Evidence-based Impeccable UI review`. Its dependency on T006C is satisfied and it is eligible, but it has not begun.
+
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; and T006 has repaired and validated truthful OMI navigation. T007 and later workstreams remain incomplete.
 
 ## Controlling Evidence
 
@@ -29,6 +31,8 @@ T001 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T001
 T002 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002D-story-check-grounding/20260713T022337Z`. The prior BLOCKED missing-storyform run at `20260712T235515Z` and the validation-script-failure run at `20260713T021350Z` remain preserved as superseded validation history. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T002-story-check-grounding-integrity-closeout.md`.
 
 T003/T003C final PASS evidence is the accepted aggregate of `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z` (Scenarios 1-4, 16 backend tests, 63 frontend tests, build PASS) and `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z` (Scenario 5 direct Bible failure/recovery PASS). Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md`.
+
+T006/T006C final PASS evidence is `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md`.
 
 ## Release Blockers
 
@@ -63,8 +67,8 @@ order establish execution sequence:
 - Remaining validation suites: `T008`.
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
-T005 -> T008`. T003B and T003C have closed T003; T006A is next planned. T007 follows
-T006, and T007C must complete before either T004 or T005 begins. This order is
+T005 -> T008`. T003 and T006 are complete/PASS; T007A is next/planned,
+dependency-satisfied, and eligible but not begun. T007C must complete before either T004 or T005 begins. This order is
 already owner-approved and does not require another decision gate.
 
 This ordering prevents premature visual polish, avoids selecting a component
@@ -106,9 +110,11 @@ T003A provides the deterministic `project_context_readiness.v1` backend contract
 
 ### `PHASE8-IMPL-024-T006` - Truthful OMI navigation
 
-- `PHASE8-IMPL-024-T006A` - Resettable OMI Dashboard navigation and `App.jsx`/`OMIShell.jsx` state-owner decision (`planned`; depends on T003C).
-- `PHASE8-IMPL-024-T006B` - Repeated inner-view navigation and enabled actions only for implemented destinations (`planned`; depends on T006A).
-- `PHASE8-IMPL-024-T006C` - Navigation regression validation and closeout (`planned`; depends on T006B).
+- `PHASE8-IMPL-024-T006A` - Resettable OMI Dashboard navigation and `App.jsx`/`OMIShell.jsx` state-owner decision (`complete/PASS`; commit `64dd90c23a926465ec42718032d79c6181d138e4`).
+- `PHASE8-IMPL-024-T006B` - Repeated inner-view navigation and enabled actions only for implemented destinations (`complete/PASS`; commit `14e8c8138621a87973fb469e8233c08180da8374`).
+- `PHASE8-IMPL-024-T006C` - Navigation regression validation and closeout (`complete/PASS`; evidence `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`).
+
+T006 is complete/PASS. Its closeout decision is `docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md`. T007A is next/planned and dependency-satisfied, but not started or in progress.
 
 Unavailable workflows must render as honest status rows, not enabled no-op buttons. Duplicate resolution, audit mutation, and apply-promotion must not be implemented merely to make a dashboard button work.
 
@@ -164,7 +170,7 @@ Verified working behavior is limited to the successful reconciliation collector'
 
 Verified defects were P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s. T001, T002, and T003 have repaired and closed the first, second, and optional-resource defects respectively. The captured overflow and OMI heading skip remain open in later workstreams.
 
-Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, undersized-control standards triage, misleading enabled actions, and OMI internal reset ambiguity.
+Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, and undersized-control standards triage. T006 repaired and validated misleading enabled actions and OMI internal reset ambiguity.
 
 The following remain `NOT_YET_TESTED`: grouped-review owner-decision mutation; candidate lifecycle mutations beyond existing evidence; promotion creation/audit persistence; apply-promotion; approved Memory/Canon mutation; review-queue commands; evidence-drawer focus restoration; complete keyboard navigation; browser zoom and screen-reader behavior; and broader T008 resilience/accessibility behavior beyond the optional-resource states validated by T003C.
 

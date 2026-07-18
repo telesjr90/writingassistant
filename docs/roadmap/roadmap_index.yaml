@@ -5,9 +5,9 @@
     "current_track": "Application UI/UX audit integrity and owner-acceptance repair",
     "current_parent_task_id": "PHASE8-IMPL-024",
     "current_parent_task_title": "Application UI/UX Audit Integrity and Acceptance Repair",
-    "next_readiness_task_id": "PHASE8-IMPL-024-T006A",
-    "next_readiness_task_title": "Resettable OMI Dashboard navigation and state-owner decision",
-    "next_readiness_task_type": "frontend implementation",
+    "next_readiness_task_id": "PHASE8-IMPL-024-T007A",
+    "next_readiness_task_title": "Evidence-based Impeccable UI review",
+    "next_readiness_task_type": "planning task",
     "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
     "planned_architecture_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
     "planned_architecture_activation_after": ["PHASE8-IMPL-024"],
@@ -19,7 +19,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. Its OMI-guided creation P0 finding is repaired and closed by PHASE8-IMPL-024 T001 complete/PASS; its Story Check contradictory factual warnings P0 finding is repaired and closed by PHASE8-IMPL-024 T002 complete/PASS; and its normally absent optional-resource request defect is repaired and closed by T003 complete/PASS through T003A-T003C. T003C accepted aggregate evidence is 20260718T042148Z plus 20260718T045420Z. PHASE8-IMPL-024 remains the active repair parent and T006A is the next planned application frontier. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and broader resilience workflows remain NOT_YET_TESTED. Failed playwright-advanced collector attempts are excluded from readiness evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
+    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. T001 guided creation, T002 Story Check grounding, T003 optional-resource handling, and T006 truthful OMI navigation are complete/PASS. T006A commit 64dd90c establishes App coarse-workspace ownership and centralized OMIShell reset; T006B commit 14e8c81 establishes truthful destinations; T006C fresh validation 20260718T202605Z passed 127/127 dedicated assertions and all four tracked harnesses with zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests. PHASE8-IMPL-024 remains the active incomplete repair parent. T007A is next/planned, dependency-satisfied, eligible, and not begun. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and broader resilience workflows remain NOT_YET_TESTED. Failed collector-development attempts are excluded from passing evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5526,13 +5526,13 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
       "controlling_child_order": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T008"],
-      "latest_child_task": "PHASE8-IMPL-024-T003",
+      "latest_child_task": "PHASE8-IMPL-024-T006",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-024-T006A",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md",
+      "next_child_task": "PHASE8-IMPL-024-T007A",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned/inactive; activation waits for full PHASE8-IMPL-024 closeout and passing application closeout validation",
-      "result": "published/active release-blocker repair parent; T001, T002, and T003 complete/PASS; T006A next/planned; P0-A, P0-B, and optional-resource handling repaired/closed; broad owner acceptance and MVP readiness remain blocked"
+      "result": "published/active incomplete release-blocker repair parent; T001, T002, T003, and T006 complete/PASS; T007A next/planned, dependency-satisfied, eligible, and not begun; broad owner acceptance and MVP readiness remain blocked"
     },
     {
       "id": "PHASE8-IMPL-024-T001",
@@ -5642,23 +5642,23 @@
       "id": "PHASE8-IMPL-024-T006",
       "title": "Truthful OMI navigation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-024",
       "depends_on": ["PHASE8-IMPL-024-T003"],
       "boundary_tags": ["candidate_only", "review_ui_planning", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned workstream; resettable dashboard navigation, repeated inner-view navigation, implemented destinations only, and unavailable workflows as honest status rows"
+      "result": "complete/PASS through T006A-T006C; T006A commit 64dd90c23a926465ec42718032d79c6181d138e4; T006B commit 14e8c8138621a87973fb469e8233c08180da8374; T006C fresh PASS evidence 20260718T202605Z; truthful destinations, centralized reset, review-only promotion, App-owned approved Memory/Canon delegation, zero mutations"
     },
     {
-      "id": "PHASE8-IMPL-024-T006A", "title": "Resettable OMI Dashboard navigation and state-owner decision", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T003C"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T003C"
+      "id": "PHASE8-IMPL-024-T006A", "title": "Resettable OMI Dashboard navigation and state-owner decision", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T003C"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit 64dd90c23a926465ec42718032d79c6181d138e4; App owns coarse workspace selection and OMIShell owns inner navigation/reset state"
     },
     {
-      "id": "PHASE8-IMPL-024-T006B", "title": "Repeated inner-view navigation and truthful enabled actions", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006A"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T006A"
+      "id": "PHASE8-IMPL-024-T006B", "title": "Repeated inner-view navigation and truthful enabled actions", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006A"],
+      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit 14e8c8138621a87973fb469e8233c08180da8374; actionable implemented destinations and truthful unavailable status rows"
     },
     {
-      "id": "PHASE8-IMPL-024-T006C", "title": "Navigation regression validation and closeout", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006B"],
-      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned after T006B"
+      "id": "PHASE8-IMPL-024-T006C", "title": "Navigation regression validation and closeout", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006B"],
+      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; fresh evidence .codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z; 127/127 dedicated assertions, four tracked harnesses PASS, zero mutations, identical protected snapshots/manifests"
     },
     {
       "id": "PHASE8-IMPL-024-T007",
@@ -5672,7 +5672,7 @@
     },
     {
       "id": "PHASE8-IMPL-024-T007A", "title": "Evidence-based Impeccable UI review", "type": "planning_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T006C"],
-      "boundary_tags": ["review_ui_planning", "evidence_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned evidence review; does not select a component library"
+      "boundary_tags": ["review_ui_planning", "evidence_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned, dependency-satisfied, eligible, and not begun; evidence review does not select a component library"
     },
     {
       "id": "PHASE8-IMPL-024-T007B", "title": "Owner component-foundation decision", "type": "planning_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007A"],

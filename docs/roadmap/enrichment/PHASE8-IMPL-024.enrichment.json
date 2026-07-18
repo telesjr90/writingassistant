@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T006A",
-    "activation_state": "T001/T002/T003 are complete/PASS; T006A is the next planned application frontier. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T007A",
+    "activation_state": "T001/T002/T003/T006 are complete/PASS; T007A is next/planned, dependency-satisfied, eligible, and not begun. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -176,8 +176,54 @@
     ],
     "next_task": "PHASE8-IMPL-024-T006A"
   },
+  "t006_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "complete/PASS",
+    "children": {
+      "T006A": "complete/PASS",
+      "T006B": "complete/PASS",
+      "T006C": "complete/PASS"
+    },
+    "commits": {
+      "T006A": "64dd90c23a926465ec42718032d79c6181d138e4",
+      "T006B": "14e8c8138621a87973fb469e8233c08180da8374"
+    },
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md",
+    "fresh_validation": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z",
+    "historical_baseline_diagnostic": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression-diagnostic/20260718T194703Z",
+    "validation": {
+      "historical_digest_guard": "checkout and clean starting-HEAD archive each 1 failed, 22 passed; exact expected/actual frontend/src/api.js digests matched",
+      "historical_source_guards": "checkout and clean starting-HEAD archive each 48 failed, 349 passed; identical node IDs, assertion meanings, and values",
+      "node_test": "PASS",
+      "frontend_build": "PASS; 144 modules transformed",
+      "component_branches": "PASS; nine required branches",
+      "tracked_browser_harnesses": 4,
+      "tracked_browser_harnesses_passed": 4,
+      "navigation_assertions": 127,
+      "navigation_assertions_passed": 127,
+      "desktop_assertions": 61,
+      "mobile_assertions": 35,
+      "product_console_errors": 0,
+      "page_errors": 0,
+      "request_failures": 0,
+      "unexpected_http_responses": 0,
+      "unexpected_fixture_gets": 0,
+      "mutating_requests": 0,
+      "forbidden_requests": 0,
+      "expected_controlled_omi_responses": 2,
+      "expected_controlled_console_responses": 2,
+      "protected_fixture_snapshots_identical": true,
+      "project_filesystem_manifest_identical": true
+    },
+    "product_code_changed_in_t006c": false,
+    "project_memory_required": false,
+    "impeccable_context": "NO_PRODUCT_MD detected; initialization not applicable to validation-only T006C; no product/design/live context files created or modified",
+    "next_task": "PHASE8-IMPL-024-T007A; planned, dependency-satisfied, eligible, not begun"
+  },
   "latest_verified_evidence": {
-    "classification": "T003C accepted aggregate PASS; not product-wide acceptance",
+    "classification": "T006C navigation regression PASS; not product-wide acceptance",
+    "t006c": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z",
+    "t006c_result": "127/127 dedicated assertions and four tracked browser harnesses PASS; zero unexpected console/page/network failures; zero mutations; protected fixture snapshots and project filesystem manifest identical",
     "aggregate_run_ids": ["20260718T042148Z", "20260718T045420Z"],
     "scenarios_1_through_4": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z",
     "scenario_5": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z",
@@ -185,10 +231,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T006A",
-    "title": "Resettable OMI Dashboard navigation and App.jsx/OMIShell.jsx state-owner decision",
-    "status": "planned; dependency on T003C satisfied; next application frontier",
-    "scope": "Bounded truthful OMI navigation implementation; not begun by T003 closeout"
+    "task_id": "PHASE8-IMPL-024-T007A",
+    "title": "Evidence-based Impeccable UI review",
+    "status": "planned; dependency on T006C satisfied; eligible; next application frontier; not begun",
+    "scope": "Evidence-based UI review only; no component-library selection, design-system implementation, or T007A work begun by T006 closeout"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -262,7 +308,8 @@
       "existing-project preservation during the reconciliation run",
       "Story Check grounded diagnostics: exact source identity/hash, deterministic verification-state classification, quarantined unsupported factual claims, source-mismatch fail-closed, non-mutating, live validation PASS at 20260713T022337Z (22 diagnostics: 17 unverified + 5 quarantined, identity matched, no false verification)",
       "T003A project_context_readiness.v1 backend contract for Bible, storyform, and derived storyform-context with stable absent/invalid/unavailable/ready states, bounded diagnostics, safe relative locators, genuine transport-failure boundaries, deterministic responses, and no mutation/model/tool runtime",
-      "T003B/T003C readiness-first conditional loading with canonical Available/Not stored/Invalid/Unavailable/Load failed presentation; all five browser scenarios PASS from aggregate evidence 20260718T042148Z + 20260718T045420Z; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations"
+      "T003B/T003C readiness-first conditional loading with canonical Available/Not stored/Invalid/Unavailable/Load failed presentation; all five browser scenarios PASS from aggregate evidence 20260718T042148Z + 20260718T045420Z; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations",
+      "T006 truthful OMI navigation complete/PASS: T006A reset ownership commit 64dd90c, T006B truthful destinations commit 14e8c81, and T006C fresh validation 20260718T202605Z with 127/127 dedicated assertions, four tracked harnesses PASS, zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests"
     ],
     "verified_defects": [
       "captured document-level horizontal overflow",
@@ -270,9 +317,7 @@
     ],
     "likely_manual_review": [
       "OMI workspace density and weak next-task prioritization",
-      "misleading enabled OMI actions",
       "undersized controls requiring standards-aware triage",
-      "App.jsx and OMIShell.jsx navigation reset ambiguity",
       "repeated metadata and safety presentation patterns",
       "guided review transition focus returns to BODY; non-blocking T005 follow-up",
       "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up",
@@ -292,7 +337,6 @@
     ]
   },
   "risks": [
-    "misleading enabled UI actions",
     "hidden content caused by document overflow",
     "unvalidated mutation/promotion/apply-promotion/approved-data workflows",
     "failed collectors mistaken for product evidence",
