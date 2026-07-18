@@ -38,6 +38,71 @@ def test_shell_recognizes_and_renders_grouped_review() -> None:
     assert "setOmiView('dashboard')" in shell
 
 
+def test_shell_consumes_dashboard_reset_request_through_one_local_reset() -> None:
+    shell = source(SHELL)
+    reset = shell[
+        shell.index("const handleBackToDashboard = useCallback(() => {"):
+        shell.index("function handleNavigate")
+    ]
+
+    assert "dashboardResetRequest = 0" in shell
+    assert "useEffect(() => {" in reset
+    assert "handleBackToDashboard();" in reset
+    assert "[dashboardResetRequest, handleBackToDashboard]" in reset
+    for local_reset in (
+        "setOmiView('dashboard')",
+        "setSelectedCandidateId('')",
+        "setSelectedEvidence(null)",
+        "evidenceOpenerRef.current = null",
+    ):
+        assert reset.count(local_reset) == 1
+
+
+def test_shell_keeps_inner_navigation_state_and_back_cancel_wiring_local() -> None:
+    shell = source(SHELL)
+
+    for shell_owned_state in (
+        "const [omiView, setOmiView] = useState('dashboard')",
+        "const [selectedCandidateId, setSelectedCandidateId] = useState('')",
+        "const [selectedEvidence, setSelectedEvidence] = useState(null)",
+        "const evidenceOpenerRef = useRef(null)",
+    ):
+        assert shell_owned_state in shell
+
+    assert "onCancel={handleBackToDashboard}" in shell
+    assert shell.count("onBackToDashboard={handleBackToDashboard}") == 2
+    navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
+    assert "handleBackToDashboard();" in navigate
+
+
+def test_current_inner_route_identities_and_non_mutating_boundary_remain() -> None:
+    shell = source(SHELL)
+
+    for route_identity in (
+        "import OMICandidateDetail from './OMICandidateDetail.jsx'",
+        "import OMIGroupedReview from './OMIGroupedReview.jsx'",
+        "import OMIApplyPromotionRoute from './OMIApplyPromotionRoute.jsx'",
+        "<OMICandidateDetail",
+        "<OMIGroupedReview",
+        "<OMIApplyPromotionRoute",
+    ):
+        assert route_identity in shell
+
+    assert "from '../api.js'" not in shell
+    for forbidden_mutation in (
+        "fetch(",
+        "axios",
+        "setOmiData",
+        "createOMIPromotion",
+        "submitApplyPromotion",
+        "saveMemory",
+        "saveCanon",
+        "updateMemory",
+        "updateCanon",
+    ):
+        assert forbidden_mutation not in shell
+
+
 def test_app_passes_existing_server_confirmed_handler_and_status_props() -> None:
     app = source(APP)
     shell_call = app[app.index("<OMIShell"):app.index("/>", app.index("<OMIShell"))]

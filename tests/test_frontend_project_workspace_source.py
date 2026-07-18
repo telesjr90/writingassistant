@@ -21,6 +21,7 @@ PROJECT_OVERVIEW_JSX = FRONTEND_SRC / "components" / "ProjectOverview.jsx"
 MEMORY_CANON_SHELL_JSX = FRONTEND_SRC / "components" / "MemoryCanonShell.jsx"
 OMI_GUIDED_PROJECT_CREATION_JSX = FRONTEND_SRC / "components" / "OmiGuidedProjectCreation.jsx"
 OMI_PANEL_JSX = FRONTEND_SRC / "components" / "OMIPanel.jsx"
+OMI_SHELL_JSX = FRONTEND_SRC / "components" / "OMIShell.jsx"
 EDITOR_JSX = FRONTEND_SRC / "components" / "Editor.jsx"
 PROJECT_CONTEXT_JSX = FRONTEND_SRC / "components" / "ProjectContext.jsx"
 BACKEND_MAIN_PY = BACKEND_SRC / "main.py"
@@ -134,6 +135,11 @@ def omi_guided_project_creation_source() -> str:
 @pytest.fixture(scope="module")
 def omi_panel_source() -> str:
     return read_source(OMI_PANEL_JSX)
+
+
+@pytest.fixture(scope="module")
+def omi_shell_source() -> str:
+    return read_source(OMI_SHELL_JSX)
 
 
 @pytest.fixture(scope="module")
@@ -5813,3 +5819,61 @@ class TestSharedEditorRegressionCoverage:
         assert "rewrite scene" not in lower_source
         assert "rewrite note" not in lower_source
         assert "rewrite material" not in lower_source
+
+
+class TestOmiDashboardResetOwnership:
+    """PHASE8-IMPL-024-T006A source contract for coarse OMI navigation."""
+
+    @staticmethod
+    def _omi_dashboard_handler(app_source: str) -> str:
+        return app_source.split(
+            "const handleSelectOMIDashboard = useCallback(() => {", 1
+        )[1].split("const handleOpenEditorWorkspace", 1)[0]
+
+    def test_app_owns_only_coarse_workspace_and_monotonic_reset_request(
+        self, app_source: str, omi_shell_source: str
+    ) -> None:
+        assert (
+            "const [activeWorkspaceView, setActiveWorkspaceView] = "
+            "useState(WORKSPACE_VIEWS.OVERVIEW)"
+        ) in app_source
+        assert (
+            "const [omiDashboardResetRequest, setOmiDashboardResetRequest] = useState(0)"
+        ) in app_source
+        assert "setOmiDashboardResetRequest((request) => request + 1)" in app_source
+
+        for shell_owned_state in (
+            "const [omiView, setOmiView]",
+            "const [selectedCandidateId, setSelectedCandidateId]",
+            "const [selectedEvidence, setSelectedEvidence]",
+        ):
+            assert shell_owned_state not in app_source
+            assert shell_owned_state in omi_shell_source
+
+    def test_omi_request_resets_when_active_and_confirms_before_cross_workspace_entry(
+        self, app_source: str
+    ) -> None:
+        handler = self._omi_dashboard_handler(app_source)
+        confirmation = "!window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)"
+        workspace_update = "setActiveWorkspaceView(WORKSPACE_VIEWS.OMI_DASHBOARD)"
+        reset_update = "setOmiDashboardResetRequest((request) => request + 1)"
+
+        assert "activeWorkspaceView !== WORKSPACE_VIEWS.OMI_DASHBOARD" in handler
+        assert "activeWorkspaceView === WORKSPACE_VIEWS.OMI_DASHBOARD" not in handler
+        assert confirmation in handler
+        assert workspace_update in handler
+        assert reset_update in handler
+        assert handler.index(confirmation) < handler.index("return;")
+        assert handler.index("return;") < handler.index(workspace_update)
+        assert handler.index(workspace_update) < handler.index(reset_update)
+
+        cancelled_gate = handler[:handler.index(workspace_update)]
+        assert "return;" in cancelled_gate
+        assert reset_update not in cancelled_gate
+
+    def test_app_passes_reset_request_to_omi_shell(self, app_source: str) -> None:
+        shell_call = app_source[
+            app_source.index("<OMIShell"):
+            app_source.index("/>", app_source.index("<OMIShell"))
+        ]
+        assert "dashboardResetRequest={omiDashboardResetRequest}" in shell_call

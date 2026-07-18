@@ -243,6 +243,7 @@ export default function App() {
   const [noteSaveStatus, setNoteSaveStatus] = useState('');
   const [materialSaveStatus, setMaterialSaveStatus] = useState('');
   const [activeWorkspaceView, setActiveWorkspaceView] = useState(WORKSPACE_VIEWS.OVERVIEW);
+  const [omiDashboardResetRequest, setOmiDashboardResetRequest] = useState(0);
   const isDirty = selectedSceneId !== '' && sceneContent !== lastSavedContent;
   const isNoteDirty =
     selectedNoteId !== '' && noteContent !== lastSavedNoteContent;
@@ -704,15 +705,16 @@ export default function App() {
   }, [activeWorkspaceView, hasUnsavedDocumentChanges]);
 
   const handleSelectOMIDashboard = useCallback(() => {
-    if (activeWorkspaceView === WORKSPACE_VIEWS.OMI_DASHBOARD) {
-      return;
-    }
-
-    if (hasUnsavedDocumentChanges && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)) {
+    if (
+      activeWorkspaceView !== WORKSPACE_VIEWS.OMI_DASHBOARD
+      && hasUnsavedDocumentChanges
+      && !window.confirm(UNSAVED_PROJECT_SWITCH_MESSAGE)
+    ) {
       return;
     }
 
     setActiveWorkspaceView(WORKSPACE_VIEWS.OMI_DASHBOARD);
+    setOmiDashboardResetRequest((request) => request + 1);
   }, [activeWorkspaceView, hasUnsavedDocumentChanges]);
 
   const handleOpenEditorWorkspace = useCallback(() => {
@@ -1706,6 +1708,7 @@ export default function App() {
             isUpdating={isUpdatingOMI}
             status={omiStatus}
             error={omiError}
+            dashboardResetRequest={omiDashboardResetRequest}
             onUpdateCandidateDecision={handleUpdateOMICandidateDecision}
           />
         ) : (

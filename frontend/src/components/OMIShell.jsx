@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import OMIBoundaryBanner from './OMIBoundaryBanner.jsx';
 import OMICandidateCanonStatusStrip from './OMICandidateCanonStatusStrip.jsx';
 import OMICandidateDetail from './OMICandidateDetail.jsx';
@@ -32,6 +32,7 @@ export default function OMIShell({
   isUpdating = false,
   status = '',
   error = '',
+  dashboardResetRequest = 0,
   onUpdateCandidateDecision = async () => null,
 }) {
   const summary = getOMIDashboardSummary(omiData, { isLoading, error });
@@ -42,6 +43,17 @@ export default function OMIShell({
   const candidates = useMemo(() => (
     Array.isArray(omiData?.candidates) ? omiData.candidates : []
   ), [omiData]);
+
+  const handleBackToDashboard = useCallback(() => {
+    setOmiView('dashboard');
+    setSelectedCandidateId('');
+    setSelectedEvidence(null);
+    evidenceOpenerRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    handleBackToDashboard();
+  }, [dashboardResetRequest, handleBackToDashboard]);
 
   function handleNavigate(destination) {
     if (destination === 'candidates') {
@@ -63,11 +75,7 @@ export default function OMIShell({
       return;
     }
 
-    setOmiView('dashboard');
-  }
-
-  function handleBackToDashboard() {
-    setOmiView('dashboard');
+    handleBackToDashboard();
   }
 
   function handleOpenEvidence(evidence, openerElement) {
