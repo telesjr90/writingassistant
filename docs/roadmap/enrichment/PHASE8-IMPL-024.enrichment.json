@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T007A",
-    "activation_state": "T001/T002/T003/T006 are complete/PASS; T007A is next/planned, dependency-satisfied, eligible, and not begun. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T007B",
+    "activation_state": "T001/T002/T003/T006/T007A are complete/PASS; T007B is next/planned, dependency-satisfied, eligible, and not begun. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -220,8 +220,76 @@
     "impeccable_context": "NO_PRODUCT_MD detected; initialization not applicable to validation-only T006C; no product/design/live context files created or modified",
     "next_task": "PHASE8-IMPL-024-T007A; planned, dependency-satisfied, eligible, not begun"
   },
+  "t007a_closeout": {
+    "status": "complete/PASS",
+    "evidence": ".codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z",
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md",
+    "execution_starting_head": "29d788b0d06ed1167f57edbbaa5feb507014925a",
+    "execution_subject": "docs(ui): close truthful OMI navigation (T006C)",
+    "audit_type": "read-only evidence-based Impeccable UI review",
+    "product_code_changed": false,
+    "commit_or_push_performed": false,
+    "no_p0_p1_findings": true,
+    "classification_totals": {
+      "verified_defects": 4,
+      "recommendations": 6,
+      "preferences": 1,
+      "accepted_behaviors": 3,
+      "deferred_items": 2,
+      "collector_limitations": 1,
+      "not_yet_tested_items": 1,
+      "historical_baselines": 1
+    },
+    "verified_p2_defects": [
+      "Candidate Detail initially places its field-table row action offscreen inside a narrow horizontal-scroll viewport, including at the primary desktop width",
+      "At 320 x 568, the application document expands to approximately 376 CSS pixels and clips the Story Check source selector",
+      "Several core inputs and selects measure approximately 19-21 CSS pixels high and visible checkbox elements approximately 13 CSS pixels; target-size audit finding, not complete WCAG conformance determination",
+      "OMI routes contain duplicate level-one headings and heading-level skips"
+    ],
+    "validation": {
+      "frontend_build": "PASS",
+      "tracked_browser_harnesses": 4,
+      "tracked_browser_harnesses_passed": 4,
+      "fresh_audit_collector": "PASS after one authorized evidence-local locator correction",
+      "captures": 42,
+      "scenarios": 11,
+      "viewport_sizes": 6,
+      "tracked_changes": 0,
+      "product_data_changes": 0,
+      "forbidden_requests": 0,
+      "mutating_requests": 0,
+      "story_check_requests": 0,
+      "model_requests": 0,
+      "extraction_requests": 0,
+      "promotion_execution_requests": 0,
+      "memory_canon_mutation_requests": 0,
+      "protected_snapshots_identical": true,
+      "projects_example_manifest_identical": true,
+      "worktree_remained_clean": true,
+      "staging_remained_empty": true
+    },
+    "handoff": {
+      "t007b_neutral": true,
+      "component_foundation_selected": false,
+      "component_foundation_ranked": false,
+      "component_foundation_installed": false,
+      "impeccable_initialization_files_created": false,
+      "product_md_created": false,
+      "design_md_created": false,
+      "impeccable_live_config_created": false,
+      "waiver_expired_with_t007a": true,
+      "tailwind_installed": false,
+      "shadcn_ui_installed": false,
+      "react_aria_installed": false,
+      "radix_installed": false
+    },
+    "t006_preserved": true,
+    "next_task": "PHASE8-IMPL-024-T007B; planned, dependency-satisfied, eligible, not begun"
+  },
   "latest_verified_evidence": {
-    "classification": "T006C navigation regression PASS; not product-wide acceptance",
+    "classification": "T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
+    "t007a": ".codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z",
+    "t007a_result": "read-only UI audit PASS across 42 captures, 11 scenarios, and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no code/tracked/product-data changes; no commit or push; no forbidden or mutating requests",
     "t006c": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z",
     "t006c_result": "127/127 dedicated assertions and four tracked browser harnesses PASS; zero unexpected console/page/network failures; zero mutations; protected fixture snapshots and project filesystem manifest identical",
     "aggregate_run_ids": ["20260718T042148Z", "20260718T045420Z"],
@@ -231,10 +299,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T007A",
-    "title": "Evidence-based Impeccable UI review",
-    "status": "planned; dependency on T006C satisfied; eligible; next application frontier; not begun",
-    "scope": "Evidence-based UI review only; no component-library selection, design-system implementation, or T007A work begun by T006 closeout"
+    "task_id": "PHASE8-IMPL-024-T007B",
+    "title": "Owner component-foundation decision",
+    "status": "planned; dependency on T007A satisfied; eligible; next application frontier; not begun",
+    "scope": "Owner component-foundation decision only; no library selection or installation yet; depends on T007A evidence"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -309,11 +377,18 @@
       "Story Check grounded diagnostics: exact source identity/hash, deterministic verification-state classification, quarantined unsupported factual claims, source-mismatch fail-closed, non-mutating, live validation PASS at 20260713T022337Z (22 diagnostics: 17 unverified + 5 quarantined, identity matched, no false verification)",
       "T003A project_context_readiness.v1 backend contract for Bible, storyform, and derived storyform-context with stable absent/invalid/unavailable/ready states, bounded diagnostics, safe relative locators, genuine transport-failure boundaries, deterministic responses, and no mutation/model/tool runtime",
       "T003B/T003C readiness-first conditional loading with canonical Available/Not stored/Invalid/Unavailable/Load failed presentation; all five browser scenarios PASS from aggregate evidence 20260718T042148Z + 20260718T045420Z; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations",
-      "T006 truthful OMI navigation complete/PASS: T006A reset ownership commit 64dd90c, T006B truthful destinations commit 14e8c81, and T006C fresh validation 20260718T202605Z with 127/127 dedicated assertions, four tracked harnesses PASS, zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests"
+      "T006 truthful OMI navigation complete/PASS: T006A reset ownership commit 64dd90c, T006B truthful destinations commit 14e8c81, and T006C fresh validation 20260718T202605Z with 127/127 dedicated assertions, four tracked harnesses PASS, zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests",
+      "T007A evidence-based Impeccable UI review complete/PASS: 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; 6 recommendations; 1 preference; 3 accepted behaviors; 2 deferred items; 1 collector limitation; 1 not-yet-tested; 1 historical baseline; no P0/P1 findings; no tracked/product-data changes; no commits; no forbidden/mutating requests; no component foundation selected or installed"
     ],
     "verified_defects": [
       "captured document-level horizontal overflow",
       "captured OMI heading hierarchy skip"
+    ],
+    "t007a_verified_p2_defects": [
+      "Candidate Detail field-table row action offscreen inside narrow horizontal-scroll viewport at desktop width",
+      "At 320 x 568, application document expands to ~376 CSS pixels and clips Story Check source selector",
+      "Core inputs/selects ~19-21 CSS pixels high and visible checkbox elements ~13 CSS pixels; target-size audit finding, not complete WCAG conformance",
+      "OMI routes contain duplicate level-one headings and heading-level skips"
     ],
     "likely_manual_review": [
       "OMI workspace density and weak next-task prioritization",

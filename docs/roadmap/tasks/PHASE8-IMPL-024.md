@@ -12,9 +12,11 @@ T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T
 
 T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-Next planned task: `PHASE8-IMPL-024-T007A - Evidence-based Impeccable UI review`. Its dependency on T006C is satisfied and it is eligible, but it has not begun.
+Latest completed task: `PHASE8-IMPL-024-T007A - Evidence-based Impeccable UI review` is complete/PASS. Evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md`.
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; and T006 has repaired and validated truthful OMI navigation. T007 and later workstreams remain incomplete.
+Next planned task: `PHASE8-IMPL-024-T007B - Owner component-foundation decision`. Its dependency on T007A is satisfied and it is eligible, but it has not begun.
+
+The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; T006 has repaired and validated truthful OMI navigation; and T007A has completed the evidence-based Impeccable UI review. T007B and later workstreams remain incomplete.
 
 ## Controlling Evidence
 
@@ -33,6 +35,8 @@ T002 final PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T002
 T003/T003C final PASS evidence is the accepted aggregate of `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z` (Scenarios 1-4, 16 backend tests, 63 frontend tests, build PASS) and `.codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z` (Scenario 5 direct Bible failure/recovery PASS). Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T003-optional-resource-handling-closeout.md`.
 
 T006/T006C final PASS evidence is `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md`.
+
+T007A final PASS evidence is `.codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md`.
 
 ## Release Blockers
 
@@ -59,15 +63,15 @@ Task identifiers remain stable. Dependencies and the documented workstream
 order establish execution sequence:
 
 - Functional and integrity work: `T001`, `T002`, `T003`, then `T006`.
-- Impeccable evidence review: `T007A`.
-- Component-library decision: `T007B`.
+- Impeccable evidence review: `T007A` (complete/PASS).
+- Component-library decision: `T007B` (next/planned, dependency-satisfied, eligible).
 - Design-system and shared-component standardization: `T007C`.
 - Responsive containment and validation: `T004`.
 - Accessibility semantics, target sizing, and keyboard validation: `T005`.
 - Remaining validation suites: `T008`.
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
-T005 -> T008`. T003 and T006 are complete/PASS; T007A is next/planned,
+T005 -> T008`. T003, T006, and T007A are complete/PASS; T007B is next/planned,
 dependency-satisfied, and eligible but not begun. T007C must complete before either T004 or T005 begins. This order is
 already owner-approved and does not require another decision gate.
 
@@ -114,14 +118,14 @@ T003A provides the deterministic `project_context_readiness.v1` backend contract
 - `PHASE8-IMPL-024-T006B` - Repeated inner-view navigation and enabled actions only for implemented destinations (`complete/PASS`; commit `14e8c8138621a87973fb469e8233c08180da8374`).
 - `PHASE8-IMPL-024-T006C` - Navigation regression validation and closeout (`complete/PASS`; evidence `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`).
 
-T006 is complete/PASS. Its closeout decision is `docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md`. T007A is next/planned and dependency-satisfied, but not started or in progress.
+T006 is complete/PASS. Its closeout decision is `docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md`. T007A is complete/PASS. T007B is next/planned, dependency-satisfied, and eligible, but not begun.
 
 Unavailable workflows must render as honest status rows, not enabled no-op buttons. Duplicate resolution, audit mutation, and apply-promotion must not be implemented merely to make a dashboard button work.
 
 ### `PHASE8-IMPL-024-T007` - Evidence-based UI review, component-library decision, and design-system standardization
 
-- `PHASE8-IMPL-024-T007A` - Run an evidence-based Impeccable UI review after the P0/P1 functional work, consolidate findings with the existing Playwright evidence, and define the prioritized information-architecture and shared-component requirements (`planned`; depends on T006C).
-- `PHASE8-IMPL-024-T007B` - Record the owner-approved component-foundation decision between shadcn/ui, React Aria, Radix Primitives, or retaining native/custom components; evaluate accessibility, styling, migration cost, dependency impact, local-first compatibility, and fit with the existing React/Vite application before adoption (`planned`; depends on T007A).
+- `PHASE8-IMPL-024-T007A` - Run an evidence-based Impeccable UI review after the P0/P1 functional work, consolidate findings with the existing Playwright evidence, and define the prioritized information-architecture and shared-component requirements (`complete/PASS`; depends on T006C). Evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z`. Closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md`.
+- `PHASE8-IMPL-024-T007B` - Record the owner-approved component-foundation decision between shadcn/ui, React Aria, Radix Primitives, or retaining native/custom components; evaluate accessibility, styling, migration cost, dependency impact, local-first compatibility, and fit with the existing React/Vite application before adoption (`planned`; dependency on T007A satisfied, eligible, next/planned, and not begun).
 - `PHASE8-IMPL-024-T007C` - Standardize the design system and shared boundary, metadata, status, empty, loading, error, action, disclosure, and owner-attention components according to the T007B decision; retain complete provenance and safety details and validate the standardized information architecture (`planned`; depends on T007B).
 
 Impeccable is an evidence-based design and critique tool, not a runtime component dependency. T007A findings inform T007B but do not select a component library automatically.

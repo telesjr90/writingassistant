@@ -5,10 +5,10 @@
 - ID: `PHASE8-IMPL-024`
 - Title: Application UI/UX Audit Integrity and Acceptance Repair
 - Status: published/active
-- Latest completed workstream: `PHASE8-IMPL-024-T006` (`complete/PASS`). Latest child: T006C (`complete/PASS`), fresh evidence `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`; T006A commit `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit `14e8c8138621a87973fb469e8233c08180da8374`.
-- Immediate child: `PHASE8-IMPL-024-T007A` (next/planned, dependency-satisfied, eligible, and not begun)
+- Latest completed task: `PHASE8-IMPL-024-T007A` (`complete/PASS`). Latest child: T007A (`complete/PASS`), evidence `.codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z`. T006A commit `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit `14e8c8138621a87973fb469e8233c08180da8374`; T006C evidence `20260718T202605Z`. T007A found no P0/P1 findings; 4 verified P2 defects; 6 recommendations; 1 preference; 3 accepted behaviors; 2 deferred items; 1 collector limitation; 1 not-yet-tested item; 1 historical baseline.
+- Immediate child: `PHASE8-IMPL-024-T007B` (next/planned, dependency-satisfied, eligible, and not begun)
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md`
-- Latest closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T006-truthful-omi-navigation-closeout.md`
+- Latest closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md`
 - Evidence pack: `.codex-context/application-uiux-audit/`
 
 ## Workstreams
@@ -18,14 +18,14 @@
 3. `T003` optional-resource handling: T003A-T003C complete/PASS.
 4. `T006` truthful OMI navigation: T006A-T006C complete/PASS.
 5. `T007` evidence review, owner component-foundation decision, and component
-   standardization: T007A is next/planned and eligible but not begun; T007B-T007C follow.
+   standardization: T007A is complete/PASS; T007B is next/planned, dependency-satisfied, eligible, and not begun; T007C follows.
 6. `T004` responsive containment: T004A-T004C after T007C.
 7. `T005` accessibility semantics and target sizing: T005A-T005C after T004.
 8. `T008` remaining validation suites: T008A-T008F.
 
 ## Sequencing
 
-P0-A T001 is complete/PASS. P0-B T002 is complete/PASS. T003 optional-resource handling is complete/PASS through T003A-T003C. T006 truthful OMI navigation is complete/PASS through T006A-T006C. T007A is the immediate planned, dependency-satisfied, eligible frontier and has not begun. The controlling order is `T003 -> T006 -> T007 -> T004 -> T005 -> T008`; T007C completes before T004/T005. The parent PHASE8-IMPL-024 remains active and incomplete.
+P0-A T001 is complete/PASS. P0-B T002 is complete/PASS. T003 optional-resource handling is complete/PASS through T003A-T003C. T006 truthful OMI navigation is complete/PASS through T006A-T006C. T007A evidence-based Impeccable UI review is complete/PASS; it found no P0/P1 defects. T007B is the immediate planned, dependency-satisfied, eligible frontier and has not begun. The controlling order is `T003 -> T006 -> T007 -> T004 -> T005 -> T008`; T007C completes before T004/T005. The parent PHASE8-IMPL-024 remains active and incomplete.
 
 Existing `PHASE8-IMPL-023-T023A` and T023B completion remains historical and
 valid. T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into
