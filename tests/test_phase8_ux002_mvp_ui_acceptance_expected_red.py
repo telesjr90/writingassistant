@@ -521,18 +521,29 @@ def test_omi_evidence_drawer_stored_review_metadata_only_contract() -> None:
             "Source open action unavailable",
             "Source open action failed closed",
             "Source-opening failures must not create fallback summaries or inferred evidence.",
-            "role=\"dialog\"",
-            "aria-modal=\"true\"",
-            "aria-labelledby={titleId}",
+            "import * as Dialog from '@radix-ui/react-dialog';",
+            "<Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>",
+            "<Dialog.Portal>",
+            "<Dialog.Overlay className=\"omi-evidence-overlay\" />",
+            "<Dialog.Content",
+            "<Dialog.Title asChild>",
+            "<Dialog.Close asChild>",
+            "aria-describedby={undefined}",
+            "onOpenAutoFocus={handleOpenAutoFocus}",
+            "onCloseAutoFocus={handleCloseAutoFocus}",
             "data-testid=\"omi-evidence-drawer-close-top\"",
             "data-testid=\"omi-evidence-drawer-close-bottom\"",
-            "document.addEventListener('keydown', handleKeyDown)",
-            "opener.focus()",
+            "const focusTarget = openerRef?.current ?? previousActiveElementRef.current;",
+            "focusTarget.focus()",
             "buildCandidateEvidenceScope",
             "buildFieldEvidenceScope",
         ),
         "OMI-EVIDENCE-DRAWER-STORED-METADATA",
     )
+
+    drawer_source = read_source(OMI_EVIDENCE_DRAWER_JSX)
+    assert "document.addEventListener('keydown'" not in drawer_source
+    assert 'document.addEventListener("keydown"' not in drawer_source
 
 
 def test_omi_evidence_drawer_disabled_reason_associations_and_footer_groups() -> None:

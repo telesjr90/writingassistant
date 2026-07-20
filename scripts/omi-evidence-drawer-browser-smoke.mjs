@@ -20,6 +20,7 @@ const FRONTEND_NODE_MODULES = path.join(REPO_ROOT, 'frontend', 'node_modules');
 
 const APP_BASE_URL = process.env.APP_BASE_URL ?? 'http://localhost:5173';
 const PROJECT_ID = process.env.OMI_EVIDENCE_DRAWER_PROJECT_ID ?? 'example';
+const CONTEXT_READINESS_PATH = `/api/projects/${PROJECT_ID}/context-readiness`;
 const EVIDENCE_DIR = path.resolve(
   process.env.OMI_EVIDENCE_DRAWER_EVIDENCE_DIR
     ?? 'docs/roadmap/validation/omi-evidence-drawer-browser-evidence',
@@ -114,6 +115,72 @@ const FIXTURE_API = Object.freeze({
   bible: {},
   storyform: {},
   storyformContext: { context: '' },
+  contextReadiness: {
+    schema_version: 'project_context_readiness.v1',
+    project_id: PROJECT_ID,
+    status_vocabulary: [
+      'absent',
+      'invalid',
+      'not_applicable',
+      'ready',
+      'unavailable',
+    ],
+    resource_order: [
+      'bible',
+      'storyform',
+      'storyform_context',
+    ],
+    resources: {
+      bible: {
+        resource_id: 'bible',
+        resource_type: 'project_json',
+        exists: false,
+        structurally_valid: false,
+        ready: false,
+        state: 'absent',
+        reason_code: 'bible_absent',
+        diagnostics: ['Optional Bible resource is not present.'],
+        source_locator: 'bible.json',
+      },
+      storyform: {
+        resource_id: 'storyform',
+        resource_type: 'project_json',
+        exists: false,
+        structurally_valid: false,
+        ready: false,
+        state: 'absent',
+        reason_code: 'storyform_absent',
+        diagnostics: ['Optional storyform resource is not present.'],
+        source_locator: 'storyform.json',
+      },
+      storyform_context: {
+        resource_id: 'storyform_context',
+        resource_type: 'derived_context',
+        exists: false,
+        structurally_valid: false,
+        ready: false,
+        state: 'unavailable',
+        reason_code: 'storyform_context_storyform_absent',
+        diagnostics: ['Storyform context requires a present storyform.'],
+        source_locator: 'storyform.json',
+      },
+    },
+    summary: {
+      resource_count: 3,
+      ready_count: 0,
+      all_ready: false,
+    },
+    safety: {
+      read_only: true,
+      analysis_runtime_invoked: false,
+      model_or_external_tool_invoked: false,
+      resource_mutation: false,
+      candidate_persistence: false,
+      promotion_or_apply_promotion: false,
+      memory_canon_mutation: false,
+      story_prose_generated: false,
+    },
+  },
   omi: {
     index: null,
     owner_input_count: 1,
@@ -146,8 +213,15 @@ let viteProcess = null;
 let playwrightChromium = null;
 let desktopScreenshotPath = '';
 let mobileScreenshotPath = '';
+let compactMobileScreenshotPath = '';
 let beforeSnapshot = null;
 let afterSnapshot = null;
+const pageErrors = [];
+const consoleErrors = [];
+const failedApplicationRequests = [];
+const failedApplicationResponses = [];
+let readinessRequestCount = 0;
+const readinessResponses = [];
 
 function logAction(action, details = {}) {
   const entry = { ts: new Date().toISOString(), action, ...details };
@@ -337,6 +411,7 @@ async function installApiGuard(context) {
       [`/api/projects/${PROJECT_ID}/scenes`, FIXTURE_API.scenes],
       [`/api/projects/${PROJECT_ID}/notes`, FIXTURE_API.notes],
       [`/api/projects/${PROJECT_ID}/materials`, FIXTURE_API.materials],
+      [CONTEXT_READINESS_PATH, FIXTURE_API.contextReadiness],
       [`/api/projects/${PROJECT_ID}/bible`, FIXTURE_API.bible],
       [`/api/projects/${PROJECT_ID}/storyform`, FIXTURE_API.storyform],
       [`/api/projects/${PROJECT_ID}/storyform-context`, FIXTURE_API.storyformContext],
@@ -410,10 +485,12 @@ async function openEvidenceDrawer() {
 
   const trigger = page.locator('[data-testid="omi-evidence-drawer-trigger"]').first();
   await trigger.waitFor({ state: 'visible', timeout: 15000 });
+  const closedDocumentMetrics = await documentWidthMetrics();
   await trigger.click();
   await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'visible', timeout: 15000 });
   await page.waitForTimeout(250);
   logAction('omi_evidence_drawer_opened');
+  return { trigger, closedDocumentMetrics };
 }
 
 async function screenshot(name) {
@@ -433,13 +510,54 @@ async function visibleText(locator) {
   return (await locator.innerText().catch(() => '')).trim();
 }
 
+async function documentWidthMetrics() {
+  return page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+}
+
+async function assertDrawerContainment(viewName, closedDocumentMetrics) {
+  const drawer = page.locator('[data-testid="omi-evidence-drawer"]').first();
+  const box = await drawer.boundingBox();
+  const viewport = page.viewportSize();
+  const openDocumentMetrics = await documentWidthMetrics();
+  const tolerance = 1;
+  const contained = Boolean(
+    box
+    && viewport
+    && box.x >= -tolerance
+    && box.y >= -tolerance
+    && box.x + box.width <= viewport.width + tolerance
+    && box.y + box.height <= viewport.height + tolerance
+  );
+
+  assertEvidence(`${viewName}: drawer is fully contained within the viewport`, contained, {
+    box,
+    viewport,
+  });
+  assertEvidence(`${viewName}: drawer causes no document-level horizontal overflow`, (
+    openDocumentMetrics.scrollWidth <= Math.max(
+      closedDocumentMetrics.scrollWidth,
+      openDocumentMetrics.clientWidth,
+    )
+  ), {
+    closedDocumentMetrics,
+    openDocumentMetrics,
+  });
+}
+
 async function assertDrawerVisibleEvidence(viewName) {
   const drawer = page.locator('[data-testid="omi-evidence-drawer"]').first();
+  const namedDialog = page.getByRole('dialog', { name: /^Evidence scope:/ }).first();
   const drawerText = await visibleText(drawer);
   const sourceOpenButton = page.getByRole('button', { name: /^Open source record$/ }).first();
   const sourceReason = page.locator('[data-testid="omi-source-open-disabled-reason"]').first();
 
   assertEvidence(`${viewName}: Evidence Drawer is visible`, await drawer.isVisible(), {});
+  assertEvidence(`${viewName}: dialog has accessible role and visible scope name`, await namedDialog.isVisible(), {
+    accessibleName: await namedDialog.getAttribute('aria-labelledby'),
+  });
   assertEvidence(`${viewName}: drawer title includes evidence scope`, drawerText.includes('Evidence scope:'), {});
 
   for (const requiredText of [
@@ -505,6 +623,7 @@ async function assertDrawerVisibleEvidence(viewName) {
 
 async function assertFocusTrapAndReturnFocus() {
   const topClose = page.locator('[data-testid="omi-evidence-drawer-close-top"]').first();
+  const bottomClose = page.locator('[data-testid="omi-evidence-drawer-close-bottom"]').first();
   const trigger = page.locator('[data-testid="omi-evidence-drawer-trigger"]').first();
   const initiallyFocused = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
   assertEvidence('desktop: drawer moves focus to labelled top close button', initiallyFocused === 'omi-evidence-drawer-close-top', {
@@ -512,29 +631,65 @@ async function assertFocusTrapAndReturnFocus() {
   });
 
   await page.keyboard.press('Shift+Tab');
-  const afterShiftTabText = await page.evaluate(() => document.activeElement?.textContent?.trim());
-  assertEvidence('desktop: focus trap wraps backward inside drawer', afterShiftTabText === 'Close drawer', {
-    afterShiftTabText,
+  const afterShiftTab = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
+  assertEvidence('desktop: focus trap wraps backward inside drawer', afterShiftTab === 'omi-evidence-drawer-close-bottom', {
+    afterShiftTab,
   });
 
-  await topClose.click();
+  await page.keyboard.press('Tab');
+  const afterForwardTab = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
+  assertEvidence('desktop: focus trap wraps forward inside drawer', afterForwardTab === 'omi-evidence-drawer-close-top', {
+    afterForwardTab,
+  });
+
+  await page.mouse.click(10, 10);
+  assertEvidence('desktop: pointer interaction on overlay does not dismiss drawer', await topClose.isVisible(), {});
+
+  await page.keyboard.press('Escape');
   await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'detached', timeout: 15000 });
   const returnedToTrigger = await trigger.evaluate((element) => document.activeElement === element);
-  assertEvidence('desktop: closing drawer returns focus to opener', returnedToTrigger, {});
+  assertEvidence('desktop: Escape dismisses and returns focus to exact opener', returnedToTrigger, {});
+
+  await trigger.click();
+  await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'visible', timeout: 15000 });
+  const reopenedFocus = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
+  assertEvidence('desktop: drawer successfully reopens after Escape with accepted initial focus', (
+    reopenedFocus === 'omi-evidence-drawer-close-top'
+  ), { reopenedFocus });
+
+  await bottomClose.scrollIntoViewIfNeeded();
+  await bottomClose.click();
+  await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'detached', timeout: 15000 });
+  const buttonCloseReturnedToTrigger = await trigger.evaluate((element) => document.activeElement === element);
+  assertEvidence('desktop: close button dismisses and returns focus to exact opener', buttonCloseReturnedToTrigger, {});
 
   await trigger.click();
   await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'visible', timeout: 15000 });
 }
 
-async function assertMobileSheet() {
+async function reopenAtViewport(width, height) {
+  const topClose = page.locator('[data-testid="omi-evidence-drawer-close-top"]').first();
+  const trigger = page.locator('[data-testid="omi-evidence-drawer-trigger"]').first();
+  await topClose.click();
+  await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'detached', timeout: 15000 });
+  await page.setViewportSize({ width, height });
+  await page.waitForTimeout(250);
+  const closedDocumentMetrics = await documentWidthMetrics();
+  await trigger.click();
+  await page.locator('[data-testid="omi-evidence-drawer"]').waitFor({ state: 'visible', timeout: 15000 });
+  await page.waitForTimeout(250);
+  return closedDocumentMetrics;
+}
+
+async function assertMobileSheet(viewName, minimumWidth) {
   const drawer = page.locator('[data-testid="omi-evidence-drawer"]').first();
   const topClose = page.locator('[data-testid="omi-evidence-drawer-close-top"]').first();
   const bottomClose = page.locator('[data-testid="omi-evidence-drawer-close-bottom"]').first();
   const box = await drawer.boundingBox();
 
-  assertEvidence('mobile: Evidence Drawer is full-screen sheet width', Boolean(box && box.width >= 380), { box });
-  assertEvidence('mobile: top close visible', await topClose.isVisible(), {});
-  assertEvidence('mobile: bottom close visible', await bottomClose.isVisible(), {});
+  assertEvidence(`${viewName}: Evidence Drawer is full-screen sheet width`, Boolean(box && box.width >= minimumWidth), { box });
+  assertEvidence(`${viewName}: top close visible`, await topClose.isVisible(), {});
+  assertEvidence(`${viewName}: bottom close visible`, await bottomClose.isVisible(), {});
 }
 
 async function runWorkflow() {
@@ -551,11 +706,54 @@ async function runWorkflow() {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   await installApiGuard(context);
   page = await context.newPage();
+  page.on('pageerror', (error) => {
+    pageErrors.push(error.message);
+  });
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      consoleErrors.push(message.text());
+    }
+  });
+  page.on('requestfailed', (request) => {
+    failedApplicationRequests.push({
+      method: request.method(),
+      url: request.url(),
+      failure: request.failure()?.errorText ?? 'unknown',
+    });
+  });
+  page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (request.method().toUpperCase() === 'GET' && pathname === CONTEXT_READINESS_PATH) {
+      readinessRequestCount += 1;
+    }
+  });
+  page.on('response', (response) => {
+    const pathname = new URL(response.url()).pathname;
+    if (pathname === CONTEXT_READINESS_PATH) {
+      readinessResponses.push({ status: response.status(), url: response.url() });
+    }
+    if (response.status() >= 400) {
+      failedApplicationResponses.push({ status: response.status(), url: response.url() });
+    }
+  });
 
-  await openEvidenceDrawer();
+  const desktopOpen = await openEvidenceDrawer();
   await assertDrawerVisibleEvidence('desktop');
+  await assertDrawerContainment('desktop', desktopOpen.closedDocumentMetrics);
   await assertFocusTrapAndReturnFocus();
   desktopScreenshotPath = await screenshot('01-desktop-omi-evidence-drawer');
+
+  const mobileClosedDocumentMetrics = await reopenAtViewport(390, 900);
+  await assertDrawerVisibleEvidence('mobile');
+  await assertDrawerContainment('mobile', mobileClosedDocumentMetrics);
+  await assertMobileSheet('mobile', 389);
+  mobileScreenshotPath = await screenshot('02-mobile-omi-evidence-drawer');
+
+  const compactClosedDocumentMetrics = await reopenAtViewport(320, 568);
+  await assertDrawerVisibleEvidence('compact mobile');
+  await assertDrawerContainment('compact mobile', compactClosedDocumentMetrics);
+  await assertMobileSheet('compact mobile', 319);
+  compactMobileScreenshotPath = await screenshot('03-compact-mobile-omi-evidence-drawer');
 
   afterSnapshot = await readOnlyProjectSnapshot('after');
   assertEvidence('opening evidence drawer does not create candidates', beforeSnapshot.omi.candidateCount === afterSnapshot.omi.candidateCount, {
@@ -572,12 +770,26 @@ async function runWorkflow() {
     mutatingApiRequests,
     apiMode,
   });
-
-  await page.setViewportSize({ width: 390, height: 900 });
-  await page.waitForTimeout(250);
-  await assertDrawerVisibleEvidence('mobile');
-  await assertMobileSheet();
-  mobileScreenshotPath = await screenshot('02-mobile-omi-evidence-drawer');
+  assertEvidence('browser reports no unexpected page errors', pageErrors.length === 0, { pageErrors });
+  assertEvidence('browser reports no unexpected console errors', consoleErrors.length === 0, { consoleErrors });
+  assertEvidence('browser reports no failed application requests', failedApplicationRequests.length === 0, {
+    failedApplicationRequests,
+  });
+  assertEvidence('browser reports no failed application responses', failedApplicationResponses.length === 0, {
+    failedApplicationResponses,
+  });
+  assertEvidence('browser observes at least one successful context-readiness GET request', (
+    readinessRequestCount > 0 && readinessResponses.length > 0
+  ), { readinessRequestCount, readinessResponses });
+  assertEvidence('browser context-readiness responses are HTTP 200', (
+    readinessResponses.length > 0
+    && readinessResponses.every((response) => response.status === 200)
+  ), { readinessResponses });
+  assertEvidence('browser reports zero failed context-readiness responses', (
+    failedApplicationResponses.every(
+      (response) => new URL(response.url).pathname !== CONTEXT_READINESS_PATH,
+    )
+  ), { failedApplicationResponses });
 
   await context.close();
 }
@@ -599,9 +811,14 @@ async function writeArtifacts(exitCode) {
     screenshots: {
       desktop: desktopScreenshotPath,
       mobile: mobileScreenshotPath,
+      compactMobile: compactMobileScreenshotPath,
     },
     beforeSnapshot,
     afterSnapshot,
+    readiness: {
+      requestCount: readinessRequestCount,
+      responses: readinessResponses,
+    },
     failures,
     actions: workflowLog,
     safety: {
@@ -612,6 +829,10 @@ async function writeArtifacts(exitCode) {
       applyPromotionNotRunOrEnabled: true,
       noGeneratedProseControlsAdded: true,
       mutatingApiRequests,
+      pageErrors,
+      consoleErrors,
+      failedApplicationRequests,
+      failedApplicationResponses,
     },
   };
 
@@ -638,6 +859,7 @@ async function writeArtifacts(exitCode) {
     '',
     `- Desktop: \`${path.relative(REPO_ROOT, desktopScreenshotPath || path.join(SCREENSHOT_DIR, '01-desktop-omi-evidence-drawer.png'))}\``,
     `- Mobile: \`${path.relative(REPO_ROOT, mobileScreenshotPath || path.join(SCREENSHOT_DIR, '02-mobile-omi-evidence-drawer.png'))}\``,
+    `- Compact mobile (320 x 568): \`${path.relative(REPO_ROOT, compactMobileScreenshotPath || path.join(SCREENSHOT_DIR, '03-compact-mobile-omi-evidence-drawer.png'))}\``,
     '',
     '## Assertions',
     '',
@@ -660,6 +882,13 @@ async function writeArtifacts(exitCode) {
     '- No model/Ollama calls were made.',
     '- Apply-promotion was not run or enabled from the Evidence Drawer.',
     '- No generated prose controls were added by this script.',
+    `- Mutating API request count: \`${mutatingApiRequests.length}\`.`,
+    `- Page error count: \`${pageErrors.length}\`.`,
+    `- Console error count: \`${consoleErrors.length}\`.`,
+    `- Failed application request count: \`${failedApplicationRequests.length}\`.`,
+    `- Failed application response count: \`${failedApplicationResponses.length}\`.`,
+    `- Context-readiness GET request count: \`${readinessRequestCount}\`.`,
+    `- Context-readiness response statuses: \`${readinessResponses.map((response) => response.status).join(', ') || 'none'}\`.`,
   ];
 
   if (failures.length > 0) {

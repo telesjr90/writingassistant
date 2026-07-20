@@ -1,3 +1,4 @@
+import * as Dialog from '@radix-ui/react-dialog';
 import { useEffect, useMemo, useRef } from 'react';
 
 export const SOURCE_OPEN_STATES = {
@@ -161,8 +162,8 @@ export default function OMIEvidenceDrawer({
   openerRef = null,
   onClose = () => {},
 }) {
-  const drawerRef = useRef(null);
-  const titleId = 'omi-evidence-drawer-title';
+  const closeTopRef = useRef(null);
+  const previousActiveElementRef = useRef(null);
   const sourceReasonId = 'omi-source-open-disabled-reason';
   const copyReasonId = 'omi-source-copy-disabled-reason';
   const reviewReasonId = 'omi-evidence-review-action-disabled-reason';
@@ -178,55 +179,32 @@ export default function OMIEvidenceDrawer({
       return undefined;
     }
 
-    const previousActiveElement = document.activeElement;
-    const closeButton = drawerRef.current?.querySelector('[data-testid="omi-evidence-drawer-close-top"]');
-    closeButton?.focus();
-
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (event.key !== 'Tab' || !drawerRef.current) {
-        return;
-      }
-
-      const focusable = Array.from(
-        drawerRef.current.querySelectorAll(
-          'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        ),
-      );
-      if (focusable.length === 0) {
-        event.preventDefault();
-        return;
-      }
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      const opener = openerRef?.current ?? previousActiveElement;
-      if (opener && typeof opener.focus === 'function') {
-        opener.focus();
+      const focusTarget = openerRef?.current ?? previousActiveElementRef.current;
+      if (focusTarget?.isConnected && typeof focusTarget.focus === 'function') {
+        focusTarget.focus();
       }
     };
-  }, [isOpen, onClose, openerRef]);
+  }, [isOpen, openerRef]);
 
-  if (!isOpen || !evidence) {
-    return null;
+  function handleOpenChange(nextOpen) {
+    if (!nextOpen && isOpen) {
+      onClose();
+    }
+  }
+
+  function handleOpenAutoFocus(event) {
+    previousActiveElementRef.current = openerRef?.current ?? document.activeElement;
+    event.preventDefault();
+    closeTopRef.current?.focus();
+  }
+
+  function handleCloseAutoFocus(event) {
+    event.preventDefault();
+    const focusTarget = openerRef?.current ?? previousActiveElementRef.current;
+    if (focusTarget?.isConnected && typeof focusTarget.focus === 'function') {
+      focusTarget.focus();
+    }
   }
 
   async function handleCopySourceLocation() {
@@ -237,29 +215,40 @@ export default function OMIEvidenceDrawer({
   }
 
   return (
-    <div className="omi-evidence-overlay" role="presentation">
-      <aside
-        className="omi-evidence-drawer"
-        data-testid="omi-evidence-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        ref={drawerRef}
-      >
+    <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+      {evidence ? (
+        <Dialog.Portal>
+          <Dialog.Overlay className="omi-evidence-overlay" />
+          <Dialog.Content
+            asChild
+            aria-describedby={undefined}
+            onOpenAutoFocus={handleOpenAutoFocus}
+            onCloseAutoFocus={handleCloseAutoFocus}
+            onPointerDownOutside={(event) => event.preventDefault()}
+            onInteractOutside={(event) => event.preventDefault()}
+          >
+            <aside
+              className="omi-evidence-drawer"
+              data-testid="omi-evidence-drawer"
+            >
         <header className="omi-evidence-header">
           <div>
             <p className="eyebrow">Evidence Scope</p>
-            <h2 id={titleId}>Evidence scope: {scopeLabel}</h2>
+            <Dialog.Title asChild>
+              <h2>Evidence scope: {scopeLabel}</h2>
+            </Dialog.Title>
           </div>
-          <button
-            className="secondary-button"
-            type="button"
-            onClick={onClose}
-            data-testid="omi-evidence-drawer-close-top"
-            aria-label="Close evidence drawer"
-          >
-            Close
-          </button>
+          <Dialog.Close asChild>
+            <button
+              ref={closeTopRef}
+              className="secondary-button"
+              type="button"
+              data-testid="omi-evidence-drawer-close-top"
+              aria-label="Close evidence drawer"
+            >
+              Close
+            </button>
+          </Dialog.Close>
         </header>
 
         <section className="omi-evidence-boundary" aria-label="Evidence and canon boundary">
@@ -385,17 +374,21 @@ export default function OMIEvidenceDrawer({
 
           <fieldset className="omi-evidence-action-group">
             <legend>Close</legend>
-            <button
-              className="primary-button"
-              type="button"
-              onClick={onClose}
-              data-testid="omi-evidence-drawer-close-bottom"
-            >
-              Close drawer
-            </button>
+            <Dialog.Close asChild>
+              <button
+                className="primary-button"
+                type="button"
+                data-testid="omi-evidence-drawer-close-bottom"
+              >
+                Close drawer
+              </button>
+            </Dialog.Close>
           </fieldset>
         </footer>
-      </aside>
-    </div>
+            </aside>
+          </Dialog.Content>
+        </Dialog.Portal>
+      ) : null}
+    </Dialog.Root>
   );
 }
