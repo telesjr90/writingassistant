@@ -5,9 +5,9 @@
     "current_track": "Application UI/UX audit integrity and owner-acceptance repair",
     "current_parent_task_id": "PHASE8-IMPL-024",
     "current_parent_task_title": "Application UI/UX Audit Integrity and Acceptance Repair",
-    "next_readiness_task_id": "PHASE8-IMPL-024-T007B",
-    "next_readiness_task_title": "Owner component-foundation decision",
-    "next_readiness_task_type": "planning task",
+    "next_readiness_task_id": "PHASE8-IMPL-024-T007C",
+    "next_readiness_task_title": "Design-system and shared-component standardization",
+    "next_readiness_task_type": "runtime microtask",
     "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
     "planned_architecture_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
     "planned_architecture_activation_after": ["PHASE8-IMPL-024"],
@@ -19,7 +19,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. T001 guided creation, T002 Story Check grounding, T003 optional-resource handling, T006 truthful OMI navigation, and T007A evidence-based Impeccable UI review are complete/PASS. T006A commit 64dd90c establishes App coarse-workspace ownership and centralized OMIShell reset; T006B commit 14e8c81 establishes truthful destinations; T006C fresh validation 20260718T202605Z passed 127/127 dedicated assertions and all four tracked harnesses with zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests. T007A evidence at 20260718T222816Z completed 42 captures across 11 scenarios and 6 viewport sizes with 4 verified P2 defects, no P0/P1 findings, no tracked/product-data changes, and no commits. PHASE8-IMPL-024 remains the active incomplete repair parent. T007B is next/planned, dependency-satisfied, eligible, and not begun. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and broader resilience workflows remain NOT_YET_TESTED. Failed collector-development attempts are excluded from passing evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
+    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. T001 guided creation, T002 Story Check grounding, T003 optional-resource handling, T006 truthful OMI navigation, T007A evidence-based Impeccable UI review, and T007B owner component-foundation decision are complete/PASS. T006A commit 64dd90c establishes App coarse-workspace ownership and centralized OMIShell reset; T006B commit 14e8c81 establishes truthful destinations; T006C fresh validation 20260718T202605Z passed 127/127 dedicated assertions and all four tracked harnesses with zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests. T007A evidence at 20260718T222816Z completed 42 captures across 11 scenarios and 6 viewport sizes with 4 verified P2 defects, no P0/P1 findings, no tracked/product-data changes, and no commits. T007B records the owner selection of Radix Primitives for incremental accessibility and complex-interaction primitives while retaining native HTML where sufficient and application-owned product semantics; Tailwind and shadcn/ui are not authorized, and no dependency was installed or version pinned. PHASE8-IMPL-024 remains the active incomplete repair parent. T007C is next/planned, dependency-satisfied, eligible, and not begun; its first gate is a bounded OMIEvidenceDrawer proof of concept using the smallest necessary individual Radix package after separate implementation authorization. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Advanced owner mutation, promotion, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and broader resilience workflows remain NOT_YET_TESTED. Failed collector-development attempts are excluded from passing evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5526,13 +5526,13 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
       "controlling_child_order": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T008"],
-      "latest_child_task": "PHASE8-IMPL-024-T007A",
+      "latest_child_task": "PHASE8-IMPL-024-T007B",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-024-T007B",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md",
+      "next_child_task": "PHASE8-IMPL-024-T007C",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned/inactive; activation waits for full PHASE8-IMPL-024 closeout and passing application closeout validation",
-      "result": "published/active incomplete release-blocker repair parent; T001, T002, T003, T006, and T007A complete/PASS; T007B next/planned, dependency-satisfied, eligible, and not begun; broad owner acceptance and MVP readiness remain blocked"
+      "result": "published/active incomplete release-blocker repair parent; T001, T002, T003, T006, T007A, and T007B complete/PASS; T007C next/planned, dependency-satisfied, eligible, and not begun; broad owner acceptance and MVP readiness remain blocked"
     },
     {
       "id": "PHASE8-IMPL-024-T001",
@@ -5668,19 +5668,19 @@
       "parent": "PHASE8-IMPL-024",
       "depends_on": ["PHASE8-IMPL-024-T006"],
       "boundary_tags": ["candidate_only", "evidence_first", "review_ui_planning", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "active/in progress; T007A complete/PASS; T007B next/planned, dependency-satisfied, eligible, not begun; T007C planned/later"
+      "result": "active/in progress; T007A and T007B complete/PASS; Radix Primitives selected under bounded incremental-adoption conditions; T007C next/planned, dependency-satisfied, eligible, and not begun"
     },
     {
       "id": "PHASE8-IMPL-024-T007A", "title": "Evidence-based Impeccable UI review", "type": "planning_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T006C"],
       "boundary_tags": ["review_ui_planning", "evidence_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; read-only evidence-based Impeccable UI review at .codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z; 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no tracked/product-data changes; no commit or push; no component foundation selected or installed; NO_PRODUCT_MD waiver expired with T007A; T006 preserved; neutral T007B handoff"
     },
     {
-      "id": "PHASE8-IMPL-024-T007B", "title": "Owner component-foundation decision", "type": "planning_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007A"],
-      "boundary_tags": ["owner_review_required", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned; dependency on T007A satisfied; eligible; next application frontier; not begun; no component foundation selected, ranked, installed, or prototyped; no Tailwind/shadcn/ui/React Aria/Radix installed; NO_PRODUCT_MD waiver expired with T007A and does not apply"
+      "id": "PHASE8-IMPL-024-T007B", "title": "Owner component-foundation decision", "type": "planning_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007A"],
+      "boundary_tags": ["owner_review_required", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; owner selected Radix Primitives for incremental complex interactions and accessibility primitives; native HTML remains preferred where sufficient; product semantics remain application-owned; Tailwind and shadcn/ui are not authorized; no dependency installed or version pinned; T007C begins with the bounded OMIEvidenceDrawer gate; decision docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md"
     },
     {
       "id": "PHASE8-IMPL-024-T007C", "title": "Design-system and shared-component standardization", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007B"],
-      "boundary_tags": ["review_ui_planning", "candidate_only", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned; dependent on accepted T007B; not yet eligible"
+      "boundary_tags": ["review_ui_planning", "candidate_only", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned; dependency on complete/PASS T007B satisfied; eligible; next frontier; not begun; first gate is a bounded OMIEvidenceDrawer proof of concept using the smallest necessary individual Radix package after separate implementation authorization"
     },
     {
       "id": "PHASE8-IMPL-024-T008",

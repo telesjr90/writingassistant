@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007A-evidence-based-impeccable-ui-review-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T007B",
-    "activation_state": "T001/T002/T003/T006/T007A are complete/PASS; T007B is next/planned, dependency-satisfied, eligible, and not begun. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T007C",
+    "activation_state": "T001/T002/T003/T006/T007A/T007B are complete/PASS; T007C is next/planned, dependency-satisfied, eligible, and not begun. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -286,6 +286,29 @@
     "t006_preserved": true,
     "next_task": "PHASE8-IMPL-024-T007B; planned, dependency-satisfied, eligible, not begun"
   },
+  "t007b_decision": {
+    "status": "complete/PASS",
+    "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md",
+    "selected_foundation": "Radix Primitives",
+    "foundation_layer": "accessibility and complex-interaction primitives",
+    "incremental_complex_interactions_only": true,
+    "native_html_preferred_where_sufficient": true,
+    "product_semantics_application_owned": true,
+    "tailwind_authorized": false,
+    "shadcn_ui_authorized": false,
+    "react_aria_selected": false,
+    "radix_installed_in_t007b": false,
+    "smallest_individual_package_first": true,
+    "umbrella_package_authorized_for_first_gate": false,
+    "t007c_first_gate": "bounded OMIEvidenceDrawer proof of concept",
+    "design_md_deferred_to_t007c": true,
+    "design_tokens_application_owned": true,
+    "fallback_order": [
+      "React Aria Components",
+      "retained native/custom behavior"
+    ],
+    "next_task": "PHASE8-IMPL-024-T007C; planned, dependency-satisfied, eligible, next frontier, not begun"
+  },
   "latest_verified_evidence": {
     "classification": "T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
     "t007a": ".codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z",
@@ -299,10 +322,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T007B",
-    "title": "Owner component-foundation decision",
-    "status": "planned; dependency on T007A satisfied; eligible; next application frontier; not begun",
-    "scope": "Owner component-foundation decision only; no library selection or installation yet; depends on T007A evidence"
+    "task_id": "PHASE8-IMPL-024-T007C",
+    "title": "Design-system and shared-component standardization",
+    "status": "planned; dependency on complete/PASS T007B satisfied; eligible; next application frontier; not begun",
+    "scope": "Begin with a bounded OMIEvidenceDrawer proof of concept using the smallest necessary individual Radix package after separate implementation authorization; preserve native HTML where sufficient and keep design tokens and product semantics application-owned"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -378,7 +401,8 @@
       "T003A project_context_readiness.v1 backend contract for Bible, storyform, and derived storyform-context with stable absent/invalid/unavailable/ready states, bounded diagnostics, safe relative locators, genuine transport-failure boundaries, deterministic responses, and no mutation/model/tool runtime",
       "T003B/T003C readiness-first conditional loading with canonical Available/Not stored/Invalid/Unavailable/Load failed presentation; all five browser scenarios PASS from aggregate evidence 20260718T042148Z + 20260718T045420Z; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations",
       "T006 truthful OMI navigation complete/PASS: T006A reset ownership commit 64dd90c, T006B truthful destinations commit 14e8c81, and T006C fresh validation 20260718T202605Z with 127/127 dedicated assertions, four tracked harnesses PASS, zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests",
-      "T007A evidence-based Impeccable UI review complete/PASS: 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; 6 recommendations; 1 preference; 3 accepted behaviors; 2 deferred items; 1 collector limitation; 1 not-yet-tested; 1 historical baseline; no P0/P1 findings; no tracked/product-data changes; no commits; no forbidden/mutating requests; no component foundation selected or installed"
+      "T007A evidence-based Impeccable UI review complete/PASS: 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; 6 recommendations; 1 preference; 3 accepted behaviors; 2 deferred items; 1 collector limitation; 1 not-yet-tested; 1 historical baseline; no P0/P1 findings; no tracked/product-data changes; no commits; no forbidden/mutating requests; no component foundation selected or installed",
+      "T007B owner component-foundation decision complete/PASS: Radix Primitives selected for incremental accessibility and complex-interaction primitives; native HTML preferred where sufficient; product semantics and design tokens application-owned; no dependency installed or version pinned; T007C bounded OMIEvidenceDrawer gate is next"
     ],
     "verified_defects": [
       "captured document-level horizontal overflow",
@@ -396,7 +420,7 @@
       "repeated metadata and safety presentation patterns",
       "guided review transition focus returns to BODY; non-blocking T005 follow-up",
       "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up",
-      "evidence-based Impeccable review before component-library selection and design-system standardization"
+      "bounded Radix OMIEvidenceDrawer gate before broader component standardization"
     ],
     "not_yet_tested": [
       "grouped-review owner-decision mutation",
@@ -417,14 +441,13 @@
     "failed collectors mistaken for product evidence",
     "guided review focus and immediate selected-project presentation advisories",
     "over-filtering useful Story Check diagnostics (now guarded by quarantined/unverified classification; future architecture ungrounded-model-output risk carried into PHASE8-IMPL-025-T007)",
-    "premature component-library adoption before Impeccable evidence review and an explicit owner-approved decision",
+    "controlled Radix adoption must stop if the bounded OMIEvidenceDrawer gate cannot preserve accessibility, responsive containment, evidence/provenance visibility, review-only behavior, and existing safety contracts",
     "responsive and accessibility rework caused by replacing shared components after those repairs are completed"
   ],
   "open_questions": [
     "MVP-required versus intentionally unavailable OMI destinations",
     "minimum desktop width and touch-target policy",
-    "advanced mutation validation sequencing relative to MVP acceptance",
-    "component-foundation decision after Impeccable review: shadcn/ui, React Aria, Radix Primitives, or retained native/custom components"
+    "advanced mutation validation sequencing relative to MVP acceptance"
   ],
   "boundaries": [
     "analysis-only",
