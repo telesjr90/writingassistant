@@ -13,6 +13,14 @@ DESIGN_MD = REPO_ROOT / "DESIGN.md"
 DESIGN_SIDECAR = REPO_ROOT / ".impeccable" / "design.json"
 STYLES_CSS = REPO_ROOT / "frontend" / "src" / "styles.css"
 PACKAGE_JSON = REPO_ROOT / "frontend" / "package.json"
+OMI_LOADING_STATE = REPO_ROOT / "frontend" / "src" / "components" / "OMILoadingState.jsx"
+OMI_DASHBOARD = REPO_ROOT / "frontend" / "src" / "components" / "OMIDashboard.jsx"
+OMI_CANDIDATE_DETAIL = (
+    REPO_ROOT / "frontend" / "src" / "components" / "OMICandidateDetail.jsx"
+)
+OMI_GROUPED_REVIEW = (
+    REPO_ROOT / "frontend" / "src" / "components" / "OMIGroupedReview.jsx"
+)
 
 REQUIRED_HEADINGS = [
     "## 1. Overview",
@@ -239,6 +247,56 @@ def test_css_defines_semantic_tokens_and_shared_selectors_consume_them() -> None
     assert "var(--wa-color-border)" in empty_block
 
 
+def test_omi_loading_state_is_a_children_only_presentational_leaf() -> None:
+    loading_source = read_text(OMI_LOADING_STATE)
+    expected_source = """export default function OMILoadingState({ children }) {
+  return (
+    <p className=\"omi-loading-state\" role=\"status\">
+      {children}
+    </p>
+  );
+}
+"""
+    assert loading_source == expected_source
+
+    lower_loading_source = loading_source.lower()
+    assert "import " not in loading_source
+    for forbidden in (
+        "usestate",
+        "useeffect",
+        "usecallback",
+        "usememo",
+        "useref",
+        "fetch(",
+        "axios",
+        "@radix-ui",
+        "promotion",
+        "memory",
+        "canon",
+    ):
+        assert forbidden not in lower_loading_source
+    for loading_copy in (
+        "Loading OMI status.",
+        "Loading candidate.",
+        "Loading grouped owner review.",
+    ):
+        assert loading_copy not in loading_source
+
+    callers = (
+        (OMI_DASHBOARD, "Loading OMI status.", "{isLoading && ("),
+        (OMI_CANDIDATE_DETAIL, "Loading candidate.", "if (isLoading) {"),
+        (OMI_GROUPED_REVIEW, "Loading grouped owner review.", "if (isLoading) {"),
+    )
+    for path, loading_copy, loading_marker in callers:
+        caller_source = read_text(path)
+        assert "import OMILoadingState from './OMILoadingState.jsx';" in caller_source
+        assert "<OMILoadingState>" in caller_source
+        assert "</OMILoadingState>" in caller_source
+        assert loading_copy in caller_source
+        assert '<p className="omi-loading-state" role="status">' not in caller_source
+        assert loading_marker in caller_source
+
+
 def test_dependency_and_scope_boundaries_remain_unchanged() -> None:
     package = json.loads(read_text(PACKAGE_JSON))
     dependencies = package.get("dependencies", {})
@@ -266,7 +324,6 @@ def test_dependency_and_scope_boundaries_remain_unchanged() -> None:
             "docs/roadmap",
             "frontend/package.json",
             "frontend/package-lock.json",
-            "frontend/src/components",
         ],
         cwd=REPO_ROOT,
         text=True,

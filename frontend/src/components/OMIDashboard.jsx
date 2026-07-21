@@ -1,4 +1,5 @@
 import OMIWorkflowStatusRow from './OMIWorkflowStatusRow.jsx';
+import OMILoadingState from './OMILoadingState.jsx';
 
 export const OMI_DISABLED_APPLY_REASON =
   'Disabled: apply-promotion requires owner approval, destination, evidence/provenance review, duplicate resolution, dependency review, and final confirmation.';
@@ -281,9 +282,9 @@ export default function OMIDashboard({
   return (
     <section className="omi-dashboard" data-testid="omi-dashboard" aria-label="OMI Dashboard">
       {isLoading && (
-        <p className="omi-loading-state" role="status">
+        <OMILoadingState>
           Loading OMI status.
-        </p>
+        </OMILoadingState>
       )}
 
       {error && (

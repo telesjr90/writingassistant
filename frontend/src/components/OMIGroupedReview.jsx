@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import OMILoadingState from './OMILoadingState.jsx';
 import {
   buildGroupedReviewModel,
   selectLinkedReviewCandidates,
@@ -279,7 +280,9 @@ export default function OMIGroupedReview({
   if (isLoading) {
     return (
       <section className="omi-grouped-review" data-testid="omi-grouped-review">
-        <p className="omi-loading-state" role="status">Loading grouped owner review.</p>
+        <OMILoadingState>
+          Loading grouped owner review.
+        </OMILoadingState>
         <button className="secondary-button" type="button" onClick={onBackToDashboard}>
           Back to OMI Dashboard
         </button>

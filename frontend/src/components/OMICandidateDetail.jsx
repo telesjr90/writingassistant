@@ -1,4 +1,5 @@
 import OMICandidateFieldTable from './OMICandidateFieldTable.jsx';
+import OMILoadingState from './OMILoadingState.jsx';
 import {
   buildCandidateEvidenceScope,
 } from './OMIEvidenceDrawer.jsx';
@@ -246,7 +247,9 @@ export default function OMICandidateDetail({
   if (isLoading) {
     return (
       <section className="omi-candidate-detail" data-testid="omi-candidate-detail" aria-label="OMI Candidate Detail">
-        <p className="omi-loading-state" role="status">Loading candidate.</p>
+        <OMILoadingState>
+          Loading candidate.
+        </OMILoadingState>
         <button className="secondary-button" type="button" onClick={onBackToDashboard}>
           Back to OMI Dashboard
         </button>
