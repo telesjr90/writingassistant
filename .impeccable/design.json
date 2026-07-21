@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-20T17:13:38Z",
+  "title": "Design System: Writing Assistant Application",
+  "extensions": {
+    "colorMeta": {
+      "application-canvas": {
+        "role": "neutral",
+        "displayName": "Application Canvas",
+        "cssVariable": "--wa-color-canvas"
+      },
+      "primary-surface": {
+        "role": "neutral",
+        "displayName": "Primary Surface",
+        "cssVariable": "--wa-color-surface"
+      },
+      "primary-action-accent": {
+        "role": "primary",
+        "displayName": "Primary Action Accent",
+        "cssVariable": "--wa-color-accent"
+      },
+      "focus-accent": {
+        "role": "focus",
+        "displayName": "Focus Accent",
+        "cssVariable": "--wa-color-focus"
+      },
+      "success-text": {
+        "role": "success",
+        "displayName": "Success Text",
+        "cssVariable": "--wa-color-success"
+      },
+      "warning-text": {
+        "role": "warning",
+        "displayName": "Warning Text",
+        "cssVariable": "--wa-color-warning"
+      },
+      "danger-text": {
+        "role": "danger",
+        "displayName": "Danger Text",
+        "cssVariable": "--wa-color-danger"
+      }
+    },
+    "typographyMeta": {
+      "h1": {
+        "displayName": "Page Heading",
+        "purpose": "Current page-level heading role; hierarchy repair remains owned by T005."
+      },
+      "h2": {
+        "displayName": "Section Heading",
+        "purpose": "Current section-level heading role; hierarchy repair remains owned by T005."
+      },
+      "body-copy": {
+        "displayName": "Product Copy",
+        "purpose": "Direct interface explanations, boundaries, and state copy."
+      },
+      "compact-metadata": {
+        "displayName": "Compact Metadata",
+        "purpose": "Evidence, provenance, status, identifiers, and timestamps."
+      },
+      "monospace-data": {
+        "displayName": "Stored Data",
+        "purpose": "JSON, hashes, locators, and machine-shaped stored values."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel",
+        "value": "0 18px 50px rgba(15, 23, 42, 0.08)",
+        "purpose": "Existing major editor-panel elevation only."
+      }
+    ],
+    "focusRings": [
+      {
+        "name": "default",
+        "value": "0 0 0 3px rgba(122, 162, 232, 0.2)",
+        "purpose": "Existing input, textarea, and editor focus treatment."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "current-compact-layout",
+        "value": "900px",
+        "purpose": "Actual current CSS breakpoint; T004 owns responsive completion."
+      }
+    ],
+    "narrative": {
+      "northStar": "The Evidence Workbench",
+      "overview": "A calm, rigorous, trustworthy product workspace where writers inspect owner-authored material, analysis, evidence, provenance, and review state without mistaking automated output for truth. Visual language and product semantics remain application-owned.",
+      "keyCharacteristics": [
+        "Restrained cool-neutral product UI",
+        "Truthful state and action boundaries",
+        "Evidence and provenance before confidence",
+        "Native HTML by default",
+        "Radix only for bounded complex interaction behavior",
+        "Flat-by-default surfaces with limited structural elevation"
+      ],
+      "rules": [
+        {
+          "name": "The Truthful Affordance Rule",
+          "body": "Blocked, unavailable, degraded, review-only, and not-yet-implemented states remain visibly distinct and never masquerade as working actions.",
+          "section": "overview"
+        },
+        {
+          "name": "The Evidence-First Rule",
+          "body": "Evidence and provenance precede confidence; confidence communicates support strength, never truth.",
+          "section": "overview"
+        },
+        {
+          "name": "The Native-First Rule",
+          "body": "Use native HTML whenever it provides sufficient semantics and behavior; runtime primitives require a bounded complex-interaction need.",
+          "section": "components"
+        }
+      ],
+      "dos": [
+        "Do preserve truthful affordances and explicit owner authority.",
+        "Do preserve evidence, provenance, candidate, approval, approved Memory, and Canon distinctions.",
+        "Do keep analysis output candidate-first and non-canon."
+      ],
+      "donts": [
+        "Don't generate story prose.",
+        "Don't automatically promote or apply promotion.",
+        "Don't automatically mutate approved Memory or Canon.",
+        "Don't make blocked or review-only behavior appear actionable."
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "primary-action",
+      "description": "Existing enabled primary action treatment.",
+      "html": "<button class=\"ds-primary-action\" type=\"button\">Primary action</button>",
+      "css": ".ds-primary-action { min-height: 32px; padding: 0 var(--wa-space-12); color: var(--wa-color-surface); background: var(--wa-color-accent); border: 1px solid var(--wa-color-accent); border-radius: var(--wa-radius-control); font: inherit; cursor: pointer; } .ds-primary-action:focus-visible { outline: none; box-shadow: var(--wa-focus-ring); }"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "secondary-action",
+      "description": "Existing neutral outlined secondary action treatment.",
+      "html": "<button class=\"ds-secondary-action\" type=\"button\">Secondary action</button>",
+      "css": ".ds-secondary-action { min-height: 32px; padding: 0 var(--wa-space-12); color: var(--wa-color-accent); background: var(--wa-color-surface); border: 1px solid #aab8ce; border-radius: var(--wa-radius-control); font: inherit; cursor: pointer; } .ds-secondary-action:focus-visible { outline: none; box-shadow: var(--wa-focus-ring); }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "form-input",
+      "description": "Existing application input treatment and focus ring.",
+      "html": "<label class=\"ds-field\">Label<input class=\"ds-input\" value=\"Stored value\" readonly></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: var(--wa-space-6); color: var(--wa-color-text-secondary); font: 700 12px/1.2 var(--wa-font-ui); } .ds-input { min-height: 36px; padding: 0 var(--wa-space-10); color: var(--wa-color-text); background: var(--wa-color-surface-subtle); border: 1px solid var(--wa-color-border); border-radius: var(--wa-radius-surface); font: inherit; } .ds-input:focus-visible { border-color: var(--wa-color-focus); box-shadow: var(--wa-focus-ring); outline: none; }"
+    },
+    {
+      "name": "Surface Panel",
+      "kind": "card",
+      "refersTo": "surface-panel",
+      "description": "Existing bordered primary surface without decorative elevation.",
+      "html": "<section class=\"ds-panel\"><strong>Panel</strong><p>Task-focused content.</p></section>",
+      "css": ".ds-panel { padding: var(--wa-space-20); color: var(--wa-color-text); background: var(--wa-color-surface); border: 1px solid var(--wa-color-border); border-radius: var(--wa-radius-surface); font-family: var(--wa-font-ui); } .ds-panel p { color: var(--wa-color-text-secondary); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Existing compact informational state badge.",
+      "html": "<span class=\"ds-status-badge\">Candidate only</span>",
+      "css": ".ds-status-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 2px var(--wa-space-8); color: var(--wa-color-accent); background: var(--wa-color-surface-selected); border: 1px solid #bdd0f2; border-radius: var(--wa-radius-pill); font: 700 12px/1.2 var(--wa-font-ui); }"
+    },
+    {
+      "name": "Boundary Notice",
+      "kind": "custom",
+      "refersTo": "boundary-notice",
+      "description": "Existing evidence, provenance, and review-only boundary treatment.",
+      "html": "<aside class=\"ds-boundary\">Evidence supports review. It is not Canon.</aside>",
+      "css": ".ds-boundary { padding: var(--wa-space-10) var(--wa-space-12); color: var(--wa-color-text-secondary); background: var(--wa-color-surface-subtle); border: 1px solid var(--wa-color-boundary-border); border-radius: var(--wa-radius-surface); font: 400 13px/1.45 var(--wa-font-ui); }"
+    },
+    {
+      "name": "Radix Evidence Dialog",
+      "kind": "custom",
+      "refersTo": "radix-evidence-dialog",
+      "description": "Application-owned evidence drawer using Radix Dialog for complex interaction behavior only.",
+      "html": "<aside class=\"ds-evidence-dialog\" role=\"dialog\" aria-label=\"Evidence scope\"><strong>Evidence scope</strong><p>Stored evidence and provenance.</p></aside>",
+      "css": ".ds-evidence-dialog { width: min(520px, calc(100vw - 48px)); padding: 18px; color: var(--wa-color-text); background: var(--wa-color-surface); border-left: 1px solid var(--wa-color-boundary-border); box-shadow: -18px 0 50px rgba(15, 23, 42, 0.18); font-family: var(--wa-font-ui); } .ds-evidence-dialog:focus-visible { outline: none; box-shadow: var(--wa-focus-ring); }"
+    }
+  ]
+}
