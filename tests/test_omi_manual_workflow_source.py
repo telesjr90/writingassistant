@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -7,6 +8,9 @@ FRONTEND_SRC = REPO_ROOT / "frontend" / "src"
 OMI_PANEL = FRONTEND_SRC / "components" / "OMIPanel.jsx"
 OMI_CANDIDATE_DETAIL = FRONTEND_SRC / "components" / "OMICandidateDetail.jsx"
 OMI_CANDIDATE_FIELD_TABLE = FRONTEND_SRC / "components" / "OMICandidateFieldTable.jsx"
+OMI_EMPTY_CANDIDATE_SHELL_WARNING = (
+    FRONTEND_SRC / "components" / "OMIEmptyCandidateShellWarning.jsx"
+)
 OMI_PROMOTION_READINESS_CHECKLIST = (
     FRONTEND_SRC / "components" / "OMIPromotionReadinessChecklist.jsx"
 )
@@ -21,6 +25,7 @@ def combined_omi_source() -> str:
     return "\n".join(
         read_source(path)
         for path in (
+            OMI_EMPTY_CANDIDATE_SHELL_WARNING,
             OMI_PANEL,
             OMI_CANDIDATE_DETAIL,
             OMI_CANDIDATE_FIELD_TABLE,
@@ -28,6 +33,84 @@ def combined_omi_source() -> str:
             API_JS,
         )
     )
+
+
+def test_empty_candidate_shell_warning_is_a_caller_owned_leaf_component() -> None:
+    component_source = read_source(OMI_EMPTY_CANDIDATE_SHELL_WARNING)
+    panel_source = read_source(OMI_PANEL)
+    detail_source = read_source(OMI_CANDIDATE_DETAIL)
+    field_table_source = read_source(OMI_CANDIDATE_FIELD_TABLE)
+    caller_sources = (panel_source, detail_source, field_table_source)
+    component_import = (
+        "import OMIEmptyCandidateShellWarning from "
+        "'./OMIEmptyCandidateShellWarning.jsx';"
+    )
+    warning_copy = (
+        "This is a manual candidate shell. No extraction has populated characters, "
+        "locations, timeline, or story facts."
+    )
+    direct_wrapper = re.compile(
+        r'<p\s+className="omi-workflow-warning"\s+'
+        r'data-testid="omi-empty-candidate-shell-warning"'
+    )
+
+    assert (
+        "export default function OMIEmptyCandidateShellWarning({ children })"
+        in component_source
+    )
+    assert component_source.count("<p") == 1
+    assert component_source.count("</p>") == 1
+    assert 'className="omi-workflow-warning"' in component_source
+    assert 'data-testid="omi-empty-candidate-shell-warning"' in component_source
+    assert "{children}" in component_source
+    for forbidden_marker in (
+        "import ",
+        "usestate",
+        "useeffect",
+        "usememo",
+        "state",
+        "hook",
+        "callback",
+        "onclick",
+        "api",
+        "radix",
+        "promotion",
+        "memory",
+        "canon",
+        "role=",
+        "aria-",
+    ):
+        assert forbidden_marker not in component_source.lower()
+
+    for caller_source in caller_sources:
+        assert component_import in caller_source
+        assert direct_wrapper.search(caller_source) is None
+        assert "function isEmptyManualCandidateShell(candidate)" in caller_source
+
+    assert panel_source.count("<OMIEmptyCandidateShellWarning>") == 2
+    assert panel_source.count("</OMIEmptyCandidateShellWarning>") == 2
+    assert detail_source.count("<OMIEmptyCandidateShellWarning>") == 1
+    assert detail_source.count("</OMIEmptyCandidateShellWarning>") == 1
+    assert field_table_source.count("<OMIEmptyCandidateShellWarning>") == 1
+    assert field_table_source.count("</OMIEmptyCandidateShellWarning>") == 1
+
+    assert "const EMPTY_CANDIDATE_SHELL_WARNING" in panel_source
+    assert warning_copy in panel_source
+    assert warning_copy in detail_source
+    assert warning_copy in field_table_source
+    assert "{EMPTY_CANDIDATE_SHELL_WARNING}" in panel_source
+
+    assert panel_source.count("{isEmptyManualCandidateShell(candidate) && (") == 1
+    assert (
+        panel_source.count("{isEmptyManualCandidateShell(selectedCandidate) && (")
+        == 1
+    )
+    assert detail_source.count("{isEmptyManualCandidateShell(candidate) && (") == 1
+    assert (
+        "const emptyManualShell = isEmptyManualCandidateShell(candidate);"
+        in field_table_source
+    )
+    assert "{emptyManualShell && (" in field_table_source
 
 
 def test_empty_candidate_shell_and_extraction_unavailable_labels_are_visible() -> None:

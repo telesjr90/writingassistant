@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import OMIEmptyCandidateShellWarning from './OMIEmptyCandidateShellWarning.jsx';
 
 const CANDIDATE_TYPES = [
   { value: 'planning_note', label: 'Planning note' },
@@ -870,12 +871,9 @@ export default function OMIPanel({
                   </div>
                 </dl>
                 {isEmptyManualCandidateShell(candidate) && (
-                  <p
-                    className="omi-workflow-warning"
-                    data-testid="omi-empty-candidate-shell-warning"
-                  >
+                  <OMIEmptyCandidateShellWarning>
                     {EMPTY_CANDIDATE_SHELL_WARNING}
-                  </p>
+                  </OMIEmptyCandidateShellWarning>
                 )}
                 {candidate.owner_decision?.decision === 'approve' && (
                   <p className="review-boundary-note">
@@ -938,12 +936,9 @@ export default function OMIPanel({
         ) : (
           <>
             {isEmptyManualCandidateShell(selectedCandidate) && (
-              <p
-                className="omi-workflow-warning"
-                data-testid="omi-empty-candidate-shell-warning"
-              >
+              <OMIEmptyCandidateShellWarning>
                 {EMPTY_CANDIDATE_SHELL_WARNING}
-              </p>
+              </OMIEmptyCandidateShellWarning>
             )}
             {selectedCandidate.owner_decision?.decision === 'approve' && (
               <p className="review-boundary-note">

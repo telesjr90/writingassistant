@@ -1,4 +1,5 @@
 import { buildFieldEvidenceScope } from './OMIEvidenceDrawer.jsx';
+import OMIEmptyCandidateShellWarning from './OMIEmptyCandidateShellWarning.jsx';
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -128,12 +129,9 @@ export default function OMICandidateFieldTable({ candidate, onOpenEvidence = () 
         <span className="omi-status-badge">Confidence indicates support strength, not truth.</span>
       </div>
       {emptyManualShell && (
-        <p
-          className="omi-workflow-warning"
-          data-testid="omi-empty-candidate-shell-warning"
-        >
+        <OMIEmptyCandidateShellWarning>
           This is a manual candidate shell. No extraction has populated characters, locations, timeline, or story facts.
-        </p>
+        </OMIEmptyCandidateShellWarning>
       )}
       <div className="omi-field-table-wrap">
         <table

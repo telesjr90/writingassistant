@@ -1,4 +1,5 @@
 import OMICandidateFieldTable from './OMICandidateFieldTable.jsx';
+import OMIEmptyCandidateShellWarning from './OMIEmptyCandidateShellWarning.jsx';
 import OMILoadingState from './OMILoadingState.jsx';
 import {
   buildCandidateEvidenceScope,
@@ -366,12 +367,9 @@ export default function OMICandidateDetail({
       </p>
 
       {isEmptyManualCandidateShell(candidate) && (
-        <p
-          className="omi-workflow-warning"
-          data-testid="omi-empty-candidate-shell-warning"
-        >
+        <OMIEmptyCandidateShellWarning>
           This is a manual candidate shell. No extraction has populated characters, locations, timeline, or story facts.
-        </p>
+        </OMIEmptyCandidateShellWarning>
       )}
 
       {isOwnerApproved(candidate) && (
