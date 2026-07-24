@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007-design-system-and-shared-component-standardization-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T007C",
-    "activation_state": "T001/T002/T003/T006/T007A/T007B are complete/PASS; T007C is next/planned, dependency-satisfied, eligible, and not begun. PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T004A",
+    "activation_state": "T001/T002/T003/T006/T007 are complete/PASS; T004A is next planned, dependency-satisfied, and eligible; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -309,12 +309,73 @@
     ],
     "next_task": "PHASE8-IMPL-024-T007C; planned, dependency-satisfied, eligible, next frontier, not begun"
   },
+  "t007c_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "complete/PASS",
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T007-design-system-and-shared-component-standardization-closeout.md",
+    "implementation_commits": {
+      "radix_evidence_drawer": "71393b40a60888506c6ed63ca8444e8639fa22c3",
+      "design_contract_and_semantic_tokens": "9ea8557c97266953cd5eb5bc7d2dfe8626ec8efd",
+      "loading_state": "8c338913516c5eec99c72e0daeb890ac7960ade1",
+      "empty_candidate_warning": "945254a844a33323d292ab9afb7e3f98346faef3"
+    },
+    "readiness_evidence": {
+      "archive": "/tmp/PHASE8-IMPL-024-T007C-closeout-readiness-20260722T040518Z.tar.gz",
+      "sha256": "31c2a17a8231a0b3e9cb034b807588f9e75b454b300e8c5894185c3306a697a8"
+    },
+    "validation_evidence": {
+      "archive": "/tmp/PHASE8-IMPL-024-T007C-consolidated-validation-resumed-20260722T044725Z.tar.gz",
+      "sha256": "21ee0e54b9aa2fa700912f8b1b635720bcf7fef7492ef3c995e2ee2dbe925bb6",
+      "result": "PASS_WITH_FINDINGS - T007C_CONSOLIDATED_VALIDATION_ACCEPTED",
+      "focused_source_tests": "55 passed, 2 deselected",
+      "ssr_parity": "PASS",
+      "external_vite_build": "PASS",
+      "tracked_browser_harnesses": "4 PASS",
+      "radix_focus_and_accessibility": "PASS",
+      "mutating_requests": 0,
+      "apply_promotion_requests": 0,
+      "candidates_unchanged": true,
+      "approved_memory_canon_unchanged": true,
+      "protected_files_unchanged": true,
+      "project_data_unchanged": true
+    },
+    "radix_scope": "@radix-ui/react-dialog used only for OMIEvidenceDrawer interaction/accessibility mechanics; native-first and application-owned semantics retained",
+    "accepted_shared_components": [
+      "OMILoadingState",
+      "OMIEmptyCandidateShellWarning"
+    ],
+    "families_kept_local": [
+      "status-label and badge",
+      "metadata key/value",
+      "boundary, warning, and owner-attention",
+      "disabled-reason and conditional aria-describedby",
+      "static error and alert",
+      "native disclosure and expandable-detail"
+    ],
+    "known_findings": [
+      "KNOWN_HISTORICAL_API_DIGEST_BASELINE",
+      "KNOWN_HISTORICAL_APPLY_PROMOTION_COPY_BASELINE",
+      "EXISTING_VITE_CHUNK_SIZE_WARNING",
+      "EXISTING_PYDANTIC_DEPRECATION_WARNINGS",
+      "EXPECTED_READ_ONLY_FIXTURE_FALLBACK",
+      "EXPECTED_OPTIONAL_RESOURCE_ABSENCE",
+      "AGGREGATE_SNAPSHOT_LABEL_FALSE_POSITIVE"
+    ],
+    "aggregate_snapshot_label_clarification": "The aggregate checker compared only intentional metadata labels (beforeSnapshot.label = 'before' vs afterSnapshot.label = 'after'). Substantive snapshot data was identical; not product-state drift.",
+    "safety": "analysis-only; candidate-first; provenance-backed; owner-controlled; no automatic promotion or Memory/Canon mutation",
+    "next_task": "PHASE8-IMPL-024-T004A; planned, dependency-satisfied, eligible after T007 closeout publication"
+  },
   "latest_verified_evidence": {
-    "classification": "T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
+    "classification": "T007C design-system and shared-component standardization PASS_WITH_FINDINGS; T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
     "t007a": ".codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z",
     "t007a_result": "read-only UI audit PASS across 42 captures, 11 scenarios, and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no code/tracked/product-data changes; no commit or push; no forbidden or mutating requests",
     "t006c": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z",
     "t006c_result": "127/127 dedicated assertions and four tracked browser harnesses PASS; zero unexpected console/page/network failures; zero mutations; protected fixture snapshots and project filesystem manifest identical",
+    "t007c_readiness_archive": "/tmp/PHASE8-IMPL-024-T007C-closeout-readiness-20260722T040518Z.tar.gz",
+    "t007c_readiness_sha256": "31c2a17a8231a0b3e9cb034b807588f9e75b454b300e8c5894185c3306a697a8",
+    "t007c_validation_archive": "/tmp/PHASE8-IMPL-024-T007C-consolidated-validation-resumed-20260722T044725Z.tar.gz",
+    "t007c_validation_sha256": "21ee0e54b9aa2fa700912f8b1b635720bcf7fef7492ef3c995e2ee2dbe925bb6",
+    "t007c_result": "PASS_WITH_FINDINGS - T007C_CONSOLIDATED_VALIDATION_ACCEPTED; historical baselines reproduced; 55 focused tests passed, 2 deselected; SSR parity PASS; external build PASS; four browser harnesses PASS; Radix focus/accessibility PASS; zero mutating or apply-promotion requests; candidates and approved Memory/Canon unchanged",
     "aggregate_run_ids": ["20260718T042148Z", "20260718T045420Z"],
     "scenarios_1_through_4": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T042148Z",
     "scenario_5": ".codex-context/PHASE8-IMPL-024/manual-validation/T003C-console-network/20260718T045420Z",
@@ -322,10 +383,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T007C",
-    "title": "Design-system and shared-component standardization",
-    "status": "planned; dependency on complete/PASS T007B satisfied; eligible; next application frontier; not begun",
-    "scope": "Begin with a bounded OMIEvidenceDrawer proof of concept using the smallest necessary individual Radix package after separate implementation authorization; preserve native HTML where sufficient and keep design tokens and product semantics application-owned"
+    "task_id": "PHASE8-IMPL-024-T004A",
+    "title": "Document overflow repair and native-control containment",
+    "status": "planned; dependency on complete/PASS T007C satisfied; eligible; next application frontier; not begun",
+    "scope": "Bounded T004A responsive-containment task: document-level overflow repair and native-control containment"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -402,7 +463,8 @@
       "T003B/T003C readiness-first conditional loading with canonical Available/Not stored/Invalid/Unavailable/Load failed presentation; all five browser scenarios PASS from aggregate evidence 20260718T042148Z + 20260718T045420Z; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations",
       "T006 truthful OMI navigation complete/PASS: T006A reset ownership commit 64dd90c, T006B truthful destinations commit 14e8c81, and T006C fresh validation 20260718T202605Z with 127/127 dedicated assertions, four tracked harnesses PASS, zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests",
       "T007A evidence-based Impeccable UI review complete/PASS: 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; 6 recommendations; 1 preference; 3 accepted behaviors; 2 deferred items; 1 collector limitation; 1 not-yet-tested; 1 historical baseline; no P0/P1 findings; no tracked/product-data changes; no commits; no forbidden/mutating requests; no component foundation selected or installed",
-      "T007B owner component-foundation decision complete/PASS: Radix Primitives selected for incremental accessibility and complex-interaction primitives; native HTML preferred where sufficient; product semantics and design tokens application-owned; no dependency installed or version pinned; T007C bounded OMIEvidenceDrawer gate is next"
+       "T007B owner component-foundation decision complete/PASS: native-first and application-owned semantics",
+       "T007C design-system standardization complete/PASS_WITH_FINDINGS: Radix Dialog for Evidence Drawer (71393b40), DESIGN.md/semantic-token foundation (9ea8557c), OMILoadingState (8c338913), OMIEmptyCandidateShellWarning (945254a8); accepted consolidated validation PASS; Radix naming/focus-containment/Escape/close/styled-opener-restoration PASS; zero mutating/apply-promotion requests; candidates and approved Memory/Canon unchanged; protected state unchanged; six families retained locally"
     ],
     "verified_defects": [
       "captured document-level horizontal overflow",
@@ -418,9 +480,8 @@
       "OMI workspace density and weak next-task prioritization",
       "undersized controls requiring standards-aware triage",
       "repeated metadata and safety presentation patterns",
-      "guided review transition focus returns to BODY; non-blocking T005 follow-up",
-      "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up",
-      "bounded Radix OMIEvidenceDrawer gate before broader component standardization"
+       "guided review transition focus returns to BODY; non-blocking T005 follow-up",
+       "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up"
     ],
     "not_yet_tested": [
       "grouped-review owner-decision mutation",
@@ -429,7 +490,6 @@
       "apply-promotion",
       "approved Memory/Canon mutation",
       "review-queue commands",
-      "evidence-drawer focus restoration",
       "complete keyboard navigation",
       "browser zoom and screen-reader behavior",
       "broader T008 resilience and accessibility states beyond the optional-resource failure/recovery contract validated by T003C"
@@ -441,7 +501,6 @@
     "failed collectors mistaken for product evidence",
     "guided review focus and immediate selected-project presentation advisories",
     "over-filtering useful Story Check diagnostics (now guarded by quarantined/unverified classification; future architecture ungrounded-model-output risk carried into PHASE8-IMPL-025-T007)",
-    "controlled Radix adoption must stop if the bounded OMIEvidenceDrawer gate cannot preserve accessibility, responsive containment, evidence/provenance visibility, review-only behavior, and existing safety contracts",
     "responsive and accessibility rework caused by replacing shared components after those repairs are completed"
   ],
   "open_questions": [
