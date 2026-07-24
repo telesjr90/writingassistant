@@ -75,6 +75,7 @@ button {
   flex-direction: column;
   gap: var(--wa-space-24);
   min-height: 100vh;
+  min-width: 0;
   padding: var(--wa-space-24);
   background: var(--wa-color-surface);
 }
@@ -96,6 +97,35 @@ button {
   flex-direction: column;
   gap: var(--wa-space-16);
   padding: var(--wa-space-32);
+}
+
+.project-selector {
+  min-width: 0;
+}
+
+.project-select-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-6);
+  min-width: 0;
+}
+
+.project-select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.project-title-input {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.project-select-label textarea {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 .panel-header,
