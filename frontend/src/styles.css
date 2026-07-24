@@ -99,6 +99,10 @@ button {
   padding: var(--wa-space-32);
 }
 
+.editor-column[data-active-workspace="omi-dashboard"] {
+  padding: var(--wa-space-16);
+}
+
 .project-selector {
   min-width: 0;
 }
@@ -1108,6 +1112,8 @@ h2 {
 }
 
 .omi-shell {
+  container-type: inline-size;
+  container-name: omi-shell;
   padding: var(--wa-space-24);
   background: var(--wa-color-surface);
   border: 1px solid var(--wa-color-border);
@@ -1162,12 +1168,13 @@ h2 {
 }
 
 .omi-status-strip {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(110px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--wa-space-8);
 }
 
 .omi-status-strip div {
+  flex: 1 1 140px;
   min-width: 0;
   padding: var(--wa-space-10);
   background: var(--wa-color-surface-muted);
@@ -1297,13 +1304,14 @@ h2 {
 }
 
 .omi-approved-snapshot dl {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 0;
 }
 
-.omi-approved-snapshot div {
+.omi-approved-snapshot dl div {
+  flex: 1 1 140px;
   min-width: 0;
 }
 
@@ -1374,12 +1382,13 @@ h2 {
 }
 
 .omi-candidate-status-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .omi-candidate-status-grid div {
+  flex: 1 1 160px;
   min-width: 0;
   padding: 10px;
   background: #f7f9fc;
@@ -1459,6 +1468,20 @@ h2 {
   background: #ffffff;
 }
 
+.omi-candidate-field-table th:last-child,
+.omi-candidate-field-table td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--wa-color-surface);
+  box-shadow: -4px 0 8px rgba(15, 23, 42, 0.06);
+}
+
+.omi-candidate-field-table thead th:last-child {
+  background: var(--wa-color-surface-subtle);
+  z-index: 2;
+}
+
 .omi-candidate-field-table caption {
   padding: 10px 12px;
   color: #46546c;
@@ -1516,6 +1539,18 @@ h2 {
   font-size: 13px;
   line-height: 1.45;
   overflow-wrap: anywhere;
+}
+
+.omi-table-scroll-guidance {
+  margin: -4px 0 0 0;
+  padding: var(--wa-space-6) var(--wa-space-10);
+  color: var(--wa-color-text-secondary);
+  background: var(--wa-color-warning-surface);
+  border: 1px solid var(--wa-color-warning-border);
+  border-radius: var(--wa-radius-control);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .omi-disabled-action-row {
@@ -1949,12 +1984,14 @@ h2 {
 }
 
 .omi-grouped-metrics {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(100px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .omi-grouped-metrics div {
+  flex: 1 1 120px;
+  min-width: 0;
   padding: 10px;
   background: #f7f9fc;
   border: 1px solid #dfe5ef;
@@ -2175,6 +2212,28 @@ h2 {
   outline-offset: 2px;
 }
 
+@container omi-shell (max-width: 680px) {
+  .omi-candidate-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .omi-candidate-side-rail {
+    gap: 10px;
+  }
+}
+
+@container omi-shell (max-width: 760px) {
+  .omi-grouped-review-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .omi-grouped-detail {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
 @media (max-width: 900px) {
   .app-shell {
     flex-direction: column;
@@ -2187,7 +2246,8 @@ h2 {
     border: 0;
   }
 
-  .editor-column {
+  .editor-column,
+  .editor-column[data-active-workspace="omi-dashboard"] {
     padding: 20px;
   }
 
@@ -2199,9 +2259,6 @@ h2 {
   .omi-promotion-form,
   .omi-metadata,
   .omi-checklist li,
-  .omi-status-strip,
-  .omi-approved-snapshot dl,
-  .omi-candidate-status-grid,
   .omi-candidate-detail-layout,
   .omi-candidate-metadata,
   .omi-apply-section-grid,
@@ -2212,7 +2269,6 @@ h2 {
 
   .omi-grouped-boundaries ul,
   .omi-grouped-source-scope,
-  .omi-grouped-metrics,
   .omi-grouped-filter-grid,
   .omi-grouped-review-layout,
   .omi-grouped-detail-metadata {
@@ -2257,6 +2313,32 @@ h2 {
 
   .omi-shell {
     padding: 16px;
+  }
+
+  .omi-status-strip div {
+    flex: 1 1 100%;
+  }
+
+  .omi-candidate-status-grid div {
+    flex: 1 1 100%;
+  }
+
+  .omi-approved-snapshot dl div {
+    flex: 1 1 100%;
+  }
+
+  .omi-grouped-metrics div {
+    flex: 1 1 100%;
+  }
+
+  .omi-candidate-field-table th:last-child,
+  .omi-candidate-field-table td:last-child {
+    position: static;
+    box-shadow: none;
+  }
+
+  .omi-table-scroll-guidance {
+    display: none;
   }
 
   .omi-workflow-table {

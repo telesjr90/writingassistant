@@ -64,6 +64,16 @@ let beforeSnapshot = null;
 let afterSnapshot = null;
 let apiMode = 'live-backend';
 const mutatingApiRequests = [];
+const pageErrors = [];
+const consoleErrors = [];
+const failedRequests = [];
+const httpErrorResponses = [];
+const unmatchedFixtures = [];
+const nonGetApiRequests = [];
+const applyPromotionRequests = [];
+let finalTelemetry = null;
+let finalDesktopMeasurements = null;
+let finalMobileMeasurements = null;
 
 const ZERO_STATE_API = Object.freeze({
   project: {
@@ -377,7 +387,18 @@ async function installReadOnlyApiFixture(context) {
       await route.fulfill(jsonResponse(ZERO_STATE_API.omi));
       return;
     }
+    if (pathname === `/api/projects/${PROJECT_ID}/context-readiness`) {
+      await route.fulfill(jsonResponse({
+        resources: {
+          bible: { state: 'absent', ready: false },
+          storyform: { state: 'absent', ready: false },
+          storyform_context: { state: 'unavailable', ready: false },
+        },
+      }));
+      return;
+    }
 
+    unmatchedFixtures.push({ method, pathname });
     await route.fulfill(jsonResponse({ detail: `Unhandled read-only fixture route: ${pathname}` }, 404));
   });
   logAction('read_only_api_fixture_installed', { projectId: PROJECT_ID });
@@ -514,6 +535,79 @@ async function assertMobileStackedLayout() {
   );
 }
 
+async function collectDashboardMeasurements(viewportLabel) {
+  const metrics = await page.evaluate((vpLabel) => {
+    const docEl = document.documentElement;
+    const body = document.body;
+    const projectNav = document.querySelector('.project-nav');
+    const analysisSidebar = document.querySelector('.analysis-sidebar');
+    const editorCol = document.querySelector('.editor-column');
+    const omiShell = document.querySelector('.omi-shell');
+    const statusStrip = document.querySelector('[data-testid="omi-candidate-canon-status"]');
+    const workflowWrap = document.querySelector('.omi-workflow-table-wrap');
+    const scrollGuidance = document.querySelector('[data-testid="omi-dashboard-scroll-guidance"]');
+
+    const navRect = projectNav ? projectNav.getBoundingClientRect() : null;
+    const sidebarRect = analysisSidebar ? analysisSidebar.getBoundingClientRect() : null;
+    const editorRect = editorCol ? editorCol.getBoundingClientRect() : null;
+    const shellRect = omiShell ? omiShell.getBoundingClientRect() : null;
+    const stripRect = statusStrip ? statusStrip.getBoundingClientRect() : null;
+    const wrapMeasure = workflowWrap
+      ? { clientWidth: workflowWrap.clientWidth, scrollWidth: workflowWrap.scrollWidth }
+      : null;
+    const guidanceVisible = scrollGuidance
+      ? window.getComputedStyle(scrollGuidance).display !== 'none'
+      : false;
+
+    const enabledActions = [];
+    document.querySelectorAll('button:not([disabled]), a[href]:not([disabled])').forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.right > docEl.clientWidth) {
+        enabledActions.push(el.textContent?.trim().slice(0, 60) || '(unnamed)');
+      }
+    });
+
+    return {
+      viewportLabel: vpLabel,
+      document: { clientWidth: docEl.clientWidth, scrollWidth: docEl.scrollWidth },
+      body: { clientWidth: body.clientWidth, scrollWidth: body.scrollWidth },
+      projectNav: navRect ? { width: Math.round(navRect.width) } : null,
+      analysisSidebar: sidebarRect ? { width: Math.round(sidebarRect.width) } : null,
+      editorColumn: editorRect ? { width: Math.round(editorRect.width) } : null,
+      omiShell: shellRect ? { width: Math.round(shellRect.width) } : null,
+      statusStrip: stripRect
+        ? { width: Math.round(stripRect.width), clientWidth: statusStrip.clientWidth, scrollWidth: statusStrip.scrollWidth }
+        : null,
+      workflowWrapper: wrapMeasure,
+      scrollGuidanceVisible: guidanceVisible,
+      enabledActionsOutsideViewport: enabledActions,
+    };
+  }, viewportLabel);
+  logAction('collect_dashboard_measurements', metrics);
+  return metrics;
+}
+
+function collectTelemetry() {
+  const telemetry = {
+    pageErrors: pageErrors.length,
+    pageErrorDetails: [...pageErrors],
+    consoleErrors: consoleErrors.length,
+    consoleErrorDetails: [...consoleErrors].slice(0, 20),
+    failedRequests: failedRequests.length,
+    failedRequestDetails: [...failedRequests].slice(0, 20),
+    httpErrorResponses: httpErrorResponses.length,
+    httpErrorDetails: [...httpErrorResponses].slice(0, 20),
+    unmatchedFixtures: unmatchedFixtures.length,
+    unmatchedFixtureDetails: [...unmatchedFixtures].slice(0, 20),
+    nonGetApiRequests: nonGetApiRequests.length,
+    nonGetApiDetails: [...nonGetApiRequests].slice(0, 20),
+    applyPromotionRequests: applyPromotionRequests.length,
+    applyPromotionDetails: [...applyPromotionRequests].slice(0, 20),
+  };
+  logAction('telemetry_summary', telemetry);
+  return telemetry;
+}
+
 async function runWorkflow() {
   logAction('workflow_start', {
     appBaseUrl: APP_BASE_URL,
@@ -531,9 +625,92 @@ async function runWorkflow() {
   }
   page = await context.newPage();
 
+  page.on('pageerror', (error) => { pageErrors.push(String(error)); });
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') { consoleErrors.push(msg.text()); }
+  });
+  page.on('requestfailed', (req) => {
+    failedRequests.push(req.url());
+    const failure = req.failure();
+    if (failure && failure.errorText) {
+      consoleErrors.push(`Request failed: ${req.url()} — ${failure.errorText}`);
+    }
+  });
+  page.on('response', (res) => {
+    if (res.status() >= 400) {
+      httpErrorResponses.push({ url: res.url(), status: res.status() });
+    }
+  });
+
+  page.on('request', (req) => {
+    const url = new URL(req.url());
+    const pn = url.pathname;
+    if (req.method().toUpperCase() !== 'GET' && pn.startsWith('/api/')) {
+      nonGetApiRequests.push({ method: req.method(), pathname: pn });
+    }
+    if (pn.startsWith('/api/') && (pn.toLowerCase().includes('apply-promotion') || pn.toLowerCase().includes('promotion'))) {
+      applyPromotionRequests.push({ method: req.method(), pathname: pn });
+    }
+  });
+
   await openOMIDashboard();
   await assertDashboardVisibleEvidence('desktop');
+  finalDesktopMeasurements = await collectDashboardMeasurements('desktop');
   desktopScreenshotPath = await screenshot('01-desktop-omi-dashboard');
+
+  const dm = finalDesktopMeasurements;
+  assertEvidence('desktop: document cw = sw', dm.document.clientWidth === dm.document.scrollWidth, dm.document);
+  assertEvidence('desktop: body cw = sw', dm.body.clientWidth === dm.body.scrollWidth, dm.body);
+  assertEvidence('desktop: ProjectNav ~260px', Math.abs((dm.projectNav?.width || 0) - 260) <= 10, dm.projectNav);
+  assertEvidence('desktop: AnalysisSidebar ~320px', Math.abs((dm.analysisSidebar?.width || 0) - 320) <= 10, dm.analysisSidebar);
+  assertEvidence('desktop: status-strip cw = sw (no overflow)', (dm.statusStrip?.clientWidth || 0) === (dm.statusStrip?.scrollWidth || 0), dm.statusStrip);
+  assertEvidence('desktop: workflow-wrapper local scroll only', (dm.workflowWrapper?.scrollWidth || 0) >= (dm.workflowWrapper?.clientWidth || 0), dm.workflowWrapper);
+  assertEvidence('desktop: local-scroll guidance visible', dm.scrollGuidanceVisible === true, {});
+  assertEvidence('desktop: no enabled action outside viewport', (dm.enabledActionsOutsideViewport || []).length === 0, { count: dm.enabledActionsOutsideViewport.length });
+
+  const nonOmi = await page.evaluate(() => {
+    const overviewEntry = document.querySelector('[data-testid="omi-workspace-entry"]');
+    if (overviewEntry) {
+      const navItems = document.querySelectorAll('.project-nav button, .project-nav a');
+      for (const item of navItems) {
+        const text = item.textContent?.trim() || '';
+        if (text.toLowerCase().includes('overview')) {
+          item.click();
+          return { clickedOverview: true };
+        }
+      }
+    }
+    return { clickedOverview: false, reason: 'no overview nav found' };
+  });
+  await page.waitForTimeout(300);
+  const nonOmiMeasurements = await page.evaluate(() => {
+    const ec = document.querySelector('.editor-column');
+    const cs = ec ? window.getComputedStyle(ec) : null;
+    const dw = ec ? ec.getAttribute('data-active-workspace') : null;
+    return {
+      dataActiveWorkspace: dw,
+      editorPadding: cs ? cs.paddingLeft : 'unknown',
+      editorColumnWidth: ec ? Math.round(ec.getBoundingClientRect().width) : 0,
+      documentCW: document.documentElement.clientWidth,
+      documentSW: document.documentElement.scrollWidth,
+    };
+  });
+  assertEvidence('non-OMI: data-active-workspace !== omi-dashboard', nonOmiMeasurements.dataActiveWorkspace !== 'omi-dashboard', nonOmiMeasurements);
+  assertEvidence('non-OMI: editor padding is 32px (normal desktop)', nonOmiMeasurements.editorPadding === '32px', nonOmiMeasurements);
+  assertEvidence('non-OMI: no document overflow', nonOmiMeasurements.documentCW === nonOmiMeasurements.documentSW, nonOmiMeasurements);
+
+  await openOMIDashboard();
+  await page.waitForTimeout(250);
+  const omiAgain = await page.evaluate(() => {
+    const ec = document.querySelector('.editor-column');
+    const cs = ec ? window.getComputedStyle(ec) : null;
+    return {
+      dataActiveWorkspace: ec ? ec.getAttribute('data-active-workspace') : null,
+      editorPadding: cs ? cs.paddingLeft : 'unknown',
+    };
+  });
+  assertEvidence('return-OMI: data-active-workspace = omi-dashboard', omiAgain.dataActiveWorkspace === 'omi-dashboard', omiAgain);
+  assertEvidence('return-OMI: editor padding restored to 16px', omiAgain.editorPadding === '16px', omiAgain);
 
   afterSnapshot = await readOnlyProjectSnapshot('after');
   assertEvidence('opening dashboard does not create candidates', beforeSnapshot.omi.candidateCount === afterSnapshot.omi.candidateCount, {
@@ -558,12 +735,30 @@ async function runWorkflow() {
   await page.waitForTimeout(250);
   await assertDashboardVisibleEvidence('mobile');
   await assertMobileStackedLayout();
+  finalMobileMeasurements = await collectDashboardMeasurements('mobile');
   mobileScreenshotPath = await screenshot('02-mobile-omi-dashboard');
+
+  const mm = finalMobileMeasurements;
+  assertEvidence('mobile: document cw = sw', mm.document.clientWidth === mm.document.scrollWidth, mm.document);
+  assertEvidence('mobile: body cw = sw', mm.body.clientWidth === mm.body.scrollWidth, mm.body);
+  assertEvidence('mobile: workflow-wrapper cw = sw (no horizontal scroll needed)', (mm.workflowWrapper?.clientWidth || 0) === (mm.workflowWrapper?.scrollWidth || 0), mm.workflowWrapper);
+  assertEvidence('mobile: guidance hidden', mm.scrollGuidanceVisible === false, {});
+  assertEvidence('mobile: status strip cw = sw (no overflow)', (mm.statusStrip?.clientWidth || 0) === (mm.statusStrip?.scrollWidth || 0), mm.statusStrip);
+
+  finalTelemetry = collectTelemetry();
+
+  assertEvidence('telemetry: page errors = 0', pageErrors.length === 0, { pageErrors: pageErrors.length });
+  assertEvidence('telemetry: console errors = 0', consoleErrors.length === 0, { consoleErrors: consoleErrors.length });
+  assertEvidence('telemetry: failed requests = 0', failedRequests.length === 0, { failedRequests: failedRequests.length });
+  assertEvidence('telemetry: HTTP error responses = 0', httpErrorResponses.length === 0, { httpErrorResponses: httpErrorResponses.length });
+  assertEvidence('telemetry: unmatched fixtures = 0', unmatchedFixtures.length === 0, { unmatchedFixtures: unmatchedFixtures.length });
+  assertEvidence('telemetry: non-GET API requests = 0', nonGetApiRequests.length === 0, { nonGetApiRequests: nonGetApiRequests.length });
+  assertEvidence('telemetry: apply-promotion API requests = 0', applyPromotionRequests.length === 0, { applyPromotionRequests: applyPromotionRequests.length });
 
   await context.close();
 }
 
-async function writeArtifacts(exitCode) {
+async function writeArtifacts(exitCode, telemetry, desktopMeasurements, mobileMeasurements) {
   const result = failures.length === 0 ? 'PASS' : 'FAIL';
   const finishedAt = new Date().toISOString();
   const payload = {
@@ -583,6 +778,11 @@ async function writeArtifacts(exitCode) {
     },
     beforeSnapshot,
     afterSnapshot,
+    telemetry: telemetry || {},
+    measurements: {
+      desktop: desktopMeasurements || {},
+      mobile: mobileMeasurements || {},
+    },
     failures,
     actions: workflowLog,
     safety: {
@@ -643,6 +843,34 @@ async function writeArtifacts(exitCode) {
     '- No generated prose controls were added by this script.',
   ];
 
+  if (telemetry) {
+    reportLines.push('', '## T004B Telemetry', '',
+      `- page errors: \`${telemetry.pageErrors}\``,
+      `- console errors: \`${telemetry.consoleErrors}\``,
+      `- failed application requests: \`${telemetry.failedRequests}\``,
+      `- HTTP error responses: \`${telemetry.httpErrorResponses}\``,
+      `- unmatched fixture requests: \`${telemetry.unmatchedFixtures}\``,
+      `- non-GET /api/** requests: \`${telemetry.nonGetApiRequests}\``,
+      `- apply-promotion requests: \`${telemetry.applyPromotionRequests}\``,
+    );
+  }
+
+  if (desktopMeasurements) {
+    reportLines.push('', '## Desktop Measurements (1440x1000)', '',
+      '```json',
+      JSON.stringify(desktopMeasurements, null, 2),
+      '```',
+    );
+  }
+
+  if (mobileMeasurements) {
+    reportLines.push('', '## Mobile Measurements (390x900)', '',
+      '```json',
+      JSON.stringify(mobileMeasurements, null, 2),
+      '```',
+    );
+  }
+
   if (failures.length > 0) {
     reportLines.push('', '## Failures', '');
     for (const failure of failures) {
@@ -687,6 +915,9 @@ async function cleanup() {
 
 async function main() {
   let exitCode = 0;
+  let telemetry = null;
+  let desktopMeasurements = null;
+  let mobileMeasurements = null;
   try {
     await ensureEvidenceDirs();
     playwrightChromium = await loadPlaywrightChromium();
@@ -699,7 +930,7 @@ async function main() {
       message: error instanceof Error ? error.message : String(error),
     });
   } finally {
-    await writeArtifacts(exitCode).catch((error) => {
+    await writeArtifacts(exitCode, finalTelemetry, finalDesktopMeasurements, finalMobileMeasurements).catch((error) => {
       console.error(error instanceof Error ? error.stack : error);
       exitCode = 1;
     });

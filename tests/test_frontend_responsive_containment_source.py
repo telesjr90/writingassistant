@@ -1,4 +1,4 @@
-"""Focused source contracts for PHASE8-IMPL-024-T004A responsive containment."""
+"""Source contracts for PHASE8-IMPL-024 T004A+T004B responsive containment."""
 
 from __future__ import annotations
 
@@ -11,6 +11,11 @@ STYLES_CSS = REPO_ROOT / "frontend" / "src" / "styles.css"
 PROJECT_NAV_JSX = REPO_ROOT / "frontend" / "src" / "components" / "ProjectNav.jsx"
 OMI_GUIDED_CREATION_JSX = (
     REPO_ROOT / "frontend" / "src" / "components" / "OmiGuidedProjectCreation.jsx"
+)
+APP_JSX = REPO_ROOT / "frontend" / "src" / "App.jsx"
+DASHBOARD_JSX = REPO_ROOT / "frontend" / "src" / "components" / "OMIDashboard.jsx"
+FIELD_TABLE_JSX = (
+    REPO_ROOT / "frontend" / "src" / "components" / "OMICandidateFieldTable.jsx"
 )
 
 
@@ -28,6 +33,18 @@ def project_nav_source() -> str:
 
 def omi_guided_creation_source() -> str:
     return read_text(OMI_GUIDED_CREATION_JSX)
+
+
+def app_source() -> str:
+    return read_text(APP_JSX)
+
+
+def dashboard_source() -> str:
+    return read_text(DASHBOARD_JSX)
+
+
+def field_table_source() -> str:
+    return read_text(FIELD_TABLE_JSX)
 
 
 # ---------------------------------------------------------------------------
@@ -75,7 +92,7 @@ def _rule_body(source: str, selector: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Root containment chain
+# Root containment chain (T004A)
 # ---------------------------------------------------------------------------
 
 class TestRootContainmentChain:
@@ -103,7 +120,7 @@ class TestRootContainmentChain:
 
 
 # ---------------------------------------------------------------------------
-# Form and label containment
+# Form and label containment (T004A)
 # ---------------------------------------------------------------------------
 
 class TestFormLabelContainment:
@@ -140,7 +157,7 @@ class TestFormLabelContainment:
 
 
 # ---------------------------------------------------------------------------
-# Desktop navigation and sidebar widths preserved
+# Desktop navigation and sidebar widths preserved (T004A)
 # ---------------------------------------------------------------------------
 
 class TestDesktopPreservedWidths:
@@ -160,7 +177,7 @@ class TestDesktopPreservedWidths:
 
 
 # ---------------------------------------------------------------------------
-# Story Check selector presence
+# Story Check selector presence (T004A)
 # ---------------------------------------------------------------------------
 
 class TestStoryCheckSelectorPresence:
@@ -179,55 +196,300 @@ class TestStoryCheckSelectorPresence:
 
 
 # ---------------------------------------------------------------------------
-# OMI table/grid/workspace rules not changed
+# T004B: OMI-specific workspace marker
 # ---------------------------------------------------------------------------
 
-class TestOmiRulesUnchanged:
-    def test_new_rules_do_not_reference_omi_table_metric_or_workspace_selectors(self) -> None:
-        css = styles_css()
-        new_containment_selectors = [
-            ".project-selector",
-            ".project-select-label",
-            ".project-select",
-            ".project-title-input",
-        ]
-        for selector in new_containment_selectors:
-            block = _rule_body(css, selector)
-            assert ".omi-status-strip" not in block
-            assert ".omi-grouped-metrics" not in block
-            assert ".omi-workflow-table" not in block
-            assert ".omi-candidate-field-table" not in block
-            assert ".omi-grouped-review-layout" not in block
+class TestOmiWorkspaceMarker:
+    def test_omi_workspace_class_conditionally_applied(self) -> None:
+        source = app_source()
+        assert 'data-active-workspace={activeWorkspaceView}' in source
+        assert 'WORKSPACE_VIEWS.OMI_DASHBOARD' in source
 
-    def test_omi_status_strip_unchanged(self) -> None:
+    def test_omi_workspace_attribute_not_global(self) -> None:
+        css = styles_css()
+        assert '.editor-column[data-active-workspace="omi-dashboard"]' in css
+
+    def test_editor_column_omi_workspace_reduces_padding(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, '.editor-column[data-active-workspace="omi-dashboard"]')
+        assert "padding" in block
+
+
+# ---------------------------------------------------------------------------
+# T004B: Status and metric wrapping
+# ---------------------------------------------------------------------------
+
+class TestStatusMetricWrapping:
+    def test_omi_status_strip_uses_flex_wrap(self) -> None:
         css = styles_css()
         block = _rule_body(css, ".omi-status-strip")
-        assert "grid-template-columns: repeat(7, minmax(110px, 1fr))" in block
+        assert "display: flex" in block
+        assert "flex-wrap: wrap" in block
 
-    def test_omi_workflow_table_unchanged(self) -> None:
+    def test_omi_status_strip_div_has_flex_grow(self) -> None:
         css = styles_css()
-        block = _rule_body(css, ".omi-workflow-table")
-        assert "width: 100%" in block
-        assert "min-width: 980px" in block
+        block = _rule_body(css, ".omi-status-strip div")
+        assert "flex: 1 1 140px" in block
 
-    def test_omi_grouped_metrics_unchanged(self) -> None:
+    def test_omi_grouped_metrics_uses_flex_wrap(self) -> None:
         css = styles_css()
         block = _rule_body(css, ".omi-grouped-metrics")
-        assert "grid-template-columns: repeat(6, minmax(100px, 1fr))" in block
+        assert "display: flex" in block
+        assert "flex-wrap: wrap" in block
 
-    def test_omi_candidate_field_table_unchanged(self) -> None:
+    def test_omi_candidate_status_grid_uses_flex_wrap(self) -> None:
         css = styles_css()
-        block = _rule_body(css, ".omi-candidate-field-table")
-        assert "min-width: 1120px" in block
+        block = _rule_body(css, ".omi-candidate-status-grid")
+        assert "display: flex" in block
+        assert "flex-wrap: wrap" in block
 
-    def test_omi_grouped_review_layout_unchanged(self) -> None:
+    def test_omi_approved_snapshot_dl_uses_flex_wrap(self) -> None:
         css = styles_css()
-        block = _rule_body(css, ".omi-grouped-review-layout")
-        assert "grid-template-columns: minmax(320px, 0.85fr) minmax(420px, 1.15fr)" in block
+        block = _rule_body(css, ".omi-approved-snapshot dl")
+        assert "display: flex" in block
+        assert "flex-wrap: wrap" in block
 
 
 # ---------------------------------------------------------------------------
-# Design token consumption preserved
+# T004B: Container queries for OMI reflow
+# ---------------------------------------------------------------------------
+
+class TestOmiContainerQueries:
+    def test_omi_shell_has_container_type_inline_size(self) -> None:
+        css = styles_css()
+        assert "container-type: inline-size" in css
+
+    def test_candidate_detail_container_query_present(self) -> None:
+        css = styles_css()
+        assert "@container omi-shell" in css
+        assert "omi-candidate-detail-layout" in css
+
+    def test_grouped_review_container_query_present(self) -> None:
+        css = styles_css()
+        assert "@container omi-shell" in css
+        assert "omi-grouped-review-layout" in css
+
+
+# ---------------------------------------------------------------------------
+# T004B: Local overflow containment on table wrappers only
+# ---------------------------------------------------------------------------
+
+class TestLocalTableOverflowContainment:
+    def test_workflow_table_wrap_has_local_overflow(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-workflow-table-wrap")
+        assert "overflow-x: auto" in block
+
+    def test_field_table_wrap_has_local_overflow(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-field-table-wrap")
+        assert "overflow-x: auto" in block
+
+    def test_no_omi_shell_overflow_hidden(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-shell")
+        assert "overflow-x: hidden" not in block
+
+    def test_no_editor_column_overflow_hidden(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".editor-column")
+        assert "overflow-x: hidden" not in block
+
+
+# ---------------------------------------------------------------------------
+# T004B: Sticky field-action column
+# ---------------------------------------------------------------------------
+
+class TestStickyFieldActionColumn:
+    def test_field_table_last_child_sticky(self) -> None:
+        css = styles_css()
+        assert ".omi-candidate-field-table th:last-child" in css
+        assert ".omi-candidate-field-table td:last-child" in css
+        assert "position: sticky" in css
+
+    def test_sticky_surfaces_use_semantic_tokens(self) -> None:
+        css = styles_css()
+        base_block = (
+            _rule_body(css, ".omi-candidate-field-table th:last-child")
+            + _rule_body(css, ".omi-candidate-field-table td:last-child")
+        )
+        assert "#ffffff" not in base_block
+        assert "var(--wa-color-surface)" in base_block
+        header_block = _rule_body(css, ".omi-candidate-field-table thead th:last-child")
+        assert "#fbfcff" not in header_block
+        assert "var(--wa-color-surface-subtle)" in header_block
+
+
+# ---------------------------------------------------------------------------
+# Correction: .omi-disabled-action-row restored
+# ---------------------------------------------------------------------------
+
+class TestDisabledActionRowRestored:
+    def test_disabled_action_row_has_flex_display(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-disabled-action-row")
+        assert "display: flex" in block
+
+    def test_disabled_action_row_has_flex_wrap(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-disabled-action-row")
+        assert "flex-wrap: wrap" in block
+
+    def test_disabled_action_row_has_gap(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-disabled-action-row")
+        assert "gap: 8px" in block
+
+    def test_sticky_disabled_at_mobile(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert "position: static" in mobile_section
+        assert ".omi-candidate-field-table th:last-child" in mobile_section
+
+
+# ---------------------------------------------------------------------------
+# T004B: Scroll affordance text
+# ---------------------------------------------------------------------------
+
+class TestScrollAffordance:
+    def test_dashboard_has_scroll_guidance(self) -> None:
+        source = dashboard_source()
+        assert "omi-dashboard-scroll-guidance" in source
+        assert "Scroll horizontally within this table to review all columns." in source
+
+    def test_dashboard_scroll_guidance_not_aria_hidden(self) -> None:
+        source = dashboard_source()
+        before_guidance = source.split("omi-dashboard-scroll-guidance")[0]
+        after_testid = source.split("omi-dashboard-scroll-guidance")[1]
+        end_line = after_testid.split("\n", 1)[0] if "\n" in after_testid else ""
+        guidance_block = before_guidance[-200:] + 'omi-dashboard-scroll-guidance' + after_testid[:200]
+        assert 'aria-hidden="true"' not in guidance_block
+
+    def test_candidate_field_table_has_scroll_guidance(self) -> None:
+        source = field_table_source()
+        assert "omi-candidate-field-scroll-guidance" in source
+        assert "Field actions remain visible." in source
+
+    def test_candidate_scroll_guidance_not_aria_hidden(self) -> None:
+        source = field_table_source()
+        before_guidance = source.split("omi-candidate-field-scroll-guidance")[0]
+        after_testid = source.split("omi-candidate-field-scroll-guidance")[1]
+        guidance_block = before_guidance[-200:] + 'omi-candidate-field-scroll-guidance' + after_testid[:200]
+        assert 'aria-hidden="true"' not in guidance_block
+
+    def test_scroll_guidance_not_css_generated_only(self) -> None:
+        dashboard = dashboard_source()
+        assert "<p" in dashboard
+        assert "omi-dashboard-scroll-guidance" in dashboard
+
+
+# ---------------------------------------------------------------------------
+# T004B: Preserved semantic table structure
+# ---------------------------------------------------------------------------
+
+class TestPreservedSemanticTable:
+    def test_workflow_table_is_table_element(self) -> None:
+        source = dashboard_source()
+        assert "<table" in source
+        assert "omi-workflow-table" in source
+
+    def test_field_table_is_table_element(self) -> None:
+        source = field_table_source()
+        assert "<table" in source
+        assert "omi-candidate-field-table" in source
+
+    def test_workflow_table_retains_min_width(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-workflow-table")
+        assert "min-width" in block
+
+    def test_field_table_retains_min_width(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-candidate-field-table")
+        assert "min-width" in block
+
+    def test_mobile_field_table_to_card_preserved(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert "display: block" in mobile_section
+        assert ".omi-candidate-field-table" in mobile_section
+
+    def test_mobile_workflow_table_to_card_preserved(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert "display: none" in mobile_section
+        assert ".omi-workflow-table thead" in mobile_section
+
+
+# ---------------------------------------------------------------------------
+# T004B: No hidden evidence, provenance, status, or owner-action fields
+# ---------------------------------------------------------------------------
+
+class TestNoHiddenSafetyFields:
+    def test_mobile_field_table_cards_list_all_columns(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert "Proposed value" in mobile_section
+        assert "Decision" in mobile_section
+        assert "Evidence" in mobile_section
+        assert "Provenance" in mobile_section
+        assert "Duplicate/dependency" in mobile_section
+        assert "Owner note" in mobile_section
+        assert "Field action" in mobile_section
+
+    def test_mobile_workflow_table_cards_list_all_columns(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert "Count" in mobile_section
+        assert "Status" in mobile_section
+        assert "Blockers" in mobile_section
+        assert "Evidence / Provenance" in mobile_section
+        assert "Action" in mobile_section
+        assert "Disabled risky action / reason" in mobile_section
+
+    def test_dashboard_has_disabled_apply_reason(self) -> None:
+        source = dashboard_source()
+        assert "omi-dashboard-disabled-apply-reason" in source
+
+    def test_field_table_has_approval_disabled_reasons(self) -> None:
+        source = field_table_source()
+        assert "omi-field-approval-disabled-reason" in source
+
+
+# ---------------------------------------------------------------------------
+# T004B: Grouped Review reflow preservation
+# ---------------------------------------------------------------------------
+
+class TestGroupedReviewReflow:
+    def test_grouped_review_layout_grid_retained_at_desktop(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-grouped-review-layout")
+        assert "display: grid" in block
+
+    def test_grouped_review_metrics_wrap(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-grouped-metrics")
+        assert "flex-wrap: wrap" in block
+
+    def test_grouped_detail_sticky_preserved_at_desktop(self) -> None:
+        css = styles_css()
+        assert ".omi-grouped-detail {\n  position: sticky" in css
+
+    def test_mobile_grouped_review_reflow_preserved(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert ".omi-grouped-review-layout" in mobile_section
+        assert "position: static" in mobile_section
+
+
+# ---------------------------------------------------------------------------
+# Design token consumption preserved (T004A)
 # ---------------------------------------------------------------------------
 
 class TestDesignTokenPreservation:
@@ -279,7 +541,7 @@ class TestDesignTokenPreservation:
 
 
 # ---------------------------------------------------------------------------
-# Universal box-sizing preserved
+# Universal box-sizing preserved (T004A)
 # ---------------------------------------------------------------------------
 
 class TestBoxSizingPreserved:
@@ -289,7 +551,7 @@ class TestBoxSizingPreserved:
 
 
 # ---------------------------------------------------------------------------
-# Context textarea and field-input retain existing containment
+# Context textarea and field-input retain existing containment (T004A)
 # ---------------------------------------------------------------------------
 
 class TestExistingContainmentPreserved:

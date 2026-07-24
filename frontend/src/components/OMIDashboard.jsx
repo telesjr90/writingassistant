@@ -296,6 +296,12 @@ export default function OMIDashboard({
       )}
 
       <div className="omi-workflow-table-wrap">
+        <p
+          className="omi-table-scroll-guidance"
+          data-testid="omi-dashboard-scroll-guidance"
+        >
+          Scroll horizontally within this table to review all columns.
+        </p>
         <table className="omi-workflow-table">
           <caption>Project-local OMI operational workflow rows</caption>
           <thead>

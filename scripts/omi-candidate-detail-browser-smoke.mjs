@@ -117,6 +117,13 @@ const FIXTURE_API = Object.freeze({
 const workflowLog = [];
 const failures = [];
 const mutatingApiRequests = [];
+const pageErrors = [];
+const consoleErrors = [];
+const failedRequests = [];
+const httpErrorResponses = [];
+const unmatchedFixtures = [];
+const nonGetApiRequests = [];
+const applyPromotionRequests = [];
 let apiMode = 'live-backend';
 let browser = null;
 let page = null;
@@ -126,6 +133,9 @@ let desktopScreenshotPath = '';
 let mobileScreenshotPath = '';
 let beforeSnapshot = null;
 let afterSnapshot = null;
+let finalTelemetry = null;
+let finalDesktopMeasurements = null;
+let finalMobileMeasurements = null;
 
 function logAction(action, details = {}) {
   const entry = { ts: new Date().toISOString(), action, ...details };
@@ -315,6 +325,13 @@ async function installReadOnlyApiFixture(context) {
       [`/api/projects/${PROJECT_ID}/storyform-context`, FIXTURE_API.storyformContext],
       [`/api/projects/${PROJECT_ID}/omi`, FIXTURE_API.omi],
       [`/api/projects/${PROJECT_ID}/omi/candidates/${FIXTURE_CANDIDATE.candidate_id}`, FIXTURE_CANDIDATE],
+      [`/api/projects/${PROJECT_ID}/context-readiness`, {
+        resources: {
+          bible: { state: 'absent', ready: false },
+          storyform: { state: 'absent', ready: false },
+          storyform_context: { state: 'unavailable', ready: false },
+        },
+      }],
     ]);
 
     if (routeMap.has(pathname)) {
@@ -322,6 +339,7 @@ async function installReadOnlyApiFixture(context) {
       return;
     }
 
+    unmatchedFixtures.push({ method, pathname });
     await route.fulfill(jsonResponse({ detail: `Unhandled read-only fixture route: ${pathname}` }, 404));
   });
   logAction('read_only_api_fixture_installed', { projectId: PROJECT_ID });
@@ -482,6 +500,218 @@ async function assertMobileTabs() {
   ), { labels, display });
 }
 
+async function collectCandidateDetailMeasurementsAtScroll(viewportLabel, scrollLeft) {
+  const metrics = await page.evaluate(({ vpLabel, sl }) => {
+    const docEl = document.documentElement;
+    const body = document.body;
+
+    const fw = document.querySelector('.omi-field-table-wrap');
+    if (fw) { fw.scrollLeft = sl; }
+
+    const projectNav = document.querySelector('.project-nav');
+    const analysisSidebar = document.querySelector('.analysis-sidebar');
+    const editorCol = document.querySelector('.editor-column');
+    const omiShell = document.querySelector('.omi-shell');
+    const detailLayout = document.querySelector('.omi-candidate-detail-layout');
+    const scrollGuidance = document.querySelector('[data-testid="omi-candidate-field-scroll-guidance"]');
+    const fieldTable = document.querySelector('.omi-candidate-field-table');
+
+    function bbox(el) {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height), left: Math.round(r.left), right: Math.round(r.right) };
+    }
+
+    const wrapperBbox = bbox(fw);
+    const wrapperData = fw ? { ...bbox(fw), clientWidth: fw.clientWidth, scrollWidth: fw.scrollWidth, scrollLeft: fw.scrollLeft } : null;
+
+    function insideWrapper(elemBbox, tolerance) {
+      if (!elemBbox || !wrapperBbox) return false;
+      const t = tolerance || 1;
+      return elemBbox.left >= wrapperBbox.left - t && elemBbox.right <= wrapperBbox.right + t;
+    }
+
+    const actionCells = [];
+    if (fieldTable) {
+      fieldTable.querySelectorAll('tbody tr td:last-child').forEach(td => {
+        const cellBox = bbox(td);
+        const buttons = [];
+        td.querySelectorAll('button').forEach(btn => {
+          const bb = bbox(btn);
+          buttons.push({ ...bb, label: (btn.getAttribute('aria-label') || '').slice(0, 80), fullyInsideWrapper: insideWrapper(bb) });
+        });
+        actionCells.push({ ...cellBox, buttons, fullyInsideWrapper: insideWrapper(cellBox) });
+      });
+    }
+
+    const maxScrollLeft = fw ? fw.scrollWidth - fw.clientWidth : 0;
+
+    const navRect = projectNav ? projectNav.getBoundingClientRect() : null;
+    const sidebarRect = analysisSidebar ? analysisSidebar.getBoundingClientRect() : null;
+    const editorRect = editorCol ? editorCol.getBoundingClientRect() : null;
+    const shellRect = omiShell ? omiShell.getBoundingClientRect() : null;
+
+    let detailColumns = null;
+    if (detailLayout) {
+      detailColumns = window.getComputedStyle(detailLayout).gridTemplateColumns;
+    }
+
+    const stickyColWidth = fieldTable ? Math.round(
+      (fieldTable.querySelector('thead th:last-child')?.getBoundingClientRect()?.width || 0)
+    ) : 0;
+    const wrapperWidth = wrapperData ? wrapperData.clientWidth : 0;
+    const nonStickyUsable = wrapperWidth - stickyColWidth;
+
+    return {
+      viewportLabel: vpLabel,
+      scrollLeft: sl,
+      document: { clientWidth: docEl.clientWidth, scrollWidth: docEl.scrollWidth },
+      body: { clientWidth: body.clientWidth, scrollWidth: body.scrollWidth },
+      projectNav: navRect ? { width: Math.round(navRect.width) } : null,
+      analysisSidebar: sidebarRect ? { width: Math.round(sidebarRect.width) } : null,
+      editorColumn: editorRect ? { width: Math.round(editorRect.width) } : null,
+      omiShell: shellRect ? { width: Math.round(shellRect.width) } : null,
+      detailLayoutColumns: detailColumns,
+      fieldWrapper: wrapperData,
+      maxScrollLeft: Math.round(maxScrollLeft),
+      actionCells,
+      scrollGuidanceVisible: scrollGuidance ? window.getComputedStyle(scrollGuidance).display !== 'none' : false,
+      stickyColumn: { width: stickyColWidth },
+      viewport: { wrapperWidth, nonStickyUsable, stickyOccupiesFullViewport: stickyColWidth >= wrapperWidth - 10 },
+    };
+  }, { vpLabel: viewportLabel, sl: scrollLeft });
+  logAction('collect_candidate_detail_measurements_at_scroll', { viewportLabel, scrollLeft, metrics });
+  return metrics;
+}
+
+async function verifyColumnReachability() {
+  const reachability = await page.evaluate(() => {
+    const fw = document.querySelector('.omi-field-table-wrap');
+    const ft = document.querySelector('.omi-candidate-field-table');
+    if (!fw || !ft) return { error: 'missing table or wrapper' };
+
+    const results = [];
+    const headerCells = ft.querySelectorAll('thead th');
+    const dataRows = ft.querySelectorAll('tbody tr');
+
+    const wrapperRect = fw.getBoundingClientRect();
+    const wrapperLeft = wrapperRect.left;
+    const wrapperRight = wrapperRect.right;
+    const wrapperW = fw.clientWidth;
+    const totalW = fw.scrollWidth;
+    const maxSL = totalW - wrapperW;
+
+    const stickyTh = headerCells[headerCells.length - 1];
+    const stickyColWidth = stickyTh ? stickyTh.getBoundingClientRect().width : 0;
+    const stickyLeft = wrapperRight - stickyColWidth;
+    const nonStickyVisibleLeft = wrapperLeft;
+    const nonStickyVisibleRight = stickyLeft;
+    const nonStickyVisibleWidth = Math.max(0, nonStickyVisibleRight - nonStickyVisibleLeft);
+
+    function intersectWidth(elemLeft, elemRight) {
+      const visLeft = Math.max(elemLeft, nonStickyVisibleLeft);
+      const visRight = Math.min(elemRight, nonStickyVisibleRight);
+      return Math.max(0, visRight - visLeft);
+    }
+
+    function insideWrapper(elemLeft, elemRight) {
+      return elemLeft >= wrapperLeft - 1 && elemRight <= wrapperRight + 1;
+    }
+
+    headerCells.forEach((th, idx) => {
+      fw.scrollLeft = 0;
+      fw.dispatchEvent(new Event('scroll', { bubbles: true }));
+
+      const isSticky = idx === headerCells.length - 1;
+      const thText = th.textContent?.trim() || '';
+      const thWidth = Math.round(th.getBoundingClientRect().width);
+      const thNaturalLeft = Math.round(th.getBoundingClientRect().left);
+      const thNaturalRight = Math.round(th.getBoundingClientRect().right);
+
+      let scrollPos;
+      if (isSticky || idx === 0) {
+        scrollPos = 0;
+      } else {
+        scrollPos = Math.min(maxSL, Math.max(0, Math.round(thNaturalLeft - nonStickyVisibleLeft)));
+      }
+      fw.scrollLeft = scrollPos;
+      fw.dispatchEvent(new Event('scroll', { bubbles: true }));
+
+      const thBox = th.getBoundingClientRect();
+      const thLeft = Math.round(thBox.left);
+      const thRight = Math.round(thBox.right);
+      const thWidthMeasured = Math.round(thBox.width);
+
+      const td = dataRows.length > 0 ? dataRows[0].querySelectorAll('td, th')[idx] : null;
+      const tdBox = td ? td.getBoundingClientRect() : null;
+      const tdLeft = tdBox ? Math.round(tdBox.left) : null;
+      const tdRight = tdBox ? Math.round(tdBox.right) : null;
+      const tdWidthMeasured = tdBox ? Math.round(tdBox.width) : null;
+
+      const thIntersect = isSticky ? nonStickyVisibleWidth : intersectWidth(thLeft, thRight);
+      const tdIntersect = !isSticky && tdBox ? intersectWidth(tdLeft, tdRight) : null;
+
+      const thPct = thWidthMeasured > 0 ? Math.round((thIntersect / thWidthMeasured) * 100) : 0;
+      const tdPct = tdWidthMeasured && tdWidthMeasured > 0 ? Math.round((tdIntersect / tdWidthMeasured) * 100) : null;
+
+      const thInsideWrapper = insideWrapper(thLeft, thRight);
+      const tdInsideWrapper = tdBox ? insideWrapper(tdLeft, tdRight) : null;
+
+      const colWidth = thWidthMeasured;
+      const fullyFits = colWidth <= nonStickyVisibleWidth;
+      const headerVisible = isSticky ? thInsideWrapper : (thIntersect > 5);
+      const headerIdentifiable = fullyFits ? (thIntersect >= colWidth * 0.9) : (thIntersect >= nonStickyVisibleWidth * 0.5);
+      const dataCellVisible = isSticky ? tdInsideWrapper : (tdIntersect !== null && tdIntersect > 5);
+      const dataCellReadable = tdIntersect !== null ? (fullyFits ? (tdIntersect >= (tdWidthMeasured || colWidth) * 0.9) : (tdIntersect >= nonStickyVisibleWidth * 0.5)) : null;
+
+      results.push({
+        index: idx, text: thText, isSticky,
+        scrollPositionRequested: scrollPos,
+        scrollPositionActual: fw.scrollLeft,
+        headerRect: { left: thLeft, right: thRight, width: thWidthMeasured },
+        dataCellRect: tdBox ? { left: tdLeft, right: tdRight, width: tdWidthMeasured } : null,
+        nonStickyRegion: { left: nonStickyVisibleLeft, right: nonStickyVisibleRight, width: nonStickyVisibleWidth },
+        headerIntersectWidth: thIntersect,
+        headerVisiblePercent: thPct,
+        dataCellIntersectWidth: tdIntersect,
+        dataCellVisiblePercent: tdPct,
+        headerInsideWrapper: thInsideWrapper,
+        dataCellInsideWrapper: tdInsideWrapper,
+        headerVisible,
+        headerIdentifiable,
+        dataCellVisible,
+        dataCellReadable,
+      });
+    });
+
+    fw.scrollLeft = 0;
+    return { columns: results, nonStickyVisibleWidth, stickyColWidth, wrapperW };
+  });
+  logAction('verify_column_reachability', reachability);
+  return reachability;
+}
+
+function collectTelemetry() {
+  const tel = {
+    pageErrors: pageErrors.length,
+    pageErrorDetails: [...pageErrors],
+    consoleErrors: consoleErrors.length,
+    consoleErrorDetails: [...consoleErrors].slice(0, 20),
+    failedRequests: failedRequests.length,
+    failedRequestDetails: [...failedRequests].slice(0, 20),
+    httpErrorResponses: httpErrorResponses.length,
+    httpErrorDetails: [...httpErrorResponses].slice(0, 20),
+    unmatchedFixtures: unmatchedFixtures.length,
+    unmatchedFixtureDetails: [...unmatchedFixtures].slice(0, 20),
+    nonGetApiRequests: nonGetApiRequests.length,
+    nonGetApiDetails: [...nonGetApiRequests].slice(0, 20),
+    applyPromotionRequests: applyPromotionRequests.length,
+    applyPromotionDetails: [...applyPromotionRequests].slice(0, 20),
+  };
+  logAction('telemetry_summary', tel);
+  return tel;
+}
+
 async function runWorkflow() {
   logAction('workflow_start', {
     appBaseUrl: APP_BASE_URL,
@@ -499,9 +729,127 @@ async function runWorkflow() {
   }
   page = await context.newPage();
 
+  page.on('pageerror', (error) => { pageErrors.push(String(error)); });
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') { consoleErrors.push(msg.text()); }
+  });
+  page.on('requestfailed', (req) => {
+    failedRequests.push(req.url());
+  });
+  page.on('response', (res) => {
+    if (res.status() >= 400) {
+      httpErrorResponses.push({ url: res.url(), status: res.status() });
+    }
+  });
+  page.on('request', (req) => {
+    const url = new URL(req.url());
+    const pn = url.pathname;
+    if (req.method().toUpperCase() !== 'GET' && pn.startsWith('/api/')) {
+      nonGetApiRequests.push({ method: req.method(), pathname: pn });
+    }
+    if (pn.startsWith('/api/') && (pn.toLowerCase().includes('apply-promotion') || pn.toLowerCase().includes('promotion'))) {
+      applyPromotionRequests.push({ method: req.method(), pathname: pn });
+    }
+  });
+
   await openCandidateDetail();
   await assertCandidateDetailVisibleEvidence('desktop');
+
+  const m0 = await collectCandidateDetailMeasurementsAtScroll('desktop', 0);
+  finalDesktopMeasurements = m0;
+
+  const maxSL = m0.maxScrollLeft || 0;
+  if (maxSL > 0) {
+    await page.evaluate((sl) => {
+      const fw = document.querySelector('.omi-field-table-wrap');
+      if (fw) { fw.scrollLeft = sl; }
+    }, maxSL);
+    await page.waitForTimeout(150);
+  }
+  const mMax = maxSL > 0 ? await collectCandidateDetailMeasurementsAtScroll('desktop-max-scroll', maxSL) : null;
+
+  if (maxSL > 0) {
+    await page.evaluate(() => {
+      const fw = document.querySelector('.omi-field-table-wrap');
+      if (fw) { fw.scrollLeft = 0; }
+    });
+    await page.waitForTimeout(150);
+  }
+
+  const columnReachability = await verifyColumnReachability();
+
   desktopScreenshotPath = await screenshot('01-desktop-omi-candidate-detail');
+
+  const wrapperCW = m0.fieldWrapper?.clientWidth || 0;
+  const T004A_BASELINE_CW = 418;
+
+  assertEvidence('desktop: wrapper clientWidth > T004A baseline (418px)', wrapperCW > T004A_BASELINE_CW, {
+    wrapperCW, baslineCW: T004A_BASELINE_CW,
+  });
+  assertEvidence('desktop: wrapper clientWidth >= 450px', wrapperCW >= 450, { wrapperCW });
+  assertEvidence('desktop: document does not overflow', m0.document.clientWidth === m0.document.scrollWidth, m0.document);
+  assertEvidence('desktop: body does not overflow', m0.body.clientWidth === m0.body.scrollWidth, m0.body);
+  assertEvidence('desktop: scroll guidance visible', m0.scrollGuidanceVisible === true, {});
+
+  const sticky = m0.stickyColumn || {};
+  const vp = m0.viewport || {};
+  assertEvidence('desktop: sticky column does not occupy full viewport', (vp.stickyOccupiesFullViewport) === false, {
+    stickyWidth: sticky.width, wrapperWidth: vp.wrapperWidth, nonStickyUsable: vp.nonStickyUsable,
+  });
+
+  assertEvidence('desktop: scrollLeft=0 action cells measured', (m0.actionCells || []).length > 0, { count: m0.actionCells.length });
+  for (const ac of (m0.actionCells || [])) {
+    assertEvidence('desktop: scrollLeft=0 action cell inside wrapper', ac.fullyInsideWrapper === true, {
+      x: ac.x, y: ac.y, left: ac.left, right: ac.right,
+    });
+    for (const btn of (ac.buttons || [])) {
+      assertEvidence('desktop: scrollLeft=0 button inside wrapper', btn.fullyInsideWrapper === true, {
+        label: btn.label, left: btn.left, right: btn.right,
+      });
+    }
+  }
+
+  if (mMax) {
+    assertEvidence('desktop: maxScrollLeft measurements available', mMax.actionCells.length > 0, { count: mMax.actionCells.length });
+    for (const ac of (mMax.actionCells || [])) {
+      assertEvidence('desktop: maxScroll action cell inside wrapper', ac.fullyInsideWrapper === true, {
+        x: ac.x, y: ac.y, left: ac.left, right: ac.right,
+      });
+      for (const btn of (ac.buttons || [])) {
+        assertEvidence('desktop: maxScroll button inside wrapper', btn.fullyInsideWrapper === true, {
+          label: btn.label, left: btn.left, right: btn.right,
+        });
+      }
+    }
+  }
+
+  const columns = (columnReachability && columnReachability.columns) ? columnReachability.columns : [];
+  assertEvidence('desktop: non-sticky visible region > 0', (columnReachability && columnReachability.nonStickyVisibleWidth > 0) === true, {
+    nsvw: columnReachability?.nonStickyVisibleWidth, stickyW: columnReachability?.stickyColWidth, wrapperW: columnReachability?.wrapperW,
+  });
+  for (const col of columns) {
+    if (col.isSticky) {
+      assertEvidence(`desktop: sticky column "${col.text}" inside wrapper`, col.headerInsideWrapper === true, {
+        index: col.index, text: col.text, headerInsideWrapper: col.headerInsideWrapper, dataCellInsideWrapper: col.dataCellInsideWrapper,
+      });
+      continue;
+    }
+    const colWidth = col.headerRect?.width || 0;
+    const fitsFully = colWidth <= (columnReachability?.nonStickyVisibleWidth || 0);
+    assertEvidence(`desktop: non-sticky col "${col.text}" header visible`, col.headerVisible === true, {
+      index: col.index, text: col.text, scrollReq: col.scrollPositionRequested, scrollAct: col.scrollPositionActual,
+      hdrIntersectW: col.headerIntersectWidth, hdrPct: col.headerVisiblePercent, hdrIdentifiable: col.headerIdentifiable,
+    });
+    assertEvidence(`desktop: non-sticky col "${col.text}" header identifiable`, col.headerIdentifiable === true, {
+      index: col.index, hdrPct: col.headerVisiblePercent, hdrIntersectW: col.headerIntersectWidth,
+    });
+    assertEvidence(`desktop: non-sticky col "${col.text}" data visible`, col.dataCellVisible === true, {
+      index: col.index, dataIntersectW: col.dataCellIntersectWidth, dataPct: col.dataCellVisiblePercent, dataReadable: col.dataCellReadable,
+    });
+    assertEvidence(`desktop: non-sticky col "${col.text}" data readable`, col.dataCellReadable === true, {
+      index: col.index, dataPct: col.dataCellVisiblePercent, dataIntersectW: col.dataCellIntersectWidth,
+    });
+  }
 
   afterSnapshot = await readOnlyProjectSnapshot('after');
   assertEvidence('opening candidate detail does not create candidates', beforeSnapshot.omi.candidateCount === afterSnapshot.omi.candidateCount, {
@@ -523,12 +871,30 @@ async function runWorkflow() {
   await page.waitForTimeout(250);
   await assertCandidateDetailVisibleEvidence('mobile');
   await assertMobileTabs();
+  finalMobileMeasurements = await collectCandidateDetailMeasurementsAtScroll('mobile', 0);
   mobileScreenshotPath = await screenshot('02-mobile-omi-candidate-detail');
+
+  const mm = finalMobileMeasurements;
+  assertEvidence('mobile: document cw = sw', mm.document.clientWidth === mm.document.scrollWidth, mm.document);
+  assertEvidence('mobile: body cw = sw', mm.body.clientWidth === mm.body.scrollWidth, mm.body);
+  assertEvidence('mobile: wrapper cw = sw (card mode, no scroll)', (mm.fieldWrapper?.clientWidth || 0) === (mm.fieldWrapper?.scrollWidth || 0), mm.fieldWrapper);
+  assertEvidence('mobile: guidance hidden', mm.scrollGuidanceVisible === false, {});
+  assertEvidence('mobile: action cells present', (mm.actionCells || []).length > 0, { count: mm.actionCells.length });
+
+  finalTelemetry = collectTelemetry();
+
+  assertEvidence('telemetry: page errors = 0', pageErrors.length === 0, { pageErrors: pageErrors.length });
+  assertEvidence('telemetry: console errors = 0', consoleErrors.length === 0, { consoleErrors: consoleErrors.length });
+  assertEvidence('telemetry: failed requests = 0', failedRequests.length === 0, { failedRequests: failedRequests.length });
+  assertEvidence('telemetry: HTTP error responses = 0', httpErrorResponses.length === 0, { httpErrorResponses: httpErrorResponses.length });
+  assertEvidence('telemetry: unmatched fixtures = 0', unmatchedFixtures.length === 0, { unmatchedFixtures: unmatchedFixtures.length });
+  assertEvidence('telemetry: non-GET API requests = 0', nonGetApiRequests.length === 0, { nonGetApiRequests: nonGetApiRequests.length });
+  assertEvidence('telemetry: apply-promotion API requests = 0', applyPromotionRequests.length === 0, { applyPromotionRequests: applyPromotionRequests.length });
 
   await context.close();
 }
 
-async function writeArtifacts(exitCode) {
+async function writeArtifacts(exitCode, telemetry, desktopMeasurements, mobileMeasurements) {
   const result = failures.length === 0 ? 'PASS' : 'FAIL';
   const finishedAt = new Date().toISOString();
   const payload = {
@@ -548,6 +914,11 @@ async function writeArtifacts(exitCode) {
     },
     beforeSnapshot,
     afterSnapshot,
+    telemetry: telemetry || {},
+    measurements: {
+      desktop: desktopMeasurements || {},
+      mobile: mobileMeasurements || {},
+    },
     failures,
     actions: workflowLog,
     safety: {
@@ -608,6 +979,34 @@ async function writeArtifacts(exitCode) {
     '- No generated prose controls were added by this script.',
   ];
 
+  if (telemetry) {
+    reportLines.push('', '## T004B Telemetry', '',
+      `- page errors: \`${telemetry.pageErrors}\``,
+      `- console errors: \`${telemetry.consoleErrors}\``,
+      `- failed application requests: \`${telemetry.failedRequests}\``,
+      `- HTTP error responses: \`${telemetry.httpErrorResponses}\``,
+      `- unmatched fixture requests: \`${telemetry.unmatchedFixtures}\``,
+      `- non-GET /api/** requests: \`${telemetry.nonGetApiRequests}\``,
+      `- apply-promotion requests: \`${telemetry.applyPromotionRequests}\``,
+    );
+  }
+
+  if (desktopMeasurements) {
+    reportLines.push('', '## Desktop Measurements (1440x1000)', '',
+      '```json',
+      JSON.stringify(desktopMeasurements, null, 2),
+      '```',
+    );
+  }
+
+  if (mobileMeasurements) {
+    reportLines.push('', '## Mobile Measurements (390x900)', '',
+      '```json',
+      JSON.stringify(mobileMeasurements, null, 2),
+      '```',
+    );
+  }
+
   if (failures.length > 0) {
     reportLines.push('', '## Failures', '');
     for (const failure of failures) {
@@ -664,7 +1063,7 @@ async function main() {
       message: error instanceof Error ? error.message : String(error),
     });
   } finally {
-    await writeArtifacts(exitCode).catch((error) => {
+    await writeArtifacts(exitCode, finalTelemetry, finalDesktopMeasurements, finalMobileMeasurements).catch((error) => {
       console.error(error instanceof Error ? error.stack : error);
       exitCode = 1;
     });

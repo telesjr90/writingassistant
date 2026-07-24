@@ -134,6 +134,12 @@ export default function OMICandidateFieldTable({ candidate, onOpenEvidence = () 
         </OMIEmptyCandidateShellWarning>
       )}
       <div className="omi-field-table-wrap">
+        <p
+          className="omi-table-scroll-guidance"
+          data-testid="omi-candidate-field-scroll-guidance"
+        >
+          Scroll horizontally within this table to review all columns. Field actions remain visible.
+        </p>
         <table
           className="omi-candidate-field-table"
           data-testid="omi-candidate-field-table"

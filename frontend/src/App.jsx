@@ -1663,7 +1663,7 @@ export default function App() {
         onCreateOrImportStoryCheckSource={handleCreateOrImportStoryCheckSource}
         onSelectStoryCheckSource={handleSelectStoryCheckSource}
       />
-      <main className="editor-column" aria-label="Project workspace">
+      <main className="editor-column" data-active-workspace={activeWorkspaceView} data-testid="editor-column" aria-label="Project workspace">
         {activeWorkspaceView === WORKSPACE_VIEWS.OVERVIEW ? (
           <>
             <OmiGuidedProjectCreation
