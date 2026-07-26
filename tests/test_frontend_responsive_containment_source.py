@@ -541,6 +541,46 @@ class TestDesignTokenPreservation:
 
 
 # ---------------------------------------------------------------------------
+# Candidate Detail grid-child min-width containment (T004C)
+# ---------------------------------------------------------------------------
+
+class TestCandidateDetailGridContainment:
+    def test_candidate_fields_div_has_min_width_zero(self) -> None:
+        css = styles_css()
+        assert "#omi-candidate-fields" in css, (
+            "ID selector #omi-candidate-fields must exist in styles.css"
+        )
+        # Find the rule body directly since _rule_block only handles class selectors
+        idx = css.index("#omi-candidate-fields")
+        open_brace = css.index("{", idx)
+        depth = 0
+        close_brace = open_brace
+        for i in range(open_brace, len(css)):
+            if css[i] == "{":
+                depth += 1
+            elif css[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    close_brace = i
+                    break
+        body = css[open_brace + 1 : close_brace]
+        assert "min-width: 0" in body, (
+            "#omi-candidate-fields must set min-width: 0 so the CSS Grid "
+            "can shrink the left track below the field table's min-content. "
+            "Without this, the grid's default min-width: auto lets the "
+            "table's 1120 px min-width expand the document horizontally."
+        )
+
+    def test_candidate_detail_grid_preserves_two_track_definition(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-candidate-detail-layout")
+        assert "minmax(0," in block and "minmax(280px," in block, (
+            ".omi-candidate-detail-layout must retain its two-track grid "
+            "template with minmax columns."
+        )
+
+
+# ---------------------------------------------------------------------------
 # Universal box-sizing preserved (T004A)
 # ---------------------------------------------------------------------------
 
@@ -565,3 +605,117 @@ class TestExistingContainmentPreserved:
         css = styles_css()
         block = _rule_body(css, ".field-input")
         assert "width: 100%" in block
+
+
+# ---------------------------------------------------------------------------
+# T004C: Review boundary note wrapping (defect 1 fix)
+# ---------------------------------------------------------------------------
+
+class TestReviewBoundaryNoteWrapping:
+    def test_review_boundary_note_has_overflow_wrap(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-boundary-note")
+        assert "overflow-wrap: anywhere" in block, (
+            ".review-boundary-note must have overflow-wrap: anywhere to wrap "
+            "long serialized audit JSON strings without causing document overflow."
+        )
+
+    def test_review_boundary_note_has_word_break(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-boundary-note")
+        assert "word-break: break-word" in block, (
+            ".review-boundary-note must have word-break: break-word as a "
+            "fallback wrapping mechanism for unbroken content."
+        )
+
+    def test_review_boundary_note_retains_font_size(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-boundary-note")
+        assert "font-size: 13px" in block, (
+            ".review-boundary-note must retain its 13px font size."
+        )
+
+
+# ---------------------------------------------------------------------------
+# T004C: Editor column segment containment (defect 2 fix)
+# ---------------------------------------------------------------------------
+
+class TestEditorColumnSegmentContainment:
+    def test_context_panel_has_min_width_zero(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".project-context")
+        assert "min-width: 0" in block, (
+            ".project-context must have min-width: 0 in its grouped rule "
+            "so it can shrink within .editor-column at narrow widths."
+        )
+
+    def test_review_queue_panel_has_min_width_zero(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-panel")
+        assert "min-width: 0" in block, (
+            ".review-queue-panel must have min-width: 0 in its grouped rule "
+            "so it can shrink within .editor-column at narrow widths."
+        )
+
+    def test_omi_panel_has_min_width_zero(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".omi-panel")
+        assert "min-width: 0" in block, (
+            ".omi-panel must have min-width: 0 in its grouped rule "
+            "so it can shrink within .editor-column at narrow widths."
+        )
+
+
+# ---------------------------------------------------------------------------
+# T004C: Review queue layout mobile reflow (defect 2 fix)
+# ---------------------------------------------------------------------------
+
+class TestReviewQueueLayoutMobileSingleColumn:
+    def test_review_queue_layout_single_column_at_mobile(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert ".review-queue-layout" in mobile_section, (
+            ".review-queue-layout must appear in the @media (max-width: 900px) "
+            "block to become single-column and prevent two-column overflow "
+            "at narrow viewports."
+        )
+        assert "grid-template-columns: 1fr" in mobile_section, (
+            "The mobile section must set grid-template-columns: 1fr for "
+            ".review-queue-layout."
+        )
+
+    def test_review_queue_layout_preserves_two_column_at_desktop(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-layout")
+        assert "grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr)" in block, (
+            ".review-queue-layout must retain its two-column grid at desktop widths."
+        )
+
+
+# ---------------------------------------------------------------------------
+# T004C: Editor header reflow at narrow widths
+# ---------------------------------------------------------------------------
+
+class TestEditorHeaderNarrowReflow:
+    def test_editor_header_has_flex_wrap_at_mobile(self) -> None:
+        css = styles_css()
+        mobile_start = css.index("@media (max-width: 900px)")
+        mobile_section = css[mobile_start:]
+        assert ".editor-header" in mobile_section, (
+            ".editor-header must appear in the @media (max-width: 900px) block "
+            "to allow header content to wrap at narrow widths."
+        )
+        assert "flex-wrap: wrap" in mobile_section, (
+            "The mobile section must apply flex-wrap: wrap to .editor-header."
+        )
+
+    def test_editor_header_preserves_desktop_layout(self) -> None:
+        css = styles_css()
+        # The grouped block (.panel-header, .context-header, .editor-header)
+        # sets flex-direction: column; the individual .editor-header overrides
+        # with flex-direction: row.  Verify both are present.
+        assert "flex-direction: row" in css, (
+            ".editor-header must retain row flex-direction at desktop "
+            "(overrides the grouped column default)."
+        )

@@ -225,6 +225,7 @@ h2 {
 .omi-panel,
 .review-queue-panel {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: var(--wa-space-16);
   padding: var(--wa-space-20);
@@ -723,6 +724,8 @@ h2 {
   border-radius: var(--wa-radius-surface);
   font-size: 13px;
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .omi-workflow-notice,
@@ -1446,6 +1449,10 @@ h2 {
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
   gap: 16px;
   align-items: start;
+}
+
+#omi-candidate-fields {
+  min-width: 0;
 }
 
 .omi-candidate-side-rail {
@@ -2251,6 +2258,14 @@ h2 {
     padding: 20px;
   }
 
+  .editor-header {
+    flex-wrap: wrap;
+  }
+
+  .editor-header > div:first-child {
+    min-width: 0;
+  }
+
   .context-grid,
   .omi-grid,
   .omi-record-grid,
@@ -2277,6 +2292,10 @@ h2 {
 
   .omi-grouped-source-scope p {
     grid-column: auto;
+  }
+
+  .review-queue-layout {
+    grid-template-columns: 1fr;
   }
 
   .omi-grouped-review-header,
