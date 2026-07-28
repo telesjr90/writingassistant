@@ -261,3 +261,91 @@ The application-owned `OMIEvidenceDrawer` remains the evidence-dialog composite 
 - **Don't** add generated story-prose controls or examples.
 - **Don't** let Radix, another primitive, or a CSS framework define application visual language, information architecture, or product semantics.
 - **Don't** claim responsive completion before T004 or accessibility completion before T005.
+
+## 7. Minimum Operable-Target Policy
+
+This policy classifies pointer-operable targets under review relative to two
+target-size thresholds. It is a documented, testable guide, not a
+product-wide WCAG conformance claim.
+
+### Classification Distinctions
+
+1. **Confirmed failure of the 24 CSS-pixel minimum** — A control whose
+   interactive target area is demonstrably smaller than 24-by-24 CSS pixels,
+   no spacing exception is available, and no other applicable WCAG exception
+   is active. This requires repair.
+
+2. **Allowed WCAG exception** — A control that is smaller than 24-by-24 CSS
+   pixels but qualifies for an explicit WCAG 2.2 SC 2.5.8 exception. The
+   exact exception name and the evidence supporting it must be recorded.
+
+3. **Meets the WCAG minimum but below the preferred 44 CSS pixels** — A
+   control whose interactive target area is at least 24-by-24 CSS pixels
+   (meets SC 2.5.8 Level AA) but falls below the preferred 44-by-44
+   CSS-pixel objective (SC 2.5.5 Level AAA). Repair is desirable but not a
+   Level AA failure.
+
+4. **Already meets the preferred 44 CSS pixels** — A control whose
+   interactive target area is at least 44-by-44 CSS pixels, satisfying both
+   SC 2.5.8 and the application's preferred objective.
+
+5. **Insufficient evidence pending rendered geometry** — Source CSS alone
+   cannot establish the actual computed target area or determine whether a
+   spacing exception applies. Classification is deferred until rendered
+   browser geometry evidence is available.
+
+### Governing Criteria
+
+- **WCAG 2.2 SC 2.5.8 (Level AA):** Target Size (Minimum) requires that
+  pointer-target interactive areas are at least 24-by-24 CSS pixels. This
+  applies to clickable/tappable interactive controls in the rendered page.
+
+- **WCAG 2.2 SC 2.5.5 (Level AAA):** Target Size (Enhanced) requires that
+  pointer-target interactive areas are at least 44-by-44 CSS pixels.
+
+- This application **adopts 44-by-44 CSS pixels as a preferred product
+  objective**, especially for frequent, consequential, sequential, mobile,
+  or coarse-pointer actions.
+
+- **A control below 44 CSS pixels is not automatically a WCAG Level AA
+  failure.** The 44-pixel threshold belongs to SC 2.5.5 (Level AAA), not the
+  Level AA minimum.
+
+### WCAG 2.5.8 Exceptions
+
+A control smaller than 24 CSS pixels may still satisfy SC 2.5.8 if one of the
+following exceptions applies:
+
+1. **Spacing** — For an undersized target, a 24-CSS-pixel-diameter circle
+   centered on the target's bounding box must not intersect another target
+   or the corresponding circle for another undersized target. The visible
+   glyph, icon, or checkbox alone is insufficient to evaluate this
+   exception; rendered target geometry is required.
+
+2. **Equivalent** — An equivalent control that meets the minimum exists
+   elsewhere on the same page.
+
+3. **Inline** — The target is part of a sentence or block of text and
+   its size is constrained by the line height of non-target text.
+
+4. **User-agent control** — The target size is determined by the user agent
+   and has not been modified by the author.
+
+5. **Essential** — A particular presentation of the target is essential to
+   the information being conveyed.
+
+### Evidence Requirements
+
+- **Interactive target area matters, not merely the visible icon, label, or
+  checkbox glyph.** A small glyph inside a larger clickable region may meet
+  the minimum target through its full interactive area.
+
+- **CSS source declarations (width, height, padding, line-height) are not
+  browser-computed geometry.** Source CSS may be used to identify controls
+  likely to require further review, but alone it cannot establish the final
+  rendered target size or confirm that a spacing exception applies.
+
+- **No product-wide WCAG conformance claim is asserted.** Each classification
+  is a bounded assessment of a specific control under the distinctions defined
+  here. Accessibility completion (T005) and full WCAG conformance evaluation
+  are separate from this policy.

@@ -289,7 +289,7 @@ export default function OMIDashboard({
 
       {error && (
         <section className="omi-error-state" role="alert" aria-label="Degraded OMI status">
-          <h3>OMI status unavailable</h3>
+          <h2>OMI status unavailable</h2>
           <p>{error}</p>
           <p>No inferred counts are shown while OMI status is degraded.</p>
         </section>
@@ -330,7 +330,7 @@ export default function OMIDashboard({
       >
         <div className="section-heading">
           <div>
-            <h3>Approved Memory/Canon Snapshot</h3>
+            <h2>Approved Memory/Canon Snapshot</h2>
             <p className="muted-copy">
               Approved Memory/Canon is shown separately from candidates and promotion audit records.
             </p>
@@ -360,7 +360,7 @@ export default function OMIDashboard({
       </section>
 
       <section className="omi-health-panel" aria-label="Warnings / Health">
-        <h3>Warnings / Health</h3>
+        <h2>Warnings / Health</h2>
         <ul>
           <li>Dashboard counts show review status only. Candidates, groups, and promotion records are not canon.</li>
           <li>Ready means the handoff packet is complete. Memory/Canon has not changed.</li>

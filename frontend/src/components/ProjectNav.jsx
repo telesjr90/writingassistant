@@ -360,7 +360,7 @@ export default function ProjectNav({
     <aside className="project-nav" aria-label="Project navigation">
       <div className="panel-header">
         <p className="eyebrow">Project</p>
-        <h1>{activeProjectLabel}</h1>
+        <p className="project-nav-title">{activeProjectLabel}</p>
       </div>
 
       <section className="project-selector" aria-label="Project library">

@@ -422,7 +422,7 @@ export default function ApplyPromotionConfirmation({
       <header className="omi-apply-guard-header">
         <div>
           <p className="eyebrow">Guarded Handoff</p>
-          <h1>Apply-Promotion Confirmation</h1>
+          <h2>Apply-Promotion Confirmation</h2>
         </div>
         <span className="omi-status-badge is-warning">Not Applied to Memory/Canon</span>
       </header>
@@ -440,7 +440,7 @@ export default function ApplyPromotionConfirmation({
 
       <div className="omi-apply-section-grid">
         <section className="omi-apply-section" aria-label="Candidate Snapshot">
-          <h2>Candidate Snapshot</h2>
+          <h3>Candidate Snapshot</h3>
           <dl className="omi-apply-metadata">
             <MetadataRow label="Candidate" value={candidateId} missingLabel="Missing candidate" />
             <MetadataRow label="Candidate type" value={candidateType} missingLabel="Missing candidate type" />
@@ -454,7 +454,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Destination and target path">
-          <h2>Destination</h2>
+          <h3>Destination</h3>
           <dl className="omi-apply-metadata">
             <MetadataRow label="Destination" value={destinationLabel} />
             <MetadataRow label="Destination type" value={destinationType} missingLabel="Unsupported destination" />
@@ -464,7 +464,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Evidence / Provenance Summary">
-          <h2>Evidence / Provenance Summary</h2>
+          <h3>Evidence / Provenance Summary</h3>
           <dl className="omi-apply-metadata" data-testid="ux2-promotion-audit-evidence">
             <MetadataRow label="Evidence refs" value={evidenceRefs} missingLabel="Missing evidence/provenance" />
             <MetadataRow label="Provenance refs" value={provenanceRefs} missingLabel="Missing evidence/provenance" />
@@ -476,7 +476,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Source Location Summary">
-          <h2>Source Location Summary</h2>
+          <h3>Source Location Summary</h3>
           <dl className="omi-apply-metadata">
             <MetadataRow label="Source locator refs" value={sourceLocatorRefs} missingLabel="Missing source locator" />
             <MetadataRow label="Source hash" value={candidate?.source_hash} />
@@ -485,7 +485,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Duplicate / Link / Dependency Summary">
-          <h2>Duplicate / Link / Dependency Summary</h2>
+          <h3>Duplicate / Link / Dependency Summary</h3>
           <dl className="omi-apply-metadata">
             <MetadataRow label="Duplicate decision" value={duplicateState} missingLabel="Duplicate unresolved" />
             <MetadataRow label="Dependencies" value={dependencyState} missingLabel="Dependency unresolved" />
@@ -498,7 +498,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Approved Memory/Canon Before-State">
-          <h2>Approved Memory/Canon Before-State</h2>
+          <h3>Approved Memory/Canon Before-State</h3>
           <dl className="omi-apply-metadata">
             <MetadataRow label="Before-state snapshot" value={beforeState} missingLabel="Approved Memory/Canon before-state unavailable" />
             <MetadataRow label="Before-state status" value="Memory/Canon Unchanged" />
@@ -507,7 +507,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Promotion Audit Record">
-          <h2>Promotion Audit Record</h2>
+          <h3>Promotion Audit Record</h3>
           <dl className="omi-apply-metadata">
             <MetadataRow label="Promotion Audit Record" value={promotionAudit} missingLabel="Promotion audit record missing" />
             <MetadataRow label="Audit Preview" value="Audit Preview: candidate ID, owner approval, destination, evidence, provenance, target path, timestamp, and confirmation." />
@@ -516,7 +516,7 @@ export default function ApplyPromotionConfirmation({
         </section>
 
         <section className="omi-apply-section" aria-label="Failure safety">
-          <h2>Failure Safety</h2>
+          <h3>Failure Safety</h3>
           <p>
             Failure safety copy: if apply-promotion fails, Memory/Canon must remain unchanged
             and the audit trail must show the failure state.
@@ -526,7 +526,7 @@ export default function ApplyPromotionConfirmation({
 
       <form className="omi-apply-final-form" onSubmit={handleSubmit}>
         <section className="omi-apply-section" aria-label="Owner Final Confirmation">
-          <h2>Owner Final Confirmation</h2>
+          <h3>Owner Final Confirmation</h3>
           <label
             className="omi-checkbox-row"
             data-testid="ux2-apply-promotion-owner-confirmation"

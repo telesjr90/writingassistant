@@ -85,6 +85,14 @@ button {
   border-right: 1px solid var(--wa-color-border);
 }
 
+.project-nav-title {
+  margin: 0;
+  color: var(--wa-color-text-strong);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .analysis-sidebar {
   flex: 0 0 320px;
   border-left: 1px solid var(--wa-color-border);
@@ -1162,8 +1170,11 @@ h2 {
   background: var(--wa-color-danger-surface);
 }
 
+.omi-error-state h2,
 .omi-error-state h3,
+.omi-health-panel h2,
 .omi-health-panel h3,
+.omi-approved-snapshot h2,
 .omi-approved-snapshot h3 {
   margin: 0;
   color: var(--wa-color-text-strong);
@@ -1362,7 +1373,9 @@ h2 {
 }
 
 .omi-empty-state h2,
-.omi-candidate-panel h2 {
+.omi-empty-state h3,
+.omi-candidate-panel h2,
+.omi-candidate-panel h3 {
   margin: 0;
   color: var(--wa-color-text-strong);
   font-size: 16px;
@@ -1382,6 +1395,10 @@ h2 {
   gap: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #dfe5ef;
+}
+
+.omi-candidate-header h2 {
+  font-size: 24px;
 }
 
 .omi-candidate-status-grid {
@@ -1755,8 +1772,10 @@ h2 {
   border-bottom: 1px solid #dfb66f;
 }
 
-.omi-apply-guard-header h1 {
+.omi-apply-guard-header h1,
+.omi-apply-guard-header h2 {
   margin-top: 4px;
+  font-size: 24px;
 }
 
 .omi-apply-boundary,
@@ -1828,8 +1847,11 @@ h2 {
 }
 
 .omi-apply-section h2,
+.omi-apply-section h3,
 .omi-apply-blockers h2,
-.omi-apply-final-form h2 {
+.omi-apply-blockers h3,
+.omi-apply-final-form h2,
+.omi-apply-final-form h3 {
   margin: 0;
   color: #101828;
   font-size: 16px;

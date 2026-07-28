@@ -29,6 +29,7 @@ REQUIRED_HEADINGS = [
     "## 4. Elevation",
     "## 5. Components",
     "## 6. Do's and Don'ts",
+    "## 7. Minimum Operable-Target Policy",
 ]
 
 REQUIRED_FRONTMATTER_GROUPS = {

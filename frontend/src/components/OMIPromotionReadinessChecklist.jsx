@@ -116,7 +116,7 @@ export default function OMIPromotionReadinessChecklist({ candidate }) {
       data-testid="omi-promotion-readiness-checklist"
       aria-label="Promotion readiness checklist"
     >
-      <h2>Promotion readiness checklist</h2>
+      <h3>Promotion readiness checklist</h3>
       <ul className="omi-checklist">
         {items.map((item) => (
           <li

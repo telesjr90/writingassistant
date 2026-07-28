@@ -121,7 +121,7 @@ function ReadOnlyReferences({ candidate }) {
 
   return (
     <section className="omi-candidate-panel" aria-label="Read-only approved Memory/Canon references">
-      <h2>Approved Memory/Canon links</h2>
+      <h3>Approved Memory/Canon links</h3>
       {approvedLinks.length === 0 ? (
         <p className="muted-copy">No approved Memory/Canon links.</p>
       ) : (
@@ -145,7 +145,7 @@ function EvidenceProvenance({ candidate, onOpenEvidence = () => {} }) {
   return (
     <section className="omi-candidate-panel" aria-label="Evidence and provenance summary">
       <div className="section-heading">
-        <h2>Evidence / Provenance</h2>
+        <h3>Evidence / Provenance</h3>
         <button
           className="secondary-button"
           type="button"
@@ -195,7 +195,7 @@ function EvidenceProvenance({ candidate, onOpenEvidence = () => {} }) {
 function DuplicateDependencyPanel({ candidate }) {
   return (
     <section className="omi-candidate-panel" aria-label="Duplicate / Merge / Clarification">
-      <h2>Duplicate / Merge / Clarification</h2>
+      <h3>Duplicate / Merge / Clarification</h3>
       <dl className="omi-candidate-metadata">
         <div>
           <dt>Duplicate/dependency</dt>
@@ -322,7 +322,7 @@ export default function OMICandidateDetail({
       <header className="omi-candidate-header">
         <div>
           <p className="eyebrow">Active project: {projectTitle || activeProjectId || 'Project'} / project-local OMI</p>
-          <h1>Candidate: {candidateId}</h1>
+          <h2>Candidate: {candidateId}</h2>
         </div>
         <button className="secondary-button" type="button" onClick={onBackToDashboard}>
           Back to OMI Dashboard
@@ -423,7 +423,7 @@ export default function OMICandidateDetail({
       </div>
 
       <section className="omi-candidate-panel" aria-label="Candidate apply-promotion boundary">
-        <h2>Apply to Memory/Canon</h2>
+        <h3>Apply to Memory/Canon</h3>
         <button
           className="secondary-button"
           type="button"

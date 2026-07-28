@@ -120,7 +120,7 @@ export default function OMICandidateFieldTable({ candidate, onOpenEvidence = () 
     <section className="omi-candidate-panel" aria-label="Field review table">
       <div className="section-heading">
         <div>
-          <h2>Field review table</h2>
+          <h3>Field review table</h3>
           <p className="muted-copy">
             Stored review metadata only. Missing values show Missing / Not linked / Unavailable.
             Approval does not extract new fields.

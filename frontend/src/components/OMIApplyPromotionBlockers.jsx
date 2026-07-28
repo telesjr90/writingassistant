@@ -31,7 +31,7 @@ export default function OMIApplyPromotionBlockers({
     >
       <div className="section-heading">
         <div>
-          <h2>Visible Blockers</h2>
+          <h3>Visible Blockers</h3>
           <p className="muted-copy">
             Blocked reasons appear before Owner Final Confirmation and Final Apply-Promotion.
           </p>
