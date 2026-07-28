@@ -247,7 +247,7 @@ export default function OmiGuidedProjectCreation({
             </div>
           </dl>
 
-          <label className="project-select-label">
+          <label className="omi-checkbox-row">
             <input
               type="checkbox"
               checked={finalConfirmation}

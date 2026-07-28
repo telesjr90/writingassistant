@@ -63,6 +63,18 @@ button {
   font: inherit;
 }
 
+button:focus-visible,
+a[href]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+details summary:focus-visible,
+[tabindex]:focus-visible,
+.tiptap-surface:focus-visible {
+  outline: 2px solid var(--wa-color-focus);
+  outline-offset: 1px;
+}
+
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -204,11 +216,14 @@ h2 {
 }
 
 .scene-item:hover,
-.scene-item:focus-visible,
 .scene-item.is-active {
   background: var(--wa-color-surface-selected);
   border-color: #8fb3ff;
-  outline: none;
+}
+
+.scene-item:focus-visible {
+  outline: 2px solid var(--wa-color-focus);
+  outline-offset: 2px;
 }
 
 .scene-item small {
@@ -711,11 +726,14 @@ h2 {
 }
 
 .review-queue-entry:hover,
-.review-queue-entry:focus-visible,
 .review-queue-entry.is-active {
   background: var(--wa-color-surface-selected);
   border-color: #8fb3ff;
-  outline: none;
+}
+
+.review-queue-entry:focus-visible {
+  outline: 2px solid var(--wa-color-focus);
+  outline-offset: 2px;
 }
 
 .review-queue-entry span,
@@ -2237,7 +2255,7 @@ h2 {
 .omi-grouped-filter-grid select:focus-visible,
 .omi-grouped-owner-actions textarea:focus-visible,
 .omi-grouped-owner-actions[tabindex="-1"]:focus-visible {
-  outline: 3px solid #7aa7e8;
+  outline: 2px solid var(--wa-color-focus);
   outline-offset: 2px;
 }
 
@@ -2560,5 +2578,75 @@ h2 {
   .omi-apply-final-actions .secondary-button,
   .omi-apply-final-actions .omi-final-apply-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  button {
+    min-height: 44px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 44px;
+  }
+
+  .primary-action {
+    min-height: 44px;
+  }
+
+  .scene-item {
+    min-height: 44px;
+  }
+
+  .review-queue-entry {
+    min-height: 44px;
+  }
+
+  .omi-row-action {
+    min-height: 44px;
+  }
+
+  .omi-final-apply-button {
+    min-height: 44px;
+  }
+
+  .omi-grouped-candidate-row {
+    min-height: 44px;
+  }
+
+  .omi-grouped-disclosure summary {
+    min-height: 44px;
+  }
+
+  .omi-mobile-tabs a {
+    min-height: 44px;
+  }
+
+  .project-select,
+  .project-title-input {
+    min-height: 44px;
+  }
+
+  .field-input {
+    min-height: 44px;
+  }
+
+  .omi-grouped-source-scope select,
+  .omi-grouped-filter-grid input[type="search"],
+  .omi-grouped-filter-grid select {
+    min-height: 44px;
+  }
+
+  .project-select-label textarea {
+    min-height: 44px;
+  }
+
+  .omi-checkbox-row,
+  .omi-grouped-check-filter,
+  .omi-grouped-approval-confirmation {
+    min-height: 44px;
+    align-items: flex-start;
+    cursor: pointer;
   }
 }

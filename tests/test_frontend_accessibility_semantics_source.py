@@ -1,4 +1,4 @@
-"""Focused source contracts for PHASE8-IMPL-024 T005A heading hierarchy and minimum operable-target policy."""
+"""Focused source contracts for PHASE8-IMPL-024 T005A heading hierarchy and T005B target-sizing, checkbox hit areas, and focus visibility."""
 
 from __future__ import annotations
 
@@ -25,6 +25,9 @@ OMI_APPLY_PROMOTION_BLOCKERS_JSX = (
 )
 APPLY_PROMOTION_CONFIRMATION_JSX = (
     FRONTEND_SRC / "components" / "ApplyPromotionConfirmation.jsx"
+)
+OMI_GUIDED_CREATION_JSX = (
+    FRONTEND_SRC / "components" / "OmiGuidedProjectCreation.jsx"
 )
 DESIGN_MD = REPO_ROOT / "DESIGN.md"
 STYLES_CSS = FRONTEND_SRC / "styles.css"
@@ -370,11 +373,15 @@ class TestTargetSizePolicyInDesignMd:
 
 def _rule_block(source: str, partial_selector: str) -> str:
     first_line = partial_selector.split(",")[0].strip()
-    if not first_line.startswith("."):
-        first_line = "." + first_line
-    escaped = re.escape(first_line)
+    if not first_line.startswith(".") and not first_line.startswith("[") and bool(re.match(r'^[a-zA-Z]', first_line)):
+        escaped = re.escape(first_line)
+        pattern = rf"(?m)^\s*{escaped}(?=[\s,.{{])"
+    else:
+        if not first_line.startswith("."):
+            first_line = "." + first_line
+        escaped = re.escape(first_line)
+        pattern = rf"(?m)^\s*{escaped}(?=[\s,\n.{{])"
 
-    pattern = rf"(?m)^{escaped}(?=[\s,\n.{{])"
     match = re.search(pattern, source)
     assert match is not None, (
         f"Rule block for {partial_selector!r} not found in styles.css"
@@ -397,3 +404,219 @@ def _rule_block(source: str, partial_selector: str) -> str:
         i += 1
 
     raise AssertionError(f"Unclosed rule block for {partial_selector!r}")
+
+
+def _media_block(source: str, condition_pattern: str) -> str:
+    pattern = rf"@media {re.escape(condition_pattern)}\s*\{{"
+    match = re.search(pattern, source)
+    assert match is not None, (
+        f"@media {condition_pattern} block not found in styles.css"
+    )
+    start = match.start()
+    depth = 0
+    i = match.end()
+    while i < len(source):
+        ch = source[i]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            if depth == 0:
+                return source[start : i + 1]
+            depth -= 1
+        i += 1
+    raise AssertionError(f"Unclosed @media block for {condition_pattern!r}")
+
+
+# ---------------------------------------------------------------------------
+# T005B — Mobile/coarse-pointer target sizing
+# ---------------------------------------------------------------------------
+
+T005B_MEDIA_CONDITION = "(max-width: 900px), (pointer: coarse)"
+
+T005B_TARGET_SELECTORS = (
+    "button",
+    ".primary-button",
+    ".secondary-button",
+    ".primary-action",
+    ".scene-item",
+    ".review-queue-entry",
+    ".omi-row-action",
+    ".omi-final-apply-button",
+    ".omi-grouped-candidate-row",
+    ".omi-grouped-disclosure summary",
+    ".omi-mobile-tabs a",
+    ".project-select",
+    ".project-title-input",
+    ".field-input",
+    ".omi-grouped-source-scope select",
+    ".omi-grouped-filter-grid input[type=\"search\"]",
+    ".omi-grouped-filter-grid select",
+    ".project-select-label textarea",
+)
+
+
+class TestT005BMobileCoarseTargetSizing:
+    def test_combined_media_query_exists(self) -> None:
+        css = read_text(STYLES_CSS)
+        block = _media_block(css, T005B_MEDIA_CONDITION)
+        assert "min-height: 44px" in block
+
+    def test_authorized_control_families_have_44px_min_height(self) -> None:
+        css = read_text(STYLES_CSS)
+        block = _media_block(css, T005B_MEDIA_CONDITION)
+        for selector in T005B_TARGET_SELECTORS:
+            selector_block = _rule_block(block, selector)
+            assert "min-height: 44px" in selector_block, (
+                f"{selector} missing min-height: 44px in T005B media"
+            )
+
+    def test_unclassed_buttons_included(self) -> None:
+        css = read_text(STYLES_CSS)
+        block = _media_block(css, T005B_MEDIA_CONDITION)
+        btn_block = _rule_block(block, "button")
+        assert "min-height: 44px" in btn_block
+
+    def test_desktop_base_sizes_intact_outside_conditional(self) -> None:
+        css = read_text(STYLES_CSS)
+        media_start = css.find(f"@media {T005B_MEDIA_CONDITION}")
+        assert media_start > 0
+        pre_media = css[:media_start]
+
+        assert "32px" in pre_media
+
+        button_match = re.search(
+            r".context-actions button[^{]*\{[^}]*min-height:\s*(\d+)px", pre_media
+        )
+        assert button_match, "desktop context-actions button min-height not found"
+        assert int(button_match.group(1)) < 44, "desktop button min-height must remain below 44px"
+
+        primary_match = re.search(
+            r"\.primary-action[^{]*\{[^}]*min-height:\s*(\d+)px", pre_media
+        )
+        assert primary_match, "desktop primary-action min-height not found"
+
+        field_match = re.search(
+            r"\.field-input[^{]*\{[^}]*min-height:\s*(\d+)px", pre_media
+        )
+        assert field_match, "desktop field-input min-height not found"
+        assert int(field_match.group(1)) < 44, "desktop field-input min-height must remain below 44px"
+
+
+# ---------------------------------------------------------------------------
+# T005B — Checkbox label hit areas
+# ---------------------------------------------------------------------------
+
+class TestT005BCheckboxLabelHitAreas:
+    def test_checkbox_label_families_have_conditional_44px_min(self) -> None:
+        css = read_text(STYLES_CSS)
+        block = _media_block(css, T005B_MEDIA_CONDITION)
+        for selector in (
+            ".omi-checkbox-row",
+            ".omi-grouped-check-filter",
+            ".omi-grouped-approval-confirmation",
+        ):
+            assert selector in block
+            assert "min-height: 44px" in block
+
+    def test_guided_project_confirmation_uses_omi_checkbox_row(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'className="omi-checkbox-row"' in source
+        assert "I confirm this owner-authored setup" in source
+        assert "type=\"checkbox\"" in source
+
+    def test_no_manual_checkbox_label_click_handler_introduced(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'className="omi-checkbox-row"' in source
+        label_idx = source.index('className="omi-checkbox-row"')
+        label_end_idx = source.index("</label>", label_idx)
+        label_block = source[label_idx:label_end_idx]
+        assert "onClick" not in label_block
+
+
+# ---------------------------------------------------------------------------
+# T005B — Focus-visible
+# ---------------------------------------------------------------------------
+
+class TestT005BFocusVisible:
+    def test_shared_focus_visible_rule_covers_control_families(self) -> None:
+        css = read_text(STYLES_CSS)
+        required_selectors = (
+            "button:focus-visible",
+            "a[href]:focus-visible",
+            "input:focus-visible",
+            "select:focus-visible",
+            "textarea:focus-visible",
+            "details summary:focus-visible",
+            "[tabindex]:focus-visible",
+            ".tiptap-surface:focus-visible",
+        )
+        for selector in required_selectors:
+            assert selector in css, f"{selector} not found in shared focus-visible rule"
+
+    def test_focus_visible_rule_consumes_semantic_focus_token(self) -> None:
+        css = read_text(STYLES_CSS)
+        focus_rules = re.findall(
+            r".*focus-visible[^{]*\{[^}]*\}",
+            css,
+            flags=re.DOTALL,
+        )
+        assert len(focus_rules) >= 1
+        found_focus = False
+        for rule_body in focus_rules:
+            if "outline:" in rule_body and "var(--wa-color-focus)" in rule_body:
+                found_focus = True
+                break
+        assert found_focus, "no focus-visible rule consumes var(--wa-color-focus)"
+
+    def test_scene_item_no_longer_suppresses_focus_visible_outline(self) -> None:
+        css = read_text(STYLES_CSS)
+        scene_block = _rule_block(css, ".scene-item:focus-visible")
+        assert "outline: none" not in scene_block
+        assert "outline:" not in scene_block or "solid" in scene_block
+        assert "var(--wa-color-focus)" in scene_block
+
+    def test_review_queue_entry_no_longer_suppresses_focus_visible_outline(self) -> None:
+        css = read_text(STYLES_CSS)
+        rq_block = _rule_block(css, ".review-queue-entry:focus-visible")
+        assert "outline: none" not in rq_block
+        assert "outline:" not in rq_block or "solid" in rq_block
+        assert "var(--wa-color-focus)" in rq_block
+
+    def test_grouped_review_focus_no_longer_uses_hardcoded_color(self) -> None:
+        css = read_text(STYLES_CSS)
+        assert "#7aa7e8" not in css
+
+    def test_grouped_review_focus_uses_semantic_token(self) -> None:
+        css = read_text(STYLES_CSS)
+        grouped_block = _rule_block(css, ".omi-grouped-candidate-row:focus-visible")
+        assert "var(--wa-color-focus)" in grouped_block
+
+    def test_focus_visible_distinct_from_hover_for_scene_item(self) -> None:
+        css = read_text(STYLES_CSS)
+        hover_block = _rule_block(css, ".scene-item:hover")
+        assert ":focus-visible" not in hover_block
+
+    def test_focus_visible_distinct_from_hover_for_review_queue_entry(self) -> None:
+        css = read_text(STYLES_CSS)
+        hover_block = _rule_block(css, ".review-queue-entry:hover")
+        assert ":focus-visible" not in hover_block
+
+
+# ---------------------------------------------------------------------------
+# T005B — T005A contracts remain unchanged (regression guard)
+# ---------------------------------------------------------------------------
+
+class TestT005AContractsRemainUnchanged:
+    def test_scene_item_hover_has_selected_background(self) -> None:
+        css = read_text(STYLES_CSS)
+        hover_block = _rule_block(css, ".scene-item:hover")
+        assert "var(--wa-color-surface-selected)" in hover_block
+
+    def test_project_nav_title_still_not_a_heading(self) -> None:
+        source = read_text(PROJECT_NAV_JSX)
+        for tag in ("<h1>", "<h2>", "<h3>", "<h4>", "<h5>", "<h6>"):
+            assert tag not in source
+
+    def test_omi_shell_has_exactly_one_h1(self) -> None:
+        source = read_text(OMI_SHELL_JSX)
+        assert source.count("<h1>") == 1
