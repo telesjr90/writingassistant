@@ -5,10 +5,10 @@
 - ID: `PHASE8-IMPL-024`
 - Title: Application UI/UX Audit Integrity and Acceptance Repair
 - Status: published/active
-- Latest completed task: `PHASE8-IMPL-024-T005C` (`complete/PASS` at `a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e`). T004 is complete/PASS through T004A-T004C (commits `d6318c67`, `d72ace8f`, `faae964f`). T005 is complete/PASS through T005A-T005C (commits `0825abab`, `30d33ed`, `a0d3bac`). T007 is complete/PASS through T007A-T007C.
-- Immediate child/frontier: `PHASE8-IMPL-024-T008A` (planned, dependency-satisfied, eligible, and has not begun).
+- Latest completed task: `PHASE8-IMPL-024-T008A` (`complete/PASS`; validation-only; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`). T004 is complete/PASS through T004A-T004C (commits `d6318c67`, `d72ace8f`, `faae964f`). T005 is complete/PASS through T005A-T005C (commits `0825abab`, `30d33ed`, `a0d3bac`). T007 is complete/PASS through T007A-T007C.
+- Immediate child/frontier: `PHASE8-IMPL-024-T008B` (planned, dependency satisfied by complete/PASS T008A, eligible, and has not begun).
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md`
-- Latest decision record: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md`
+- Latest decision record: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`
 - Evidence pack: `.codex-context/application-uiux-audit/`
 
 ## Workstreams
@@ -21,11 +21,11 @@
    standardization: T007A-T007C and T007 are complete/PASS. T007C adopted `@radix-ui/react-dialog` for the Evidence Drawer, established the DESIGN.md design contract and semantic tokens, and extracted `OMILoadingState` and `OMIEmptyCandidateShellWarning`. Families kept local: status/badge, metadata, boundary/notice, disabled-reason/aria-describedby, error/alert, and native disclosure.
 6. `T004` responsive containment: T004A-T004C complete/PASS.
 7. `T005` accessibility semantics and target sizing: T005A-T005C complete/PASS.
-8. `T008` remaining validation suites: active/in_progress; T008A planned, dependency-satisfied, eligible, and not begun; T008B-T008F dependency-gated.
+8. `T008` remaining validation suites: active/in_progress; T008A complete/PASS; T008B planned, dependency-satisfied, eligible, and not begun; T008C-T008F dependency-gated.
 
 ## Sequencing
 
-P0-A T001 is complete/PASS. P0-B T002 is complete/PASS. T003 optional-resource handling is complete/PASS through T003A-T003C. T006 truthful OMI navigation is complete/PASS through T006A-T006C. T007 (T007A-T007C) is complete/PASS. T004 responsive containment is complete/PASS through T004A-T004C. T005 accessibility semantics and target sizing is complete/PASS through T005A-T005C. T008 is active/in_progress. T008A is the immediate planned, dependency-satisfied, eligible frontier and has not begun. The controlling order is `T003 -> T006 -> T007 -> T004 -> T005 -> T008`. The parent PHASE8-IMPL-024 remains active and incomplete.
+P0-A T001 is complete/PASS. P0-B T002 is complete/PASS. T003 optional-resource handling is complete/PASS through T003A-T003C. T006 truthful OMI navigation is complete/PASS through T006A-T006C. T007 (T007A-T007C) is complete/PASS. T004 responsive containment is complete/PASS through T004A-T004C. T005 accessibility semantics and target sizing is complete/PASS through T005A-T005C. T008 is active/in_progress. T008A is complete/PASS. T008B is the immediate planned, dependency-satisfied, eligible frontier and has not begun. The controlling order is `T003 -> T006 -> T007 -> T004 -> T005 -> T008`. The parent PHASE8-IMPL-024 remains active and incomplete.
 
 Existing `PHASE8-IMPL-023-T023A` and T023B completion remains historical and
 valid. T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into

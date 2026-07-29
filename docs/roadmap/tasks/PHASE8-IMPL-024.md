@@ -12,9 +12,9 @@ T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T
 
 T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-Latest completed task: `PHASE8-IMPL-024-T005C - Manual keyboard validation` is complete/PASS at `a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e` (`fix(ui): restore guided review focus (T005C)`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
+Latest completed task: `PHASE8-IMPL-024-T008A - Guided-creation persistence suite` is complete/PASS (validation-only; accepted evidence archive `/tmp/PHASE8-IMPL-024-T008A-validation-20260729T184242Z.tar.gz` SHA-256 `808f663d4719444a13dfedeaee2d34b241c16ccdd61d538b91235019f69bba95`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
 
-Next planned task: `PHASE8-IMPL-024-T008A - Guided-creation persistence suite`. Its dependency on complete/PASS T005C is satisfied; it is eligible, the immediate frontier, and has not begun. T008B-T008F remain dependency-gated in the enforced child order T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008 activation contract: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md`.
+Next planned task: `PHASE8-IMPL-024-T008B - Candidate lifecycle and grouped-review owner-decision suite`. Its dependency on complete/PASS T008A is satisfied; it is eligible, the immediate frontier, and has not begun. T008C-T008F remain dependency-gated in the enforced child order T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008A closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`.
 
 The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; T006 has repaired and validated truthful OMI navigation; T007A has completed the evidence-based Impeccable UI review; T007B has recorded the owner component-foundation decision; T007C has standardized the design system and shared components; T004 has repaired responsive containment; T005 has repaired accessibility semantics, targets, and keyboard focus. The T008 validation workstream remains active/in_progress.
 
@@ -72,11 +72,11 @@ order establish execution sequence:
 - Design-system and shared-component standardization: `T007C` (complete/PASS).
 - Responsive containment and validation: `T004` (complete/PASS through T004A-T004C).
 - Accessibility semantics, target sizing, and keyboard validation: `T005` (complete/PASS through T005A-T005C).
-- Remaining validation suites: `T008` (active/in_progress; T008A planned, dependency-satisfied, eligible, and not begun).
+- Remaining validation suites: `T008` (active/in_progress; T008A complete/PASS; T008B planned, dependency-satisfied, eligible, immediate frontier, and not begun).
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
 T005 -> T008`. T003, T006, T007A, T007B, T007C, T007, T004, and T005 are complete/PASS.
-T008A is planned, dependency-satisfied, eligible, the immediate frontier, and has not begun. This order is
+T008A is complete/PASS. T008B is planned, dependency-satisfied, eligible, the immediate frontier, and has not begun. This order is
 already owner-approved and does not require another decision gate.
 
 This ordering prevents premature visual polish, avoids selecting a component
@@ -158,14 +158,12 @@ T005 is complete/PASS through T005A-T005C. The guided setup-to-review `BODY_FOCU
 
 T008 is active/in_progress. The owner-approved child order is T008A -> T008B -> T008C -> T008D -> T008E -> T008F.
 
-- `PHASE8-IMPL-024-T008A` - Guided-creation persistence suite (`planned`; dependency on complete/PASS T005C satisfied; eligible; immediate frontier; not begun).
-- `PHASE8-IMPL-024-T008B` - Candidate lifecycle and grouped-review owner-decision suite (`planned`; depends on T008A; separate from apply-promotion).
+- `PHASE8-IMPL-024-T008A` - Guided-creation persistence suite (`complete/PASS`; validation-only; closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`).
+- `PHASE8-IMPL-024-T008B` - Candidate lifecycle and grouped-review owner-decision suite (`planned`; dependency on complete/PASS T008A satisfied; eligible; immediate frontier; not begun; separate from apply-promotion).
 - `PHASE8-IMPL-024-T008C` - Promotion creation and handoff suite (`planned`; depends on T008B; separate disposable project).
 - `PHASE8-IMPL-024-T008D` - Apply-promotion suite (`planned`; depends on T008C; isolated from read-only and candidate-decision suites).
 - `PHASE8-IMPL-024-T008E` - Review-queue command suite (`planned`; depends on T008D; separate disposable project).
 - `PHASE8-IMPL-024-T008F` - Non-mutating resilience and accessibility suite (`planned`; depends on T008E; loading, degraded, failure, retry, recovery, evidence-drawer focus restoration, complete keyboard navigation, browser zoom, and screen-reader behavior).
-
-T008A activation contract: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md`.
 
 Every future mutation suite must use its own disposable `uiux-audit-*` project; capture API and filesystem manifests before and after; reject writes outside that project; preserve all existing projects; package evidence before cleanup; and remove only the exact disposable project. Apply-promotion validation must never be combined with read-only or candidate-decision validation.
 
