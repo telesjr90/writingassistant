@@ -2,10 +2,10 @@
 
 <!-- CURRENT-REPOSITORY-TRUTH:START -->
 - Active application parent: `PHASE8-IMPL-024`
-- Immediate application frontier: `PHASE8-IMPL-024-T003C`
+- Immediate application frontier: `PHASE8-IMPL-024-T008A`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
-- Current routing source: `docs/project-memory/registries/execution-routing.json`
+- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
 
 This block is the current summary. Numbered questions retain chronological

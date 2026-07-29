@@ -16,13 +16,14 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T004A",
-    "activation_state": "T001/T002/T003/T006/T007 are complete/PASS; T004A is next planned, dependency-satisfied, and eligible; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T008A",
+    "activation_state": "T001/T002/T003/T006/T007/T004/T005 are complete/PASS; T008A is next planned, dependency-satisfied, and eligible; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
     "mvp_readiness": "blocked",
-    "p0_blockers": []
+    "p0_blockers": [],
+    "remaining_workstreams": ["PHASE8-IMPL-024-T008"]
   },
   "t001_closeout": {
     "status": "complete/PASS",
@@ -363,7 +364,60 @@
     ],
     "aggregate_snapshot_label_clarification": "The aggregate checker compared only intentional metadata labels (beforeSnapshot.label = 'before' vs afterSnapshot.label = 'after'). Substantive snapshot data was identical; not product-state drift.",
     "safety": "analysis-only; candidate-first; provenance-backed; owner-controlled; no automatic promotion or Memory/Canon mutation",
-    "next_task": "PHASE8-IMPL-024-T004A; planned, dependency-satisfied, eligible after T007 closeout publication"
+    "next_task": "PHASE8-IMPL-024-T008A; planned, dependency-satisfied, eligible after T005 closeout"
+  },
+  "t004_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "complete/PASS",
+    "children": {
+      "T004A": "complete/PASS",
+      "T004B": "complete/PASS",
+      "T004C": "complete/PASS"
+    },
+    "commits": {
+      "T004A": "d6318c678f07015f0bfebc6997cc8c69cfd7cd2a",
+      "T004B": "d72ace8f25afb248afc39f6b38d1ad0fcdd8bcf6",
+      "T004C": "faae964f65e7d68efe3c16bf21f11c6c258ff2d6"
+    },
+    "t004a_scope": "Document-level overflow repair and native-control containment",
+    "t004b_scope": "OMI containment and contextual workspace",
+    "t004c_scope": "Six-width responsive validation (1440, 1280, 834, 640, 390, 320)",
+    "next_task": "PHASE8-IMPL-024-T005A"
+  },
+  "t005_closeout": {
+    "status": "complete/PASS",
+    "parent_status": "complete/PASS",
+    "children": {
+      "T005A": "complete/PASS",
+      "T005B": "complete/PASS",
+      "T005C": "complete/PASS"
+    },
+    "commits": {
+      "T005A": "0825ababcf9f4785e6b55aee6b19fc5c7419355b",
+      "T005B": "30d33eda3aa077bd675aba1b6a3527b9d74ba348",
+      "T005C": "a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e"
+    },
+    "t005a_scope": "Heading hierarchy and minimum operable-target policy",
+    "t005b_scope": "Coarse-pointer sizing, hit areas, and focus visibility",
+    "t005c_scope": "Manual keyboard validation and guided review focus restoration",
+    "t005c_closeout_head": "a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e",
+    "next_task": "PHASE8-IMPL-024-T008A"
+  },
+  "t008_activation": {
+    "status": "active/in_progress",
+    "parent_status": "active/in_progress",
+    "children": {
+      "T008A": "planned; dependency-satisfied; eligible; immediate frontier; not begun",
+      "T008B": "planned; depends on T008A; not begun",
+      "T008C": "planned; depends on T008B; not begun",
+      "T008D": "planned; depends on T008C; not begun",
+      "T008E": "planned; depends on T008D; not begun",
+      "T008F": "planned; depends on T008E; not begun"
+    },
+    "enforced_child_order": "T008A -> T008B -> T008C -> T008D -> T008E -> T008F",
+    "activation_contract": "docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md",
+    "t008a_scope": "Guided-creation persistence validation-only suite; disposable project mutation isolation; no product-code editing to make validation pass",
+    "next_task": "PHASE8-IMPL-024-T008A"
   },
   "latest_verified_evidence": {
     "classification": "T007C design-system and shared-component standardization PASS_WITH_FINDINGS; T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
@@ -383,10 +437,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T004A",
-    "title": "Document overflow repair and native-control containment",
-    "status": "planned; dependency on complete/PASS T007C satisfied; eligible; next application frontier; not begun",
-    "scope": "Bounded T004A responsive-containment task: document-level overflow repair and native-control containment"
+    "task_id": "PHASE8-IMPL-024-T008A",
+    "title": "Guided-creation persistence suite",
+    "status": "planned; dependency on complete/PASS T005C satisfied; eligible; immediate application frontier; not begun",
+    "scope": "Bounded T008A validation-only task: validate OMI-guided creation persistence contract through real application path with disposable project isolation"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",

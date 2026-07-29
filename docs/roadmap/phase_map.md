@@ -2,7 +2,7 @@
 
 <!-- CURRENT-REPOSITORY-TRUTH:START -->
 - Active application parent: `PHASE8-IMPL-024`
-- Immediate application frontier: `PHASE8-IMPL-024-T003C`
+- Immediate application frontier: `PHASE8-IMPL-024-T008A`
 - Planned architecture parent: `PHASE8-IMPL-025`
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
@@ -49,8 +49,8 @@ frontier changes under this policy.
 - Superseded decision: `docs/roadmap/decisions/PHASE8-post-accepted-owner-gate-next-readiness-step-decision.md`.
 - Blocked/superseded closeout task: `PHASE8-MVP-COMPLETE-CLOSEOUT-001 - Full MVP completion closeout and post-MVP readiness publication`.
 - Historical foundation parent: `PHASE8-IMPL-023 - OMI AI Tool-Assisted Analysis Candidate Review MVP`.
-- Active phase-map frontier: `PHASE8-IMPL-024 - Application UI/UX Audit Integrity and Acceptance Repair` is published/active. T001 and T002 are complete/PASS. T003A is complete/PASS. Immediate next: `PHASE8-IMPL-024-T003B - Conditional frontend loading with distinct absent, invalid, and request-failure states`; T003 remains active/in progress and T003C remains planned.
-- Release order: T001/T002 complete/PASS; optional-resource handling T003A-T003C; truthful navigation T006A-T006C; T007A evidence, T007B owner component decision, T007C foundation; responsive T004; accessibility T005; then reusable T008 validation/closeout.
+- Active phase-map frontier: `PHASE8-IMPL-024 - Application UI/UX Audit Integrity and Acceptance Repair` is published/active. T001 and T002 are complete/PASS. T003, T004, T005, T006, and T007 are complete/PASS. Immediate next: `PHASE8-IMPL-024-T008A - Guided-creation persistence suite`; T008 is active/in_progress and T008A is planned, dependency-satisfied, and eligible.
+- Release order: T001/T002 complete/PASS; optional-resource handling T003A-T003C complete/PASS; truthful navigation T006A-T006C complete/PASS; T007A evidence, T007B owner component decision, T007C foundation complete/PASS; responsive T004 complete/PASS; accessibility T005 complete/PASS; then reusable T008 validation/closeout active/in_progress.
 - Evidence gate: successful reconciliation `20260712T030010Z` is evidence collection, not product-wide PASS. Failed `playwright-advanced` attempts are invalid product evidence. Advanced mutation/promotion/apply-promotion/approved-data/review-command/accessibility/recovery workflows remain `NOT_YET_TESTED`.
 - Existing phase-map history is preserved: `PHASE8-IMPL-023-T023B` remains complete/PASS. T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; these historical identities are not competing active tasks.
 - Latest completed phase-map item: `PHASE8-IMPL-023-T022B - Resume candidate-only persistence using preserved real T022 findings` is complete/PASS. The exact 113 findings were persisted once as pending, candidate-only, non-canon review records and replayed with complete ID reuse and no mutation; no live orchestrator call occurred. T022 is complete/PASS, the original blocked evidence remains immutable, T023 grouped owner-review UI is planned, PHASE8-IMPL-023 remains published/active, and full MVP completion remains blocked.
