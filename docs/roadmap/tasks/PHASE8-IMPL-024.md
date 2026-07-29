@@ -12,7 +12,7 @@ T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T
 
 T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-Latest completed task: `PHASE8-IMPL-024-T005C - Restore guided review focus` is complete/PASS at `a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e`. T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
+Latest completed task: `PHASE8-IMPL-024-T005C - Manual keyboard validation` is complete/PASS at `a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e` (`fix(ui): restore guided review focus (T005C)`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
 
 Next planned task: `PHASE8-IMPL-024-T008A - Guided-creation persistence suite`. Its dependency on complete/PASS T005C is satisfied; it is eligible, the immediate frontier, and has not begun. T008B-T008F remain dependency-gated in the enforced child order T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008 activation contract: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md`.
 
