@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const STEPS = {
   SETUP: 'setup',
@@ -88,10 +88,17 @@ export default function OmiGuidedProjectCreation({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [failureMessage, setFailureMessage] = useState('');
   const submissionPendingRef = useRef(false);
+  const reviewFormRef = useRef(null);
   const reviewDraft = useMemo(() => getReviewDraft(draft), [draft]);
   const projectIdPreview = previewProjectId(reviewDraft.projectTitle);
   const canReview = Boolean(reviewDraft.projectTitle && draft.rawIdea.trim());
   const canCreate = canReview && finalConfirmation && !disabled && !isSubmitting;
+
+  useEffect(() => {
+    if (step === STEPS.REVIEW && reviewFormRef.current) {
+      reviewFormRef.current.focus();
+    }
+  }, [step]);
 
   function updateDraft(fieldName, value) {
     setDraft((currentDraft) => ({
@@ -227,7 +234,7 @@ export default function OmiGuidedProjectCreation({
           </div>
         </form>
       ) : (
-        <form onSubmit={handleFinalCreate} aria-label="Review setup draft">
+        <form onSubmit={handleFinalCreate} aria-label="Review setup draft" ref={reviewFormRef} tabIndex={-1}>
           <dl className="project-overview-list">
             <div>
               <dt>Project title</dt>

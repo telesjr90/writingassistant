@@ -620,3 +620,35 @@ class TestT005AContractsRemainUnchanged:
     def test_omi_shell_has_exactly_one_h1(self) -> None:
         source = read_text(OMI_SHELL_JSX)
         assert source.count("<h1>") == 1
+
+
+# ---------------------------------------------------------------------------
+# T005C — Guided setup-to-review keyboard focus contract
+# ---------------------------------------------------------------------------
+
+class TestGuidedSetupToReviewFocusContract:
+    def test_review_form_has_ref_and_tabindex(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'ref={reviewFormRef}' in source
+        assert 'tabIndex={-1}' in source
+        assert 'aria-label="Review setup draft"' in source
+        assert 'ref={reviewFormRef} tabIndex={-1}' in source
+
+    def test_useeffect_manages_focus_on_step_to_review(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'useEffect(() => {' in source
+        assert 'step === STEPS.REVIEW' in source
+        assert 'reviewFormRef.current.focus()' in source
+        assert '}, [step]' in source
+
+    def test_review_form_ref_is_a_useref(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'reviewFormRef = useRef(null)' in source
+
+    def test_useeffect_is_imported(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'import { useEffect, useMemo, useRef, useState }' in source
+
+    def test_review_form_remains_semantically_labelled(self) -> None:
+        source = read_text(OMI_GUIDED_CREATION_JSX)
+        assert 'aria-label="Review setup draft"' in source
