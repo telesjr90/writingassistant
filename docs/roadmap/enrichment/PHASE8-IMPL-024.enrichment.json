@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T008B",
-    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008A are complete/PASS; T008B is next planned, dependency-satisfied, and eligible; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T008C",
+    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008A/T008B are complete/PASS; T008C is next planned, dependency on complete/PASS T008B is satisfied, eligible, and not begun; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -434,13 +434,47 @@
     },
     "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md"
   },
+  "t008b_closeout": {
+    "status": "complete/PASS",
+    "type": "runtime_microtask",
+    "parent": "PHASE8-IMPL-024-T008",
+    "dependency": "PHASE8-IMPL-024-T008A complete/PASS",
+    "correction_commit": {
+      "hash": "81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593",
+      "subject": "test(ui): narrow grouped-review checksum guard (T008B)"
+    },
+    "validation_evidence": {
+      "archive": "/tmp/PHASE8-IMPL-024-T008B-owner-runtime-20260729T224916Z.tar.gz",
+      "sha256": "66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a",
+      "pre_cleanup_archive": "/tmp/PHASE8-IMPL-024-T008B-owner-runtime-20260729T224916Z-pre-cleanup.tar.gz",
+      "pre_cleanup_sha256": "72d824c54ff6a3f0bee3ceef0048e934f95286bc5e382ed7e433f49f8ab3ecad",
+      "disposable_project_archive_sha256": "21eec95193c78884ff644eaabb429f60f879081acf9c392bfe9076b0226c2317",
+      "correction_verification_archive": "/tmp/PHASE8-IMPL-024-T008B-stale-test-correction-verification-20260729T211817Z.tar.gz",
+      "correction_verification_sha256": "0fd64afeeb8ee615836cab8a3f250087e0587021827757efa326408130c0f788"
+    },
+    "results": {
+      "grouped_review": "PASS: 4 candidates, 2 adapter groups, 4 pending, 2 uncertain, 1 conflict group; five filters and deterministic ordering passed",
+      "owner_decision_refresh": "PASS: server-confirmed PATCH followed by authoritative OMI refresh; no optimistic lifecycle mutation",
+      "lifecycle": "PASS: all seven required legal transitions persisted correctly; archived candidates exposed no owner-decision action",
+      "negative_api_cases": "PASS: all six cases failed closed with HTTP 400 or 404 and byte-identical candidate persistence",
+      "promotion_eligibility": false,
+      "authorized_mutation_requests": 19,
+      "forbidden_mutation_requests": 0,
+      "pre_existing_projects": "preserved byte-identical",
+      "protected_paths": "preserved byte-identical",
+      "cleanup_restored_state": "PASS",
+      "task_processes_and_ports": "all task-owned processes ended; ports 8000 and 5173 free",
+      "product_defect_found": false
+    },
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md"
+  },
   "t008_activation": {
     "status": "active/in_progress",
     "parent_status": "active/in_progress",
     "children": {
       "T008A": "complete/PASS; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md",
-      "T008B": "planned; dependency on complete/PASS T008A satisfied; eligible; immediate frontier; not begun",
-      "T008C": "planned; depends on T008B; not begun",
+      "T008B": "complete/PASS; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
+      "T008C": "planned; dependency on complete/PASS T008B satisfied; eligible; immediate application frontier; not begun",
       "T008D": "planned; depends on T008C; not begun",
       "T008E": "planned; depends on T008D; not begun",
       "T008F": "planned; depends on T008E; not begun"
@@ -448,7 +482,10 @@
     "enforced_child_order": "T008A -> T008B -> T008C -> T008D -> T008E -> T008F",
     "activation_contract": "docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md",
     "t008a_scope": "Guided-creation persistence validation-only suite; disposable project mutation isolation; no product-code editing to make validation pass",
-    "next_task": "PHASE8-IMPL-024-T008B"
+    "t008b_scope": "Candidate lifecycle and grouped-review owner-decision validation-led suite with one narrow stale-test correction; no application behavior change",
+    "latest_child_task": "PHASE8-IMPL-024-T008B",
+    "next_child_task": "PHASE8-IMPL-024-T008C",
+    "next_task": "PHASE8-IMPL-024-T008C"
   },
   "latest_verified_evidence": {
     "classification": "T007C design-system and shared-component standardization PASS_WITH_FINDINGS; T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
@@ -468,10 +505,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T008B",
-    "title": "Candidate lifecycle and grouped-review owner-decision suite",
-    "status": "planned; dependency on complete/PASS T008A satisfied; eligible; immediate application frontier; not begun",
-    "scope": "Bounded T008B candidate-lifecycle and grouped-review owner-decision validation suite"
+    "task_id": "PHASE8-IMPL-024-T008C",
+    "title": "Promotion creation and handoff suite",
+    "status": "planned; dependency on complete/PASS T008B satisfied; eligible; immediate application frontier; not begun",
+    "scope": "Bounded T008C promotion-creation and handoff validation suite"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -569,8 +606,6 @@
        "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up"
     ],
     "not_yet_tested": [
-      "grouped-review owner-decision mutation",
-      "candidate lifecycle mutations beyond existing evidence",
       "promotion creation and audit persistence",
       "apply-promotion",
       "approved Memory/Canon mutation",

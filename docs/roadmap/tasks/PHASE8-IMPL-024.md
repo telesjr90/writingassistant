@@ -12,9 +12,9 @@ T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T
 
 T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-Latest completed task: `PHASE8-IMPL-024-T008A - Guided-creation persistence suite` is complete/PASS (validation-only; accepted evidence archive `/tmp/PHASE8-IMPL-024-T008A-validation-20260729T184242Z.tar.gz` SHA-256 `808f663d4719444a13dfedeaee2d34b241c16ccdd61d538b91235019f69bba95`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
+Latest completed task: `PHASE8-IMPL-024-T008B - Candidate lifecycle and grouped-review owner-decision suite` is complete/PASS (validation-led with correction commit `81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593`; accepted runtime archive `/tmp/PHASE8-IMPL-024-T008B-owner-runtime-20260729T224916Z.tar.gz` SHA-256 `66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
 
-Next planned task: `PHASE8-IMPL-024-T008B - Candidate lifecycle and grouped-review owner-decision suite`. Its dependency on complete/PASS T008A is satisfied; it is eligible, the immediate frontier, and has not begun. T008C-T008F remain dependency-gated in the enforced child order T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008A closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`.
+Next planned task: `PHASE8-IMPL-024-T008C - Promotion creation and handoff suite`. Its dependency on complete/PASS T008B is satisfied; it is eligible, the immediate application frontier, and has not begun. T008D-T008F remain dependency-gated in the enforced child order T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008B closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md`.
 
 The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; T006 has repaired and validated truthful OMI navigation; T007A has completed the evidence-based Impeccable UI review; T007B has recorded the owner component-foundation decision; T007C has standardized the design system and shared components; T004 has repaired responsive containment; T005 has repaired accessibility semantics, targets, and keyboard focus. The T008 validation workstream remains active/in_progress.
 
@@ -72,11 +72,11 @@ order establish execution sequence:
 - Design-system and shared-component standardization: `T007C` (complete/PASS).
 - Responsive containment and validation: `T004` (complete/PASS through T004A-T004C).
 - Accessibility semantics, target sizing, and keyboard validation: `T005` (complete/PASS through T005A-T005C).
-- Remaining validation suites: `T008` (active/in_progress; T008A complete/PASS; T008B planned, dependency-satisfied, eligible, immediate frontier, and not begun).
+- Remaining validation suites: `T008` (active/in_progress; T008A and T008B complete/PASS; T008C planned, dependency-satisfied, eligible, immediate application frontier, and not begun).
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
 T005 -> T008`. T003, T006, T007A, T007B, T007C, T007, T004, and T005 are complete/PASS.
-T008A is complete/PASS. T008B is planned, dependency-satisfied, eligible, the immediate frontier, and has not begun. This order is
+T008A and T008B are complete/PASS. T008C is planned, dependency-satisfied, eligible, the immediate application frontier, and has not begun. This order is
 already owner-approved and does not require another decision gate.
 
 This ordering prevents premature visual polish, avoids selecting a component
@@ -159,8 +159,8 @@ T005 is complete/PASS through T005A-T005C. The guided setup-to-review `BODY_FOCU
 T008 is active/in_progress. The owner-approved child order is T008A -> T008B -> T008C -> T008D -> T008E -> T008F.
 
 - `PHASE8-IMPL-024-T008A` - Guided-creation persistence suite (`complete/PASS`; validation-only; closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`).
-- `PHASE8-IMPL-024-T008B` - Candidate lifecycle and grouped-review owner-decision suite (`planned`; dependency on complete/PASS T008A satisfied; eligible; immediate frontier; not begun; separate from apply-promotion).
-- `PHASE8-IMPL-024-T008C` - Promotion creation and handoff suite (`planned`; depends on T008B; separate disposable project).
+- `PHASE8-IMPL-024-T008B` - Candidate lifecycle and grouped-review owner-decision suite (`complete/PASS`; validation-led with narrow stale-test correction commit `81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593`; accepted runtime archive SHA-256 `66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md`; separate from apply-promotion).
+- `PHASE8-IMPL-024-T008C` - Promotion creation and handoff suite (`planned`; dependency on complete/PASS T008B satisfied; eligible; immediate application frontier; not begun; separate disposable project).
 - `PHASE8-IMPL-024-T008D` - Apply-promotion suite (`planned`; depends on T008C; isolated from read-only and candidate-decision suites).
 - `PHASE8-IMPL-024-T008E` - Review-queue command suite (`planned`; depends on T008D; separate disposable project).
 - `PHASE8-IMPL-024-T008F` - Non-mutating resilience and accessibility suite (`planned`; depends on T008E; loading, degraded, failure, retry, recovery, evidence-drawer focus restoration, complete keyboard navigation, browser zoom, and screen-reader behavior).
@@ -184,7 +184,7 @@ Verified defects were P0-A, P0-B, document-level horizontal overflow in captured
 
 Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, and undersized-control standards triage. T006 repaired and validated misleading enabled actions and OMI internal reset ambiguity.
 
-The following remain `NOT_YET_TESTED`: grouped-review owner-decision mutation; candidate lifecycle mutations beyond existing evidence; promotion creation/audit persistence; apply-promotion; approved Memory/Canon mutation; review-queue commands; evidence-drawer focus restoration; complete keyboard navigation; browser zoom and screen-reader behavior; and broader T008 resilience/accessibility behavior beyond the optional-resource states validated by T003C.
+The following remain `NOT_YET_TESTED`: promotion creation/audit persistence; apply-promotion; approved Memory/Canon mutation; review-queue commands; evidence-drawer focus restoration; complete keyboard navigation; browser zoom and screen-reader behavior; and broader T008 resilience/accessibility behavior beyond the optional-resource states validated by T003C.
 
 ## Product Boundaries
 
