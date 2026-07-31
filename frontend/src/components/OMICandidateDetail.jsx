@@ -21,15 +21,39 @@ function firstPresent(...values) {
   return null;
 }
 
+function hasStoredValue(value) {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).length > 0;
+  }
+  return value !== null && value !== undefined && value !== '';
+}
+
+function firstStoredValue(...values) {
+  return values.find((value) => hasStoredValue(value)) ?? null;
+}
+
+function sortStoredValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(sortStoredValue);
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).sort().reduce((sorted, key) => {
+      sorted[key] = sortStoredValue(value[key]);
+      return sorted;
+    }, {});
+  }
+  return value;
+}
+
 function formatStoredValue(value, missingLabel = 'Unavailable') {
-  if (value === null || value === undefined || value === '') {
+  if (!hasStoredValue(value)) {
     return missingLabel;
   }
-  if (Array.isArray(value)) {
-    return value.length > 0 ? value.join(', ') : missingLabel;
-  }
   if (typeof value === 'object') {
-    return JSON.stringify(value);
+    return JSON.stringify(sortStoredValue(value));
   }
   return String(value);
 }
@@ -46,7 +70,7 @@ function isEmptyManualCandidateShell(candidate) {
   return (
     !Array.isArray(fields) || fields.length === 0
   ) && isBlankText(candidateContent?.summary) && (
-    !Array.isArray(evidence) || evidence.length === 0
+    !hasStoredValue(evidence)
   );
 }
 
@@ -95,8 +119,8 @@ function getSource(candidate) {
   );
 }
 
-function getCandidateApprovalDisabledReason(candidate) {
-  const readinessItems = getPromotionReadinessItems(candidate);
+function getCandidateApprovalDisabledReason(candidate, promotionAuditRecords) {
+  const readinessItems = getPromotionReadinessItems(candidate, promotionAuditRecords);
   const blockers = readinessItems.filter((item) => !item.isMet).map((item) => item.detail);
   if (blockers.length === 0) {
     return 'Disabled: candidate approval is reserved for future review metadata wiring; it does not update Memory/Canon.';
@@ -111,13 +135,38 @@ function findCandidate(candidates, selectedCandidateId) {
   return candidates.find((candidate) => getCandidateId(candidate) === selectedCandidateId) ?? null;
 }
 
-function ReadOnlyReferences({ candidate }) {
+export function getPromotionsForCandidate(promotions, candidateId) {
+  if (!hasStoredValue(candidateId)) {
+    return [];
+  }
+  return asArray(promotions).filter(
+    (promotion) => promotion?.candidate_id === candidateId,
+  );
+}
+
+function getPromotionTarget(promotion) {
+  return firstStoredValue(
+    promotion?.target_file,
+    promotion?.target_path,
+    promotion?.destination,
+  );
+}
+
+function getPromotionTimestamp(promotion) {
+  return firstStoredValue(
+    promotion?.created_at,
+    promotion?.confirmed_at,
+    promotion?.confirmation_timestamp,
+    promotion?.owner_approval?.confirmed_at,
+  );
+}
+
+function ReadOnlyReferences({ candidate, promotionAuditRecords }) {
   const approvedLinks = asArray(
     candidate?.approved_memory_canon_links
       ?? candidate?.approved_memory_links
       ?? candidate?.canon_links,
   );
-  const promotionAudit = candidate?.promotion_audit_record ?? candidate?.promotion_record;
 
   return (
     <section className="omi-candidate-panel" aria-label="Read-only approved Memory/Canon references">
@@ -134,8 +183,38 @@ function ReadOnlyReferences({ candidate }) {
           ))}
         </ul>
       )}
+      <h3>Promotion Audit Records</h3>
+      {promotionAuditRecords.length === 0 ? (
+        <p className="muted-copy">No associated promotion audit records.</p>
+      ) : (
+        <ul className="omi-readonly-reference-list" data-testid="omi-candidate-promotion-audits">
+          {promotionAuditRecords.map((promotion, index) => (
+            <li key={formatStoredValue(promotion?.promotion_id, `promotion-audit-${index + 1}`)}>
+              <span className="omi-status-badge">Audit-only</span>
+              <dl className="omi-candidate-metadata">
+                <div>
+                  <dt>Promotion ID</dt>
+                  <dd>{formatStoredValue(promotion?.promotion_id)}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{formatStoredValue(promotion?.status)}</dd>
+                </div>
+                <div>
+                  <dt>Target</dt>
+                  <dd>{formatStoredValue(getPromotionTarget(promotion))}</dd>
+                </div>
+                <div>
+                  <dt>Created / confirmed</dt>
+                  <dd>{formatStoredValue(getPromotionTimestamp(promotion))}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ul>
+      )}
       <p className="review-boundary-note">
-        Promotion Audit Record: {formatStoredValue(promotionAudit, 'Not Applied to Memory/Canon')}
+        Promotion Audit Record. Not Applied to Memory/Canon.
       </p>
     </section>
   );
@@ -161,7 +240,7 @@ function EvidenceProvenance({ candidate, onOpenEvidence = () => {} }) {
           <dt>Evidence</dt>
           <dd>
             {formatStoredValue(
-              firstPresent(candidate?.evidence_summary, candidate?.evidence_refs),
+              firstStoredValue(candidate?.evidence, candidate?.evidence_summary, candidate?.evidence_refs),
               'Missing evidence',
             )}
           </dd>
@@ -170,7 +249,12 @@ function EvidenceProvenance({ candidate, onOpenEvidence = () => {} }) {
           <dt>Provenance</dt>
           <dd>
             {formatStoredValue(
-              firstPresent(candidate?.provenance_summary, candidate?.provenance_refs, candidate?.source_locator),
+              firstStoredValue(
+                candidate?.provenance,
+                candidate?.provenance_summary,
+                candidate?.provenance_refs,
+                candidate?.source_locator,
+              ),
               'Missing provenance',
             )}
           </dd>
@@ -234,6 +318,7 @@ export default function OMICandidateDetail({
   activeProjectId,
   projectTitle,
   candidates = [],
+  promotions = [],
   selectedCandidateId = '',
   isLoading = false,
   error = '',
@@ -243,6 +328,7 @@ export default function OMICandidateDetail({
 }) {
   const storedCandidates = asArray(candidates);
   const candidate = findCandidate(storedCandidates, selectedCandidateId);
+  const promotionAuditRecords = getPromotionsForCandidate(promotions, selectedCandidateId);
   const approvalReasonId = 'omi-candidate-approval-disabled-reason';
 
   if (isLoading) {
@@ -315,7 +401,7 @@ export default function OMICandidateDetail({
   }
 
   const candidateId = getCandidateId(candidate);
-  const disabledReason = getCandidateApprovalDisabledReason(candidate);
+  const disabledReason = getCandidateApprovalDisabledReason(candidate, promotionAuditRecords);
 
   return (
     <section className="omi-candidate-detail" data-testid="omi-candidate-detail" aria-label="OMI Candidate Detail">
@@ -414,12 +500,18 @@ export default function OMICandidateDetail({
         <aside className="omi-candidate-side-rail" id="omi-candidate-evidence">
           <EvidenceProvenance candidate={candidate} onOpenEvidence={onOpenEvidence} />
           <DuplicateDependencyPanel candidate={candidate} />
-          <ReadOnlyReferences candidate={candidate} />
+          <ReadOnlyReferences
+            candidate={candidate}
+            promotionAuditRecords={promotionAuditRecords}
+          />
         </aside>
       </div>
 
       <div id="omi-candidate-readiness">
-        <OMIPromotionReadinessChecklist candidate={candidate} />
+        <OMIPromotionReadinessChecklist
+          candidate={candidate}
+          promotionAuditRecords={promotionAuditRecords}
+        />
       </div>
 
       <section className="omi-candidate-panel" aria-label="Candidate apply-promotion boundary">

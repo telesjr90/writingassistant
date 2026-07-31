@@ -6,7 +6,14 @@ function hasValue(value) {
   if (Array.isArray(value)) {
     return value.length > 0;
   }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).length > 0;
+  }
   return value !== null && value !== undefined && value !== '';
+}
+
+function firstValue(...values) {
+  return values.find((value) => hasValue(value)) ?? null;
 }
 
 function isBlankText(value) {
@@ -21,7 +28,7 @@ function isEmptyManualCandidateShell(candidate) {
   return (
     !Array.isArray(fields) || fields.length === 0
   ) && isBlankText(candidateContent?.summary) && (
-    !Array.isArray(evidence) || evidence.length === 0
+    !hasValue(evidence)
   );
 }
 
@@ -29,16 +36,21 @@ function getStatusText(isMet, blockedText) {
   return isMet ? 'Complete' : blockedText;
 }
 
-export function getPromotionReadinessItems(candidate) {
+export function getPromotionReadinessItems(candidate, promotionAuditRecords = []) {
   const blockers = asArray(candidate?.blockers ?? candidate?.promotion_blockers);
   const status = String(candidate?.status ?? candidate?.review_status ?? '').toLowerCase();
   const destination = candidate?.destination ?? candidate?.target_destination;
-  const evidence = candidate?.evidence_summary ?? candidate?.evidence_refs;
-  const provenance = candidate?.provenance_summary ?? candidate?.provenance_refs ?? candidate?.source_locator;
+  const evidence = firstValue(candidate?.evidence, candidate?.evidence_summary, candidate?.evidence_refs);
+  const provenance = firstValue(
+    candidate?.provenance,
+    candidate?.provenance_summary,
+    candidate?.provenance_refs,
+    candidate?.source_locator,
+  );
   const duplicateState = candidate?.duplicate_state ?? candidate?.duplicate_decision;
   const dependencyState = candidate?.dependency_state ?? candidate?.dependency_review;
   const schemaStatus = candidate?.schema_status ?? candidate?.candidate_schema_status;
-  const promotionAudit = candidate?.promotion_audit_record ?? candidate?.promotion_record;
+  const promotionAudits = asArray(promotionAuditRecords);
   const emptyManualShell = isEmptyManualCandidateShell(candidate);
 
   return [
@@ -99,16 +111,19 @@ export function getPromotionReadinessItems(candidate) {
     },
     {
       label: 'Promotion audit record preview available',
-      isMet: hasValue(promotionAudit),
-      detail: hasValue(promotionAudit)
-        ? 'Promotion audit record exists but is not applied.'
+      isMet: promotionAudits.length > 0,
+      detail: promotionAudits.length > 0
+        ? `${promotionAudits.length} associated promotion audit record(s) exist but are not applied.`
         : 'Promotion Audit Record: Not Applied to Memory/Canon',
     },
   ];
 }
 
-export default function OMIPromotionReadinessChecklist({ candidate }) {
-  const items = getPromotionReadinessItems(candidate);
+export default function OMIPromotionReadinessChecklist({
+  candidate,
+  promotionAuditRecords = [],
+}) {
+  const items = getPromotionReadinessItems(candidate, promotionAuditRecords);
 
   return (
     <section

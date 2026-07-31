@@ -36,15 +36,19 @@ function countByStatus(items, matches) {
   }).length;
 }
 
+function hasStoredValue(value) {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).length > 0;
+  }
+  return value !== null && value !== undefined && value !== '';
+}
+
 function countPresentRefs(items, keys) {
   return items.filter((item) => (
-    keys.some((key) => {
-      const value = item?.[key];
-      if (Array.isArray(value)) {
-        return value.length > 0;
-      }
-      return value !== null && value !== undefined && value !== '';
-    })
+    keys.some((key) => hasStoredValue(item?.[key]))
   )).length;
 }
 
@@ -55,14 +59,20 @@ function formatCount(count, degraded) {
   return Number.isFinite(count) ? String(count) : '0';
 }
 
-function evidenceSummary({ linked, total, degraded, fallback = 'No stored evidence/provenance metadata' }) {
+function evidenceSummary({
+  evidenceLinked,
+  provenanceLinked,
+  total,
+  degraded,
+  fallback = 'No stored evidence/provenance metadata',
+}) {
   if (degraded) {
     return 'Unavailable: OMI status did not load';
   }
   if (!Number.isFinite(total) || total === 0) {
     return fallback;
   }
-  return `Evidence Linked ${linked} / ${total}; Provenance Linked ${linked} / ${total}`;
+  return `Evidence Linked ${evidenceLinked} / ${total}; Provenance Linked ${provenanceLinked} / ${total}`;
 }
 
 function approvedMemoryTotal(snapshot) {
@@ -135,8 +145,12 @@ export function getOMIDashboardSummary(omiData, { isLoading = false, error = '' 
     : explicitCount(omiData?.duplicate_decision_count)
       ?? countByStatus(candidates, ['duplicate', 'merge']);
   const evidenceLinked = degraded ? 0 : countPresentRefs(candidates, [
+    'evidence',
     'evidence_refs',
     'evidence_summary',
+  ]);
+  const provenanceLinked = degraded ? 0 : countPresentRefs(candidates, [
+    'provenance',
     'provenance_refs',
     'provenance_summary',
     'source_locator',
@@ -162,6 +176,7 @@ export function getOMIDashboardSummary(omiData, { isLoading = false, error = '' 
     promotionAuditCount,
     approvedTotal,
     evidenceLinked,
+    provenanceLinked,
   };
 }
 
@@ -186,6 +201,7 @@ export default function OMIDashboard({
     groups,
     deferred,
     warnings,
+    provenanceLinked,
   } = summary;
   const disabledApplyReasonId = 'omi-dashboard-disabled-apply-reason';
   const rows = [
@@ -196,7 +212,8 @@ export default function OMIDashboard({
       statusTone: ownerInputCount === 0 ? 'is-warning' : '',
       blockers: degraded ? 'Unavailable' : ownerInputCount === 0 ? 'No owner input' : 'Stored review source',
       evidence: evidenceSummary({
-        linked: ownerInputCount ?? 0,
+        evidenceLinked: ownerInputCount ?? 0,
+        provenanceLinked: ownerInputCount ?? 0,
         total: ownerInputCount ?? 0,
         degraded,
         fallback: ZERO_STATE_OWNER_INPUT,
@@ -211,7 +228,8 @@ export default function OMIDashboard({
       statusTone: candidateCount === 0 ? 'is-warning' : '',
       blockers: degraded ? 'Unavailable' : `${formatCount(blockedCount, false)} blocked`,
       evidence: evidenceSummary({
-        linked: evidenceLinked,
+        evidenceLinked,
+        provenanceLinked,
         total: candidateCount ?? 0,
         degraded,
         fallback: ZERO_STATE_CANDIDATES,

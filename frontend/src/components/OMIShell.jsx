@@ -44,6 +44,9 @@ export default function OMIShell({
   const candidates = useMemo(() => (
     Array.isArray(omiData?.candidates) ? omiData.candidates : []
   ), [omiData]);
+  const promotions = useMemo(() => (
+    Array.isArray(omiData?.promotions) ? omiData.promotions : []
+  ), [omiData]);
 
   const handleBackToDashboard = useCallback(() => {
     setOmiView('dashboard');
@@ -149,6 +152,7 @@ export default function OMIShell({
           activeProjectId={activeProjectId}
           projectTitle={projectTitle}
           candidates={candidates}
+          promotions={promotions}
           selectedCandidateId={selectedCandidateId}
           isLoading={isLoading}
           error={error}
