@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T008C",
-    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008A/T008B are complete/PASS; T008C is next planned, dependency on complete/PASS T008B is satisfied, eligible, and not begun; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T008D",
+    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008A/T008B/T008C are complete/PASS; T008D is next planned, dependency on complete/PASS T008C is satisfied, eligible, and not begun; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -468,14 +468,88 @@
     },
     "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md"
   },
+  "t008c_closeout": {
+    "status": "complete/PASS",
+    "type": "runtime_microtask",
+    "parent": "PHASE8-IMPL-024-T008",
+    "dependency": "PHASE8-IMPL-024-T008B complete/PASS",
+    "implementation_commit": {
+      "hash": "f8b8be5d37a28e182f18cacd719667db5884a969",
+      "subject": "fix(ui): reconcile promotion audit presentation (T008C)"
+    },
+    "validation_evidence": {
+      "archive": "/tmp/PHASE8-IMPL-024-T008C-opencode-validation-20260731T013447Z.tar.gz",
+      "sha256": "0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41",
+      "pre_cleanup_archive": "/tmp/PHASE8-IMPL-024-T008C-opencode-validation-20260731T013447Z-pre-cleanup.tar.gz",
+      "pre_cleanup_sha256": "b02ad57f32a6d0ffa9dd7ac1c3a9af726ef5fbd9a92622628b523a1ca742a827",
+      "commit_evidence_archive": "/tmp/PHASE8-IMPL-024-T008C-commit-20260731T023409Z.tar.gz",
+      "commit_evidence_sha256": "c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c",
+      "internal_manifest_entries": 520,
+      "commit_manifest_entries": 71
+    },
+    "historical_evidence": {
+      "initial_runtime_archive": "/tmp/PHASE8-IMPL-024-T008C-promotion-runtime-20260730T034020Z.tar.gz",
+      "initial_runtime_sha256": "5a696b9e2f82ba2ca53a44990a21fbf2631ec9f0da47de1c77e6592c89e5ad9c",
+      "initial_pre_cleanup_archive": "/tmp/PHASE8-IMPL-024-T008C-promotion-runtime-20260730T034020Z-pre-cleanup.tar.gz",
+      "initial_pre_cleanup_sha256": "9ff0a358ce8a936c0fbb20b4e6c82125a325275a711d937ea1cec005662cb89c",
+      "codex_correction_archive": "/tmp/PHASE8-IMPL-024-T008C-correction-20260731T010226Z.tar.gz",
+      "codex_correction_sha256": "eb97cc475c19f60177614f916905a1b95ab0e8d853458eea69f64802da2bd88f",
+      "codex_pre_cleanup_archive": "/tmp/PHASE8-IMPL-024-T008C-correction-20260731T010226Z-pre-cleanup.tar.gz",
+      "codex_pre_cleanup_sha256": "459a3a15fc22497b6e60718ae13472e074a80104f8031b8cf475e4fa75469040"
+    },
+    "results": {
+      "focused_promotion_audit_source_tests": "11 passed",
+      "grouped_review_navigation_source_contracts": "23 passed",
+      "workspace_boundary_selection": "3 passed, 380 deselected",
+      "backend_promotion_contracts": "27 passed, 83 deselected",
+      "frontend_build": "PASS, 200 modules transformed, existing chunk-size advisory only",
+      "git_diff_check": "PASS",
+      "promotion_creation": "PASS; owner-controlled, candidate approval and confirmation required, fail-closed on invalid requests",
+      "promotion_persistence": "PASS; record persisted, evidence/provenance preserved, owner-decision audit metadata, timestamps, candidate-to-promotion lineage, complete source snapshot",
+      "promotion_status": "ready_for_manual_application",
+      "no_optimistic_presentation": true,
+      "omi_refresh_after_post": "PASS",
+      "editor_audit_presentation": "PASS",
+      "dashboard_audit_presentation": "PASS",
+      "candidate_detail_association": "PASS; exact candidate_id match, zero/one/multiple records supported",
+      "dashboard_fixture_candidates": 2,
+      "dashboard_fixture_evidence_linked": "1 / 2",
+      "dashboard_fixture_provenance_linked": "2 / 2",
+      "dashboard_fixture_promotion_audit_records": 1,
+      "dashboard_fixture_handoff_readiness": 0,
+      "dashboard_fixture_status": "Not Ready",
+      "product_defect_found": true,
+      "product_defect_fixed": true,
+      "frontend_correction_committed": true,
+      "backend_persistence_unchanged": true,
+      "handoff_ready_semantics_unchanged": true,
+      "mutation_isolation": "PASS; disposable project uiux-audit-t008c-20260731t015400z; candidate byte-identical; only index.json and new promotion record changed",
+      "pre_existing_projects": "preserved byte-identical",
+      "cleanup_restored_state": "PASS",
+      "task_processes_and_ports": "all task-owned processes ended; ports 8000 and 5173 free",
+      "apply_promotion_requests": 0,
+      "review_queue_mutation_requests": 0,
+      "model_runtime_calls": 0,
+      "memory_canon_mutations": 0
+    },
+    "correction_committed_paths": [
+      "frontend/src/components/OMICandidateDetail.jsx",
+      "frontend/src/components/OMIDashboard.jsx",
+      "frontend/src/components/OMIPromotionReadinessChecklist.jsx",
+      "frontend/src/components/OMIShell.jsx",
+      "tests/test_frontend_omi_promotion_audit_presentation_source.py"
+    ],
+    "known_nonblocking_finding": "no explicit idempotency key or same-candidate duplicate-promotion guard; preserved for future owner decision; no change authorized",
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md"
+  },
   "t008_activation": {
     "status": "active/in_progress",
     "parent_status": "active/in_progress",
     "children": {
       "T008A": "complete/PASS; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md",
       "T008B": "complete/PASS; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
-      "T008C": "planned; dependency on complete/PASS T008B satisfied; eligible; immediate application frontier; not begun",
-      "T008D": "planned; depends on T008C; not begun",
+      "T008C": "complete/PASS; implementation commit f8b8be5d37a28e182f18cacd719667db5884a969; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md",
+      "T008D": "planned; dependency on complete/PASS T008C satisfied; eligible; immediate application frontier; not begun",
       "T008E": "planned; depends on T008D; not begun",
       "T008F": "planned; depends on T008E; not begun"
     },
@@ -483,9 +557,10 @@
     "activation_contract": "docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md",
     "t008a_scope": "Guided-creation persistence validation-only suite; disposable project mutation isolation; no product-code editing to make validation pass",
     "t008b_scope": "Candidate lifecycle and grouped-review owner-decision validation-led suite with one narrow stale-test correction; no application behavior change",
-    "latest_child_task": "PHASE8-IMPL-024-T008B",
-    "next_child_task": "PHASE8-IMPL-024-T008C",
-    "next_task": "PHASE8-IMPL-024-T008C"
+    "t008c_scope": "Promotion creation and handoff validation-led suite with one bounded frontend correction; no backend persistence or handoff-semantics change",
+    "latest_child_task": "PHASE8-IMPL-024-T008C",
+    "next_child_task": "PHASE8-IMPL-024-T008D",
+    "next_task": "PHASE8-IMPL-024-T008D"
   },
   "latest_verified_evidence": {
     "classification": "T007C design-system and shared-component standardization PASS_WITH_FINDINGS; T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
@@ -505,10 +580,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T008C",
-    "title": "Promotion creation and handoff suite",
-    "status": "planned; dependency on complete/PASS T008B satisfied; eligible; immediate application frontier; not begun",
-    "scope": "Bounded T008C promotion-creation and handoff validation suite"
+    "task_id": "PHASE8-IMPL-024-T008D",
+    "title": "Apply-promotion suite",
+    "status": "planned; dependency on complete/PASS T008C satisfied; eligible; immediate application frontier; not begun",
+    "scope": "Bounded T008D apply-promotion validation suite"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -606,7 +681,6 @@
        "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up"
     ],
     "not_yet_tested": [
-      "promotion creation and audit persistence",
       "apply-promotion",
       "approved Memory/Canon mutation",
       "review-queue commands",

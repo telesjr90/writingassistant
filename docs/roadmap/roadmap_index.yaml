@@ -5,8 +5,8 @@
     "current_track": "Application UI/UX audit integrity and owner-acceptance repair",
     "current_parent_task_id": "PHASE8-IMPL-024",
     "current_parent_task_title": "Application UI/UX Audit Integrity and Acceptance Repair",
-    "next_readiness_task_id": "PHASE8-IMPL-024-T008C",
-    "next_readiness_task_title": "Promotion creation and handoff suite",
+    "next_readiness_task_id": "PHASE8-IMPL-024-T008D",
+    "next_readiness_task_title": "Apply-promotion suite",
     "next_readiness_task_type": "runtime microtask",
     "planned_architecture_parent_task_id": "PHASE8-IMPL-025",
     "planned_architecture_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
@@ -19,7 +19,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. T001 guided creation, T002 Story Check grounding, T003 optional-resource handling, T006 truthful OMI navigation, T007A evidence-based Impeccable UI review, and T007B owner component-foundation decision are complete/PASS. T004 responsive containment is complete/PASS through T004A-T004C (commits d6318c67, d72ace8f, faae964f). T005 accessibility semantics and targets is complete/PASS through T005A-T005C (commits 0825abab, 30d33ed, a0d3bac). T007C and T007 are complete/PASS (PASS_WITH_FINDINGS — T007C_CONSOLIDATED_VALIDATION_ACCEPTED). T008 is active/in_progress. T008A and T008B are complete/PASS; T008B correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593, runtime SHA-256 66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a, closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md. T008C is the next dependency-satisfied eligible child and has not begun; T008D-F remain dependency-gated. PHASE8-IMPL-025 remains inactive. Project Memory remains paused/nonblocking. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Promotion creation, apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and broader resilience workflows remain NOT_YET_TESTED. Failed collector-development attempts are excluded from passing evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
+    "frontier_note": "The successful 20260712T030010Z Playwright reconciliation is evidence collection, not a product-wide pass. T001 guided creation, T002 Story Check grounding, T003 optional-resource handling, T006 truthful OMI navigation, T007A evidence-based Impeccable UI review, and T007B owner component-foundation decision are complete/PASS. T004 responsive containment is complete/PASS through T004A-T004C (commits d6318c67, d72ace8f, faae964f). T005 accessibility semantics and targets is complete/PASS through T005A-T005C (commits 0825abab, 30d33ed, a0d3bac). T007C and T007 are complete/PASS (PASS_WITH_FINDINGS — T007C_CONSOLIDATED_VALIDATION_ACCEPTED). T008 is active/in_progress. T008A, T008B, and T008C are complete/PASS; T008C implementation commit f8b8be5d37a28e182f18cacd719667db5884a969, validation SHA-256 0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41, commit evidence SHA-256 c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c, closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md. T008D is the next dependency-satisfied eligible child and has not begun; T008E-F remain dependency-gated. PHASE8-IMPL-025 remains inactive. Project Memory remains paused/nonblocking. Functional/data integrity precedes responsive and visual work. PHASE8-IMPL-023-T023A/T023B remain historical complete/PASS evidence; T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027 without competing current gates. Apply-promotion, approved Memory/Canon mutation, review-queue commands, complete accessibility, and broader resilience workflows remain NOT_YET_TESTED. Failed collector-development attempts are excluded from passing evidence. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, non-canon, no automatic promotion/apply-promotion/Memory-Canon mutation, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5526,13 +5526,13 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
       "controlling_child_order": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T008"],
-      "latest_child_task": "PHASE8-IMPL-024-T008B",
+      "latest_child_task": "PHASE8-IMPL-024-T008C",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-024-T008C",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
+      "next_child_task": "PHASE8-IMPL-024-T008D",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "planned/inactive; activation waits for full PHASE8-IMPL-024 closeout and passing application closeout validation",
-      "result": "published/active incomplete release-blocker repair parent; T001, T002, T003, T006, T007, T004, T005, T008A, and T008B are complete/PASS; T008 is active/in_progress; T008C is planned, dependency on complete/PASS T008B satisfied, eligible, immediate frontier, and not begun; broad owner acceptance and MVP readiness remain blocked"
+      "result": "published/active incomplete release-blocker repair parent; T001, T002, T003, T006, T007, T004, T005, T008A, T008B, and T008C are complete/PASS; T008 is active/in_progress; T008D is planned, dependency on complete/PASS T008C satisfied, eligible, immediate frontier, and not begun; broad owner acceptance and MVP readiness remain blocked"
     },
     {
       "id": "PHASE8-IMPL-024-T001",
@@ -5690,7 +5690,7 @@
       "parent": "PHASE8-IMPL-024",
       "depends_on": ["PHASE8-IMPL-024-T005C"],
       "boundary_tags": ["candidate_only", "evidence_first", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "active/in_progress; latest completed child T008B complete/PASS (correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; runtime SHA-256 66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md); next child T008C planned, dependency-satisfied, eligible, immediate frontier, not begun; T008D-F dependency-gated in enforced order T008A->T008B->T008C->T008D->T008E->T008F"
+      "result": "active/in_progress; latest completed child T008C complete/PASS (implementation commit f8b8be5d37a28e182f18cacd719667db5884a969; validation SHA-256 0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41; commit evidence SHA-256 c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md); next child T008D planned, dependency-satisfied, eligible, immediate frontier, not begun; T008E-F dependency-gated in enforced order T008A->T008B->T008C->T008D->T008E->T008F"
     },
     {
       "id": "PHASE8-IMPL-024-T008A", "title": "Guided-creation persistence suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
@@ -5701,12 +5701,12 @@
       "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; validation-led with one narrow stale-test correction; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; accepted runtime SHA-256 66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md; no application behavior change"
     },
     {
-      "id": "PHASE8-IMPL-024-T008C", "title": "Promotion creation and handoff suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008B"],
-      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned; dependency on complete/PASS T008B satisfied; eligible; immediate application frontier; not begun"
+      "id": "PHASE8-IMPL-024-T008C", "title": "Promotion creation and handoff suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008B"],
+      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; validation-led with bounded frontend correction; implementation commit f8b8be5d37a28e182f18cacd719667db5884a969; validation SHA-256 0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41; commit evidence SHA-256 c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md; audit/candidate-side only; does not apply promotion"
     },
     {
       "id": "PHASE8-IMPL-024-T008D", "title": "Apply-promotion suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008C"],
-      "boundary_tags": ["validation", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned; depends on T008C; not begun"
+      "boundary_tags": ["validation", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "planned; dependency on complete/PASS T008C satisfied; eligible; immediate application frontier; not begun"
     },
     {
       "id": "PHASE8-IMPL-024-T008E", "title": "Review-queue command suite", "type": "runtime_microtask", "status": "planned", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008D"],
@@ -5733,7 +5733,7 @@
       "latest_child_status": null,
       "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "result": "published/planned/inactive architecture-integration parent; activation waits for PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory remains paused and nonblocking; PHASE8-IMPL-024-T008C is the current application frontier"
+      "result": "published/planned/inactive architecture-integration parent; activation waits for PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory remains paused and nonblocking; PHASE8-IMPL-024-T008D is the current application frontier"
     },
     {
       "id": "PHASE8-IMPL-025-T001",
