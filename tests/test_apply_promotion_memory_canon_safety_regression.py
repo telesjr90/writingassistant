@@ -10,11 +10,11 @@ from typing import Any
 import anyio
 import httpx
 import pytest
-from fastapi import HTTPException
 
 from backend import main, project_manager
 from backend.routes import apply_promotion as apply_promotion_route
 from backend.story_knowledge import apply_promotion
+from backend.story_knowledge.apply_contract import ApplyContractError
 
 
 PROJECT_ID = "example"
@@ -331,33 +331,59 @@ def test_review_queue_actions_do_not_mutate_approved_memory_or_canon(
 )
 def test_apply_promotion_route_failures_do_not_create_approved_memory(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
     body_overrides: dict[str, Any],
 ) -> None:
-    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
-    body = valid_promotion_request(**body_overrides)
+    project_dir = tmp_path / PROJECT_ID
+    body = {
+        "promotion_id": "promotion_001",
+        "revision": 1,
+        "sealed_contract_hash": "a" * 64,
+        "before_state_snapshot_token": "b" * 64,
+        "challenge_id": f"challenge_{'c' * 16}_{'d' * 64}",
+        "challenge_response": "e" * 64,
+        "final_confirmation": {
+            "confirmed": True,
+            "method": "explicit_final_apply_confirmation",
+        },
+        "idempotency_key": "11111111-1111-4111-8111-111111111111",
+        **body_overrides,
+    }
 
-    with pytest.raises(HTTPException) as exc_info:
-        apply_promotion_route.post_apply_promotion(PROJECT_ID, body)
+    with pytest.raises(ApplyContractError) as exc_info:
+        apply_promotion.final_apply_promotion(
+            project_dir=project_dir,
+            project_id=PROJECT_ID,
+            promotion_id="promotion_001",
+            promotion={},
+            candidate={},
+            body=body,
+            registry=None,
+        )
 
-    assert exc_info.value.status_code in {400, 403, 422}
-    assert_no_memory_or_applied_audit(tmp_path / PROJECT_ID)
+    assert exc_info.value.code == "SCHEMA_UNKNOWN_FIELD"
+    assert not project_dir.exists()
 
 
-def test_apply_promotion_route_success_is_explicit_apply_only(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+def test_apply_promotion_route_is_explicit_reference_only_final_apply() -> None:
+    route_source = Path(apply_promotion_route.__file__).read_text(encoding="utf-8")
+    service_source = Path(apply_promotion.__file__).read_text(encoding="utf-8")
 
-    payload = apply_promotion_route.post_apply_promotion(
-        PROJECT_ID,
-        valid_promotion_request(),
-    )
-
-    assert payload["promotion_result"]["promotion_status"] == "applied"
-    assert len(approved_memory_files(tmp_path / PROJECT_ID)) == 1
-    assert len(promotion_audit_files(tmp_path / PROJECT_ID)) == 1
+    assert '@router.post("")' in route_source
+    assert "async def post_apply_promotion(" in route_source
+    assert "apply_promotion.final_apply_promotion(" in route_source
+    assert "validate_promotion_request(body)" not in route_source
+    assert 'label="final apply request"' in service_source
+    for field in (
+        "promotion_id",
+        "revision",
+        "sealed_contract_hash",
+        "before_state_snapshot_token",
+        "challenge_id",
+        "challenge_response",
+        "final_confirmation",
+        "idempotency_key",
+    ):
+        assert f'"{field}"' in service_source
 
 
 def test_frontend_source_keeps_review_actions_separate_from_apply_promotion() -> None:
@@ -381,18 +407,39 @@ def test_frontend_source_keeps_review_actions_separate_from_apply_promotion() ->
     assert "ApplyPromotionConfirmation" in review_panel
 
 
-def test_frontend_apply_promotion_requires_final_owner_confirmation() -> None:
+def test_frontend_apply_promotion_requires_explicit_final_confirmation() -> None:
     root = Path(__file__).resolve().parents[1] / "frontend" / "src"
     api_source = (root / "api.js").read_text(encoding="utf-8")
     confirmation = (root / "components" / "ApplyPromotionConfirmation.jsx").read_text(
         encoding="utf-8"
     )
 
-    assert "owner_confirmation" in api_source
-    assert "owner_confirmation is required before apply-promotion" in api_source
-    assert "submitDisabled = Boolean(unavailableReason) || !ownerConfirmation || isSubmitting" in confirmation
-    assert "final owner confirmation" in confirmation
-    assert "setOwnerConfirmation(false)" in confirmation
+    final_request_builder = api_source.split(
+        "export function buildReferenceOnlyApplyPromotionRequest", 1
+    )[1].split("export async function submitApplyPromotion", 1)[0]
+    for field_fragment in (
+        "promotion_id:",
+        "revision,",
+        "sealed_contract_hash:",
+        "before_state_snapshot_token:",
+        "challenge_id:",
+        "challenge_response:",
+        "final_confirmation:",
+        "idempotency_key:",
+    ):
+        assert field_fragment in final_request_builder
+    assert "confirmed: true" in final_request_builder
+    assert "method: 'explicit_final_apply_confirmation'" in final_request_builder
+    assert "owner_confirmation" not in final_request_builder
+
+    assert "if (!finalConfirmationChecked)" in confirmation
+    assert "Explicit final apply confirmation is incomplete." in confirmation
+    assert "checked={finalConfirmationChecked}" in confirmation
+    assert "disabled={finalApplyDisabled}" in confirmation
+    assert (
+        "const finalApplyDisabled = finalApplyBlockers.length > 0 || isApplying || isLoading"
+        in confirmation
+    )
 
 
 def test_frontend_source_retains_candidate_only_boundary_copy_and_no_forbidden_controls() -> None:
@@ -406,6 +453,7 @@ def test_frontend_source_retains_candidate_only_boundary_copy_and_no_forbidden_c
             root / "components" / "ApplyPromotionConfirmation.jsx",
         ]
     )
+    normalized_sources = sources.lower()
 
     for marker in (
         "candidate-only",
@@ -415,7 +463,7 @@ def test_frontend_source_retains_candidate_only_boundary_copy_and_no_forbidden_c
         "candidate persistence is not canon",
         "raw artifacts are support data",
     ):
-        assert marker in sources
+        assert marker in normalized_sources
     forbidden_markers = [
         "".join(parts)
         for parts in (

@@ -28,16 +28,17 @@ export default function OMIApplyPromotionBlockers({
       className="omi-apply-blockers"
       data-testid="omi-apply-promotion-blockers"
       aria-label="Apply-Promotion blockers"
+      aria-live="polite"
     >
       <div className="section-heading">
         <div>
-          <h3>Visible Blockers</h3>
+          <h3>Visible blockers</h3>
           <p className="muted-copy">
-            Blocked reasons appear before Owner Final Confirmation and Final Apply-Promotion.
+            Preparation and approval remain disabled until their labeled requirements are satisfied.
           </p>
         </div>
         <span className={blockers.length > 0 ? 'omi-status-badge is-error' : 'omi-status-badge'}>
-          {blockers.length > 0 ? 'Promotion Blocked' : 'No blocker recorded'}
+          {blockers.length > 0 ? 'Action blocked' : 'No blocker recorded'}
         </span>
       </div>
       <ul id={describedById} className="omi-apply-blocker-list">

@@ -1776,9 +1776,28 @@ h2 {
 
 .omi-apply-confirmation {
   padding: 18px;
-  background: #fffaf2;
-  border: 2px solid #b7791f;
+  background: #f7f9fc;
+  border: 1px solid #9fb3d4;
   border-radius: 8px;
+}
+
+.omi-apply-selection,
+.omi-apply-selection-state {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 14px;
+  color: #46546c;
+  background: #ffffff;
+  border: 1px solid #9fb3d4;
+  border-radius: 8px;
+}
+
+.omi-apply-selection select {
+  width: 100%;
+  min-width: 0;
 }
 
 .omi-apply-guard-header {
@@ -1787,7 +1806,7 @@ h2 {
   justify-content: space-between;
   gap: 16px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #dfb66f;
+  border-bottom: 1px solid #9fb3d4;
 }
 
 .omi-apply-guard-header h1,
@@ -1806,7 +1825,7 @@ h2 {
   gap: 10px;
   padding: 14px;
   background: #ffffff;
-  border: 1px solid #dfb66f;
+  border: 1px solid #dfe5ef;
   border-radius: 8px;
 }
 
@@ -1833,6 +1852,50 @@ h2 {
   background: #fff7f7;
 }
 
+.omi-apply-loading,
+.omi-apply-status,
+.omi-apply-recovery-state,
+.omi-apply-recovered-state,
+.omi-apply-sealed-state {
+  margin: 0;
+  padding: 12px 14px;
+  color: #46546c;
+  background: #ffffff;
+  border: 1px solid #9fb3d4;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.omi-apply-recovery-state {
+  color: #9a6500;
+  background: #fff9eb;
+  border-color: #d7b46a;
+}
+
+.omi-apply-recovered-state,
+.omi-apply-sealed-state {
+  color: #3b6948;
+  background: #f3fbf5;
+  border-color: #8ec79c;
+}
+
+.omi-apply-recovery-state h3,
+.omi-apply-recovered-state h3,
+.omi-apply-sealed-state h3,
+.omi-apply-recovery-state p,
+.omi-apply-recovered-state p,
+.omi-apply-sealed-state p {
+  margin: 0;
+}
+
+.omi-apply-recovery-state,
+.omi-apply-recovered-state,
+.omi-apply-sealed-state {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .omi-apply-blocker-list {
   display: flex;
   flex-direction: column;
@@ -1847,7 +1910,7 @@ h2 {
   grid-template-columns: minmax(92px, 0.24fr) minmax(0, 1fr);
   gap: 10px;
   padding: 8px 10px;
-  color: #2c374c;
+  color: #46546c;
   background: #ffffff;
   border: 1px solid #e2a3a3;
   border-radius: 6px;
@@ -1894,7 +1957,7 @@ h2 {
 
 .omi-apply-metadata dd {
   margin: 0;
-  color: #2c374c;
+  color: #46546c;
   font-size: 13px;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -1902,6 +1965,251 @@ h2 {
 
 .omi-apply-final-form {
   border-color: #b7791f;
+}
+
+.omi-apply-preparation-form,
+.omi-apply-approval-form,
+.omi-apply-challenge,
+.omi-apply-final-confirmation {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #9fb3d4;
+  border-radius: 8px;
+}
+
+.omi-apply-challenge {
+  border-color: #9fb3d4;
+}
+
+.omi-apply-challenge p,
+.omi-apply-final-confirmation p {
+  max-width: 72ch;
+  margin: 0;
+  color: #46546c;
+  line-height: 1.5;
+}
+
+.omi-apply-challenge-status {
+  padding: 10px 12px;
+  color: #46546c;
+  background: #f7f9fc;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.omi-apply-challenge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.omi-apply-final-confirmation {
+  background: #fff9eb;
+  border-color: #d7b46a;
+}
+
+.omi-apply-final-confirmation h3,
+.omi-apply-success h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+.omi-apply-final-check {
+  min-height: 44px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.omi-apply-success {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  color: #3b6948;
+  background: #f3fbf5;
+  border: 1px solid #8ec79c;
+  border-radius: 8px;
+}
+
+.omi-apply-success p {
+  margin: 0;
+}
+
+.omi-apply-preparation-form fieldset,
+.omi-apply-reference-options,
+.omi-apply-supersession {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-apply-preparation-form legend,
+.omi-apply-reference-options legend,
+.omi-apply-supersession legend {
+  padding: 0 5px;
+  color: #46546c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.omi-apply-form-grid,
+.omi-apply-reference-grid,
+.omi-apply-decision-grid,
+.omi-apply-endpoint-grid,
+.omi-apply-dependency-grid,
+.omi-apply-dependency-target {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.omi-apply-dependency-editor {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--wa-color-border);
+}
+
+.omi-apply-dependency-editor-heading,
+.omi-apply-dependency-entry-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.omi-apply-dependency-editor-heading h4,
+.omi-apply-dependency-editor-heading p,
+.omi-apply-dependency-entry-heading p {
+  margin: 0;
+}
+
+.omi-apply-dependency-editor-heading h4 {
+  color: var(--wa-color-text-strong);
+  font-size: 15px;
+}
+
+.omi-apply-dependency-entry {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--wa-color-surface-subtle);
+}
+
+.omi-apply-dependency-empty,
+.omi-apply-dependency-entry-status {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--wa-color-text-secondary);
+  background: var(--wa-color-surface-muted);
+  border: 1px solid var(--wa-color-border);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.omi-apply-dependency-entry-status.is-blocked {
+  color: var(--wa-color-danger);
+  background: var(--wa-color-danger-surface);
+  border-color: var(--wa-color-danger-border);
+}
+
+.omi-apply-dependency-entry-status ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.omi-apply-preparation-form .field-label,
+.omi-apply-approval-form .field-label,
+.omi-apply-endpoint .field-label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.omi-apply-preparation-form input:not([type="checkbox"]),
+.omi-apply-preparation-form select,
+.omi-apply-preparation-form textarea {
+  width: 100%;
+  min-width: 0;
+}
+
+.omi-apply-preparation-form textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.omi-apply-reference-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fbfcff;
+}
+
+.omi-apply-endpoint {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-apply-endpoint h4,
+.omi-apply-approval-form h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.omi-monospace-input,
+.omi-apply-record-preview pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.omi-apply-record-preview {
+  min-width: 0;
+  padding: 10px 12px;
+  color: #46546c;
+  background: #fbfcff;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+}
+
+.omi-apply-record-preview summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.omi-apply-record-preview pre {
+  max-height: 320px;
+  overflow: auto;
+  margin: 10px 0 0;
+  padding: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #46546c;
+  background: #ffffff;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .omi-apply-final-actions {
@@ -1915,12 +2223,25 @@ h2 {
   min-height: 38px;
   padding: 0 14px;
   color: #ffffff;
-  background: #8a2c0d;
-  border: 1px solid #8a2c0d;
+  background: #a93636;
+  border: 1px solid #a93636;
   border-radius: 6px;
   cursor: pointer;
   font: inherit;
   font-weight: 800;
+}
+
+.omi-final-apply-button:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+.omi-final-apply-button:active:not(:disabled) {
+  filter: brightness(0.82);
+}
+
+.omi-final-apply-button:focus-visible {
+  outline: 2px solid #7aa2e8;
+  outline-offset: 2px;
 }
 
 .omi-final-apply-button:disabled {
@@ -2318,8 +2639,20 @@ h2 {
   .omi-candidate-metadata,
   .omi-apply-section-grid,
   .omi-apply-metadata,
-  .omi-apply-blocker-list li {
+  .omi-apply-blocker-list li,
+  .omi-apply-form-grid,
+  .omi-apply-reference-grid,
+  .omi-apply-decision-grid,
+  .omi-apply-endpoint-grid,
+  .omi-apply-dependency-grid,
+  .omi-apply-dependency-target {
     grid-template-columns: 1fr;
+  }
+
+  .omi-apply-dependency-editor-heading,
+  .omi-apply-dependency-entry-heading {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .omi-grouped-boundaries ul,
@@ -2576,8 +2909,18 @@ h2 {
   }
 
   .omi-apply-final-actions .secondary-button,
-  .omi-apply-final-actions .omi-final-apply-button {
+  .omi-apply-final-actions .omi-final-apply-button,
+  .omi-apply-challenge-actions .primary-button,
+  .omi-apply-challenge-actions .secondary-button,
+  .omi-apply-final-confirmation .omi-final-apply-button {
     width: 100%;
+  }
+
+  .omi-apply-selection select,
+  .omi-apply-preparation-form input:not([type="checkbox"]),
+  .omi-apply-preparation-form select,
+  .omi-apply-preparation-form textarea {
+    min-height: 44px;
   }
 }
 

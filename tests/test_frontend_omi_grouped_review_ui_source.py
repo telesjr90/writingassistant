@@ -64,6 +64,7 @@ def test_shell_consumes_dashboard_reset_request_through_one_local_reset() -> Non
     for local_reset in (
         "setOmiView('dashboard')",
         "setSelectedCandidateId('')",
+        "setSelectedPromotionId('')",
         "setSelectedEvidence(null)",
         "evidenceOpenerRef.current = null",
     ):
@@ -76,6 +77,7 @@ def test_shell_keeps_inner_navigation_state_and_back_cancel_wiring_local() -> No
     for shell_owned_state in (
         "const [omiView, setOmiView] = useState('dashboard')",
         "const [selectedCandidateId, setSelectedCandidateId] = useState('')",
+        "const [selectedPromotionId, setSelectedPromotionId] = useState('')",
         "const [selectedEvidence, setSelectedEvidence] = useState(null)",
         "const evidenceOpenerRef = useRef(null)",
     ):
@@ -165,16 +167,17 @@ def test_inner_navigation_clears_navigation_scoped_shell_state() -> None:
 
     assert "setSelectedCandidateId('')" in grouped
     assert "setOmiView('grouped-review')" in grouped
-    assert "candidates.some(" in promotion
-    assert "getCandidateId(candidate) === selectedCandidateId" in promotion
-    assert "? selectedCandidateId" in promotion
-    assert ": getCandidateId(candidates[0])" in promotion
+    assert "promotions.find(" in promotion
+    assert "getPromotionId(promotion) === selectedPromotionId" in promotion
+    assert "setSelectedPromotionId('')" in promotion
+    assert "candidates[0]" not in promotion
+    assert "promotions[0]" not in promotion
     assert "setOmiView('apply-promotion')" in promotion
 
 
 def test_memory_canon_and_unknown_destinations_fail_closed_through_reset() -> None:
     shell = source(SHELL)
-    navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
+    navigate = shell[shell.index("function handleNavigate"):shell.index("function handleSelectPromotion")]
     memory = navigate[navigate.index("destination === 'approved-memory-canon'"):]
 
     assert "handleBackToDashboard();" in memory
@@ -204,11 +207,17 @@ def test_missing_loading_and_error_return_paths_use_existing_back_callback() -> 
         assert "Back to OMI Dashboard" in state
 
 
-def test_apply_promotion_route_remains_review_only_and_unavailable() -> None:
+def test_apply_promotion_route_requires_exact_promotion_before_contract_work() -> None:
     route = source(APPLY_PROMOTION_ROUTE)
 
-    assert "applyPromotionAvailable={false}" in route
+    assert "findExactPromotion" in route
+    assert "findExactPromotionCandidate" in route
+    assert "selectedPromotionId" in route
+    assert "Select a promotion record" in route
+    assert "associationValid" in route
     assert "onCancel={onCancel}" in route
+    assert "candidates[0]" not in route
+    assert "promotions[0]" not in route
     assert "submitApplyPromotion" not in source(SHELL)
 
 

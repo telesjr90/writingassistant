@@ -11,6 +11,10 @@ function getCandidateId(candidate) {
   return candidate?.candidate_id ?? candidate?.candidateId ?? candidate?.id ?? '';
 }
 
+function getPromotionId(promotion) {
+  return promotion?.promotion_id ?? '';
+}
+
 function getShellTitle(omiView) {
   if (omiView === 'candidate-detail') {
     return 'OMI Candidate Detail';
@@ -39,6 +43,7 @@ export default function OMIShell({
   const summary = getOMIDashboardSummary(omiData, { isLoading, error });
   const [omiView, setOmiView] = useState('dashboard');
   const [selectedCandidateId, setSelectedCandidateId] = useState('');
+  const [selectedPromotionId, setSelectedPromotionId] = useState('');
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const evidenceOpenerRef = useRef(null);
   const candidates = useMemo(() => (
@@ -51,6 +56,7 @@ export default function OMIShell({
   const handleBackToDashboard = useCallback(() => {
     setOmiView('dashboard');
     setSelectedCandidateId('');
+    setSelectedPromotionId('');
     setSelectedEvidence(null);
     evidenceOpenerRef.current = null;
   }, []);
@@ -70,13 +76,16 @@ export default function OMIShell({
     }
 
     if (destination === 'promotion-handoff') {
-      const selectedCandidateIsCurrent = candidates.some(
-        (candidate) => getCandidateId(candidate) === selectedCandidateId,
+      const selectedPromotion = promotions.find(
+        (promotion) => getPromotionId(promotion) === selectedPromotionId,
       );
-      const candidateId = selectedCandidateIsCurrent
-        ? selectedCandidateId
-        : getCandidateId(candidates[0]);
-      setSelectedCandidateId(candidateId);
+      const selectedPromotionIsExact = Boolean(
+        selectedPromotion
+        && selectedPromotion.candidate_id === selectedCandidateId,
+      );
+      if (!selectedPromotionIsExact) {
+        setSelectedPromotionId('');
+      }
       setSelectedEvidence(null);
       evidenceOpenerRef.current = null;
       setOmiView('apply-promotion');
@@ -98,6 +107,14 @@ export default function OMIShell({
     }
 
     handleBackToDashboard();
+  }
+
+  function handleSelectPromotion(promotionId) {
+    const promotion = promotions.find(
+      (item) => getPromotionId(item) === promotionId,
+    );
+    setSelectedPromotionId(promotion ? promotionId : '');
+    setSelectedCandidateId(promotion?.candidate_id ?? '');
   }
 
   function handleOpenEvidence(evidence, openerElement) {
@@ -143,7 +160,10 @@ export default function OMIShell({
         <OMIApplyPromotionRoute
           activeProjectId={activeProjectId}
           candidates={candidates}
+          promotions={promotions}
           selectedCandidateId={selectedCandidateId}
+          selectedPromotionId={selectedPromotionId}
+          onSelectPromotion={handleSelectPromotion}
           approvedMemoryCanonSnapshot={summary.approvedSnapshot}
           onCancel={handleBackToDashboard}
         />

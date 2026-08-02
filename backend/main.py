@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -15,6 +16,10 @@ from urllib.parse import unquote
 try:
     from . import context_readiness, omi_runtime_preflight, project_manager, storyform
     from .routes import apply_promotion, review_queue
+    from .story_knowledge.promotion_apply_runtime import (
+        ApplyPromotionRuntimeManager,
+        FinalChallengeRegistry,
+    )
     _analysis_module = importlib.import_module(__package__ + ".analysis_" + "engine")
 except ImportError:  # pragma: no cover - supports uvicorn main:app from backend/
     import context_readiness
@@ -22,6 +27,10 @@ except ImportError:  # pragma: no cover - supports uvicorn main:app from backend
     import project_manager
     import storyform
     from routes import apply_promotion, review_queue
+    from story_knowledge.promotion_apply_runtime import (
+        ApplyPromotionRuntimeManager,
+        FinalChallengeRegistry,
+    )
     _analysis_module = importlib.import_module("analysis_" + "engine")
 
 
@@ -137,7 +146,32 @@ class MaterialMetadataUpdate(BaseModel):
     metadata: dict
 
 
-app = FastAPI()
+apply_promotion_runtime_manager: ApplyPromotionRuntimeManager | None = None
+apply_promotion_challenge_registry: FinalChallengeRegistry | None = None
+
+
+@asynccontextmanager
+async def _application_lifespan(application: FastAPI):
+    """Fail startup closed unless the accepted single-worker runtime is safe."""
+
+    global apply_promotion_runtime_manager, apply_promotion_challenge_registry
+    manager = ApplyPromotionRuntimeManager.from_environment(
+        projects_dir=project_manager.PROJECTS_DIR
+    ).start()
+    try:
+        registry = FinalChallengeRegistry()
+        apply_promotion_runtime_manager = manager
+        apply_promotion_challenge_registry = registry
+        application.state.apply_promotion_runtime_manager = manager
+        application.state.apply_promotion_challenge_registry = registry
+        yield
+    finally:
+        apply_promotion_challenge_registry = None
+        apply_promotion_runtime_manager = None
+        manager.close()
+
+
+app = FastAPI(lifespan=_application_lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -149,6 +183,7 @@ app.add_middleware(
 
 app.include_router(review_queue.router)
 app.include_router(apply_promotion.router)
+app.include_router(apply_promotion.lifecycle_router)
 
 _REVIEW_ACTION_FORBIDDEN_COMMAND_BOUNDARY_MARKERS = (
     "apply_promotion",
@@ -259,7 +294,12 @@ def get_projects() -> dict:
 @app.post("/api/projects")
 def post_project(payload: ProjectCreate) -> dict:
     try:
-        return project_manager.create_project(title=payload.title)
+        project = project_manager.create_project(title=payload.title)
+        if apply_promotion_runtime_manager is not None:
+            apply_promotion_runtime_manager.register_project(
+                project_manager.PROJECTS_DIR / project["project_id"]
+            )
+        return project
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
@@ -274,11 +314,16 @@ def post_project(payload: ProjectCreate) -> dict:
 @app.post("/api/projects/omi-guided")
 def post_omi_guided_project(payload: OMIGuidedProjectCreate):
     try:
-        return project_manager.create_omi_guided_project(
+        project = project_manager.create_omi_guided_project(
             title=payload.title,
             raw_idea=payload.raw_idea,
             setup_notes=payload.setup_notes,
         )
+        if apply_promotion_runtime_manager is not None:
+            apply_promotion_runtime_manager.register_project(
+                project_manager.PROJECTS_DIR / project["project_id"]
+            )
+        return project
     except project_manager.OMIGuidedCreationError as exc:
         return JSONResponse(status_code=500, content=exc.result)
     except (TypeError, ValueError) as exc:

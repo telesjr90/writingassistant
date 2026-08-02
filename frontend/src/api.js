@@ -390,7 +390,10 @@ export async function saveMaterialMetadata(materialId, metadata, projectId = PRO
 }
 
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
-const SAFE_DESTINATION_PATH_PATTERN = /^memory\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.json$/;
+const UUID_V4_PATTERN = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
+const SHA256_PATTERN = /^[a-f0-9]{64}$/;
+const FINAL_CHALLENGE_ID_PATTERN = /^challenge_[a-f0-9]{16}_[a-f0-9]{64}$/;
+const FINAL_CHALLENGE_RESPONSE_ALGORITHM = 'sha256-canonical-final-confirmation-v1';
 
 function requireSafeOwnerAuthoredSourceId(value, label) {
   if (!isSafeReviewRouteId(value)) {
@@ -418,7 +421,6 @@ export const APPLY_PROMOTION_DESTINATION_TYPES = Object.freeze([
   'approved_plot_thread',
   'approved_continuity_record',
   'approved_open_question',
-  'approved_memory_index',
 ]);
 
 export function isSafeReviewRouteId(value) {
@@ -443,20 +445,37 @@ function requireApplyPromotionDestinationType(destinationType) {
   }
 }
 
-function requireNonEmptyRefList(value, label) {
-  if (!Array.isArray(value) || value.length === 0) {
-    throw new Error(`${label} is required before apply-promotion.`);
-  }
-}
-
-function requireSafeDestinationPath(value) {
-  if (typeof value !== 'string' || !SAFE_DESTINATION_PATH_PATTERN.test(value)) {
-    throw new Error('destination_path is required before apply-promotion.');
-  }
-}
-
 function compactStringField(value) {
   return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
+}
+
+export class ApplyPromotionContractError extends Error {
+  constructor(message, { status = null, code = null, payload = null } = {}) {
+    super(message);
+    this.name = 'ApplyPromotionContractError';
+    this.status = status;
+    this.code = code;
+    this.payload = payload;
+  }
+}
+
+async function requestApplyPromotionContract(request) {
+  try {
+    const response = await request();
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status ?? null;
+      const payload = error.response?.data ?? null;
+      const detail = payload?.detail;
+      const code = typeof detail === 'object' ? detail?.code ?? null : null;
+      const message = typeof detail === 'object' && detail?.message
+        ? detail.message
+        : getErrorMessage(error);
+      throw new ApplyPromotionContractError(message, { status, code, payload });
+    }
+    throw new ApplyPromotionContractError(getErrorMessage(error));
+  }
 }
 
 export async function fetchReviewQueueEntries(projectId = PROJECT_ID) {
@@ -464,71 +483,240 @@ export async function fetchReviewQueueEntries(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/review-queue`));
 }
 
-export async function submitApplyPromotion(projectId = PROJECT_ID, payload = {}) {
+export async function getApplyPromotionContract(
+  projectId = PROJECT_ID,
+  promotionId,
+  { revision = null } = {},
+) {
   requireSafeReviewRouteId(projectId, 'project_id');
-  requireSafeReviewRouteId(payload.candidate_id, 'candidate_id');
-  requireSafeReviewRouteId(payload.owner_actor_id, 'owner_actor_id');
-  requireApplyPromotionDestinationType(payload.destination_type);
-  requireSafeDestinationPath(payload.destination_path);
-  requireNonEmptyRefList(payload.evidence_refs, 'evidence_refs');
-  requireNonEmptyRefList(payload.provenance_refs, 'provenance_refs');
-  requireNonEmptyRefList(payload.source_locator_refs, 'source_locator_refs');
+  requireSafeReviewRouteId(promotionId, 'promotion_id');
+  const config = revision === null ? undefined : { params: { revision } };
+  return requestApplyPromotionContract(() => (
+    client.get(`/projects/${projectId}/omi/promotions/${promotionId}/apply-contract`, config)
+  ));
+}
 
-  if (typeof payload.candidate_type !== 'string' || payload.candidate_type.trim() === '') {
-    throw new Error('candidate_type is required before apply-promotion.');
-  }
-  if (payload.destination_key && !isSafeReviewRouteId(payload.destination_key)) {
-    throw new Error('destination_key is required before apply-promotion.');
-  }
-  if (payload.queue_entry_id && !isSafeReviewRouteId(payload.queue_entry_id)) {
-    throw new Error('queue_entry_id must be safe before apply-promotion.');
-  }
-  if (payload.owner_confirmation !== true) {
-    throw new Error('owner_confirmation is required before apply-promotion.');
-  }
+export async function prepareApplyPromotionContract(
+  projectId = PROJECT_ID,
+  promotionId,
+  payload = {},
+) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(promotionId, 'promotion_id');
+  requireApplyPromotionDestinationType(payload.approved_destination_type);
+  return requestApplyPromotionContract(() => (
+    client.post(
+      `/projects/${projectId}/omi/promotions/${promotionId}/apply-contract/revisions`,
+      payload,
+    )
+  ));
+}
 
-  const requestPayload = {
-    project_id: projectId,
-    candidate_id: payload.candidate_id,
-    queue_entry_id: compactStringField(payload.queue_entry_id),
-    candidate_type: payload.candidate_type,
-    owner_actor_id: payload.owner_actor_id,
-    owner_actor_label: compactStringField(payload.owner_actor_label),
-    owner_confirmation: true,
-    owner_note: compactStringField(payload.owner_note) ?? '',
-    destination_type: payload.destination_type,
-    destination_path: payload.destination_path,
-    destination_key: compactStringField(payload.destination_key),
-    approved_payload: {
-      record_type: payload.destination_type,
-      candidate_id: payload.candidate_id,
-      destination_key: compactStringField(payload.destination_key),
-      evidence_refs: payload.evidence_refs,
-      provenance_refs: payload.provenance_refs,
-      source_locator_refs: payload.source_locator_refs,
-    },
-    evidence_refs: payload.evidence_refs,
-    provenance_refs: payload.provenance_refs,
-    source_locator_refs: payload.source_locator_refs,
-    source_candidate_snapshot_hash: compactStringField(payload.source_candidate_snapshot_hash),
-    requested_at: compactStringField(payload.requested_at),
-    boundary_flags: [
-      'candidate persistence is not canon',
-      'queue presence is not approval',
-      'confidence is not truth',
-      'raw artifacts are support data',
-      'no_auto_promotion',
-      'no_confidence_as_truth',
-      'no_queue_presence_as_approval',
-      'no_generated_prose',
-      'no_model_calls',
-      'no_training_artifacts',
-    ],
+export async function approveApplyPromotionContract(
+  projectId = PROJECT_ID,
+  promotionId,
+  revision,
+  payload = {},
+) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(promotionId, 'promotion_id');
+  if (!Number.isInteger(revision) || revision < 1) {
+    throw new ApplyPromotionContractError('A positive contract revision is required for approval.');
+  }
+  return requestApplyPromotionContract(() => (
+    client.post(
+      `/projects/${projectId}/omi/promotions/${promotionId}/apply-contract/revisions/${revision}/approval`,
+      payload,
+    )
+  ));
+}
+
+function requireUuidV4(value, label) {
+  if (typeof value !== 'string' || !UUID_V4_PATTERN.test(value)) {
+    throw new ApplyPromotionContractError(`${label} must be a UUIDv4.`);
+  }
+}
+
+function requireSha256(value, label) {
+  if (typeof value !== 'string' || !SHA256_PATTERN.test(value)) {
+    throw new ApplyPromotionContractError(`${label} must be a lowercase SHA-256 value.`);
+  }
+}
+
+function requirePositiveRevision(value) {
+  if (!Number.isInteger(value) || value < 1 || value > 256) {
+    throw new ApplyPromotionContractError('A contract revision from 1 through 256 is required.');
+  }
+}
+
+export function buildFinalChallengeRequest({
+  revision,
+  sealedContractHash,
+  beforeStateSnapshotToken,
+  idempotencyKey,
+}) {
+  requirePositiveRevision(revision);
+  requireSha256(sealedContractHash, 'sealed_contract_hash');
+  requireSha256(beforeStateSnapshotToken, 'before_state_snapshot_token');
+  requireUuidV4(idempotencyKey, 'idempotency_key');
+  return {
+    revision,
+    sealed_contract_hash: sealedContractHash,
+    before_state_snapshot_token: beforeStateSnapshotToken,
+    idempotency_key: idempotencyKey,
   };
+}
 
-  return requestData(() => (
+export async function issueApplyPromotionFinalChallenge(
+  projectId = PROJECT_ID,
+  promotionId,
+  input = {},
+) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(promotionId, 'promotion_id');
+  const requestPayload = buildFinalChallengeRequest(input);
+  return requestApplyPromotionContract(() => (
+    client.post(
+      `/projects/${projectId}/omi/promotions/${promotionId}/apply-contract/final-challenge`,
+      requestPayload,
+    )
+  ));
+}
+
+export function canonicalizeFinalChallengeValue(value) {
+  if (value === null || typeof value === 'boolean' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'number') {
+    if (!Number.isSafeInteger(value)) {
+      throw new ApplyPromotionContractError('Challenge scope contains an unsupported number.');
+    }
+    return Object.is(value, -0) ? '0' : String(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => canonicalizeFinalChallengeValue(item)).join(',')}]`;
+  }
+  if (value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
+    return `{${Object.keys(value).sort().map((key) => (
+      `${JSON.stringify(key)}:${canonicalizeFinalChallengeValue(value[key])}`
+    )).join(',')}}`;
+  }
+  throw new ApplyPromotionContractError('Challenge scope contains an unsupported value.');
+}
+
+function decodeBase64Url(value) {
+  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value)) {
+    throw new ApplyPromotionContractError('Final challenge nonce is malformed.');
+  }
+  const normalized = value.replaceAll('-', '+').replaceAll('_', '/');
+  const decoded = globalThis.atob(`${normalized}${'='.repeat((4 - (normalized.length % 4)) % 4)}`);
+  return Uint8Array.from(decoded, (character) => character.charCodeAt(0));
+}
+
+export async function computeFinalChallengeResponse(challenge) {
+  if (
+    challenge?.response_algorithm !== FINAL_CHALLENGE_RESPONSE_ALGORITHM
+    || !FINAL_CHALLENGE_ID_PATTERN.test(challenge?.challenge_id ?? '')
+    || challenge?.challenge_scope?.challenge_id !== challenge.challenge_id
+  ) {
+    throw new ApplyPromotionContractError('Final challenge response does not match the accepted protocol.');
+  }
+  if (!globalThis.crypto?.subtle) {
+    throw new ApplyPromotionContractError('Web Crypto is required to confirm the final challenge.');
+  }
+  const nonce = decodeBase64Url(challenge.challenge_nonce);
+  const encoder = new TextEncoder();
+  const prefix = encoder.encode('apply-promotion-final-confirmation-v1\u0000');
+  const confirmation = encoder.encode(canonicalizeFinalChallengeValue({
+    challenge_scope: challenge.challenge_scope,
+    final_confirmation: {
+      confirmed: true,
+      method: 'explicit_final_apply_confirmation',
+    },
+  }));
+  const preimage = new Uint8Array(prefix.length + nonce.length + 1 + confirmation.length);
+  preimage.set(prefix, 0);
+  preimage.set(nonce, prefix.length);
+  preimage[prefix.length + nonce.length] = 0;
+  preimage.set(confirmation, prefix.length + nonce.length + 1);
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', preimage);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export function buildReferenceOnlyApplyPromotionRequest({
+  promotionId,
+  revision,
+  sealedContractHash,
+  beforeStateSnapshotToken,
+  challengeId,
+  challengeResponse,
+  idempotencyKey,
+}) {
+  requireSafeReviewRouteId(promotionId, 'promotion_id');
+  requirePositiveRevision(revision);
+  requireSha256(sealedContractHash, 'sealed_contract_hash');
+  requireSha256(beforeStateSnapshotToken, 'before_state_snapshot_token');
+  if (typeof challengeId !== 'string' || !FINAL_CHALLENGE_ID_PATTERN.test(challengeId)) {
+    throw new ApplyPromotionContractError('challenge_id does not match the accepted final-challenge protocol.');
+  }
+  requireSha256(challengeResponse, 'challenge_response');
+  requireUuidV4(idempotencyKey, 'idempotency_key');
+  return {
+    promotion_id: promotionId,
+    revision,
+    sealed_contract_hash: sealedContractHash,
+    before_state_snapshot_token: beforeStateSnapshotToken,
+    challenge_id: challengeId,
+    challenge_response: challengeResponse,
+    final_confirmation: {
+      confirmed: true,
+      method: 'explicit_final_apply_confirmation',
+    },
+    idempotency_key: idempotencyKey,
+  };
+}
+
+export async function submitApplyPromotion(projectId = PROJECT_ID, input = {}) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  const requestPayload = buildReferenceOnlyApplyPromotionRequest(input);
+  return requestApplyPromotionContract(() => (
     client.post(`/projects/${projectId}/apply-promotion`, requestPayload)
   ));
+}
+
+export function classifyApplyPromotionFailure(code) {
+  const challengeStates = {
+    FINAL_CHALLENGE_EXPIRED: 'expired',
+    FINAL_CHALLENGE_REPLACED: 'replaced',
+    FINAL_CHALLENGE_REQUIRED_AFTER_RESTART: 'restart_invalidated',
+    FINAL_CHALLENGE_CONSUMED: 'consumed',
+    FINAL_CHALLENGE_UNKNOWN: 'unknown',
+  };
+  if (challengeStates[code]) {
+    return { challengeState: challengeStates[code], applyState: 'not_started' };
+  }
+  if (code === 'RECOVERY_REQUIRED') {
+    return { challengeState: 'consumed', applyState: 'recovery_required' };
+  }
+  if (code === 'APPLY_FAILED_BEFORE_COMMIT') {
+    return { challengeState: 'consumed', applyState: 'not_committed' };
+  }
+  return { challengeState: null, applyState: code ? 'blocked' : 'failed' };
+}
+
+export function getFinalChallengeTemporalState(challenge, nowMs = Date.now()) {
+  const expiresAt = Date.parse(challenge?.challenge_scope?.expires_at ?? '');
+  if (!Number.isFinite(expiresAt)) {
+    return { state: 'invalid', secondsRemaining: 0 };
+  }
+  const millisecondsRemaining = expiresAt - nowMs;
+  if (millisecondsRemaining <= 0) {
+    return { state: 'expired', secondsRemaining: 0 };
+  }
+  return {
+    state: 'active',
+    secondsRemaining: Math.ceil(millisecondsRemaining / 1000),
+  };
 }
 
 export async function submitReviewQueueAction({
