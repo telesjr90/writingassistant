@@ -719,3 +719,59 @@ class TestEditorHeaderNarrowReflow:
             ".editor-header must retain row flex-direction at desktop "
             "(overrides the grouped column default)."
         )
+
+
+# ---------------------------------------------------------------------------
+# T008E: Review-queue entry identifier overflow correction
+# ---------------------------------------------------------------------------
+
+class TestReviewQueueEntryIdentifierWrapping:
+    def test_review_queue_entry_strong_has_min_width_zero(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-entry strong")
+        assert "min-width: 0" in block, (
+            ".review-queue-entry strong must have min-width: 0 so the flex "
+            "child can shrink below its min-content size and allow the "
+            "identifier to wrap inside the queue button."
+        )
+
+    def test_review_queue_entry_strong_has_overflow_wrap_anywhere(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-entry strong")
+        assert "overflow-wrap: anywhere" in block, (
+            ".review-queue-entry strong must have overflow-wrap: anywhere so "
+            "long unbroken queue-entry IDs can wrap at any character boundary "
+            "inside the queue button."
+        )
+
+    def test_review_queue_entry_strong_is_not_clipped(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-entry strong")
+        assert "overflow: hidden" not in block, (
+            ".review-queue-entry strong must not clip identifier text."
+        )
+        assert "text-overflow: ellipsis" not in block, (
+            ".review-queue-entry strong must not truncate the identifier."
+        )
+
+    def test_review_queue_entry_strong_is_not_single_line_forced(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-entry strong")
+        assert "white-space: nowrap" not in block, (
+            ".review-queue-entry strong must not force the identifier onto "
+            "a single line."
+        )
+
+    def test_review_queue_entry_strong_has_no_fixed_width(self) -> None:
+        css = styles_css()
+        block = _rule_body(css, ".review-queue-entry strong")
+        assert "px" not in block, (
+            ".review-queue-entry strong must not use a fixed pixel width "
+            "workaround."
+        )
+
+    def test_no_global_strong_overflow_clip(self) -> None:
+        css = styles_css()
+        assert re.search(r'^strong\s*\{', css, re.MULTILINE) is None, (
+            "No global bare strong selector must be added."
+        )

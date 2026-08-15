@@ -2,12 +2,16 @@
 
 import copy
 import json
+import os
+import re
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
 from backend.story_knowledge import candidate_record
 from backend.story_knowledge import candidate_review_gate
 from backend.story_knowledge import candidate_schema
+from backend.story_knowledge.apply_contract import canonical_json_bytes
 
 _INDEX_SCHEMA_VERSION = 1
 
@@ -48,6 +52,13 @@ _OPTIONAL_ENTRY_FIELDS = frozenset(
         "duplicate_candidate_ids",
         "insufficient_evidence_reason",
         "rejected_output_reason",
+        "review_version",
+        "owner_note",
+        "rationale",
+        "quarantine_note",
+        "superseded_by_candidate_id",
+        "owner_review_completed",
+        "owner_reviewed_at",
         "storage_version",
         "entry_hash",
         "candidate_snapshot_hash",
@@ -78,6 +89,25 @@ _ALLOWED_LIFECYCLE_STATES = frozenset(
         "superseded_candidate",
         "archived_without_promotion",
     }
+)
+
+_VALID_REVIEW_STATE_PAIRS = frozenset(
+    {
+        ("pending", "draft_ready_for_review"),
+        ("pending", "owner_review_pending"),
+        ("needs_info", "needs_more_evidence"),
+        ("needs_info", "blocked_invalid_support"),
+        ("rejected", "owner_reviewed_rejected"),
+        ("deferred", "owner_reviewed_deferred"),
+        ("duplicate", "duplicate_candidate"),
+        ("superseded", "superseded_candidate"),
+        ("archived", "archived_without_promotion"),
+    }
+)
+
+_RFC3339_UTC_RE = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]+)?Z$"
 )
 
 _NON_CANDIDATE_STATUS = frozenset({"approved", "promoted"})
@@ -203,6 +233,26 @@ def _require_non_empty_string(value):
     return value
 
 
+def _require_optional_text(value, *, maximum):
+    if value is None:
+        return value
+    if not isinstance(value, str) or len(value) > maximum:
+        raise ValueError("invalid field")
+    if any(0xD800 <= ord(character) <= 0xDFFF for character in value):
+        raise ValueError("invalid field")
+    return value
+
+
+def _require_rfc3339_utc(value):
+    if not isinstance(value, str) or not _RFC3339_UTC_RE.fullmatch(value):
+        raise ValueError("invalid field")
+    try:
+        datetime.fromisoformat(value[:-1] + "+00:00")
+    except ValueError as exc:
+        raise ValueError("invalid field") from exc
+    return value
+
+
 def validate_review_queue_entry(entry):
     if not isinstance(entry, dict):
         raise ValueError("invalid input")
@@ -215,6 +265,10 @@ def validate_review_queue_entry(entry):
     for field in _REQUIRED_ENTRY_FIELDS:
         if field not in working:
             raise ValueError("invalid field")
+
+    working.setdefault("review_version", 0)
+    working.setdefault("owner_review_completed", False)
+    working.setdefault("owner_reviewed_at", None)
 
     _require_safe_id(working["queue_entry_id"])
     _require_safe_id(working["project_id"])
@@ -232,6 +286,47 @@ def validate_review_queue_entry(entry):
     if working["review_status"] not in _ALLOWED_REVIEW_STATUS:
         raise ValueError("invalid field")
     if working["lifecycle_state"] not in _ALLOWED_LIFECYCLE_STATES:
+        raise ValueError("invalid field")
+    if (working["review_status"], working["lifecycle_state"]) not in _VALID_REVIEW_STATE_PAIRS:
+        raise ValueError("invalid field")
+
+    review_version = working["review_version"]
+    if (
+        isinstance(review_version, bool)
+        or not isinstance(review_version, int)
+        or not 0 <= review_version <= 2_147_483_647
+    ):
+        raise ValueError("invalid field")
+
+    for field, maximum in (
+        ("owner_note", 10_000),
+        ("rationale", 1_000),
+        ("quarantine_note", 10_000),
+    ):
+        if field in working:
+            _require_optional_text(working[field], maximum=maximum)
+
+    if "duplicate_candidate_ids" in working:
+        duplicate_ids = working["duplicate_candidate_ids"]
+        if duplicate_ids is not None:
+            if not isinstance(duplicate_ids, list) or not duplicate_ids:
+                raise ValueError("invalid field")
+            validated_ids = [_require_safe_id(value) for value in duplicate_ids]
+            if len(set(validated_ids)) != len(validated_ids):
+                raise ValueError("invalid field")
+
+    if "superseded_by_candidate_id" in working:
+        superseding_id = working["superseded_by_candidate_id"]
+        if superseding_id is not None:
+            _require_safe_id(superseding_id)
+
+    completion = working["owner_review_completed"]
+    reviewed_at = working["owner_reviewed_at"]
+    if not isinstance(completion, bool):
+        raise ValueError("invalid field")
+    if completion:
+        _require_rfc3339_utc(reviewed_at)
+    elif reviewed_at is not None:
         raise ValueError("invalid field")
 
     _require_confidence(working["confidence"])
@@ -311,6 +406,53 @@ def write_review_queue_entry(entry, *, project_dir):
         "candidate_linked": True,
         "review_workflow_only": True,
     }
+
+
+def replace_review_queue_entry_atomic(entry, *, project_dir):
+    """Durably replace one validated queue entry with canonical JSON bytes."""
+
+    validated = validate_review_queue_entry(entry)
+    entry_path = review_queue_entry_path(project_dir, validated["queue_entry_id"])
+    entries_dir = entry_path.parent
+    entries_dir.mkdir(parents=True, exist_ok=True)
+    if entries_dir.is_symlink() or not entries_dir.is_dir():
+        raise ValueError("invalid storage path")
+
+    raw = canonical_json_bytes(validated)
+    temporary_path = entries_dir / ".{0}.tmp-{1}".format(
+        entry_path.name, uuid.uuid4().hex
+    )
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    if hasattr(os, "O_CLOEXEC"):
+        flags |= os.O_CLOEXEC
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+
+    descriptor = os.open(temporary_path, flags, 0o600)
+    replaced = False
+    try:
+        with os.fdopen(descriptor, "wb", closefd=True) as handle:
+            handle.write(raw)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary_path, entry_path)
+        replaced = True
+
+        directory_flags = os.O_RDONLY
+        if hasattr(os, "O_DIRECTORY"):
+            directory_flags |= os.O_DIRECTORY
+        if hasattr(os, "O_CLOEXEC"):
+            directory_flags |= os.O_CLOEXEC
+        directory_descriptor = os.open(entries_dir, directory_flags)
+        try:
+            os.fsync(directory_descriptor)
+        finally:
+            os.close(directory_descriptor)
+    finally:
+        if not replaced:
+            temporary_path.unlink(missing_ok=True)
+
+    return validated
 
 
 def _load_entry_object(path):
@@ -466,6 +608,7 @@ __all__ = (
     "review_queue_entry_path",
     "review_queue_index_path",
     "write_review_queue_entry",
+    "replace_review_queue_entry_atomic",
     "read_review_queue_entry",
     "list_review_queue_entries",
     "build_review_queue_index",

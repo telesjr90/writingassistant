@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -159,11 +160,15 @@ async def _application_lifespan(application: FastAPI):
         projects_dir=project_manager.PROJECTS_DIR
     ).start()
     try:
+        validated_runtime_dir = manager.runtime_dir
+        if not isinstance(validated_runtime_dir, Path):
+            raise RuntimeError("validated runtime directory is unavailable")
         registry = FinalChallengeRegistry()
         apply_promotion_runtime_manager = manager
         apply_promotion_challenge_registry = registry
         application.state.apply_promotion_runtime_manager = manager
         application.state.apply_promotion_challenge_registry = registry
+        application.state.validated_runtime_dir = validated_runtime_dir
         yield
     finally:
         apply_promotion_challenge_registry = None

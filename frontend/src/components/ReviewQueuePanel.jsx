@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   fetchReviewQueueEntries,
   submitReviewQueueAction,
@@ -72,49 +78,52 @@ export default function ReviewQueuePanel({ projectId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('Ready');
+  const isMountedRef = useRef(false);
+  const refreshRequestIdRef = useRef(0);
 
-  useEffect(() => {
-    let isMounted = true;
+  const refreshReviewQueue = useCallback(async () => {
+    const requestId = refreshRequestIdRef.current + 1;
+    refreshRequestIdRef.current = requestId;
+    setIsLoading(true);
+    setError('');
+    setStatus('Loading review queue');
 
-    async function loadReviewQueue() {
-      setIsLoading(true);
-      setError('');
-      setStatus('Loading review queue');
-
-      try {
-        const payload = await fetchReviewQueueEntries(projectId);
-        const nextEntries = Array.isArray(payload?.entries) ? payload.entries : [];
-        if (!isMounted) {
-          return;
-        }
-        setEntries(nextEntries);
-        setSelectedQueueEntryId((currentId) => (
-          nextEntries.some((entry) => entry.queue_entry_id === currentId)
-            ? currentId
-            : nextEntries[0]?.queue_entry_id ?? ''
-        ));
-        setStatus('Review queue loaded');
-      } catch (loadError) {
-        if (!isMounted) {
-          return;
-        }
-        setEntries([]);
-        setSelectedQueueEntryId('');
+    try {
+      const payload = await fetchReviewQueueEntries(projectId);
+      const nextEntries = Array.isArray(payload?.entries) ? payload.entries : [];
+      if (!isMountedRef.current || refreshRequestIdRef.current !== requestId) {
+        return nextEntries;
+      }
+      setEntries(nextEntries);
+      setSelectedQueueEntryId((currentId) => (
+        nextEntries.some((entry) => entry.queue_entry_id === currentId)
+          ? currentId
+          : nextEntries[0]?.queue_entry_id ?? ''
+      ));
+      setStatus('Review queue loaded');
+      return nextEntries;
+    } catch (loadError) {
+      if (isMountedRef.current && refreshRequestIdRef.current === requestId) {
         setError(loadError instanceof Error ? loadError.message : 'Review queue load failed.');
         setStatus('Review queue unavailable');
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      }
+      throw loadError;
+    } finally {
+      if (isMountedRef.current && refreshRequestIdRef.current === requestId) {
+        setIsLoading(false);
       }
     }
+  }, [projectId]);
 
-    loadReviewQueue();
+  useEffect(() => {
+    isMountedRef.current = true;
+    void refreshReviewQueue().catch(() => {});
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
+      refreshRequestIdRef.current += 1;
     };
-  }, [projectId]);
+  }, [refreshReviewQueue]);
 
   const selectedEntry = useMemo(
     () => entries.find((entry) => entry.queue_entry_id === selectedQueueEntryId) ?? entries[0] ?? null,
@@ -126,6 +135,7 @@ export default function ReviewQueuePanel({ projectId }) {
       projectId,
       ...command,
     });
+    await refreshReviewQueue();
     setStatus('Owner review command accepted as workflow metadata only.');
     return response;
   }
@@ -215,6 +225,22 @@ export default function ReviewQueuePanel({ projectId }) {
                   <dd>{formatValue(selectedEntry.review_status)}; not canon</dd>
                 </div>
                 <div>
+                  <dt>Review version</dt>
+                  <dd>{formatValue(selectedEntry.review_version)}</dd>
+                </div>
+                <div>
+                  <dt>Owner note</dt>
+                  <dd>{formatValue(selectedEntry.owner_note)}</dd>
+                </div>
+                <div>
+                  <dt>Review workflow completion</dt>
+                  <dd>{selectedEntry.owner_review_completed ? 'Completed' : 'Not completed'}</dd>
+                </div>
+                <div>
+                  <dt>Review workflow completed at</dt>
+                  <dd>{formatValue(selectedEntry.owner_reviewed_at)}</dd>
+                </div>
+                <div>
                   <dt>Confidence</dt>
                   <dd>{formatValue(selectedEntry.confidence)}; not canon</dd>
                 </div>
@@ -249,6 +275,7 @@ export default function ReviewQueuePanel({ projectId }) {
                 queueEntry={selectedEntry}
                 disabled={isLoading}
                 onSubmitAction={handleSubmitAction}
+                onRefreshQueue={refreshReviewQueue}
               />
 
               <ApplyPromotionConfirmation

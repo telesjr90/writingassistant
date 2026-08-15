@@ -184,27 +184,32 @@ class TestCandidateDetailHeadingHierarchy:
 class TestApplyPromotionHeadingHierarchy:
     def test_route_title_is_h2(self) -> None:
         source = read_text(APPLY_PROMOTION_CONFIRMATION_JSX)
-        assert "<h2>Apply-Promotion Confirmation</h2>" in source
+        assert "<h2>Prepare and approve an immutable revision</h2>" in source
+        assert "<h2>Apply-Promotion Confirmation</h2>" not in source
 
     def test_direct_sections_are_h3(self) -> None:
         source = read_text(APPLY_PROMOTION_CONFIRMATION_JSX)
         h3_sections = (
-            "Candidate Snapshot",
-            "Destination",
-            "Evidence / Provenance Summary",
-            "Source Location Summary",
-            "Duplicate / Link / Dependency Summary",
-            "Approved Memory/Canon Before-State",
-            "Promotion Audit Record",
-            "Failure Safety",
-            "Owner Final Confirmation",
+            "Preparation publication incomplete",
+            "Preparation publication recovered from immutable saved bytes",
+            "Exact promotion association",
+            "Authoritative owner",
+            "Prepare immutable revision",
+            "Selected revision {selectedRevision.revision}",
+            "Explicit revision approval",
+            "Sealed contract reference",
+            "Final anti-replay challenge",
+            "Final apply recovery required",
+            "Final apply verified not committed",
+            "Final confirmation",
+            "{applyResult.replayed ? 'Completed replay or committed recovery' : 'Apply-Promotion completed'}",
         )
         for label in h3_sections:
             assert f"<h3>{label}</h3>" in source
 
     def test_visible_blockers_section_is_h3(self) -> None:
         source = read_text(OMI_APPLY_PROMOTION_BLOCKERS_JSX)
-        assert "<h3>Visible Blockers</h3>" in source
+        assert "<h3>Visible blockers</h3>" in source
 
     def test_apply_promotion_has_no_h1(self) -> None:
         source = read_text(APPLY_PROMOTION_CONFIRMATION_JSX)

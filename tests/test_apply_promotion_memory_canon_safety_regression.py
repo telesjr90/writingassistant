@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -13,13 +14,20 @@ import pytest
 
 from backend import main, project_manager
 from backend.routes import apply_promotion as apply_promotion_route
-from backend.story_knowledge import apply_promotion
+from backend.story_knowledge import (
+    apply_promotion,
+    candidate_persistence,
+    candidate_record,
+    candidate_review_gate,
+    review_queue_storage,
+)
 from backend.story_knowledge.apply_contract import ApplyContractError
 
 
 PROJECT_ID = "example"
 CANDIDATE_ID = "core_candidate_scene_001_character_001"
 QUEUE_ENTRY_ID = "review_queue_entry_scene_001_character_001"
+REVIEW_FIXTURE_TIME = "2026-08-09T20:00:00Z"
 
 ALLOWED_REVIEW_COMMANDS = (
     "mark_reviewed",
@@ -132,6 +140,67 @@ def valid_queue_entry(**overrides: Any) -> dict[str, Any]:
     return entry
 
 
+def valid_review_candidate_record() -> dict[str, Any]:
+    return candidate_record.validate_candidate_record(
+        {
+            "candidate_id": CANDIDATE_ID,
+            "project_id": PROJECT_ID,
+            "candidate_type": "character_candidate",
+            "status": "candidate",
+            "target_category": "characters",
+            "source_locator": {
+                "project_id": PROJECT_ID,
+                "source_document_type": "scene",
+                "source_document_id": "scene_001",
+                "section_id": None,
+                "chapter_id": None,
+                "scene_id": "scene_001",
+                "line_start": None,
+                "line_end": None,
+                "char_start": None,
+                "char_end": None,
+                "source_hash": None,
+            },
+            "evidence": [],
+            "provenance": {
+                "origin": "extractor",
+                "extraction_method": "fixture_orchestrator",
+                "timestamp": REVIEW_FIXTURE_TIME,
+                "human_review_required": True,
+            },
+            "owner_decision": "undecided",
+            "destination": "omi_candidate_only",
+            "confidence": 0.4,
+            "created_at": REVIEW_FIXTURE_TIME,
+            "updated_at": REVIEW_FIXTURE_TIME,
+        }
+    )
+
+
+def valid_review_queue_entry(candidate: dict[str, Any]) -> dict[str, Any]:
+    entry = candidate_review_gate.build_review_queue_entry(candidate, project_id=PROJECT_ID)
+    entry.update(
+        queue_entry_id=QUEUE_ENTRY_ID,
+        review_status="pending",
+        lifecycle_state="owner_review_pending",
+        evidence_summary="Evidence summary",
+        evidence_refs=["evidence_001"],
+        provenance_summary="Fixture provenance",
+        provenance_refs=["fixture_orchestrator"],
+        review_version=0,
+        owner_note=None,
+        rationale=None,
+        duplicate_candidate_ids=None,
+        superseded_by_candidate_id=None,
+        rejected_output_reason=None,
+        insufficient_evidence_reason=None,
+        quarantine_note=None,
+        owner_review_completed=False,
+        owner_reviewed_at=None,
+    )
+    return review_queue_storage.validate_review_queue_entry(entry)
+
+
 def build_valid_plan() -> dict[str, Any]:
     return apply_promotion.build_promotion_plan(
         valid_promotion_request(),
@@ -145,29 +214,27 @@ def review_command_payload(action_type: str, **overrides: Any) -> dict[str, Any]
         "action_type": action_type,
         "queue_entry_id": QUEUE_ENTRY_ID,
         "candidate_id": CANDIDATE_ID,
-        "actor": {
-            "actor_type": "owner",
-            "owner_confirmed": True,
-            "owner_confirmation_marker": "owner-reviewed",
-        },
+        "actor": "owner-reviewed",
         "owner_confirmed": True,
-        "owner_note": "Owner-authored candidate review rationale.",
-        "rationale": "Owner-authored review command metadata.",
-        "expected_current_review_status": "pending",
-        "expected_current_version": 1,
         "preserve_candidate_linkage": True,
         "preserve_evidence_provenance": True,
-        "metadata": {
-            "client_request_id": "phase8-impl-017-t006",
-            "no_silent_promotion": True,
-            "no_apply_promotion": True,
-            "no_memory_canon_mutation": True,
-            "no_raw_artifact_persistence": True,
-            "no_runtime_extraction": True,
-            "no_model_calls": True,
-            "no_generated_prose": True,
-        },
+        "idempotency_key": str(uuid.uuid4()),
+        "expected_current_review_status": "pending",
+        "expected_current_version": 0,
     }
+    payload.update(
+        {
+            "request_more_evidence": {"owner_note": "Need more supporting evidence."},
+            "defer": {"owner_note": "Defer for later owner review."},
+            "reject": {"owner_note": "Reject after owner review."},
+            "quarantine": {"owner_note": "The supporting evidence is invalid."},
+            "update_owner_note": {"owner_note": "Owner-authored review note."},
+            "set_review_status": {
+                "target_review_status": "deferred",
+                "owner_note": "Defer through the review-status command.",
+            },
+        }.get(action_type, {})
+    )
     payload.update(overrides)
     return payload
 
@@ -178,6 +245,10 @@ def approved_memory_files(project_dir: Path) -> list[Path]:
 
 def promotion_audit_files(project_dir: Path) -> list[Path]:
     return sorted((project_dir / "writer_assistant" / "promotion_audit").rglob("*.json"))
+
+
+def file_snapshots(paths: list[Path]) -> list[tuple[Path, bytes]]:
+    return [(path, path.read_bytes()) for path in paths]
 
 
 def assert_no_memory_or_applied_audit(project_dir: Path) -> None:
@@ -303,19 +374,33 @@ def test_review_queue_actions_do_not_mutate_approved_memory_or_canon(
     action_type: str,
 ) -> None:
     monkeypatch.setattr(project_manager, "PROJECTS_DIR", tmp_path)
+    project_manager.create_project("Example", projects_dir=tmp_path)
+    project_dir = (tmp_path / PROJECT_ID).resolve()
+    candidate = valid_review_candidate_record()
+    candidate_persistence.write_candidate_record(project_dir, candidate)
+    review_queue_storage.write_review_queue_entry(
+        valid_review_queue_entry(candidate), project_dir=project_dir
+    )
+    runtime_dir = tmp_path / "runtime"
+    runtime_dir.mkdir(mode=0o700)
+    monkeypatch.setattr(main.app.state, "validated_runtime_dir", runtime_dir, raising=False)
+    approved_memory_before = file_snapshots(approved_memory_files(project_dir))
+    promotion_audit_before = file_snapshots(promotion_audit_files(project_dir))
 
     response = route_client.post(
         f"/api/projects/{PROJECT_ID}/review-queue/{QUEUE_ENTRY_ID}/actions",
         json=review_command_payload(action_type),
     )
 
-    assert response.status_code in {200, 202}
+    assert response.status_code == 200
     payload = response.json()
     assert payload["review_workflow_state"]["is_canon"] is False
     assert payload["review_workflow_state"]["apply_promotion_performed"] is False
     assert payload["review_workflow_state"]["memory_canon_mutation_performed"] is False
     assert any("not canon" in warning.lower() for warning in payload["warnings"])
-    assert_no_memory_or_applied_audit(tmp_path / PROJECT_ID)
+    assert file_snapshots(approved_memory_files(project_dir)) == approved_memory_before
+    assert file_snapshots(promotion_audit_files(project_dir)) == promotion_audit_before
+    assert_no_memory_or_applied_audit(project_dir)
 
 
 @pytest.mark.parametrize(

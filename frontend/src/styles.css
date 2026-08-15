@@ -742,6 +742,11 @@ h2 {
   font-size: 12px;
 }
 
+.review-queue-entry strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .review-boundary-note {
   padding: var(--wa-space-10) var(--wa-space-12);
   color: var(--wa-color-text-secondary);

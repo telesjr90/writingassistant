@@ -31,12 +31,15 @@ Filesystem assertions use pytest tmp_path only.
 """
 
 import copy
+import os
+import stat
 from pathlib import Path
 
 import pytest
 
 from backend.story_knowledge import candidate_record
 from backend.story_knowledge import candidate_review_gate
+from backend.story_knowledge import apply_contract
 
 # The future storage module is imported normally; expected red until T005 exists.
 from backend.story_knowledge import review_queue_storage
@@ -55,6 +58,7 @@ EXPECTED_PUBLIC_API = (
     "review_queue_entry_path",
     "review_queue_index_path",
     "write_review_queue_entry",
+    "replace_review_queue_entry_atomic",
     "read_review_queue_entry",
     "list_review_queue_entries",
     "build_review_queue_index",
@@ -111,6 +115,20 @@ ALLOWED_LIFECYCLE_STATES = frozenset(
         "duplicate_candidate",
         "superseded_candidate",
         "archived_without_promotion",
+    }
+)
+
+VALID_REVIEW_STATE_PAIRS = frozenset(
+    {
+        ("pending", "draft_ready_for_review"),
+        ("pending", "owner_review_pending"),
+        ("needs_info", "needs_more_evidence"),
+        ("needs_info", "blocked_invalid_support"),
+        ("rejected", "owner_reviewed_rejected"),
+        ("deferred", "owner_reviewed_deferred"),
+        ("duplicate", "duplicate_candidate"),
+        ("superseded", "superseded_candidate"),
+        ("archived", "archived_without_promotion"),
     }
 )
 
@@ -541,18 +559,142 @@ def test_validate_entry_accepts_allowed_optional_fields():
         assert field in result
 
 
-@pytest.mark.parametrize("review_status", sorted(ALLOWED_REVIEW_STATUS_VALUES))
-def test_validate_entry_accepts_allowed_review_status(review_status):
-    entry = build_valid_queue_entry(review_status=review_status)
+@pytest.mark.parametrize("review_status,lifecycle_state", sorted(VALID_REVIEW_STATE_PAIRS))
+def test_validate_entry_accepts_allowed_review_status(review_status, lifecycle_state):
+    entry = build_valid_queue_entry(
+        review_status=review_status, lifecycle_state=lifecycle_state
+    )
     result = review_queue_storage.validate_review_queue_entry(entry)
     assert result["review_status"] == review_status
 
 
-@pytest.mark.parametrize("lifecycle_state", sorted(ALLOWED_LIFECYCLE_STATES))
-def test_validate_entry_accepts_allowed_lifecycle_state(lifecycle_state):
-    entry = build_valid_queue_entry(lifecycle_state=lifecycle_state)
+@pytest.mark.parametrize("review_status,lifecycle_state", sorted(VALID_REVIEW_STATE_PAIRS))
+def test_validate_entry_accepts_allowed_lifecycle_state(review_status, lifecycle_state):
+    entry = build_valid_queue_entry(
+        review_status=review_status, lifecycle_state=lifecycle_state
+    )
     result = review_queue_storage.validate_review_queue_entry(entry)
     assert result["lifecycle_state"] == lifecycle_state
+
+
+def test_validate_entry_accepts_and_normalizes_t008e_optional_fields():
+    entry = build_valid_queue_entry(
+        review_version=7,
+        owner_note="Owner note",
+        rationale="Owner rationale",
+        quarantine_note=None,
+        duplicate_candidate_ids=None,
+        superseded_by_candidate_id=None,
+        owner_review_completed=True,
+        owner_reviewed_at="2026-08-09T19:40:00.123Z",
+    )
+    result = review_queue_storage.validate_review_queue_entry(entry)
+    assert result["review_version"] == 7
+    assert result["owner_review_completed"] is True
+    assert result["owner_reviewed_at"] == "2026-08-09T19:40:00.123Z"
+
+    legacy = build_valid_queue_entry()
+    legacy_result = review_queue_storage.validate_review_queue_entry(legacy)
+    assert legacy_result["review_version"] == 0
+    assert legacy_result["owner_review_completed"] is False
+    assert legacy_result["owner_reviewed_at"] is None
+    assert "review_version" not in legacy
+    assert "owner_review_completed" not in legacy
+    assert "owner_reviewed_at" not in legacy
+
+
+def test_validate_entry_rejects_invalid_review_status_lifecycle_pairs():
+    invalid_pairs = {
+        (status, lifecycle)
+        for status in ALLOWED_REVIEW_STATUS_VALUES
+        for lifecycle in ALLOWED_LIFECYCLE_STATES
+    } - VALID_REVIEW_STATE_PAIRS
+    assert invalid_pairs
+    for review_status, lifecycle_state in invalid_pairs:
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(
+                build_valid_queue_entry(
+                    review_status=review_status, lifecycle_state=lifecycle_state
+                )
+            )
+
+
+@pytest.mark.parametrize(
+    "invalid_version", (True, False, -1, 2_147_483_648, 1.0, "1", None)
+)
+def test_validate_entry_rejects_invalid_review_version_values(invalid_version):
+    with pytest.raises(ValueError):
+        review_queue_storage.validate_review_queue_entry(
+            build_valid_queue_entry(review_version=invalid_version)
+        )
+
+
+def test_validate_entry_enforces_owner_review_completion_pair():
+    for overrides in (
+        {"owner_review_completed": True, "owner_reviewed_at": None},
+        {
+            "owner_review_completed": False,
+            "owner_reviewed_at": "2026-08-09T19:40:00Z",
+        },
+        {
+            "owner_review_completed": True,
+            "owner_reviewed_at": "2026-08-09T19:40:00+00:00",
+        },
+        {"owner_review_completed": 1, "owner_reviewed_at": None},
+    ):
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(
+                build_valid_queue_entry(**overrides)
+            )
+
+
+def test_validate_entry_preserves_owner_text_unicode_exactly():
+    owner_note = "  Café e\u0301 — 所有者の注記\n"
+    rationale = "Rationale\r\nkeeps exact whitespace"
+    quarantine_note = "🔒" * 10_000
+    result = review_queue_storage.validate_review_queue_entry(
+        build_valid_queue_entry(
+            owner_note=owner_note,
+            rationale=rationale,
+            quarantine_note=quarantine_note,
+        )
+    )
+    assert result["owner_note"] == owner_note
+    assert result["rationale"] == rationale
+    assert result["quarantine_note"] == quarantine_note
+    for field, value in (
+        ("owner_note", "x" * 10_001),
+        ("rationale", "x" * 1_001),
+        ("quarantine_note", "x" * 10_001),
+        ("owner_note", "\ud800"),
+    ):
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(
+                build_valid_queue_entry(**{field: value})
+            )
+
+
+def test_validate_entry_validates_disposition_linkage_fields():
+    duplicate_ids = ["candidate_002", "candidate_003"]
+    result = review_queue_storage.validate_review_queue_entry(
+        build_valid_queue_entry(
+            duplicate_candidate_ids=duplicate_ids,
+            superseded_by_candidate_id="candidate_004",
+        )
+    )
+    assert result["duplicate_candidate_ids"] == duplicate_ids
+    assert result["superseded_by_candidate_id"] == "candidate_004"
+
+    for invalid in ([], ["candidate_002", "candidate_002"], ["../escape"], "candidate_002"):
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(
+                build_valid_queue_entry(duplicate_candidate_ids=invalid)
+            )
+    for invalid in ("../escape", 1, [], False):
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(
+                build_valid_queue_entry(superseded_by_candidate_id=invalid)
+            )
 
 
 @pytest.mark.parametrize("bad_status", ("approved", "promoted", "canon", "unknown_status"))
@@ -828,6 +970,64 @@ def test_write_review_queue_entry_does_not_mutate_caller_input(tmp_path):
     original = copy.deepcopy(entry)
     review_queue_storage.write_review_queue_entry(entry, project_dir=project)
     assert entry == original
+
+
+def test_atomic_replace_fsyncs_file_renames_and_fsyncs_directory(
+    tmp_path, monkeypatch
+):
+    project = project_dir(tmp_path)
+    entry = build_valid_queue_entry(owner_note="durable owner note")
+    operations = []
+    real_fsync = os.fsync
+    real_replace = os.replace
+
+    def tracking_fsync(descriptor):
+        kind = "directory_fsync" if stat.S_ISDIR(os.fstat(descriptor).st_mode) else "file_fsync"
+        operations.append(kind)
+        return real_fsync(descriptor)
+
+    def tracking_replace(source, target):
+        operations.append("replace")
+        return real_replace(source, target)
+
+    monkeypatch.setattr(review_queue_storage.os, "fsync", tracking_fsync)
+    monkeypatch.setattr(review_queue_storage.os, "replace", tracking_replace)
+    persisted = review_queue_storage.replace_review_queue_entry_atomic(
+        entry, project_dir=project
+    )
+
+    entry_path = review_queue_storage.review_queue_entry_path(
+        project, entry["queue_entry_id"]
+    )
+    assert operations == ["file_fsync", "replace", "directory_fsync"]
+    assert entry_path.read_bytes() == apply_contract.canonical_json_bytes(persisted)
+    assert not list(entry_path.parent.glob(".*.tmp-*"))
+
+
+def test_atomic_replace_failure_preserves_original_entry(tmp_path, monkeypatch):
+    project = project_dir(tmp_path)
+    original = build_valid_queue_entry(owner_note="original")
+    review_queue_storage.write_review_queue_entry(original, project_dir=project)
+    entry_path = review_queue_storage.review_queue_entry_path(
+        project, original["queue_entry_id"]
+    )
+    original_bytes = entry_path.read_bytes()
+
+    def fail_replace(source, target):
+        raise OSError("synthetic replace failure")
+
+    monkeypatch.setattr(review_queue_storage.os, "replace", fail_replace)
+    with pytest.raises(OSError, match="synthetic replace failure"):
+        review_queue_storage.replace_review_queue_entry_atomic(
+            build_valid_queue_entry(owner_note="target"), project_dir=project
+        )
+    assert entry_path.read_bytes() == original_bytes
+    assert not list(entry_path.parent.glob(".*.tmp-*"))
+
+
+def test_review_queue_storage_does_not_export_event_validator():
+    assert not hasattr(review_queue_storage, "validate_review_action_event_v1")
+    assert "validate_review_action_event_v1" not in review_queue_storage.__all__
 
 
 def test_build_review_queue_index_returns_derived_summary():

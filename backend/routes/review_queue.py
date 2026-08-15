@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from backend import review_api
+from backend import project_manager, review_api
 
 
 router = APIRouter(prefix="/api/projects/{project_id}/review-queue")
@@ -277,7 +278,11 @@ def _readonly_response(
     payload_key: str,
 ) -> dict[str, Any]:
     try:
-        payload = helper(valid_request)
+        project_dir = project_manager._project_path_for_id(
+            valid_request["project_id"],
+            project_manager.PROJECTS_DIR,
+        )
+        payload = helper(valid_request, project_dir=project_dir)
         return _ensure_payload(
             payload,
             project_id=valid_request["project_id"],
@@ -311,9 +316,10 @@ def _command_error_response(
         payload = {
             "schema_version": review_api.SCHEMA_VERSION,
             "status": "rejected",
+            "error_code": "REVIEW_ACTION_INVALID_REQUEST",
             "project_id": project_id,
             "queue_entry_id": queue_entry_id,
-            "action_type": None,
+            "action_command": None,
             "candidate_id": None,
             "warnings": [str(detail)],
             "errors": [str(detail)],
@@ -337,12 +343,34 @@ async def execute_review_queue_action(
             status_code=400,
         )
     try:
+        project_dir = project_manager._project_path_for_id(
+            project_id,
+            project_manager.PROJECTS_DIR,
+        )
+        trusted_runtime_dir = getattr(
+            request.app.state, "validated_runtime_dir", None
+        )
+        if not isinstance(trusted_runtime_dir, Path):
+            raise review_api.ReviewActionPersistenceFailure(
+                "validated runtime directory is unavailable",
+                error_code="REVIEW_ACTION_RUNTIME_PATH_UNAVAILABLE",
+                project_id=project_id,
+                queue_entry_id=queue_entry_id,
+                action_command=payload.get("action_type")
+                if isinstance(payload, dict)
+                else None,
+                candidate_id=payload.get("candidate_id")
+                if isinstance(payload, dict)
+                else None,
+            )
         return review_api.execute_review_action_command(
             payload,
             project_id=project_id,
             queue_entry_id=queue_entry_id,
+            project_dir=project_dir,
+            trusted_runtime_dir=trusted_runtime_dir,
         )
-    except review_api.ReviewActionCommandRejected as exc:
+    except review_api.ReviewActionCommandError as exc:
         return _command_error_response(
             exc,
             project_id=project_id,

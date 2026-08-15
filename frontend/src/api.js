@@ -483,6 +483,49 @@ export async function fetchReviewQueueEntries(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/review-queue`));
 }
 
+export class ReviewQueueCommandError extends Error {
+  constructor(message, { status = null, code = null, payload = null } = {}) {
+    super(message);
+    this.name = 'ReviewQueueCommandError';
+    this.status = status;
+    this.code = code;
+    this.payload = payload;
+
+    const detail = payload?.detail;
+    const recovery = detail && typeof detail === 'object' ? detail : payload;
+    this.manualRecoveryRequired = recovery?.manual_recovery_required === true;
+    this.actionId = recovery?.action_id ?? null;
+    this.completionEventHash = recovery?.completion_event_hash ?? null;
+    this.expectedQueueHash = recovery?.expected_queue_hash ?? null;
+    this.observedQueueHash = recovery?.observed_queue_hash ?? null;
+  }
+}
+
+async function requestReviewQueueCommand(request) {
+  try {
+    const response = await request();
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status ?? null;
+      const payload = error.response?.data ?? null;
+      const detail = payload?.detail;
+      const detailRecord = detail && typeof detail === 'object' ? detail : null;
+      const code = detailRecord?.error_code
+        ?? detailRecord?.code
+        ?? payload?.error_code
+        ?? payload?.code
+        ?? null;
+      const message = detailRecord?.message
+        ?? (typeof detail === 'string' ? detail : null)
+        ?? getErrorMessage(error);
+      throw new ReviewQueueCommandError(message, { status, code, payload });
+    }
+
+    throw new ReviewQueueCommandError(getErrorMessage(error));
+  }
+}
+
 export async function getApplyPromotionContract(
   projectId = PROJECT_ID,
   promotionId,
@@ -724,60 +767,59 @@ export async function submitReviewQueueAction({
   queueEntryId,
   candidateId,
   actionType,
+  idempotencyKey,
   ownerNote,
   rationale,
   expectedCurrentReviewStatus,
   expectedCurrentVersion,
-  reviewStatus,
+  targetReviewStatus,
+  duplicateCandidateIds,
+  supersededByCandidateId,
+  rejectedOutputReason,
+  insufficientEvidenceReason,
+  quarantineNote,
 }) {
   requireSafeReviewRouteId(projectId, 'project_id');
   requireSafeReviewRouteId(queueEntryId, 'queue_entry_id');
   requireSafeReviewRouteId(candidateId, 'candidate_id');
   requireReviewActionType(actionType);
+  if (idempotencyKey === undefined || idempotencyKey === null) {
+    throw new ReviewQueueCommandError(
+      'A caller-supplied idempotency key is required for an owner review command.',
+      { code: 'missing_idempotency_key' },
+    );
+  }
 
   const payload = {
     action_type: actionType,
     queue_entry_id: queueEntryId,
-    actor: {
-      actor_type: 'owner',
-      owner_confirmed: true,
-      owner_confirmation_marker: 'owner-reviewed',
-    },
+    candidate_id: candidateId,
+    actor: 'owner-reviewed',
     owner_confirmed: true,
     preserve_candidate_linkage: true,
     preserve_evidence_provenance: true,
-    metadata: {
-      client_surface: 'owner-action-review-controls',
-      no_silent_promotion: true,
-      no_model_calls: true,
-      no_generated_prose: true,
-    },
+    idempotency_key: idempotencyKey,
+    expected_current_review_status: expectedCurrentReviewStatus,
+    expected_current_version: expectedCurrentVersion,
   };
 
-  payload.candidate_id = candidateId;
+  const optionalFields = [
+    ['owner_note', ownerNote],
+    ['rationale', rationale],
+    ['target_review_status', targetReviewStatus],
+    ['duplicate_candidate_ids', duplicateCandidateIds],
+    ['superseded_by_candidate_id', supersededByCandidateId],
+    ['rejected_output_reason', rejectedOutputReason],
+    ['insufficient_evidence_reason', insufficientEvidenceReason],
+    ['quarantine_note', quarantineNote],
+  ];
+  optionalFields.forEach(([field, value]) => {
+    if (value !== undefined) {
+      payload[field] = value;
+    }
+  });
 
-  const note = compactStringField(ownerNote);
-  const actionRationale = compactStringField(rationale);
-  const currentStatus = compactStringField(expectedCurrentReviewStatus);
-  const nextReviewStatus = compactStringField(reviewStatus);
-
-  if (note) {
-    payload.owner_note = note;
-  }
-  if (actionRationale) {
-    payload.rationale = actionRationale;
-  }
-  if (currentStatus) {
-    payload.expected_current_review_status = currentStatus;
-  }
-  if (Number.isInteger(expectedCurrentVersion)) {
-    payload.expected_current_version = expectedCurrentVersion;
-  }
-  if (actionType === 'set_review_status' && nextReviewStatus) {
-    payload.target_review_status = nextReviewStatus;
-  }
-
-  return requestData(() => (
+  return requestReviewQueueCommand(() => (
     client.post(`/projects/${projectId}/review-queue/${queueEntryId}/actions`, payload)
   ));
 }

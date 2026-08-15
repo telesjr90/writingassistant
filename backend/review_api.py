@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import json
+import uuid
 from copy import deepcopy
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+from backend.story_knowledge import apply_contract
+from backend.story_knowledge import candidate_persistence
+from backend.story_knowledge import review_action_events
 from backend.story_knowledge import review_queue_storage
 
 
@@ -115,6 +124,10 @@ _ENTRY_RESPONSE_FIELDS = (
     "raw_output_refs",
     "created_at",
     "updated_at",
+    "review_version",
+    "owner_note",
+    "owner_review_completed",
+    "owner_reviewed_at",
 )
 
 _ENTRY_FILTER_FIELDS = (
@@ -196,31 +209,222 @@ _REVIEW_ACTION_FORBIDDEN_FIELDS = {
     _blocked_marker("apply_", "promotion"),
 }
 
-_REVIEW_ACTION_OPTIONAL_FIELDS = {
-    "action_type",
+_REVIEW_ACTION_COMMON_FIELDS = frozenset(
+    {
+        "action_type",
+        "queue_entry_id",
+        "candidate_id",
+        "actor",
+        "owner_confirmed",
+        "preserve_candidate_linkage",
+        "preserve_evidence_provenance",
+        "idempotency_key",
+        "expected_current_review_status",
+        "expected_current_version",
+    }
+)
+_REVIEW_ACTION_COMMAND_FIELDS = frozenset(
+    {
+        "target_review_status",
+        "duplicate_candidate_ids",
+        "superseded_by_candidate_id",
+        "owner_note",
+        "rationale",
+        "rejected_output_reason",
+        "insufficient_evidence_reason",
+        "quarantine_note",
+    }
+)
+_REVIEW_ACTION_FIELDS = (
+    _REVIEW_ACTION_COMMON_FIELDS
+    | _REVIEW_ACTION_COMMAND_FIELDS
+    | _REVIEW_ACTION_FORBIDDEN_FIELDS
+)
+_REVIEW_STATUSES = frozenset(
+    {
+        "pending",
+        "needs_info",
+        "rejected",
+        "deferred",
+        "duplicate",
+        "superseded",
+        "archived",
+    }
+)
+_VALID_REVIEW_STATE_PAIRS = frozenset(
+    {
+        ("pending", "draft_ready_for_review"),
+        ("pending", "owner_review_pending"),
+        ("needs_info", "needs_more_evidence"),
+        ("needs_info", "blocked_invalid_support"),
+        ("rejected", "owner_reviewed_rejected"),
+        ("deferred", "owner_reviewed_deferred"),
+        ("duplicate", "duplicate_candidate"),
+        ("superseded", "superseded_candidate"),
+        ("archived", "archived_without_promotion"),
+    }
+)
+_TARGET_STATE_PAIRS = {
+    "pending": ("pending", "owner_review_pending"),
+    "needs_info": ("needs_info", "needs_more_evidence"),
+    "rejected": ("rejected", "owner_reviewed_rejected"),
+    "deferred": ("deferred", "owner_reviewed_deferred"),
+    "duplicate": ("duplicate", "duplicate_candidate"),
+    "superseded": ("superseded", "superseded_candidate"),
+    "archived": ("archived", "archived_without_promotion"),
+}
+_COMMAND_ALLOWED_SOURCE_PAIRS = {
+    "mark_reviewed": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
+    "request_more_evidence": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
+    "defer": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
+    "reject": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
+    "quarantine": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+        }
+    ),
+    "update_owner_note": _VALID_REVIEW_STATE_PAIRS,
+    "set_review_status": _VALID_REVIEW_STATE_PAIRS,
+}
+_COMMAND_FIELD_RULES = {
+    "mark_reviewed": (frozenset(), frozenset({"owner_note", "rationale"})),
+    "request_more_evidence": (
+        frozenset({"owner_note"}),
+        frozenset({"rationale", "insufficient_evidence_reason"}),
+    ),
+    "defer": (frozenset({"owner_note"}), frozenset({"rationale"})),
+    "reject": (
+        frozenset({"owner_note"}),
+        frozenset({"rationale", "rejected_output_reason"}),
+    ),
+    "quarantine": (
+        frozenset({"owner_note"}),
+        frozenset({"rationale", "quarantine_note"}),
+    ),
+    "update_owner_note": (frozenset({"owner_note"}), frozenset({"rationale"})),
+}
+_CANONICAL_REQUEST_FIELDS = (
+    "request_schema_version",
+    "project_id",
     "queue_entry_id",
     "candidate_id",
+    "action_type",
     "actor",
     "owner_confirmed",
-    "owner_note",
-    "rationale",
-    "expected_current_review_status",
-    "expected_current_version",
     "preserve_candidate_linkage",
     "preserve_evidence_provenance",
-    "metadata",
+    "expected_current_review_status",
+    "expected_current_version",
     "target_review_status",
-}
+    "duplicate_candidate_ids",
+    "superseded_by_candidate_id",
+    "owner_note",
+    "rationale",
+    "rejected_output_reason",
+    "insufficient_evidence_reason",
+    "quarantine_note",
+)
+_EVIDENCE_PROVENANCE_PROJECTION_FIELDS = (
+    "source_document",
+    "source_locator",
+    "evidence_summary",
+    "evidence_refs",
+    "provenance_summary",
+    "provenance_refs",
+    "raw_output_refs",
+)
+_MAX_REVIEW_VERSION = 2_147_483_647
 
-_REVIEW_ACTION_FIELDS = _REVIEW_ACTION_OPTIONAL_FIELDS | _REVIEW_ACTION_FORBIDDEN_FIELDS
+
+class ReviewActionCommandError(ValueError):
+    """Closed, route-safe review command failure."""
+
+    status_code = 500
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        error_code: str,
+        project_id: str | None = None,
+        queue_entry_id: str | None = None,
+        action_command: str | None = None,
+        candidate_id: str | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> None:
+        payload = {
+            "schema_version": SCHEMA_VERSION,
+            "status": "rejected",
+            "error_code": error_code,
+            "project_id": project_id,
+            "queue_entry_id": queue_entry_id,
+            "action_command": action_command,
+            "candidate_id": candidate_id,
+            "warnings": [message],
+            "errors": [message],
+        }
+        if extra:
+            payload.update(deepcopy(extra))
+        self.payload = payload
+        super().__init__(payload)
 
 
-class ReviewActionCommandRejected(ValueError):
-    """Fail-closed review command rejection with route-safe status details."""
+class ReviewActionBadRequest(ReviewActionCommandError):
+    status_code = 400
 
-    def __init__(self, message: str, *, status_code: int = 422) -> None:
-        super().__init__(message)
-        self.status_code = status_code
+
+class ReviewActionForbidden(ReviewActionCommandError):
+    status_code = 403
+
+
+class ReviewActionNotFound(ReviewActionCommandError):
+    status_code = 404
+
+
+class ReviewActionConflict(ReviewActionCommandError):
+    status_code = 409
+
+
+class ReviewActionUnprocessable(ReviewActionCommandError):
+    status_code = 422
+
+
+class ReviewActionLockUnavailable(ReviewActionCommandError):
+    status_code = 423
+
+
+class ReviewActionPersistenceFailure(ReviewActionCommandError):
+    status_code = 500
 
 
 def _copy_mapping(value: dict[str, Any]) -> dict[str, Any]:
@@ -246,6 +450,8 @@ def _safe_id(value: Any) -> str:
     if value.startswith(".") or value.startswith("/") or "\\" in value or "/" in value:
         raise ValueError("unsafe id")
     if len(value) >= 2 and value[1] == ":":
+        raise ValueError("unsafe id")
+    if any(0xD800 <= ord(character) <= 0xDFFF for character in value):
         raise ValueError("unsafe id")
     return value
 
@@ -382,11 +588,16 @@ def _support_response(valid: dict[str, Any], *, entries_key: str) -> dict[str, A
 
 
 def _safe_entry(entry: dict[str, Any]) -> dict[str, Any]:
-    return {
+    safe = {
         field: deepcopy(entry[field])
         for field in _ENTRY_RESPONSE_FIELDS
         if field in entry
     }
+    safe.setdefault("review_version", 0)
+    safe.setdefault("owner_note", None)
+    safe.setdefault("owner_review_completed", False)
+    safe.setdefault("owner_reviewed_at", None)
+    return safe
 
 
 def _storage_warning_response(
@@ -552,73 +763,73 @@ def validate_review_queue_read_request(request: Any) -> dict[str, Any]:
     return _copy_mapping(value)
 
 
-def _candidate_id_for_queue_entry(queue_entry_id: str) -> str:
-    prefix = "review_queue_entry_"
-    if not queue_entry_id.startswith(prefix):
-        raise ReviewActionCommandRejected("queue/candidate mismatch", status_code=422)
-    return "core_candidate_" + queue_entry_id[len(prefix) :]
-
-
-def _reject_review_action(
-    valid: dict[str, Any],
+def _command_error(
+    error_type: type[ReviewActionCommandError],
     message: str,
     *,
-    status_code: int = 422,
-) -> None:
-    valid["_rejection_status_code"] = status_code
-    valid["_rejection_reason"] = message
-    raise ReviewActionCommandRejected(message, status_code=status_code)
+    error_code: str,
+    project_id: str | None = None,
+    queue_entry_id: str | None = None,
+    request: dict[str, Any] | None = None,
+    extra: dict[str, Any] | None = None,
+) -> ReviewActionCommandError:
+    request = request or {}
+    return error_type(
+        message,
+        error_code=error_code,
+        project_id=project_id,
+        queue_entry_id=queue_entry_id,
+        action_command=request.get("action_type"),
+        candidate_id=request.get("candidate_id"),
+        extra=extra,
+    )
 
 
-def _require_owner_confirmation(valid: dict[str, Any]) -> None:
-    if valid.get("owner_confirmed") is not True:
-        _reject_review_action(valid, "owner confirmation required", status_code=403)
-    actor = valid.get("actor")
-    if not isinstance(actor, dict):
-        _reject_review_action(valid, "owner confirmation required", status_code=403)
-    if actor.get("actor_type") != "owner" or actor.get("owner_confirmed") is not True:
-        _reject_review_action(valid, "owner confirmation required", status_code=403)
-
-
-def _review_status_for_action(valid: dict[str, Any]) -> str:
-    action_type = valid["action_type"]
-    if action_type == "mark_reviewed":
-        return "reviewed"
-    if action_type == "request_more_evidence":
-        return "needs_more_evidence"
-    if action_type == "defer":
-        return "deferred"
-    if action_type == "reject":
-        return "rejected"
-    if action_type == "quarantine":
-        return "quarantined"
-    if action_type == "set_review_status":
-        target = valid.get("target_review_status") or valid.get(
-            "expected_current_review_status"
-        )
-        return _require_safe_text_id(target)
-    return valid.get("expected_current_review_status", "pending")
-
-
-def _review_action_rejection_response(
+def _require_unicode_scalar_text(
+    value: Any,
     *,
-    project_id: str | None,
-    queue_entry_id: str | None,
-    candidate_id: str | None,
-    action_type: Any,
-    reason: str,
-) -> dict[str, Any]:
-    response: dict[str, Any] = {
-        "schema_version": SCHEMA_VERSION,
-        "status": "rejected",
-        "action_type": action_type,
-        "project_id": project_id,
-        "queue_entry_id": queue_entry_id,
-        "candidate_id": candidate_id,
-        "warnings": [reason],
-        "errors": [reason],
-    }
-    return response
+    maximum: int,
+    allow_null: bool = True,
+) -> str | None:
+    if value is None and allow_null:
+        return None
+    if not isinstance(value, str) or len(value) > maximum:
+        raise ValueError("invalid text")
+    if any(0xD800 <= ord(character) <= 0xDFFF for character in value):
+        raise ValueError("invalid text")
+    return value
+
+
+def _require_uuid4(value: Any) -> str:
+    if not isinstance(value, str):
+        raise ValueError("invalid UUIDv4")
+    try:
+        parsed = uuid.UUID(value)
+    except (AttributeError, ValueError) as exc:
+        raise ValueError("invalid UUIDv4") from exc
+    if parsed.version != 4 or str(parsed) != value:
+        raise ValueError("invalid UUIDv4")
+    return value
+
+
+def _set_review_status_field_rules(target: Any) -> tuple[frozenset[str], frozenset[str]]:
+    if target not in _TARGET_STATE_PAIRS:
+        raise ValueError("invalid target review status")
+    required = {"target_review_status"}
+    optional = {"rationale"}
+    if target in {"pending", "archived"}:
+        optional.add("owner_note")
+    else:
+        required.add("owner_note")
+    if target == "needs_info":
+        optional.add("insufficient_evidence_reason")
+    elif target == "rejected":
+        optional.add("rejected_output_reason")
+    elif target == "duplicate":
+        required.add("duplicate_candidate_ids")
+    elif target == "superseded":
+        required.add("superseded_by_candidate_id")
+    return frozenset(required), frozenset(optional)
 
 
 def validate_review_action_command_request(
@@ -627,56 +838,930 @@ def validate_review_action_command_request(
     project_id: str,
     queue_entry_id: str,
 ) -> dict[str, Any]:
-    _safe_id(project_id)
-    _safe_id(queue_entry_id)
-    value = _ensure_mapping(request)
+    body = request if isinstance(request, dict) else {}
+    try:
+        _safe_id(project_id)
+        _safe_id(queue_entry_id)
+    except (TypeError, ValueError) as exc:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid route identity",
+            error_code="REVIEW_ACTION_INVALID_IDENTITY",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=body,
+        ) from exc
+    if not isinstance(request, dict):
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "request must be a JSON object",
+            error_code="REVIEW_ACTION_INVALID_REQUEST",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+        )
+    value = _copy_mapping(request)
     unsupported = set(value) - _REVIEW_ACTION_FIELDS
     if unsupported:
-        raise ReviewActionCommandRejected("unsupported field", status_code=422)
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "unsupported request field",
+            error_code="REVIEW_ACTION_INVALID_FIELD",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
     forbidden = set(value) & _REVIEW_ACTION_FORBIDDEN_FIELDS
     if forbidden:
-        raise ReviewActionCommandRejected("forbidden field", status_code=403)
+        raise _command_error(
+            ReviewActionForbidden,
+            "forbidden request field",
+            error_code="REVIEW_ACTION_FORBIDDEN_FIELD",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
 
-    valid = _copy_mapping(value)
-    valid["project_id"] = project_id
-    valid["queue_entry_id"] = queue_entry_id
-
-    action_type = valid.get("action_type")
-    if not isinstance(action_type, str) or not action_type:
-        _reject_review_action(valid, "missing action_type", status_code=422)
+    action_type = value.get("action_type")
     if action_type in _REVIEW_ACTION_FORBIDDEN_COMMANDS:
-        _reject_review_action(valid, "forbidden command", status_code=403)
+        raise _command_error(
+            ReviewActionForbidden,
+            "forbidden command",
+            error_code="REVIEW_ACTION_FORBIDDEN_COMMAND",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
     if action_type not in _REVIEW_ACTION_ALLOWED_COMMANDS:
-        _reject_review_action(valid, "unknown command", status_code=422)
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "unknown or missing command",
+            error_code="REVIEW_ACTION_INVALID_COMMAND",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
 
-    if valid.get("queue_entry_id") != queue_entry_id:
-        _reject_review_action(valid, "queue entry mismatch", status_code=422)
-
-    candidate_id = valid.get("candidate_id")
-    if not isinstance(candidate_id, str):
-        _reject_review_action(valid, "candidate required", status_code=422)
-    _safe_id(candidate_id)
-    if candidate_id != _candidate_id_for_queue_entry(queue_entry_id):
-        _reject_review_action(valid, "queue/candidate mismatch", status_code=422)
-
-    for field in ("owner_note", "rationale"):
-        if field in valid:
-            _require_text(valid[field])
-    for field in ("expected_current_review_status", "target_review_status"):
-        if field in valid:
-            _require_safe_text_id(valid[field])
-    if "expected_current_version" in valid and not isinstance(
-        valid["expected_current_version"], int
+    for field in (
+        "owner_confirmed",
+        "preserve_candidate_linkage",
+        "preserve_evidence_provenance",
     ):
-        _reject_review_action(valid, "invalid version", status_code=422)
-    for field in ("preserve_candidate_linkage", "preserve_evidence_provenance"):
-        if valid.get(field) is not True:
-            _reject_review_action(valid, "preservation flag required", status_code=422)
-    if "metadata" in valid and not isinstance(valid["metadata"], dict):
-        _reject_review_action(valid, "invalid metadata", status_code=422)
+        if value.get(field) is not True:
+            raise _command_error(
+                ReviewActionForbidden,
+                "owner confirmation and preservation assertions are required",
+                error_code="REVIEW_ACTION_CONFIRMATION_REQUIRED",
+                project_id=project_id,
+                queue_entry_id=queue_entry_id,
+                request=value,
+            )
+    if value.get("actor") != "owner-reviewed":
+        raise _command_error(
+            ReviewActionForbidden,
+            "owner confirmation is required",
+            error_code="REVIEW_ACTION_CONFIRMATION_REQUIRED",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
 
-    _require_owner_confirmation(valid)
-    return valid
+    missing_common = _REVIEW_ACTION_COMMON_FIELDS - set(value)
+    if missing_common:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "missing required request field",
+            error_code="REVIEW_ACTION_INVALID_REQUEST",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
+    if value["queue_entry_id"] != queue_entry_id:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "queue entry identity mismatch",
+            error_code="REVIEW_ACTION_INVALID_IDENTITY",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
+    try:
+        _safe_id(value["candidate_id"])
+        _require_uuid4(value["idempotency_key"])
+    except (TypeError, ValueError) as exc:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid candidate identity or idempotency key",
+            error_code="REVIEW_ACTION_INVALID_IDENTITY",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        ) from exc
+    if value["expected_current_review_status"] not in _REVIEW_STATUSES:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid expected review status",
+            error_code="REVIEW_ACTION_INVALID_STATUS",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
+    expected_version = value["expected_current_version"]
+    if (
+        isinstance(expected_version, bool)
+        or not isinstance(expected_version, int)
+        or not 0 <= expected_version <= _MAX_REVIEW_VERSION
+    ):
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid expected review version",
+            error_code="REVIEW_ACTION_INVALID_VERSION",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
+
+    try:
+        if action_type == "set_review_status":
+            required, optional = _set_review_status_field_rules(
+                value.get("target_review_status")
+            )
+        else:
+            required, optional = _COMMAND_FIELD_RULES[action_type]
+    except ValueError as exc:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid target review status",
+            error_code="REVIEW_ACTION_INVALID_STATUS",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        ) from exc
+    supplied_command_fields = set(value) & _REVIEW_ACTION_COMMAND_FIELDS
+    forbidden_for_command = supplied_command_fields - required - optional
+    if forbidden_for_command:
+        raise _command_error(
+            ReviewActionForbidden,
+            "field is forbidden for this command",
+            error_code="REVIEW_ACTION_FORBIDDEN_FIELD",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
+    if not required <= set(value):
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "missing command-required field",
+            error_code="REVIEW_ACTION_INVALID_REQUEST",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        )
+
+    try:
+        for field, maximum in (
+            ("owner_note", 10_000),
+            ("rationale", 1_000),
+            ("quarantine_note", 10_000),
+            ("rejected_output_reason", 10_000),
+            ("insufficient_evidence_reason", 10_000),
+        ):
+            if field in value:
+                _require_unicode_scalar_text(value[field], maximum=maximum)
+        if "owner_note" in required and (
+            not isinstance(value["owner_note"], str)
+            or (action_type != "update_owner_note" and not value["owner_note"])
+        ):
+            raise ValueError("owner_note is required")
+        if "duplicate_candidate_ids" in required:
+            duplicate_ids = value["duplicate_candidate_ids"]
+            if not isinstance(duplicate_ids, list) or not duplicate_ids:
+                raise ValueError("duplicate candidate IDs are required")
+            for duplicate_id in duplicate_ids:
+                _safe_id(duplicate_id)
+            if len(set(duplicate_ids)) != len(duplicate_ids):
+                raise ValueError("duplicate candidate IDs must be unique")
+        if "superseded_by_candidate_id" in required:
+            superseding_id = _safe_id(value["superseded_by_candidate_id"])
+            if superseding_id == value["candidate_id"]:
+                raise ValueError("candidate cannot supersede itself")
+    except (TypeError, ValueError) as exc:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid command field value",
+            error_code="REVIEW_ACTION_INVALID_FIELD",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=value,
+        ) from exc
+    return value
+
+
+def build_canonical_review_action_request_record(
+    validated_request: dict[str, Any],
+    *,
+    project_id: str,
+    queue_entry_id: str,
+) -> dict[str, Any]:
+    record = {
+        "request_schema_version": 1,
+        "project_id": project_id,
+        "queue_entry_id": queue_entry_id,
+        "candidate_id": validated_request["candidate_id"],
+        "action_type": validated_request["action_type"],
+        "actor": validated_request["actor"],
+        "owner_confirmed": validated_request["owner_confirmed"],
+        "preserve_candidate_linkage": validated_request[
+            "preserve_candidate_linkage"
+        ],
+        "preserve_evidence_provenance": validated_request[
+            "preserve_evidence_provenance"
+        ],
+        "expected_current_review_status": validated_request[
+            "expected_current_review_status"
+        ],
+        "expected_current_version": validated_request["expected_current_version"],
+        "target_review_status": validated_request.get("target_review_status"),
+        "duplicate_candidate_ids": deepcopy(
+            validated_request.get("duplicate_candidate_ids")
+        ),
+        "superseded_by_candidate_id": validated_request.get(
+            "superseded_by_candidate_id"
+        ),
+        "owner_note": validated_request.get("owner_note"),
+        "rationale": validated_request.get("rationale"),
+        "rejected_output_reason": validated_request.get("rejected_output_reason"),
+        "insufficient_evidence_reason": validated_request.get(
+            "insufficient_evidence_reason"
+        ),
+        "quarantine_note": validated_request.get("quarantine_note"),
+    }
+    if tuple(record) != _CANONICAL_REQUEST_FIELDS:
+        raise ValueError("invalid canonical request record")
+    return record
+
+
+def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
+    if not isinstance(record, dict) or set(record) != set(_CANONICAL_REQUEST_FIELDS):
+        raise ValueError("invalid canonical request record")
+    ordered = {field: deepcopy(record[field]) for field in _CANONICAL_REQUEST_FIELDS}
+    if ordered["request_schema_version"] != 1:
+        raise ValueError("invalid canonical request record")
+    for field in (
+        "project_id",
+        "queue_entry_id",
+        "candidate_id",
+        "action_type",
+        "actor",
+        "expected_current_review_status",
+    ):
+        value = ordered[field]
+        if not isinstance(value, str):
+            raise ValueError("invalid canonical request record")
+        _require_unicode_scalar_text(value, maximum=max(len(value), 1), allow_null=False)
+    for field in (
+        "owner_confirmed",
+        "preserve_candidate_linkage",
+        "preserve_evidence_provenance",
+    ):
+        if not isinstance(ordered[field], bool):
+            raise ValueError("invalid canonical request record")
+    version = ordered["expected_current_version"]
+    if (
+        isinstance(version, bool)
+        or not isinstance(version, int)
+        or not 0 <= version <= _MAX_REVIEW_VERSION
+    ):
+        raise ValueError("invalid canonical request record")
+    for field in (
+        "target_review_status",
+        "superseded_by_candidate_id",
+        "owner_note",
+        "rationale",
+        "rejected_output_reason",
+        "insufficient_evidence_reason",
+        "quarantine_note",
+    ):
+        value = ordered[field]
+        if value is not None:
+            if not isinstance(value, str):
+                raise ValueError("invalid canonical request record")
+            _require_unicode_scalar_text(value, maximum=max(len(value), 1), allow_null=False)
+    duplicate_ids = ordered["duplicate_candidate_ids"]
+    if duplicate_ids is not None:
+        if not isinstance(duplicate_ids, list):
+            raise ValueError("invalid canonical request record")
+        for item in duplicate_ids:
+            if not isinstance(item, str):
+                raise ValueError("invalid canonical request record")
+            _require_unicode_scalar_text(item, maximum=max(len(item), 1), allow_null=False)
+    return json.dumps(
+        ordered,
+        ensure_ascii=False,
+        allow_nan=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def hash_review_action_request(record: dict[str, Any]) -> str:
+    return hashlib.sha256(canonical_review_action_request_bytes(record)).hexdigest()
+
+
+def _transition_error(command: dict[str, Any], message: str) -> ReviewActionUnprocessable:
+    return _command_error(
+        ReviewActionUnprocessable,
+        message,
+        error_code="REVIEW_ACTION_INVALID_TRANSITION",
+        queue_entry_id=command.get("queue_entry_id"),
+        request=command,
+    )
+
+
+def compute_review_queue_transition(
+    queue_entry: dict[str, Any],
+    command: dict[str, Any],
+    *,
+    command_time: str,
+) -> dict[str, Any]:
+    try:
+        source = review_queue_storage.validate_review_queue_entry(queue_entry)
+    except (TypeError, ValueError) as exc:
+        raise _transition_error(command, "invalid source queue entry") from exc
+    action = command["action_type"]
+    source_pair = (source["review_status"], source["lifecycle_state"])
+    if source_pair not in _COMMAND_ALLOWED_SOURCE_PAIRS[action]:
+        raise _transition_error(command, "command is not allowed from current state")
+    if source["review_version"] >= _MAX_REVIEW_VERSION:
+        raise _transition_error(command, "review version overflow")
+
+    target = deepcopy(source)
+    state_change = action not in {"mark_reviewed", "update_owner_note"}
+    if action == "set_review_status":
+        target_status = command["target_review_status"]
+        if source_pair == ("archived", "archived_without_promotion") and target_status != "pending":
+            raise _transition_error(command, "archived entries may only reopen to pending")
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            target_status
+        ]
+    elif action == "request_more_evidence":
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            "needs_info"
+        ]
+    elif action == "defer":
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            "deferred"
+        ]
+    elif action == "reject":
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            "rejected"
+        ]
+    elif action == "quarantine":
+        target["review_status"], target["lifecycle_state"] = (
+            "needs_info",
+            "blocked_invalid_support",
+        )
+
+    if state_change:
+        previous_pair = source_pair
+        target_pair = (target["review_status"], target["lifecycle_state"])
+        for field in (
+            "duplicate_candidate_ids",
+            "superseded_by_candidate_id",
+            "rejected_output_reason",
+            "insufficient_evidence_reason",
+            "quarantine_note",
+        ):
+            target[field] = None
+        target["owner_review_completed"] = False
+        target["owner_reviewed_at"] = None
+
+        if target_pair == ("needs_info", "needs_more_evidence"):
+            supplied = command.get("insufficient_evidence_reason")
+            if supplied is not None:
+                target["insufficient_evidence_reason"] = supplied
+            elif previous_pair == target_pair:
+                target["insufficient_evidence_reason"] = source.get(
+                    "insufficient_evidence_reason"
+                )
+        elif target_pair == ("needs_info", "blocked_invalid_support"):
+            supplied = command.get("quarantine_note")
+            if supplied is not None:
+                target["quarantine_note"] = supplied
+            elif previous_pair == target_pair:
+                target["quarantine_note"] = source.get("quarantine_note")
+        elif target_pair == ("rejected", "owner_reviewed_rejected"):
+            supplied = command.get("rejected_output_reason")
+            if supplied is not None:
+                target["rejected_output_reason"] = supplied
+            elif previous_pair == target_pair:
+                target["rejected_output_reason"] = source.get(
+                    "rejected_output_reason"
+                )
+        elif target_pair == ("duplicate", "duplicate_candidate"):
+            target["duplicate_candidate_ids"] = deepcopy(
+                command["duplicate_candidate_ids"]
+            )
+        elif target_pair == ("superseded", "superseded_candidate"):
+            target["superseded_by_candidate_id"] = command[
+                "superseded_by_candidate_id"
+            ]
+
+    if action == "mark_reviewed":
+        target["owner_review_completed"] = True
+        target["owner_reviewed_at"] = command_time
+    if "owner_note" in command and command["owner_note"] is not None:
+        if action == "update_owner_note" and command["owner_note"] == "":
+            target["owner_note"] = None
+        else:
+            target["owner_note"] = command["owner_note"]
+    if command.get("rationale") is not None:
+        target["rationale"] = command["rationale"]
+
+    target["review_version"] = source["review_version"] + 1
+    target["updated_at"] = command_time
+    try:
+        return review_queue_storage.validate_review_queue_entry(target)
+    except (TypeError, ValueError) as exc:
+        raise _transition_error(command, "computed target queue entry is invalid") from exc
+
+
+def _canonical_queue_bytes(queue_entry: dict[str, Any]) -> bytes:
+    validated = review_queue_storage.validate_review_queue_entry(queue_entry)
+    return apply_contract.canonical_json_bytes(validated)
+
+
+def _canonical_queue_hash(queue_entry: dict[str, Any]) -> str:
+    return hashlib.sha256(_canonical_queue_bytes(queue_entry)).hexdigest()
+
+
+def _linked_candidate_bytes_and_hash(
+    queue_entry: dict[str, Any], *, project_dir: Path
+) -> tuple[bytes, str]:
+    candidate_id = queue_entry["candidate_record_id"]
+    candidate = candidate_persistence.read_candidate_record(project_dir, candidate_id)
+    if (
+        candidate.get("candidate_id") != candidate_id
+        or candidate.get("project_id") != queue_entry["project_id"]
+    ):
+        raise ValueError("candidate linkage mismatch")
+    raw = apply_contract.canonical_json_bytes(candidate)
+    return raw, hashlib.sha256(raw).hexdigest()
+
+
+def _evidence_provenance_projection_hash(queue_entry: dict[str, Any]) -> str:
+    projection = {
+        field: deepcopy(queue_entry[field])
+        for field in _EVIDENCE_PROVENANCE_PROJECTION_FIELDS
+    }
+    return hashlib.sha256(apply_contract.canonical_json_bytes(projection)).hexdigest()
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds").replace(
+        "+00:00", "Z"
+    )
+
+
+def _read_current_queue_state(
+    *, project_dir: Path, queue_entry_id: str
+) -> tuple[dict[str, Any] | None, str | None]:
+    try:
+        queue_entry = review_queue_storage.read_review_queue_entry(
+            queue_entry_id, project_dir=project_dir
+        )
+    except (OSError, TypeError, ValueError):
+        return None, None
+    return queue_entry, _canonical_queue_hash(queue_entry)
+
+
+def _action_parts(
+    chain: list[dict[str, Any]], intent: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    index = chain.index(intent)
+    terminal = chain[index + 1] if index + 1 < len(chain) else None
+    if terminal is not None and terminal.get("intent_event_hash") != intent["event_hash"]:
+        terminal = None
+    if terminal is not None and terminal["event_type"] == "action_failed":
+        recovery = chain[index + 2] if index + 2 < len(chain) else None
+        if recovery is not None and recovery.get("intent_event_hash") == intent["event_hash"]:
+            terminal = recovery
+    return intent, terminal
+
+
+def _classify_existing_action(
+    chain: list[dict[str, Any]],
+    intent: dict[str, Any],
+    current_queue_hash: str | None,
+) -> tuple[str, dict[str, Any] | None]:
+    index = chain.index(intent)
+    next_event = chain[index + 1] if index + 1 < len(chain) else None
+    if next_event is None or next_event.get("intent_event_hash") != intent["event_hash"]:
+        if current_queue_hash == intent["queue_before_hash"]:
+            return "R1", None
+        if current_queue_hash == intent["target_queue_hash"]:
+            return "R2", None
+        return "R3", None
+    if next_event["event_type"] == "action_failed":
+        if not next_event["retryable"]:
+            return "R6", next_event
+        recovery = chain[index + 2] if index + 2 < len(chain) else None
+        if recovery is not None and recovery.get("intent_event_hash") == intent["event_hash"]:
+            if current_queue_hash == intent["target_queue_hash"]:
+                return "R7", recovery
+            return "R8", recovery
+        if current_queue_hash == intent["queue_before_hash"]:
+            return "R4", next_event
+        if current_queue_hash == intent["target_queue_hash"]:
+            return "R5", next_event
+        return "R6", next_event
+    if next_event["event_type"] == "action_completed":
+        if current_queue_hash == intent["target_queue_hash"]:
+            return "R7", next_event
+        return "R8", next_event
+    raise ValueError("invalid action event path")
+
+
+def _manual_failure(
+    message: str,
+    *,
+    error_code: str,
+    intent: dict[str, Any] | None,
+    extra: dict[str, Any] | None = None,
+) -> ReviewActionPersistenceFailure:
+    details = {"manual_recovery_required": True}
+    if intent is not None:
+        details["action_id"] = intent["action_id"]
+    if extra:
+        details.update(extra)
+    request = None
+    if intent is not None:
+        request = {
+            "action_type": intent["action_command"],
+            "candidate_id": intent["candidate_record_id"],
+        }
+    return _command_error(
+        ReviewActionPersistenceFailure,
+        message,
+        error_code=error_code,
+        project_id=intent.get("project_id") if intent else None,
+        queue_entry_id=intent.get("queue_entry_id") if intent else None,
+        request=request,
+        extra=details,
+    )
+
+
+def _decode_intent_target(intent: dict[str, Any]) -> dict[str, Any]:
+    encoded = intent["target_queue_canonical_bytes_b64url"]
+    padding = "=" * (-len(encoded) % 4)
+    try:
+        raw = base64.b64decode(encoded + padding, altchars=b"-_", validate=True)
+        loaded = apply_contract.strict_json_loads(raw, max_bytes=4_194_304)
+        target = review_queue_storage.validate_review_queue_entry(loaded)
+    except (OSError, TypeError, ValueError) as exc:
+        raise _manual_failure(
+            "persisted action target is invalid",
+            error_code="REVIEW_ACTION_INTENT_INTEGRITY_FAILURE",
+            intent=intent,
+        ) from exc
+    if (
+        apply_contract.canonical_json_bytes(target) != raw
+        or hashlib.sha256(raw).hexdigest() != intent["target_queue_hash"]
+    ):
+        raise _manual_failure(
+            "persisted action target is invalid",
+            error_code="REVIEW_ACTION_INTENT_INTEGRITY_FAILURE",
+            intent=intent,
+        )
+    return target
+
+
+def _verify_after_hashes(
+    intent: dict[str, Any], *, project_dir: Path
+) -> tuple[dict[str, Any], str, str]:
+    queue_entry, queue_hash = _read_current_queue_state(
+        project_dir=project_dir, queue_entry_id=intent["queue_entry_id"]
+    )
+    if queue_entry is None or queue_hash != intent["target_queue_hash"]:
+        raise _manual_failure(
+            "target queue integrity verification failed",
+            error_code="REVIEW_ACTION_QUEUE_INTEGRITY_FAILURE",
+            intent=intent,
+        )
+    try:
+        _, candidate_hash = _linked_candidate_bytes_and_hash(
+            queue_entry, project_dir=project_dir
+        )
+        projection_hash = _evidence_provenance_projection_hash(queue_entry)
+    except (OSError, TypeError, ValueError) as exc:
+        raise _manual_failure(
+            "candidate or evidence integrity verification failed",
+            error_code="REVIEW_ACTION_TERMINAL_INTEGRITY_FAILURE",
+            intent=intent,
+        ) from exc
+    if (
+        candidate_hash != intent["candidate_before_hash"]
+        or projection_hash != intent["evidence_projection_before_hash"]
+    ):
+        raise _manual_failure(
+            "candidate or evidence integrity verification failed",
+            error_code="REVIEW_ACTION_TERMINAL_INTEGRITY_FAILURE",
+            intent=intent,
+        )
+    return queue_entry, candidate_hash, projection_hash
+
+
+def _build_success_response(
+    intent: dict[str, Any],
+    completion: dict[str, Any],
+    queue_entry: dict[str, Any],
+    *,
+    replay: bool,
+) -> dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "status": "accepted",
+        "replay": replay,
+        "action_command": intent["action_command"],
+        "action_id": intent["action_id"],
+        "project_id": intent["project_id"],
+        "queue_entry_id": intent["queue_entry_id"],
+        "candidate_id": intent["candidate_record_id"],
+        "review_status": queue_entry["review_status"],
+        "lifecycle_state": queue_entry["lifecycle_state"],
+        "review_version": queue_entry["review_version"],
+        "owner_review_completed": queue_entry["owner_review_completed"],
+        "owner_reviewed_at": queue_entry["owner_reviewed_at"],
+        "owner_note": queue_entry.get("owner_note"),
+        "rationale": queue_entry.get("rationale"),
+        "completion_event_hash": completion["event_hash"],
+        "review_workflow_state": {
+            "is_canon": False,
+            "apply_promotion_performed": False,
+            "memory_canon_mutation_performed": False,
+            "project_truth_mutation_performed": False,
+            "raw_artifact_persistence_performed": False,
+            "runtime_extraction_performed": False,
+            "model_call_performed": False,
+            "generated_prose_performed": False,
+            "training_artifact_performed": False,
+        },
+        "warnings": [
+            "accepted as review workflow state only; not canon and no promotion performed"
+        ],
+        "errors": [],
+    }
+
+
+def _publish_completion(
+    intent: dict[str, Any],
+    *,
+    project_dir: Path,
+    failed: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    queue_entry, candidate_hash, projection_hash = _verify_after_hashes(
+        intent, project_dir=project_dir
+    )
+    completed_at = _utc_now()
+    if failed is None:
+        completion = review_action_events.build_action_completed_event_v1(
+            intent=intent,
+            queue_after_hash=intent["target_queue_hash"],
+            candidate_after_hash=candidate_hash,
+            evidence_projection_after_hash=projection_hash,
+            completed_at=completed_at,
+        )
+    else:
+        completion = review_action_events.build_action_recovery_completed_event_v1(
+            intent=intent,
+            failed=failed,
+            queue_after_hash=intent["target_queue_hash"],
+            candidate_after_hash=candidate_hash,
+            evidence_projection_after_hash=projection_hash,
+            completed_at=completed_at,
+        )
+    try:
+        published = review_action_events.publish_review_action_event(
+            completion,
+            project_dir=project_dir,
+            queue_entry_id=intent["queue_entry_id"],
+        )
+    except Exception as exc:
+        raise _command_error(
+            ReviewActionPersistenceFailure,
+            "completion event publication failed",
+            error_code="REVIEW_ACTION_COMPLETION_WRITE_FAILED",
+            project_id=intent["project_id"],
+            queue_entry_id=intent["queue_entry_id"],
+            request={
+                "action_type": intent["action_command"],
+                "candidate_id": intent["candidate_record_id"],
+            },
+        ) from exc
+    return queue_entry, published
+
+
+def _recover_r1(intent: dict[str, Any], *, project_dir: Path) -> dict[str, Any]:
+    target = _decode_intent_target(intent)
+    try:
+        review_queue_storage.replace_review_queue_entry_atomic(
+            target, project_dir=project_dir
+        )
+    except Exception as exc:
+        _publish_queue_write_failure(intent, exc, project_dir=project_dir)
+    queue_entry, completion = _publish_completion(intent, project_dir=project_dir)
+    return _build_success_response(intent, completion, queue_entry, replay=True)
+
+
+def _recover_r2(intent: dict[str, Any], *, project_dir: Path) -> dict[str, Any]:
+    _decode_intent_target(intent)
+    queue_entry, completion = _publish_completion(intent, project_dir=project_dir)
+    return _build_success_response(intent, completion, queue_entry, replay=True)
+
+
+def _recover_r4(
+    intent: dict[str, Any], failed: dict[str, Any], *, project_dir: Path
+) -> dict[str, Any]:
+    target = _decode_intent_target(intent)
+    try:
+        review_queue_storage.replace_review_queue_entry_atomic(
+            target, project_dir=project_dir
+        )
+    except Exception as exc:
+        raise _manual_failure(
+            "retryable queue recovery write failed",
+            error_code="REVIEW_ACTION_RECOVERY_WRITE_FAILED",
+            intent=intent,
+        ) from exc
+    queue_entry, completion = _publish_completion(
+        intent, failed=failed, project_dir=project_dir
+    )
+    return _build_success_response(intent, completion, queue_entry, replay=True)
+
+
+def _recover_r5(
+    intent: dict[str, Any], failed: dict[str, Any], *, project_dir: Path
+) -> dict[str, Any]:
+    _decode_intent_target(intent)
+    queue_entry, completion = _publish_completion(
+        intent, failed=failed, project_dir=project_dir
+    )
+    return _build_success_response(intent, completion, queue_entry, replay=True)
+
+
+def _return_r6(
+    intent: dict[str, Any], failed: dict[str, Any] | None
+) -> None:
+    extra = {"recovery_state": "R6"}
+    if failed is not None:
+        extra.update(
+            {
+                "failure_reason": failed.get("failure_reason"),
+                "retryable": failed.get("retryable"),
+                "failure_event_hash": failed.get("event_hash"),
+            }
+        )
+    raise _manual_failure(
+        "review action requires manual recovery",
+        error_code="REVIEW_ACTION_MANUAL_RECOVERY_REQUIRED",
+        intent=intent,
+        extra=extra,
+    )
+
+
+def _return_r7_replay(
+    intent: dict[str, Any], completion: dict[str, Any], *, project_dir: Path
+) -> dict[str, Any]:
+    queue_entry, candidate_hash, projection_hash = _verify_after_hashes(
+        intent, project_dir=project_dir
+    )
+    if (
+        completion["queue_after_hash"] != intent["target_queue_hash"]
+        or completion["candidate_after_hash"] != candidate_hash
+        or completion["evidence_projection_after_hash"] != projection_hash
+    ):
+        raise _manual_failure(
+            "completion integrity verification failed",
+            error_code="REVIEW_ACTION_TERMINAL_INTEGRITY_FAILURE",
+            intent=intent,
+        )
+    return _build_success_response(intent, completion, queue_entry, replay=True)
+
+
+def _return_r8(
+    intent: dict[str, Any],
+    completion: dict[str, Any],
+    current_queue_hash: str | None,
+) -> None:
+    raise _manual_failure(
+        "completed review action queue state does not match its durable target",
+        error_code="REVIEW_ACTION_POST_COMPLETION_INTEGRITY_FAILURE",
+        intent=intent,
+        extra={
+            "completion_event_hash": completion["event_hash"],
+            "expected_queue_hash": intent["target_queue_hash"],
+            "observed_queue_hash": current_queue_hash,
+        },
+    )
+
+
+def _return_r9(
+    *, project_id: str, queue_entry_id: str, request: dict[str, Any]
+) -> None:
+    raise _command_error(
+        ReviewActionPersistenceFailure,
+        "review action event chain is corrupt",
+        error_code="REVIEW_ACTION_EVENT_CHAIN_CORRUPT",
+        project_id=project_id,
+        queue_entry_id=queue_entry_id,
+        request=request,
+        extra={"manual_recovery_required": True, "recovery_state": "R9"},
+    )
+
+
+def _publish_queue_write_failure(
+    intent: dict[str, Any], failure: Exception, *, project_dir: Path
+) -> None:
+    queue_entry, observed_hash = _read_current_queue_state(
+        project_dir=project_dir, queue_entry_id=intent["queue_entry_id"]
+    )
+    if queue_entry is not None and observed_hash == intent["queue_before_hash"]:
+        reason, retryable = "QUEUE_WRITE_FAILED", True
+    elif queue_entry is not None and observed_hash == intent["target_queue_hash"]:
+        reason, retryable = "QUEUE_WRITE_PARTIAL", True
+    else:
+        reason, retryable = "QUEUE_STATE_CORRUPT", False
+    detail = "atomic queue replacement failed ({0})".format(
+        type(failure).__name__
+    )[:2000]
+    failed = review_action_events.build_action_failed_event_v1(
+        intent=intent,
+        failure_reason=reason,
+        failure_detail=detail,
+        observed_queue_hash=observed_hash,
+        retryable=retryable,
+        failed_at=_utc_now(),
+    )
+    try:
+        review_action_events.publish_review_action_event(
+            failed,
+            project_dir=project_dir,
+            queue_entry_id=intent["queue_entry_id"],
+        )
+    except Exception as exc:
+        raise _command_error(
+            ReviewActionPersistenceFailure,
+            "queue write and failure-event publication failed",
+            error_code="REVIEW_ACTION_FAILURE_EVENT_WRITE_FAILED",
+            project_id=intent["project_id"],
+            queue_entry_id=intent["queue_entry_id"],
+            request={
+                "action_type": intent["action_command"],
+                "candidate_id": intent["candidate_record_id"],
+            },
+        ) from exc
+    raise _command_error(
+        ReviewActionPersistenceFailure,
+        "queue replacement failed",
+        error_code=reason,
+        project_id=intent["project_id"],
+        queue_entry_id=intent["queue_entry_id"],
+        request={
+            "action_type": intent["action_command"],
+            "candidate_id": intent["candidate_record_id"],
+        },
+        extra={
+            "manual_recovery_required": not retryable,
+            "retryable": retryable,
+            "observed_queue_hash": observed_hash,
+        },
+    )
+
+
+def _enforce_chain_head_health(
+    chain: list[dict[str, Any]],
+    current_queue_hash: str | None,
+    *,
+    project_dir: Path,
+) -> None:
+    if not chain:
+        return
+    intent = next(
+        (event for event in reversed(chain) if event["event_type"] == "action_intent"),
+        None,
+    )
+    if intent is None:
+        raise ValueError("event chain has no intent")
+    state, terminal = _classify_existing_action(chain, intent, current_queue_hash)
+    if state == "R7":
+        _return_r7_replay(intent, terminal, project_dir=project_dir)
+        return
+    if state == "R8":
+        _return_r8(intent, terminal, current_queue_hash)
+    raise _manual_failure(
+        "an earlier review action is unresolved",
+        error_code="REVIEW_ACTION_PRIOR_ACTION_UNRESOLVED",
+        intent=intent,
+        extra={"recovery_state": state},
+    )
 
 
 def execute_review_action_command(
@@ -684,61 +1769,297 @@ def execute_review_action_command(
     *,
     project_id: str,
     queue_entry_id: str,
+    project_dir: Path,
+    trusted_runtime_dir: Path,
 ) -> dict[str, Any]:
+    valid = validate_review_action_command_request(
+        request, project_id=project_id, queue_entry_id=queue_entry_id
+    )
+    record = build_canonical_review_action_request_record(
+        valid, project_id=project_id, queue_entry_id=queue_entry_id
+    )
+    request_hash = hash_review_action_request(record)
+    if not isinstance(project_dir, Path) or not isinstance(trusted_runtime_dir, Path):
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid injected path",
+            error_code="REVIEW_ACTION_INVALID_PATH",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=valid,
+        )
     try:
-        valid = validate_review_action_command_request(
-            request,
+        resolved_project_dir = project_dir.resolve(strict=True)
+    except OSError as exc:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid project directory",
+            error_code="REVIEW_ACTION_INVALID_PATH",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=valid,
+        ) from exc
+    if (
+        resolved_project_dir != project_dir
+        or not resolved_project_dir.is_dir()
+        or not (resolved_project_dir / "project.json").is_file()
+    ):
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "invalid project directory",
+            error_code="REVIEW_ACTION_INVALID_PATH",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=valid,
+        )
+
+    try:
+        lock = review_action_events.acquire_review_action_lock(
+            trusted_runtime_dir=trusted_runtime_dir,
             project_id=project_id,
             queue_entry_id=queue_entry_id,
         )
-    except ReviewActionCommandRejected as exc:
-        body = request if isinstance(request, dict) else {}
-        action_type = body.get("action_type") if isinstance(body, dict) else None
-        candidate_id = body.get("candidate_id") if isinstance(body, dict) else None
-        raise ReviewActionCommandRejected(
-            _review_action_rejection_response(
+        with lock:
+            try:
+                chain = review_action_events.scan_review_action_event_chain(
+                    project_dir=resolved_project_dir,
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                )
+            except (OSError, TypeError, ValueError):
+                _return_r9(
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                )
+
+            queue_entry, queue_hash = _read_current_queue_state(
+                project_dir=resolved_project_dir, queue_entry_id=queue_entry_id
+            )
+            existing_intent = next(
+                (
+                    event
+                    for event in chain
+                    if event["event_type"] == "action_intent"
+                    and event["idempotency_key"] == valid["idempotency_key"]
+                ),
+                None,
+            )
+            if existing_intent is not None:
+                if existing_intent["request_hash"] != request_hash:
+                    raise _command_error(
+                        ReviewActionConflict,
+                        "idempotency key was already used for another request",
+                        error_code="REVIEW_ACTION_IDEMPOTENCY_CONFLICT",
+                        project_id=project_id,
+                        queue_entry_id=queue_entry_id,
+                        request=valid,
+                    )
+                state, terminal = _classify_existing_action(
+                    chain, existing_intent, queue_hash
+                )
+                if state == "R1":
+                    return _recover_r1(existing_intent, project_dir=resolved_project_dir)
+                if state == "R2":
+                    return _recover_r2(existing_intent, project_dir=resolved_project_dir)
+                if state == "R3":
+                    failed = review_action_events.build_action_failed_event_v1(
+                        intent=existing_intent,
+                        failure_reason="QUEUE_STATE_CORRUPT",
+                        failure_detail="intent-only queue state is missing, invalid, or unexpected",
+                        observed_queue_hash=queue_hash,
+                        retryable=False,
+                        failed_at=_utc_now(),
+                    )
+                    try:
+                        review_action_events.publish_review_action_event(
+                            failed,
+                            project_dir=resolved_project_dir,
+                            queue_entry_id=queue_entry_id,
+                        )
+                    except Exception as exc:
+                        raise _command_error(
+                            ReviewActionPersistenceFailure,
+                            "R3 failure event publication failed",
+                            error_code="REVIEW_ACTION_FAILURE_EVENT_WRITE_FAILED",
+                            project_id=project_id,
+                            queue_entry_id=queue_entry_id,
+                            request=valid,
+                        ) from exc
+                    raise _manual_failure(
+                        "intent-only queue state requires manual recovery",
+                        error_code="REVIEW_ACTION_MANUAL_RECOVERY_REQUIRED",
+                        intent=existing_intent,
+                        extra={
+                            "recovery_state": "R3",
+                            "failure_reason": failed["failure_reason"],
+                            "failure_event_hash": failed["event_hash"],
+                            "retryable": False,
+                        },
+                    )
+                if state == "R4":
+                    return _recover_r4(
+                        existing_intent, terminal, project_dir=resolved_project_dir
+                    )
+                if state == "R5":
+                    return _recover_r5(
+                        existing_intent, terminal, project_dir=resolved_project_dir
+                    )
+                if state == "R6":
+                    _return_r6(existing_intent, terminal)
+                if state == "R7":
+                    return _return_r7_replay(
+                        existing_intent, terminal, project_dir=resolved_project_dir
+                    )
+                if state == "R8":
+                    _return_r8(existing_intent, terminal, queue_hash)
+
+            _enforce_chain_head_health(
+                chain, queue_hash, project_dir=resolved_project_dir
+            )
+            if queue_entry is None:
+                entry_path = review_queue_storage.review_queue_entry_path(
+                    resolved_project_dir, queue_entry_id
+                )
+                error_type = (
+                    ReviewActionNotFound
+                    if not entry_path.exists()
+                    else ReviewActionPersistenceFailure
+                )
+                raise _command_error(
+                    error_type,
+                    "queue entry was not found"
+                    if error_type is ReviewActionNotFound
+                    else "persisted queue entry is invalid",
+                    error_code="REVIEW_ACTION_QUEUE_ENTRY_NOT_FOUND"
+                    if error_type is ReviewActionNotFound
+                    else "REVIEW_ACTION_QUEUE_STATE_INVALID",
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                )
+            if queue_entry.get("project_id") != project_id:
+                raise _command_error(
+                    ReviewActionUnprocessable,
+                    "queue/project linkage mismatch",
+                    error_code="REVIEW_ACTION_INVALID_LINKAGE",
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                )
+            if queue_entry.get("candidate_record_id") != valid["candidate_id"]:
+                raise _command_error(
+                    ReviewActionUnprocessable,
+                    "queue/candidate linkage mismatch",
+                    error_code="REVIEW_ACTION_INVALID_LINKAGE",
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                )
+            if (
+                queue_entry["review_status"]
+                != valid["expected_current_review_status"]
+                or queue_entry["review_version"] != valid["expected_current_version"]
+            ):
+                raise _command_error(
+                    ReviewActionConflict,
+                    "stale review status or version",
+                    error_code="REVIEW_ACTION_STALE_STATE",
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                )
+            try:
+                _, candidate_hash = _linked_candidate_bytes_and_hash(
+                    queue_entry, project_dir=resolved_project_dir
+                )
+                projection_hash = _evidence_provenance_projection_hash(queue_entry)
+            except (OSError, TypeError, ValueError) as exc:
+                raise _command_error(
+                    ReviewActionUnprocessable,
+                    "linked candidate or evidence provenance is invalid",
+                    error_code="REVIEW_ACTION_INVALID_LINKAGE",
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                ) from exc
+
+            command_time = _utc_now()
+            target = compute_review_queue_transition(
+                queue_entry, valid, command_time=command_time
+            )
+            target_bytes = _canonical_queue_bytes(target)
+            target_hash = hashlib.sha256(target_bytes).hexdigest()
+            action_id = "rvact_" + uuid.uuid4().hex
+            intent = review_action_events.build_action_intent_event_v1(
+                sequence=len(chain) + 1,
+                previous_event_hash=chain[-1]["event_hash"] if chain else None,
                 project_id=project_id,
                 queue_entry_id=queue_entry_id,
-                candidate_id=candidate_id,
-                action_type=action_type,
-                reason=str(exc),
-            ),
-            status_code=exc.status_code,
+                candidate_record_id=valid["candidate_id"],
+                action_command=valid["action_type"],
+                action_id=action_id,
+                idempotency_key=valid["idempotency_key"],
+                request_hash=request_hash,
+                created_at=command_time,
+                queue_before_hash=queue_hash,
+                target_queue_canonical_bytes_b64url=base64.urlsafe_b64encode(
+                    target_bytes
+                ).rstrip(b"=").decode("ascii"),
+                target_queue_hash=target_hash,
+                candidate_before_hash=candidate_hash,
+                evidence_projection_before_hash=projection_hash,
+                predecessor=chain[-1] if chain else None,
+            )
+            try:
+                intent = review_action_events.publish_review_action_event(
+                    intent,
+                    project_dir=resolved_project_dir,
+                    queue_entry_id=queue_entry_id,
+                )
+            except Exception as exc:
+                raise _command_error(
+                    ReviewActionPersistenceFailure,
+                    "intent event publication failed",
+                    error_code="REVIEW_ACTION_INTENT_WRITE_FAILED",
+                    project_id=project_id,
+                    queue_entry_id=queue_entry_id,
+                    request=valid,
+                ) from exc
+            try:
+                review_queue_storage.replace_review_queue_entry_atomic(
+                    target, project_dir=resolved_project_dir
+                )
+            except Exception as exc:
+                _publish_queue_write_failure(
+                    intent, exc, project_dir=resolved_project_dir
+                )
+            persisted, completion = _publish_completion(
+                intent, project_dir=resolved_project_dir
+            )
+            return _build_success_response(
+                intent, completion, persisted, replay=False
+            )
+    except BlockingIOError as exc:
+        raise _command_error(
+            ReviewActionLockUnavailable,
+            "review action lock is unavailable",
+            error_code="REVIEW_ACTION_LOCK_UNAVAILABLE",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=valid,
         ) from exc
-    review_status = _review_status_for_action(valid)
-    return {
-        "schema_version": SCHEMA_VERSION,
-        "status": "accepted",
-        "action_type": valid["action_type"],
-        "project_id": project_id,
-        "queue_entry_id": queue_entry_id,
-        "candidate_id": valid["candidate_id"],
-        "review_workflow_state": {
-            "review_status": review_status,
-            "owner_note": valid.get("owner_note"),
-            "is_canon": False,
-            _blocked_marker("apply_", "promotion_performed"): False,
-            "memory_canon_mutation_performed": False,
-            "project_truth_mutation_performed": False,
-            "raw_artifact_persistence_performed": False,
-            "runtime_extraction_performed": False,
-            "model_call_performed": False,
-            _blocked_marker("generated_", "prose_performed"): False,
-            "training_artifact_performed": False,
-        },
-        "evidence_provenance": {
-            "source_locator": {
-                "project_id": project_id,
-                "queue_entry_id": queue_entry_id,
-                "candidate_id": valid["candidate_id"],
-            },
-            "preserve_evidence_provenance": True,
-        },
-        "warnings": [
-            "accepted as review workflow state only; not canon and no promotion performed"
-        ],
-        "errors": [],
-    }
+    except ReviewActionCommandError:
+        raise
+    except (OSError, TypeError, ValueError) as exc:
+        raise _command_error(
+            ReviewActionPersistenceFailure,
+            "review action runtime or persistence integrity failure",
+            error_code="REVIEW_ACTION_PERSISTENCE_FAILURE",
+            project_id=project_id,
+            queue_entry_id=queue_entry_id,
+            request=valid,
+        ) from exc
 
 
 def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
