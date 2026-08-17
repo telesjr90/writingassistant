@@ -66,7 +66,7 @@ def read_source(path: Path) -> str:
 
 
 def source_without_t005_apply_promotion(source: str) -> str:
-    """Remove the T005-approved helper from older workspace source guards."""
+    """Remove the accepted guarded apply-promotion surface from legacy guards."""
     stripped = source
     ranges = [
         (
@@ -78,7 +78,11 @@ def source_without_t005_apply_promotion(source: str) -> str:
             "function compactStringField",
         ),
         (
-            "export async function submitApplyPromotion",
+            "export class ApplyPromotionContractError",
+            "export async function fetchReviewQueueEntries",
+        ),
+        (
+            "export async function getApplyPromotionContract",
             "export async function submitReviewQueueAction",
         ),
     ]
@@ -90,11 +94,39 @@ def source_without_t005_apply_promotion(source: str) -> str:
     return stripped
 
 
+def source_without_truthful_safety_negations(source: str) -> str:
+    """Exclude exact non-executable safety copy from legacy positive-word scans."""
+    stripped = re.sub(
+        r"runtime_extraction_status\s*:\s*['\"]runtime extraction unavailable['\"]",
+        "",
+        source,
+    )
+    for accepted_negation in (
+        "not canon, memory, training data, or approved truth",
+        "output cannot become approved memory automatically",
+    ):
+        stripped = stripped.replace(accepted_negation, "")
+    return re.sub(
+        r"does not extract characters,\s*locations,\s*timeline,\s*or other story facts",
+        "",
+        stripped,
+        flags=re.IGNORECASE,
+    )
+
+
 def read_source_for_legacy_workspace_guard(path: Path) -> str:
-    source = read_source(path)
+    source = source_without_truthful_safety_negations(read_source(path))
     if path == API_JS:
         return source_without_t005_apply_promotion(source)
     return source
+
+
+def jsx_self_closing_invocation(source: str, component_name: str) -> str:
+    """Return one explicitly named self-closing JSX invocation."""
+    marker = f"<{component_name}"
+    start = source.index(marker)
+    end = source.index("/>", start) + len("/>")
+    return source[start:end]
 
 
 @pytest.fixture(scope="module")
@@ -295,6 +327,36 @@ class TestApiProjectHelpers:
         body = match.group(0)
         assert "project_id" not in body
 
+    def test_apply_promotion_is_reference_only_and_owner_confirmed(
+        self, api_source: str
+    ) -> None:
+        request_builder = api_source.split(
+            "export function buildReferenceOnlyApplyPromotionRequest",
+            1,
+        )[1].split("export async function submitApplyPromotion", 1)[0]
+        submit_helper = api_source.split(
+            "export async function submitApplyPromotion",
+            1,
+        )[1].split("export function classifyApplyPromotionFailure", 1)[0]
+
+        for required_field in (
+            "promotion_id:",
+            "revision,",
+            "sealed_contract_hash:",
+            "before_state_snapshot_token:",
+            "challenge_id:",
+            "challenge_response:",
+            "final_confirmation:",
+            "idempotency_key:",
+        ):
+            assert required_field in request_builder
+        assert "confirmed: true" in request_builder
+        assert "method: 'explicit_final_apply_confirmation'" in request_builder
+        assert "buildReferenceOnlyApplyPromotionRequest(input)" in submit_helper
+        assert "client.post(`/projects/${projectId}/apply-promotion`, requestPayload)" in (
+            submit_helper
+        )
+
     @pytest.mark.parametrize(
         "function_name",
         [
@@ -381,24 +443,28 @@ class TestAppActiveProjectState:
     @pytest.mark.parametrize(
         "api_call_pattern",
         [
-            r"fetchScenes\(activeProjectId\)",
-            r"fetchBible\(activeProjectId\)",
-            r"fetchStoryform\(activeProjectId\)",
-            r"fetchStoryformContext\(activeProjectId\)",
-            r"getOMI\(activeProjectId\)",
+            r"fetchScenes\(capturedProjectId\)",
+            r"fetchBible\(capturedProjectId\)",
+            r"fetchStoryform\(capturedProjectId\)",
+            r"fetchStoryformContext\(capturedProjectId\)",
+            r"getOMI\(capturedProjectId\)",
             r"fetchScene\([^,]+,\s*activeProjectId\)",
             r"saveScene\([^,]+,\s*[^,]+,\s*activeProjectId\)",
             r"saveBible\([^,]+,\s*activeProjectId\)",
-            r"saveStoryform\([^,]+,\s*activeProjectId\)",
-            r"runStoryCheck\([^,]+,\s*activeProjectId\)",
+            r"saveStoryform\([^,]+,\s*(?:activeProjectId|\w+Guard\.session\.projectId)\)",
+            r"runStoryCheckForSelectedSource\(\{\s*projectId:\s*(?:activeProjectId|capturedProjectId|\w+Guard\.session\.projectId)",
         ],
     )
-    def test_project_scoped_api_calls_use_active_project_id(
+    def test_project_scoped_api_calls_use_selected_or_captured_project_identity(
         self, app_source: str, api_call_pattern: str
     ) -> None:
         assert re.search(api_call_pattern, app_source), (
-            f"Expected activeProjectId usage matching /{api_call_pattern}/"
+            f"Expected selected/captured project scoping matching /{api_call_pattern}/"
         )
+
+        if "capturedProjectId" in api_call_pattern:
+            assert "const capturedProjectId = activeProjectId" in app_source
+            assert "currentProjectIdRef.current !== capturedProjectId" in app_source
 
     def test_unsaved_confirmation_before_project_create(self, app_source: str) -> None:
         assert "UNSAVED_PROJECT_CREATE_MESSAGE" in app_source
@@ -435,10 +501,28 @@ class TestAppActiveProjectState:
 
         assert "Promise.allSettled" in initial_load_block
         assert "Promise.all([" not in initial_load_block
+        for scoped_list_call in (
+            "fetchScenes(capturedProjectId)",
+            "fetchNotes(capturedProjectId)",
+            "fetchMaterials(capturedProjectId)",
+            "getOMI(capturedProjectId)",
+        ):
+            assert scoped_list_call in initial_load_block
         assert "sceneResult.status === 'fulfilled'" in initial_load_block
-        assert "bibleResult.status === 'fulfilled'" in initial_load_block
-        assert "storyformResult.status === 'fulfilled'" in initial_load_block
+        assert "notesResult.status === 'fulfilled'" in initial_load_block
+        assert "materialsResult.status === 'fulfilled'" in initial_load_block
         assert "omiResult.status === 'fulfilled'" in initial_load_block
+        assert "fetchProjectContextReadiness(capturedProjectId)" in initial_load_block
+        assert "if (bibleRes.ready && bibleRes.state === 'ready')" in initial_load_block
+        assert "if (storyformRes.ready && storyformRes.state === 'ready')" in initial_load_block
+        assert "if (contextRes.ready && contextRes.state === 'ready')" in initial_load_block
+        for optional_load in (
+            "fetchBible(capturedProjectId)",
+            "fetchStoryform(capturedProjectId)",
+            "fetchStoryformContext(capturedProjectId)",
+        ):
+            assert optional_load in initial_load_block
+        assert "currentProjectIdRef.current !== capturedProjectId" in initial_load_block
         assert "setScenes(Array.isArray(scenePayload) ? scenePayload : scenePayload.scenes ?? [])" in (
             initial_load_block
         )
@@ -594,9 +678,9 @@ class TestProjectOverviewDataContract:
         inventory_007_source: str,
     ) -> None:
         for list_call in (
-            "fetchScenes(activeProjectId)",
-            "fetchNotes(activeProjectId)",
-            "fetchMaterials(activeProjectId)",
+            "fetchScenes(capturedProjectId)",
+            "fetchNotes(capturedProjectId)",
+            "fetchMaterials(capturedProjectId)",
         ):
             assert list_call in app_source
 
@@ -752,10 +836,10 @@ class TestProjectOverviewDataContract:
 
         for load_call in (
             "listProjects()",
-            "fetchScenes(activeProjectId)",
-            "fetchNotes(activeProjectId)",
-            "fetchMaterials(activeProjectId)",
-            "getOMI(activeProjectId)",
+            "fetchScenes(capturedProjectId)",
+            "fetchNotes(capturedProjectId)",
+            "fetchMaterials(capturedProjectId)",
+            "getOMI(capturedProjectId)",
         ):
             assert load_call in app_source
 
@@ -895,7 +979,7 @@ class TestProjectOverviewDataContract:
     def test_runtime_sources_exclude_overview_forbidden_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = read_source(source_path).lower()
+        lower_source = read_source_for_legacy_workspace_guard(source_path).lower()
         forbidden_terms = [
             "generated summary",
             "ai summary",
@@ -1205,9 +1289,9 @@ class TestProjectOverviewIntegration:
             "onOpenScenes={handleOpenEditorWorkspace}",
             "onOpenNotes={handleOpenEditorWorkspace}",
             "onOpenMaterials={handleOpenEditorWorkspace}",
-            "onOpenOmi={handleOpenEditorWorkspace}",
         ):
             assert callback_prop in overview_render
+        assert "onOpenOmi={handleSelectOMIDashboard}" in overview_render
 
     def test_no_backend_or_api_overview_dependency_after_integration(
         self, app_source: str, api_source: str, project_overview_source: str
@@ -1399,9 +1483,9 @@ class TestProjectOverviewRegressionCoverage:
             "onOpenScenes={handleOpenEditorWorkspace}",
             "onOpenNotes={handleOpenEditorWorkspace}",
             "onOpenMaterials={handleOpenEditorWorkspace}",
-            "onOpenOmi={handleOpenEditorWorkspace}",
         ):
             assert callback_prop in overview_render
+        assert "onOpenOmi={handleSelectOMIDashboard}" in overview_render
 
     def test_dirty_state_guards_overview_document_and_project_switches(
         self, app_source: str
@@ -1544,7 +1628,7 @@ class TestProjectOverviewRegressionCoverage:
     def test_overview_frontend_runtime_excludes_unsafe_terms(
         self, source_path: Path
     ) -> None:
-        lower_source = read_source(source_path).lower()
+        lower_source = read_source_for_legacy_workspace_guard(source_path).lower()
         for forbidden_term in (
             "generated summary",
             "ai summary",
@@ -1677,13 +1761,7 @@ class TestMemoryCanonShellRegressionCoverage:
 
     @staticmethod
     def _memory_canon_render_block(app_source: str) -> str:
-        return app_source.split(
-            ") : activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON ? (",
-            1,
-        )[1].split(
-            ") : (",
-            1,
-        )[0]
+        return jsx_self_closing_invocation(app_source, "MemoryCanonShell")
 
     @staticmethod
     def _workspace_nav_block(project_nav_source: str) -> str:
@@ -1899,7 +1977,7 @@ class TestMemoryCanonShellRegressionCoverage:
         assert "OmiGuidedProjectCreation" not in memory_canon_render
 
         setup_creation_block = app_source.split("<OmiGuidedProjectCreation", 1)[1].split("/>", 1)[0]
-        assert "onCreateProject={handleCreateProject}" in setup_creation_block
+        assert "onCreateGuidedProject={handleCreateOmiGuidedProject}" in setup_creation_block
         assert "approvedRecordsByCategory" not in setup_creation_block
         assert "MemoryCanonShell" not in setup_creation_block
 
@@ -2113,7 +2191,11 @@ class TestOmiGuidedProjectCreationStagedFlowContract:
         assert "export async function createProject(title)" in api_source
         assert "client.post('/projects', { title })" in api_source
         assert '@app.post("/api/projects")' in backend_main_source
-        assert "return project_manager.create_project(title=payload.title)" in backend_main_source
+        blank_route = backend_main_source.split(
+            "def post_project(payload: ProjectCreate) -> dict:", 1
+        )[1].split('@app.post("/api/projects/omi-guided")', 1)[0]
+        assert "project_manager.create_project(title=payload.title)" in blank_route
+        assert "return project" in blank_route
         assert "def create_project(" in project_manager_source
         assert "derive_project_id" in project_manager_source
         assert "validate_project_id" in project_manager_source
@@ -2270,7 +2352,7 @@ class TestOmiGuidedProjectCreationStagedFlowContract:
     def test_frontend_runtime_sources_exclude_staged_flow_forbidden_terms(
         self, source_path: Path
     ) -> None:
-        lower_source = read_source(source_path).lower()
+        lower_source = read_source_for_legacy_workspace_guard(source_path).lower()
         for forbidden_term in (
             "generated setup",
             "generated prose",
@@ -2411,7 +2493,11 @@ class TestOmiGuidedProjectCreationBackendStorageDecision:
         assert "client.post('/projects', { title })" in api_source
         assert "class ProjectCreate(BaseModel)" in backend_main_source
         assert '@app.post("/api/projects")' in backend_main_source
-        assert "return project_manager.create_project(title=payload.title)" in backend_main_source
+        blank_route = backend_main_source.split(
+            "def post_project(payload: ProjectCreate) -> dict:", 1
+        )[1].split('@app.post("/api/projects/omi-guided")', 1)[0]
+        assert "project_manager.create_project(title=payload.title)" in blank_route
+        assert "return project" in blank_route
         assert "def create_project(" in project_manager_source
         assert "PROJECT_CREATION_METHOD_BLANK = \"blank\"" in project_manager_source
 
@@ -2578,8 +2664,6 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
             "/pre-project",
             "staged_setup",
             "setup_draft",
-            "project_setup",
-            "omi_guided_setup",
             "draft_project",
             "preproject",
             "pre_project",
@@ -2588,6 +2672,9 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
             "projects/from-omi",
         ):
             assert deferred_route_or_helper not in runtime_backend.lower()
+        assert '@app.post("/api/projects/omi-guided")' in backend_main_source
+        assert "project_manager.create_omi_guided_project(" in backend_main_source
+        assert 'OMI_GUIDED_SETUP_NOTE_ID = "omi_guided_setup_notes"' in project_manager_source
 
     def test_existing_project_create_route_remains_final_durable_route(
         self,
@@ -2598,7 +2685,11 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
     ) -> None:
         assert '@app.post("/api/projects")' in backend_main_source
         assert "def post_project(payload: ProjectCreate) -> dict:" in backend_main_source
-        assert "return project_manager.create_project(title=payload.title)" in backend_main_source
+        blank_route = backend_main_source.split(
+            "def post_project(payload: ProjectCreate) -> dict:", 1
+        )[1].split('@app.post("/api/projects/omi-guided")', 1)[0]
+        assert "project_manager.create_project(title=payload.title)" in blank_route
+        assert "return project" in blank_route
         assert "class ProjectCreate(BaseModel)" in backend_main_source
         assert "title: str" in backend_main_source
         assert "extra = \"forbid\"" in backend_main_source
@@ -2671,8 +2762,6 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
         for hidden_write_route_or_helper in (
             "setup_draft",
             "staged_setup",
-            "project_setup",
-            "omi_guided_setup",
             "draft_project",
             "pre_project",
             "finalize_setup",
@@ -2682,6 +2771,14 @@ class TestOmiGuidedProjectCreationBackendRouteDecision:
             "hidden project write",
         ):
             assert hidden_write_route_or_helper not in runtime_without_comments
+        guided_route = backend_main_source.split(
+            "def post_omi_guided_project(payload: OMIGuidedProjectCreate):", 1
+        )[1].split('@app.get("/api/projects/{project_name}/scenes")', 1)[0]
+        assert "project_manager.create_omi_guided_project(" in guided_route
+        assert "title=payload.title" in guided_route
+        assert "raw_idea=payload.raw_idea" in guided_route
+        assert "setup_notes=payload.setup_notes" in guided_route
+        assert 'OMI_GUIDED_SETUP_NOTE_ID = "omi_guided_setup_notes"' in project_manager_source
 
     def test_omi_routes_remain_project_local_and_candidate_audit_only(
         self,
@@ -2795,10 +2892,11 @@ class TestOmiGuidedProjectCreationFrontendShell:
         self, omi_guided_project_creation_source: str
     ) -> None:
         for local_state_token in (
-            "import { useMemo, useState } from 'react';",
+            "import { useEffect, useMemo, useRef, useState } from 'react';",
             "const [draft, setDraft] = useState(INITIAL_DRAFT)",
             "const [step, setStep] = useState(STEPS.SETUP)",
             "const [finalConfirmation, setFinalConfirmation] = useState(false)",
+            "const submissionPendingRef = useRef(false)",
             "function resetDraft()",
         ):
             assert local_state_token in omi_guided_project_creation_source
@@ -2847,7 +2945,7 @@ class TestOmiGuidedProjectCreationFrontendShell:
             "setStep(STEPS.REVIEW)",
             "aria-label=\"Review setup draft\"",
             "checked={finalConfirmation}",
-            "const canCreate = canReview && finalConfirmation && !disabled",
+            "const canCreate = canReview && finalConfirmation && !disabled && !isSubmitting",
             "disabled={!canCreate}",
         ):
             assert expected_step_token in omi_guided_project_creation_source
@@ -2857,10 +2955,16 @@ class TestOmiGuidedProjectCreationFrontendShell:
             1,
         )[1].split("\n  return (", 1)[0]
         assert "event.preventDefault()" in final_create_body
-        assert "if (!canCreate || typeof onCreateProject !== 'function')" in final_create_body
-        assert "await onCreateProject(trimmedDraft.projectTitle)" in final_create_body
+        assert "!canCreate" in final_create_body
+        assert "submissionPendingRef.current" in final_create_body
+        assert "typeof onCreateGuidedProject !== 'function'" in final_create_body
+        assert "const result = await onCreateGuidedProject({" in final_create_body
+        assert "title: reviewDraft.projectTitle" in final_create_body
+        assert "rawIdea: draft.rawIdea" in final_create_body
+        assert "setupNotes: draft.setupNotes" in final_create_body
+        assert "result?.success !== true" in final_create_body
         assert "resetDraft()" in final_create_body
-        assert "onComplete?.()" in final_create_body
+        assert "onComplete?.(result)" in final_create_body
 
     def test_cancel_and_back_paths_clear_transient_state_without_backend_cleanup(
         self, omi_guided_project_creation_source: str
@@ -2885,7 +2989,7 @@ class TestOmiGuidedProjectCreationFrontendShell:
         assert "setFinalConfirmation(false)" in omi_guided_project_creation_source
         assert "Back to setup draft" in omi_guided_project_creation_source
 
-    def test_app_imports_renders_and_uses_existing_create_project_callback(
+    def test_app_imports_renders_and_uses_guided_creation_callback(
         self, app_source: str
     ) -> None:
         assert "import OmiGuidedProjectCreation from './components/OmiGuidedProjectCreation.jsx';" in (
@@ -2893,14 +2997,19 @@ class TestOmiGuidedProjectCreationFrontendShell:
         )
         assert "<OmiGuidedProjectCreation" in app_source
         shell_render = app_source.split("<OmiGuidedProjectCreation", 1)[1].split("/>", 1)[0]
-        assert "onCreateProject={handleCreateProject}" in shell_render
+        assert "onCreateGuidedProject={handleCreateOmiGuidedProject}" in shell_render
         assert "disabled={isCreatingProject}" in shell_render
         assert "setCreateProjectError('')" in shell_render
         assert "setCreateProjectStatus('')" in shell_render
         assert "setActiveWorkspaceView(WORKSPACE_VIEWS.OVERVIEW)" in shell_render
-        assert "createProject(trimmedTitle)" in app_source
-        assert "await loadProjects()" in app_source
-        assert "setActiveProjectId(newProjectId)" in app_source
+        guided_handler = app_source.split(
+            "const handleCreateOmiGuidedProject = useCallback", 1
+        )[1].split("const handleSelectProject", 1)[0]
+        assert "createOmiGuidedProject({ title, rawIdea, setupNotes })" in guided_handler
+        assert "requireCompleteOmiGuidedProjectResponse(response)" in guided_handler
+        assert "handleSelectProject(newProjectId, { skipUnsavedConfirmation: true })" in (
+            guided_handler
+        )
 
     def test_blank_project_creation_remains_present_and_additive(
         self, app_source: str, project_nav_source: str
@@ -3056,9 +3165,9 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
             "async function handleFinalCreate(event)",
             1,
         )[1].split("\n  return (", 1)[0]
-        assert "if (created) {" in final_create_body
+        assert "if (result?.success !== true)" in final_create_body
         assert "resetDraft()" in final_create_body
-        assert "onComplete?.()" in final_create_body
+        assert "onComplete?.(result)" in final_create_body
 
         assert "Back to setup draft" in omi_guided_project_creation_source
         assert "setStep(STEPS.SETUP)" in omi_guided_project_creation_source
@@ -3072,10 +3181,10 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
     def test_final_confirmation_gates_only_project_creation_call(
         self, omi_guided_project_creation_source: str
     ) -> None:
-        assert "const canReview = Boolean(trimmedDraft.projectTitle)" in (
+        assert "const canReview = Boolean(reviewDraft.projectTitle && draft.rawIdea.trim())" in (
             omi_guided_project_creation_source
         )
-        assert "const canCreate = canReview && finalConfirmation && !disabled" in (
+        assert "const canCreate = canReview && finalConfirmation && !disabled && !isSubmitting" in (
             omi_guided_project_creation_source
         )
         assert "checked={finalConfirmation}" in omi_guided_project_creation_source
@@ -3087,7 +3196,7 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
         )[1].split("\n  function resetDraft", 1)[0]
         assert "setDraft((currentDraft)" in update_body
         assert "setFinalConfirmation(false)" in update_body
-        assert "onCreateProject" not in update_body
+        assert "onCreateGuidedProject" not in update_body
 
         review_body = omi_guided_project_creation_source.split(
             "function handleReview(event)",
@@ -3096,28 +3205,32 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
         assert "event.preventDefault()" in review_body
         assert "if (!canReview)" in review_body
         assert "setStep(STEPS.REVIEW)" in review_body
-        assert "onCreateProject" not in review_body
+        assert "onCreateGuidedProject" not in review_body
 
         final_create_body = omi_guided_project_creation_source.split(
             "async function handleFinalCreate(event)",
             1,
         )[1].split("\n  return (", 1)[0]
-        assert "if (!canCreate || typeof onCreateProject !== 'function')" in final_create_body
+        assert "!canCreate" in final_create_body
+        assert "submissionPendingRef.current" in final_create_body
+        assert "typeof onCreateGuidedProject !== 'function'" in final_create_body
         assert "return;" in final_create_body
-        assert "await onCreateProject(trimmedDraft.projectTitle)" in final_create_body
-        assert final_create_body.count("onCreateProject") == 2
+        assert "const result = await onCreateGuidedProject({" in final_create_body
+        assert final_create_body.count("onCreateGuidedProject") == 2
 
-    def test_final_creation_uses_existing_create_project_path_only(
+    def test_final_creation_uses_accepted_guided_project_path_only(
         self,
         omi_guided_project_creation_source: str,
         app_source: str,
         api_source: str,
     ) -> None:
-        assert "onCreateProject={handleCreateProject}" in app_source
-        assert "const metadata = await createProject(trimmedTitle)" in app_source
-        assert "export async function createProject(title)" in api_source
-        assert "client.post('/projects', { title })" in api_source
-        assert "await onCreateProject(trimmedDraft.projectTitle)" in (
+        assert "onCreateGuidedProject={handleCreateOmiGuidedProject}" in app_source
+        assert "const response = await createOmiGuidedProject({ title, rawIdea, setupNotes })" in (
+            app_source
+        )
+        assert "export async function createOmiGuidedProject" in api_source
+        assert "client.post('/projects/omi-guided'," in api_source
+        assert "const result = await onCreateGuidedProject({" in (
             omi_guided_project_creation_source
         )
 
@@ -3250,7 +3363,12 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
             "async function handleFinalCreate(event)",
             1,
         )[1].split("\n  return (", 1)[0]
-        assert "await onCreateProject(trimmedDraft.projectTitle)" in final_create_body
+        assert "const result = await onCreateGuidedProject({" in final_create_body
+        assert "title: reviewDraft.projectTitle" in final_create_body
+        assert "rawIdea: draft.rawIdea" in final_create_body
+        assert "setupNotes: draft.setupNotes" in final_create_body
+        assert "submissionPendingRef.current = true" in final_create_body
+        assert "submissionPendingRef.current = false" in final_create_body
         for forbidden_final_write in (
             "project.json",
             "saveScene",
@@ -3300,7 +3418,7 @@ class TestOmiGuidedProjectCreationStagedFlowRegressionCoverage:
         editor_source: str,
     ) -> None:
         shell_render = app_source.split("<OmiGuidedProjectCreation", 1)[1].split("/>", 1)[0]
-        assert "onCreateProject={handleCreateProject}" in shell_render
+        assert "onCreateGuidedProject={handleCreateOmiGuidedProject}" in shell_render
         assert "disabled={isCreatingProject}" in shell_render
 
         for forbidden_shell_wire in (
@@ -3641,7 +3759,7 @@ class TestApprovedMemoryCanonShellContract:
                 backend_main_source,
                 project_manager_source,
             ]
-        )
+        ).replace("approved_memory_boundary", "")
         for forbidden_route_or_helper in (
             "/memory-canon",
             "/approved-memory",
@@ -3652,7 +3770,10 @@ class TestApprovedMemoryCanonShellContract:
             "getApprovedMemory",
             "getCanon",
             "approved_memory",
-            "memory_canon",
+            "fetch_memory_canon",
+            "save_memory_canon",
+            "create_memory_canon",
+            "update_memory_canon",
         ):
             assert forbidden_route_or_helper not in combined_runtime
 
@@ -3811,7 +3932,9 @@ class TestApprovedMemoryCanonShellContract:
     def test_runtime_sources_exclude_t002_forbidden_approved_memory_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         forbidden_terms = (
             "generated prose",
             "ai-written",
@@ -4036,7 +4159,9 @@ class TestMemoryCanonShellComponent:
     def test_runtime_sources_exclude_t003_forbidden_memory_canon_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
         lower_source = lower_source.replace("no apply" + "-promotion in this phase", "")
         forbidden_terms = (
@@ -4081,9 +4206,7 @@ class TestMemoryCanonShellAppNavIntegration:
 
     @staticmethod
     def _memory_canon_app_render_block(app_source: str) -> str:
-        branch_start = ") : activeWorkspaceView === WORKSPACE_VIEWS.MEMORY_CANON ? ("
-        assert branch_start in app_source
-        return app_source.split(branch_start, 1)[1].split(") : (", 1)[0]
+        return jsx_self_closing_invocation(app_source, "MemoryCanonShell")
 
     @staticmethod
     def _memory_canon_nav_button_block(project_nav_source: str) -> str:
@@ -4296,7 +4419,9 @@ class TestMemoryCanonShellAppNavIntegration:
     def test_runtime_sources_exclude_t004_forbidden_memory_canon_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
         lower_source = lower_source.replace("no apply" + "-promotion in this phase", "")
         forbidden_terms = (
@@ -4609,7 +4734,9 @@ class TestApprovedCategoryEmptyStateCoverage:
     def test_runtime_sources_exclude_t005_forbidden_memory_canon_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = self._runtime_source_without_comments(read_source(source_path)).lower()
+        lower_source = self._runtime_source_without_comments(
+            read_source_for_legacy_workspace_guard(source_path)
+        ).lower()
         lower_source = lower_source.replace("no memory/canon mutation in this phase", "")
         lower_source = lower_source.replace("no apply" + "-promotion in this phase", "")
         forbidden_terms = (
@@ -4941,7 +5068,9 @@ class TestApiNoteMaterialHelpers:
     def test_api_js_excludes_forbidden_workspace_terms(
         self, api_source: str
     ) -> None:
-        lower_source = source_without_t005_apply_promotion(api_source).lower()
+        lower_source = source_without_truthful_safety_negations(
+            source_without_t005_apply_promotion(api_source)
+        ).lower()
         forbidden_terms = [
             "apply" + "-promotion",
             "apply promotion",
@@ -5067,8 +5196,10 @@ class TestNoteMaterialShellSource:
         assert "onSelectMaterial?.(materialLabel)" not in project_nav_source
 
     def test_app_fetches_exact_note_and_material_bodies(self, app_source: str) -> None:
-        assert "fetchNotes(activeProjectId)" in app_source
-        assert "fetchMaterials(activeProjectId)" in app_source
+        assert "const capturedProjectId = activeProjectId" in app_source
+        assert "fetchNotes(capturedProjectId)" in app_source
+        assert "fetchMaterials(capturedProjectId)" in app_source
+        assert "currentProjectIdRef.current !== capturedProjectId" in app_source
         assert "fetchNote(noteId, activeProjectId)" in app_source
         assert "fetchMaterial(materialId, activeProjectId)" in app_source
         assert "const loadedContent = getDocumentResponseContent(data)" in app_source
@@ -5365,14 +5496,35 @@ class TestSharedDocumentStateContract:
             assert setter in body
             assert "Unsaved changes" in body
 
-        for save_handler, last_saved_setter in (
-            ("handleSave", "setLastSavedContent(sceneContent)"),
-            ("handleSaveNote", "setLastSavedNoteContent(noteContent)"),
-            ("handleSaveMaterial", "setLastSavedMaterialContent(materialContent)"),
+        for save_handler, expected_updates, expected_status in (
+            (
+                "handleSave",
+                ("setLastSavedContent(sceneContent)",),
+                "setSaveStatus('Saved')",
+            ),
+            (
+                "handleSaveNote",
+                (
+                    "reloadProjectScopedNotesMaterials(activeProjectId",
+                    "setNoteContent(reloadedContent)",
+                    "setLastSavedNoteContent(reloadedContent)",
+                ),
+                "setNoteSaveStatus('Saved and reloaded owner-authored note; not canon by default.')",
+            ),
+            (
+                "handleSaveMaterial",
+                (
+                    "reloadProjectScopedNotesMaterials(activeProjectId",
+                    "setMaterialContent(reloadedContent)",
+                    "setLastSavedMaterialContent(reloadedContent)",
+                ),
+                "setMaterialSaveStatus('Saved and reloaded owner-provided material; not canon by default.')",
+            ),
         ):
             body = self._callback_body(app_source, save_handler)
-            assert last_saved_setter in body
-            assert "set" in body and "SaveStatus('Saved')" in body
+            for expected_update in expected_updates:
+                assert expected_update in body
+            assert expected_status in body
 
     def test_dirty_state_blocks_document_and_project_switches(
         self, app_source: str
@@ -5647,8 +5799,8 @@ class TestSharedEditorRegressionCoverage:
             ("handleSelectNote", "setLastSavedNoteContent(loadedContent)"),
             ("handleSelectMaterial", "setLastSavedMaterialContent(loadedContent)"),
             ("handleSave", "setLastSavedContent(sceneContent)"),
-            ("handleSaveNote", "setLastSavedNoteContent(noteContent)"),
-            ("handleSaveMaterial", "setLastSavedMaterialContent(materialContent)"),
+            ("handleSaveNote", "setLastSavedNoteContent(reloadedContent)"),
+            ("handleSaveMaterial", "setLastSavedMaterialContent(reloadedContent)"),
         )
         for callback_name, baseline_update in expected_baselines:
             body = self._callback_body(app_source, callback_name)
@@ -5793,7 +5945,7 @@ class TestSharedEditorRegressionCoverage:
     def test_shared_editor_sources_exclude_unsafe_future_behavior(
         self, source_path: Path
     ) -> None:
-        lower_source = read_source(source_path).lower()
+        lower_source = read_source_for_legacy_workspace_guard(source_path).lower()
         forbidden_terms = [
             "generated prose",
             "improve prose",
