@@ -6,7 +6,7 @@
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
     "follow_on_status": "published/planned",
@@ -16,8 +16,8 @@
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T008E",
-    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008A/T008B/T008C/T008D are complete/PASS; T008E is next planned, dependency on complete/PASS T008D is satisfied, eligible, and not begun; T008F remains gated; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-024-T008F",
+    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008A/T008B/T008C/T008D/T008E are complete/PASS; T008F is next planned, dependency on complete/PASS T008E is satisfied, eligible, and not begun; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
@@ -596,6 +596,57 @@
     "repository_state": "Implementation commit ended with empty staging and a clean worktree; no push; no package or lockfile change; no roadmap file in the implementation commit; no T008E, T008F, or PHASE8-IMPL-025 implementation began",
     "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md"
   },
+  "t008e_closeout": {
+    "status": "complete/PASS",
+    "type": "runtime_microtask",
+    "parent": "PHASE8-IMPL-024-T008",
+    "dependency": "PHASE8-IMPL-024-T008D complete/PASS",
+    "implementation_commit": {
+      "hash": "f9f189c2f037e08feb65ae5a4b8c7c5327ea1275",
+      "subject": "feat(app): implement review-queue command suite (T008E)",
+      "parent": "0a3f627b2d90dacb5d49ccb83d356157f2ede653",
+      "path_count": 21,
+      "reviewed_patch_sha256": "79564b206d9c3ad5b72d09599edf4ba2bfdbc121ecb582c7ef250dd7bbe6dc7b"
+    },
+    "deterministic_evidence": {
+      "report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/handoff/run-5-final.md",
+      "result": "PASS",
+      "storage_event": "388 passed",
+      "transition_persistence": "26 passed",
+      "stale_idempotency": "9 passed",
+      "recovery": "22 passed, 5 Pydantic deprecation warnings",
+      "routes_storage_get_global_safety": "401 passed",
+      "frontend_workflow_accessibility_responsive": "161 passed",
+      "combined_t008e": "482 passed, 5 Pydantic deprecation warnings",
+      "frontend_build": "PASS, 200 modules transformed, existing chunk-size advisory only"
+    },
+    "runtime_api_evidence": {
+      "report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-evidence-20260809TjocbKKZ/final-report.md",
+      "archive": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-evidence-blocked-20260809T235159Z.tar.gz",
+      "archive_sha256": "986dad9c6ea3cbefd865e7d2ebba15149f6859cd67f85d6c7886491e913c061f",
+      "acceptance_decision": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/handoff/07-stage6-editor-browser-retry-owner-decision.md",
+      "result": "accepted runtime/API evidence; seven commands 7/7 HTTP 200 with exact version 0 -> 1, immutable intent/completion, authoritative GET agreement, idempotent restart replay, write-free stale/ABA 409, immediate lock 423, and R1-R9/C001 coverage"
+    },
+    "browser_evidence": {
+      "report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-editor-browser-retry-evidence-yNpPRony/final-report.md",
+      "archive": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-editor-browser-retry-evidence-pass-20260810T204002Z.tar.gz",
+      "archive_sha256": "663dc9a95bd568376440606c3d9c2f4bfbf2d9f7394be63a650a6d3aab630a0b",
+      "internal_manifest_entries": 56,
+      "result": "PASS on the second and final authorized attempt; durable mark_reviewed, authoritative note/completion/version, UUID retention and rotation, controlled 409/423/500, keyboard behavior, 390px/320px containment, and zero unexpected console/page/request failures"
+    },
+    "results": {
+      "review_commands": "PASS: all seven durable public commands and all nine valid state pairs covered",
+      "event_version_idempotency_recovery": "PASS: canonical request binding, immutable intent/completion chains, exact versioning, replay, stale/ABA rejection, locking, and R1-R9/C001 fail-closed recovery",
+      "candidate_evidence_provenance": "preserved byte-identical or projection-identical as applicable",
+      "automatic_promotion_or_apply": false,
+      "memory_canon_mutation": false,
+      "generated_prose_model_extraction_training_mutation": false,
+      "cleanup_isolation": "PASS: runtime/API disposable uiux-audit-t008e-20260809-2338 and final browser disposable uiux-audit-t008e-editor-retry-20260810-202955 were archived then exactly removed; all five pre-existing project IDs, recursive entries, modes, sizes, and SHA-256 hashes restored; task-owned processes stopped; ports 8000/5173 clear",
+      "repository_state": "implementation commit ended with clean worktree and empty staging; no push; no roadmap file in the implementation commit; T008F and PHASE8-IMPL-025 not begun",
+      "historical_browser_blockers": "superseded test-infrastructure failures only: locator ambiguity and missing Overview-to-Editor harness navigation; neither demonstrated a product defect"
+    },
+    "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md"
+  },
   "t008_activation": {
     "status": "active/in_progress",
     "parent_status": "active/in_progress",
@@ -604,8 +655,8 @@
       "T008B": "complete/PASS; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
       "T008C": "complete/PASS; implementation commit f8b8be5d37a28e182f18cacd719667db5884a969; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md",
       "T008D": "complete/PASS; implementation commit bc93fcedd6e4609ce3e695b2706be4cc7682a6b0; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md",
-      "T008E": "planned; dependency on complete/PASS T008D satisfied; eligible; immediate application frontier; not begun",
-      "T008F": "planned; depends on T008E; not begun"
+      "T008E": "complete/PASS; implementation commit f9f189c2f037e08feb65ae5a4b8c7c5327ea1275; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md",
+      "T008F": "planned; dependency on complete/PASS T008E satisfied; eligible; immediate application frontier; not begun"
     },
     "enforced_child_order": "T008A -> T008B -> T008C -> T008D -> T008E -> T008F",
     "activation_contract": "docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-activation-contract.md",
@@ -613,12 +664,17 @@
     "t008b_scope": "Candidate lifecycle and grouped-review owner-decision validation-led suite with one narrow stale-test correction; no application behavior change",
     "t008c_scope": "Promotion creation and handoff validation-led suite with one bounded frontend correction; no backend persistence or handoff-semantics change",
     "t008d_scope": "Apply-promotion implementation and validation suite; explicit owner-approved destination mutation only, with append-only audit/recovery events and protected-path mutation isolation",
-    "latest_child_task": "PHASE8-IMPL-024-T008D",
-    "next_child_task": "PHASE8-IMPL-024-T008E",
-    "next_task": "PHASE8-IMPL-024-T008E"
+    "t008e_scope": "Review-queue command implementation and validation suite; durable event/version/idempotency/recovery behavior with candidate/evidence/provenance preservation and no promotion, apply-promotion, Memory/Canon, prose, model, extraction, or training mutation",
+    "latest_child_task": "PHASE8-IMPL-024-T008E",
+    "next_child_task": "PHASE8-IMPL-024-T008F",
+    "next_task": "PHASE8-IMPL-024-T008F"
   },
   "latest_verified_evidence": {
-    "classification": "T008D apply-promotion suite complete/PASS; T007C design-system and shared-component standardization PASS_WITH_FINDINGS; T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
+    "classification": "T008E review-queue command suite complete/PASS; T008D apply-promotion suite complete/PASS; T007C design-system and shared-component standardization PASS_WITH_FINDINGS; T007A evidence-based Impeccable UI review PASS; T006C navigation regression PASS; not product-wide acceptance",
+    "t008e_deterministic_report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/handoff/run-5-final.md",
+    "t008e_runtime_api_report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-evidence-20260809TjocbKKZ/final-report.md",
+    "t008e_browser_report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-editor-browser-retry-evidence-yNpPRony/final-report.md",
+    "t008e_result": "complete/PASS; deterministic, runtime/API, browser, cleanup/isolation, and implementation-commit evidence accepted",
     "t007a": ".codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z",
     "t007a_result": "read-only UI audit PASS across 42 captures, 11 scenarios, and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no code/tracked/product-data changes; no commit or push; no forbidden or mutating requests",
     "t006c": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z",
@@ -635,10 +691,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T008E",
-    "title": "Review-queue command suite",
-    "status": "planned; dependency on complete/PASS T008D satisfied; eligible; immediate application frontier; not begun",
-    "scope": "Bounded T008E review-queue command validation suite"
+    "task_id": "PHASE8-IMPL-024-T008F",
+    "title": "Non-mutating resilience and accessibility suite",
+    "status": "planned; dependency on complete/PASS T008E satisfied; eligible; immediate application frontier; not begun",
+    "scope": "Bounded T008F non-mutating resilience and accessibility suite"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",

@@ -12,9 +12,9 @@ T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T
 
 T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-Latest completed task: `PHASE8-IMPL-024-T008D - Apply-promotion suite` is complete/PASS (implementation commit `bc93fcedd6e4609ce3e695b2706be4cc7682a6b0`; reviewed implementation patch SHA-256 `08f96fe2c0dbe4469dd386a606b5c8e70ca02fa8ab47f8cbcf7d7dd22ee2f578`; supervisor diff-review archive `/tmp/PHASE8-IMPL-024-T008D-supervisor-diff-review-20260802T190239Z.tar.gz` SHA-256 `24a8368dab0419d74386c33aaf36930268af6c9405d1aea65e8492df81d4fd55`; commit-review archive `/tmp/PHASE8-IMPL-024-T008D-commit-review-20260802T191634Z.tar.gz` SHA-256 `2ef0afba383ab25f9f21cb4c1105ccec72d179c4207c1de82ac74a875359c23a`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
+Latest completed task: `PHASE8-IMPL-024-T008E - Review-queue command suite` is complete/PASS (implementation commit `f9f189c2f037e08feb65ae5a4b8c7c5327ea1275`; reviewed implementation patch SHA-256 `79564b206d9c3ad5b72d09599edf4ba2bfdbc121ecb582c7ef250dd7bbe6dc7b`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
 
-Next planned task: `PHASE8-IMPL-024-T008E - Review-queue command suite`. Its dependency on complete/PASS T008D is satisfied; it is eligible, the immediate application frontier, and has not begun. T008F remains dependency-gated in the enforced child order T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008D closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md`.
+Next planned task: `PHASE8-IMPL-024-T008F - Non-mutating resilience and accessibility suite`. Its dependency on complete/PASS T008E is satisfied; it is eligible, the immediate application frontier, and has not begun. The enforced child order remains T008A -> T008B -> T008C -> T008D -> T008E -> T008F. T008E closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md`.
 
 The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; T006 has repaired and validated truthful OMI navigation; T007A has completed the evidence-based Impeccable UI review; T007B has recorded the owner component-foundation decision; T007C has standardized the design system and shared components; T004 has repaired responsive containment; T005 has repaired accessibility semantics, targets, and keyboard focus. The T008 validation workstream remains active/in_progress.
 
@@ -72,11 +72,11 @@ order establish execution sequence:
 - Design-system and shared-component standardization: `T007C` (complete/PASS).
 - Responsive containment and validation: `T004` (complete/PASS through T004A-T004C).
 - Accessibility semantics, target sizing, and keyboard validation: `T005` (complete/PASS through T005A-T005C).
-- Remaining validation suites: `T008` (active/in_progress; T008A, T008B, T008C, and T008D complete/PASS; T008E planned, dependency-satisfied, eligible, immediate application frontier, and not begun; T008F dependency-gated).
+- Remaining validation suites: `T008` (active/in_progress; T008A, T008B, T008C, T008D, and T008E complete/PASS; T008F planned, dependency-satisfied, eligible, immediate application frontier, and not begun).
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
 T005 -> T008`. T003, T006, T007A, T007B, T007C, T007, T004, and T005 are complete/PASS.
-T008A, T008B, T008C, and T008D are complete/PASS. T008E is planned, dependency-satisfied, eligible, the immediate application frontier, and has not begun. T008F remains dependency-gated. This order is
+T008A, T008B, T008C, T008D, and T008E are complete/PASS. T008F is planned, dependency-satisfied, eligible, the immediate application frontier, and has not begun. This order is
 already owner-approved and does not require another decision gate.
 
 This ordering prevents premature visual polish, avoids selecting a component
@@ -162,8 +162,8 @@ T008 is active/in_progress. The owner-approved child order is T008A -> T008B -> 
 - `PHASE8-IMPL-024-T008B` - Candidate lifecycle and grouped-review owner-decision suite (`complete/PASS`; validation-led with narrow stale-test correction commit `81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593`; accepted runtime archive SHA-256 `66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md`; separate from apply-promotion).
 - `PHASE8-IMPL-024-T008C` - Promotion creation and handoff suite (`complete/PASS`; validation-led with bounded frontend correction commit `f8b8be5d37a28e182f18cacd719667db5884a969`; controlling validation archive SHA-256 `0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41`; commit evidence archive SHA-256 `c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md`; separate disposable project; audit/candidate-side only; does not apply promotion).
 - `PHASE8-IMPL-024-T008D` - Apply-promotion suite (`complete/PASS`; depends on T008C; implementation commit `bc93fcedd6e4609ce3e695b2706be4cc7682a6b0`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md`).
-- `PHASE8-IMPL-024-T008E` - Review-queue command suite (`planned`; dependency on complete/PASS T008D satisfied; eligible; immediate application frontier; not begun; separate disposable project).
-- `PHASE8-IMPL-024-T008F` - Non-mutating resilience and accessibility suite (`planned`; depends on T008E; loading, degraded, failure, retry, recovery, evidence-drawer focus restoration, complete keyboard navigation, browser zoom, and screen-reader behavior).
+- `PHASE8-IMPL-024-T008E` - Review-queue command suite (`complete/PASS`; depends on T008D; implementation commit `f9f189c2f037e08feb65ae5a4b8c7c5327ea1275`; reviewed patch SHA-256 `79564b206d9c3ad5b72d09599edf4ba2bfdbc121ecb582c7ef250dd7bbe6dc7b`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md`; separate disposable project).
+- `PHASE8-IMPL-024-T008F` - Non-mutating resilience and accessibility suite (`planned`; dependency on complete/PASS T008E satisfied; eligible; immediate application frontier; not begun; loading, degraded, failure, retry, recovery, evidence-drawer focus restoration, complete keyboard navigation, browser zoom, and screen-reader behavior).
 
 Every future mutation suite must use its own disposable `uiux-audit-*` project; capture API and filesystem manifests before and after; reject writes outside that project; preserve all existing projects; package evidence before cleanup; and remove only the exact disposable project. Apply-promotion validation must never be combined with read-only or candidate-decision validation.
 
@@ -184,7 +184,7 @@ Verified defects were P0-A, P0-B, document-level horizontal overflow in captured
 
 Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, and undersized-control standards triage. T006 repaired and validated misleading enabled actions and OMI internal reset ambiguity.
 
-The following remain `NOT_YET_TESTED`: review-queue commands; evidence-drawer focus restoration; complete keyboard navigation beyond the T008D final-flow checks; browser zoom and screen-reader behavior; and broader T008 resilience/accessibility behavior beyond the optional-resource states validated by T003C and the apply-promotion states validated by T008D.
+The following remain `NOT_YET_TESTED`: evidence-drawer focus restoration; complete keyboard navigation beyond the T008E bounded command-flow checks; browser zoom and screen-reader behavior; and broader T008 resilience/accessibility behavior beyond the optional-resource states validated by T003C, the apply-promotion states validated by T008D, and the review-command states validated by T008E.
 
 ## Product Boundaries
 
