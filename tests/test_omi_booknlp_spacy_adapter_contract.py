@@ -542,7 +542,19 @@ def test_live_spacy_missing_package_returns_unavailable(
     monkeypatch: Any,
 ) -> None:
     """spaCy not installed -> runner returns unavailable."""
+    import builtins
+
     _mock_live_spacy_env(monkeypatch)
+
+    real_import = builtins.__import__
+
+    def _missing_spacy_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "spacy" or name.startswith("spacy."):
+            raise ImportError("simulated missing spaCy package")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.delitem(sys.modules, "spacy", raising=False)
+    monkeypatch.setattr(builtins, "__import__", _missing_spacy_import)
 
     result = _run_adapter("spacy")
 
