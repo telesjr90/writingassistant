@@ -83,7 +83,7 @@ def test_phase7_impl_008_t004_backend_staged_setup_routes_are_deferred():
 
     assert '@app.post("/api/projects")' in source
     assert "def post_project(payload: ProjectCreate) -> dict:" in source
-    assert "return project_manager.create_project(title=payload.title)" in source
+    assert "project_manager.create_project(title=payload.title)" in source
 
     for deferred_route in (
         "/staged-setup",

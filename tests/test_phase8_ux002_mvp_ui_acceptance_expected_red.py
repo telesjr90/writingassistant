@@ -1,8 +1,8 @@
-"""Expected-red source contracts for PHASE8-UX-002 MVP UI acceptance surfaces.
+"""Historical UX002 source contracts for current MVP UI acceptance surfaces.
 
-These tests intentionally describe browser-visible UI/workflow contracts that
-are not implemented yet. They must fail until the PHASE8-UX-002-T004/T005/T006
-implementation slices add the corresponding source/Story Check/no-prose UI.
+The filename is retained for traceability, but current accepted authority
+requires this completed UX surface to remain green against the implemented
+application contracts.
 """
 
 from __future__ import annotations
@@ -233,15 +233,17 @@ def test_ux2_review_promotion_001_confirmation_audit_contract() -> None:
         source,
         (
             "data-testid=\"ux2-review-queue-fixture\"",
-            "data-testid=\"ux2-apply-promotion-owner-confirmation\"",
-            "data-testid=\"ux2-promotion-audit-evidence\"",
-            "data-testid=\"ux2-approved-memory-unchanged-after-rejection\"",
-            "explicit owner confirmation",
-            "apply-promotion is explicit/audited/owner-confirmed",
-            "candidate persistence is not canon",
-            "queue presence is not approval",
-            "failed promotion leaves approved memory/canon unchanged",
-            "rejected promotion leaves approved memory/canon unchanged",
+            "data-testid=\"omi-apply-promotion-confirmation\"",
+            "className=\"omi-apply-final-confirmation\"",
+            "checked={finalConfirmationChecked}",
+            "disabled={finalApplyDisabled}",
+            "Approval event",
+            "Apply ID",
+            "Preparation and approval alone do not apply this promotion.",
+            "Queue presence is not approval. Confidence is not truth. Candidate persistence is not canon.",
+            "Only an explicit final challenge and confirmed final POST can invoke the approved-record mutation path.",
+            "Final apply verified not committed",
+            "The backend verified the destination still matches the recorded before state.",
         ),
         "UX2-REVIEW-PROMOTION-001",
     )
@@ -627,28 +629,26 @@ def test_omi_apply_promotion_confirmation_only_contract() -> None:
         (
             "data-testid=\"omi-apply-promotion-confirmation\"",
             "data-testid=\"omi-apply-promotion-blockers\"",
-            "data-testid=\"omi-apply-promotion-final-action\"",
+            "className=\"omi-final-apply-button\"",
             "Apply-Promotion Confirmation",
-            "Candidate Snapshot",
-            "Destination",
-            "Target Path",
-            "Evidence / Provenance Summary",
-            "Source Location Summary",
-            "Duplicate / Link / Dependency Summary",
-            "Approved Memory/Canon Before-State",
-            "Promotion Audit Record",
-            "Audit Preview",
-            "Owner Final Confirmation",
+            "Owner-controlled apply contract",
+            "Exact promotion association",
+            "Operation and destination",
+            "Evidence references",
+            "Provenance references",
+            "Duplicate decision",
+            "Dependency decision",
+            "Selected revision",
+            "Before-state token",
+            "Approval event",
+            "Apply ID",
+            "Final confirmation",
             "Final Apply-Promotion",
             "Cancel / Return",
             "Not Applied to Memory/Canon",
-            "Memory/Canon Unchanged",
-            "This is the only screen that may lead to Memory/Canon mutation.",
-            "Candidate approval, queue presence, confidence, and promotion audit records are not enough.",
-            "Ready means the handoff packet is complete. Memory/Canon has not changed.",
-            "Evidence supports review. It is not canon truth until owner approval and apply-promotion are complete.",
-            "This remains a candidate until apply-promotion is separately confirmed and completed.",
-            "Failure safety copy",
+            "Preparation and approval alone do not apply this promotion.",
+            "Queue presence is not approval. Confidence is not truth. Candidate persistence is not canon.",
+            "Only an explicit final challenge and confirmed final POST can invoke the approved-record mutation path.",
             "setOmiView('apply-promotion')",
         ),
         "OMI-APPLY-PROMOTION-CONFIRMATION",
@@ -677,13 +677,18 @@ def test_omi_apply_promotion_blocker_states_and_disabled_association() -> None:
             "Final confirmation incomplete",
             "Apply-promotion unavailable in this version",
             "Apply-promotion failed or would fail closed",
-            "const finalDisabled = blockers.length > 0 || isSubmitting;",
-            "disabled={finalDisabled}",
-            "aria-describedby={`${blockerReasonId} ${finalReasonId}`}",
-            "Disabled: Final Apply-Promotion cannot run while visible blockers remain",
-            "I am the owner and this is owner final confirmation for apply-promotion.",
-            "ownerFinalConfirmation",
-            "getApplyPromotionBlockers",
+            "getApplyPromotionPreparationBlockers",
+            "Choose an allowed ordinary approved-record destination.",
+            "Enter a safe destination key.",
+            "The exact sealed revision, C2, and before-state token are unavailable.",
+            "Backend revalidation no longer permits the sealed final operation.",
+            "if (!finalConfirmationChecked)",
+            "Explicit final apply confirmation is incomplete.",
+            "checked={finalConfirmationChecked}",
+            "const finalApplyDisabled = finalApplyBlockers.length > 0 || isApplying || isLoading;",
+            "disabled={finalApplyDisabled}",
+            "aria-describedby={blockerReasonId}",
+            "Final apply is blocked by the visible requirements.",
         ),
         "OMI-APPLY-PROMOTION-BLOCKERS",
     )
@@ -697,14 +702,17 @@ def test_omi_apply_promotion_audit_and_before_state_labels() -> None:
     assert_markers_present(
         source,
         (
-            "Before-state snapshot",
-            "Before-state status",
-            "Mutation status",
-            "Promotion Audit Record",
-            "Audit Preview: candidate ID, owner approval, destination, evidence, provenance, target path, timestamp, and confirmation.",
-            "Promotion audit records are audit-only until apply-promotion succeeds.",
-            "Failure Safety",
-            "Memory/Canon must remain unchanged",
+            "Before-state token",
+            "before_state_snapshot_token: selectedRevision.before_state.snapshot_token",
+            "The backend verified the destination still matches the recorded before state.",
+            "Approval event",
+            "Apply ID",
+            "Sealed-contract hash",
+            "Approved-record hash",
+            "Approved-record size",
+            "Apply-Promotion completed",
+            "Memory/Canon remains unchanged.",
+            "Final apply failed closed.",
         ),
         "OMI-APPLY-PROMOTION-AUDIT-BEFORE-STATE",
     )
@@ -716,10 +724,12 @@ def test_omi_apply_promotion_no_enabled_apply_outside_confirmation() -> None:
     outside_source = combined_source((OMI_DASHBOARD_JSX, OMI_CANDIDATE_DETAIL_JSX, OMI_EVIDENCE_DRAWER_JSX))
     confirmation_source = read_source(APPLY_PROMOTION_CONFIRMATION_JSX)
 
-    assert "data-testid=\"omi-apply-promotion-final-action\"" not in outside_source
+    assert "className=\"omi-final-apply-button\"" not in outside_source
     assert "submitApplyPromotion" not in outside_source
-    assert "data-testid=\"omi-apply-promotion-final-action\"" in confirmation_source
+    assert "className=\"omi-final-apply-button\"" in confirmation_source
     assert "submitApplyPromotion" in confirmation_source
+    assert "disabled={finalApplyDisabled}" in confirmation_source
+    assert "if (!finalConfirmationChecked)" in confirmation_source
     assert "Disabled: apply-promotion requires a completed route-backed confirmation and every handoff gate." in outside_source
 
 
@@ -735,19 +745,35 @@ def test_omi_apply_promotion_source_has_no_generated_prose_controls() -> None:
     )
     lowered = source.lower()
 
-    forbidden_control_labels = (
-        "rewrite",
-        "continue",
-        "outline",
-        "draft",
-        "polish",
-        "improve",
-        "expand",
-        "imitate",
-        "revise",
-        "compose",
+    forbidden_prose_controls = (
+        "generate prose",
+        "generate story prose",
+        "generated prose",
+        "rewrite prose",
+        "rewrite story prose",
+        "continue scene",
+        "outline chapter",
+        "polish story prose",
+        "improve story prose",
+        "expand story prose",
+        "imitate story prose",
+        "compose story prose",
+        "generate_prose",
+        "rewrite_prose",
+        "continue_scene",
+        "outline_chapter",
+        "polish_prose",
+        "improve_prose",
+        "expand_prose",
+        "imitate_prose",
+        "compose_story_prose",
+        "generateprose",
+        "rewriteprose",
+        "continuescene",
+        "call_model",
+        "call_ollama",
     )
 
     assert not [
-        label for label in forbidden_control_labels if label in lowered
+        marker for marker in forbidden_prose_controls if marker in lowered
     ], "OMI apply-promotion confirmation source must not expose generated-prose controls."

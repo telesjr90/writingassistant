@@ -46,10 +46,10 @@ def test_offline_run_reads_fixtures_and_returns_summary():
     report = baseline_eval.run_offline_fixture_evaluation(FIXTURE_DIR)
 
     assert report["mode"] == "offline_fixtures"
-    assert report["summary"]["total_fixture_count"] == 6
-    assert report["summary"]["json_fixture_count"] == 5
+    assert report["summary"]["total_fixture_count"] == 7
+    assert report["summary"]["json_fixture_count"] == 6
     assert report["summary"]["malformed_fixture_count"] == 1
-    assert report["summary"]["normalized_output_count"] == 5
+    assert report["summary"]["normalized_output_count"] == 6
     assert report["summary"]["error_count"] == 0
 
 
@@ -73,7 +73,7 @@ def test_output_report_contains_expected_keys(tmp_path):
     } <= set(written["pass_fail"])
 
 
-def test_all_app_12_fixtures_are_represented():
+def test_all_app_13_fixtures_are_represented():
     report = baseline_eval.run_offline_fixture_evaluation(FIXTURE_DIR)
     fixture_names = {item["fixture_name"] for item in report["per_fixture"]}
 
@@ -84,6 +84,7 @@ def test_all_app_12_fixtures_are_represented():
         "refusal_response.json",
         "insufficient_evidence_story_check.json",
         "unsafe_output_story_check.json",
+        "grounding_regression_t002d.json",
     }
 
 
