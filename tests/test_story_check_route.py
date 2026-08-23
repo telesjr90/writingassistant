@@ -1,53 +1,8 @@
 import sys
-import types
 from pathlib import Path
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-
-class _FakeFastAPI:
-    def add_middleware(self, *args, **kwargs):
-        return None
-
-    def get(self, *args, **kwargs):
-        return self._decorator
-
-    def post(self, *args, **kwargs):
-        return self._decorator
-
-    def put(self, *args, **kwargs):
-        return self._decorator
-
-    @staticmethod
-    def _decorator(func):
-        return func
-
-
-class _FakeHTTPException(Exception):
-    def __init__(self, status_code, detail):
-        super().__init__(detail)
-        self.status_code = status_code
-        self.detail = detail
-
-
-class _FakeBaseModel:
-    pass
-
-
-fake_fastapi = types.ModuleType("fastapi")
-fake_fastapi.FastAPI = _FakeFastAPI
-fake_fastapi.HTTPException = _FakeHTTPException
-fake_middleware = types.ModuleType("fastapi.middleware")
-fake_cors = types.ModuleType("fastapi.middleware.cors")
-fake_cors.CORSMiddleware = object
-fake_pydantic = types.ModuleType("pydantic")
-fake_pydantic.BaseModel = _FakeBaseModel
-
-sys.modules.setdefault("fastapi", fake_fastapi)
-sys.modules.setdefault("fastapi.middleware", fake_middleware)
-sys.modules.setdefault("fastapi.middleware.cors", fake_cors)
-sys.modules.setdefault("pydantic", fake_pydantic)
 
 from backend import main
 
@@ -58,7 +13,7 @@ def _patch_story_check(monkeypatch, payload):
         assert scene_id == "scene_001"
         return payload
 
-    monkeypatch.setattr(main.analysis_engine, "run_story_check", fake_run_story_check)
+    monkeypatch.setattr(main._analysis_module, "run_story_check", fake_run_story_check)
 
 
 def test_story_check_route_returns_minimal_report(monkeypatch):
@@ -176,7 +131,7 @@ def test_story_check_route_returns_mock_mode_output_without_ollama(monkeypatch):
     def fail_post(*args, **kwargs):
         raise AssertionError("mock route must not call Ollama")
 
-    monkeypatch.setattr(main.analysis_engine.requests, "post", fail_post)
+    monkeypatch.setattr(main._analysis_module.requests, "post", fail_post)
 
     body = main.story_check("example", "scene_001")
 
