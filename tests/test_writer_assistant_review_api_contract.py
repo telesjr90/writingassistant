@@ -25,6 +25,7 @@ runtime extraction, or generated prose.
 """
 
 from pathlib import Path
+import re
 
 import pytest
 
@@ -303,10 +304,8 @@ FORBIDDEN_SOURCE_TERMS = (
     "FastAPI(",
     "write_to_memory",
     "write_to_canon",
-    "apply_promotion",
     "promote_candidate",
     "approve_candidate",
-    "generated_prose",
     "rewrite_source",
     "continue_scene",
     "run_booknlp",
@@ -314,6 +313,22 @@ FORBIDDEN_SOURCE_TERMS = (
     "persist_raw_artifact",
     "create_training_record",
     "export_jsonl",
+)
+
+FORBIDDEN_APPLY_PROMOTION_SOURCE_PATTERNS = (
+    r'''["']apply[-_]promotion["']''',
+    r"\bapply_promotion\s*\(",
+    r"^\s*(?:from|import)\s+[^\n]*\bapply_promotion\b",
+    r"\b(?:execute|run|perform|invoke|delegate)_apply_promotion\b",
+    r"\bapply_promotion_(?:executor|handler|service|client)\b",
+)
+
+FORBIDDEN_GENERATED_PROSE_SOURCE_PATTERNS = (
+    r'''["'](?:generate|generated)[-_]prose["']''',
+    r"\b(?:generate|generated)_prose\s*\(",
+    r"^\s*(?:from|import)\s+[^\n]*\b(?:generate|generated)_prose\b",
+    r"\b(?:execute|run|perform|invoke|delegate)_(?:generate|generated)_prose\b",
+    r"\b(?:generate|generated)_prose_(?:executor|handler|service|client)\b",
 )
 
 
@@ -672,3 +687,7 @@ def test_future_review_api_source_has_no_route_runtime_prose_raw_or_mutation_imp
 
     for term in FORBIDDEN_SOURCE_TERMS:
         assert term not in source, term
+    for pattern in FORBIDDEN_APPLY_PROMOTION_SOURCE_PATTERNS:
+        assert re.search(pattern, source, flags=re.MULTILINE) is None, pattern
+    for pattern in FORBIDDEN_GENERATED_PROSE_SOURCE_PATTERNS:
+        assert re.search(pattern, source, flags=re.MULTILINE) is None, pattern
