@@ -20,12 +20,13 @@ the package or unrelated implications to authority.
 
 ## Accepted consolidated plan
 
-- PHASE8-IMPL-024 controlling order is `T003 -> T006 -> T007 -> T004 -> T005
-  -> T008`, preserving T003A complete and T003B/T003C current sequence. T007C
-  precedes T004/T005; T006 follows T003; T007 follows T006.
-- PHASE8-IMPL-025 remains planned and inactive until PHASE8-IMPL-024 is fully
-  closed, closeout validation passes, and the post-closeout Project Memory
-  refresh is accepted and `FRESH`.
+- PHASE8-IMPL-024 completed its controlling order `T003 -> T006 -> T007 ->
+  T004 -> T005 -> T008` and is complete/closed as complete/PASS.
+- PHASE8-IMPL-025 is published/active after PHASE8-IMPL-024 fully closed and
+  application closeout validation passed. PHASE8-IMPL-025-T001 is planned,
+  dependency-satisfied/eligible, and not begun; no implementation child is
+  active or in progress. Project Memory is paused/nonblocking and is not an
+  activation gate.
 - PHASE8-IMPL-025 uses shared T001-T003 contracts followed by independent
   contributor branches, explicit join dependencies, and no artificial
   T004-through-T011 serial chain.
@@ -38,18 +39,20 @@ the package or unrelated implications to authority.
   PHASE8-IMPL-023-T024-T026 intent is incorporated as historical baseline and
   has no competing terminal suite or owner gate.
 - PHASE8-IMPL-027 is the single current terminal real-project/browser/live-
-  runtime owner acceptance and closeout gate, including the mandatory final
-  Project Memory refresh.
+  runtime owner acceptance and closeout gate. Project Memory is not a terminal
+  application gate while the accepted 2026-07-17 pause decision remains
+  current.
 
 ## Preserved pending owner decisions
 
-PHASE8-IMPL-024-T007B still selects the component foundation later; no library
-is selected or installed here. Later owner decisions remain required for
-owner-visible physical migration, NCP export destination, retention/deletion,
-destructive operations, unresolved candidate-bundle behavior, and the final
-PHASE8-IMPL-027 accept/reject/defer gate. Full Subtxt authorization remains
-accepted; Q136-Q139 are technical T005 questions. External dramatica-flow
-remains owner-blocked, and the app-owned rubric remains distinct.
+PHASE8-IMPL-024-T007B completed/PASS with the owner-selected component
+foundation; it is no longer a pending decision. Later owner decisions remain
+required for owner-visible physical migration, NCP export destination,
+retention/deletion, destructive operations, unresolved candidate-bundle
+behavior, and the final PHASE8-IMPL-027 accept/reject/defer gate. Full Subtxt
+authorization remains accepted; Q136-Q139 are technical T005 questions.
+External dramatica-flow remains owner-blocked, and the app-owned rubric remains
+distinct.
 
 ## Safety and authority
 

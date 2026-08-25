@@ -7,6 +7,24 @@ applicable current entry and explicit supersession notices control current
 planning; older “next task” language is historical and must not be used as the
 current frontier.
 
+- PHASE8-IMPL-024-T008 application closeout validation and PHASE8-IMPL-024
+  parent closeout: accepted/current at
+  `docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md`.
+  T008 and T008A-T008F are complete/PASS; PHASE8-IMPL-024 is complete/closed as
+  complete/PASS. Accepted validation is bound to final implementation HEAD
+  `f8aeaa32327500832ed8678c194e3abf5e47a75b`; ordinary Python aggregate 5203
+  passed with zero unexpected failures/errors and exact expected-red
+  reproduction; roadmap validators, Node tests, build, live-backend browser,
+  responsive, semantic accessibility-tree proxy, and Chromium page-scale 2.0
+  passed; `ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED`; project,
+  application, and repository state remained unchanged. Accepted archive
+  SHA-256: `cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0`.
+  PHASE8-IMPL-025 is published/active; T001 is the immediate application
+  frontier as planned, dependency-satisfied/eligible, and not begun. No
+  PHASE8-IMPL-025 implementation child began. Project Memory remains
+  paused/nonblocking. Broad owner acceptance and MVP readiness remain blocked
+  on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027.
+
 - Project Memory paused as an application implementation gate: accepted/current
   owner decision dated 2026-07-17 at
   `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`.

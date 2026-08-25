@@ -227,9 +227,11 @@ or the new PHASE8-IMPL-025 workstreams are complete.
 ## Planned parent and sequencing
 
 `PHASE8-IMPL-025 — Layered Analysis Architecture and Tool Integration
-Expansion` is published/planned and inactive. T001/T002 are already
-complete/PASS. Activation waits for full PHASE8-IMPL-024 parent closeout,
-passing closeout validation, and an accepted `FRESH` Project Memory refresh.
+Expansion` is published/active after full PHASE8-IMPL-024 parent closeout and
+passing application closeout validation. PHASE8-IMPL-025-T001 is planned,
+dependency-satisfied/eligible, and not begun; no implementation child is active
+or in progress. Project Memory remains paused/nonblocking and is not an
+activation gate.
 
 After that boundary, PHASE8-IMPL-025 proceeds through the
 tool-role/orchestration contract, source identity/run manifest, immutable

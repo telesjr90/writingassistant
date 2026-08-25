@@ -4,11 +4,12 @@
 
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
-- Status: published/planned
-- Immediate implementation frontier: `PHASE8-IMPL-024-T003B`
-  (`planned/next/unimplemented`)
-- Activation dependency: PHASE8-IMPL-024 fully complete/closed, closeout
-  validation PASS, and accepted post-closeout Project Memory refresh `FRESH`
+- Status: published/active
+- Immediate implementation frontier: `PHASE8-IMPL-025-T001`
+  (`planned`; dependency-satisfied/eligible; not begun)
+- Activation dependency: satisfied by PHASE8-IMPL-024 fully complete/closed
+  with application closeout validation PASS; Project Memory is
+  paused/nonblocking and is not an activation gate
 - Controlling decision:
   `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`
 
@@ -78,7 +79,7 @@ All are planned. Lettered bounded slices are defined in the parent task record.
 ## Dependencies
 
 ```text
-PHASE8-IMPL-024 closeout + validation PASS + accepted FRESH refresh
+PHASE8-IMPL-024 closeout + application validation PASS
   -> PHASE8-IMPL-025 -> T001 -> T002 -> T003
   -> [T004] + [T005 -> T006] + [T007]
   -> T008
@@ -90,7 +91,9 @@ T007 consumes PHASE8-IMPL-024-T002's completed Story Check grounding work and
 must not duplicate it. T010H waits for T009 and T010 backend contracts; T011H
 waits for T003F and the completed PHASE8-IMPL-024 component foundation. T012
 reuses PHASE8-IMPL-024-T008 and adds only layered deltas. T012I apply-promotion
-validation remains isolated.
+validation remains isolated. No PHASE8-IMPL-025 child has begun; T001 remains
+planned and requires a separately owner-authorized context-generation task
+before implementation activation.
 
 ## Open technical questions
 

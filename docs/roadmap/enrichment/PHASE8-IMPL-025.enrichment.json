@@ -1,7 +1,7 @@
 {
   "task_id": "PHASE8-IMPL-025",
   "title": "Layered Analysis Architecture and Tool Integration Expansion",
-  "status": "published/planned",
+  "status": "published/active",
   "task_type": "implementation parent",
   "mvp_required": true,
   "context_pack": null,
@@ -73,11 +73,11 @@
     "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
   ],
   "activation": {
-    "status": "planned",
+    "status": "active",
     "depends_on": ["PHASE8-IMPL-024"],
-    "activation_condition": "PHASE8-IMPL-024 complete/closed, closeout validation PASS, accepted post-closeout Project Memory refresh FRESH",
-    "immediate_next_task": "PHASE8-IMPL-024-T003C",
-    "immediate_next_task_status": "planned/next/unimplemented",
+    "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
+    "immediate_next_task": "PHASE8-IMPL-025-T001",
+    "immediate_next_task_status": "planned/dependency-satisfied/eligible/not-begun",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "planned"
   },

@@ -947,14 +947,14 @@
   "latest_child_task": "PHASE8-IMPL-023-T023B",
   "latest_child_status": "complete/PASS",
   "latest_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-023-T023B-grouped-review-react-ui-and-owner-decision-integration.md",
-  "next_child_task": "PHASE8-IMPL-024-T003C",
-  "next_child_title": "Conditional frontend loading with distinct absent, invalid, and request-failure states",
-  "next_child_status": "planned/next/unimplemented",
+  "next_child_task": "PHASE8-IMPL-025-T001",
+  "next_child_title": "Tool-role and layered-orchestration contract",
+  "next_child_status": "planned/dependency-satisfied/eligible/not-begun",
   "parent_status": "published/historical foundation",
-  "full_mvp_completion_status": "blocked by remaining PHASE8-IMPL-024 work, planned/inactive PHASE8-IMPL-025 layered delivery, and terminal PHASE8-IMPL-027 acceptance",
+  "full_mvp_completion_status": "blocked by active PHASE8-IMPL-025 layered delivery and terminal PHASE8-IMPL-027 acceptance; PHASE8-IMPL-024 complete/closed",
   "owner_gate_status": "accepted historically, not full MVP completion",
   "latest_child_title": "Grouped-review React UI and owner-decision integration",
-  "latest_child_summary": "T023A/T023B remain complete/PASS historical foundation. Completed PHASE8-IMPL-024 T001/T002/T003A repairs are not reopened. T003B is the application frontier. Current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027.",
+  "latest_child_summary": "T023A/T023B remain complete/PASS historical foundation. PHASE8-IMPL-024 T001-T008 and T008A-T008F are complete/PASS and are not reopened. PHASE8-IMPL-025-T001 is the planned, dependency-satisfied/eligible, not-begun application frontier. Current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027.",
   "latest_verified_evidence": {
     "run_id": "20260712T030010Z",
     "classification": "successful evidence collection, not product-wide pass",
@@ -970,14 +970,14 @@
   ],
   "repair_dependency": {
     "parent": "PHASE8-IMPL-024",
-    "next_task": "PHASE8-IMPL-024-T003B",
-    "ordering": ["T001 guided-creation integrity complete/PASS", "T002 Story Check grounding complete/PASS", "T003 optional resources with T003B next", "T006 truthful navigation", "T007 evidence/owner-decision/component foundation", "T004 responsive containment", "T005 accessibility", "T008 reusable validation baseline and parent closeout"],
+    "next_task": "PHASE8-IMPL-025-T001",
+    "ordering": ["T001 guided-creation integrity complete/PASS", "T002 Story Check grounding complete/PASS", "T003 optional resources complete/PASS", "T006 truthful navigation complete/PASS", "T007 evidence/owner-decision/component foundation complete/PASS", "T004 responsive containment complete/PASS", "T005 accessibility complete/PASS", "T008 reusable validation baseline and parent closeout complete/PASS"],
     "architecture_follow_on": {
       "parent": "PHASE8-IMPL-025",
-      "status": "published/planned",
-      "activation_after": ["PHASE8-IMPL-024 parent complete/closed", "closeout validation PASS", "accepted post-closeout Project Memory refresh FRESH"],
+      "status": "published/active",
+      "activation_after": ["satisfied: PHASE8-IMPL-024 parent complete/closed", "satisfied: application closeout validation PASS", "Project Memory paused/nonblocking and not an activation gate"],
       "first_task": "PHASE8-IMPL-025-T001",
-      "first_task_status": "planned"
+      "first_task_status": "planned/dependency-satisfied/eligible/not-begun"
     }
   },
   "audit_risks": [

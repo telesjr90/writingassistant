@@ -2,7 +2,7 @@
 
 ## Status
 
-Published and active as the release-blocker repair parent.
+Complete/closed as complete/PASS.
 
 T001 OMI-guided creation integrity is complete/PASS through T001A-T001D.
 
@@ -12,11 +12,11 @@ T003 optional-resource handling is complete/PASS through T003A-T003C. Accepted T
 
 T006 truthful OMI navigation is complete/PASS through T006A-T006C. T006A commit: `64dd90c23a926465ec42718032d79c6181d138e4`; T006B commit: `14e8c8138621a87973fb469e8233c08180da8374`; T006C fresh PASS evidence: `.codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z`.
 
-Latest completed task: `PHASE8-IMPL-024-T008F - Non-mutating resilience and accessibility suite` is complete/PASS (validation-only/read-only; accepted final archive SHA-256 `83e373a0101bb77ef33e25d82946b8ce244012fbedd302367eed02256718fd79`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008F-non-mutating-resilience-and-accessibility-suite-closeout.md`). T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
+Latest completed task: `PHASE8-IMPL-024-T008 - Remaining validation suites` is complete/PASS. Its T008A-T008F child history remains complete/PASS with the existing child closeout records and evidence. Application closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md`. T004 is complete/PASS through T004A-T004C. T005 is complete/PASS through T005A-T005C. T007 is complete/PASS through T007A-T007C.
 
-Current frontier: the existing `PHASE8-IMPL-024-T008` application closeout-validation boundary. T008A through T008F are complete/PASS, but T008 remains active/in_progress until it validates and closes PHASE8-IMPL-024. PHASE8-IMPL-024 remains active, incomplete, and closeout-ready; PHASE8-IMPL-025 remains planned/inactive.
+Current frontier: `PHASE8-IMPL-025-T001 - Tool-role and layered-orchestration contract` is planned, dependency-satisfied/eligible, and not begun. PHASE8-IMPL-025 is published/active after the PHASE8-IMPL-024 closeout boundary passed. No PHASE8-IMPL-025 implementation child is active or in progress.
 
-The application is not ready for broad owner acceptance or MVP readiness. T001 has repaired the guided-creation P0 defect; T002 has repaired the Story Check grounding P0 defect; T003 has repaired and validated optional-resource handling; T006 has repaired and validated truthful OMI navigation; T007A has completed the evidence-based Impeccable UI review; T007B has recorded the owner component-foundation decision; T007C has standardized the design system and shared components; T004 has repaired responsive containment; T005 has repaired accessibility semantics, targets, and keyboard focus. The T008 validation workstream remains active/in_progress.
+The application is not ready for broad owner acceptance or MVP readiness. PHASE8-IMPL-024 and its T001-T008 workstreams are complete/closed, but PHASE8-IMPL-025 layered architecture/integration work and terminal PHASE8-IMPL-027 owner acceptance remain planned. Closing PHASE8-IMPL-024 does not complete the product or MVP.
 
 ## Controlling Evidence
 
@@ -41,6 +41,8 @@ T007A final PASS evidence is `.codex-context/PHASE8-IMPL-024/manual-validation/T
 T007B final owner decision is `docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md` (Radix Primitives selected for incremental accessibility and complex-interaction primitives, native HTML where sufficient, application-owned product semantics and design tokens; no dependency installed in T007B).
 
 T007C final PASS_WITH_FINDINGS evidence is externally preserved. T007C implementation commits: `71393b40a60888506c6ed63ca8444e8639fa22c3` (Radix Evidence Drawer), `9ea8557c97266953cd5eb5bc7d2dfe8626ec8efd` (design contract and semantic tokens), `8c338913516c5eec99c72e0daeb890ac7960ade1` (OMILoadingState), and `945254a844a33323d292ab9afb7e3f98346faef3` (OMIEmptyCandidateShellWarning). Readiness archive: `/tmp/PHASE8-IMPL-024-T007C-closeout-readiness-20260722T040518Z.tar.gz` (SHA-256 `31c2a17a8231a0b3e9cb034b807588f9e75b454b300e8c5894185c3306a697a8`). Consolidated validation archive: `/tmp/PHASE8-IMPL-024-T007C-consolidated-validation-resumed-20260722T044725Z.tar.gz` (SHA-256 `21ee0e54b9aa2fa700912f8b1b635720bcf7fef7492ef3c995e2ee2dbe925bb6`). Accepted validation result: `PASS_WITH_FINDINGS — T007C_CONSOLIDATED_VALIDATION_ACCEPTED`. Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T007-design-system-and-shared-component-standardization-closeout.md`.
+
+T008/PHASE8-IMPL-024 application closeout validation is complete/PASS at final implementation HEAD `f8aeaa32327500832ed8678c194e3abf5e47a75b`. The deterministic 100-file inventory SHA-256 is `c455b33b2eb303252ac48334f8748f2eb9f1a4577c186906842d9b797e81755f`; the five ordinary Python batches aggregate to 5203 passed with zero unexpected failures/errors, and the intentional expected-red batch reproduced exactly at 5 failed / 1 passed. Roadmap validators passed. Standalone Node tests passed 8/8; the production build passed with 200 modules transformed and only the existing nonblocking chunk-size advisory. Final `apiMode=live-backend` browser validation passed at 1440x1000 and 390x900 with zero page/console errors or warnings, failed requests, unexpected errors/non-2xx, unmatched fixture calls, non-GET API requests, mutating API requests, or apply-promotion requests. `ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED`; `SEMANTIC_ACCESSIBILITY_TREE_PROXY=PASS`; Chromium page-scale emulation at 2.0 passed. Fresh `projects/` manifests were byte-identical before/after (SHA-256 `2af75aad127f97e2ddd389e1fa24045e670ead70f95c392e0ceb7e17b29e116c`), and candidate, approved Memory, Canon, Bible, Storyform, project state, repository, and project data were unchanged. Accepted archive: `/tmp/PHASE8-IMPL-024-T008-runtime-browser-retry-20260824T193730Z.tar.gz` (SHA-256 `cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0`; internal verification 58/58 PASS). Closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md`.
 
 ## Release Blockers
 
@@ -72,16 +74,15 @@ order establish execution sequence:
 - Design-system and shared-component standardization: `T007C` (complete/PASS).
 - Responsive containment and validation: `T004` (complete/PASS through T004A-T004C).
 - Accessibility semantics, target sizing, and keyboard validation: `T005` (complete/PASS through T005A-T005C).
-- Remaining validation suites: `T008` (active/in_progress only for its required PHASE8-IMPL-024 application closeout-validation gate; T008A through T008F complete/PASS; no new child is created).
+- Remaining validation suites: `T008` (complete/PASS; T008A through T008F preserved complete/PASS; application closeout validation PASS; no new child was created).
 
 The controlling indexed order is therefore `T003 -> T006 -> T007 -> T004 ->
 T005 -> T008`. T003, T006, T007A, T007B, T007C, T007, T004, and T005 are complete/PASS.
 T008A through T008F are complete/PASS in the preserved owner-approved order
-`T008A -> T008B -> T008C -> T008D -> T008E -> T008F`. The current application
-frontier is the existing T008/PHASE8-IMPL-024 closeout-validation boundary;
-T008 remains active/in_progress for that gate, no new child is created, and
-PHASE8-IMPL-025 remains inactive. This order is already owner-approved and does
-not require another decision gate.
+`T008A -> T008B -> T008C -> T008D -> T008E -> T008F`. T008 is complete/PASS,
+PHASE8-IMPL-024 is complete/closed, and the current application frontier is
+PHASE8-IMPL-025-T001 as planned, dependency-satisfied/eligible, and not begun.
+No PHASE8-IMPL-025 implementation child is active or in progress.
 
 This ordering prevents premature visual polish, avoids selecting a component
 library without evidence, and avoids repeating responsive and accessibility
@@ -110,7 +111,7 @@ Lettered children are bounded execution slices under the indexed workstream chil
 
 The grounding validator must avoid over-filtering potentially useful diagnostics: unsupported factual warnings are quarantined or explicitly unverified, while supported non-factual diagnostics may remain visible under their correct evidence status.
 
-Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/hash, direct factual evidence, deterministic grounding, unsupported-output quarantine, and source-mismatch failure repair. The planned `PHASE8-IMPL-025-T007` must consume and extend this result into the shared `AnalysisRunManifest`/evidence-ledger architecture and the separate Ollama roles; it must not create a duplicate or conflicting Story Check grounding contract. PHASE8-IMPL-025 remains planned until T001/T002 complete.
+Architecture coordination: T002 owns the immediate P0 exact-selected-source ID/hash, direct factual evidence, deterministic grounding, unsupported-output quarantine, and source-mismatch failure repair. The planned `PHASE8-IMPL-025-T007` must consume and extend this result into the shared `AnalysisRunManifest`/evidence-ledger architecture and the separate Ollama roles; it must not create a duplicate or conflicting Story Check grounding contract. PHASE8-IMPL-025 is now published/active after the PHASE8-IMPL-024 closeout boundary passed; its T007 remains planned.
 
 ### `PHASE8-IMPL-024-T003` - Optional-resource handling
 
@@ -160,7 +161,7 @@ T005 is complete/PASS through T005A-T005C. The guided setup-to-review `BODY_FOCU
 
 ### `PHASE8-IMPL-024-T008` - Remaining validation suites
 
-T008 is active/in_progress. The owner-approved child order is T008A -> T008B -> T008C -> T008D -> T008E -> T008F.
+T008 is complete/PASS. The owner-approved child order is T008A -> T008B -> T008C -> T008D -> T008E -> T008F.
 
 - `PHASE8-IMPL-024-T008A` - Guided-creation persistence suite (`complete/PASS`; validation-only; closeout decision: `docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md`).
 - `PHASE8-IMPL-024-T008B` - Candidate lifecycle and grouped-review owner-decision suite (`complete/PASS`; validation-led with narrow stale-test correction commit `81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593`; accepted runtime archive SHA-256 `66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md`; separate from apply-promotion).
@@ -169,9 +170,14 @@ T008 is active/in_progress. The owner-approved child order is T008A -> T008B -> 
 - `PHASE8-IMPL-024-T008E` - Review-queue command suite (`complete/PASS`; depends on T008D; implementation commit `f9f189c2f037e08feb65ae5a4b8c7c5327ea1275`; reviewed patch SHA-256 `79564b206d9c3ad5b72d09599edf4ba2bfdbc121ecb582c7ef250dd7bbe6dc7b`; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md`; separate disposable project).
 - `PHASE8-IMPL-024-T008F` - Non-mutating resilience and accessibility suite (`complete/PASS`; validation-only/read-only; 165 focused pytest tests passed; Grouped Review Node test 1 passed; frontend build PASS; loading/degraded/recovery, Dashboard/Candidate Detail/Grouped Review keyboard traversal, native details/summary activation, Evidence Drawer focus restoration, eligible Grouped Review ARIA snapshot, semantic accessibility-tree proxy, and Chromium page-scale emulation at 2.0 PASS; final browser 79 PASS / 0 FAIL; all telemetry zero; `nonGetApiRequests=0`; `mutatingApiRequests=0`; no product defect or repository/application/project-data mutation; closeout: `docs/roadmap/decisions/PHASE8-IMPL-024-T008F-non-mutating-resilience-and-accessibility-suite-closeout.md`).
 
-All T008 children A-F are complete/PASS. T008 remains active/in_progress only
-for its required PHASE8-IMPL-024 application closeout-validation gate; it has
-no planned child and no new child ID is created.
+All T008 children A-F are complete/PASS. T008 and its required
+PHASE8-IMPL-024 application closeout-validation gate are complete/PASS; it has
+no planned child and no new child ID was created.
+
+The accepted T008 application closeout validation is bound to final
+implementation HEAD `f8aeaa32327500832ed8678c194e3abf5e47a75b` and the
+complete evidence summarized under Controlling Evidence. It closes
+PHASE8-IMPL-024 as complete/closed without beginning PHASE8-IMPL-025 work.
 
 Every future mutation suite must use its own disposable `uiux-audit-*` project; capture API and filesystem manifests before and after; reject writes outside that project; preserve all existing projects; package evidence before cleanup; and remove only the exact disposable project. Apply-promotion validation must never be combined with read-only or candidate-decision validation.
 
@@ -179,8 +185,10 @@ T008 is the reusable UI/readiness regression baseline for later layered work.
 PHASE8-IMPL-025-T012 adds only layered-runtime and integration deltas. Candidate
 lifecycle, promotion, apply-promotion, review-queue, and owner-decision
 assertions must be reused from these suites rather than independently
-reimplemented. T008 closeout must validate and close the PHASE8-IMPL-024 parent;
-PHASE8-IMPL-025 may activate after that application closeout validation passes.
+reimplemented. T008 closeout validated and closed the PHASE8-IMPL-024 parent.
+PHASE8-IMPL-025 is published/active because that application closeout boundary
+passed; PHASE8-IMPL-025-T001 is planned, dependency-satisfied/eligible, and not
+begun.
 Project Memory is not an activation or closeout gate while the accepted
 2026-07-17 pause decision remains current.
 
@@ -188,7 +196,7 @@ Project Memory is not an activation or closeout gate while the accepted
 
 Verified working behavior is limited to the successful reconciliation collector's actual coverage: read-only existing-project navigation, correct selected Story Check source transport, regular disposable project creation and owner-authored scene/note/material writes, unsaved-switch confirmation, staged guided-creation UI progression, and preservation of existing projects during that run.
 
-Verified defects were P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s. T001, T002, and T003 have repaired and closed the first, second, and optional-resource defects respectively. The captured overflow and OMI heading skip remain open in later workstreams.
+Verified defects were P0-A, P0-B, document-level horizontal overflow in captured responsive/OMI views, OMI heading skip in captured states, and repeated normally absent-resource 404s. T001, T002, and T003 repaired and closed the first, second, and optional-resource defects respectively; T004 repaired responsive containment and T005 repaired accessibility semantics and heading behavior.
 
 Likely defects requiring focused manual review are OMI workspace density, weak next-task prioritization, and undersized-control standards triage. T006 repaired and validated misleading enabled actions and OMI internal reset ambiguity.
 

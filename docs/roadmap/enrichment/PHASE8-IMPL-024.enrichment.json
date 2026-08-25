@@ -1,29 +1,29 @@
 {
   "task_id": "PHASE8-IMPL-024",
   "title": "Application UI/UX Audit Integrity and Acceptance Repair",
-  "status": "published/active",
+  "status": "complete/PASS",
   "task_type": "implementation parent",
   "mvp_required": true,
   "context_pack": ".codex-context/application-uiux-audit/",
   "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-application-uiux-audit-readiness-reconciliation.md",
-  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008F-non-mutating-resilience-and-accessibility-suite-closeout.md",
+  "latest_closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
   "architecture_coordination": {
     "follow_on_parent": "PHASE8-IMPL-025",
-    "follow_on_status": "published/planned",
+    "follow_on_status": "published/active",
     "controlling_architecture_decision": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
     "activation_after": [
       "PHASE8-IMPL-024"
     ],
     "story_check_boundary": "PHASE8-IMPL-024-T002 owns the immediate P0 grounding repair; complete/PASS through T002A-T002E; PHASE8-IMPL-025-T007 consumes and extends the exact-source-ID/hash, deterministic verification-state, unsupported-factual quarantine, and source-mismatch fail-closed contract without duplication",
     "subtxt_authorization": "resolved; full runtime planned separately in PHASE8-IMPL-025-T005 and PHASE8-IMPL-025-T006",
-    "immediate_next_task": "PHASE8-IMPL-024-T008",
-    "activation_state": "T001/T002/T003/T006/T007/T004/T005 and T008A-T008F are complete/PASS; T008 remains active/in_progress for the PHASE8-IMPL-024 application closeout-validation gate; PHASE8-IMPL-024 remains active, incomplete, and closeout-ready; PHASE8-IMPL-025 remains inactive until PHASE8-IMPL-024 is fully closed and application closeout validation passes"
+    "immediate_next_task": "PHASE8-IMPL-025-T001",
+    "activation_state": "T001/T002/T003/T006/T007/T004/T005/T008 and T008A-T008F are complete/PASS; PHASE8-IMPL-024 is complete/closed after application closeout validation PASS; PHASE8-IMPL-025 is published/active; PHASE8-IMPL-025-T001 is planned, dependency-satisfied/eligible, and not begun; no PHASE8-IMPL-025 implementation child is active or in progress"
   },
   "readiness": {
     "broad_owner_acceptance": "blocked",
     "mvp_readiness": "blocked",
     "p0_blockers": [],
-    "remaining_workstreams": ["PHASE8-IMPL-024-T008"]
+    "remaining_workstreams": []
   },
   "t001_closeout": {
     "status": "complete/PASS",
@@ -648,8 +648,8 @@
     "closeout_decision": "docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md"
   },
   "t008_activation": {
-    "status": "active/in_progress",
-    "parent_status": "active/in_progress",
+    "status": "complete/PASS",
+    "parent_status": "complete/closed as complete/PASS",
     "children": {
       "T008A": "complete/PASS; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md",
       "T008B": "complete/PASS; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; closeout: docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md",
@@ -668,10 +668,10 @@
     "t008f_scope": "Non-mutating resilience and accessibility validation-only/read-only suite; no repository, application, project-data, candidate, promotion, Memory, or Canon mutation",
     "latest_child_task": "PHASE8-IMPL-024-T008F",
     "next_child_task": null,
-    "next_task": "PHASE8-IMPL-024-T008"
+    "next_task": "PHASE8-IMPL-025-T001"
   },
   "latest_verified_evidence": {
-    "classification": "T008F non-mutating resilience and accessibility suite complete/PASS; all T008 children A-F complete/PASS; T008 remains active/in_progress for PHASE8-IMPL-024 application closeout validation; not product-wide acceptance",
+    "classification": "T008 application closeout validation complete/PASS; all T008 children A-F preserved complete/PASS; PHASE8-IMPL-024 complete/closed; not product-wide acceptance",
     "t008e_deterministic_report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/handoff/run-5-final.md",
     "t008e_runtime_api_report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-evidence-20260809TjocbKKZ/final-report.md",
     "t008e_browser_report": "/tmp/PHASE8-IMPL-024-T008E-codex-loop-20260809T193259Z/run6-editor-browser-retry-evidence-yNpPRony/final-report.md",
@@ -681,6 +681,14 @@
     "t008f_archive_sha256": "83e373a0101bb77ef33e25d82946b8ce244012fbedd302367eed02256718fd79",
     "t008f_result": "complete/PASS; validation-only/read-only; focused pytest 165 passed; Grouped Review Node 1 passed; frontend build PASS; loading/degraded/recovery PASS; Dashboard, Candidate Detail, Evidence Drawer, and eligible Grouped Review keyboard/focus behavior PASS; native details/summary activation PASS; eligible Grouped Review ARIA snapshot PASS; SEMANTIC_ACCESSIBILITY_TREE_PROXY=PASS; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; Chromium page-scale emulation at 2.0 PASS; final browser 79 PASS / 0 FAIL; all telemetry zero; nonGetApiRequests=0; mutatingApiRequests=0; no product defect or repository/application/project-data mutation",
     "t008f_historical_blockers": "Earlier BLOCKED_TEST_INFRASTRUCTURE runs remain preserved with their original classifications and are superseded for acceptance by the final successful evidence",
+    "t008_final_implementation_head": "f8aeaa32327500832ed8678c194e3abf5e47a75b",
+    "t008_inventory_sha256": "c455b33b2eb303252ac48334f8748f2eb9f1a4577c186906842d9b797e81755f",
+    "t008_deterministic_result": "complete/PASS; five ordinary Python batches aggregate to 5203 passed with zero unexpected failures/errors; intentional expected-red reproduced exactly at 5 failed / 1 passed; roadmap validators PASS; standalone Node 8 passed / 0 failed; production build PASS with 200 modules transformed and existing chunk-size advisory nonblocking",
+    "t008_browser_result": "complete/PASS with apiMode=live-backend at 1440x1000 and 390x900; page/console errors and warnings, failed requests, unexpected errors/non-2xx, unmatched fixture calls, non-GET API requests, mutating API requests, and apply-promotion requests all zero; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; SEMANTIC_ACCESSIBILITY_TREE_PROXY=PASS; Chromium page-scale emulation 2.0 PASS",
+    "t008_nonmutation_result": "fresh projects manifests byte-identical before/after with SHA-256 2af75aad127f97e2ddd389e1fa24045e670ead70f95c392e0ceb7e17b29e116c; candidate, approved Memory, Canon, Bible, Storyform, project state, repository, and project data unchanged",
+    "t008_archive": "/tmp/PHASE8-IMPL-024-T008-runtime-browser-retry-20260824T193730Z.tar.gz",
+    "t008_archive_sha256": "cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0",
+    "t008_archive_internal_verification": "58/58 PASS",
     "t007a": ".codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z",
     "t007a_result": "read-only UI audit PASS across 42 captures, 11 scenarios, and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no code/tracked/product-data changes; no commit or push; no forbidden or mutating requests",
     "t006c": ".codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z",
@@ -697,10 +705,10 @@
     "failed_collectors": "preserved with original classifications and excluded from passing aggregate evidence"
   },
   "next_planned_task": {
-    "task_id": "PHASE8-IMPL-024-T008",
-    "title": "Application closeout validation",
-    "status": "active/in_progress; child sequence T008A-T008F complete/PASS; parent/application closeout-validation gate pending",
-    "scope": "Existing T008/PHASE8-IMPL-024 application closeout-validation boundary only; no new child task"
+    "task_id": "PHASE8-IMPL-025-T001",
+    "title": "Tool-role and layered-orchestration contract",
+    "status": "planned; dependency-satisfied/eligible; not begun",
+    "scope": "Immediate application frontier only; separately owner-authorized context generation remains required before implementation child activation; no PHASE8-IMPL-025 child begun"
   },
   "workstream_order": [
     "PHASE8-IMPL-024-T001 OMI-guided creation integrity",
@@ -778,12 +786,12 @@
       "T006 truthful OMI navigation complete/PASS: T006A reset ownership commit 64dd90c, T006B truthful destinations commit 14e8c81, and T006C fresh validation 20260718T202605Z with 127/127 dedicated assertions, four tracked harnesses PASS, zero unexpected console/page/network failures, zero mutations, and identical protected snapshots/manifests",
       "T007A evidence-based Impeccable UI review complete/PASS: 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; 6 recommendations; 1 preference; 3 accepted behaviors; 2 deferred items; 1 collector limitation; 1 not-yet-tested; 1 historical baseline; no P0/P1 findings; no tracked/product-data changes; no commits; no forbidden/mutating requests; no component foundation selected or installed",
        "T007B owner component-foundation decision complete/PASS: native-first and application-owned semantics",
-       "T007C design-system standardization complete/PASS_WITH_FINDINGS: Radix Dialog for Evidence Drawer (71393b40), DESIGN.md/semantic-token foundation (9ea8557c), OMILoadingState (8c338913), OMIEmptyCandidateShellWarning (945254a8); accepted consolidated validation PASS; Radix naming/focus-containment/Escape/close/styled-opener-restoration PASS; zero mutating/apply-promotion requests; candidates and approved Memory/Canon unchanged; protected state unchanged; six families retained locally"
+       "T007C design-system standardization complete/PASS_WITH_FINDINGS: Radix Dialog for Evidence Drawer (71393b40), DESIGN.md/semantic-token foundation (9ea8557c), OMILoadingState (8c338913), OMIEmptyCandidateShellWarning (945254a8); accepted consolidated validation PASS; Radix naming/focus-containment/Escape/close/styled-opener-restoration PASS; zero mutating/apply-promotion requests; candidates and approved Memory/Canon unchanged; protected state unchanged; six families retained locally",
+      "T004 responsive containment complete/PASS and T005 accessibility semantics, targets, keyboard focus, and heading behavior complete/PASS",
+      "T008A-T008F preserved complete/PASS across guided creation, candidate lifecycle/grouped review, promotion handoff, apply-promotion, review-queue commands, non-mutating resilience, and accessibility",
+      "T008 application closeout validation complete/PASS at implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b with 5203 ordinary Python passes, exact expected-red reproduction, roadmap/Node/build/live-backend browser/responsive/accessibility PASS, and zero repository/project-data mutation"
     ],
-    "verified_defects": [
-      "captured document-level horizontal overflow",
-      "captured OMI heading hierarchy skip"
-    ],
+    "verified_defects": [],
     "t007a_verified_p2_defects": [
       "Candidate Detail field-table row action offscreen inside narrow horizontal-scroll viewport at desktop width",
       "At 320 x 568, application document expands to ~376 CSS pixels and clips Story Check source selector",
@@ -793,24 +801,18 @@
     "likely_manual_review": [
       "OMI workspace density and weak next-task prioritization",
       "undersized controls requiring standards-aware triage",
-      "repeated metadata and safety presentation patterns",
-       "guided review transition focus returns to BODY; non-blocking T005 follow-up",
-       "newly selected guided project option is temporarily disabled/invalid until library refresh; non-blocking T007 follow-up"
+      "repeated metadata and safety presentation patterns"
     ],
     "not_yet_tested": [
-      "review-queue commands",
-      "complete keyboard navigation beyond the T008D final-flow checks",
-      "browser zoom and screen-reader behavior",
-      "broader T008 resilience and accessibility states beyond the optional-resource failure/recovery contract validated by T003C and the apply-promotion states validated by T008D"
+      "actual screen-reader execution",
+      "browser-menu zoom or actual Chrome UI zoom",
+      "PHASE8-IMPL-025 layered-runtime and integration deltas over the reusable T008 baseline"
     ]
   },
   "risks": [
-    "hidden content caused by document overflow",
-    "unvalidated review-queue command and remaining advanced owner-mutation workflows",
     "failed collectors mistaken for product evidence",
-    "guided review focus and immediate selected-project presentation advisories",
     "over-filtering useful Story Check diagnostics (now guarded by quarantined/unverified classification; future architecture ungrounded-model-output risk carried into PHASE8-IMPL-025-T007)",
-    "responsive and accessibility rework caused by replacing shared components after those repairs are completed"
+    "future PHASE8-IMPL-025 component or integration changes regressing the reusable T008 UI/readiness baseline"
   ],
   "open_questions": [
     "MVP-required versus intentionally unavailable OMI destinations",
