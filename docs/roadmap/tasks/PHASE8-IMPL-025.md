@@ -2,7 +2,9 @@
 
 ## Status
 
-Published/active. No implementation child has begun or is complete.
+Published/active. T001 is complete/PASS. T002 is planned,
+dependency-satisfied/eligible, and not begun. No runtime implementation child
+is active or in progress.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
