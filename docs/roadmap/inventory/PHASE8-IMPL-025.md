@@ -5,13 +5,20 @@
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
 - Status: published/active
-- Immediate implementation frontier: `PHASE8-IMPL-025-T001`
+- Immediate implementation frontier: `PHASE8-IMPL-025-T002`
   (`planned`; dependency-satisfied/eligible; not begun)
 - Activation dependency: satisfied by PHASE8-IMPL-024 fully complete/closed
   with application closeout validation PASS; Project Memory is
   paused/nonblocking and is not an activation gate
-- Controlling decision:
+- Controlling decisions:
   `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`
+  and
+  `docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md`
+- Completed child: `PHASE8-IMPL-025-T001` (`complete/PASS`)
+- T001 supporting context pack:
+  `.codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/`
+  (generated/read-only supporting evidence, not authority or a tracked
+  deliverable)
 
 ## Owner authorization
 
@@ -48,7 +55,7 @@ layers or official/full Subtxt runtime path.
 | 1 | Raw spaCy, BookNLP, explicit NCP parsing, deterministic extraction | partial foundation |
 | 2 | Immutable raw artifact/evidence ledger and run manifest | partial/missing unified lineage |
 | 3 | Ollama, Story Check, full Subtxt, app-owned rubrics, diagnostics | partial; full Subtxt and project diagnostics missing |
-| 4 | Exact grounding and semantic guardrails | P0 Story Check work planned; shared guardrail missing |
+| 4 | Exact grounding and semantic guardrails | P0 Story Check grounding complete; shared guardrail missing |
 | 5 | Fusion/conflict/uncertainty/provenance | implemented foundation; layered inputs not fully validated |
 | 6 | Candidate persistence and expanded owner review | implemented foundation; correction lifecycle incomplete |
 | 7 | Explicit promotion and approved context | existing isolated boundary; layered handoff validation incomplete |
@@ -56,7 +63,8 @@ layers or official/full Subtxt runtime path.
 
 ## Indexed workstreams
 
-1. `PHASE8-IMPL-025-T001` — Tool-role and layered-orchestration contract.
+1. `PHASE8-IMPL-025-T001` — Tool-role and layered-orchestration contract
+   (`complete/PASS`).
 2. `PHASE8-IMPL-025-T002` — Source identity and AnalysisRunManifest.
 3. `PHASE8-IMPL-025-T003` — Immutable raw artifact and evidence ledger.
 4. `PHASE8-IMPL-025-T004` — BookNLP extraction expansion.
@@ -74,7 +82,8 @@ data compatibility; T005H/T006K provisioning and current-machine runtime
 compatibility; T010H NCP/diagnostics owner UI; T011H owner live-run workflow;
 T012K layered integration deltas. PHASE8-IMPL-027 is the terminal gate.
 
-All are planned. Lettered bounded slices are defined in the parent task record.
+T001 is complete/PASS. T002 through T012 remain planned. Lettered bounded
+slices are defined in the parent task record.
 
 ## Dependencies
 
@@ -91,9 +100,9 @@ T007 consumes PHASE8-IMPL-024-T002's completed Story Check grounding work and
 must not duplicate it. T010H waits for T009 and T010 backend contracts; T011H
 waits for T003F and the completed PHASE8-IMPL-024 component foundation. T012
 reuses PHASE8-IMPL-024-T008 and adds only layered deltas. T012I apply-promotion
-validation remains isolated. No PHASE8-IMPL-025 child has begun; T001 remains
-planned and requires a separately owner-authorized context-generation task
-before implementation activation.
+validation remains isolated. T001 is complete/PASS; its context prerequisite
+is satisfied by the generated supporting pack identified above. T002 is the
+planned, dependency-satisfied, not-begun frontier.
 
 ## Open technical questions
 

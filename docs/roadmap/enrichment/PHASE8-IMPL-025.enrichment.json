@@ -4,10 +4,11 @@
   "status": "published/active",
   "task_type": "implementation parent",
   "mvp_required": true,
-  "context_pack": null,
-  "context_pack_status": "not generated; requires a separate owner-authorized context-generation task before implementation activation",
+  "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
+  "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
   "architecture_decision": {
     "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
+    "t001_contract_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md",
     "accepted_pattern": "layered plus parallel",
     "current_pattern": "source/raw idea -> independent adapters -> normalization -> fusion/conflict/uncertainty -> candidate persistence -> owner review",
     "current_pattern_classification": "valid implemented foundation, incomplete target architecture",
@@ -76,10 +77,10 @@
     "status": "active",
     "depends_on": ["PHASE8-IMPL-024"],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": "PHASE8-IMPL-025-T001",
+    "immediate_next_task": "PHASE8-IMPL-025-T002",
     "immediate_next_task_status": "planned/dependency-satisfied/eligible/not-begun",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
-    "first_phase8_impl_025_task_status": "planned"
+    "first_phase8_impl_025_task_status": "complete/PASS"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -172,6 +173,7 @@
   ],
   "validation_frontier": {
     "preserved_verified_foundation": [
+      "T001 tool-role and layered-orchestration contract",
       "spaCy live extraction",
       "Ollama live structured extraction",
       "Story Check live execution",

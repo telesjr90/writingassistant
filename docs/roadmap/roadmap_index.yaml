@@ -5723,23 +5723,25 @@
       "task_record": "docs/roadmap/tasks/PHASE8-IMPL-025.md",
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-025.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-025.enrichment.json",
-      "context_pack": null,
-      "context_pack_status": "not generated; requires a separate owner-authorized context-generation task before implementation activation",
-      "latest_child_task": null,
-      "latest_child_status": null,
-      "next_child_task": "PHASE8-IMPL-025-T001",
+      "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
+      "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
+      "latest_child_task": "PHASE8-IMPL-025-T001",
+      "latest_child_status": "complete/PASS",
+      "next_child_task": "PHASE8-IMPL-025-T002",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; PHASE8-IMPL-025-T001 planned, dependency-satisfied/eligible, and not begun; no implementation child active or in progress; separately owner-authorized context generation required before child activation; Project Memory paused/nonblocking and not an activation gate"
+      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md",
+      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; PHASE8-IMPL-025-T001 complete/PASS; PHASE8-IMPL-025-T002 planned, dependency-satisfied/eligible, and not begun; generated T001 context prerequisite satisfied as supporting evidence only; no runtime implementation child active or in progress; Project Memory paused/nonblocking and not an activation gate"
     },
     {
       "id": "PHASE8-IMPL-025-T001",
       "title": "Tool-role and layered-orchestration contract",
       "type": "planning_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-025",
       "depends_on": ["PHASE8-IMPL-025"],
       "boundary_tags": ["orchestration_contract", "evidence_first", "candidate_only", "owner_review_required", "no_generated_prose", "no_memory_canon_mutation"],
-      "result": "planned adapter roles, sequential/parallel dependencies, activation modes, identity/labels, fail-closed boundaries, and partial-run lineage"
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md",
+      "result": "complete/PASS documentation-only contract for adapter roles and input/output dependency classes, layered-plus-parallel sequencing and activation, stable identity/label/provenance separation, and fail-closed partial-run/no-silent-fallback lineage; no runtime or schema implementation"
     },
     {
       "id": "PHASE8-IMPL-025-T002",
