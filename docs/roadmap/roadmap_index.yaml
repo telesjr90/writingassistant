@@ -5,8 +5,8 @@
     "current_track": "Layered analysis architecture and tool-integration expansion",
     "current_parent_task_id": "PHASE8-IMPL-025",
     "current_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
-    "next_readiness_task_id": "PHASE8-IMPL-025-T002",
-    "next_readiness_task_title": "Source identity and AnalysisRunManifest",
+    "next_readiness_task_id": "PHASE8-IMPL-025-T003",
+    "next_readiness_task_title": "Immutable raw artifact and evidence ledger",
     "next_readiness_task_type": "planned dependency-satisfied/eligible not-begun implementation frontier",
     "remaining_mvp_parent_task_ids": ["PHASE8-IMPL-025", "PHASE8-IMPL-027"],
     "terminal_mvp_task_id": "PHASE8-IMPL-027",
@@ -15,7 +15,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; full runtime authorized and planned separately from subtxt_informed_rubric",
-    "frontier_note": "PHASE8-IMPL-024 and T008 are complete/closed as complete/PASS; T008A-T008F remain complete/PASS with their accepted child evidence. Accepted application closeout validation is bound to final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b; deterministic 100-file inventory SHA-256 c455b33b2eb303252ac48334f8748f2eb9f1a4577c186906842d9b797e81755f; ordinary Python aggregate 5203 passed with zero unexpected failures/errors and intentional expected-red reproduced exactly; roadmap validators, Node 8/8, production build with 200 modules, live-backend browser, 1440x1000 and 390x900 responsive checks, semantic accessibility-tree proxy, and Chromium page-scale emulation 2.0 PASS; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; project/application/repository state unchanged; accepted archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0 with 58/58 internal verification PASS. PHASE8-IMPL-025 is published/active; PHASE8-IMPL-025-T001 is complete/PASS; PHASE8-IMPL-025-T002 is the immediate application frontier as planned, dependency-satisfied/eligible, and not begun; no runtime implementation child is active or in progress. Project Memory remains paused/nonblocking. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, nonautomatic, explicit owner-approved destination mutation only, and no generated prose."
+    "frontier_note": "PHASE8-IMPL-024 and T008 are complete/closed as complete/PASS; T008A-T008F remain complete/PASS with their accepted child evidence. Accepted application closeout validation is bound to final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b; deterministic 100-file inventory SHA-256 c455b33b2eb303252ac48334f8748f2eb9f1a4577c186906842d9b797e81755f; ordinary Python aggregate 5203 passed with zero unexpected failures/errors and intentional expected-red reproduced exactly; roadmap validators, Node 8/8, production build with 200 modules, live-backend browser, 1440x1000 and 390x900 responsive checks, semantic accessibility-tree proxy, and Chromium page-scale emulation 2.0 PASS; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; project/application/repository state unchanged; accepted archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0 with 58/58 internal verification PASS. PHASE8-IMPL-025 is published/active; PHASE8-IMPL-025-T001 and PHASE8-IMPL-025-T002 are complete/PASS; PHASE8-IMPL-025-T003 is the immediate application frontier as planned, dependency-satisfied/eligible, and not begun; no later implementation child is active or in progress. Project Memory remains paused/nonblocking. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, nonautomatic, explicit owner-approved destination mutation only, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5491,11 +5491,11 @@
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
       "latest_child_task": "PHASE8-IMPL-023-T023B",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-025-T002",
+      "next_child_task": "PHASE8-IMPL-025-T003",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "published/active",
-      "result": "published historical foundation; T023A/T023B remain complete/PASS; current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 and T008 are complete/PASS; PHASE8-IMPL-025-T001 is complete/PASS; PHASE8-IMPL-025-T002 is the immediate planned, dependency-satisfied/eligible, not-begun application frontier"
+      "result": "published historical foundation; T023A/T023B remain complete/PASS; current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 and T008 are complete/PASS; PHASE8-IMPL-025-T001/T002 are complete/PASS; PHASE8-IMPL-025-T003 is the immediate planned, dependency-satisfied/eligible, not-begun application frontier"
     },
     {
       "id": "PHASE8-IMPL-024",
@@ -5527,7 +5527,7 @@
       "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
-      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025-T001 complete/PASS; PHASE8-IMPL-025-T002 planned, dependency-satisfied/eligible, and not begun",
+      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025-T001/T002 complete/PASS; PHASE8-IMPL-025-T003 planned, dependency-satisfied/eligible, and not begun",
       "result": "complete/closed as complete/PASS; T001, T002, T003, T006, T007, T004, T005, T008, and T008A-T008F complete/PASS; accepted application closeout validation bound to final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b with 5203 ordinary Python passes, exact expected-red reproduction, roadmap/Node/build/browser/responsive/accessibility PASS, no project/application/repository mutation, and archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0; broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and PHASE8-IMPL-027"
     },
     {
@@ -5725,12 +5725,12 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-025.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
       "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
-      "latest_child_task": "PHASE8-IMPL-025-T001",
+      "latest_child_task": "PHASE8-IMPL-025-T002",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-025-T002",
+      "next_child_task": "PHASE8-IMPL-025-T003",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md",
-      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; PHASE8-IMPL-025-T001 complete/PASS; PHASE8-IMPL-025-T002 planned, dependency-satisfied/eligible, and not begun; generated T001 context prerequisite satisfied as supporting evidence only; no runtime implementation child active or in progress; Project Memory paused/nonblocking and not an activation gate"
+      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md",
+      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; PHASE8-IMPL-025-T001/T002 complete/PASS; PHASE8-IMPL-025-T003 planned, dependency-satisfied/eligible, and not begun; no later implementation child active or in progress; Project Memory paused/nonblocking and not an activation gate"
     },
     {
       "id": "PHASE8-IMPL-025-T001",
@@ -5747,11 +5747,12 @@
       "id": "PHASE8-IMPL-025-T002",
       "title": "Source identity and AnalysisRunManifest",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "done",
       "parent": "PHASE8-IMPL-025",
       "depends_on": ["PHASE8-IMPL-025-T001"],
       "boundary_tags": ["evidence_first", "metadata_only", "local_first", "candidate_only", "no_memory_canon_mutation", "no_generated_prose"],
-      "result": "planned stable source IDs, exact snapshots/hashes/maps/offsets, immutable run manifest, versions/configuration, and rejected/unverified lineage"
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md",
+      "result": "complete/PASS pure local contract for stable path-independent source IDs, exact UTF-8 snapshots/hashes and provable character/byte offsets, immutable AnalysisRunManifest with dependency/provenance/transformation lineage, and preserved rejected/quarantined/unverified/partial results; no T003 persistence or runtime execution"
     },
     {
       "id": "PHASE8-IMPL-025-T003",
@@ -5915,7 +5916,7 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json",
       "context_pack": null,
       "classification": "hybrid governance, documentation, and developer infrastructure; parallel workstream, not an application feature",
-      "parallel_governance_note": "PHASE8-IMPL-026 is complete/closed as a parallel governance workstream. PHASE8-IMPL-024 and T008 are complete/PASS. PHASE8-IMPL-025 is published/active, PHASE8-IMPL-025-T001 is complete/PASS, and PHASE8-IMPL-025-T002 is the planned, dependency-satisfied/eligible, not-begun application frontier. Project Memory remains paused and nonblocking."
+      "parallel_governance_note": "PHASE8-IMPL-026 is complete/closed as a parallel governance workstream. PHASE8-IMPL-024 and T008 are complete/PASS. PHASE8-IMPL-025 is published/active, PHASE8-IMPL-025-T001/T002 are complete/PASS, and PHASE8-IMPL-025-T003 is the planned, dependency-satisfied/eligible, not-begun application frontier. Project Memory remains paused and nonblocking."
     },
     {
       "id": "PHASE8-IMPL-026-T001",

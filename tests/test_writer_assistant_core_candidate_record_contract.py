@@ -15,6 +15,7 @@ import pytest
 
 from backend.story_knowledge import candidate_record
 from backend.story_knowledge import candidate_schema
+from backend.story_knowledge import source_map
 
 # ---------------------------------------------------------------------------
 # Contract constants (aligned with PHASE8-IMPL-002-T002 decision)
@@ -393,6 +394,37 @@ def test_validate_source_locator_rejects_arbitrary_filesystem_path_values():
         locator,
         match="source_document_id",
     )
+
+
+def test_t002_canonical_locator_projects_to_existing_candidate_shape():
+    snapshot = source_map.build_exact_source_snapshot(
+        project_id="example",
+        source_document_type="scene",
+        source_document_id="scene_001",
+        source_document_version="1",
+        source_ownership="owner_authored",
+        source_content="A café 雨.",
+        chapter_id="chapter_001",
+        scene_id="scene_001",
+    )
+    character_range = source_map.OffsetRange(2, 8, source_map.CHAR_OFFSET_BASIS)
+    byte_range = source_map.translate_exact_offset_range(
+        snapshot,
+        character_range,
+        target_basis=source_map.BYTE_OFFSET_BASIS,
+    )
+    canonical = source_map.build_canonical_source_locator(
+        snapshot.identity,
+        character_range=character_range,
+        byte_range=byte_range,
+        exact_snapshot=snapshot,
+    )
+    projected = source_map.project_candidate_source_locator(canonical)
+    assert candidate_record.validate_source_locator(projected) == projected
+    assert projected["char_start"] == 2
+    assert projected["char_end"] == 8
+    assert "byte_start" not in projected
+    assert projected["source_hash"] == snapshot.identity.content_hash
 
 
 # ---------------------------------------------------------------------------

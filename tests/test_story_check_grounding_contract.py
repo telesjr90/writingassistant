@@ -17,6 +17,7 @@ from backend.story_check_grounding_contract import (
     build_story_check_source_snapshot,
     compute_story_check_source_sha256,
 )
+from backend.story_knowledge import source_map
 
 
 def snapshot(text: str = "The pea was beneath twenty mattresses.", **overrides):
@@ -55,6 +56,41 @@ def evidence(source=None, excerpt="pea"):
     start = source_bytes.index(excerpt_bytes)
     return build_story_check_evidence_reference(
         source, start, start + len(excerpt_bytes), excerpt
+    )
+
+
+def test_t002_shared_identity_represents_story_check_multibyte_bytes_exactly():
+    text = "A café 雨 ends"
+    story_check_source = snapshot(text)
+    story_check_reference = evidence(story_check_source, "café 雨")
+    shared_source = source_map.build_exact_source_snapshot(
+        project_id="example",
+        source_document_type="scene",
+        source_document_id="scene_001",
+        source_document_version="1",
+        source_ownership="owner_authored",
+        source_content=text,
+        scene_id="scene_001",
+    )
+    shared_byte_range = source_map.OffsetRange(
+        story_check_reference.start_byte,
+        story_check_reference.end_byte,
+        source_map.BYTE_OFFSET_BASIS,
+    )
+    shared_character_range = source_map.translate_exact_offset_range(
+        shared_source,
+        shared_byte_range,
+        target_basis=source_map.CHAR_OFFSET_BASIS,
+        expected_content_hash=story_check_source.source_sha256,
+    )
+
+    assert shared_source.identity.content_hash == story_check_source.source_sha256
+    assert story_check_reference.offset_basis == source_map.BYTE_OFFSET_BASIS
+    assert shared_byte_range == source_map.OffsetRange(
+        2, 11, source_map.BYTE_OFFSET_BASIS
+    )
+    assert shared_character_range == source_map.OffsetRange(
+        2, 8, source_map.CHAR_OFFSET_BASIS
     )
 
 

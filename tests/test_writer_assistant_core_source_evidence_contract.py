@@ -7,6 +7,7 @@ normally so this targeted file is expected red until T004 creates them:
 """
 
 import inspect
+import hashlib
 
 import pytest
 
@@ -464,6 +465,265 @@ def assert_offset_pair_rejected(validator, builder, start_field, end_field):
     assert_rejects(validator, builder(**{end_field: False}))
     assert_accepts(validator, builder(**{start_field: 5, end_field: 5}))
     assert_rejects(validator, builder(**{start_field: 6, end_field: 5}))
+
+
+def build_t002_exact_snapshot(text="A café 雨.\n"):
+    return source_map.build_exact_source_snapshot(
+        project_id="example",
+        source_document_type="scene",
+        source_document_id="scene_001",
+        source_document_version="1",
+        source_ownership="owner_authored",
+        source_content=text,
+        source_map_id="source_map_001",
+        chapter_id="chapter_001",
+        scene_id="scene_001",
+    )
+
+
+def test_t002_source_identity_is_stable_hierarchical_and_path_independent():
+    first = build_t002_exact_snapshot()
+    second = build_t002_exact_snapshot()
+    assert first.identity == second.identity
+    assert first.identity.project_id == "example"
+    assert first.identity.source_document_id == "scene_001"
+    assert first.identity.chapter_id == "chapter_001"
+    assert first.identity.scene_id == "scene_001"
+    assert first.identity.snapshot_id == second.identity.snapshot_id
+    assert "path" not in first.identity.to_json().casefold()
+
+
+def test_t002_source_identity_enforces_shared_deterministic_snapshot_id():
+    snapshot = build_t002_exact_snapshot()
+    identity = snapshot.identity
+    derivation_fields = {
+        "contract_version": identity.contract_version,
+        "project_id": identity.project_id,
+        "source_document_type": identity.source_document_type,
+        "source_document_id": identity.source_document_id,
+        "source_document_version": identity.source_document_version,
+        "source_ownership": identity.source_ownership,
+        "section_id": identity.section_id,
+        "chapter_id": identity.chapter_id,
+        "scene_id": identity.scene_id,
+        "content_hash": identity.content_hash,
+        "hash_algorithm": identity.hash_algorithm,
+        "hash_basis": identity.hash_basis,
+    }
+    derived_id = source_map.derive_source_snapshot_id(**derivation_fields)
+    direct = source_map.SourceIdentity(
+        **derivation_fields,
+        snapshot_id=derived_id,
+        source_map_id=identity.source_map_id,
+    )
+
+    assert direct == identity
+    assert tuple(inspect.signature(source_map.derive_source_snapshot_id).parameters) == tuple(
+        derivation_fields
+    )
+    assert source_map.SourceIdentity(
+        **derivation_fields,
+        snapshot_id=derived_id,
+        source_map_id="different-display-map",
+    ).snapshot_id == derived_id
+    with pytest.raises(source_map.SourceIdentityValidationError, match="deterministic"):
+        source_map.SourceIdentity(
+            **derivation_fields,
+            snapshot_id="snapshot-arbitrary-safe-id",
+        )
+
+
+def test_t002_optional_source_hierarchy_and_closed_ownership_type_contract():
+    snapshot = source_map.build_exact_source_snapshot(
+        project_id="example",
+        source_document_type="note",
+        source_document_id="note_001",
+        source_document_version="1",
+        source_ownership="owner_selected_imported",
+        source_content="Exact imported owner selection.",
+    )
+    assert snapshot.identity.chapter_id is None
+    assert snapshot.identity.scene_id is None
+    assert snapshot.identity.source_ownership.value == "owner_selected_imported"
+    with pytest.raises(source_map.SourceIdentityValidationError):
+        build_t002_exact_snapshot().__class__(
+            identity=source_map.SourceIdentity(
+                project_id="example",
+                source_document_type="scene",
+                source_document_id="scene_001",
+                source_document_version="1",
+                source_ownership="external_truth",
+                snapshot_id="snapshot-safe",
+                content_hash="0" * 64,
+            ),
+            source_content="",
+        )
+
+
+@pytest.mark.parametrize("unsafe_id", UNSAFE_IDS)
+def test_t002_source_identity_rejects_unsafe_ids(unsafe_id):
+    with pytest.raises(source_map.SourceIdentityValidationError):
+        source_map.build_exact_source_snapshot(
+            project_id=unsafe_id,
+            source_document_type="scene",
+            source_document_id="scene_001",
+            source_document_version="1",
+            source_ownership="owner_authored",
+            source_content="Exact.",
+        )
+
+
+def test_t002_exact_snapshot_hash_preserves_content_bytes_and_line_endings():
+    lf = build_t002_exact_snapshot("first\nsecond")
+    crlf = build_t002_exact_snapshot("first\r\nsecond")
+    changed = build_t002_exact_snapshot("first\nchanged")
+    assert lf.identity.content_hash == hashlib.sha256(b"first\nsecond").hexdigest()
+    assert lf.identity.snapshot_id != crlf.identity.snapshot_id
+    assert lf.identity.content_hash != crlf.identity.content_hash
+    assert lf.identity.snapshot_id != changed.identity.snapshot_id
+
+
+def test_t002_ascii_and_multibyte_offset_translation_is_exact():
+    ascii_snapshot = build_t002_exact_snapshot("alpha beta")
+    ascii_chars = source_map.OffsetRange(6, 10, source_map.CHAR_OFFSET_BASIS)
+    assert source_map.translate_exact_offset_range(
+        ascii_snapshot,
+        ascii_chars,
+        target_basis=source_map.BYTE_OFFSET_BASIS,
+    ) == source_map.OffsetRange(6, 10, source_map.BYTE_OFFSET_BASIS)
+
+    multibyte = build_t002_exact_snapshot("A café 雨.")
+    character_range = source_map.OffsetRange(2, 8, source_map.CHAR_OFFSET_BASIS)
+    byte_range = source_map.translate_exact_offset_range(
+        multibyte,
+        character_range,
+        target_basis=source_map.BYTE_OFFSET_BASIS,
+        expected_snapshot_id=multibyte.identity.snapshot_id,
+        expected_content_hash=multibyte.identity.content_hash,
+    )
+    assert byte_range == source_map.OffsetRange(2, 11, source_map.BYTE_OFFSET_BASIS)
+    assert source_map.translate_exact_offset_range(
+        multibyte,
+        byte_range,
+        target_basis=source_map.CHAR_OFFSET_BASIS,
+    ) == character_range
+
+
+def test_t002_offset_translation_rejects_split_codepoints_and_snapshot_mismatch():
+    snapshot = build_t002_exact_snapshot("é")
+    with pytest.raises(source_map.SourceIdentityValidationError, match="splits"):
+        source_map.translate_exact_offset_range(
+            snapshot,
+            source_map.OffsetRange(0, 1, source_map.BYTE_OFFSET_BASIS),
+            target_basis=source_map.CHAR_OFFSET_BASIS,
+        )
+    with pytest.raises(source_map.SourceIdentityValidationError, match="identity mismatch"):
+        source_map.translate_exact_offset_range(
+            snapshot,
+            source_map.OffsetRange(0, 1, source_map.CHAR_OFFSET_BASIS),
+            target_basis=source_map.BYTE_OFFSET_BASIS,
+            expected_snapshot_id="snapshot-other",
+        )
+    with pytest.raises(source_map.SourceIdentityValidationError, match="hash mismatch"):
+        source_map.translate_exact_offset_range(
+            snapshot,
+            source_map.OffsetRange(0, 1, source_map.CHAR_OFFSET_BASIS),
+            target_basis=source_map.BYTE_OFFSET_BASIS,
+            expected_content_hash="0" * 64,
+        )
+
+
+def test_t002_offset_availability_and_basis_are_explicit_without_token_fabrication():
+    snapshot = build_t002_exact_snapshot()
+    offsets = snapshot.to_dict()["offsets"]
+    assert offsets["character"] == {
+        "available": True,
+        "basis": source_map.CHAR_OFFSET_BASIS,
+    }
+    assert offsets["byte"] == {
+        "available": True,
+        "basis": source_map.BYTE_OFFSET_BASIS,
+    }
+    assert offsets["line"] == {"available": False, "basis": None}
+    assert offsets["token"] == {"available": False, "basis": None}
+
+
+def test_t002_canonical_locator_keeps_char_and_byte_bases_distinct():
+    snapshot = build_t002_exact_snapshot("A café 雨.")
+    char_range = source_map.OffsetRange(2, 8, source_map.CHAR_OFFSET_BASIS)
+    byte_range = source_map.translate_exact_offset_range(
+        snapshot,
+        char_range,
+        target_basis=source_map.BYTE_OFFSET_BASIS,
+    )
+    locator = source_map.build_canonical_source_locator(
+        snapshot.identity,
+        character_range=char_range,
+        byte_range=byte_range,
+        exact_snapshot=snapshot,
+    )
+    assert (locator["char_start"], locator["char_end"]) == (2, 8)
+    assert (locator["byte_start"], locator["byte_end"]) == (2, 11)
+    assert locator["char_offset_basis"] == source_map.CHAR_OFFSET_BASIS
+    assert locator["byte_offset_basis"] == source_map.BYTE_OFFSET_BASIS
+
+
+def test_t002_canonical_locator_rejects_unproved_or_mismatched_dual_ranges():
+    snapshot = build_t002_exact_snapshot("A café 雨.")
+    character_range = source_map.OffsetRange(2, 8, source_map.CHAR_OFFSET_BASIS)
+    byte_range = source_map.OffsetRange(2, 11, source_map.BYTE_OFFSET_BASIS)
+    with pytest.raises(source_map.SourceIdentityValidationError, match="exact snapshot"):
+        source_map.build_canonical_source_locator(
+            snapshot.identity,
+            character_range=character_range,
+            byte_range=byte_range,
+        )
+    with pytest.raises(source_map.SourceIdentityValidationError, match="same exact span"):
+        source_map.build_canonical_source_locator(
+            snapshot.identity,
+            character_range=character_range,
+            byte_range=source_map.OffsetRange(2, 10, source_map.BYTE_OFFSET_BASIS),
+            exact_snapshot=snapshot,
+        )
+
+
+def test_t002_canonical_locator_accepts_explicit_story_check_byte_only_basis():
+    snapshot = build_t002_exact_snapshot("A café 雨.")
+    locator = source_map.build_canonical_source_locator(
+        snapshot.identity,
+        byte_range=source_map.OffsetRange(2, 11, source_map.BYTE_OFFSET_BASIS),
+    )
+    assert locator["char_start"] is None
+    assert locator["byte_offset_basis"] == source_map.BYTE_OFFSET_BASIS
+    assert source_map.validate_canonical_source_locator(locator) == locator
+
+    without_basis = dict(locator)
+    without_basis["byte_offset_basis"] = None
+    with pytest.raises(ValueError, match="byte_offset_basis"):
+        source_map.validate_canonical_source_locator(without_basis)
+
+
+def test_t002_canonical_exact_locator_enforces_sha256_hash_consistency():
+    snapshot = build_t002_exact_snapshot("A café 雨.")
+    locator = source_map.build_canonical_source_locator(
+        snapshot.identity,
+        byte_range=source_map.OffsetRange(2, 11, source_map.BYTE_OFFSET_BASIS),
+    )
+    assert source_map.validate_canonical_source_locator(locator) == locator
+
+    for field in ("snapshot_hash", "source_hash"):
+        malformed = dict(locator)
+        malformed[field] = "not-a-lowercase-sha256"
+        with pytest.raises(ValueError, match=field):
+            source_map.validate_canonical_source_locator(malformed)
+
+    mismatch = dict(locator)
+    mismatch["source_hash"] = "0" * 64
+    with pytest.raises(ValueError, match="must match"):
+        source_map.validate_canonical_source_locator(mismatch)
+
+    legacy_locator = build_valid_source_locator()
+    assert source_map.validate_source_locator(legacy_locator) == legacy_locator
 
 
 def test_source_document_ref_accepts_valid_fixture():

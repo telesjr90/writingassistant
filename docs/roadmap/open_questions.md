@@ -3,7 +3,7 @@
 <!-- CURRENT-REPOSITORY-TRUTH:START -->
 - Latest closed application parent: `PHASE8-IMPL-024` (complete/closed as complete/PASS)
 - Active application parent: `PHASE8-IMPL-025`
-- Immediate application frontier: `PHASE8-IMPL-025-T002` (planned; dependency-satisfied/eligible; not begun)
+- Immediate application frontier: `PHASE8-IMPL-025-T003` (planned; dependency-satisfied/eligible; not begun)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
@@ -24,7 +24,7 @@ current frontier.
 
 142. In what order should shared semantic guardrails run relative to interpretation, normalization, fusion, and persistence, and may official Subtxt guardrail analysis run in the same manifest or require a dependent child run?
 
-141. What exact immutable `AnalysisRunManifest` schema should identify sources, snapshots, hashes, source maps, adapter/model/tool versions, configurations, feature flags, operations, dependencies, artifacts, transformations, rejected/unverified outputs, and partial-run status?
+141. ~~What exact immutable `AnalysisRunManifest` schema should identify sources, snapshots, hashes, source maps, adapter/model/tool versions, configurations, feature flags, operations, dependencies, artifacts, transformations, rejected/unverified outputs, and partial-run status?~~ **Resolved by PHASE8-IMPL-025-T002:** `analysis-run-manifest.v1` is a frozen, deterministic, pure value contract over exact path-independent source/snapshot identities, declared operations and T001 dependency classes, separate adapter/label/implementation/runtime provenance planes, storage-independent artifact references, transformation/output lineage, the unchanged six adapter result states, and run-level complete/partial/degraded coverage. Rejected, quarantined, and unverified outputs retain reasons and attributable original-output references. Mutable execution status/control and artifact/evidence-ledger persistence remain T003/T003F scope. See `docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md`.
 
 140. What raw-artifact retention and cleanup policy should apply to immutable tool/model outputs and manifests, including privacy, owner deletion, failed/partial runs, derived evidence survival, and provenance references after cleanup?
 

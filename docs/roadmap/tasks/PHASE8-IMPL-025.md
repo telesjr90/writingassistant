@@ -2,18 +2,18 @@
 
 ## Status
 
-Published/active. T001 is complete/PASS. T002 is planned,
-dependency-satisfied/eligible, and not begun. No runtime implementation child
-is active or in progress.
+Published/active. T001 and T002 are complete/PASS. T003 is planned,
+dependency-satisfied/eligible, and not begun. No later implementation child is
+active or in progress.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
 accepted PHASE8-IMPL-024-T008 closeout, so this parent is published/active.
 Project Memory is not an activation gate while the accepted 2026-07-17 pause
-decision remains current. `PHASE8-IMPL-025-T001` is complete/PASS. The current
-application frontier is `PHASE8-IMPL-025-T002`, which is planned,
-dependency-satisfied/eligible, and not begun. No runtime implementation child
-is active or in progress.
+decision remains current. `PHASE8-IMPL-025-T001` and
+`PHASE8-IMPL-025-T002` are complete/PASS. The current application frontier is
+`PHASE8-IMPL-025-T003`, which is planned, dependency-satisfied/eligible, and
+not begun. No later implementation child is active or in progress.
 
 The owner-authorized T001 context prerequisite is satisfied by the generated,
 read-only supporting pack at
@@ -121,7 +121,8 @@ Closeout/contract:
 
 ### PHASE8-IMPL-025-T002 — Source identity and AnalysisRunManifest
 
-Status: `planned`; depends on T001.
+Status: `complete/PASS`; depends on T001. Closeout:
+`docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md`.
 
 - `T002A` — Stable project/document/chapter/scene identity and source
   ownership/type contract.
@@ -135,7 +136,8 @@ Status: `planned`; depends on T001.
 
 ### PHASE8-IMPL-025-T003 — Immutable raw artifact and evidence ledger
 
-Status: `planned`; depends on T002.
+Status: `planned`; depends on completed/PASS T002; dependency-satisfied/eligible;
+not begun.
 
 - `T003A` — Immutable raw-artifact reference, file-hash, bundle-hash, and
   manifest linkage contract.
@@ -376,9 +378,9 @@ not competing terminal suites or owner gates.
 
 Documentation publication occurred before this reconciliation. The
 PHASE8-IMPL-024 parent-closeout boundary has passed, this parent is
-published/active, and T001 is complete/PASS. T002 is the planned,
-dependency-satisfied/eligible, not-begun frontier; this T001 closeout does not
-begin or mark T002 active. T001 -> T002 -> T003 establishes the shared
+published/active, and T001/T002 are complete/PASS. T003 is the planned,
+dependency-satisfied/eligible, not-begun frontier; this T002 closeout does not
+begin or mark T003 active. T001 -> T002 -> T003 establishes the shared
 contracts. T004, T005 -> T006, and T007 then form
 independent contributor branches. T008 joins their required outputs. T009,
 T010 backend work, and T011 lifecycle work may then proceed according to their

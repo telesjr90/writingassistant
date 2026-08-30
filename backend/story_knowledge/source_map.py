@@ -1,4 +1,21 @@
+from __future__ import annotations
+
 from copy import deepcopy
+from dataclasses import dataclass
+from enum import Enum
+import hashlib
+import json
+import re
+from typing import Any
+
+
+SOURCE_IDENTITY_CONTRACT_VERSION = "writer-assistant-source-identity.v1"
+SOURCE_HASH_ALGORITHM = "sha256"
+SOURCE_HASH_BASIS = "utf-8-exact"
+CHAR_OFFSET_BASIS = "unicode-code-points-zero-based-half-open"
+BYTE_OFFSET_BASIS = "utf-8-bytes-zero-based-half-open"
+
+_SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
 
 _SOURCE_TYPES = frozenset(
     {
@@ -120,6 +137,10 @@ _LOCATOR_FIELDS = frozenset(
         "locator_precision",
         "source_label",
         "source_hash",
+        "char_offset_basis",
+        "byte_offset_basis",
+        "line_offset_basis",
+        "token_offset_basis",
     }
 )
 
@@ -310,7 +331,7 @@ def validate_source_map(source_map):
     return deepcopy(payload)
 
 
-def validate_source_locator(locator):
+def validate_source_locator(locator, *, allow_exact_byte_only=False):
     payload = _require_mapping(locator, "source_locator")
     _require_fields(
         payload,
@@ -334,8 +355,35 @@ def validate_source_locator(locator):
 
     precision = payload["locator_precision"]
     if precision not in ("document_only", "unknown"):
-        if payload.get("char_start") is None or payload.get("char_end") is None:
+        has_character_range = (
+            payload.get("char_start") is not None
+            and payload.get("char_end") is not None
+        )
+        has_byte_range = (
+            payload.get("byte_start") is not None
+            and payload.get("byte_end") is not None
+        )
+        if not has_character_range and not (allow_exact_byte_only and has_byte_range):
             raise ValueError("character offsets are required")
+
+    for range_prefix in ("char", "byte", "line", "token"):
+        start_present = payload.get(f"{range_prefix}_start") is not None
+        end_present = payload.get(f"{range_prefix}_end") is not None
+        if start_present != end_present:
+            raise ValueError(f"{range_prefix} offsets must form a complete range")
+
+    basis_values = {
+        "char_offset_basis": CHAR_OFFSET_BASIS,
+        "byte_offset_basis": BYTE_OFFSET_BASIS,
+    }
+    for field, expected in basis_values.items():
+        if field in payload and payload[field] is not None:
+            _validate_string(payload[field], field)
+            if payload[field] != expected:
+                raise ValueError(f"{field} is not supported")
+    for field in ("line_offset_basis", "token_offset_basis"):
+        if field in payload and payload[field] is not None:
+            _validate_string(payload[field], field)
 
     for field in ("source_document_version", "snapshot_hash", "source_label", "source_hash"):
         if field in payload and payload[field] is not None:
@@ -344,7 +392,473 @@ def validate_source_locator(locator):
     return deepcopy(payload)
 
 
+class SourceOwnership(str, Enum):
+    OWNER_AUTHORED = "owner_authored"
+    OWNER_SELECTED_IMPORTED = "owner_selected_imported"
+    APP_OWNED_DERIVED = "app_owned_derived"
+
+
+class SourceIdentityValidationError(ValueError):
+    """Raised when an exact source identity or offset range is not provable."""
+
+
+def _canonical_json(value: object) -> str:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+
+
+def _checked_optional_safe_id(value: str | None, label: str) -> str | None:
+    if value is not None:
+        try:
+            _validate_safe_id(value, label)
+        except ValueError as exc:
+            raise SourceIdentityValidationError(str(exc)) from exc
+    return value
+
+
+def derive_source_snapshot_id(
+    *,
+    contract_version: str,
+    project_id: str,
+    source_document_type: str,
+    source_document_id: str,
+    source_document_version: str,
+    source_ownership: SourceOwnership | str,
+    section_id: str | None,
+    chapter_id: str | None,
+    scene_id: str | None,
+    content_hash: str,
+    hash_algorithm: str,
+    hash_basis: str,
+) -> str:
+    """Derive the path-independent ID for one exact logical source snapshot."""
+
+    snapshot_basis = {
+        "contract_version": contract_version,
+        "project_id": project_id,
+        "source_document_type": source_document_type,
+        "source_document_id": source_document_id,
+        "source_document_version": source_document_version,
+        "source_ownership": (
+            source_ownership.value
+            if isinstance(source_ownership, SourceOwnership)
+            else source_ownership
+        ),
+        "section_id": section_id,
+        "chapter_id": chapter_id,
+        "scene_id": scene_id,
+        "content_hash": content_hash,
+        "hash_algorithm": hash_algorithm,
+        "hash_basis": hash_basis,
+    }
+    snapshot_digest = hashlib.sha256(
+        _canonical_json(snapshot_basis).encode("utf-8")
+    ).hexdigest()
+    return f"snapshot-{snapshot_digest}"
+
+
+@dataclass(frozen=True)
+class SourceIdentity:
+    """Path-independent identity for one exact owner-selected source snapshot."""
+
+    project_id: str
+    source_document_type: str
+    source_document_id: str
+    source_document_version: str
+    source_ownership: SourceOwnership | str
+    snapshot_id: str
+    content_hash: str
+    source_map_id: str | None = None
+    section_id: str | None = None
+    chapter_id: str | None = None
+    scene_id: str | None = None
+    hash_algorithm: str = SOURCE_HASH_ALGORITHM
+    hash_basis: str = SOURCE_HASH_BASIS
+    text_encoding: str = "utf-8"
+    normalization_policy: str = "none-exact-owner-input"
+    contract_version: str = SOURCE_IDENTITY_CONTRACT_VERSION
+
+    def __post_init__(self) -> None:
+        try:
+            _validate_safe_id(self.project_id, "project_id")
+            _validate_safe_id(self.source_document_id, "source_document_id")
+            _validate_safe_id(self.snapshot_id, "snapshot_id")
+        except ValueError as exc:
+            raise SourceIdentityValidationError(str(exc)) from exc
+        if self.source_document_type not in _SOURCE_TYPES:
+            raise SourceIdentityValidationError("source_document_type is not allowed")
+        _validate_string(self.source_document_version, "source_document_version")
+        try:
+            ownership = SourceOwnership(self.source_ownership)
+        except (TypeError, ValueError) as exc:
+            raise SourceIdentityValidationError("source_ownership is not allowed") from exc
+        object.__setattr__(self, "source_ownership", ownership)
+        for field_name in ("source_map_id", "section_id", "chapter_id", "scene_id"):
+            _checked_optional_safe_id(getattr(self, field_name), field_name)
+        if not isinstance(self.content_hash, str) or not _SHA256_PATTERN.fullmatch(
+            self.content_hash
+        ):
+            raise SourceIdentityValidationError(
+                "content_hash must be a lowercase SHA-256 hex digest"
+            )
+        if self.hash_algorithm != SOURCE_HASH_ALGORITHM:
+            raise SourceIdentityValidationError("hash_algorithm must be sha256")
+        if self.hash_basis != SOURCE_HASH_BASIS:
+            raise SourceIdentityValidationError("hash_basis must identify exact UTF-8 bytes")
+        if self.text_encoding != "utf-8":
+            raise SourceIdentityValidationError("text_encoding must be utf-8")
+        if self.normalization_policy != "none-exact-owner-input":
+            raise SourceIdentityValidationError(
+                "normalization_policy must preserve exact owner input"
+            )
+        if self.contract_version != SOURCE_IDENTITY_CONTRACT_VERSION:
+            raise SourceIdentityValidationError("unsupported source identity contract_version")
+        expected_snapshot_id = derive_source_snapshot_id(
+            contract_version=self.contract_version,
+            project_id=self.project_id,
+            source_document_type=self.source_document_type,
+            source_document_id=self.source_document_id,
+            source_document_version=self.source_document_version,
+            source_ownership=self.source_ownership,
+            section_id=self.section_id,
+            chapter_id=self.chapter_id,
+            scene_id=self.scene_id,
+            content_hash=self.content_hash,
+            hash_algorithm=self.hash_algorithm,
+            hash_basis=self.hash_basis,
+        )
+        if self.snapshot_id != expected_snapshot_id:
+            raise SourceIdentityValidationError(
+                "snapshot_id does not match the deterministic source identity"
+            )
+
+    @property
+    def source_id(self) -> str:
+        return self.source_document_id
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "contract_version": self.contract_version,
+            "project_id": self.project_id,
+            "source_document_type": self.source_document_type,
+            "source_document_id": self.source_document_id,
+            "source_document_version": self.source_document_version,
+            "source_ownership": self.source_ownership.value,
+            "section_id": self.section_id,
+            "chapter_id": self.chapter_id,
+            "scene_id": self.scene_id,
+            "snapshot_id": self.snapshot_id,
+            "content_hash": self.content_hash,
+            "hash_algorithm": self.hash_algorithm,
+            "hash_basis": self.hash_basis,
+            "text_encoding": self.text_encoding,
+            "normalization_policy": self.normalization_policy,
+            "source_map_id": self.source_map_id,
+        }
+
+    def to_json(self) -> str:
+        return _canonical_json(self.to_dict())
+
+
+@dataclass(frozen=True)
+class ExactSourceSnapshot:
+    """Exact UTF-8 owner-input value used to prove hashes and offset translation."""
+
+    identity: SourceIdentity
+    source_content: str
+    char_offset_basis: str = CHAR_OFFSET_BASIS
+    byte_offset_basis: str = BYTE_OFFSET_BASIS
+    line_offset_basis: str | None = None
+    token_offset_basis: str | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.identity, SourceIdentity):
+            raise SourceIdentityValidationError("identity must be a SourceIdentity")
+        if not isinstance(self.source_content, str):
+            raise SourceIdentityValidationError("source_content must be a string")
+        actual_hash = hashlib.sha256(self.source_content.encode("utf-8")).hexdigest()
+        if actual_hash != self.identity.content_hash:
+            raise SourceIdentityValidationError("source content hash mismatch")
+        if self.char_offset_basis != CHAR_OFFSET_BASIS:
+            raise SourceIdentityValidationError("unsupported char_offset_basis")
+        if self.byte_offset_basis != BYTE_OFFSET_BASIS:
+            raise SourceIdentityValidationError("unsupported byte_offset_basis")
+        for field_name in ("line_offset_basis", "token_offset_basis"):
+            value = getattr(self, field_name)
+            if value is not None and (not isinstance(value, str) or not value):
+                raise SourceIdentityValidationError(f"{field_name} must be explicit or None")
+
+    @property
+    def utf8_byte_length(self) -> int:
+        return len(self.source_content.encode("utf-8"))
+
+    def to_dict(self, *, include_content: bool = False) -> dict[str, Any]:
+        value = {
+            "identity": self.identity.to_dict(),
+            "offsets": {
+                "character": {
+                    "available": True,
+                    "basis": self.char_offset_basis,
+                },
+                "byte": {
+                    "available": True,
+                    "basis": self.byte_offset_basis,
+                },
+                "line": {
+                    "available": self.line_offset_basis is not None,
+                    "basis": self.line_offset_basis,
+                },
+                "token": {
+                    "available": self.token_offset_basis is not None,
+                    "basis": self.token_offset_basis,
+                },
+            },
+            "character_length": len(self.source_content),
+            "utf8_byte_length": self.utf8_byte_length,
+        }
+        if include_content:
+            value["source_content"] = self.source_content
+        return value
+
+
+@dataclass(frozen=True)
+class OffsetRange:
+    start: int
+    end: int
+    basis: str
+
+    def __post_init__(self) -> None:
+        if type(self.start) is not int or self.start < 0:
+            raise SourceIdentityValidationError("offset start must be non-negative")
+        if type(self.end) is not int or self.end < self.start:
+            raise SourceIdentityValidationError("offset end must not precede start")
+        if self.basis not in (CHAR_OFFSET_BASIS, BYTE_OFFSET_BASIS):
+            raise SourceIdentityValidationError("offset basis is not exactly translatable")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"start": self.start, "end": self.end, "basis": self.basis}
+
+
+def build_exact_source_snapshot(
+    *,
+    project_id: str,
+    source_document_type: str,
+    source_document_id: str,
+    source_document_version: str,
+    source_ownership: SourceOwnership | str,
+    source_content: str,
+    source_map_id: str | None = None,
+    section_id: str | None = None,
+    chapter_id: str | None = None,
+    scene_id: str | None = None,
+    line_offset_basis: str | None = None,
+    token_offset_basis: str | None = None,
+) -> ExactSourceSnapshot:
+    if not isinstance(source_content, str):
+        raise SourceIdentityValidationError("source_content must be a string")
+    content_hash = hashlib.sha256(source_content.encode("utf-8")).hexdigest()
+    snapshot_id = derive_source_snapshot_id(
+        contract_version=SOURCE_IDENTITY_CONTRACT_VERSION,
+        project_id=project_id,
+        source_document_type=source_document_type,
+        source_document_id=source_document_id,
+        source_document_version=source_document_version,
+        source_ownership=source_ownership,
+        section_id=section_id,
+        chapter_id=chapter_id,
+        scene_id=scene_id,
+        content_hash=content_hash,
+        hash_algorithm=SOURCE_HASH_ALGORITHM,
+        hash_basis=SOURCE_HASH_BASIS,
+    )
+    identity = SourceIdentity(
+        project_id=project_id,
+        source_document_type=source_document_type,
+        source_document_id=source_document_id,
+        source_document_version=source_document_version,
+        source_ownership=source_ownership,
+        snapshot_id=snapshot_id,
+        content_hash=content_hash,
+        source_map_id=source_map_id,
+        section_id=section_id,
+        chapter_id=chapter_id,
+        scene_id=scene_id,
+    )
+    return ExactSourceSnapshot(
+        identity=identity,
+        source_content=source_content,
+        line_offset_basis=line_offset_basis,
+        token_offset_basis=token_offset_basis,
+    )
+
+
+def translate_exact_offset_range(
+    snapshot: ExactSourceSnapshot,
+    offset_range: OffsetRange,
+    *,
+    target_basis: str,
+    expected_snapshot_id: str | None = None,
+    expected_content_hash: str | None = None,
+) -> OffsetRange:
+    """Translate only exact character/UTF-8 byte boundaries for one snapshot."""
+
+    if not isinstance(snapshot, ExactSourceSnapshot):
+        raise SourceIdentityValidationError("exact source snapshot is required")
+    if not isinstance(offset_range, OffsetRange):
+        raise SourceIdentityValidationError("offset_range must be an OffsetRange")
+    if expected_snapshot_id is not None and expected_snapshot_id != snapshot.identity.snapshot_id:
+        raise SourceIdentityValidationError("snapshot identity mismatch")
+    if expected_content_hash is not None and expected_content_hash != snapshot.identity.content_hash:
+        raise SourceIdentityValidationError("snapshot content hash mismatch")
+    if target_basis not in (CHAR_OFFSET_BASIS, BYTE_OFFSET_BASIS):
+        raise SourceIdentityValidationError("target offset basis is not exactly translatable")
+
+    text = snapshot.source_content
+    encoded = text.encode("utf-8")
+    if offset_range.basis == CHAR_OFFSET_BASIS:
+        if offset_range.end > len(text):
+            raise SourceIdentityValidationError("character range exceeds exact source")
+        byte_start = len(text[: offset_range.start].encode("utf-8"))
+        byte_end = len(text[: offset_range.end].encode("utf-8"))
+        if target_basis == CHAR_OFFSET_BASIS:
+            return offset_range
+        return OffsetRange(byte_start, byte_end, BYTE_OFFSET_BASIS)
+
+    if offset_range.end > len(encoded):
+        raise SourceIdentityValidationError("byte range exceeds exact source")
+    try:
+        char_start = len(encoded[: offset_range.start].decode("utf-8"))
+        char_end = len(encoded[: offset_range.end].decode("utf-8"))
+    except UnicodeDecodeError as exc:
+        raise SourceIdentityValidationError(
+            "byte range splits a UTF-8 code point"
+        ) from exc
+    if target_basis == BYTE_OFFSET_BASIS:
+        return offset_range
+    return OffsetRange(char_start, char_end, CHAR_OFFSET_BASIS)
+
+
+def build_canonical_source_locator(
+    identity: SourceIdentity,
+    *,
+    character_range: OffsetRange | None = None,
+    byte_range: OffsetRange | None = None,
+    exact_snapshot: ExactSourceSnapshot | None = None,
+    locator_precision: str = "exact",
+) -> dict[str, Any]:
+    if not isinstance(identity, SourceIdentity):
+        raise SourceIdentityValidationError("identity must be a SourceIdentity")
+    if character_range is not None and character_range.basis != CHAR_OFFSET_BASIS:
+        raise SourceIdentityValidationError("character_range has the wrong basis")
+    if byte_range is not None and byte_range.basis != BYTE_OFFSET_BASIS:
+        raise SourceIdentityValidationError("byte_range has the wrong basis")
+    if character_range is not None and byte_range is not None:
+        if exact_snapshot is None:
+            raise SourceIdentityValidationError(
+                "exact snapshot is required to relate character and byte ranges"
+            )
+        if exact_snapshot.identity != identity:
+            raise SourceIdentityValidationError("locator snapshot identity mismatch")
+        translated = translate_exact_offset_range(
+            exact_snapshot,
+            character_range,
+            target_basis=BYTE_OFFSET_BASIS,
+            expected_snapshot_id=identity.snapshot_id,
+            expected_content_hash=identity.content_hash,
+        )
+        if translated != byte_range:
+            raise SourceIdentityValidationError(
+                "character and byte ranges do not identify the same exact span"
+            )
+    locator = {
+        "project_id": identity.project_id,
+        "source_document_type": identity.source_document_type,
+        "source_document_id": identity.source_document_id,
+        "source_document_version": identity.source_document_version,
+        "source_map_id": identity.source_map_id,
+        "snapshot_id": identity.snapshot_id,
+        "snapshot_hash": identity.content_hash,
+        "section_id": identity.section_id,
+        "chapter_id": identity.chapter_id,
+        "scene_id": identity.scene_id,
+        "char_start": character_range.start if character_range else None,
+        "char_end": character_range.end if character_range else None,
+        "byte_start": byte_range.start if byte_range else None,
+        "byte_end": byte_range.end if byte_range else None,
+        "locator_precision": locator_precision,
+        "source_hash": identity.content_hash,
+        "char_offset_basis": CHAR_OFFSET_BASIS if character_range else None,
+        "byte_offset_basis": BYTE_OFFSET_BASIS if byte_range else None,
+        "line_offset_basis": None,
+        "token_offset_basis": None,
+    }
+    return validate_canonical_source_locator(locator)
+
+
+def validate_canonical_source_locator(locator: dict[str, Any]) -> dict[str, Any]:
+    """Validate the shared locator, including exact byte-only Story Check spans."""
+
+    validated = validate_source_locator(locator, allow_exact_byte_only=True)
+    for prefix in ("char", "byte", "line", "token"):
+        if validated.get(f"{prefix}_start") is not None and not validated.get(
+            f"{prefix}_offset_basis"
+        ):
+            raise ValueError(f"{prefix}_offset_basis is required for canonical offsets")
+    if validated["locator_precision"] not in ("document_only", "unknown"):
+        for field in ("snapshot_id", "snapshot_hash", "source_hash"):
+            if not validated.get(field):
+                raise ValueError(f"{field} is required for canonical exact locators")
+        for field in ("snapshot_hash", "source_hash"):
+            if not _SHA256_PATTERN.fullmatch(validated[field]):
+                raise ValueError(
+                    f"{field} must be a lowercase SHA-256 hex digest for canonical exact locators"
+                )
+        if validated["snapshot_hash"] != validated["source_hash"]:
+            raise ValueError(
+                "snapshot_hash and source_hash must match for canonical exact locators"
+            )
+    return validated
+
+
+def project_candidate_source_locator(locator: dict[str, Any]) -> dict[str, Any]:
+    """Project a canonical locator into the existing narrow candidate shape."""
+
+    validated = validate_source_locator(locator)
+    return {
+        "project_id": validated["project_id"],
+        "source_document_type": validated["source_document_type"],
+        "source_document_id": validated["source_document_id"],
+        "section_id": validated.get("section_id"),
+        "chapter_id": validated.get("chapter_id"),
+        "scene_id": validated.get("scene_id"),
+        "line_start": validated.get("line_start"),
+        "line_end": validated.get("line_end"),
+        "char_start": validated.get("char_start"),
+        "char_end": validated.get("char_end"),
+        "source_hash": validated.get("source_hash"),
+    }
+
+
 __all__ = (
+    "SOURCE_IDENTITY_CONTRACT_VERSION",
+    "SOURCE_HASH_ALGORITHM",
+    "SOURCE_HASH_BASIS",
+    "CHAR_OFFSET_BASIS",
+    "BYTE_OFFSET_BASIS",
+    "SourceOwnership",
+    "SourceIdentityValidationError",
+    "SourceIdentity",
+    "ExactSourceSnapshot",
+    "OffsetRange",
+    "build_exact_source_snapshot",
+    "translate_exact_offset_range",
+    "build_canonical_source_locator",
+    "validate_canonical_source_locator",
+    "project_candidate_source_locator",
     "validate_source_document_ref",
     "validate_source_segment",
     "validate_source_map",

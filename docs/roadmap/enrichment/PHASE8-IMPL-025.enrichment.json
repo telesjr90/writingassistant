@@ -9,6 +9,7 @@
   "architecture_decision": {
     "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
     "t001_contract_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md",
+    "t002_contract_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md",
     "accepted_pattern": "layered plus parallel",
     "current_pattern": "source/raw idea -> independent adapters -> normalization -> fusion/conflict/uncertainty -> candidate persistence -> owner review",
     "current_pattern_classification": "valid implemented foundation, incomplete target architecture",
@@ -56,8 +57,6 @@
     "grouped owner review with T023A and T023B complete/PASS"
   ],
   "missing_layers": [
-    "unified stable source identity and exact source snapshots",
-    "immutable AnalysisRunManifest and transformation lineage",
     "complete immutable raw artifact/evidence ledger",
     "expanded BookNLP mappings and precise offset translation",
     "official/full authorized Subtxt runtime inventory, contracts, adapter, and validation",
@@ -77,10 +76,12 @@
     "status": "active",
     "depends_on": ["PHASE8-IMPL-024"],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": "PHASE8-IMPL-025-T002",
+    "immediate_next_task": "PHASE8-IMPL-025-T003",
     "immediate_next_task_status": "planned/dependency-satisfied/eligible/not-begun",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
-    "first_phase8_impl_025_task_status": "complete/PASS"
+    "first_phase8_impl_025_task_status": "complete/PASS",
+    "latest_completed_task": "PHASE8-IMPL-025-T002",
+    "latest_completed_task_status": "complete/PASS"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -163,7 +164,6 @@
     "Subtxt internal model/provider provenance",
     "supported source/document granularity",
     "raw artifact retention",
-    "AnalysisRunManifest schema",
     "cross-adapter guardrail ordering",
     "exact BookNLP candidate mapping expansion",
     "NCP import/export mapping version",
@@ -174,6 +174,7 @@
   "validation_frontier": {
     "preserved_verified_foundation": [
       "T001 tool-role and layered-orchestration contract",
+      "T002 stable source identity, exact snapshots/hashes/offsets, immutable AnalysisRunManifest, and unsuccessful-output lineage",
       "spaCy live extraction",
       "Ollama live structured extraction",
       "Story Check live execution",
@@ -185,7 +186,6 @@
       "grouped-review contract and UI"
     ],
     "not_yet_validated": [
-      "complete source identity and AnalysisRunManifest",
       "immutable layered evidence ledger",
       "expanded BookNLP output classes",
       "official/full Subtxt runtime",
