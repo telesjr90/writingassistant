@@ -431,6 +431,14 @@ def test_parse_entities_tsv_parses_valid_text_and_keeps_raw_support_only():
     assert "approved_truth" not in rows[0]
 
 
+def test_parse_entities_tsv_preserves_booknlp_unresolved_coreference_sentinel():
+    rows = booknlp_fixture_parser.parse_booknlp_entities_tsv(
+        valid_entities_tsv(COREF="-1")
+    )
+    assert rows[0]["COREF"] == -1
+    assert "canonical_identity" not in rows[0]
+
+
 @pytest.mark.parametrize(
     "text",
     [
@@ -439,7 +447,7 @@ def test_parse_entities_tsv_parses_valid_text_and_keeps_raw_support_only():
         "\t".join(ENTITIES_HEADER) + "\n1\t0\n",
         valid_entities_tsv(text=""),
         valid_entities_tsv(cat=""),
-        valid_entities_tsv(COREF="-1"),
+        valid_entities_tsv(COREF="-2"),
         valid_entities_tsv(COREF="False"),
         valid_entities_tsv(start_token="2", end_token="1"),
     ],

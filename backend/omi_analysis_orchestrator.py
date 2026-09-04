@@ -21,14 +21,12 @@ T005 scope (PHASE8-IMPL-023):
     ``OMI_LIVE_BOOKNLP_ENABLED`` env flags that imports
     ``booknlp.booknlp.BookNLP`` lazily, writes the owner raw idea to a
     temporary file, runs BookNLP against a temporary output directory,
-    and converts the parsed ``.entities`` / ``.quotes`` / ``.tokens``
-    rows into the existing T007
-    ``omi_booknlp_local_nlp_extraction.v1`` envelope shape. The live
-    BookNLP adapter does NOT persist raw BookNLP output, mutate
-    Memory/Canon, create promotion records, run apply-promotion, or
-    generate story prose. T017C must later perform manual real BookNLP
-    processing on owner-authored text to prove the live BookNLP MVP
-    path.
+    and maps actual ``.tokens``, ``.entities``, ``.quotes``,
+    ``.supersense``, and ``.book`` fields into the existing T007 envelope.
+    T004 adds exact T002 offset validation and a strict in-memory handoff so
+    the T003 control plane can publish the actual raw files immutably. The
+    adapter itself still does not persist, mutate Memory/Canon, create
+    promotion records, run apply-promotion, or generate story prose.
   - Wires ``story_check`` through a fixture-only diagnostic handoff contract
     that normalizes evidence-backed structural diagnostics/questions into
     candidate-review support without importing or running Story Check.
@@ -90,17 +88,23 @@ context is sufficient.
 
 from __future__ import annotations
 
+import copy
 import hashlib
+import importlib.metadata
 import json
 import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any, Callable, Mapping
+
+from backend.story_knowledge import booknlp_adapter_contract
+from backend.story_knowledge import source_map as exact_source_map
 
 # ---------------------------------------------------------------------------
 # Adapter identity and result-state constants
@@ -1090,10 +1094,11 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
         # but it is downgraded by the orchestrator to "empty" at the run
         # envelope level. We accept and pass through here.
         pass
-    # Preserve orchestrator-level metadata fields (e.g. ``fallback_only``)
-    # that real adapter implementations may set, but reject any other
-    # unknown extra fields.
-    allowed_extras = {"fallback_only"}
+    # Preserve bounded orchestrator-level metadata.  ``raw_artifacts`` is
+    # accepted only for the real BookNLP identity and only through the strict
+    # T004 in-memory handoff contract; the T003 control plane removes payloads
+    # from the result envelope before publishing them immutably.
+    allowed_extras = {"fallback_only", "raw_artifacts"}
     extras: dict[str, Any] = {}
     for key, value in result.items():
         if key in {"adapter", "state", "explanation", "candidates"}:
@@ -1102,7 +1107,14 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
             raise ValueError(
                 f"adapter result has unsupported extra field: {key}"
             )
-        extras[key] = value
+        if key == "raw_artifacts":
+            if adapter != "booknlp":
+                raise ValueError("only booknlp may provide BookNLP raw artifacts")
+            extras[key] = booknlp_adapter_contract.validate_booknlp_raw_artifact_handoff(
+                value
+            )
+        else:
+            extras[key] = value
     return {
         "adapter": adapter,
         "state": state,
@@ -2414,7 +2426,7 @@ def _validate_local_nlp_finding(
     if not isinstance(raw_finding_id, str) or not raw_finding_id.strip():
         raw_finding_id = f"{adapter_name}::fixture::{source_locator}"
 
-    return {
+    normalized = {
         "candidate_type": candidate_type,
         "label": label,
         "extracted_claim": extracted_claim,
@@ -2437,6 +2449,18 @@ def _validate_local_nlp_finding(
             extracted_claim,
         ),
     }
+    if "support_metadata" in finding:
+        if not isinstance(finding["support_metadata"], dict):
+            raise ValueError(f"{adapter_name} support_metadata must be an object")
+        normalized["support_metadata"] = dict(finding["support_metadata"])
+    if "uncertainty_label" in finding:
+        uncertainty = _require_non_empty_string(
+            finding["uncertainty_label"], f"{adapter_name} uncertainty_label"
+        )
+        if is_truth_label(uncertainty):
+            raise ValueError(f"{adapter_name} uncertainty_label is not allowed")
+        normalized["uncertainty_label"] = uncertainty
+    return normalized
 
 
 def validate_local_nlp_fixture_envelope(
@@ -7851,6 +7875,473 @@ def _booknlp_make_quote_finding(
     }
 
 
+def _booknlp_required_int(value: Any, label: str) -> int:
+    if isinstance(value, bool):
+        raise ValueError(f"BookNLP {label} must be a non-negative integer")
+    if isinstance(value, int):
+        number = value
+    elif isinstance(value, str) and value.strip().isdecimal():
+        number = int(value.strip())
+    else:
+        raise ValueError(f"BookNLP {label} must be a non-negative integer")
+    if number < 0:
+        raise ValueError(f"BookNLP {label} must be a non-negative integer")
+    return number
+
+
+def _booknlp_coreference_id(value: Any) -> int:
+    """Validate BookNLP's coreference ID, including its unresolved ``-1`` sentinel."""
+
+    if value == -1 or value == "-1":
+        return -1
+    return _booknlp_required_int(value, "COREF")
+
+
+def _booknlp_t004_snapshot(
+    *, project_name: str, source_idea_id: str | None, source_content: str
+) -> Any:
+    if not isinstance(source_content, str) or not source_content:
+        raise ValueError("BookNLP exact source content is required")
+    return exact_source_map.build_exact_source_snapshot(
+        project_id=project_name,
+        source_document_type="omi",
+        source_document_id=source_idea_id or "request-source",
+        source_document_version="1",
+        source_ownership="owner_authored",
+        source_content=source_content,
+    )
+
+
+def _booknlp_t004_token_index(snapshot: Any, tokens: list[dict[str, Any]]) -> dict[int, dict[str, Any]]:
+    if not isinstance(tokens, list) or not tokens:
+        raise ValueError("BookNLP token output is required for exact offsets")
+    indexed: dict[int, dict[str, Any]] = {}
+    for raw in tokens:
+        if not isinstance(raw, dict):
+            raise ValueError("BookNLP token row must be an object")
+        token_id = _booknlp_required_int(
+            raw.get("token_ID_within_document", raw.get("token_id")),
+            "token_ID_within_document",
+        )
+        if token_id in indexed:
+            raise ValueError("BookNLP token IDs must be unique")
+        byte_start = _booknlp_required_int(
+            raw.get("byte_onset", raw.get("byte_start")), "byte_onset"
+        )
+        byte_end = _booknlp_required_int(
+            raw.get("byte_offset", raw.get("byte_end")), "byte_offset"
+        )
+        byte_range = exact_source_map.OffsetRange(
+            byte_start, byte_end, exact_source_map.BYTE_OFFSET_BASIS
+        )
+        char_range = exact_source_map.translate_exact_offset_range(
+            snapshot,
+            byte_range,
+            target_basis=exact_source_map.CHAR_OFFSET_BASIS,
+            expected_snapshot_id=snapshot.identity.snapshot_id,
+            expected_content_hash=snapshot.identity.content_hash,
+        )
+        if "char_start" in raw or "char_end" in raw:
+            supplied = exact_source_map.OffsetRange(
+                _booknlp_required_int(raw.get("char_start"), "char_start"),
+                _booknlp_required_int(raw.get("char_end"), "char_end"),
+                exact_source_map.CHAR_OFFSET_BASIS,
+            )
+            if supplied != char_range:
+                raise ValueError("BookNLP byte and character token offsets disagree")
+        word = raw.get("word", raw.get("token"))
+        if not isinstance(word, str) or not word:
+            raise ValueError("BookNLP token word is required")
+        excerpt = snapshot.source_content[char_range.start:char_range.end]
+        if excerpt != word:
+            raise ValueError("BookNLP token offsets do not identify the emitted token")
+        indexed[token_id] = {
+            **dict(raw),
+            "token_id": token_id,
+            "byte_start": byte_start,
+            "byte_end": byte_end,
+            "char_start": char_range.start,
+            "char_end": char_range.end,
+            "source_excerpt": excerpt,
+        }
+    return indexed
+
+
+def _booknlp_t004_span(
+    snapshot: Any,
+    token_index: dict[int, dict[str, Any]],
+    start_value: Any,
+    end_value: Any,
+) -> tuple[int, int, int, int, str]:
+    start_token = _booknlp_required_int(start_value, "span start token")
+    end_token = _booknlp_required_int(end_value, "span end token")
+    if end_token < start_token or start_token not in token_index or end_token not in token_index:
+        raise ValueError("BookNLP token span cannot be proven against the exact source")
+    byte_start = token_index[start_token]["byte_start"]
+    byte_end = token_index[end_token]["byte_end"]
+    byte_range = exact_source_map.OffsetRange(
+        byte_start, byte_end, exact_source_map.BYTE_OFFSET_BASIS
+    )
+    char_range = exact_source_map.translate_exact_offset_range(
+        snapshot,
+        byte_range,
+        target_basis=exact_source_map.CHAR_OFFSET_BASIS,
+        expected_snapshot_id=snapshot.identity.snapshot_id,
+        expected_content_hash=snapshot.identity.content_hash,
+    )
+    excerpt = snapshot.source_content[char_range.start:char_range.end]
+    return char_range.start, char_range.end, byte_start, byte_end, excerpt
+
+
+def _booknlp_t004_evidence(
+    snapshot: Any,
+    span: tuple[int, int, int, int, str],
+    *,
+    artifact_file_id: str,
+    evidence_role: str,
+) -> dict[str, Any]:
+    char_start, char_end, byte_start, byte_end, excerpt = span
+    return {
+        "source_excerpt": excerpt,
+        "source_locator": f"raw_idea:utf8-bytes:{byte_start}-{byte_end}",
+        "snapshot_id": snapshot.identity.snapshot_id,
+        "snapshot_hash": snapshot.identity.content_hash,
+        "source_hash": snapshot.identity.content_hash,
+        "char_start": char_start,
+        "char_end": char_end,
+        "char_offset_basis": exact_source_map.CHAR_OFFSET_BASIS,
+        "byte_start": byte_start,
+        "byte_end": byte_end,
+        "byte_offset_basis": exact_source_map.BYTE_OFFSET_BASIS,
+        "artifact_file_id": artifact_file_id,
+        "evidence_role": evidence_role,
+    }
+
+
+def _booknlp_t004_finding(
+    *,
+    candidate_type: str,
+    label: str,
+    claim: str,
+    evidence: list[dict[str, Any]],
+    raw_finding_id: str,
+    support_metadata: dict[str, Any],
+    uncertainty_label: str | None = None,
+) -> dict[str, Any]:
+    if not evidence:
+        raise ValueError("BookNLP finding requires exact evidence")
+    finding = {
+        "raw_finding_id": raw_finding_id,
+        "candidate_type": candidate_type,
+        "label": label,
+        "extracted_claim": claim,
+        "evidence": evidence,
+        "source_locator": evidence[0]["source_locator"],
+        "provenance": {
+            "tool_source": "booknlp",
+            "adapter": "booknlp",
+            "support": "BookNLP external runtime support only",
+        },
+        "support_label": "BookNLP external runtime support only",
+        "confidence": "BookNLP support with owner review required",
+        "owner_decision": {
+            "decision": OMI_FINDING_OWNER_DECISION_DEFAULT,
+            "approved": False,
+        },
+        "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+        "support_metadata": support_metadata,
+    }
+    if uncertainty_label is not None:
+        finding["uncertainty_label"] = uncertainty_label
+    return finding
+
+
+def _booknlp_t004_result_to_envelope(
+    *,
+    project_name: str,
+    source_idea_id: str | None,
+    source_content: str,
+    tokens: list[dict[str, Any]],
+    entities: list[dict[str, Any]],
+    quotes: list[dict[str, Any]],
+    supersense: list[dict[str, Any]],
+    book_json: dict[str, Any],
+) -> dict[str, Any]:
+    """Map actual BookNLP fields to exact, support-only normalized evidence."""
+
+    snapshot = _booknlp_t004_snapshot(
+        project_name=project_name,
+        source_idea_id=source_idea_id,
+        source_content=source_content,
+    )
+    token_index = _booknlp_t004_token_index(snapshot, tokens)
+    if not isinstance(entities, list) or not isinstance(quotes, list) or not isinstance(supersense, list):
+        raise ValueError("BookNLP parsed tables must be lists")
+    if not isinstance(book_json, dict):
+        raise ValueError("BookNLP book output must be an object")
+
+    findings_by_class: dict[str, list[dict[str, Any]]] = {
+        "entities": [],
+        "coreference": [],
+        "quotes": [],
+        "events": [],
+        "supersense": [],
+        "tokens": [],
+    }
+    limitations: list[str] = []
+    clusters: dict[int, list[tuple[str, dict[str, Any]]]] = {}
+
+    for index, row in enumerate(entities):
+        if not isinstance(row, dict):
+            raise ValueError("BookNLP entity row must be an object")
+        span = _booknlp_t004_span(
+            snapshot, token_index, row.get("start_token"), row.get("end_token")
+        )
+        category = row.get("cat")
+        if not isinstance(category, str) or not _booknlp_entity_category_is_safe(category):
+            raise ValueError("BookNLP entity category is invalid")
+        entity_class = category.upper().split("_", 1)[-1]
+        candidate_type = _OMI_BOOKNLP_LIVE_ENTITY_CATEGORY_TO_CANDIDATE_TYPE.get(entity_class)
+        if candidate_type is None:
+            limitations.append(f"unsupported_entity_class:{entity_class}")
+            continue
+        label = row.get("text")
+        if not isinstance(label, str) or not label.strip():
+            raise ValueError("BookNLP entity mention text is required")
+        if label.strip() != span[4]:
+            raise ValueError("BookNLP entity text does not match its exact token span")
+        coref = _booknlp_coreference_id(row.get("COREF"))
+        evidence = _booknlp_t004_evidence(
+            snapshot,
+            span,
+            artifact_file_id="booknlp-entities",
+            evidence_role="entity_mention_span",
+        )
+        findings_by_class["entities"].append(
+            _booknlp_t004_finding(
+                candidate_type=candidate_type,
+                label=label.strip(),
+                claim=(
+                    f"BookNLP entity support: {label.strip()}; class={entity_class}; "
+                    f"mention_form={row.get('prop', '')}; cluster={coref}."
+                ),
+                evidence=[evidence],
+                raw_finding_id=f"booknlp-entity-{index}-{coref}-{span[2]}-{span[3]}",
+                support_metadata={
+                    "signal_kind": "entity_mention",
+                    "booknlp_entity_class": entity_class,
+                    "mention_form": str(row.get("prop", "")),
+                    "coreference_cluster_id": coref,
+                    "identity_resolution": (
+                        "unresolved_by_booknlp" if coref == -1 else "owner_review_required"
+                    ),
+                },
+                uncertainty_label="booknlp_entity_support_uncertain",
+            )
+        )
+        if coref >= 0:
+            clusters.setdefault(coref, []).append((label.strip(), evidence))
+
+    for cluster_id in sorted(clusters):
+        mentions = clusters[cluster_id]
+        distinct = sorted({label for label, _ in mentions})
+        if len(mentions) < 2:
+            continue
+        findings_by_class["coreference"].append(
+            _booknlp_t004_finding(
+                candidate_type="relationship",
+                label=f"BookNLP coreference cluster {cluster_id}",
+                claim=(
+                    f"BookNLP linked {len(mentions)} mention spans in cluster {cluster_id}; "
+                    "owner review is required before identity resolution."
+                ),
+                evidence=[copy.deepcopy(item[1]) for item in mentions],
+                raw_finding_id=f"booknlp-coreference-{cluster_id}",
+                support_metadata={
+                    "signal_kind": "coreference",
+                    "coreference_cluster_id": cluster_id,
+                    "candidate_mentions": distinct,
+                    "automatic_identity_merge": False,
+                    "identity_resolution": "owner_review_required",
+                },
+                uncertainty_label="booknlp_coreference_ambiguous",
+            )
+        )
+
+    for index, row in enumerate(quotes):
+        if not isinstance(row, dict):
+            raise ValueError("BookNLP quote row must be an object")
+        quote_span = _booknlp_t004_span(
+            snapshot, token_index, row.get("quote_start"), row.get("quote_end")
+        )
+        mention_span = _booknlp_t004_span(
+            snapshot, token_index, row.get("mention_start"), row.get("mention_end")
+        )
+        char_id = _booknlp_required_int(row.get("char_id"), "quote char_id")
+        mention = row.get("mention_phrase")
+        if not isinstance(mention, str) or not mention.strip():
+            raise ValueError("BookNLP quote speaker mention is required")
+        quote_text = row.get("quote")
+        if not isinstance(quote_text, str) or quote_text != quote_span[4]:
+            raise ValueError("BookNLP quote text does not match its exact token span")
+        if mention.strip() != mention_span[4]:
+            raise ValueError("BookNLP speaker mention does not match its exact token span")
+        evidence = [
+            _booknlp_t004_evidence(
+                snapshot,
+                quote_span,
+                artifact_file_id="booknlp-quotes",
+                evidence_role="quote_span",
+            ),
+            _booknlp_t004_evidence(
+                snapshot,
+                mention_span,
+                artifact_file_id="booknlp-quotes",
+                evidence_role="speaker_mention_span",
+            ),
+        ]
+        findings_by_class["quotes"].append(
+            _booknlp_t004_finding(
+                candidate_type="relationship",
+                label="BookNLP dialogue attribution",
+                claim=(
+                    f"BookNLP associated a quote span with speaker mention {mention.strip()}; "
+                    f"character_cluster={char_id}; owner review is required."
+                ),
+                evidence=evidence,
+                raw_finding_id=f"booknlp-quote-{index}-{char_id}-{quote_span[2]}-{quote_span[3]}",
+                support_metadata={
+                    "signal_kind": "quote_attribution",
+                    "speaker_mention": mention.strip(),
+                    "speaker_cluster_id": char_id,
+                    "attribution_resolution": "owner_review_required",
+                },
+                uncertainty_label="booknlp_speaker_attribution_uncertain",
+            )
+        )
+
+    for token_id in sorted(token_index):
+        token = token_index[token_id]
+        token_span = (
+            token["char_start"],
+            token["char_end"],
+            token["byte_start"],
+            token["byte_end"],
+            token["source_excerpt"],
+        )
+        event_marker = token.get("event")
+        if event_marker == "EVENT":
+            findings_by_class["events"].append(
+                _booknlp_t004_finding(
+                    candidate_type="timeline_event",
+                    label=f"BookNLP event marker: {token['source_excerpt']}",
+                    claim=f"App-derived event support from BookNLP token event marker at token {token_id}.",
+                    evidence=[_booknlp_t004_evidence(snapshot, token_span, artifact_file_id="booknlp-tokens", evidence_role="event_token_span")],
+                    raw_finding_id=f"booknlp-event-token-{token_id}",
+                    support_metadata={
+                        "signal_kind": "event_marker",
+                        "event": "EVENT",
+                        "token_ID_within_document": token_id,
+                        "derivation": "app_owned_from_booknlp_token_event_marker",
+                        "raw_event_artifact": False,
+                    },
+                    uncertainty_label="booknlp_event_support_uncertain",
+                )
+            )
+        findings_by_class["tokens"].append(
+            _booknlp_t004_finding(
+                candidate_type="evidence_note",
+                label=f"BookNLP token evidence {token_id}",
+                claim=(
+                    f"BookNLP token support: token={token_id}; lemma={token.get('lemma', '')}; "
+                    f"dependency={token.get('dependency_relation', '')}; "
+                    f"head={token.get('syntactic_head_ID', '')}; event={event_marker or ''}."
+                ),
+                evidence=[_booknlp_t004_evidence(snapshot, token_span, artifact_file_id="booknlp-tokens", evidence_role="token_dependency_span")],
+                raw_finding_id=f"booknlp-token-{token_id}-{token['byte_start']}-{token['byte_end']}",
+                support_metadata={
+                    "signal_kind": "token_dependency",
+                    "token_ID_within_document": token_id,
+                    "lemma": str(token.get("lemma", "")),
+                    "POS_tag": str(token.get("POS_tag", "")),
+                    "fine_POS_tag": str(token.get("fine_POS_tag", "")),
+                    "dependency_relation": str(token.get("dependency_relation", "")),
+                    "syntactic_head_ID": _booknlp_required_int(token.get("syntactic_head_ID"), "syntactic_head_ID"),
+                    "event": str(event_marker or ""),
+                    "byte_offset_basis": exact_source_map.BYTE_OFFSET_BASIS,
+                },
+            )
+        )
+
+    object_supersenses = {"noun.artifact", "noun.object"}
+    for index, row in enumerate(supersense):
+        if not isinstance(row, dict):
+            raise ValueError("BookNLP supersense row must be an object")
+        span = _booknlp_t004_span(
+            snapshot, token_index, row.get("start_token"), row.get("end_token")
+        )
+        category = row.get("supersense_category", row.get("category"))
+        if not isinstance(category, str) or not category:
+            raise ValueError("BookNLP supersense category is required")
+        supersense_text = row.get("text")
+        if not isinstance(supersense_text, str) or supersense_text != span[4]:
+            raise ValueError("BookNLP supersense text does not match its exact token span")
+        candidate_type = "object" if category in object_supersenses else "evidence_note"
+        findings_by_class["supersense"].append(
+            _booknlp_t004_finding(
+                candidate_type=candidate_type,
+                label=f"BookNLP supersense: {category}",
+                claim=f"BookNLP supersense support: category={category}; token_span={row.get('start_token')}-{row.get('end_token')}.",
+                evidence=[_booknlp_t004_evidence(snapshot, span, artifact_file_id="booknlp-supersense", evidence_role="supersense_span")],
+                raw_finding_id=f"booknlp-supersense-{index}-{span[2]}-{span[3]}",
+                support_metadata={
+                    "signal_kind": "supersense",
+                    "supersense_category": category,
+                    "object_mapping": category in object_supersenses,
+                },
+                uncertainty_label="booknlp_supersense_support_uncertain",
+            )
+        )
+
+    characters = book_json.get("characters", [])
+    if not isinstance(characters, list):
+        raise ValueError("BookNLP book characters must be a list")
+    if any(isinstance(character, dict) and character.get("poss") for character in characters):
+        limitations.append("possession_book_summary_has_no_exact_span_and_is_not_normalized")
+
+    limits = {
+        "entities": 16,
+        "coreference": 8,
+        "quotes": 8,
+        "events": 8,
+        "supersense": 8,
+        "tokens": 16,
+    }
+    findings = [
+        item
+        for group_name in ("entities", "coreference", "quotes", "events", "supersense", "tokens")
+        for item in findings_by_class[group_name][: limits[group_name]]
+    ][:_OMI_LIVE_BOOKNLP_MAX_FINDINGS]
+    status = "succeeded" if findings else "empty"
+    limitation_text = ", ".join(sorted(set(limitations))) or "none"
+    return {
+        "schema_version": OMI_BOOKNLP_SCHEMA_VERSION,
+        "adapter": "booknlp",
+        "status": status,
+        "explanation": (
+            f"BookNLP fields were normalized as exact source support; "
+            f"mapping limitations: {limitation_text}."
+        ),
+        "diagnostics": sorted(set(limitations)),
+        "provenance": {
+            "tool_source": "booknlp",
+            "adapter": "booknlp",
+            "support": "BookNLP external runtime support only",
+        },
+        "findings": findings,
+    }
+
+
 def _booknlp_live_result_to_envelope(
     *,
     entities: list[dict[str, str]],
@@ -8103,6 +8594,35 @@ def _booknlp_construct_with_state_dict_shim(
         _booknlp_state_dict_shim_uninstall(original_load, torch_module)
 
 
+def _booknlp_collect_raw_output_files(output_dir: str, book_id: str) -> dict[str, bytes]:
+    """Read only the tracked BookNLP textual output vocabulary."""
+
+    suffixes = {
+        "tokens": ".tokens",
+        "entities": ".entities",
+        "quotes": ".quotes",
+        "supersense": ".supersense",
+        "book": ".book",
+        "book_html": ".book.html",
+    }
+    captured: dict[str, bytes] = {}
+    for kind, suffix in suffixes.items():
+        path = os.path.join(output_dir, f"{book_id}{suffix}")
+        try:
+            with open(path, "rb") as handle:
+                captured[kind] = handle.read()
+        except FileNotFoundError:
+            continue
+    return captured
+
+
+def _booknlp_runtime_version() -> str | None:
+    try:
+        return importlib.metadata.version("booknlp")
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
 def _build_booknlp_live_runner(
     *,
     adapter_config: dict[str, Any] | None = None,
@@ -8122,14 +8642,13 @@ def _build_booknlp_live_runner(
       (``pipeline="entity,quote,supersense,event"``, ``model="small"``)
       unless ``OMI_LIVE_BOOKNLP_MODEL`` / ``OMI_LIVE_BOOKNLP_PIPELINE``
       override them.
-    - Reads the temporary ``.entities``, ``.quotes``, and ``.tokens``
-      files written by BookNLP. No BookNLP output is written outside
-      the temporary directory; the temporary directory is cleaned up
-      after processing.
-    - Parses only evidence-backed rows (entity ``text`` + ``cat``,
-      quote ``quote`` + ``mention_phrase`` + ``char_id``) and converts
-      them into the existing T007
-      ``omi_booknlp_local_nlp_extraction.v1`` envelope shape.
+    - Reads the supported temporary BookNLP textual artifacts and creates a
+      strict, hash-bound in-memory handoff before cleanup. The T003 control
+      plane may publish that handoff; this runner does not persist it.
+    - Maps exact entity/coreference, quote/speaker, token-event,
+      supersense, token, and dependency support into the existing T007
+      ``omi_booknlp_local_nlp_extraction.v1`` envelope shape. All spans are
+      proven against the exact T002 UTF-8 source snapshot.
     - Validates the converted envelope through
       ``validate_local_nlp_fixture_envelope``. The T007 validator
       remains authoritative; any T007 validation failure fails the
@@ -8137,7 +8656,7 @@ def _build_booknlp_live_runner(
     - Fails closed on ``ImportError``, ``OSError`` (BookNLP package
       missing or model files missing), runtime processing exception,
       empty/malformed raw idea, or malformed BookNLP output.
-    - The runner never persists raw BookNLP output, never mutates
+    - The runner never directly persists raw BookNLP output, never mutates
       Memory/Canon, never creates promotion records, never runs
       apply-promotion, and never generates story prose.
 
@@ -8207,8 +8726,6 @@ def _build_booknlp_live_runner(
             try:
                 with open(input_path, "w", encoding="utf-8") as handle:
                     handle.write(raw_text)
-                    if not raw_text.endswith("\n"):
-                        handle.write("\n")
             except OSError as exc:
                 return {
                     "adapter": "booknlp",
@@ -8267,30 +8784,123 @@ def _build_booknlp_live_runner(
                     "candidates": [],
                 }
 
-            entities_path = os.path.join(output_dir, f"{book_id}.entities")
-            quotes_path = os.path.join(output_dir, f"{book_id}.quotes")
-            tokens_path = os.path.join(output_dir, f"{book_id}.tokens")
-
-            entities_rows = _booknlp_parse_entities_file(entities_path)
-            quotes_rows = _booknlp_parse_quotes_file(quotes_path)
-            tokens_rows = _booknlp_parse_tokens_file(tokens_path)
-
-            if not entities_rows and not quotes_rows:
+            try:
+                raw_files = _booknlp_collect_raw_output_files(output_dir, book_id)
+            except OSError as exc:
                 return {
                     "adapter": "booknlp",
-                    "state": "empty",
+                    "state": "failed_closed",
                     "explanation": (
-                        "Live BookNLP produced no parseable .entities or "
-                        ".quotes rows. Failing closed with no findings."
+                        "Live BookNLP raw output could not be read exactly: "
+                        f"{type(exc).__name__}: {exc}. Failing closed."
                     ),
                     "candidates": [],
                 }
-
-            envelope = _booknlp_live_result_to_envelope(
-                entities=entities_rows,
-                quotes=quotes_rows,
-                tokens=tokens_rows,
+            if not raw_files:
+                return {
+                    "adapter": "booknlp",
+                    "state": "empty",
+                    "explanation": "Live BookNLP produced no supported raw artifacts.",
+                    "candidates": [],
+                }
+            snapshot = _booknlp_t004_snapshot(
+                project_name=project_name,
+                source_idea_id=source_idea_id,
+                source_content=raw_text,
             )
+            missing = sorted(
+                kind
+                for kind in ("tokens", "entities", "quotes", "supersense", "book")
+                if kind not in raw_files
+            )
+            limitations = [f"missing_raw_output:{kind}" for kind in missing]
+            handoff = booknlp_adapter_contract.build_booknlp_raw_artifact_handoff(
+                snapshot=snapshot,
+                files=raw_files,
+                tool_version=_booknlp_runtime_version(),
+                runtime_name="python",
+                runtime_version=".".join(str(value) for value in sys.version_info[:3]),
+                model_name=model_name,
+                pipeline=safe_pipeline,
+                mapping_limitations=limitations,
+            )
+            try:
+                from backend.story_knowledge import booknlp_fixture_parser
+
+                if "tokens" not in raw_files:
+                    raise ValueError("BookNLP .tokens output is required for exact offsets")
+                tokens_rows = booknlp_fixture_parser.parse_booknlp_tokens_tsv(
+                    raw_files["tokens"].decode("utf-8")
+                )
+                entities_rows = (
+                    booknlp_fixture_parser.parse_booknlp_entities_tsv(
+                        raw_files["entities"].decode("utf-8")
+                    )
+                    if "entities" in raw_files
+                    else []
+                )
+                quotes_rows = (
+                    booknlp_fixture_parser.parse_booknlp_quotes_tsv(
+                        raw_files["quotes"].decode("utf-8")
+                    )
+                    if "quotes" in raw_files
+                    else []
+                )
+                supersense_rows = (
+                    booknlp_fixture_parser.parse_booknlp_supersense_tsv(
+                        raw_files["supersense"].decode("utf-8")
+                    )
+                    if "supersense" in raw_files
+                    else []
+                )
+                book_json = (
+                    booknlp_fixture_parser.parse_booknlp_book_json(
+                        raw_files["book"].decode("utf-8")
+                    )
+                    if "book" in raw_files
+                    else {"characters": []}
+                )
+                envelope = _booknlp_t004_result_to_envelope(
+                    project_name=project_name,
+                    source_idea_id=source_idea_id,
+                    source_content=raw_text,
+                    tokens=tokens_rows,
+                    entities=entities_rows,
+                    quotes=quotes_rows,
+                    supersense=supersense_rows,
+                    book_json=book_json,
+                )
+                combined_limitations = sorted(
+                    set([*limitations, *envelope.get("diagnostics", [])])
+                )
+                envelope["diagnostics"] = combined_limitations
+                envelope["explanation"] = (
+                    "BookNLP fields were normalized as exact source support; "
+                    "mapping limitations: "
+                    + (", ".join(combined_limitations) or "none")
+                    + "."
+                )
+                handoff = booknlp_adapter_contract.build_booknlp_raw_artifact_handoff(
+                    snapshot=snapshot,
+                    files=raw_files,
+                    tool_version=_booknlp_runtime_version(),
+                    runtime_name="python",
+                    runtime_version=".".join(str(value) for value in sys.version_info[:3]),
+                    model_name=model_name,
+                    pipeline=safe_pipeline,
+                    mapping_limitations=combined_limitations,
+                )
+            except (UnicodeDecodeError, ValueError) as exc:
+                return {
+                    "adapter": "booknlp",
+                    "state": "failed_closed",
+                    "explanation": (
+                        "Live BookNLP raw output failed exact T004 validation: "
+                        f"{type(exc).__name__}: {exc}."
+                    ),
+                    "candidates": [],
+                    "raw_artifacts": handoff,
+                }
         finally:
             try:
                 tmp_dir_obj.cleanup()
@@ -8327,6 +8937,7 @@ def _build_booknlp_live_runner(
                 or "Live BookNLP local NLP extraction completed."
             ),
             "candidates": validated["findings"],
+            "raw_artifacts": handoff,
         }
 
     return _runner
@@ -8490,15 +9101,10 @@ def _resolve_adapter_runner(
         # T017B: live BookNLP path behind explicit env flags. The runner
         # imports ``booknlp.booknlp.BookNLP`` lazily, writes the owner raw
         # idea to a temporary file, runs BookNLP against a temporary
-        # output directory, and converts parsed ``.entities`` /
-        # ``.quotes`` / ``.tokens`` rows into the existing T007
-        # ``omi_booknlp_local_nlp_extraction.v1`` envelope shape. The T007
-        # ``validate_local_nlp_fixture_envelope`` is the authoritative
-        # downstream validator. The runner does NOT persist raw BookNLP
-        # output, mutate Memory/Canon, create promotion records, run
-        # apply-promotion, or generate story prose. T017C must later
-        # perform manual real BookNLP processing on owner-authored text
-        # to prove the live BookNLP MVP path.
+        # output directory, validates actual output fields against exact T002
+        # UTF-8 offsets, and emits the existing T007 envelope plus a strict
+        # in-memory T004 raw-artifact handoff. The runner does not persist;
+        # the T003 control plane owns immutable publication.
         if adapter == "booknlp":
             env = os.environ
             if (
@@ -8649,6 +9255,7 @@ def analyze_omi_raw_idea_with_tools(
 
     if not isinstance(raw_idea, str):
         raise ValueError("OMI orchestrator raw_idea must be a string")
+    raw_idea_exact = raw_idea
     raw_idea_text = raw_idea.strip()
 
     if not isinstance(persist_candidates, bool):
@@ -8891,7 +9498,7 @@ def analyze_omi_raw_idea_with_tools(
         # here. Today this branch is unreachable; kept for shape.
         result = runner(
             project_name=project_name,
-            raw_idea=raw_idea_text,
+            raw_idea=(raw_idea_exact if adapter == "booknlp" else raw_idea_text),
             source_idea_id=source_idea_id,
         )
         envelope = validate_adapter_result(result)

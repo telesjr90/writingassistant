@@ -1,3 +1,4 @@
+import hashlib
 from copy import deepcopy
 
 from backend.story_knowledge import evidence
@@ -5,6 +6,95 @@ from backend.story_knowledge import source_map as source_map_helpers
 
 _TOOL = "boo" + "knlp"
 _RUN_TYPE = _TOOL + "_raw_import"
+BOOKNLP_RAW_ARTIFACT_HANDOFF_VERSION = "booknlp-raw-artifact-handoff.v1"
+
+_T004_RAW_FILE_CONTRACTS = {
+    "tokens": {
+        "artifact_file_id": "booknlp-tokens",
+        "artifact_type": "token_table",
+        "relative_path": "artifacts/booknlp/tokens.tsv",
+        "media_type": "text/tab-separated-values",
+        "schema_name": "booknlp_tokens",
+        "parser_hint": "tsv",
+    },
+    "entities": {
+        "artifact_file_id": "booknlp-entities",
+        "artifact_type": "entity_table",
+        "relative_path": "artifacts/booknlp/entities.tsv",
+        "media_type": "text/tab-separated-values",
+        "schema_name": "booknlp_entities",
+        "parser_hint": "tsv",
+    },
+    "quotes": {
+        "artifact_file_id": "booknlp-quotes",
+        "artifact_type": "quote_table",
+        "relative_path": "artifacts/booknlp/quotes.tsv",
+        "media_type": "text/tab-separated-values",
+        "schema_name": "booknlp_quotes",
+        "parser_hint": "tsv",
+    },
+    "supersense": {
+        "artifact_file_id": "booknlp-supersense",
+        "artifact_type": "normalized_intermediate",
+        "relative_path": "artifacts/booknlp/supersense.tsv",
+        "media_type": "text/tab-separated-values",
+        "schema_name": "booknlp_supersense",
+        "parser_hint": "tsv",
+    },
+    "book": {
+        "artifact_file_id": "booknlp-book",
+        "artifact_type": "coref_table",
+        "relative_path": "artifacts/booknlp/book.json",
+        "media_type": "application/json",
+        "schema_name": "booknlp_book",
+        "parser_hint": "json",
+    },
+    "book_html": {
+        "artifact_file_id": "booknlp-book-html",
+        "artifact_type": "parser_metadata",
+        "relative_path": "artifacts/booknlp/book.html",
+        "media_type": "text/html",
+        "schema_name": "booknlp_book_html",
+        "parser_hint": "html",
+    },
+}
+
+_T004_HANDOFF_FIELDS = frozenset(
+    {
+        "schema_version",
+        "adapter_id",
+        "source_identity",
+        "tool_version",
+        "runtime_name",
+        "runtime_version",
+        "model_name",
+        "pipeline",
+        "files",
+        "mapping_limitations",
+        "provenance",
+    }
+)
+
+_SOURCE_IDENTITY_FIELDS = frozenset(
+    {
+        "contract_version",
+        "project_id",
+        "source_document_type",
+        "source_document_id",
+        "source_document_version",
+        "source_ownership",
+        "section_id",
+        "chapter_id",
+        "scene_id",
+        "snapshot_id",
+        "content_hash",
+        "hash_algorithm",
+        "hash_basis",
+        "text_encoding",
+        "normalization_policy",
+        "source_map_id",
+    }
+)
 
 _MANIFEST_FIELDS = frozenset(
     {
@@ -336,6 +426,226 @@ def _validate_optional_locator(payload):
         if not isinstance(payload["source_locator"], dict):
             raise ValueError("source_locator must be a mapping")
         source_map_helpers.validate_source_locator(payload["source_locator"])
+
+
+def _t004_source_identity(value):
+    payload = _require_mapping(value, "source_identity")
+    if set(payload) != _SOURCE_IDENTITY_FIELDS:
+        raise ValueError("source_identity fields do not match the T002 contract")
+    try:
+        identity = source_map_helpers.SourceIdentity(
+            project_id=payload["project_id"],
+            source_document_type=payload["source_document_type"],
+            source_document_id=payload["source_document_id"],
+            source_document_version=payload["source_document_version"],
+            source_ownership=payload["source_ownership"],
+            snapshot_id=payload["snapshot_id"],
+            content_hash=payload["content_hash"],
+            source_map_id=payload["source_map_id"],
+            section_id=payload["section_id"],
+            chapter_id=payload["chapter_id"],
+            scene_id=payload["scene_id"],
+            hash_algorithm=payload["hash_algorithm"],
+            hash_basis=payload["hash_basis"],
+            text_encoding=payload["text_encoding"],
+            normalization_policy=payload["normalization_policy"],
+            contract_version=payload["contract_version"],
+        )
+    except (KeyError, ValueError) as exc:
+        raise ValueError("invalid T002 source identity") from exc
+    return identity
+
+
+def _optional_version(value, label):
+    if value is not None:
+        _validate_string(value, label)
+    return value
+
+
+def build_booknlp_raw_artifact_handoff(
+    *,
+    snapshot,
+    files,
+    tool_version,
+    runtime_name,
+    runtime_version,
+    model_name,
+    pipeline,
+    mapping_limitations=(),
+):
+    """Build an in-memory, exact-source handoff for T003 publication.
+
+    ``files`` contains only actual BookNLP-emitted textual artifacts.  Event
+    abstractions are derived from the raw token ``event`` column and therefore
+    have no entry in the accepted raw-file vocabulary.
+    """
+
+    if not isinstance(snapshot, source_map_helpers.ExactSourceSnapshot):
+        raise ValueError("exact T002 source snapshot is required")
+    if not isinstance(files, dict) or not files:
+        raise ValueError("BookNLP raw artifact files are required")
+    unknown = set(files) - set(_T004_RAW_FILE_CONTRACTS)
+    if unknown:
+        raise ValueError("unsupported BookNLP raw artifact kind")
+    _optional_version(tool_version, "tool_version")
+    _validate_string(runtime_name, "runtime_name")
+    _optional_version(runtime_version, "runtime_version")
+    _validate_string(model_name, "model_name")
+    _validate_string(pipeline, "pipeline")
+    if not isinstance(mapping_limitations, (list, tuple)):
+        raise ValueError("mapping_limitations must be a list or tuple")
+    checked_limitations = []
+    for limitation in mapping_limitations:
+        checked_limitations.append(_validate_string(limitation, "mapping limitation"))
+
+    file_records = []
+    for file_kind in _T004_RAW_FILE_CONTRACTS:
+        if file_kind not in files:
+            continue
+        payload = files[file_kind]
+        if not isinstance(payload, bytes):
+            raise ValueError("BookNLP raw artifact payload must be bytes")
+        try:
+            text = payload.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError("BookNLP raw artifact is not exact UTF-8") from exc
+        contract = _T004_RAW_FILE_CONTRACTS[file_kind]
+        record_count = 1
+        if contract["parser_hint"] == "tsv":
+            lines = text.splitlines()
+            record_count = max(len(lines) - 1, 0)
+        file_records.append(
+            {
+                **contract,
+                "encoding": "utf-8",
+                "size_bytes": len(payload),
+                "sha256": hashlib.sha256(payload).hexdigest(),
+                "record_count": record_count,
+                "line_count": len(text.splitlines()),
+                "schema_version": "1",
+                "payload": text,
+            }
+        )
+
+    provenance = {
+        "tool_source": _TOOL,
+        "adapter": _TOOL,
+        "support": "BookNLP external runtime support only",
+        "implementation_kind": "official_external",
+        "user_facing_label": "BookNLP evidence production",
+        "tool": {
+            "availability": "available",
+            "name": "BookNLP",
+            "version": tool_version,
+        },
+        "runtime": {
+            "availability": "available",
+            "name": runtime_name,
+            "version": runtime_version,
+        },
+        "provider": {"availability": "unknown"},
+        "model": {
+            "availability": "available",
+            "name": model_name,
+            "version": None,
+        },
+    }
+    handoff = {
+        "schema_version": BOOKNLP_RAW_ARTIFACT_HANDOFF_VERSION,
+        "adapter_id": _TOOL,
+        "source_identity": snapshot.identity.to_dict(),
+        "tool_version": tool_version,
+        "runtime_name": runtime_name,
+        "runtime_version": runtime_version,
+        "model_name": model_name,
+        "pipeline": pipeline,
+        "files": file_records,
+        "mapping_limitations": checked_limitations,
+        "provenance": provenance,
+    }
+    return validate_booknlp_raw_artifact_handoff(handoff)
+
+
+def validate_booknlp_raw_artifact_handoff(handoff):
+    payload = _require_mapping(handoff, "BookNLP raw artifact handoff")
+    if set(payload) != _T004_HANDOFF_FIELDS:
+        raise ValueError("invalid BookNLP raw artifact handoff fields")
+    if payload["schema_version"] != BOOKNLP_RAW_ARTIFACT_HANDOFF_VERSION:
+        raise ValueError("unsupported BookNLP raw artifact handoff version")
+    if payload["adapter_id"] != _TOOL:
+        raise ValueError("BookNLP handoff adapter identity mismatch")
+    identity = _t004_source_identity(payload["source_identity"])
+    for field in ("tool_version", "runtime_version"):
+        _optional_version(payload[field], field)
+    for field in ("runtime_name", "model_name", "pipeline"):
+        _validate_string(payload[field], field)
+    if not isinstance(payload["mapping_limitations"], list):
+        raise ValueError("mapping_limitations must be a list")
+    for limitation in payload["mapping_limitations"]:
+        _validate_string(limitation, "mapping limitation")
+    provenance = _require_mapping(payload["provenance"], "provenance")
+    if provenance.get("tool_source") != _TOOL or provenance.get("adapter") != _TOOL:
+        raise ValueError("BookNLP handoff provenance identity mismatch")
+    if provenance.get("implementation_kind") != "official_external":
+        raise ValueError("BookNLP live handoff must identify external execution")
+
+    files = _require_list(payload["files"], "files")
+    if not files:
+        raise ValueError("BookNLP raw artifact files are required")
+    seen = set()
+    contracts_by_id = {
+        contract["artifact_file_id"]: contract
+        for contract in _T004_RAW_FILE_CONTRACTS.values()
+    }
+    expected_file_fields = frozenset(
+        {
+            "artifact_file_id",
+            "artifact_type",
+            "relative_path",
+            "media_type",
+            "schema_name",
+            "parser_hint",
+            "encoding",
+            "size_bytes",
+            "sha256",
+            "record_count",
+            "line_count",
+            "schema_version",
+            "payload",
+        }
+    )
+    for record in files:
+        item = _require_mapping(record, "BookNLP raw artifact file")
+        if set(item) != expected_file_fields:
+            raise ValueError("invalid BookNLP raw artifact file fields")
+        file_id = item.get("artifact_file_id")
+        if file_id in seen or file_id not in contracts_by_id:
+            raise ValueError("invalid or duplicate BookNLP artifact_file_id")
+        seen.add(file_id)
+        contract = contracts_by_id[file_id]
+        for field in (
+            "artifact_file_id",
+            "artifact_type",
+            "relative_path",
+            "media_type",
+            "schema_name",
+            "parser_hint",
+        ):
+            if item[field] != contract[field]:
+                raise ValueError("BookNLP raw artifact contract mismatch")
+        if item["encoding"] != "utf-8" or item["schema_version"] != "1":
+            raise ValueError("invalid BookNLP raw artifact encoding or schema")
+        text = _validate_string(item["payload"], "payload", allow_empty=True)
+        encoded = text.encode("utf-8")
+        if item["size_bytes"] != len(encoded):
+            raise ValueError("BookNLP raw artifact size mismatch")
+        if item["sha256"] != hashlib.sha256(encoded).hexdigest():
+            raise ValueError("BookNLP raw artifact hash mismatch")
+        for field in ("record_count", "line_count"):
+            _validate_non_negative_int(item[field], field)
+    checked = deepcopy(payload)
+    checked["source_identity"] = identity.to_dict()
+    return checked
 
 
 def validate_booknlp_run_manifest(manifest: dict) -> dict:
@@ -817,6 +1127,9 @@ def _mark_status(drafts, status):
 
 
 __all__ = (
+    "BOOKNLP_RAW_ARTIFACT_HANDOFF_VERSION",
+    "build_booknlp_raw_artifact_handoff",
+    "validate_booknlp_raw_artifact_handoff",
     "validate_booknlp_run_manifest",
     "validate_booknlp_raw_artifact_bundle",
     "normalize_booknlp_entity_mentions",

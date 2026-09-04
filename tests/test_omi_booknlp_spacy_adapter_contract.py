@@ -991,18 +991,18 @@ def test_live_booknlp_entities_become_candidate_only_findings(
             {
                 "COREF": "2",
                 "start_token": "4",
-                "end_token": "6",
+                "end_token": "5",
                 "prop": "PROP",
                 "cat": "PROP_LOC",
                 "text": "Harbor Archive",
             },
             {
                 "COREF": "3",
-                "start_token": "10",
-                "end_token": "11",
+                "start_token": "4",
+                "end_token": "5",
                 "prop": "PROP",
                 "cat": "PROP_ORG",
-                "text": "Storm Watch",
+                "text": "Harbor Archive",
             },
         ],
         tokens=[
@@ -1043,8 +1043,8 @@ def test_live_booknlp_entities_become_candidate_only_findings(
                 "token_ID_within_document": "4",
                 "word": "Harbor",
                 "lemma": "Harbor",
-                "byte_onset": "28",
-                "byte_offset": "34",
+                "byte_onset": "32",
+                "byte_offset": "38",
                 "POS_tag": "NNP",
                 "fine_POS_tag": "NNP",
                 "dependency_relation": "compound",
@@ -1058,57 +1058,12 @@ def test_live_booknlp_entities_become_candidate_only_findings(
                 "token_ID_within_document": "5",
                 "word": "Archive",
                 "lemma": "Archive",
-                "byte_onset": "35",
-                "byte_offset": "42",
+                "byte_onset": "39",
+                "byte_offset": "46",
                 "POS_tag": "NNP",
                 "fine_POS_tag": "NNP",
                 "dependency_relation": "nsubj",
                 "syntactic_head_ID": "6",
-                "event": "O",
-            },
-            {
-                "paragraph_ID": "0",
-                "sentence_ID": "0",
-                "token_ID_within_sentence": "6",
-                "token_ID_within_document": "6",
-                "word": ".",
-                "lemma": ".",
-                "byte_onset": "42",
-                "byte_offset": "43",
-                "POS_tag": ".",
-                "fine_POS_tag": ".",
-                "dependency_relation": "punct",
-                "syntactic_head_ID": "5",
-                "event": "O",
-            },
-            {
-                "paragraph_ID": "0",
-                "sentence_ID": "1",
-                "token_ID_within_sentence": "0",
-                "token_ID_within_document": "10",
-                "word": "Storm",
-                "lemma": "Storm",
-                "byte_onset": "80",
-                "byte_offset": "86",
-                "POS_tag": "NNP",
-                "fine_POS_tag": "NNP",
-                "dependency_relation": "compound",
-                "syntactic_head_ID": "11",
-                "event": "O",
-            },
-            {
-                "paragraph_ID": "0",
-                "sentence_ID": "1",
-                "token_ID_within_sentence": "1",
-                "token_ID_within_document": "11",
-                "word": "Watch",
-                "lemma": "Watch",
-                "byte_onset": "87",
-                "byte_offset": "92",
-                "POS_tag": "NNP",
-                "fine_POS_tag": "NNP",
-                "dependency_relation": "nsubj",
-                "syntactic_head_ID": "12",
                 "event": "O",
             },
         ],
@@ -1123,6 +1078,8 @@ def test_live_booknlp_entities_become_candidate_only_findings(
     assert "character" in types
     assert "location" in types
     assert "organization" in types
+    assert "missing_raw_output:book" in env["explanation"]
+    assert "missing_raw_output:supersense" in env["explanation"]
     for finding in result["findings"]:
         _assert_candidate_only_finding(finding, "booknlp")
 
@@ -1137,13 +1094,36 @@ def test_live_booknlp_quotes_become_dialogue_attribution_candidates(
         quotes=[
             {
                 "quote_start": "0",
-                "quote_end": "3",
-                "mention_start": "5",
-                "mention_end": "5",
-                "mention_phrase": "she",
+                "quote_end": "1",
+                "mention_start": "2",
+                "mention_end": "2",
+                "mention_phrase": "clerk",
                 "char_id": "42",
-                "quote": "we wait here",
+                "quote": "Mara Vale",
             }
+        ],
+        tokens=[
+            {
+                "paragraph_ID": "0", "sentence_ID": "0",
+                "token_ID_within_sentence": "0", "token_ID_within_document": "0",
+                "word": "Mara", "lemma": "Mara", "byte_onset": "12", "byte_offset": "16",
+                "POS_tag": "NNP", "fine_POS_tag": "NNP", "dependency_relation": "nsubj",
+                "syntactic_head_ID": "1", "event": "O",
+            },
+            {
+                "paragraph_ID": "0", "sentence_ID": "0",
+                "token_ID_within_sentence": "1", "token_ID_within_document": "1",
+                "word": "Vale", "lemma": "Vale", "byte_onset": "17", "byte_offset": "21",
+                "POS_tag": "NNP", "fine_POS_tag": "NNP", "dependency_relation": "flat",
+                "syntactic_head_ID": "0", "event": "O",
+            },
+            {
+                "paragraph_ID": "0", "sentence_ID": "0",
+                "token_ID_within_sentence": "2", "token_ID_within_document": "2",
+                "word": "clerk", "lemma": "clerk", "byte_onset": "47", "byte_offset": "52",
+                "POS_tag": "NN", "fine_POS_tag": "NN", "dependency_relation": "obj",
+                "syntactic_head_ID": "1", "event": "O",
+            },
         ],
     )
 
@@ -1152,12 +1132,14 @@ def test_live_booknlp_quotes_become_dialogue_attribution_candidates(
     env = _adapter_env(result, "booknlp")
     assert env["state"] == "succeeded"
     types = [f["candidate_type"] for f in env["candidates"]]
-    assert "diagnostic_question" in types
+    assert "relationship" in types
     for finding in result["findings"]:
         _assert_candidate_only_finding(finding, "booknlp")
-        assert "dialogue attribution" in finding["label"].lower() or (
-            "dialogue attribution" in finding["extracted_claim"].lower()
-        )
+    assert any(
+        "dialogue attribution" in finding["label"].lower()
+        or "dialogue attribution" in finding["extracted_claim"].lower()
+        for finding in result["findings"]
+    )
 
 
 def test_live_booknlp_unsafe_excerpt_text_does_not_leak_into_findings(
@@ -1648,8 +1630,8 @@ def test_live_booknlp_state_dict_shim_safety_boundaries_preserved(
                 "token_ID_within_document": "0",
                 "word": "Mara",
                 "lemma": "Mara",
-                "byte_onset": "0",
-                "byte_offset": "4",
+                "byte_onset": "12",
+                "byte_offset": "16",
                 "POS_tag": "NNP",
                 "fine_POS_tag": "NNP",
                 "dependency_relation": "nsubj",
@@ -1663,8 +1645,8 @@ def test_live_booknlp_state_dict_shim_safety_boundaries_preserved(
                 "token_ID_within_document": "1",
                 "word": "Vale",
                 "lemma": "Vale",
-                "byte_onset": "5",
-                "byte_offset": "9",
+                "byte_onset": "17",
+                "byte_offset": "21",
                 "POS_tag": "NNP",
                 "fine_POS_tag": "NNP",
                 "dependency_relation": "flat",

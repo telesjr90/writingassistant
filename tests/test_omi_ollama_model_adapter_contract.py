@@ -491,6 +491,32 @@ def test_live_ollama_enabled_with_mocked_valid_model_returns_candidates(
     assert "ollama model" in finding["provenance"]["support"].lower()
 
 
+def test_live_ollama_runner_normalizes_owner_input_whitespace(
+    monkeypatch: Any,
+) -> None:
+    """The pre-T004 live-runner boundary trims surrounding whitespace."""
+    bodies: list[bytes] = []
+
+    def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
+        bodies.append(request.data)
+        return _MockResponse(
+            _valid_ollama_chat_response(_valid_live_model_content())
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
+    runner = oao._build_ollama_model_live_runner()
+    result = runner(
+        project_name="demo",
+        raw_idea=f"  \n{RAW_IDEA}\n  ",
+        source_idea_id=None,
+    )
+
+    assert result["state"] == "succeeded"
+    assert len(bodies) == 1
+    sent_body = json.loads(bodies[0].decode("utf-8"))
+    assert sent_body["messages"][1] == {"role": "user", "content": RAW_IDEA}
+
+
 def test_live_ollama_uses_env_base_url(monkeypatch: Any) -> None:
     """Live Ollama uses OMI_LIVE_OLLAMA_BASE_URL env var."""
     _mock_live_ollama_env(monkeypatch)

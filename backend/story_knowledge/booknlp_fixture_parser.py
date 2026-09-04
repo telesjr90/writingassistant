@@ -39,6 +39,7 @@ _TOKEN_NUMERIC_FIELDS = frozenset(
 
 _ENTITIES_HEADER = ("COREF", "start_token", "end_token", "prop", "cat", "text")
 _ENTITY_NUMERIC_FIELDS = frozenset({"COREF", "start_token", "end_token"})
+_ENTITY_NEGATIVE_ONE_SENTINEL_FIELDS = frozenset({"COREF"})
 
 _QUOTES_HEADER = (
     "quote_start",
@@ -97,7 +98,12 @@ def parse_booknlp_tokens_tsv(text: str) -> list[dict]:
 
 
 def parse_booknlp_entities_tsv(text: str) -> list[dict]:
-    rows = _parse_tsv(text, _ENTITIES_HEADER, _ENTITY_NUMERIC_FIELDS)
+    rows = _parse_tsv(
+        text,
+        _ENTITIES_HEADER,
+        _ENTITY_NUMERIC_FIELDS,
+        negative_one_sentinel_fields=_ENTITY_NEGATIVE_ONE_SENTINEL_FIELDS,
+    )
     _validate_span(rows, "start_token", "end_token")
     return rows
 
@@ -279,7 +285,14 @@ def _bundle_id(run_id):
     return "booknlp_fixture_bundle_001" if run_id else "invalid"
 
 
-def _parse_tsv(text, expected_header, numeric_fields, *, optional_empty_fields=frozenset()):
+def _parse_tsv(
+    text,
+    expected_header,
+    numeric_fields,
+    *,
+    optional_empty_fields=frozenset(),
+    negative_one_sentinel_fields=frozenset(),
+):
     _require_text(text)
     rows = list(csv.reader(io.StringIO(text), delimiter="\t"))
     if not rows:
@@ -297,7 +310,11 @@ def _parse_tsv(text, expected_header, numeric_fields, *, optional_empty_fields=f
             if value == "" and field not in optional_empty_fields:
                 raise ValueError("invalid row")
             if field in numeric_fields:
-                parsed_row[field] = _coerce_non_negative_int(value)
+                parsed_row[field] = (
+                    -1
+                    if field in negative_one_sentinel_fields and value == "-1"
+                    else _coerce_non_negative_int(value)
+                )
             else:
                 parsed_row[field] = value
         parsed_rows.append(parsed_row)

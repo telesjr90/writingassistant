@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from backend import omi_analysis_orchestrator, omi_runtime_preflight, project_manager
+from backend.story_knowledge import booknlp_adapter_contract
 from backend.story_knowledge.analysis_run_manifest import (
     AdapterProvenance,
     AnalysisRunManifest,
@@ -512,7 +513,9 @@ def _enforce_t001_control_plane_inputs(result: dict[str, Any]) -> dict[str, Any]
 def _file_ref(
     *, artifact_file_id: str, artifact_type: str, relative_path: str,
     media_type: str, payload: bytes, source_ref: str, evidence_refs: list[str],
-    provenance_refs: list[str],
+    provenance_refs: list[str], record_count: int = 1, line_count: int | None = None,
+    schema_name: str = "t003_analysis_support_data", schema_version: str = "1",
+    parser_hint: str = "json",
 ) -> dict[str, Any]:
     from backend.story_knowledge.raw_artifacts import _REQUIRED_BOUNDARY_FLAGS
 
@@ -524,11 +527,11 @@ def _file_ref(
         "encoding": "utf-8",
         "size_bytes": len(payload),
         "sha256": hashlib.sha256(payload).hexdigest(),
-        "record_count": 1,
-        "line_count": None,
-        "schema_name": "t003_analysis_support_data",
-        "schema_version": "1",
-        "parser_hint": "json",
+        "record_count": record_count,
+        "line_count": line_count,
+        "schema_name": schema_name,
+        "schema_version": schema_version,
+        "parser_hint": parser_hint,
         "source_locator_refs": [source_ref],
         "evidence_refs": evidence_refs,
         "provenance_refs": provenance_refs,
@@ -536,7 +539,39 @@ def _file_ref(
     }
 
 
-def _exact_finding_evidence_ranges(snapshot, finding: dict[str, Any]) -> list[tuple[OffsetRange, OffsetRange]]:
+def _extract_booknlp_raw_artifact_handoffs(
+    result: dict[str, Any], snapshot: Any
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    """Validate and detach in-memory BookNLP bytes before result publication."""
+
+    checked = copy.deepcopy(result)
+    handoffs: dict[str, dict[str, Any]] = {}
+    for envelope in checked["adapter_results"]:
+        handoff = envelope.pop("raw_artifacts", None)
+        if handoff is None:
+            continue
+        if envelope["adapter"] != "booknlp":
+            raise ValueError("only booknlp may publish a BookNLP raw artifact handoff")
+        validated = booknlp_adapter_contract.validate_booknlp_raw_artifact_handoff(
+            handoff
+        )
+        identity = validated["source_identity"]
+        if (
+            identity["project_id"] != snapshot.identity.project_id
+            or identity["snapshot_id"] != snapshot.identity.snapshot_id
+            or identity["content_hash"] != snapshot.identity.content_hash
+        ):
+            raise ValueError("BookNLP raw artifact source identity mismatch")
+        handoffs["booknlp"] = validated
+    return checked, handoffs
+
+
+def _exact_finding_evidence_ranges(
+    snapshot,
+    finding: dict[str, Any],
+    *,
+    artifact_hashes: dict[str, str] | None = None,
+) -> list[tuple[OffsetRange, OffsetRange, str]]:
     """Resolve each validated finding evidence item to one exact source span."""
 
     resolved = []
@@ -577,6 +612,10 @@ def _exact_finding_evidence_ranges(snapshot, finding: dict[str, Any]) -> list[tu
                     int(locator_match.group(1)), int(locator_match.group(2)), BYTE_OFFSET_BASIS
                 )
         if char_range is None and byte_range is None:
+            if finding["source_adapter"] == "booknlp":
+                raise ValueError(
+                    "BookNLP evidence requires exact declared byte or character offsets"
+                )
             excerpt = item.get("source_excerpt", item.get("excerpt"))
             if not isinstance(excerpt, str) or not excerpt:
                 raise ValueError("finding evidence has no exact attributable source span")
@@ -611,7 +650,16 @@ def _exact_finding_evidence_ranges(snapshot, finding: dict[str, Any]) -> list[tu
         excerpt = item.get("source_excerpt", item.get("excerpt"))
         if isinstance(excerpt, str) and snapshot.source_content[char_range.start:char_range.end] != excerpt:
             raise ValueError("finding evidence excerpt does not match its exact offsets")
-        resolved.append((char_range, translated_bytes))
+        artifact_file_id = offset_source.get("artifact_file_id", "source-artifact")
+        if not isinstance(artifact_file_id, str) or not artifact_file_id:
+            raise ValueError("finding evidence artifact_file_id is invalid")
+        if artifact_file_id != "source-artifact":
+            if not artifact_hashes or artifact_file_id not in artifact_hashes:
+                raise ValueError("finding evidence references an unavailable raw artifact")
+            declared_hash = offset_source.get("artifact_sha256")
+            if declared_hash is not None and declared_hash != artifact_hashes[artifact_file_id]:
+                raise ValueError("finding evidence raw artifact hash mismatch")
+        resolved.append((char_range, translated_bytes, artifact_file_id))
     if not resolved:
         raise ValueError("finding has no exact attributable evidence")
     return resolved
@@ -653,6 +701,7 @@ def _build_manifest_and_evidence(
     source_artifact_hash: str,
     result_artifact_hash: str,
     created_at: str,
+    raw_artifact_handoffs: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[AnalysisRunManifest, list[dict[str, Any]]]:
     adapter_results = list(result.get("adapter_results") or [])
     by_adapter = {item["adapter"]: item for item in adapter_results}
@@ -663,6 +712,11 @@ def _build_manifest_and_evidence(
     evidence_records = []
     findings = list(result.get("findings") or [])
     output_ids_by_adapter: dict[str, list[str]] = {adapter: [] for adapter in requested_adapters}
+    handoffs = raw_artifact_handoffs or {}
+    booknlp_artifact_hashes = {
+        item["artifact_file_id"]: item["sha256"]
+        for item in handoffs.get("booknlp", {}).get("files", [])
+    }
     whole_span = OffsetRange(0, len(snapshot.source_content), CHAR_OFFSET_BASIS)
     for adapter_id in requested_adapters:
         operation_id = f"analyze-{adapter_id.replace('_', '-')}"
@@ -715,12 +769,18 @@ def _build_manifest_and_evidence(
         transformation_id = f"transform-{output_id[7:]}"
         output_ids_by_adapter[adapter_id].append(output_id)
         output_evidence_ids = []
-        for character_range, byte_range in _exact_finding_evidence_ranges(snapshot, finding):
+        finding_artifact_ids: list[str] = []
+        for character_range, byte_range, artifact_file_id in _exact_finding_evidence_ranges(
+            snapshot,
+            finding,
+            artifact_hashes=booknlp_artifact_hashes,
+        ):
+            finding_artifact_ids.append(artifact_file_id)
             output_evidence = build_exact_evidence_record(
                 snapshot=snapshot,
                 run_id=run_id,
                 artifact_id=f"bundle-{run_id}",
-                artifact_file_id="source-artifact",
+                artifact_file_id=artifact_file_id,
                 operation_id=operation_id,
                 adapter_id=adapter_id,
                 disposition="validated",
@@ -739,7 +799,7 @@ def _build_manifest_and_evidence(
                 operation_id=operation_id,
                 transformation_kind="validated_normalization",
                 transformation_version="1",
-                input_reference_ids=("result-artifact",),
+                input_reference_ids=tuple(dict.fromkeys(finding_artifact_ids)) or ("result-artifact",),
                 output_reference_ids=(output_id,),
             )
         )
@@ -749,7 +809,7 @@ def _build_manifest_and_evidence(
                 operation_id=operation_id,
                 source_snapshot_ids=(snapshot.identity.snapshot_id,),
                 disposition="validated",
-                original_output_reference_id="result-artifact",
+                original_output_reference_id=(finding_artifact_ids[0] if finding_artifact_ids else "result-artifact"),
                 evidence_reference_ids=tuple(output_evidence_ids),
                 transformation_ids=(transformation_id,),
                 verification_outcome="omi_boundary_validated",
@@ -774,7 +834,7 @@ def _build_manifest_and_evidence(
                     adapter_id,
                     f"analyze-{adapter_id.replace('_', '-')}",
                     state,
-                    [
+                    ([handoffs[adapter_id]["provenance"]] if adapter_id in handoffs else []) + [
                         finding["provenance"] for finding in findings
                         if finding["source_adapter"] == adapter_id
                     ],
@@ -805,6 +865,18 @@ def _build_manifest_and_evidence(
                 content_hash=source_artifact_hash,
                 hash_algorithm="sha256",
                 media_type="text/plain",
+            ),
+            *tuple(
+                ArtifactReference(
+                    artifact_id=item["artifact_file_id"],
+                    availability="available",
+                    source_snapshot_ids=(snapshot.identity.snapshot_id,),
+                    content_hash=item["sha256"],
+                    hash_algorithm="sha256",
+                    media_type=item["media_type"],
+                )
+                for handoff in handoffs.values()
+                for item in handoff["files"]
             ),
         ),
         outputs=tuple(outputs),
@@ -912,6 +984,9 @@ def _submit_analysis_run_locked(
             "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(),
         }
     result = _validate_analysis_result(result, selected_adapters=effective_adapters)
+    result, raw_artifact_handoffs = _extract_booknlp_raw_artifact_handoffs(
+        result, snapshot
+    )
     source_payload = raw_idea.encode("utf-8")
     result_payload = canonical_json_bytes(result)
     manifest, evidence_records = _build_manifest_and_evidence(
@@ -923,6 +998,7 @@ def _submit_analysis_run_locked(
         source_artifact_hash=hashlib.sha256(source_payload).hexdigest(),
         result_artifact_hash=hashlib.sha256(result_payload).hexdigest(),
         created_at=timestamp,
+        raw_artifact_handoffs=raw_artifact_handoffs,
     )
     manifest_dict = manifest.to_dict()
     manifest_hash = canonical_sha256(manifest_dict)
@@ -953,6 +1029,31 @@ def _submit_analysis_run_locked(
             provenance_refs=provenance_refs,
         ),
     ]
+    raw_payloads: dict[str, bytes] = {
+        "source-artifact": source_payload,
+        "result-artifact": result_payload,
+    }
+    for adapter_id, handoff in raw_artifact_handoffs.items():
+        for item in handoff["files"]:
+            payload = item["payload"].encode("utf-8")
+            files.append(
+                _file_ref(
+                    artifact_file_id=item["artifact_file_id"],
+                    artifact_type=item["artifact_type"],
+                    relative_path=item["relative_path"],
+                    media_type=item["media_type"],
+                    payload=payload,
+                    source_ref=snapshot.identity.snapshot_id,
+                    evidence_refs=evidence_ids,
+                    provenance_refs=[f"contributor-{adapter_id}"],
+                    record_count=item["record_count"],
+                    line_count=item["line_count"],
+                    schema_name=item["schema_name"],
+                    schema_version=item["schema_version"],
+                    parser_hint=item["parser_hint"],
+                )
+            )
+            raw_payloads[item["artifact_file_id"]] = payload
     raw_manifest = build_immutable_raw_artifact_manifest(
         project_id=project_id,
         run_id=run_id,
@@ -969,7 +1070,7 @@ def _submit_analysis_run_locked(
     )
     write_immutable_raw_artifact_bundle(
         raw_manifest,
-        {"source-artifact": source_payload, "result-artifact": result_payload},
+        raw_payloads,
         project_dir=project_manager.REPO_ROOT,
     )
     append_evidence_ledger_event(
