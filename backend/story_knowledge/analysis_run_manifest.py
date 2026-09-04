@@ -796,6 +796,125 @@ class AnalysisRunManifest:
         )
 
 
+def analysis_run_manifest_from_dict(value: object) -> AnalysisRunManifest:
+    """Deterministically reconstruct and fully validate a persisted v1 value.
+
+    This is a compatible read only. It performs no write or physical migration.
+    """
+
+    if not isinstance(value, Mapping):
+        raise AnalysisRunManifestValidationError("manifest must be a mapping")
+    payload = dict(value)
+    required = {
+        "contract_version", "run_id", "project_id", "sources", "operations",
+        "dependency_graph", "contributors", "artifact_references", "outputs",
+        "transformations", "coverage", "created_at", "finalized_at",
+        "configuration", "feature_flags", "safety_boundary",
+    }
+    if set(payload) != required:
+        raise AnalysisRunManifestValidationError("persisted manifest fields are not closed")
+
+    def component(item: object) -> ProvenanceComponent:
+        if not isinstance(item, Mapping):
+            raise AnalysisRunManifestValidationError("invalid provenance component")
+        return ProvenanceComponent(**dict(item))
+
+    sources = tuple(SourceIdentity(**dict(item)) for item in payload["sources"])
+    operations = tuple(
+        OperationDeclaration(
+            operation_id=item["operation_id"],
+            adapter_id=item["adapter_id"],
+            consumes=tuple(item["consumes"]),
+            produces=tuple(item["produces"]),
+            configuration=item["configuration"],
+            feature_flags=item["feature_flags"],
+        )
+        for item in payload["operations"]
+    )
+    edges = tuple(DependencyEdge(**dict(item)) for item in payload["dependency_graph"])
+    contributors = []
+    for item in payload["contributors"]:
+        provenance = item["provenance"]
+        contributors.append(
+            ContributorLineage(
+                operation_id=item["operation_id"],
+                adapter_id=item["adapter_id"],
+                source_snapshot_ids=tuple(item["source_snapshot_ids"]),
+                result_state=item["result_state"],
+                coverage=item["coverage"],
+                explanation=item["explanation"],
+                provenance=AdapterProvenance(
+                    adapter_id=provenance["adapter_id"],
+                    operation_id=provenance["operation_id"],
+                    user_facing_label=provenance["user_facing_label"],
+                    implementation_kind=provenance["implementation_kind"],
+                    tool=component(provenance["tool"]),
+                    runtime=component(provenance["runtime"]),
+                    provider=component(provenance["provider"]),
+                    model=component(provenance["model"]),
+                ),
+                output_ids=tuple(item["output_ids"]),
+            )
+        )
+    artifacts = tuple(
+        ArtifactReference(
+            artifact_id=item["artifact_id"],
+            availability=item["availability"],
+            source_snapshot_ids=tuple(item["source_snapshot_ids"]),
+            content_hash=item["content_hash"],
+            hash_algorithm=item["hash_algorithm"],
+            media_type=item["media_type"],
+        )
+        for item in payload["artifact_references"]
+    )
+    outputs = tuple(
+        OutputLineage(
+            output_id=item["output_id"],
+            operation_id=item["operation_id"],
+            source_snapshot_ids=tuple(item["source_snapshot_ids"]),
+            disposition=item["disposition"],
+            original_output_reference_id=item["original_output_reference_id"],
+            evidence_reference_ids=tuple(item["evidence_reference_ids"]),
+            transformation_ids=tuple(item["transformation_ids"]),
+            verification_outcome=item["verification_outcome"],
+            guardrail_outcome=item["guardrail_outcome"],
+            missing_evidence_reason=item["missing_evidence_reason"],
+        )
+        for item in payload["outputs"]
+    )
+    transformations = tuple(
+        TransformationLineage(
+            transformation_id=item["transformation_id"],
+            operation_id=item["operation_id"],
+            transformation_kind=item["transformation_kind"],
+            transformation_version=item["transformation_version"],
+            input_reference_ids=tuple(item["input_reference_ids"]),
+            output_reference_ids=tuple(item["output_reference_ids"]),
+        )
+        for item in payload["transformations"]
+    )
+    manifest = AnalysisRunManifest(
+        run_id=payload["run_id"],
+        project_id=payload["project_id"],
+        sources=sources,
+        operations=operations,
+        dependency_graph=edges,
+        contributors=tuple(contributors),
+        artifact_references=artifacts,
+        outputs=outputs,
+        transformations=transformations,
+        coverage=payload["coverage"],
+        created_at=payload["created_at"],
+        finalized_at=payload["finalized_at"],
+        configuration=payload["configuration"],
+        feature_flags=payload["feature_flags"],
+        contract_version=payload["contract_version"],
+    )
+    if manifest.to_dict() != payload:
+        raise AnalysisRunManifestValidationError("persisted manifest is non-canonical")
+    return manifest
+
+
 __all__ = [
     "ANALYSIS_RUN_MANIFEST_CONTRACT_VERSION",
     "ADAPTER_RESULT_STATES",
@@ -812,4 +931,5 @@ __all__ = [
     "OutputLineage",
     "ContributorLineage",
     "AnalysisRunManifest",
+    "analysis_run_manifest_from_dict",
 ]

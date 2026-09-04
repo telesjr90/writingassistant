@@ -16,7 +16,7 @@ from urllib.parse import unquote
 
 try:
     from . import context_readiness, omi_runtime_preflight, project_manager, storyform
-    from .routes import apply_promotion, review_queue
+    from .routes import apply_promotion, omi_analysis_runs, review_queue
     from .story_knowledge.promotion_apply_runtime import (
         ApplyPromotionRuntimeManager,
         FinalChallengeRegistry,
@@ -27,7 +27,7 @@ except ImportError:  # pragma: no cover - supports uvicorn main:app from backend
     import omi_runtime_preflight
     import project_manager
     import storyform
-    from routes import apply_promotion, review_queue
+    from routes import apply_promotion, omi_analysis_runs, review_queue
     from story_knowledge.promotion_apply_runtime import (
         ApplyPromotionRuntimeManager,
         FinalChallengeRegistry,
@@ -189,6 +189,16 @@ app.add_middleware(
 app.include_router(review_queue.router)
 app.include_router(apply_promotion.router)
 app.include_router(apply_promotion.lifecycle_router)
+app.include_router(omi_analysis_runs.router)
+
+# Direct-call aliases preserve the lightweight route-test convention used by
+# the existing OMI surface while the canonical HTTP registration lives in the
+# dedicated router module.
+get_omi_analysis_tools = omi_analysis_runs.get_supported_analysis_tools
+submit_omi_analysis_run = omi_analysis_runs.submit_analysis_run
+get_omi_analysis_run_status = omi_analysis_runs.get_analysis_run_status
+get_omi_analysis_run_result = omi_analysis_runs.get_analysis_run_result
+delete_omi_analysis_run_artifacts = omi_analysis_runs.delete_analysis_run_artifacts
 
 _REVIEW_ACTION_FORBIDDEN_COMMAND_BOUNDARY_MARKERS = (
     "apply_promotion",

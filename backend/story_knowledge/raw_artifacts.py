@@ -10,6 +10,7 @@ explicit file payloads.
 import copy
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -129,7 +130,21 @@ _REQUIRED_MANIFEST_FIELDS = frozenset(
     }
 ) | _REQUIRED_CONFIRMATIONS
 
-_OPTIONAL_MANIFEST_FIELDS = frozenset({"manifest_hash", "content_hash"})
+_OPTIONAL_MANIFEST_FIELDS = frozenset(
+    {
+        "manifest_hash",
+        "content_hash",
+        "analysis_run_manifest_ref",
+        "retention_policy",
+        "lifecycle_state",
+        "tombstone_ref",
+    }
+)
+
+IMMUTABLE_RAW_ARTIFACT_VERSION = "raw-artifact-bundle.v2"
+IMMUTABLE_RETENTION_POLICY = "explicit-owner-deletion-only"
+DELETION_INTENT_VERSION = "analysis-artifact-deletion-intent.v1"
+_LOWERCASE_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 
 _REQUIRED_FILE_FIELDS = frozenset(
     {
@@ -213,6 +228,12 @@ def _validate_hash(value):
         int(value, 16)
     except ValueError as exc:
         raise ValueError("invalid field") from exc
+    return value
+
+
+def _validate_lowercase_hash(value):
+    if not isinstance(value, str) or not _LOWERCASE_SHA256.fullmatch(value):
+        raise ValueError("invalid lowercase SHA-256 field")
     return value
 
 
@@ -401,7 +422,120 @@ def validate_raw_artifact_manifest(manifest):
     for field in _REQUIRED_CONFIRMATIONS:
         if working[field] is not True:
             raise ValueError("invalid field")
+    if working["schema_version"] == IMMUTABLE_RAW_ARTIFACT_VERSION:
+        _validate_immutable_manifest_extension(working)
     return working
+
+
+def _validate_immutable_manifest_extension(manifest):
+    reference = manifest.get("analysis_run_manifest_ref")
+    if not isinstance(reference, dict) or set(reference) != {
+        "contract_version",
+        "run_id",
+        "manifest_hash",
+    }:
+        raise ValueError("invalid analysis run manifest reference")
+    _require_safe_id(reference["run_id"])
+    _validate_lowercase_hash(reference["manifest_hash"])
+    if reference["contract_version"] != "analysis-run-manifest.v1":
+        raise ValueError("invalid analysis run manifest contract")
+    if manifest["extraction_run_id"] != reference["run_id"]:
+        raise ValueError("analysis run linkage mismatch")
+    if manifest.get("retention_policy") != IMMUTABLE_RETENTION_POLICY:
+        raise ValueError("invalid retention policy")
+    if manifest.get("lifecycle_state") != "finalized":
+        raise ValueError("immutable artifact lifecycle must be finalized")
+    if manifest.get("tombstone_ref") is not None:
+        raise ValueError("retained immutable manifest cannot contain a tombstone")
+    for field in ("bundle_hash", "manifest_hash"):
+        _validate_lowercase_hash(manifest[field])
+    if "content_hash" in manifest:
+        _validate_lowercase_hash(manifest["content_hash"])
+    for file_ref in manifest["artifact_files"]:
+        _validate_lowercase_hash(file_ref["sha256"])
+
+
+def validate_raw_artifact_integrity(manifest):
+    """Validate all declared v2 identity hashes without accessing storage."""
+
+    validated = validate_raw_artifact_manifest(manifest)
+    if validated["schema_version"] != IMMUTABLE_RAW_ARTIFACT_VERSION:
+        raise ValueError("immutable raw artifact version required")
+    if compute_raw_artifact_bundle_hash(validated) != validated["bundle_hash"]:
+        raise ValueError("raw artifact bundle hash mismatch")
+    if _compute_manifest_hash(validated) != validated.get("manifest_hash"):
+        raise ValueError("raw artifact manifest hash mismatch")
+    return validated
+
+
+def build_immutable_raw_artifact_manifest(
+    *,
+    project_id,
+    run_id,
+    raw_artifact_bundle_id,
+    artifact_files,
+    analysis_run_manifest_hash,
+    created_at,
+    artifact_source_type="analysis_run",
+    artifact_source_id=None,
+    source_refs=None,
+    evidence_refs=None,
+    provenance_refs=None,
+    source_locator_refs=None,
+    adapter_name=None,
+    adapter_version=None,
+    tool_name=None,
+    tool_version=None,
+):
+    """Build the strict T003 immutable bundle contract over exact file hashes."""
+
+    _validate_hash(analysis_run_manifest_hash)
+    manifest = build_raw_artifact_manifest(
+        project_id=project_id,
+        raw_artifact_bundle_id=raw_artifact_bundle_id,
+        artifact_files=artifact_files,
+        # Build through the accepted legacy constructor first, then add and
+        # seal the strict v2 extension below.
+        schema_version=_SCHEMA_VERSION,
+        created_at=created_at,
+        status="valid",
+        validation_status="valid",
+        artifact_source_type=artifact_source_type,
+        artifact_source_id=artifact_source_id or run_id,
+        extraction_run_id=run_id,
+        source_refs=list(source_refs or []),
+        evidence_refs=list(evidence_refs or []),
+        provenance_refs=list(provenance_refs or []),
+        source_locator_refs=list(source_locator_refs or []),
+        adapter_name=adapter_name,
+        adapter_version=adapter_version,
+        tool_name=tool_name,
+        tool_version=tool_version,
+        no_generated_prose_confirmation=True,
+        no_model_call_confirmation=True,
+        no_training_artifact_confirmation=True,
+        no_apply_promotion_confirmation=True,
+        no_memory_canon_mutation_confirmation=True,
+        no_runtime_extraction_confirmation=True,
+    )
+    # Add the extension only after the legacy builder has consumed its closed
+    # metadata kwargs, then reseal both hashes over the complete v2 contract.
+    manifest.update(
+        {
+            "schema_version": IMMUTABLE_RAW_ARTIFACT_VERSION,
+            "analysis_run_manifest_ref": {
+                "contract_version": "analysis-run-manifest.v1",
+                "run_id": run_id,
+                "manifest_hash": analysis_run_manifest_hash,
+            },
+            "retention_policy": IMMUTABLE_RETENTION_POLICY,
+            "lifecycle_state": "finalized",
+            "tombstone_ref": None,
+        }
+    )
+    manifest["bundle_hash"] = compute_raw_artifact_bundle_hash(manifest)
+    manifest["manifest_hash"] = _compute_manifest_hash(manifest)
+    return validate_raw_artifact_integrity(manifest)
 
 
 def compute_raw_artifact_bundle_hash(manifest):
@@ -657,10 +791,21 @@ def write_raw_artifact_bundle(manifest, artifact_files, *, project_dir):
     for path, payload in planned_files:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(payload)
-    manifest_path.write_text(
-        json.dumps(validated, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    if validated["schema_version"] == IMMUTABLE_RAW_ARTIFACT_VERSION:
+        manifest_path.write_text(
+            json.dumps(
+                validated,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+    else:
+        manifest_path.write_text(
+            json.dumps(validated, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     return _side_effect_free_result(
         persisted=True,
         raw_artifact_bundle_id=validated["raw_artifact_bundle_id"],
@@ -818,6 +963,8 @@ def quarantine_raw_artifact_bundle(project_id, raw_artifact_bundle_id, reason, *
     manifest_path = raw_artifact_manifest_path(project_dir, project_id, raw_artifact_bundle_id)
     if manifest_path.exists():
         manifest = validate_raw_artifact_manifest(_load_json_object(manifest_path))
+        if manifest["schema_version"] == IMMUTABLE_RAW_ARTIFACT_VERSION:
+            raise ValueError("immutable artifact lifecycle cannot be rewritten")
         manifest["status"] = "quarantined"
         manifest["validation_status"] = "quarantined"
         manifest["quarantine_reason"] = reason
@@ -848,7 +995,364 @@ def quarantine_raw_artifact_bundle(project_id, raw_artifact_bundle_id, reason, *
     )
 
 
+def _validate_v2_payloads(manifest, artifact_files):
+    if not isinstance(artifact_files, dict):
+        raise ValueError("invalid input")
+    expected = {item["artifact_file_id"]: item for item in manifest["artifact_files"]}
+    if set(artifact_files) != set(expected):
+        raise ValueError("immutable bundles require every declared payload exactly once")
+    for artifact_file_id, file_ref in expected.items():
+        payload = artifact_files[artifact_file_id]
+        if not isinstance(payload, bytes):
+            raise ValueError("artifact payload must be bytes")
+        if len(payload) != file_ref["size_bytes"]:
+            raise ValueError("artifact payload size mismatch")
+        if hashlib.sha256(payload).hexdigest() != file_ref["sha256"]:
+            raise ValueError("artifact payload hash mismatch")
+
+
+def _validate_immutable_storage_boundary(project_dir, project_id, bundle_id):
+    root = _as_path(project_dir)
+    if root.is_symlink():
+        raise ValueError("unsafe artifact storage root")
+    projects_root = root / "projects"
+    project_path = projects_root / _require_safe_id(project_id)
+    bundle_path = raw_artifact_bundle_storage_dir(root, project_id, bundle_id)
+    for path in (
+        projects_root,
+        project_path,
+        project_path / "writer_assistant",
+        project_path / "writer_assistant" / "raw_artifacts",
+        bundle_path,
+    ):
+        if path.exists() and path.is_symlink():
+            raise ValueError("unsafe artifact storage path")
+    resolved_projects = projects_root.resolve(strict=False)
+    resolved_project = project_path.resolve(strict=False)
+    resolved_bundle = bundle_path.resolve(strict=False)
+    try:
+        resolved_project.relative_to(resolved_projects)
+        resolved_bundle.relative_to(resolved_project)
+    except ValueError as exc:
+        raise ValueError("cross-project artifact path rejected") from exc
+    return bundle_path
+
+
+def write_immutable_raw_artifact_bundle(manifest, artifact_files, *, project_dir):
+    """Persist a finalized v2 bundle exactly once with full pre-write integrity."""
+
+    validated = validate_raw_artifact_integrity(manifest)
+    _validate_immutable_storage_boundary(
+        project_dir, validated["project_id"], validated["raw_artifact_bundle_id"]
+    )
+    _validate_v2_payloads(validated, artifact_files)
+    result = write_raw_artifact_bundle(validated, artifact_files, project_dir=project_dir)
+    # A replay is accepted only after the already-persisted bytes are checked,
+    # so a tampered bundle can never be reported as an idempotent success.
+    persisted = read_immutable_raw_artifact_bundle(
+        validated["project_id"],
+        validated["raw_artifact_bundle_id"],
+        project_dir=project_dir,
+    )
+    if persisted != validated:
+        raise ValueError("persisted immutable bundle mismatch")
+    return result
+
+
+def read_immutable_raw_artifact_bundle(project_id, raw_artifact_bundle_id, *, project_dir):
+    """Read retained v2 content or an explicit deleted/non-replayable tombstone."""
+
+    bundle_dir = _validate_immutable_storage_boundary(
+        project_dir, project_id, raw_artifact_bundle_id
+    )
+    tombstone_path = bundle_dir / "tombstone.json"
+    intent_path = bundle_dir / "deletion-intent.json"
+    if tombstone_path.exists():
+        from backend.story_knowledge.evidence_ledger import validate_deletion_tombstone
+
+        tombstone = validate_deletion_tombstone(_load_json_object(tombstone_path))
+        if tombstone_path.read_bytes() != _canonical_json_bytes(tombstone):
+            raise ValueError("deletion tombstone is not canonical")
+        if tombstone["project_id"] != project_id or tombstone["artifact_id"] != raw_artifact_bundle_id:
+            raise ValueError("deleted artifact storage linkage mismatch")
+        manifest = validate_raw_artifact_integrity(
+            _load_json_object(bundle_dir / "manifest.json")
+        )
+        remaining = _existing_immutable_payload_paths(project_dir, manifest)
+        if remaining:
+            intent = (
+                _validate_deletion_intent(_load_json_object(intent_path))
+                if intent_path.exists()
+                else _deletion_intent_from_tombstone(tombstone)
+            )
+            return {
+                "status": "deletion_in_progress",
+                "deletion_state": "in_progress",
+                "content_available": True,
+                "replayable": False,
+                "deletion_intent": intent,
+            }
+        return {"status": "deleted", "tombstone": tombstone, "replayable": False}
+    if intent_path.exists():
+        intent = _validate_deletion_intent(_load_json_object(intent_path))
+        if intent["project_id"] != project_id or intent["artifact_id"] != raw_artifact_bundle_id:
+            raise ValueError("deletion intent storage linkage mismatch")
+        manifest = validate_raw_artifact_integrity(
+            _load_json_object(bundle_dir / "manifest.json")
+        )
+        return {
+            "status": "deletion_in_progress",
+            "deletion_state": "in_progress",
+            "content_available": bool(
+                _existing_immutable_payload_paths(project_dir, manifest)
+            ),
+            "replayable": False,
+            "deletion_intent": intent,
+        }
+    manifest = read_raw_artifact_manifest(
+        project_id, raw_artifact_bundle_id, project_dir=project_dir
+    )
+    validated = validate_raw_artifact_integrity(manifest)
+    manifest_path = raw_artifact_manifest_path(
+        project_dir, project_id, raw_artifact_bundle_id
+    )
+    if manifest_path.read_bytes() != _canonical_json_bytes(validated):
+        raise ValueError("immutable raw artifact manifest is not canonical")
+    _validate_referenced_artifact_files(project_dir, validated)
+    for file_ref in validated["artifact_files"]:
+        path = _artifact_file_path(project_dir, validated, file_ref)
+        metadata = path.stat()
+        if metadata.st_nlink != 1 or metadata.st_size != file_ref["size_bytes"]:
+            raise ValueError("artifact payload size mismatch")
+    return validated
+
+
+def _validate_deletion_intent(value):
+    required = {
+        "schema_version", "deletion_id", "project_id", "run_id", "artifact_id",
+        "source_snapshot_ids", "artifact_hashes", "manifest_hash",
+        "ledger_head_hash", "deletion_state", "authorized_at",
+    }
+    if not isinstance(value, dict) or set(value) != required:
+        raise ValueError("invalid deletion intent fields")
+    result = copy.deepcopy(value)
+    if result["schema_version"] != DELETION_INTENT_VERSION:
+        raise ValueError("unsupported deletion intent version")
+    for field in ("deletion_id", "project_id", "run_id", "artifact_id"):
+        _require_safe_id(result[field])
+    _require_list(result["source_snapshot_ids"], non_empty=True)
+    if not isinstance(result["artifact_hashes"], list) or not result["artifact_hashes"]:
+        raise ValueError("invalid deletion intent artifact hashes")
+    for digest in result["artifact_hashes"]:
+        _validate_lowercase_hash(digest)
+    _validate_lowercase_hash(result["manifest_hash"])
+    if result["ledger_head_hash"] is not None:
+        _validate_lowercase_hash(result["ledger_head_hash"])
+    if result["deletion_state"] != "in_progress":
+        raise ValueError("invalid deletion intent state")
+    if not isinstance(result["authorized_at"], str) or not result["authorized_at"].endswith("Z"):
+        raise ValueError("invalid deletion intent timestamp")
+    forbidden = {"source_text", "excerpt", "raw_output", "generated_text", "payload"}
+    if forbidden & set(result):
+        raise ValueError("deletion intent contains content")
+    return result
+
+
+def _deletion_intent_from_tombstone(tombstone):
+    return _validate_deletion_intent(
+        {
+            "schema_version": DELETION_INTENT_VERSION,
+            "deletion_id": tombstone["deletion_id"],
+            "project_id": tombstone["project_id"],
+            "run_id": tombstone["run_id"],
+            "artifact_id": tombstone["artifact_id"],
+            "source_snapshot_ids": list(tombstone["source_snapshot_ids"]),
+            "artifact_hashes": list(tombstone["artifact_hashes"]),
+            "manifest_hash": tombstone["manifest_hash"],
+            "ledger_head_hash": tombstone["ledger_head_hash"],
+            "deletion_state": "in_progress",
+            "authorized_at": tombstone["deleted_at"],
+        }
+    )
+
+
+def _build_deletion_intent(*, manifest, deleted_at, deletion_id, ledger_head_hash):
+    return _validate_deletion_intent(
+        {
+            "schema_version": DELETION_INTENT_VERSION,
+            "deletion_id": deletion_id,
+            "project_id": manifest["project_id"],
+            "run_id": manifest["analysis_run_manifest_ref"]["run_id"],
+            "artifact_id": manifest["raw_artifact_bundle_id"],
+            "source_snapshot_ids": list(manifest["source_refs"]),
+            "artifact_hashes": [item["sha256"] for item in manifest["artifact_files"]],
+            "manifest_hash": manifest["manifest_hash"],
+            "ledger_head_hash": ledger_head_hash,
+            "deletion_state": "in_progress",
+            "authorized_at": deleted_at,
+        }
+    )
+
+
+def _publish_canonical_exclusive(path, value, *, collision_message):
+    raw = _canonical_json_bytes(value)
+    try:
+        with path.open("xb") as handle:
+            handle.write(raw)
+    except FileExistsError:
+        if _load_json_object(path) != value or path.read_bytes() != raw:
+            raise ValueError(collision_message)
+
+
+def _existing_immutable_payload_paths(project_dir, manifest):
+    existing = []
+    for file_ref in manifest["artifact_files"]:
+        path = _artifact_file_path(project_dir, manifest, file_ref)
+        if path.is_symlink():
+            raise ValueError("unsafe artifact path during deletion")
+        if path.exists():
+            if not path.is_file():
+                raise ValueError("unsafe artifact path during deletion")
+            existing.append(path)
+    return existing
+
+
+def _remove_immutable_payloads(project_dir, manifest):
+    for path in _existing_immutable_payload_paths(project_dir, manifest):
+        path.unlink()
+
+
+def delete_immutable_raw_artifact_bundle(
+    project_id,
+    raw_artifact_bundle_id,
+    *,
+    project_dir,
+    deleted_at,
+    deletion_id,
+    owner_controlled,
+    ledger_head_hash=None,
+):
+    """Physically remove payload content and preserve a Q140 tombstone.
+
+    The operation touches only the selected raw-artifact bundle.  It neither
+    imports nor mutates candidate, review, promotion, approved-record, Memory,
+    or Canon stores.
+    """
+
+    bundle_dir = _validate_immutable_storage_boundary(
+        project_dir, project_id, raw_artifact_bundle_id
+    )
+    tombstone_path = bundle_dir / "tombstone.json"
+    intent_path = bundle_dir / "deletion-intent.json"
+    if tombstone_path.exists():
+        from backend.story_knowledge.evidence_ledger import validate_deletion_tombstone
+
+        existing = validate_deletion_tombstone(_load_json_object(tombstone_path))
+        if existing["deletion_id"] != deletion_id:
+            raise ValueError("deletion replay conflict")
+        manifest_path = bundle_dir / "manifest.json"
+        manifest = validate_raw_artifact_integrity(_load_json_object(manifest_path))
+        _remove_immutable_payloads(project_dir, manifest)
+        if _existing_immutable_payload_paths(project_dir, manifest):
+            raise ValueError("deletion did not remove all covered content")
+        if intent_path.exists():
+            intent_path.unlink()
+        return _side_effect_free_result(
+            status="deleted",
+            tombstone=existing,
+            idempotent=True,
+            content_removed=True,
+            replayable=False,
+        )
+    if intent_path.exists():
+        intent = _validate_deletion_intent(_load_json_object(intent_path))
+        if intent["deletion_id"] != deletion_id:
+            raise ValueError("deletion replay conflict")
+        manifest = validate_raw_artifact_integrity(
+            _load_json_object(bundle_dir / "manifest.json")
+        )
+        if (
+            intent["project_id"] != project_id
+            or intent["artifact_id"] != raw_artifact_bundle_id
+            or intent["manifest_hash"] != manifest["manifest_hash"]
+        ):
+            raise ValueError("deletion intent linkage mismatch")
+        replayed = True
+    else:
+        if owner_controlled is not True:
+            raise ValueError("explicit owner-controlled deletion is required")
+        manifest = read_immutable_raw_artifact_bundle(
+            project_id, raw_artifact_bundle_id, project_dir=project_dir
+        )
+        intent = _build_deletion_intent(
+            manifest=manifest,
+            deleted_at=deleted_at,
+            deletion_id=deletion_id,
+            ledger_head_hash=ledger_head_hash,
+        )
+        _publish_canonical_exclusive(
+            intent_path, intent, collision_message="deletion intent collision"
+        )
+        replayed = False
+    from backend.story_knowledge.evidence_ledger import build_deletion_tombstone
+
+    _remove_immutable_payloads(project_dir, manifest)
+    if _existing_immutable_payload_paths(project_dir, manifest):
+        raise ValueError("deletion did not remove all covered content")
+    tombstone = build_deletion_tombstone(
+        project_id=intent["project_id"],
+        run_id=intent["run_id"],
+        artifact_id=intent["artifact_id"],
+        source_snapshot_ids=intent["source_snapshot_ids"],
+        artifact_hashes=intent["artifact_hashes"],
+        manifest_hash=intent["manifest_hash"],
+        ledger_head_hash=intent["ledger_head_hash"],
+        deleted_at=intent["authorized_at"],
+        deletion_id=intent["deletion_id"],
+    )
+    _publish_canonical_exclusive(
+        tombstone_path, tombstone, collision_message="deletion tombstone collision"
+    )
+    if intent_path.exists():
+        intent_path.unlink()
+    return _side_effect_free_result(
+        status="deleted",
+        tombstone=tombstone,
+        idempotent=replayed,
+        content_removed=True,
+        replayable=False,
+    )
+
+
+def read_raw_artifact_manifest_compatible(
+    project_id, raw_artifact_bundle_id, *, project_dir
+):
+    """Version-detect old/new/deleted storage without rewriting it."""
+
+    bundle_dir = raw_artifact_bundle_storage_dir(project_dir, project_id, raw_artifact_bundle_id)
+    if (bundle_dir / "tombstone.json").exists() or (bundle_dir / "deletion-intent.json").exists():
+        return read_immutable_raw_artifact_bundle(
+            project_id, raw_artifact_bundle_id, project_dir=project_dir
+        )
+    manifest_path = bundle_dir / "manifest.json"
+    loaded = _load_json_object(manifest_path)
+    version = loaded.get("schema_version")
+    if version == IMMUTABLE_RAW_ARTIFACT_VERSION:
+        value = read_immutable_raw_artifact_bundle(
+            project_id, raw_artifact_bundle_id, project_dir=project_dir
+        )
+        if value.get("status") == "deletion_in_progress":
+            return value
+        return {"status": "retained", "version_state": "new", "manifest": value}
+    value = read_raw_artifact_manifest(
+        project_id, raw_artifact_bundle_id, project_dir=project_dir
+    )
+    return {"status": "retained", "version_state": "legacy", "manifest": value}
+
+
 __all__ = (
+    "IMMUTABLE_RAW_ARTIFACT_VERSION",
+    "IMMUTABLE_RETENTION_POLICY",
     "validate_raw_artifact_manifest",
     "build_raw_artifact_manifest",
     "validate_raw_artifact_file_ref",
@@ -862,4 +1366,10 @@ __all__ = (
     "rebuild_raw_artifact_index",
     "quarantine_raw_artifact_bundle",
     "compute_raw_artifact_bundle_hash",
+    "validate_raw_artifact_integrity",
+    "build_immutable_raw_artifact_manifest",
+    "write_immutable_raw_artifact_bundle",
+    "read_immutable_raw_artifact_bundle",
+    "delete_immutable_raw_artifact_bundle",
+    "read_raw_artifact_manifest_compatible",
 )
