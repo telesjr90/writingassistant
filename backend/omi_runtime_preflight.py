@@ -82,6 +82,10 @@ from pathlib import Path
 from typing import Any, Mapping
 from urllib.parse import unquote, urlparse
 
+from backend.story_knowledge.subtxt_runtime_contract import (
+    discover_official_subtxt_runtime,
+)
+
 try:
     from . import omi_analysis_orchestrator as oao
 except ImportError:  # pragma: no cover - supports direct backend/ imports
@@ -2252,15 +2256,13 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
         }
     elif adapter == "subtxt":
         probe = _subtxt_docs_source_probe(env)
-        configured = probe["subtxt_source_available"]
-        available = False
-        surface = probe["subtxt_runtime_surface"]
-        if surface == "unavailable":
-            dependency_status = "unavailable"
-        elif surface == "degraded":
-            dependency_status = "unavailable"
-        else:
-            dependency_status = "available"
+        official_inventory = discover_official_subtxt_runtime(
+            repo_root=_REPO_ROOT,
+            env=env,
+        ).to_dict()
+        configured = official_inventory["configuration_state"] == "configured"
+        available = bool(official_inventory["ready"])
+        dependency_status = str(official_inventory["readiness_state"])
         detail = probe["subtxt_detail"]
         return {
             "runtime_configured": configured,
@@ -2326,6 +2328,7 @@ def _dependency_probe(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "subtxt_path_env": probe["subtxt_path_env"],
             "subtxt_path_configured": probe["subtxt_path_configured"],
             "subtxt_path_value": probe["subtxt_path_value"],
+            "subtxt_official_runtime_inventory": official_inventory,
             "subtxt_detail": detail,
         }
     elif adapter == "dramatica_flow":
@@ -2825,6 +2828,9 @@ def _tool_report(adapter: str, env: Mapping[str, str]) -> dict[str, Any]:
             "subtxt_path_configured"
         )
         report["subtxt_path_value"] = dependency.get("subtxt_path_value")
+        report["subtxt_official_runtime_inventory"] = dependency.get(
+            "subtxt_official_runtime_inventory"
+        )
         report["subtxt_detail"] = dependency.get("subtxt_detail")
     if adapter == "dramatica_flow":
         for key in (

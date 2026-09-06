@@ -2345,6 +2345,54 @@ def test_subtxt_disabled_by_default_remains_read_only() -> None:
     assert tool["safety"]["story_prose_generated"] is False
 
 
+def test_subtxt_official_runtime_inventory_reports_current_missing_state() -> None:
+    dependency = preflight._dependency_probe("subtxt", {})
+    inventory = dependency["subtxt_official_runtime_inventory"]
+
+    assert inventory["official_adapter_identity"] == "subtxt"
+    assert inventory["app_owned_rubric_identity"] == "subtxt_informed_rubric"
+    assert inventory["protected_source_state"] == "missing"
+    assert inventory["installed_package_state"] == "missing"
+    assert inventory["executable_state"] == "missing"
+    assert inventory["configuration_state"] == "missing"
+    assert inventory["callable_library_state"] == "missing"
+    assert inventory["network_api_state"] == "unknown_unverified"
+    assert inventory["runtime_version_state"] == "unknown_unverified"
+    assert inventory["provider_state"] == "unknown_unverified"
+    assert inventory["model_state"] == "unknown_unverified"
+    assert inventory["compatibility_state"] == "unknown_unverified"
+    assert inventory["ready"] is False
+    assert inventory["readiness_state"] == "unavailable"
+    assert inventory["capabilities"] == {
+        "policy_permitted_operations": ["analyze-subtxt"],
+        "runtime_supported_operations": [],
+        "currently_available_operations": [],
+    }
+    assert dependency["runtime_dependency_available"] is False
+    assert dependency["runtime_dependency_status"] == "unavailable"
+
+
+def test_subtxt_official_configuration_presence_is_not_readiness() -> None:
+    dependency = preflight._dependency_probe(
+        "subtxt",
+        {
+            "OMI_LIVE_SUBTXT_COMMAND": "subtxt",
+            "OMI_LIVE_SUBTXT_PATH": "/opt/subtxt",
+        },
+    )
+    inventory = dependency["subtxt_official_runtime_inventory"]
+
+    assert inventory["configuration_state"] == "configured"
+    assert inventory["configured_variable_names"] == [
+        "OMI_LIVE_SUBTXT_COMMAND",
+        "OMI_LIVE_SUBTXT_PATH",
+    ]
+    assert inventory["configuration_values_exposed"] is False
+    assert inventory["ready"] is False
+    assert dependency["runtime_configured"] is True
+    assert dependency["runtime_dependency_available"] is False
+
+
 def test_subtxt_full_docs_surface_reports_reference_only(
     monkeypatch,
 ) -> None:
@@ -2400,9 +2448,10 @@ def test_subtxt_docs_reference_does_not_make_live_runtime_available(
     assert tool["runtime_enabled"] is True
     assert tool["subtxt_docs_reference_available"] is True
     assert tool["subtxt_live_runtime_available"] is False
+    assert tool["runtime_configured"] is False
     assert tool["runtime_dependency_available"] is False
-    assert tool["runtime_dependency_status"] == "available"
-    assert tool["status"] == "unavailable"
+    assert tool["runtime_dependency_status"] == "unavailable"
+    assert tool["status"] == "not_configured"
     assert tool["safety"]["read_only"] is True
 
 
