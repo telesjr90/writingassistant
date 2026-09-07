@@ -345,6 +345,55 @@ def validate_raw_artifact_file_ref(file_ref):
     return working
 
 
+def build_raw_artifact_file_ref(
+    *,
+    artifact_file_id,
+    artifact_type,
+    relative_path,
+    media_type,
+    payload,
+    source_locator_refs,
+    evidence_refs,
+    provenance_refs,
+    encoding="utf-8",
+    record_count=None,
+    line_count=None,
+    schema_name=None,
+    schema_version=None,
+    parser_hint=None,
+):
+    """Build one validated T003 file reference for already-produced bytes.
+
+    The helper is intentionally content-agnostic and side-effect free.  It
+    does not execute a runtime or reinterpret the payload; callers retain the
+    exact bytes separately and pass them to the existing immutable bundle
+    writer.
+    """
+
+    if not isinstance(payload, bytes):
+        raise ValueError("artifact payload must be bytes")
+    return validate_raw_artifact_file_ref(
+        {
+            "artifact_file_id": artifact_file_id,
+            "artifact_type": artifact_type,
+            "relative_path": relative_path,
+            "media_type": media_type,
+            "encoding": encoding,
+            "size_bytes": len(payload),
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "record_count": record_count,
+            "line_count": line_count,
+            "schema_name": schema_name,
+            "schema_version": schema_version,
+            "parser_hint": parser_hint,
+            "source_locator_refs": list(source_locator_refs),
+            "evidence_refs": list(evidence_refs),
+            "provenance_refs": list(provenance_refs),
+            "boundary_flags": sorted(_REQUIRED_BOUNDARY_FLAGS),
+        }
+    )
+
+
 def validate_raw_artifact_manifest(manifest):
     if not isinstance(manifest, dict):
         raise ValueError("invalid input")
@@ -1355,6 +1404,7 @@ __all__ = (
     "IMMUTABLE_RETENTION_POLICY",
     "validate_raw_artifact_manifest",
     "build_raw_artifact_manifest",
+    "build_raw_artifact_file_ref",
     "validate_raw_artifact_file_ref",
     "raw_artifact_bundle_storage_dir",
     "raw_artifact_manifest_path",
