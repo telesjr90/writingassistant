@@ -3,7 +3,11 @@
 <!-- CURRENT-REPOSITORY-TRUTH:START -->
 - Latest closed application parent: `PHASE8-IMPL-024` (complete/closed as complete/PASS)
 - Active application parent: `PHASE8-IMPL-025`
-- Immediate application frontier: `PHASE8-IMPL-025-T003` (planned; dependency-satisfied/eligible; not begun)
+- Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
+- Latest completed application child: `PHASE8-IMPL-025-T005` (complete/PASS)
+- Accepted implementation milestones with outstanding real-execution gates: `PHASE8-IMPL-025-T004` and `PHASE8-IMPL-025-T006`
+- Immediate application frontier: `PHASE8-IMPL-025-T006` (real official Subtxt runtime connection and current-layer execution validation pending; overall task open)
+- Later children: `PHASE8-IMPL-025-T007` and `PHASE8-IMPL-025-T008` (planned; not begun)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
@@ -16,6 +20,10 @@ Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
 and execution routing are paused as application gates. Context tools may run
 only in explicit context-generation mode; application agents consume saved
 outputs.
+
+| Accepted adapter or mock evidence is mistaken for completed external-tool integration | Active | Critical | Contract, adapter, fixture, and deterministic mock milestones can all pass while no real external runtime/interface executes through the application. | Apply the owner completion gate `contract -> real application adapter -> real execution`; preserve accepted milestones while keeping overall integration open until bounded real execution is proven. | Active |
+| Historical real execution is mistaken for current T002/T003 layered execution | Active | High | Historical spaCy, BookNLP, Ollama/qwen3:8b, Story Check, and NCP evidence predates or does not prove the complete current source/hash, control-plane, artifact, ledger, fusion, persistence, and review chain. | Require explicit current-layer reachability and a bounded post-integration real run; use `INSUFFICIENT_EVIDENCE` rather than inferring completion. | Active |
+| External `dramatica_flow` authority is silently inferred from the app-owned rubric or conflicting decisions | Active / owner decision required | Critical | The app-owned `dramatica_flow_informed_rubric` is not the external runtime. T020B blocks/reference-limits external runtime use while the newer completion policy requires real execution for MVP-required external integrations. | `OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION`; do not implement or execute the external runtime until the owner reconciles its MVP scope and authority. | Owner decision required |
 
 | Existing context-tool artifacts are attributed from filenames alone | Mitigated by T005 | High | Repomix-, Graphify-, or CCE-like filenames can be renamed, copied, mixed, or produced by unrelated tooling. Silent filename attribution could make unknown output appear trustworthy. | T005 requires deterministic manifest, command, metadata, or tracked-convention evidence. Unknown and conflicting origins are classified `unknown_generated_context` and quarantined. | Mitigated |
 | Read-only context import is mistaken for standing approval to install or execute collectors | Mitigated by T005 and implementation/context-generation mode separation | High | Consumers could treat permission to inspect an existing artifact as standing permission to install, index, query, update, or run its producing tool. | T005's historical import classifications remain preserved. The accepted 2026-07-17 owner decision permits Repomix, Graphify, LeanCTX, `generate_ai_context.sh`, and `context_health_check.sh` only in an explicit context-generation task; ordinary implementation consumes saved outputs. | Active |

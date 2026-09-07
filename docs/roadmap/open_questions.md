@@ -3,7 +3,11 @@
 <!-- CURRENT-REPOSITORY-TRUTH:START -->
 - Latest closed application parent: `PHASE8-IMPL-024` (complete/closed as complete/PASS)
 - Active application parent: `PHASE8-IMPL-025`
-- Immediate application frontier: `PHASE8-IMPL-025-T003` (planned; dependency-satisfied/eligible; not begun)
+- Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
+- Latest completed application child: `PHASE8-IMPL-025-T005` (complete/PASS)
+- Accepted implementation milestones with outstanding real-execution gates: `PHASE8-IMPL-025-T004` and `PHASE8-IMPL-025-T006`
+- Immediate application frontier: `PHASE8-IMPL-025-T006` (real official Subtxt runtime connection and current-layer execution validation pending; overall task open)
+- Later children: `PHASE8-IMPL-025-T007` and `PHASE8-IMPL-025-T008` (planned; not begun)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
@@ -11,6 +15,8 @@
 This block is the current summary. Numbered questions retain chronological
 evidence; resolved or superseded “next” claims are historical and cannot set the
 current frontier.
+
+161. Does external `dramatica_flow` remain an MVP-required external integration, and if so, what explicit implementation/execution authority supersedes or revises T020B's current blocked/reference-limited runtime decision? **`OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION`.** The app-owned `dramatica_flow_informed_rubric` is a distinct internal implementation and is not evidence of external dramatica-flow execution. This unresolved authority question does not block documentation reconciliation for other tools.
 
 147. What exact owner-correction and candidate merge/split lifecycle should PHASE8-IMPL-025-T011 use for approve, reject, needs-more-evidence, merge, split, rename, source-link correction, supersession, owner-authored correction, and selected-source rerun while keeping review status non-canon and promotion separate?
 

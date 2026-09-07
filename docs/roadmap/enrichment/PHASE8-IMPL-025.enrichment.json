@@ -23,7 +23,15 @@
       "Layer 6 - candidate persistence and owner review",
       "Layer 7 - explicit promotion and approved context",
       "Layer 8 - NCP gateway"
-    ]
+    ],
+    "t003_implementation_commit": "95a406e3f97899d83c00ff1cdeb229ced1400cef",
+    "t004_implementation_commit": "ca2f99f35a7dc029a217954872ca7a5ab479ed2f",
+    "t005_contract_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T005-full-subtxt-runtime-inventory-and-contracts.md",
+    "t005_implementation_commit": "7e58e4859f828b3ca0edb886c999f5f376f151ac",
+    "t006_milestone_pending_runtime_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md",
+    "t006_implementation_commit": "23d4825da9a257180cdc0d1d1239ce13b4e01f78",
+    "real_execution_completion_decision": "docs/roadmap/decisions/2026-09-07-real-tool-execution-required-for-tool-integration-completion.md",
+    "real_tool_reality_audit": "docs/roadmap/decisions/PHASE8-IMPL-025-real-tool-integration-reality-audit.md"
   },
   "owner_subtxt_authorization": {
     "licensing_resolved": true,
@@ -54,34 +62,40 @@
     "app-owned dramatica_flow_informed_rubric",
     "deterministic fusion IDs, fingerprints, duplicate/conflict/uncertainty metadata",
     "candidate-only persistence",
-    "grouped owner review with T023A and T023B complete/PASS"
+    "grouped owner review with T023A and T023B complete/PASS",
+    "T003 immutable raw-artifact/evidence-ledger persistence, live-run control plane, and persisted-data compatibility complete/PASS",
+    "T004 expanded BookNLP implementation milestone accepted at ca2f99f35a7dc029a217954872ca7a5ab479ed2f; real expanded current-layer execution unproven",
+    "T005 official/full Subtxt runtime inventory and fail-closed contracts complete/PASS",
+    "T006 official/full Subtxt application adapter and mocked-validation milestone accepted at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; overall T006 open; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero currently available verified official runtime surfaces"
   ],
   "missing_layers": [
-    "complete immutable raw artifact/evidence ledger",
-    "expanded BookNLP mappings and precise offset translation",
-    "official/full authorized Subtxt runtime inventory, contracts, adapter, and validation",
     "two-role evidence-bounded Ollama contract",
     "layered reuse of the completed Story Check factual-grounding repair",
     "cross-adapter semantic guardrails",
     "read-only project-level narrative diagnostics",
     "full NCP import/export gateway and round-trip provenance",
     "expanded owner correction, merge, split, and rerun lifecycle",
-    "live-run API/control plane and owner workflow",
-    "existing persisted-data compatibility",
-    "runtime provisioning and current-machine compatibility matrix",
+    "owner live-run workflow",
+    "genuinely available verified official/full Subtxt runtime and any required provisioning",
+    "real-runtime T006G execution after availability is established",
+    "real expanded BookNLP execution through the T002/T003 artifact, ledger, fusion, and candidate path",
+    "current-layer real execution proof for historical spaCy, Ollama/qwen3:8b, Story Check, BookNLP, and NCP foundations",
     "NCP and diagnostics owner UI",
     "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
   ],
   "activation": {
     "status": "active",
-    "depends_on": ["PHASE8-IMPL-024"],
+    "depends_on": [
+      "PHASE8-IMPL-024"
+    ],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": "PHASE8-IMPL-025-T003",
-    "immediate_next_task_status": "planned/dependency-satisfied/eligible/not-begun",
+    "immediate_next_task": "PHASE8-IMPL-025-T006",
+    "immediate_next_task_status": "active/open; implementation milestone accepted; real official-runtime connection and current-layer execution pending",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "complete/PASS",
-    "latest_completed_task": "PHASE8-IMPL-025-T002",
-    "latest_completed_task_status": "complete/PASS"
+    "latest_completed_task": "PHASE8-IMPL-025-T005",
+    "latest_completed_task_status": "complete/PASS",
+    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T006 at 23d4825da9a257180cdc0d1d1239ce13b4e01f78"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -97,38 +111,165 @@
     "PHASE8-IMPL-025-T011 Candidate review lifecycle expansion",
     "PHASE8-IMPL-025-T012 Layered end-to-end validation"
   ],
+  "workstream_status": {
+    "PHASE8-IMPL-025-T001": "complete/PASS",
+    "PHASE8-IMPL-025-T002": "complete/PASS",
+    "PHASE8-IMPL-025-T003": "complete/PASS; implementation commit 95a406e3f97899d83c00ff1cdeb229ced1400cef",
+    "PHASE8-IMPL-025-T004": "implementation milestone accepted at ca2f99f35a7dc029a217954872ca7a5ab479ed2f; overall real-tool completion open pending expanded BookNLP current-layer execution",
+    "PHASE8-IMPL-025-T005": "complete/PASS; implementation commit 7e58e4859f828b3ca0edb886c999f5f376f151ac",
+    "PHASE8-IMPL-025-T006": "active/open; implementation milestone accepted at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; real official-runtime connection and current-layer execution pending; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero available official runtime surfaces",
+    "PHASE8-IMPL-025-T007": "planned/not-begun; not the immediate frontier while T006 remains open; T007E requires bounded real current-layer Ollama/qwen3:8b and Story Check execution",
+    "PHASE8-IMPL-025-T008": "planned/not-begun; awaits T004/T006 real-execution gates and T007; fixtures alone cannot satisfy contributor validation"
+  },
   "child_task_ordering": {
-    "T001": ["T001A", "T001B", "T001C", "T001D"],
-    "T002": ["T002A", "T002B", "T002C", "T002D", "T002E"],
-    "T003": ["T003A", "T003B", "T003C", "T003D", "T003E", "T003F", "T003G"],
-    "T004": ["T004A", "T004B", "T004C", "T004D", "T004E", "T004F", "T004G"],
-    "T005": ["T005A", "T005B", "T005C", "T005D", "T005E", "T005F", "T005G", "T005H"],
-    "T006": ["T006A", "T006B", "T006C", "T006D", "T006E", "T006F", "T006G", "T006H", "T006I", "T006J", "T006K"],
-    "T007": ["T007A", "T007B", "T007C", "T007D", "T007E"],
-    "T008": ["T008A", "T008B", "T008C", "T008D", "T008E"],
-    "T009": ["T009A", "T009B", "T009C", "T009D", "T009E", "T009F", "T009G"],
-    "T010": ["T010A", "T010B", "T010C", "T010D", "T010E", "T010F", "T010G", "T010H"],
-    "T011": ["T011A", "T011B", "T011C", "T011D", "T011E", "T011F", "T011G", "T011H"],
-    "T012": ["T012A", "T012B", "T012C", "T012D", "T012E", "T012F", "T012G", "T012H", "T012I", "T012J", "T012K"]
+    "T001": [
+      "T001A",
+      "T001B",
+      "T001C",
+      "T001D"
+    ],
+    "T002": [
+      "T002A",
+      "T002B",
+      "T002C",
+      "T002D",
+      "T002E"
+    ],
+    "T003": [
+      "T003A",
+      "T003B",
+      "T003C",
+      "T003D",
+      "T003E",
+      "T003F",
+      "T003G"
+    ],
+    "T004": [
+      "T004A",
+      "T004B",
+      "T004C",
+      "T004D",
+      "T004E",
+      "T004F",
+      "T004G"
+    ],
+    "T005": [
+      "T005A",
+      "T005B",
+      "T005C",
+      "T005D",
+      "T005E",
+      "T005F",
+      "T005G",
+      "T005H"
+    ],
+    "T006": [
+      "T006A",
+      "T006B",
+      "T006C",
+      "T006D",
+      "T006E",
+      "T006F",
+      "T006G",
+      "T006H",
+      "T006I",
+      "T006J",
+      "T006K"
+    ],
+    "T007": [
+      "T007A",
+      "T007B",
+      "T007C",
+      "T007D",
+      "T007E"
+    ],
+    "T008": [
+      "T008A",
+      "T008B",
+      "T008C",
+      "T008D",
+      "T008E"
+    ],
+    "T009": [
+      "T009A",
+      "T009B",
+      "T009C",
+      "T009D",
+      "T009E",
+      "T009F",
+      "T009G"
+    ],
+    "T010": [
+      "T010A",
+      "T010B",
+      "T010C",
+      "T010D",
+      "T010E",
+      "T010F",
+      "T010G",
+      "T010H"
+    ],
+    "T011": [
+      "T011A",
+      "T011B",
+      "T011C",
+      "T011D",
+      "T011E",
+      "T011F",
+      "T011G",
+      "T011H"
+    ],
+    "T012": [
+      "T012A",
+      "T012B",
+      "T012C",
+      "T012D",
+      "T012E",
+      "T012F",
+      "T012G",
+      "T012H",
+      "T012I",
+      "T012J",
+      "T012K"
+    ]
   },
   "dependencies": {
     "external": {
-      "PHASE8-IMPL-025": ["PHASE8-IMPL-024"],
-      "PHASE8-IMPL-025-T011H": ["PHASE8-IMPL-024-T007C", "PHASE8-IMPL-025-T003F"]
+      "PHASE8-IMPL-025": [
+        "PHASE8-IMPL-024"
+      ],
+      "PHASE8-IMPL-025-T011H": [
+        "PHASE8-IMPL-024-T007C",
+        "PHASE8-IMPL-025-T003F"
+      ]
     },
     "shared_contract_chain": [
       "T001 -> T002",
       "T002 -> T003"
     ],
-    "contributor_branches": ["T003 -> T004", "T003 -> T005 -> T006", "T003 -> T007"],
-    "shared_contract_children": ["T003 -> T003F", "T003 -> T003G"],
+    "contributor_branches": [
+      "T003 -> T004",
+      "T003 -> T005 -> T006",
+      "T003 -> T007"
+    ],
+    "shared_contract_children": [
+      "T003 -> T003F",
+      "T003 -> T003G"
+    ],
     "guardrail_join": "T004 + T006 + T007 -> T008",
-    "integration_branches": ["T008 -> T009", "T008 -> T010", "T008 -> T011"],
-    "owner_ui_dependencies": ["T009 + T010 -> T010H", "T003F + PHASE8-IMPL-024-T007C -> T011H"],
+    "integration_branches": [
+      "T008 -> T009",
+      "T008 -> T010",
+      "T008 -> T011"
+    ],
+    "owner_ui_dependencies": [
+      "T009 + T010 -> T010H",
+      "T003F + PHASE8-IMPL-024-T007C -> T011H"
+    ],
     "final_join": "T003F + T003G + T009 + T010 + T010H + T011 + T011H -> T012 -> PHASE8-IMPL-027"
   },
   "full_subtxt_runtime_path": {
-    "status": "planned",
+    "status": "implementation milestone accepted; verified official runtime unavailable; real execution pending; overall T006 active/open",
     "official_identity_distinct_from": "subtxt_informed_rubric",
     "inventory_and_contracts": "PHASE8-IMPL-025-T005",
     "adapter_integration_and_validation": "PHASE8-IMPL-025-T006",
@@ -139,16 +280,29 @@
       "analysis operation",
       "transformation into app candidate records"
     ],
-    "provisioning_and_compatibility": "supported callable interfaces and versions; installation/access, discovery, configuration, compatibility, missing/incompatible/unavailable states, preflight accuracy, timeouts, output validation, current-machine evidence, and bounded real-input operation"
+    "provisioning_and_compatibility": "future provisioning requires current evidence of a supported callable interface/version, discovery, safe configuration, compatibility, preflight accuracy, timeout and output validation before any separately authorized real-input operation",
+    "official_adapter_identity": "subtxt",
+    "implementation_kind": "official_external",
+    "app_owned_identities": [
+      "subtxt_informed_rubric",
+      "app_owned_subtxt_informed_rubric"
+    ],
+    "sole_positive_operation": "analyze-subtxt",
+    "t005_implementation_commit": "7e58e4859f828b3ca0edb886c999f5f376f151ac",
+    "t006_implementation_commit": "23d4825da9a257180cdc0d1d1239ce13b4e01f78",
+    "t006g_status": "NOT_EXECUTED_RUNTIME_UNAVAILABLE",
+    "t006k_current_machine_available_official_runtime_surfaces": 0,
+    "real_runtime_api_or_model_call_performed": false,
+    "production_official_runner_implemented": false,
+    "t003_invokes_official_subtxt_adapter": false,
+    "mapped_output_is_native_official_runtime_format": false
   },
   "risks": [
     "source-to-candidate traceability gaps",
-    "missing immutable raw artifacts",
     "adapter-role ambiguity",
     "raw text sent to normalized-evidence consumers",
     "unsupported factual model claims",
     "BookNLP coreference and speaker uncertainty",
-    "full Subtxt runtime integration complexity",
     "missing Subtxt internal model/runtime provenance",
     "cross-adapter semantic inconsistency",
     "NCP schema and semantic drift",
@@ -156,20 +310,20 @@
     "incomplete approved-context export",
     "project-level diagnostics mistaken for truth",
     "incomplete owner correction workflows",
-    "failed collectors or partial validation mistaken for architecture completion"
+    "failed collectors or partial validation mistaken for architecture completion",
+    "official/full Subtxt runtime remains unavailable and its runtime/interface/version/provider/model provenance remains unknown where not evidenced",
+    "historical real execution mistaken for current T002/T003 layered execution",
+    "external dramatica_flow owner-blocked/reference-only authority conflicts with any claim that it remains an MVP-required external integration"
   ],
   "open_questions": [
-    "exact full Subtxt runtime interface",
-    "official analysis-only operation allowlist",
-    "Subtxt internal model/provider provenance",
-    "supported source/document granularity",
-    "raw artifact retention",
+    "future official/full Subtxt runtime provisioning and evidenced callable interface/source granularity",
+    "Subtxt runtime/interface/version/provider/model provenance where a future available runtime reports it",
     "cross-adapter guardrail ordering",
-    "exact BookNLP candidate mapping expansion",
     "NCP import/export mapping version",
     "trusted app-generated NCP round-trip rules",
     "project-level narrative-diagnostic context contract",
-    "owner correction and candidate merge/split lifecycle"
+    "owner correction and candidate merge/split lifecycle",
+    "OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION"
   ],
   "validation_frontier": {
     "preserved_verified_foundation": [
@@ -183,18 +337,25 @@
       "app-owned rubric validation",
       "fusion",
       "candidate-only persistence",
-      "grouped-review contract and UI"
+      "grouped-review contract and UI",
+      "T003 immutable layered artifacts, evidence ledger, live-run control plane, and persisted-data compatibility",
+      "T004 expanded BookNLP implementation milestone and mocked validation",
+      "T005 official/full Subtxt inventory and fail-closed contracts",
+      "T006 official/full Subtxt application adapter implementation, mocked validation, candidate persistence/grouped-review reuse, and zero-runtime current-machine matrix"
     ],
     "not_yet_validated": [
-      "immutable layered evidence ledger",
-      "expanded BookNLP output classes",
-      "official/full Subtxt runtime",
+      "T007 evidence-bounded Ollama and Story Check lifecycle",
+      "real expanded BookNLP output through T002/T003 artifacts, evidence ledger, fusion, and candidates",
+      "real official/full Subtxt execution through a production runner connected to T003",
+      "current-layer real execution for historical spaCy, Ollama/qwen3:8b, Story Check, BookNLP, and NCP foundations",
+      "real official/full Subtxt runtime execution after a verified runtime becomes available",
       "shared semantic guardrails",
       "project-level diagnostics",
       "full NCP approved export and round trip",
       "expanded correction workflows",
       "layered-runtime and integration deltas over PHASE8-IMPL-024-T008",
-      "terminal PHASE8-IMPL-027 owner acceptance"
+      "terminal PHASE8-IMPL-027 owner acceptance",
+      "external dramatica_flow MVP/runtime authority decision"
     ],
     "apply_promotion_isolated": true,
     "partial_or_failed_collectors_are_not_completion": true
