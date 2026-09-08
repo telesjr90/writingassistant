@@ -4,10 +4,10 @@
 - Latest closed application parent: `PHASE8-IMPL-024` (complete/closed as complete/PASS)
 - Active application parent: `PHASE8-IMPL-025`
 - Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
-- Latest completed application child: `PHASE8-IMPL-025-T005` (complete/PASS)
-- Accepted implementation milestones with outstanding real-execution gates: `PHASE8-IMPL-025-T004` and `PHASE8-IMPL-025-T006`
-- Immediate application frontier: `PHASE8-IMPL-025-T006` (real official Subtxt runtime connection and current-layer execution validation pending; overall task open)
-- Later children: `PHASE8-IMPL-025-T007` and `PHASE8-IMPL-025-T008` (planned; not begun)
+- Latest accepted/closed application child: `PHASE8-IMPL-025-T006` (optional paid-integration foundation; real paid runtime deferred; T006G not executed)
+- Accepted implementation milestone with outstanding required real-execution gate: `PHASE8-IMPL-025-T004`
+- Immediate application frontier: `PHASE8-IMPL-025-T007` (planned; dependency-satisfied/eligible; not begun)
+- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; required dependencies T004 and T007)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
@@ -393,5 +393,5 @@ then execute T004 responsive and T005 accessibility work.
 | Remaining-MVP tasks are omitted from normalized Project Memory | Mitigated by roadmap-derived registry completeness validation | Critical | A partial task sample can hide active/planned children or fabricate a shorter dependency path in generated publications. | The tracked roadmap index declares remaining MVP parents; the validator derives descendants generically, requires exactly one authoritative normalized task per roadmap task, validates every dependency target, rejects duplicate identities, and never treats generated evidence as authority. | Mitigated |
 | Layered backend completes without an owner-operable live-run workflow | Planned mitigation in T003F/T011H | High | Internal adapters and manifests do not create a usable MVP without canonical HTTP control and an accessible owner workflow. | Separate backend control-plane and frontend workflow tasks join before T012 and PHASE8-IMPL-027. | Active |
 | Existing owner data becomes unreadable during layered-schema cutover | Planned mitigation in T003G | High | Old, mixed, or malformed candidates, artifacts, review records, audits, manifests, and ledgers could be orphaned or misclassified. | Version detection, compatible reads or explicit migration, idempotency, non-destructive/rollback policy, provenance preservation, fixtures, and owner-visible continuity before write cutover. | Active |
-| Required runtimes cannot be reproduced on the current machine | Planned mitigation in T005/T006 | High | Discovery without supported versions, installation/access, compatibility, timeout, and output-validation contracts cannot prove a repeatable live MVP. | Fold provisioning into T005/T006 and require a current-machine evidence matrix plus bounded real-input operation for every MVP-required available runtime. | Active |
+| MVP-required free/local runtimes cannot be reproduced on the current machine | Planned mitigation in the applicable contributor tasks | High | Discovery without supported versions, installation/access, compatibility, timeout, and output-validation contracts cannot prove a repeatable live MVP. Optional paid official Subtxt unavailability is not an MVP failure. | Require current-layer real execution for every contributor classified as MVP-required. Preserve T005/T006 paid provisioning and a bounded official call as optional debt; do not count an app-owned rubric as official execution. | Active |
 | Historical validation families compete with current terminal acceptance | Mitigated by reuse/supersession map | High | PHASE8-IMPL-023, 024, and 025 suites could duplicate assertions or produce conflicting owner gates. | PHASE8-IMPL-024-T008 is the reusable baseline, T012 adds layered deltas, historical T024-T026 intent is incorporated, and PHASE8-IMPL-027 is the single terminal gate. | Mitigated |

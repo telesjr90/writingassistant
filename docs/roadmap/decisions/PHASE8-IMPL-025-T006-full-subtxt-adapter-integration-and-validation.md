@@ -1,17 +1,19 @@
-# PHASE8-IMPL-025-T006 — Full Subtxt Adapter Implementation Milestone and Pending Real-Runtime Completion
+# PHASE8-IMPL-025-T006 — Accepted Optional Paid-Integration Foundation
 
 ## Result
 
-`IMPLEMENTATION_MILESTONE_ACCEPTED_REAL_RUNTIME_EXECUTION_PENDING`.
+`ACCEPTED_OPTIONAL_PAID_INTEGRATION_FOUNDATION_REAL_PAID_RUNTIME_DEFERRED`.
 
 The T006 application-side adapter implementation and deterministic mocked
-validation are accepted. Overall `PHASE8-IMPL-025-T006` remains open under the
-2026-09-07 owner completion rule because no verified official/full Subtxt
-runtime was available, no concrete production runner was connected, and no
-real execution occurred through the current T002/T003 layered path.
+validation are accepted. Under the later 2026-09-07 owner decision that makes
+official Subtxt/Dramatica an optional paid integration, T006 is accepted/closed
+as an optional-integration foundation. Paid real-runtime execution is deferred
+and does not block the free/local MVP path.
 
-This is not an adapter failure. It is a truthful incomplete external-runtime
-integration state.
+This is not an adapter failure and is not a real-runtime PASS. It is a truthful
+accepted foundation with optional external-runtime debt. Controlling
+reconciliation:
+`docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md`.
 
 ## Accepted milestones
 
@@ -27,9 +29,10 @@ Accepted implementation commit:
   mocked validation, fail-closed runtime/output handling, candidate-only
   persistence validation, and grouped-review validation.
 - T006K provides a truthful current-machine runtime matrix.
-- T006J is this implementation-milestone and pending-runtime status record.
+- T006J is this accepted-foundation and deferred optional-runtime status
+  record.
 
-## Missing completion gate
+## Deferred optional paid-runtime gate
 
 - T006G: `NOT_EXECUTED_RUNTIME_UNAVAILABLE`.
 - T006K records zero currently available verified official/full runtime
@@ -44,14 +47,15 @@ Accepted implementation commit:
   evidence does not establish them.
 - Runtime absence was not converted into a fake success and is not a T006
   application-adapter failure.
-- Future provisioning and live validation require separate current evidence
-  and authorization as applicable.
+- Future provisioning and live validation require separate authorization and
+  current evidence as applicable. They are not MVP prerequisites.
 
-Completion requires a verified concrete official runner, a T003-to-official-
-Subtxt connection, and successful bounded real execution producing native
-output and provenance through manifest/artifact/evidence-ledger,
+Any future claim that the optional official integration is fully operational
+requires a verified concrete official runner, a T003-to-official-Subtxt
+connection, and successful bounded real execution producing native output and
+provenance through manifest/artifact/evidence-ledger,
 normalization/guardrails/fusion, candidate persistence, and owner review where
-applicable.
+applicable. No such claim is made here.
 
 ## Identity and safety
 
@@ -96,12 +100,14 @@ evidence. They are not official-runtime execution evidence.
 
 ## Current status and frontier
 
-Overall T006 is active/open: implementation milestone accepted; real official
-runtime connection and current-layer execution validation pending. T006 is the
-immediate execution frontier for this lifecycle.
+T006 is accepted/closed as the optional paid-integration foundation. T006G
+remains `NOT_EXECUTED_RUNTIME_UNAVAILABLE`; paid runtime connection and
+current-layer execution remain optional deferred work.
 
-T007 remains planned/not begun and is not activated by the T006 adapter commit.
-T008 remains planned/not begun, and T006D supplies only its bounded future
-input seam. T004 separately retains an accepted implementation milestone with
-a required real expanded BookNLP layered-validation debt before downstream
-acceptance may rely on it.
+T007 remains planned/not begun, depends on completed/PASS T003, and is the next
+dependency-eligible application frontier. T008 remains planned/not begun, and
+T006D supplies its bounded optional-input seam when official Subtxt is
+configured and available; absence of that optional output does not block T008.
+T004 separately retains an accepted implementation milestone with a required
+real expanded BookNLP layered-validation debt before downstream acceptance may
+rely on it.

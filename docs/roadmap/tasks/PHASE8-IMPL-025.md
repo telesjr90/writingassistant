@@ -3,22 +3,23 @@
 ## Status
 
 Published/active. T001-T003 implementation milestones and the T005 contract are
-complete/PASS. The T004 and T006 implementation commits remain accepted, but
-their overall external-tool completion gates remain open: T004 requires real
-expanded BookNLP execution through the current layered path, and T006 requires
-a verified official Subtxt runner plus current-layer real execution. T006 is
-the immediate active execution frontier. T007 and T008 remain planned and not
-begun.
+complete/PASS. T004 retains its accepted implementation milestone and required
+current-layer real BookNLP execution debt. T006 is accepted/closed as the
+optional paid Subtxt/Dramatica integration foundation; T006G remains
+`NOT_EXECUTED_RUNTIME_UNAVAILABLE`, and paid real-runtime execution is deferred
+without blocking MVP. T007 is the next dependency-eligible application
+frontier. T007 and T008 remain planned and not begun.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
 accepted PHASE8-IMPL-024-T008 closeout, so this parent is published/active.
 Project Memory is not an activation gate while the accepted 2026-07-17 pause
 decision remains current. The current application frontier is
-`PHASE8-IMPL-025-T006`: application adapter implementation accepted; real
-official-runtime connection and execution pending. T007 and T008 remain
-planned/not begun. T004's separate current-layer real BookNLP validation debt
-must be satisfied before downstream acceptance relies on that contributor.
+`PHASE8-IMPL-025-T007`: planned, not begun, dependency-satisfied/eligible, and
+dependent on completed/PASS T003. T004's separate current-layer real BookNLP
+validation debt must be satisfied before downstream acceptance relies on that
+contributor. T008 remains planned/not begun and does not wait for optional paid
+Subtxt execution.
 
 The owner-authorized T001 context prerequisite is satisfied by the generated,
 read-only supporting pack at
@@ -29,6 +30,9 @@ tracked deliverable.
 Controlling decision:
 `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
 
+Controlling Subtxt/MVP scope reconciliation:
+`docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md`.
+
 Controlling T001 contract:
 `docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md`.
 
@@ -37,9 +41,9 @@ Controlling T001 contract:
 Expand the implemented independent-adapter/fusion/candidate-review foundation
 into a layered-plus-parallel architecture with stable source identity,
 immutable run evidence, evidence-bounded interpretation, semantic guardrails,
-full authorized Subtxt runtime integration, richer BookNLP extraction, a full
-NCP gateway, bounded owner-correction workflows, and isolated end-to-end
-validation.
+an optional paid Subtxt runtime integration foundation, richer BookNLP
+extraction, a full NCP gateway, bounded owner-correction workflows, and
+isolated end-to-end validation.
 
 ## Current foundation, not completion
 
@@ -62,8 +66,9 @@ their recorded scopes and must not be erased or described as failed:
 
 Persisted findings remain pending, unapproved, promotion-ineligible,
 candidate-only, and non-canon. The app-owned Subtxt-informed rubric remains a
-valid fallback and supplemental semantic guardrail. It is not official/full
-Subtxt runtime execution.
+valid separate deterministic contributor and supplemental semantic guardrail.
+It is not official/full Subtxt runtime execution and cannot silently substitute
+for or impersonate official `subtxt`.
 
 ## Accepted architecture
 
@@ -97,7 +102,7 @@ future task explicitly activates them.
 | B — Source identity, run manifest, and evidence ledger | T002-T003 |
 | B2 — Live-run API/control plane and persisted-data compatibility | T003F-T003G |
 | C — BookNLP extraction expansion | T004 |
-| D — Full Subtxt runtime integration | T005-T006 |
+| D — Optional paid Subtxt runtime integration | T005-T006 |
 | E — Evidence-bounded Ollama and Story Check | T007 |
 | F — Cross-adapter semantic guardrails | T008 |
 | G — Project-level narrative diagnostics | T009 |
@@ -229,10 +234,10 @@ blockers.
 
 ### PHASE8-IMPL-025-T006 — Full Subtxt adapter, integration, and validation
 
-Status: `active/open`; implementation milestone accepted, real official-runtime
-execution pending. Depends on completed/PASS T005. Accepted implementation
+Status: accepted/closed as an optional paid-integration foundation; real paid
+runtime deferred. Depends on completed/PASS T005. Accepted implementation
 commit: `23d4825da9a257180cdc0d1d1239ce13b4e01f78`.
-Milestone/pending-runtime record:
+Accepted-foundation/deferred-runtime record:
 `docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md`.
 
 - `T006A` — Official/full Subtxt adapter implementation behind the committed
@@ -244,18 +249,18 @@ Milestone/pending-runtime record:
   findings; the shared cross-adapter policy remains owned by T008.
 - `T006E` — Deterministic contract validation.
 - `T006F` — Mocked runtime validation.
-- `T006G` — Real authorized runtime validation with version/model/provider
-  provenance.
+- `T006G` — Optional paid real-runtime validation with
+  version/model/provider provenance when separately authorized and available.
 - `T006H` — Candidate-only persistence validation.
 - `T006I` — Grouped-review validation.
-- `T006J` — Documentation/status implementation-milestone reconciliation;
-  overall closeout remains unavailable until the real-runtime gate passes.
+- `T006J` — Documentation/status reconciliation for the accepted optional paid
+  integration foundation and deferred real-runtime debt.
 - `T006K` — Current-machine evidence matrix proving supported version,
   discovery, configuration, preflight accuracy, timeout behavior, output
-  validation, and one bounded real-input operation for every MVP-required
-  available runtime. Protected runtime assets remain outside authoritative
-  tracked records; external dramatica-flow stays owner-blocked and the
-  app-owned rubric remains a separate identity.
+  validation, and one bounded real-input operation when the optional paid
+  runtime is separately authorized and available. Protected runtime assets
+  remain outside authoritative tracked records; external dramatica-flow stays
+  owner-blocked and the app-owned rubric remains a separate identity.
 
 Official/full Subtxt and `subtxt_informed_rubric` remain separate identities.
 Subtxt findings remain pending, non-canon, owner-review-required, and unable to
@@ -265,15 +270,18 @@ T006G is `NOT_EXECUTED_RUNTIME_UNAVAILABLE`: no verified callable official/full
 runtime was available, and no real Subtxt/runtime/API/model call occurred.
 T006K truthfully records zero currently available official/full runtime
 surfaces on this machine. The adapter/integration/mocked-validation milestone
-is accepted, but overall T006 remains open. Completion requires a verified
-production official runner, T003-to-official-Subtxt wiring, and successful
-bounded real execution through the current layered path.
+is accepted, and T006 is closed as an optional paid-integration foundation.
+Future production-runner work, T003-to-official-Subtxt wiring, provisioning,
+and bounded real execution remain separately authorized optional debt. A
+future claim that the official integration is fully operational still requires
+that real execution; no such claim is made here.
 
 ### PHASE8-IMPL-025-T007 — Evidence-bounded Ollama and Story Check
 
-Status: `planned`; depends on completed/PASS T003; not begun and not the
-immediate frontier while T006 remains open. It consumes the completed
-`PHASE8-IMPL-024-T002` grounding repair rather than duplicating it.
+Status: `planned`; depends on completed/PASS T003; not begun;
+dependency-satisfied/eligible and the next application frontier after T006
+closeout. It consumes the completed `PHASE8-IMPL-024-T002` grounding repair
+rather than duplicating it.
 
 - `T007A` — Ollama exact-source structured extraction role.
 - `T007B` — Ollama evidence-bounded interpretation of normalized evidence.
@@ -292,10 +300,11 @@ with its verification state and is never silently rewritten.
 
 ### PHASE8-IMPL-025-T008 — Cross-adapter semantic guardrails
 
-Status: `planned`; not begun; depends on T004, T006, and T007. T004 and T006
-retain accepted implementation milestones but still have real-execution gates;
-the shared guardrail and integration layer waits for every required contributor
-branch and its required real current-layer output.
+Status: `planned`; not begun; depends on T004 and T007. T004 retains its
+accepted implementation milestone and required real-execution gate. The shared
+guardrail and integration layer waits for every MVP-required free/local
+contributor branch and its required real current-layer output. Optional paid
+official Subtxt absence does not block T008 or MVP acceptance.
 
 - `T008A` — Shared guardrail input/result contract and execution ordering.
 - `T008B` — Classification of Ollama, Story Check, NCP, Subtxt, and rubric
@@ -307,8 +316,11 @@ branch and its required real current-layer output.
   rewriting or truth selection.
 - `T008E` — Deterministic fixture regression validation plus cross-adapter
   validation using actual outputs from current-layer real executions for every
-  applicable MVP-required external contributor. Fixture-only contributor runs
-  cannot satisfy T008 acceptance.
+  applicable MVP-required contributor. Fixture-only contributor runs
+  cannot satisfy T008 acceptance. When official Subtxt is configured and
+  available, its output may participate and must pass the same guardrails and
+  evidence/candidate boundaries; its absence is an accepted fail-closed
+  optional-feature state.
 
 ### PHASE8-IMPL-025-T009 — Read-only project-level narrative diagnostics
 
@@ -437,10 +449,13 @@ terminal integration gate by themselves.
 Documentation publication occurred before this reconciliation. The
 PHASE8-IMPL-024 parent-closeout boundary has passed and this parent is
 published/active. T001 -> T002 -> T003 established the shared contracts. T005
-is complete/PASS. T004 and T006 retain accepted implementation milestones but
-their real-execution gates remain open. T006 is the immediate active frontier;
-T007 stays planned/not begun. T008 joins real current-layer outputs from the
-required contributor branches. T009,
+is complete/PASS. T004 retains its accepted implementation milestone and
+required real-execution debt. T006 is accepted/closed as the optional paid
+integration foundation, with real paid runtime deferred. T007 stays
+planned/not begun and is the next dependency-eligible frontier. T008 joins
+real current-layer outputs from the MVP-required free/local contributor
+branches; optional official Subtxt output joins only when configured and
+available. T009,
 T010 backend work, and T011 lifecycle work may then proceed according to their
 actual prerequisites; T010H waits for T009 and T010 backend contracts, while
 T011H waits for T003F and the completed PHASE8-IMPL-024 component foundation.

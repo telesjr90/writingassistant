@@ -4,10 +4,10 @@
 - Latest closed application parent: `PHASE8-IMPL-024` (complete/closed as complete/PASS)
 - Active application parent: `PHASE8-IMPL-025`
 - Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
-- Latest completed application child: `PHASE8-IMPL-025-T005` (complete/PASS)
-- Accepted implementation milestones with outstanding real-execution gates: `PHASE8-IMPL-025-T004` and `PHASE8-IMPL-025-T006`
-- Immediate application frontier: `PHASE8-IMPL-025-T006` (real official Subtxt runtime connection and current-layer execution validation pending; overall task open)
-- Later children: `PHASE8-IMPL-025-T007` and `PHASE8-IMPL-025-T008` (planned; not begun)
+- Latest accepted/closed application child: `PHASE8-IMPL-025-T006` (optional paid-integration foundation; real paid runtime deferred; T006G not executed)
+- Accepted implementation milestone with outstanding required real-execution gate: `PHASE8-IMPL-025-T004`
+- Immediate application frontier: `PHASE8-IMPL-025-T007` (planned; dependency-satisfied/eligible; not begun)
+- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; required dependencies T004 and T007)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
@@ -28,21 +28,21 @@ current frontier.
 
 143. What exact BookNLP candidate mapping expansion should be accepted for aliases/coreference, quotes/speakers, events/actions/timeline, organizations/facilities/vehicles, objects/possessions, supersense categories, and token/dependency evidence, including uncertainty and offset translation?
 
-142. In what order should shared semantic guardrails run relative to interpretation, normalization, fusion, and persistence, and may official Subtxt guardrail analysis run in the same manifest or require a dependent child run?
+142. In what order should shared semantic guardrails run relative to interpretation, normalization, fusion, and persistence, and, when optional official Subtxt is configured and available, may its guardrail analysis run in the same manifest or require a dependent child run? This optional-integration question does not block T008 or MVP acceptance.
 
 141. ~~What exact immutable `AnalysisRunManifest` schema should identify sources, snapshots, hashes, source maps, adapter/model/tool versions, configurations, feature flags, operations, dependencies, artifacts, transformations, rejected/unverified outputs, and partial-run status?~~ **Resolved by PHASE8-IMPL-025-T002:** `analysis-run-manifest.v1` is a frozen, deterministic, pure value contract over exact path-independent source/snapshot identities, declared operations and T001 dependency classes, separate adapter/label/implementation/runtime provenance planes, storage-independent artifact references, transformation/output lineage, the unchanged six adapter result states, and run-level complete/partial/degraded coverage. Rejected, quarantined, and unverified outputs retain reasons and attributable original-output references. Mutable execution status/control and artifact/evidence-ledger persistence remain T003/T003F scope. See `docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md`.
 
 140. What raw-artifact retention and cleanup policy should apply to immutable tool/model outputs and manifests, including privacy, owner deletion, failed/partial runs, derived evidence survival, and provenance references after cleanup?
 
-139. What source/document granularity does the full Subtxt runtime support: raw idea, scene, chapter, selected document, multi-document project context, approved-context snapshot, or a bounded subset?
+139. For the optional paid Subtxt integration, what source/document granularity does the full runtime support: raw idea, scene, chapter, selected document, multi-document project context, approved-context snapshot, or a bounded subset?
 
-138. What Subtxt internal model/provider identity, version, configuration, and operation metadata can the authorized runtime expose, and what explicit unavailable-provenance state is required when an internal component does not report it?
+138. For the optional paid Subtxt integration, what internal model/provider identity, version, configuration, and operation metadata can the authorized runtime expose, and what explicit unavailable-provenance state is required when an internal component does not report it?
 
-137. Which official Subtxt operations belong on the analysis-only allowlist, and which callable surfaces must be placed on the generation/rewrite/continuation/outline/draft/revision/mutation blocklist?
+137. For the optional paid Subtxt integration, which official operations belong on the analysis-only allowlist, and which callable surfaces must be placed on the generation/rewrite/continuation/outline/draft/revision/mutation blocklist?
 
-136. What is the exact current full Subtxt callable interface—API, CLI, library, local service, source/runtime package, or another supported surface—and what installation/access and read-only preflight contract does it require?
+136. For the optional paid Subtxt integration, what additional provisioning and compatibility details remain for the documented Dramatica Narrative Platform evaluation API, and what read-only preflight contract should apply when paid access is separately authorized? This is optional integration debt, not an MVP blocker.
 
-**Resolved owner question — Subtxt authorization/licensing:** the owner has resolved and approved all Subtxt licensing and authorization concerns. Full Subtxt runtime implementation is authorized. Question 115 and other historical owner-blocked/licensing-open statements are superseded only on that point by `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`; the twelve questions above are technical implementation questions, not permission or licensing blockers.
+**Resolved owner question — Subtxt authorization/licensing and MVP scope:** the owner has resolved Subtxt licensing/authorization and classified official Subtxt/Dramatica as an optional paid integration. No paid subscription, token, or API execution is required for MVP. Questions 136-139 remain optional technical debt, not MVP blockers. Question 115 and other historical owner-blocked/licensing-open statements are superseded on authorization by `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md` and on MVP scope by `docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md`.
 
 135. ~~For `PHASE8-IMPL-024-T001A`, should a guided-creation failure atomically roll back the entire project, or retain an explicitly marked incomplete project with recoverable owner input?~~ **Resolved by PHASE8-IMPL-024-T001:** guided creation uses atomic rollback. Verified cleanup reports `failed_rolled_back`; unsafe or failed cleanup reports `recovery_required`; submitted values remain available to the frontend for recovery; and incomplete projects are never returned as normal success.
 

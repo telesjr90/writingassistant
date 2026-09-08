@@ -5,9 +5,9 @@
     "current_track": "Layered analysis architecture and tool-integration expansion",
     "current_parent_task_id": "PHASE8-IMPL-025",
     "current_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
-    "next_readiness_task_id": "PHASE8-IMPL-025-T006",
-    "next_readiness_task_title": "Full Subtxt adapter, integration, and validation",
-    "next_readiness_task_type": "active open real-runtime completion frontier; implementation milestone accepted",
+    "next_readiness_task_id": "PHASE8-IMPL-025-T007",
+    "next_readiness_task_title": "Evidence-bounded Ollama and Story Check",
+    "next_readiness_task_type": "planned dependency-satisfied/eligible application frontier; not begun",
     "remaining_mvp_parent_task_ids": [
       "PHASE8-IMPL-025",
       "PHASE8-IMPL-027"
@@ -17,8 +17,8 @@
     "current_execution_routing_decision": "docs/roadmap/decisions/PHASE8-IMPL-026-T012-current-truth-execution-routing-and-ui-guidance.md",
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
-    "owner_subtxt_authorization": "resolved; T005 contract complete/PASS; T006 application-adapter and mock-validation milestone accepted; verified official runtime unavailable; overall T006 active/open; app-owned identities remain separate",
-    "frontier_note": "PHASE8-IMPL-024 and T008 are complete/closed as complete/PASS with accepted child evidence. PHASE8-IMPL-025 is published/active. T001-T003 implementation milestones are accepted and T005 is complete/PASS. T004 implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f remains accepted, but real expanded BookNLP output through the current T002/T003 artifact/ledger/fusion/candidate chain is unproven. T006 implementation commit 23d4825da9a257180cdc0d1d1239ce13b4e01f78 remains accepted, but T006G is NOT_EXECUTED_RUNTIME_UNAVAILABLE, no concrete production official runner exists, T003 does not reach the official adapter, and no real Subtxt/runtime/API/model call occurred. T006 is the immediate active/open real-runtime completion frontier. T007 and T008 are planned and not begun. Historical real spaCy, BookNLP, Ollama/qwen3:8b, Story Check, and owner-selected NCP import evidence remains valid foundation but does not prove current layered-path execution. External dramatica_flow requires OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION. Project Memory remains paused/nonblocking. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, nonautomatic, explicit owner-approved destination mutation only, and no generated prose."
+    "owner_subtxt_authorization": "resolved; official Subtxt/Dramatica is optional paid integration; T005 contract complete/PASS; T006 application-adapter and mock-validation foundation accepted/closed; T006G not executed and paid runtime deferred; app-owned identities remain separate",
+    "frontier_note": "PHASE8-IMPL-024 and T008 are complete/closed as complete/PASS with accepted child evidence. PHASE8-IMPL-025 is published/active. T001-T003 implementation milestones are accepted and T005 is complete/PASS. T004 implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f remains accepted, but required real expanded BookNLP output through the current T002/T003 artifact/ledger/fusion/candidate chain is unproven. T006 implementation commit 23d4825da9a257180cdc0d1d1239ce13b4e01f78 remains accepted/closed as the optional paid-integration foundation; T006G is NOT_EXECUTED_RUNTIME_UNAVAILABLE, no concrete production official runner exists, T003 does not reach the official adapter, and no real Subtxt/runtime/API/model call occurred. Paid Subtxt absence is fail-closed optional debt and does not block MVP. T007 is the planned dependency-satisfied/eligible next frontier and is not begun; T008 is planned and not begun, waits for required T004 and T007 gates, and accepts optional Subtxt output only when configured and available. Historical real spaCy, BookNLP, Ollama/qwen3:8b, Story Check, and owner-selected NCP import evidence remains valid foundation but does not prove current layered-path execution. External dramatica_flow requires OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION. Project Memory remains paused/nonblocking. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, nonautomatic, explicit owner-approved destination mutation only, and no generated prose."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5494,11 +5494,11 @@
       "context_pack": ".codex-context/PHASE8-IMPL-023/",
       "latest_child_task": "PHASE8-IMPL-023-T023B",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-025-T006",
+      "next_child_task": "PHASE8-IMPL-025-T007",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "published/active",
-      "result": "published historical foundation; T023A/T023B remain complete/PASS; current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 and T008 are complete/PASS; PHASE8-IMPL-025 T001-T003 milestones are accepted, T005 is complete/PASS, T004 real BookNLP layered validation is pending, and T006 is the immediate active/open frontier pending real official Subtxt current-layer execution; T007/T008 are planned and not begun"
+      "result": "published historical foundation; T023A/T023B remain complete/PASS; current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 and T008 are complete/PASS; PHASE8-IMPL-025 T001-T003 milestones are accepted, T005 is complete/PASS, T004 required real BookNLP layered validation is pending, T006 is accepted/closed as optional paid integration with real paid runtime deferred, and T007 is the planned/not-begun next frontier; T008 is planned and not begun"
     },
     {
       "id": "PHASE8-IMPL-024",
@@ -5530,7 +5530,7 @@
       "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
-      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025 T001-T003 milestones accepted; T005 complete/PASS; T004 real BookNLP layered validation pending; T006 active/open real official-runtime completion frontier; T007/T008 planned and not begun",
+      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025 T001-T003 milestones accepted; T005 complete/PASS; T004 required real BookNLP layered validation pending; T006 accepted/closed optional paid-integration foundation with real paid runtime deferred; T007 planned/not-begun next frontier; T008 planned and not begun",
       "result": "complete/closed as complete/PASS; T001, T002, T003, T006, T007, T004, T005, T008, and T008A-T008F complete/PASS; accepted application closeout validation bound to final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b with 5203 ordinary Python passes, exact expected-red reproduction, roadmap/Node/build/browser/responsive/accessibility PASS, no project/application/repository mutation, and archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0; broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and PHASE8-IMPL-027"
     },
     {
@@ -5744,11 +5744,11 @@
       "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
       "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
       "latest_child_task": "PHASE8-IMPL-025-T006",
-      "latest_child_status": "active/open; implementation milestone accepted; real official-runtime execution pending",
-      "next_child_task": "PHASE8-IMPL-025-T006",
+      "latest_child_status": "accepted/closed optional paid-integration foundation; real paid runtime deferred; T006G not executed",
+      "next_child_task": "PHASE8-IMPL-025-T007",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
       "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md",
-      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; T001-T003 and T005 complete/PASS; T004 implementation milestone ca2f99f35a7dc029a217954872ca7a5ab479ed2f accepted with real expanded BookNLP current-layer validation pending; T006 implementation milestone 23d4825da9a257180cdc0d1d1239ce13b4e01f78 accepted with T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE, zero verified official runtime surfaces, no real execution, and overall T006 active/open; T006 is the immediate execution frontier; T007 and T008 planned/not begun; Project Memory paused/nonblocking and not an activation gate"
+      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; T001-T003 and T005 complete/PASS; T004 implementation milestone ca2f99f35a7dc029a217954872ca7a5ab479ed2f accepted with required real expanded BookNLP current-layer validation pending; T006 implementation milestone 23d4825da9a257180cdc0d1d1239ce13b4e01f78 accepted/closed as optional paid-integration foundation with T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE, zero verified official runtime surfaces, no real execution, and paid runtime deferred; T007 is the planned dependency-satisfied/eligible next frontier and not begun; T008 planned/not begun with hard dependencies T004 and T007; Project Memory paused/nonblocking and not an activation gate"
     },
     {
       "id": "PHASE8-IMPL-025-T001",
@@ -5880,13 +5880,12 @@
       "id": "PHASE8-IMPL-025-T006",
       "title": "Full Subtxt adapter, integration, and validation",
       "type": "runtime_microtask",
-      "status": "active",
+      "status": "done",
       "parent": "PHASE8-IMPL-025",
       "depends_on": [
         "PHASE8-IMPL-025-T005"
       ],
       "boundary_tags": [
-        "mvp_required_analysis_runtime",
         "evidence_first",
         "candidate_only",
         "owner_review_required",
@@ -5895,9 +5894,10 @@
         "no_apply_promotion",
         "no_generated_prose"
       ],
-      "result": "active/open overall; application adapter implementation milestone accepted at 23d4825da9a257180cdc0d1d1239ce13b4e01f78 with normalized evidence-backed conversion, T002/T003 integration code, bounded future T008 seam, deterministic mocked validation, candidate-only persistence, and grouped-review reuse; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero verified official runtime surfaces; no concrete production official runner, no T003-to-official-Subtxt call, and no real runtime/API/model execution; subtxt/official_external remains distinct from app-owned identities; no prose, automatic truth/approval/promotion/apply-promotion, or Memory/Canon mutation",
+      "result": "accepted/closed optional paid-integration foundation; application adapter implementation milestone accepted at 23d4825da9a257180cdc0d1d1239ce13b4e01f78 with normalized evidence-backed conversion, T002/T003 integration code, bounded optional T008 seam, deterministic mocked validation, candidate-only persistence, and grouped-review reuse; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero verified official runtime surfaces; paid production runner, T003 wiring, and real runtime execution deferred as optional debt; no concrete production official runner, no T003-to-official-Subtxt call, and no real runtime/API/model execution; subtxt/official_external remains distinct from app-owned identities; no prose, automatic truth/approval/promotion/apply-promotion, or Memory/Canon mutation",
       "implementation_commit": "23d4825da9a257180cdc0d1d1239ce13b4e01f78",
-      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md"
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md",
+      "scope_reconciliation_decision": "docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md"
     },
     {
       "id": "PHASE8-IMPL-025-T007",
@@ -5917,7 +5917,7 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned and not begun; not the immediate frontier while T006 remains open; T007E requires deterministic regressions plus bounded real Ollama/qwen3:8b and Story Check execution through current exact-source/hash, manifest, native/raw artifact, evidence-ledger, grounding/quarantine, normalization, and candidate semantics; historical PHASE8-IMPL-023 live runs are foundation only"
+      "result": "planned and not begun; dependency-satisfied/eligible and the next application frontier after T006 optional-foundation closeout; T007E requires deterministic regressions plus bounded real Ollama/qwen3:8b and Story Check execution through current exact-source/hash, manifest, native/raw artifact, evidence-ledger, grounding/quarantine, normalization, and candidate semantics; historical PHASE8-IMPL-023 live runs are foundation only"
     },
     {
       "id": "PHASE8-IMPL-025-T008",
@@ -5927,7 +5927,6 @@
       "parent": "PHASE8-IMPL-025",
       "depends_on": [
         "PHASE8-IMPL-025-T004",
-        "PHASE8-IMPL-025-T006",
         "PHASE8-IMPL-025-T007"
       ],
       "boundary_tags": [
@@ -5939,7 +5938,7 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned and not begun; awaits T004 and T006 real-execution completion plus T007; requires deterministic fixture regression coverage and actual current-layer real outputs for every applicable MVP-required external contributor; fixture-only cross-adapter validation and the bounded T006D seam are insufficient"
+      "result": "planned and not begun; awaits required T004 real-execution completion plus T007; requires deterministic fixture regression coverage and actual current-layer real outputs for every applicable MVP-required free/local contributor; optional official Subtxt output may participate when configured and available and must pass identical guardrails/evidence/candidate boundaries, but its absence does not block T008 or MVP acceptance"
     },
     {
       "id": "PHASE8-IMPL-025-T009",
