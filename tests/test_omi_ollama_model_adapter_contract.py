@@ -125,6 +125,15 @@ def _assert_valid_ollama_result(result: dict[str, Any]) -> dict[str, Any]:
     return finding
 
 
+def test_ollama_exact_source_operation_identity_is_explicit() -> None:
+    assert oao.OMI_OLLAMA_ADAPTER_NAME == "ollama_model"
+    assert oao.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID == "analyze-ollama-model"
+    assert (
+        oao.OMI_OLLAMA_EXACT_SOURCE_OPERATION_SEMANTICS
+        == "exact_source_structured_extraction"
+    )
+
+
 def test_ollama_model_without_fixture_does_not_call_live_model_and_returns_unavailable() -> None:
     result = oao.analyze_omi_raw_idea_with_tools(
         "demo",

@@ -65,67 +65,100 @@ SUPPORTED_ADAPTERS = frozenset(omi_analysis_orchestrator.OMI_TOOL_ADAPTER_IDENTI
 _PROCESS_SUBMISSION_LOCKS: dict[tuple[str, str], threading.Lock] = {}
 _PROCESS_SUBMISSION_LOCKS_GUARD = threading.Lock()
 
-_ADAPTER_OPERATION_CONTRACT = {
-    "spacy": {
+_OPERATION_CONTRACTS = {
+    "analyze-spacy": {
+        "adapter_id": "spacy",
         "consumes": ("owner_selected_source",),
         "produces": ("raw_extraction_evidence", "normalized_evidence"),
         "role": "source_evidence_producer",
         "label": "spaCy evidence production",
     },
-    "booknlp": {
+    "analyze-booknlp": {
+        "adapter_id": "booknlp",
         "consumes": ("owner_selected_source",),
         "produces": ("raw_extraction_evidence", "normalized_evidence"),
         "role": "source_evidence_producer",
         "label": "BookNLP evidence production",
     },
-    "ollama_model": {
+    omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID: {
+        "adapter_id": omi_analysis_orchestrator.OMI_OLLAMA_ADAPTER_NAME,
+        "operation_semantics": (
+            omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_SEMANTICS
+        ),
         "consumes": ("owner_selected_source",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "exact_source_structured_extractor",
         "label": "Ollama exact-source structured extraction",
     },
-    "story_check": {
+    "analyze-story-check": {
+        "adapter_id": "story_check",
         "consumes": ("owner_selected_source",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "grounded_diagnostic_consumer",
         "label": "Story Check grounded diagnostics",
     },
-    "subtxt_informed_rubric": {
+    "analyze-subtxt-informed-rubric": {
+        "adapter_id": "subtxt_informed_rubric",
         "consumes": ("owner_selected_source",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "app_owned_direct_source_rubric",
         "label": "App-owned Subtxt-informed rubric",
     },
-    "dramatica_flow_informed_rubric": {
+    "analyze-dramatica-flow-informed-rubric": {
+        "adapter_id": "dramatica_flow_informed_rubric",
         "consumes": ("owner_selected_source",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "app_owned_direct_source_rubric",
         "label": "App-owned dramatica-flow-informed rubric",
     },
-    "deterministic_fallback": {
+    "analyze-deterministic-fallback": {
+        "adapter_id": "deterministic_fallback",
         "consumes": ("owner_selected_source",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "fallback_safety_baseline",
         "label": "Deterministic fallback analysis",
     },
-    "subtxt": {
+    "analyze-subtxt": {
+        "adapter_id": "subtxt",
         "consumes": ("normalized_evidence",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "normalized_evidence_consumer",
         "label": "Subtxt normalized-evidence interpretation",
     },
-    "dramatica_flow": {
+    "analyze-dramatica-flow": {
+        "adapter_id": "dramatica_flow",
         "consumes": ("normalized_evidence",),
         "produces": ("diagnostic_candidate_finding",),
         "role": "normalized_evidence_consumer",
         "label": "dramatica-flow normalized-evidence interpretation",
     },
-    "ncp": {
+    "analyze-ncp": {
+        "adapter_id": "ncp",
         "consumes": ("imported_artifact",),
         "produces": ("gateway_input_output",),
         "role": "gateway_import_export",
         "label": "NCP gateway/import-export",
     },
+}
+_DEFAULT_OPERATION_BY_ADAPTER = {
+    "spacy": "analyze-spacy",
+    "booknlp": "analyze-booknlp",
+    "ollama_model": omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID,
+    "story_check": "analyze-story-check",
+    "subtxt_informed_rubric": "analyze-subtxt-informed-rubric",
+    "dramatica_flow_informed_rubric": "analyze-dramatica-flow-informed-rubric",
+    "deterministic_fallback": "analyze-deterministic-fallback",
+    "subtxt": "analyze-subtxt",
+    "dramatica_flow": "analyze-dramatica-flow",
+    "ncp": "analyze-ncp",
+}
+# Compatibility view for callers that still inspect the default operation by
+# adapter. Operation contracts themselves are keyed independently above so a
+# later operation may retain the same adapter identity without replacing this
+# exact-source Ollama operation.
+_ADAPTER_OPERATION_CONTRACT = {
+    adapter_id: _OPERATION_CONTRACTS[operation_id]
+    for adapter_id, operation_id in _DEFAULT_OPERATION_BY_ADAPTER.items()
 }
 _UNPROVIDED_CONTROL_PLANE_INPUTS = {
     "subtxt": "normalized evidence is not supplied by the T003 control plane",
@@ -366,7 +399,9 @@ def _adapter_provenance(
     state: str,
     finding_provenance: list[dict[str, Any]],
 ) -> AdapterProvenance:
-    contract = _ADAPTER_OPERATION_CONTRACT[adapter_id]
+    contract = _OPERATION_CONTRACTS[operation_id]
+    if contract["adapter_id"] != adapter_id:
+        raise ValueError("operation contract does not match adapter identity")
     supplied = [
         {key: copy.deepcopy(value) for key, value in item.items() if key not in {"tool_source", "adapter", "support"}}
         for item in finding_provenance
@@ -719,7 +754,7 @@ def _build_manifest_and_evidence(
     }
     whole_span = OffsetRange(0, len(snapshot.source_content), CHAR_OFFSET_BASIS)
     for adapter_id in requested_adapters:
-        operation_id = f"analyze-{adapter_id.replace('_', '-')}"
+        operation_id = _DEFAULT_OPERATION_BY_ADAPTER[adapter_id]
         adapter_result = by_adapter.get(adapter_id) or {
             "adapter": adapter_id,
             "state": "error",
@@ -727,17 +762,22 @@ def _build_manifest_and_evidence(
             "candidates": [],
         }
         state = adapter_result["state"]
-        contract = _ADAPTER_OPERATION_CONTRACT[adapter_id]
+        contract = _OPERATION_CONTRACTS[operation_id]
+        operation_configuration = {
+            "execution_mode": "synchronous",
+            "adapter_role": contract["role"],
+        }
+        if "operation_semantics" in contract:
+            operation_configuration["operation_semantics"] = contract[
+                "operation_semantics"
+            ]
         operations.append(
             OperationDeclaration(
                 operation_id=operation_id,
                 adapter_id=adapter_id,
                 consumes=contract["consumes"],
                 produces=contract["produces"],
-                configuration={
-                    "execution_mode": "synchronous",
-                    "adapter_role": contract["role"],
-                },
+                configuration=operation_configuration,
                 feature_flags={"candidate_persistence": False},
             )
         )
@@ -761,7 +801,7 @@ def _build_manifest_and_evidence(
         adapter_id = finding.get("source_adapter")
         if adapter_id not in output_ids_by_adapter:
             raise ValueError("finding adapter was not selected")
-        operation_id = f"analyze-{adapter_id.replace('_', '-')}"
+        operation_id = _DEFAULT_OPERATION_BY_ADAPTER[adapter_id]
         output_id = str(finding.get("normalized_finding_id") or finding.get("raw_finding_id") or f"finding-{index}")
         # T002 IDs permit dots/colons but no traversal; prefixing a digest also
         # avoids carrying an unsafe producer-controlled identifier into paths.
@@ -824,7 +864,7 @@ def _build_manifest_and_evidence(
         state = adapter_result["state"]
         contributors.append(
             ContributorLineage(
-                operation_id=f"analyze-{adapter_id.replace('_', '-')}",
+                operation_id=_DEFAULT_OPERATION_BY_ADAPTER[adapter_id],
                 adapter_id=adapter_id,
                 source_snapshot_ids=(snapshot.identity.snapshot_id,),
                 result_state=state,
@@ -832,7 +872,7 @@ def _build_manifest_and_evidence(
                 explanation=adapter_result["explanation"],
                 provenance=_adapter_provenance(
                     adapter_id,
-                    f"analyze-{adapter_id.replace('_', '-')}",
+                    _DEFAULT_OPERATION_BY_ADAPTER[adapter_id],
                     state,
                     ([handoffs[adapter_id]["provenance"]] if adapter_id in handoffs else []) + [
                         finding["provenance"] for finding in findings

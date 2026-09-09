@@ -1506,6 +1506,8 @@ def _deterministic_fallback_findings(
 
 OMI_OLLAMA_SCHEMA_VERSION = "omi_ollama_structured_extraction.v1"
 OMI_OLLAMA_ADAPTER_NAME = "ollama_model"
+OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID = "analyze-ollama-model"
+OMI_OLLAMA_EXACT_SOURCE_OPERATION_SEMANTICS = "exact_source_structured_extraction"
 OMI_OLLAMA_SUPPORT_LABEL = "ollama model support strength only"
 
 # Required top-level fields in the Ollama JSON envelope. Top-level payload

@@ -8,7 +8,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from backend import main, project_manager
+from backend import main, omi_analysis_orchestrator, project_manager
 from backend.routes import omi_analysis_runs
 from backend.story_knowledge import analysis_run_control, persisted_compatibility
 from backend.story_knowledge.apply_promotion import build_promotion_audit_record
@@ -333,6 +333,74 @@ def test_finding_span_roles_dependency_graph_and_actual_provenance(monkeypatch, 
     assert contributors["subtxt"]["result_state"] == "unavailable"
     assert contributors["ncp"]["result_state"] == "unavailable"
     assert contributors["spacy"]["provenance"]["tool"]["availability"] == "unavailable"
+
+
+def test_ollama_exact_source_operation_manifest_and_lineage_are_distinct(
+    monkeypatch, tmp_path
+):
+    _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ"
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="idea-ollama-exact-source",
+        requested_adapters=["ollama_model"],
+        runner=_finding_result,
+        created_at="2026-09-08T20:00:00Z",
+    )
+    run_dir = (
+        tmp_path
+        / "projects/example/writer_assistant/analysis_runs"
+        / run["run_id"]
+    )
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+
+    assert omi_analysis_orchestrator.OMI_OLLAMA_ADAPTER_NAME == "ollama_model"
+    operation = manifest["operations"][0]
+    operation_id = omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID
+    assert operation == {
+        "operation_id": operation_id,
+        "adapter_id": "ollama_model",
+        "consumes": ["owner_selected_source"],
+        "produces": ["diagnostic_candidate_finding"],
+        "configuration": {
+            "execution_mode": "synchronous",
+            "adapter_role": "exact_source_structured_extractor",
+            "operation_semantics": "exact_source_structured_extraction",
+        },
+        "feature_flags": {"candidate_persistence": False},
+    }
+    assert "normalized_evidence" not in operation["consumes"]
+
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == operation_id
+    assert contributor["adapter_id"] == "ollama_model"
+    assert contributor["provenance"]["operation_id"] == operation_id
+    assert contributor["provenance"]["adapter_id"] == "ollama_model"
+    assert {item["operation_id"] for item in manifest["outputs"]} == {operation_id}
+    assert {item["operation_id"] for item in manifest["transformations"]} == {
+        operation_id
+    }
+
+    source_identity = manifest["sources"][0]
+    source_hash = __import__("hashlib").sha256(source.encode("utf-8")).hexdigest()
+    assert source_identity["content_hash"] == source_hash
+    source_artifact = next(
+        item
+        for item in manifest["artifact_references"]
+        if item["artifact_id"] == "source-artifact"
+    )
+    assert source_artifact["content_hash"] == source_hash
+    assert source_artifact["source_snapshot_ids"] == [source_identity["snapshot_id"]]
+
+    exact_contract = analysis_run_control._OPERATION_CONTRACTS[operation_id]
+    assert exact_contract["adapter_id"] == "ollama_model"
+    assert exact_contract["operation_semantics"] == (
+        "exact_source_structured_extraction"
+    )
+    assert analysis_run_control._DEFAULT_OPERATION_BY_ADAPTER["ollama_model"] == (
+        operation_id
+    )
 
 
 def test_t003g_validates_standalone_ledger_and_promotion_audit_variants(tmp_path):
