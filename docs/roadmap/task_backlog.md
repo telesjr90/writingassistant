@@ -6,8 +6,8 @@
 - Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
 - Latest accepted/closed application child: `PHASE8-IMPL-025-T006` (optional paid-integration foundation; real paid runtime deferred; T006G not executed)
 - Accepted implementation milestone with outstanding required real-execution gate: `PHASE8-IMPL-025-T004`
-- Immediate application frontier: `PHASE8-IMPL-025-T007` (planned; dependency-satisfied/eligible; not begun)
-- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; required dependencies T004 and T007)
+- Immediate application frontier: `PHASE8-IMPL-025-T007 — Evidence-bounded Ollama and Story Check` (planned; dependency-satisfied/eligible; not begun; single next application task)
+- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; hard dependencies T004 including T004G and T007 including T007E)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
@@ -16,13 +16,17 @@ This block is the current summary. All later backlog snapshots and “next task�
 statements are historical at the commits represented by their adjacent records
 unless explicitly classified as current.
 
+This file is a human-readable backlog view, not independent frontier authority.
+`docs/roadmap/roadmap_index.yaml` owns mutable status and dependencies;
+active task/inventory/enrichment records own detailed current work.
+
 Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
 and execution routing are paused as application gates without changing any task
 status, dependency, or frontier.
 
 # PHASE8-IMPL-026 Project Memory and Plan Integrity
 
-- Status: published/active as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature. Its implementation-gate role is currently paused and nonblocking under the accepted 2026-07-17 owner decision.
+- Status: complete/closed as a parallel governance, documentation, and developer infrastructure workstream. Not an application feature. Its implementation-gate role is paused and nonblocking under the accepted 2026-07-17 owner decision.
 - T001 decision: `docs/roadmap/decisions/PHASE8-IMPL-026-T001-project-memory-authority-lifecycle-provenance-foundation.md`.
 - Parent records: `docs/roadmap/tasks/PHASE8-IMPL-026.md`, `docs/roadmap/inventory/PHASE8-IMPL-026.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-026.enrichment.json`.
 - Application frontier: PHASE8-IMPL-025 T001-T003 implementation milestones are accepted and T005 is complete/PASS. T004 has an outstanding required current-layer real BookNLP validation gate. T006 is accepted/closed as the optional paid-integration foundation with real paid execution deferred. T007 is planned, dependency-satisfied/eligible, not begun, and next; T008 is planned and not begun.
@@ -46,10 +50,11 @@ status, dependency, or frontier.
 - Decision: `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
 - Parent records: `docs/roadmap/tasks/PHASE8-IMPL-025.md`, `docs/roadmap/inventory/PHASE8-IMPL-025.md`, and `docs/roadmap/enrichment/PHASE8-IMPL-025.enrichment.json`.
 - Owner authorization: official Subtxt/Dramatica is an optional paid integration. No paid subscription/token/API execution is required for the free/local MVP. The accepted official `subtxt` adapter remains distinct from the completed app-owned `subtxt_informed_rubric`, which cannot impersonate or silently replace it.
+- Dramatica-flow boundary: the app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary for wanted dramatica-flow-derived analysis concepts. External `dramatica_flow` is reference/provenance-only, not MVP-required, requires no runtime proof, and is not authorized for implementation or execution. Decision: `docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md`.
 - Supersession scope: later backlog entries that quote T019's former `OWNER-BLOCKED`, reference-only, licensing-open, or permission-reopening language are historical completion records only and are superseded for current planning; they must not limit PHASE8-IMPL-025 T005/T006.
 - Historical preservation: real spaCy, Ollama/qwen3:8b, Story Check, BookNLP, owner-selected NCP import, both app-owned rubrics, fusion, candidate-only persistence, grouped review, and T023A/T023B remain valid within their recorded scopes. These historical real runs do not prove current T002/T003 layered-path execution.
-- Immediate sequence: PHASE8-IMPL-025-T006 is accepted/closed as the optional paid-integration foundation; its real paid runtime is deferred. T004 current-layer real BookNLP validation is an unresolved required milestone before downstream acceptance relying on BookNLP. T007 is the next dependency-eligible frontier and remains planned/not begun; T008 remains planned and not begun.
-- Planned graph: T001 -> T002 -> T003 shared contracts; required T004 and T007 contributor branches join at T008; T005->T006 supplies optional official Subtxt input only when configured and available; parallel T009/T010/T011 integration branches follow; T012 joins them; terminal PHASE8-IMPL-027. Accepted additions are T003F live-run API/control plane, T003G persisted-data compatibility, optional provisioning/compatibility in T005/T006, T010H NCP/diagnostics UI, T011H live-run UI, and T012 layered deltas reusing PHASE8-IMPL-024-T008.
+- Immediate sequence: PHASE8-IMPL-025-T006 is accepted/closed as the optional paid-integration foundation; its real paid runtime is deferred. T004G current-layer real BookNLP validation is an unresolved required milestone before downstream acceptance relying on BookNLP. T007 is the next dependency-eligible frontier and remains planned/not begun; T007E supplies its required current-layer proof; T008 remains planned and not begun.
+- Planned graph: T001 -> T002 -> T003 shared contracts; required T004/T004G and T007/T007E contributor branches join at T008; T005->T006 supplies optional official Subtxt input only when configured and available; parallel T009/T010/T011 integration branches follow; T012 joins them; terminal PHASE8-IMPL-027. Accepted additions are T003F live-run API/control plane, T003G persisted-data compatibility, optional provisioning/compatibility in T005/T006, T010H NCP/diagnostics UI, T011H live-run UI, and T012 layered deltas reusing PHASE8-IMPL-024-T008.
 - NCP is primarily a gateway. Standard export contains approved context only; an optional candidate review bundle is separately labeled. Imported external `complete` status is source metadata, never local approval, and omitted fields are never deletions without explicit owner action.
 - Apply-promotion remains an isolated T012 suite and the only approved mutation path. No generated prose, automatic truth, automatic approval, automatic promotion, or direct tool/model Memory/Canon mutation is introduced.
 

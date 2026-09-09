@@ -5,6 +5,9 @@
 Published/planned and inactive. This is the single current terminal MVP gate.
 It activates only after PHASE8-IMPL-025 and PHASE8-IMPL-025-T012 are complete
 and passing. It does not replace or reopen historical closeout evidence.
+Current application authority and accepted PHASE8-IMPL-025-T012 evidence govern
+this gate; Project Memory freshness, Project Memory refresh, Plan Integrity,
+and execution-routing resolution are not application acceptance prerequisites.
 
 ## Goal
 
@@ -34,10 +37,13 @@ suite and does not authorize application implementation in this planning task.
   acceptance or closeout gate while the accepted 2026-07-17 pause decision
   remains current.
 
-External dramatica-flow remains owner-blocked unless its separate accepted
-reopening conditions are later met. The app-owned rubric remains a distinct
-capability. Candidate review, promotion, and apply-promotion boundaries remain
-explicit, audited, isolated, and owner-controlled.
+Official paid Subtxt is optional and requires no paid runtime execution for
+terminal acceptance. The app-owned `dramatica_flow_informed_rubric` is the
+approved MVP boundary for wanted dramatica-flow-derived analysis concepts.
+External `dramatica_flow` is reference/provenance-only for MVP, is not
+MVP-required, and requires no runtime proof. No external-runtime implementation
+or execution is authorized. Candidate review, promotion, and apply-promotion
+boundaries remain explicit, audited, isolated, and owner-controlled.
 
 ## Dependencies
 

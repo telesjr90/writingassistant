@@ -6,14 +6,18 @@
 - Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
 - Latest accepted/closed application child: `PHASE8-IMPL-025-T006` (optional paid-integration foundation; real paid runtime deferred; T006G not executed)
 - Accepted implementation milestone with outstanding required real-execution gate: `PHASE8-IMPL-025-T004`
-- Immediate application frontier: `PHASE8-IMPL-025-T007` (planned; dependency-satisfied/eligible; not begun)
-- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; required dependencies T004 and T007)
+- Immediate application frontier: `PHASE8-IMPL-025-T007 — Evidence-bounded Ollama and Story Check` (planned; dependency-satisfied/eligible; not begun; single next application task)
+- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; hard dependencies T004 including T004G and T007 including T007E)
 - Terminal MVP gate: `PHASE8-IMPL-027`
 - Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
 <!-- CURRENT-REPOSITORY-TRUTH:END -->
 
 This block is the current summary. Later phase snapshots remain historical at
 the commits they describe and do not establish the current frontier.
+
+This file is a human-readable dependency view only.
+`docs/roadmap/roadmap_index.yaml` owns mutable frontier, status, and dependency
+truth; active task/inventory/enrichment records own detailed current work.
 
 Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
 and execution routing remain preserved but are paused and nonblocking as
@@ -40,9 +44,10 @@ frontier changes under this policy.
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
 - Accepted architecture: parallel independent contributors plus sequential layers for source identity, raw extraction, immutable run evidence, interpretation, grounding/semantic guardrails, fusion, candidate review, explicit promotion, and the NCP gateway.
 - Owner Subtxt decision: official Subtxt/Dramatica is an optional paid integration under T005/T006, distinct from the completed app-owned `subtxt_informed_rubric`; no paid subscription/token/API execution is required for the free/local MVP, and no app-owned identity may impersonate or silently replace official `subtxt`.
+- Dramatica-flow decision: the app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary for wanted dramatica-flow-derived analysis concepts. External `dramatica_flow` is reference/provenance-only for MVP, not MVP-required, requires no runtime proof, and is not authorized for implementation or execution.
 - Preserved foundation: historical real spaCy, Ollama, Story Check, BookNLP, and NCP import; both app-owned rubrics; fusion; candidate-only persistence; grouped review; and T023A/T023B remain valid within their completed scopes. Historical real execution does not prove current layered-path execution.
-- Dependency boundary: PHASE8-IMPL-025-T004 current-layer real BookNLP validation remains required before downstream acceptance relying on BookNLP. T006 paid runtime is optional deferred debt. T007 is dependency-eligible and next; T008 waits for required T004 and T007 gates, not optional paid T006 execution.
-- Branched delivery map: T001 -> T002 -> T003; then required T004 and T007 branches join at T008, while T005->T006 supplies optional official Subtxt input when configured and available; T009/T010/T011 branch and join at T012; PHASE8-IMPL-027 is the terminal owner-acceptance/closeout gate. T003F/T003G, T010H, and T011H carry the accepted API, compatibility, NCP/diagnostics UI, and live-run UI obligations.
+- Dependency boundary: PHASE8-IMPL-025-T004G current-layer real BookNLP validation remains required before downstream acceptance relying on BookNLP. T006 paid runtime is optional deferred debt. T007 is dependency-eligible and next, with T007E owning its current-layer proof; T008 waits for the required T004/T004G and T007/T007E gates.
+- Branched delivery map: T001 -> T002 -> T003; then T007 plus outstanding T004G -> T008; T005->T006 supplies optional official Subtxt input only when configured and available; T009/T010/T011 branch after T008 and join at T012; PHASE8-IMPL-027 is the terminal owner-acceptance/closeout gate. T003F/T003G, T010H, and T011H carry the accepted API, compatibility, NCP/diagnostics UI, and live-run UI obligations.
 - Read-only/safety boundary: project-level diagnostics never settle truth; review status alone never changes canon; apply-promotion is isolated; no generated prose or automatic truth/promotion/Memory-Canon mutation is authorized.
 
 # PHASE8 Owner Override: AI Tool-Assisted OMI Analysis Required Before MVP Closeout

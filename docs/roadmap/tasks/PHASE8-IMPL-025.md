@@ -33,6 +33,9 @@ Controlling decision:
 Controlling Subtxt/MVP scope reconciliation:
 `docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md`.
 
+Controlling dramatica-flow/MVP scope reconciliation:
+`docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md`.
+
 Controlling T001 contract:
 `docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md`.
 
@@ -59,7 +62,9 @@ their recorded scopes and must not be erased or described as failed:
   findings;
 - app-owned `subtxt_informed_rubric` and
   `dramatica_flow_informed_rubric` contracts, evaluators, adapters, and manual
-  validation;
+  validation; `dramatica_flow_informed_rubric` is the approved MVP boundary
+  for wanted dramatica-flow-derived analysis concepts and is not evidence that
+  the external runtime ran;
 - deterministic normalized IDs, fingerprints, duplicate/conflict/uncertainty
   metadata, candidate-only persistence, and grouped review;
 - `PHASE8-IMPL-023-T023A` and T023B.
@@ -259,8 +264,9 @@ Accepted-foundation/deferred-runtime record:
   discovery, configuration, preflight accuracy, timeout behavior, output
   validation, and one bounded real-input operation when the optional paid
   runtime is separately authorized and available. Protected runtime assets
-  remain outside authoritative tracked records; external dramatica-flow stays
-  owner-blocked and the app-owned rubric remains a separate identity.
+  remain outside authoritative tracked records; external `dramatica_flow`
+  remains reference/provenance-only for MVP and the app-owned rubric remains a
+  separate identity.
 
 Official/full Subtxt and `subtxt_informed_rubric` remain separate identities.
 Subtxt findings remain pending, non-canon, owner-review-required, and unable to
@@ -304,7 +310,10 @@ Status: `planned`; not begun; depends on T004 and T007. T004 retains its
 accepted implementation milestone and required real-execution gate. The shared
 guardrail and integration layer waits for every MVP-required free/local
 contributor branch and its required real current-layer output. Optional paid
-official Subtxt absence does not block T008 or MVP acceptance.
+official Subtxt absence does not block T008 or MVP acceptance. The app-owned
+`dramatica_flow_informed_rubric` participates within its accepted internal
+scope; the external `dramatica_flow` runtime is not an MVP dependency and
+requires no T008 execution or proof.
 
 - `T008A` — Shared guardrail input/result contract and execution ordering.
 - `T008B` — Classification of Ollama, Story Check, NCP, Subtxt, and rubric
@@ -462,19 +471,30 @@ T011H waits for T003F and the completed PHASE8-IMPL-024 component foundation.
 T009, T010, and T011 join at T012.
 T012 must pass before terminal PHASE8-IMPL-027 acceptance.
 
+The external `dramatica_flow` runtime is not part of this execution graph or
+the T007, T008, T012, or PHASE8-IMPL-027 acceptance path. Its upstream identity
+is reference/provenance only for MVP. No implementation or execution is
+authorized; any future integration requires a separate explicit owner
+authorization and analysis-only safety review.
+
 No parallel execution may bypass source identity, manifest, evidence-ledger,
 allowlist/blocklist, compatibility, guardrail, or owner-review dependencies.
 This graph has no all-serial T004-through-T011 chain and no circular edge.
 
+## Resolved dramatica-flow MVP boundary
+
+The app-owned `dramatica_flow_informed_rubric` is the approved application/MVP
+boundary for permitted analysis-only concepts, rules, and structural reasoning
+derived from `ydsgangge-ux/dramatica-flow` at the observed upstream commit
+`3a6fa55e84a8248e596527f0a5013748945a6cb8`. It must never be represented as
+evidence that the external runtime ran. The external runtime is not
+MVP-required, and no external runtime proof is required.
+
+Historical T020B remains unchanged. The controlling 2026-09-08 owner decision
+resolves only the later MVP-classification question.
+
 ## Pending owner decisions
 
-- External `dramatica_flow` requires
-  `OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION`.
-  T020B currently blocks/reference-limits the external runtime, while the
-  newer completion rule requires real execution for every MVP-required
-  external integration. The owner must decide whether external
-  `dramatica_flow` remains MVP-required before any implementation or execution.
-  The app-owned `dramatica_flow_informed_rubric` is not equivalent evidence.
 - T003D/T003G require owner review only if retention/deletion or physical
   migration changes owner-visible stored structures.
 - T010H preserves later decisions for export destination, retention/deletion,

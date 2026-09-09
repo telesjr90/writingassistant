@@ -1,34 +1,39 @@
 # Dramatica-Informed Writing Assistant
 
-Dramatica-Informed Writing Assistant is a local-first writing assistant for structural narrative analysis. It is Dramatica-informed, uses Narrative Context Protocol (NCP) and storyform context as its structural backbone, and helps a writer inspect narrative coherence without taking over authorship.
+Dramatica-Informed Writing Assistant is a local-first, analysis-only writing
+workspace. It stores and organizes owner-authored material, runs bounded
+structural and continuity analysis, and presents evidence- and
+provenance-backed candidates for explicit owner review.
 
-This is an analysis-only tool, not a prose generation tool.
+It is not a co-writer. It must never generate, rewrite, continue, imitate,
+polish, improve, or expand story prose.
 
-## Implementation Policy
+## Start here
 
-Implementation-only mode is active. Project Memory is preserved but paused as
-an application implementation, validation, acceptance, and closeout gate under
-the accepted owner decision in
-`docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`.
-Ordinary application work uses current owner decisions, roadmap/task documents,
-tracked application sources and tests, saved context outputs, and focused direct
-reads. Product safety and Git safety remain unchanged.
+This README is onboarding guidance, not roadmap or status authority.
 
-## MVP Status
+- Durable product and MVP contract: [`PRODUCT.md`](PRODUCT.md)
+- Implementation and safety policy: [`AGENTS.md`](AGENTS.md)
+- Current machine-readable roadmap state:
+  [`docs/roadmap/roadmap_index.yaml`](docs/roadmap/roadmap_index.yaml)
+- Detailed current work: the active task, inventory, and enrichment records
+  referenced by the roadmap index
+- Scoped owner decisions: [`docs/roadmap/decisions/`](docs/roadmap/decisions/)
 
-The App MVP is local-ready with notes.
+Historical plans, snapshots, pass counts, and old “next task” statements do not
+define the current frontier.
 
-- Tag: `app-mvp-local-ready`
-- Backend validation: `176 passed`
-- Frontend validation: `npm run build` passed with the existing non-blocking Vite large-chunk warning
-- GitHub roadmap: labels, milestones, and post-MVP issues exist for follow-up work
-- Fine-tuning remains separate from MVP
-- Optional extractors remain post-MVP
-- Future apply-promotion behavior remains separate and unimplemented
+## Safety model
 
-The app does not claim full Dramatica verifier parity. It provides bounded, candidate diagnostics and requires insufficient-evidence handling when the current project context does not support a confident claim.
-
-## Non-Negotiable Boundary
+- Owner-authored prose may be stored, edited, saved, and organized.
+- Analysis findings remain evidence-backed candidates until the owner acts.
+- Confidence, queue presence, review status, and promotion records do not make a
+  candidate Canon.
+- Promotion records are audit records only.
+- Approved project truth can change only through the implemented, separate,
+  explicit, confirmed, and audited apply-promotion workflow.
+- Raw model, extractor, rubric, or reference output never becomes approved
+  Memory/Canon automatically.
 
 Standard refusal message:
 
@@ -36,215 +41,108 @@ Standard refusal message:
 I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose.
 ```
 
-The app must not:
+## Architecture at a glance
 
-- generate story prose
-- rewrite story prose
-- continue story prose
-- imitate style
-- polish or improve prose
-- silently promote candidate analysis into project truth
+- Backend: Python FastAPI under `backend/`
+- Frontend: React/Vite under `frontend/`
+- Project-local storage under `projects/`
+- Local inference: Ollama with the accepted `qwen3:8b` path
+- Analysis pipeline: stable source identity and hashes, immutable manifests and
+  raw artifacts, evidence ledger, normalization, deterministic fusion,
+  candidate persistence, grouped review, promotion audit, and explicit
+  apply-promotion
+- NCP: supported local/schema gateway within its accepted roadmap scope
+- App-owned deterministic contributors, including
+  `dramatica_flow_informed_rubric`
 
-Story Check output is candidate diagnostics only. Raw model output, NotebookLM output, optional extractor output, and retrieved definitions are candidate or reference material only. Owner-approved truth remains separate from candidate analysis.
+The app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary for
+permitted analysis-only concepts and structural reasoning derived from the
+upstream reference. It is not the external `dramatica_flow` runtime and is not
+evidence that that runtime ran. The external runtime is not MVP-required.
 
-## Current MVP Features
-
-- Local FastAPI backend
-- React/Vite frontend
-- File-based local project storage
-- Scene editor with save and dirty-state behavior
-- Bible and storyform JSON read/write through explicit owner saves
-- Story Check
-- Normalized rich diagnostics sidebar
-- Insufficient-evidence handling
-- Request and output guardrails for the no-prose boundary
-- Mock mode for deterministic Story Check demos and tests
-- qwen3/Ollama baseline mode
-- Bounded OMI workflow:
-  - raw ideas
-  - structured candidates
-  - owner decisions
-  - destinations
-  - provenance and status display
-  - promotion records only
-  - no durable truth mutation
-
-## Architecture
-
-- Backend: Python FastAPI in `backend/`
-- Frontend: React/Vite in `frontend/`
-- Local inference: Ollama
-- Current baseline model: `qwen3:8b`
-- Future target model: `dramatica-analyst:8b`
-- Structural context: NCP/storyform-informed project context
-- Storage: local files under `projects/`
-
-`dramatica-analyst:8b` is a future target only. It should not be treated as locally available or production-ready until a non-smoke fine-tuned model passes evaluation gates and is explicitly imported into Ollama.
+Official paid Subtxt/Dramatica is optional. See `PRODUCT.md` and the accepted
+decision records for the required, optional, and deferred integration policy.
 
 ## Prerequisites
 
-- WSL/Ubuntu recommended
-- Python virtual environment used by this project: `.venv-unsloth-clean`
-- Node target from project docs: `>=22.12.0 <23`
-- `npm`
-- Ollama is optional for baseline mode
-- `qwen3:8b` is optional for live baseline mode
+- WSL/Ubuntu is recommended.
+- Use the repository's existing Python environment; do not install or replace
+  dependencies unless the active task explicitly authorizes it.
+- The documented Node target is `>=22.12.0 <23`.
+- `npm` is required for frontend development.
+- Ollama and `qwen3:8b` are required for the accepted real local MVP contributor
+  path, but mock mode remains available for deterministic development and
+  regression checks.
 
-Mock mode does not require Ollama or `qwen3:8b`.
+## Local development
 
-## Quick Start: Mock Mode
+Run commands from the repository root.
 
-From the project root:
+Mock backend:
 
 ```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication
-
 ANALYSIS_MODE=mock \
-.venv-unsloth-clean/bin/python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+.venv-unsloth-clean/bin/python -m uvicorn backend.main:app \
+  --reload --host 0.0.0.0 --port 8000
 ```
 
-In another terminal:
+Frontend, in another terminal from the repository root:
 
 ```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication/frontend
-npm run dev
+npm --prefix frontend run dev
 ```
 
-Open:
+Open `http://localhost:5173`.
 
-```text
-http://localhost:5173
-```
-
-## Quick Start: qwen3/Ollama Baseline Mode
-
-If Ollama is running on Windows and the app is running from WSL, find the Windows host gateway and check Ollama:
+For the local Ollama path, set the accepted runtime configuration before
+starting the backend:
 
 ```bash
-WINDOWS_HOST=$(ip route | awk '/default/ {print $3}')
-curl http://$WINDOWS_HOST:11434/api/tags
-```
-
-Then start the backend with the explicit Ollama baseline configuration:
-
-```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication
-
-OLLAMA_BASE_URL="http://$WINDOWS_HOST:11434" \
+OLLAMA_BASE_URL=http://localhost:11434 \
 ANALYSIS_MODE=ollama_baseline \
 OLLAMA_MODEL=qwen3:8b \
-.venv-unsloth-clean/bin/python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+.venv-unsloth-clean/bin/python -m uvicorn backend.main:app \
+  --reload --host 0.0.0.0 --port 8000
 ```
 
-Start the frontend separately:
+Environment-specific host routing may require a different
+`OLLAMA_BASE_URL`. Follow the active task's preflight and runtime instructions
+when validating an integration.
+
+## Validation
+
+Use the commands required by the active task. The ordinary application-only
+backend suite, when a broad run is warranted, is:
 
 ```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication/frontend
-npm run dev
-```
-
-Open:
-
-```text
-http://localhost:5173
-```
-
-## Tests
-
-Backend:
-
-```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication
 python3 -m pytest -q tests --ignore=tests/project_memory
 ```
 
-Frontend build:
+The frontend build command is:
 
 ```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication/frontend
-npm run build
+npm --prefix frontend run build
 ```
 
-The frontend build currently passes with a known non-blocking Vite large-chunk warning.
+Fixtures and mocks are regression evidence; they do not prove a required real
+integration edge.
 
-## Evaluation Harness
-
-Offline Story Check baseline evaluation:
-
-```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication
-
-.venv-unsloth-clean/bin/python training/scripts/run_story_check_baseline_eval.py \
-  --fixtures-dir tests/fixtures/story_check \
-  --output /tmp/story_check_baseline_eval.json \
-  --pretty
-```
-
-This harness uses app-level fixtures under `tests/fixtures/story_check/`. They are not training data and are not part of `training/data` or `dataset_manifest.json`.
-
-## OMI Safety Notes
-
-OMI means Organize My Idea. In this MVP it is bounded to candidate planning material only.
-
-- OMI candidates are not project truth.
-- Promotion records are records only.
-- Apply-promotion behavior is not implemented.
-- OMI cannot write scenes or rewrite prose.
-- OMI does not call model paths for candidate generation in the current MVP.
-- Future truth mutation workflows require owner approval, destination choice, provenance, evidence where required, safe target validation, and final confirmation.
-
-OMI promotion records do not mutate `bible.json`, `storyform.json`, `scenes/`, `project.json`, owner memory, training data, or `dataset_manifest.json`.
-
-## Project Structure
+## Repository layout
 
 ```text
-backend/                 FastAPI backend, analysis modes, guardrails, project storage helpers
+backend/                 FastAPI backend and analysis pipeline
 frontend/                React/Vite frontend
 projects/example/        Local example project fixture
-docs/                    Project plans and public documentation
-docs/roadmap/            MVP, OMI, extractor, tooling, and post-MVP roadmap docs
-tests/                   Backend and app-level validation fixtures
-training/scripts/        Evaluation and training utility scripts
-training/reports/        Ignored/local-only reports
-training/data/           Excluded from app MVP docs and not modified by app validation
+docs/                    Product, roadmap, decisions, and reference documents
+tests/                   Backend and application validation fixtures
+training/                Separately governed deferred training/evaluation work
 ```
 
-## License and Provenance
+## License and provenance
 
 The MIT License applies to app source code only.
 
-Training data, book sources, packet evidence, datasets, model artifacts, raw source text, training runs, checkpoints, and outputs are excluded pending separate provenance, copyright, license, and owner review.
-
-Do not commit raw book/source text, secrets, virtual environments, caches, or generated model artifacts.
-
-## Post-MVP Roadmap
-
-Post-MVP work is tracked in GitHub Issues with labels and milestones. The first issues to review are:
-
-- Issue #1: apply-promotion workflow design for approved OMI candidates
-- Issue #2: apply-promotion safety tests before any truth mutation
-
-Other post-MVP areas include:
-
-- apply-promotion workflow design and safety tests
-- frontend test runner setup
-- README and documentation polish
-- optional extractor research
-- fine-tuning dataset gate review
-- RunPod/cloud training preparation
-- GGUF export and Ollama import planning
-- future `dramatica-analyst:8b` only after non-smoke evaluation passes
-
-Optional extractors are candidate-only research. They must route through OMI candidates, preserve provenance, avoid direct truth mutation, and never generate story prose.
-
-## Configuration Notes
-
-`.env.example` documents the main local settings:
-
-```text
-ANALYSIS_MODE=ollama_baseline
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen3:8b
-```
-
-Use `ANALYSIS_MODE=mock` for deterministic local Story Check demos and tests without Ollama. Use `ANALYSIS_MODE=ollama_baseline` with `OLLAMA_BASE_URL` and `OLLAMA_MODEL=qwen3:8b` for the current live baseline mode.
+Training data, book sources, packet evidence, datasets, model artifacts, raw
+source text, training runs, checkpoints, and outputs require their own
+provenance, copyright, license, and owner review. Do not commit raw book/source
+text, secrets, virtual environments, caches, or generated model artifacts.

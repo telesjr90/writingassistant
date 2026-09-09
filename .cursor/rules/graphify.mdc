@@ -1,44 +1,22 @@
 ---
-description: Use Graphify knowledge graphs before broad project search.
+description: Restrict Graphify to explicitly authorized context-generation tasks.
 alwaysApply: true
 ---
 
-# Graphify Context Rule
+# Graphify context rule
 
-Use Graphify before asking Cursor to scan broad raw directories. Prefer task-specific Graphify queries before broad file search or large edits.
+This rule is subordinate, in order, to `AGENTS.md`, current explicit owner
+decisions, and current roadmap/task authority.
 
-## Fallback behavior
+Do not use Graphify automatically for repository navigation, implementation,
+documentation, validation, acceptance, or closeout. Do not run `graphify
+update` after ordinary code or documentation changes.
 
-Graphify is helpful but not mandatory.
+Use Graphify only when the owner explicitly authorizes a context-generation
+task or explicitly invokes `/graphify`. Stay within the task's declared input
+and output scope. Graphify output is generated navigation evidence, never
+product truth, roadmap authority, implementation proof, or acceptance evidence.
 
-Use Graphify only if it is directly available from the WSL shell.
-
-If `graphify query` is unavailable or does not return usable output from the WSL shell, do not debug Graphify during the task.
-
-Report the fallback briefly and continue with targeted reads of the task-listed files.
-
-Do not inspect MCP descriptors or Cursor internal tool metadata to discover Graphify.
-
-Graph reports may exist at:
-
-```text
-docs/graphify-out/GRAPH_REPORT.md
-backend/graphify-out/GRAPH_REPORT.md
-frontend/src/graphify-out/GRAPH_REPORT.md
-tests/graphify-out/GRAPH_REPORT.md
-```
-
-Graph JSON files may exist under matching `graphify-out/graph.json` folders.
-
-To query a graph, first `cd` into the mapped folder, then run `graphify query`:
-
-```bash
-cd /home/tjrpirateking/projects/WritingAssistantApplication/docs
-graphify query "Which roadmap specs define approved memory canon pages and OMI candidate boundaries?"
-```
-
-Use `graphify path "<A>" "<B>"` for relationship questions and `graphify explain "<concept>"` for focused concepts when those are more direct than a query.
-
-Do not require reading huge raw directories before checking Graphify reports or queries. If Graphify is missing, there is no `graphify-out/graph.json`, or a query fails, report the failure and continue conservatively with targeted source-of-truth file reads.
-
-After modifying runtime code files, run `graphify update .` to keep the graph current when Graphify is available. Documentation/configuration-only tasks do not require graph updates.
+If an authorized Graphify operation is unavailable or fails, follow the task's
+fallback instructions. Do not broaden scope or debug context infrastructure
+during ordinary work.

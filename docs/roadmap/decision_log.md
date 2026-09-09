@@ -1,11 +1,31 @@
 # Decision Log
 
+This file indexes accepted decisions and preserves chronological summaries. It
+does not define the current frontier, task status, or dependencies. Use
+`docs/roadmap/roadmap_index.yaml` and active task/inventory/enrichment records
+for current work. A later decision supersedes only the exact earlier claim it
+names.
+
+## Current decision index
+
+- Project Memory paused/nonblocking for ordinary application work:
+  `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`.
+- Real-tool completion requires contract, real application adapter, and bounded
+  current-layer real execution for each MVP-required external integration:
+  `docs/roadmap/decisions/2026-09-07-real-tool-execution-required-for-tool-integration-completion.md`.
+- Official Subtxt/Dramatica is optional paid integration and not an MVP real-call
+  prerequisite:
+  `docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md`.
+- The app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary;
+  external `dramatica_flow` is reference/provenance-only and not MVP-required:
+  `docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md`.
+
 ## Accepted Decisions
 
-Entries preserve the accepted state at the commit/time they document. The first
-applicable current entry and explicit supersession notices control current
-planning; older “next task” language is historical and must not be used as the
-current frontier.
+Entries below preserve the accepted state at the commit/time they document.
+Explicit later decisions control only their scoped supersession. All older
+“next task” language is historical and must not be used as the current
+frontier.
 
 - PHASE8-IMPL-024-T008 application closeout validation and PHASE8-IMPL-024
   parent closeout: accepted/current at

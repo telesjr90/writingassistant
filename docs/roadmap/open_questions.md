@@ -1,22 +1,11 @@
-# Open Questions — Current Repository Truth
+# Open Questions
 
-<!-- CURRENT-REPOSITORY-TRUTH:START -->
-- Latest closed application parent: `PHASE8-IMPL-024` (complete/closed as complete/PASS)
-- Active application parent: `PHASE8-IMPL-025`
-- Accepted layered-control milestone: `PHASE8-IMPL-025-T003` (implementation accepted)
-- Latest accepted/closed application child: `PHASE8-IMPL-025-T006` (optional paid-integration foundation; real paid runtime deferred; T006G not executed)
-- Accepted implementation milestone with outstanding required real-execution gate: `PHASE8-IMPL-025-T004`
-- Immediate application frontier: `PHASE8-IMPL-025-T007` (planned; dependency-satisfied/eligible; not begun)
-- Later child: `PHASE8-IMPL-025-T008` (planned; not begun; required dependencies T004 and T007)
-- Terminal MVP gate: `PHASE8-IMPL-027`
-- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
-<!-- CURRENT-REPOSITORY-TRUTH:END -->
+This file records unresolved questions and preserves resolved question history.
+It does not define the current frontier, task status, or dependencies. Use
+`docs/roadmap/roadmap_index.yaml` and its active task/inventory/enrichment
+records for current work. Accepted decisions own their scoped resolutions.
 
-This block is the current summary. Numbered questions retain chronological
-evidence; resolved or superseded “next” claims are historical and cannot set the
-current frontier.
-
-161. Does external `dramatica_flow` remain an MVP-required external integration, and if so, what explicit implementation/execution authority supersedes or revises T020B's current blocked/reference-limited runtime decision? **`OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION`.** The app-owned `dramatica_flow_informed_rubric` is a distinct internal implementation and is not evidence of external dramatica-flow execution. This unresolved authority question does not block documentation reconciliation for other tools.
+161. ~~Does external `dramatica_flow` remain an MVP-required external integration, and if so, what explicit implementation/execution authority supersedes or revises T020B's current blocked/reference-limited runtime decision?~~ **Resolved by the 2026-09-08 owner decision:** the app-owned `dramatica_flow_informed_rubric` is the approved application/MVP boundary for wanted dramatica-flow-derived analysis concepts. External `dramatica_flow` is reference/provenance-only for MVP, is not MVP-required, requires no runtime proof, and is not authorized for implementation or execution. The app-owned rubric is not evidence that the external runtime ran. Historical T020B remains unchanged. See `docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md`.
 
 147. What exact owner-correction and candidate merge/split lifecycle should PHASE8-IMPL-025-T011 use for approve, reject, needs-more-evidence, merge, split, rename, source-link correction, supersession, owner-authored correction, and selected-source rerun while keeping review status non-canon and promotion separate?
 

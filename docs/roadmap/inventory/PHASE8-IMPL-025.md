@@ -16,6 +16,8 @@
   `docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md`
   and
   `docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md`
+  and
+  `docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md`
 - Completed child: `PHASE8-IMPL-025-T001` (`complete/PASS`)
 - Completed child: `PHASE8-IMPL-025-T002` (`complete/PASS`)
 - Completed child: `PHASE8-IMPL-025-T003` (`complete/PASS`), implementation
@@ -51,6 +53,11 @@
   supplemental, deterministic, and distinct from official/full Subtxt.
 - The required MVP path is free/local; no paid subscription, token, or
   official Subtxt API execution is required for MVP.
+- The app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary
+  for wanted dramatica-flow-derived analysis concepts.
+- External `dramatica_flow` is reference/provenance-only for MVP, is not
+  MVP-required, requires no runtime proof, and is not authorized for
+  implementation or execution.
 - All analysis-only, no-prose, candidate-only, provenance, owner-review,
   promotion, apply-promotion, and Memory/Canon boundaries remain in force.
 
@@ -62,7 +69,9 @@
    grounding repair complete/PASS.
 4. Real BookNLP character/location findings and compatibility repair.
 5. Explicit owner-selected NCP JSON candidate import validation.
-6. App-owned Subtxt-informed and dramatica-flow-informed rubrics.
+6. App-owned Subtxt-informed and dramatica-flow-informed rubrics; the latter is
+   the approved MVP boundary for wanted dramatica-flow-derived analysis and is
+   not evidence of external runtime execution.
 7. Deterministic fusion IDs/fingerprints, duplicate/conflict/uncertainty.
 8. Candidate-only persistence.
 9. Grouped owner review; T023A/T023B complete/PASS.
@@ -116,7 +125,8 @@ validation is pending.
    frontier).
 8. `PHASE8-IMPL-025-T008` — Cross-adapter semantic guardrails (`planned`; not
    begun; awaits required T004 and T007 gates; optional Subtxt absence does not
-   block acceptance).
+   block acceptance; external `dramatica_flow` is not a dependency or required
+   runtime proof).
 9. `PHASE8-IMPL-025-T009` — Read-only project-level narrative diagnostics.
 10. `PHASE8-IMPL-025-T010` — Full NCP gateway.
 11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion.
@@ -153,7 +163,9 @@ validation remains isolated. T007 is the next dependency-eligible frontier and
 remains planned/not begun. T008 remains not begun and waits for required T004
 real-execution completion plus T007. Optional official Subtxt output may
 participate when configured and available, but its absence does not block T008
-or MVP acceptance.
+or MVP acceptance. The app-owned `dramatica_flow_informed_rubric` participates
+within its accepted internal scope; external `dramatica_flow` is not part of
+the T007/T008/T012/PHASE8-IMPL-027 execution or proof path.
 
 ## Open technical questions
 
@@ -165,11 +177,10 @@ or MVP acceptance.
 - NCP schema/mapping versions and trusted round-trip rules.
 - Project-level diagnostic context contract.
 - Owner correction and merge/split lifecycle.
-- Whether external `dramatica_flow` remains an MVP-required external
-  integration despite T020B's owner-blocked/reference-only runtime authority;
-  `OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION`.
 
-Authorization and licensing are not open questions.
+Subtxt authorization/licensing and external `dramatica_flow` MVP classification
+are not open questions. Historical T020B remains unchanged; the 2026-09-08
+owner decision resolves the later classification question.
 
 ## Safety inventory
 

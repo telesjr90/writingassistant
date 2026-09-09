@@ -1,335 +1,80 @@
-# CLAUDE.md — Dramatica-Informed Writing Assistant
+# Claude client guidance
 
-## Project identity
+This file is a thin Claude-specific overlay. It does not define product scope,
+the current frontier, task status, dependencies, or acceptance.
 
-Working directory:
+Before acting, follow this authority order:
 
-`/home/tjrpirateking/projects/WritingAssistantApplication`
+1. [`AGENTS.md`](AGENTS.md) for repository implementation, safety, validation,
+   file-scope, and Git policy;
+2. current explicit owner decisions; and
+3. current roadmap/task authority, starting with
+   [`docs/roadmap/roadmap_index.yaml`](docs/roadmap/roadmap_index.yaml) and the
+   active task, inventory, and enrichment records it references.
 
-Repository:
+[`PRODUCT.md`](PRODUCT.md) is the durable human-readable product/MVP contract.
+Accepted decision records own their scoped decisions. Historical plans,
+completed task records, generated context, client configuration, and old “next”
+statements are reference evidence only and do not override the authority above.
 
-`telesjr90/writingassistant`
+## Product boundary
 
-Working product name:
+The application is local-first, owner-controlled, and analysis-only. It may
+store, edit, and organize owner-authored prose and project materials. Claude
+must never write, rewrite, continue, imitate, polish, improve, expand, outline,
+draft, revise, or otherwise generate story prose.
 
-`Dramatica-Informed Writing Assistant`
-
-The near-term roadmap is **not Dramatica-first**. The current priority is the **Pre-Dramatica Project Workspace Foundation**.
-
-The app should first become a usable local writing-project workspace:
-
-1. Create projects.
-2. Select projects from a library.
-3. Create projects through OMI-guided idea capture.
-4. Organize chapters, scenes, notes, and materials.
-5. Store and edit owner-authored prose.
-6. Show Project Overview, Chapters/Scenes, Notes/Materials, OMI Ideas/Candidates, and Project Memory/Canon pages.
-7. Keep pending candidates visibly separate from approved project truth.
-
-Dramatica/NCP analysis is a later advanced layer.
-
-## Non-negotiable product boundary
-
-This product is analysis-only.
-
-The app may store, edit, and organize owner-authored prose, notes, research, references, metadata, and materials.
-
-The AI must never:
-
-* write story prose
-* rewrite story prose
-* continue story prose
-* imitate style
-* polish prose
-* improve prose
-* expand a scene
-* generate dialogue
-* generate chapters
-* generate story passages
-
-Standard refusal message:
+Use the standard refusal message when applicable:
 
 `I can analyze structure and ask diagnostic questions, but I cannot write or rewrite story prose.`
 
-## Candidate/canon boundary
-
-Never treat model output, OMI output, NotebookLM output, extractor output, reference material, or generated summaries as approved truth.
-
-Important distinctions:
-
-* Owner-authored source material is source/evidence, not canon by default.
-* OMI raw ideas are owner input, not canon.
-* OMI candidates are candidate planning records, not canon.
-* Approved candidates are still not durable memory/canon until future apply-promotion explicitly applies them.
-* Promotion records are audit records only, not canon by themselves.
-* Applied memory/canon must require explicit owner-controlled future promotion.
-* Pending, rejected, archived, and needs-revision candidates are not canon.
-* Notes/materials are not training data by default.
-* Reference/copyrighted material is not owner-authored story truth unless explicitly marked by a future owner-controlled policy.
-
-## Current architecture
-
-Backend:
-
-* Python FastAPI
-* Local project files under `projects/{project_id}/`
-* Ollama-backed Story Check path through `backend/analysis_engine.py`
-* Current baseline model: `qwen3:8b`
-* Mock mode exists through `ANALYSIS_MODE=mock`
-
-Frontend:
-
-* React/Vite
-* Existing editor/sidebar style interface
-* Existing OMI panel slice
-* Future workspace pages are being documented before implementation
-
-Project docs:
-
-* `docs/master_plan.md`
-* `docs/plan.md`
-* `docs/roadmap/*`
-
-Important roadmap specs include:
-
-* `docs/roadmap/project_workspace_foundation_spec.md`
-* `docs/roadmap/project_creation_flow_spec.md`
-* `docs/roadmap/project_selector_library_spec.md`
-* `docs/roadmap/omi_guided_project_creation_spec.md`
-* `docs/roadmap/chapter_scene_data_model_spec.md`
-* `docs/roadmap/notes_materials_data_model_spec.md`
-* `docs/roadmap/user_authored_document_editor_workflow_spec.md`
-* `docs/roadmap/project_overview_page_spec.md`
-* `docs/roadmap/chapters_scenes_page_spec.md`
-* `docs/roadmap/notes_materials_page_spec.md`
-* `docs/roadmap/project_memory_canon_page_structure_spec.md`
-* `docs/roadmap/omi_storage_model.md`
-* `docs/roadmap/omi_mvp_schema_lifecycle.md`
-* `docs/roadmap/omi_story_knowledge_candidate_expansion.md`
-* `docs/roadmap/project_memory_canon_storage_model.md`
-* `docs/roadmap/writer_assistant_core_candidate_schemas.md`
-* `docs/roadmap/task_backlog.md`
-* `docs/roadmap/phase_map.md`
-* `docs/roadmap/open_questions.md`
-* `docs/roadmap/risk_register.md`
-* `docs/roadmap/decision_log.md`
-* `docs/roadmap/mvp_completion_test_matrix.md`
-
-## Default task mode
-
-Default to documentation-only unless the user explicitly asks for implementation.
-
-For documentation-only tasks:
-
-Do not modify:
-
-* backend runtime code
-* frontend runtime code
-* tests
-* package/dependency files
-* dataset files
-* JSONL files
-* training/data/dataset_manifest.json
-* runtime project files under `projects/`
-* OMI runtime records
-* memory/canon runtime files
-
-Do not run:
-
-* training
-* fine-tuning
-* Ollama/live model calls
-* package installs
-
-Do not stage, commit, or push unless the user explicitly asks.
-
-For each documentation task, create or update only the requested roadmap docs and related planning docs.
-
-Local reports under `training/reports/` are expected to be ignored by Git unless specifically whitelisted.
-
-## Required safety checks for documentation tasks
-
-Before final response, run:
-
-```bash
-git status --short --branch
-git diff --stat
-git diff --check
-git diff --cached --name-only
-```
-
-If runtime code, tests, dependency files, dataset files, JSONL files, runtime project files, OMI records, or memory/canon files were modified by mistake, stop and report BLOCKED.
-
-## Documentation task final response format
-
-Use this format unless the user gives a different one:
-
-1. Result:
-
-   * PASS / BLOCKED / PARTIAL
-
-2. Files created/modified:
-
-   * list every file
-   * include local report path
-
-3. Main spec summary:
-
-   * summarize the target
-
-4. Key model/flow decisions:
-
-   * summarize core recommendations
-
-5. Safety boundaries:
-
-   * summarize no-prose, candidate/canon, no-silent-promotion boundaries
-
-6. API/UI planning:
-
-   * summarize future route groups and frontend components, if applicable
-
-7. Future tests:
-
-   * summarize key future test categories
-
-8. Roadmap updates:
-
-   * summarize docs updated and why
-
-9. Deferred decisions:
-
-   * list what remains open
-
-10. Safety confirmations:
-
-* no backend runtime code changed
-* no frontend runtime code changed
-* no tests changed
-* no package/dependency files changed
-* no dataset files changed
-* no JSONL/training records created
-* dataset_manifest.json unchanged
-* no training/fine-tuning run
-* no Ollama/live model call
-* no packages installed
-* no Dramatica-specific logic implemented
-* no runtime project files created
-* no OMI records created
-* no memory/canon files created when applicable
-* no staging/commit
-
-11. Recommended next task:
-
-* recommend review/commit if PASS, otherwise recommend smallest corrective task
-
-## Commit policy
-
-Do not commit automatically.
-
-When the user asks for commit commands, provide commands rather than committing.
-
-Use this pattern:
-
-```bash
-git status --short --branch
-git diff --stat
-git diff --name-only
-git diff --check
-git add <explicit expected files only>
-git status --short
-git diff --cached --stat
-git diff --cached --check
-git commit -m "<message>"
-git status --short --branch
-git log -1 --oneline
-```
-
-Never stage ignored local reports unless the user explicitly asks.
-
-## OpenCode Go model routing (for MVP implementation)
-
-Remaining MVP implementation (T014–T026) uses **OpenCode Go** as the coding-agent platform, running in the Cursor integrated terminal.
-
-- Docs/status/small scoped edits: `opencode-go/deepseek-v4-flash`.
-- Runtime adapters/debugging: `opencode-go/minimax-m3`, `opencode-go/kimi-k2.7-code`, or `opencode-go/deepseek-v4-pro`.
-- Final review/hard blockers: `opencode-go/deepseek-v4-pro` or `opencode-go/minimax-m3`.
-- Excluded: OpenAI, Anthropic, Google, GPT, Claude, Gemini, Google-hosted Gemma.
-
-Decision record: `docs/roadmap/decisions/PHASE8-IMPL-023-opencode-go-model-routing-and-small-task-execution.md`.
-
-## Preferred Claude Code model settings
-
-For WORKSPACE planning/docs:
-
-* Preferred model: `sonnet`
-* Preferred effort: `high`
-
-For broad roadmap reconciliation or hard architecture decisions:
-
-* Preferred model: `opusplan`
-* Preferred effort: `high`
-
-For very difficult one-off reasoning:
-
-* Preferred model: `opus`
-* Preferred effort: `xhigh`
-
-For quick doc cleanup:
-
-* Preferred model: `sonnet`
-* Preferred effort: `medium`
-
-Avoid `max` unless the user explicitly approves the cost/token risk.
-
-## Local/free model fallback
-
-If using Ollama with Claude Code or another local agent:
-
-Preferred fallback order:
-
-1. `qwen3-coder:30b` if the machine can run it.
-2. `devstral-small-2` if it runs better.
-3. `qwen3:8b` only for drafts, review, summarization, and low-risk cleanup.
-
-Do not rely on a small local model for unsupervised repo-wide edits. Require manual review.
-
-## Skills and agents
-
-Use project subagents from `.claude/agents/` for isolated review/planning roles.
-
-Use project skills from `.claude/skills/` for repeatable workflows.
-
-Prefer these roles:
-
-* roadmap-docs-orchestrator: multi-file roadmap/spec planning
-* safety-boundary-reviewer: no-prose/candidate-canon review
-* implementation-planner: future implementation sequencing and acceptance criteria
-
-Use skills for:
-
-* workspace-doc-task
-* review-and-commit-docs
-* no-prose-boundary
-
-## Default behavior for next roadmap tasks
-
-For future WORKSPACE tasks:
-
-* inspect relevant existing specs
-* create one new spec file if needed
-* update only related docs
-* create an ignored local report
-* run safe documentation checks only
-* do not implement runtime code
-* do not stage or commit
-
-## graphify
-
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
-
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+Analysis must remain candidate-first and evidence/provenance-backed. Model,
+tool, extractor, rubric, NotebookLM, and OMI output is not approved truth.
+Confidence, queue presence, review status, and promotion records are not Canon.
+Only the separate implemented apply-promotion workflow may update approved
+project-local Memory/Canon, and only after explicit owner approval, destination
+choice, blocker validation, and final confirmation. Never apply or promote
+automatically.
+
+## Task execution
+
+- Use the exact task scope, allowlist, preflight, and validation commands.
+- Do not infer implementation eligibility from this file or from
+  `docs/master_plan.md`.
+- Preserve unrelated owner changes and stop on an unsafe scope conflict.
+- Do not stage, commit, push, amend, rebase, reset, clean, restore, or stash
+  unless the owner explicitly authorizes the exact action.
+- Do not call live models, external integrations, Story Check, extraction
+  tools, training, or Dramatica-specific logic unless the task explicitly
+  authorizes it.
+- Do not use client-specific agent or skill routing to override `AGENTS.md` or
+  current roadmap/task authority.
+
+## Context and mapping tools
+
+Repomix, Graphify, LeanCTX, MCP context tools, and context-generation scripts
+may be used only in an explicitly authorized context-generation task and only
+within that task's output scope. They are not automatic navigation,
+implementation, validation, acceptance, or closeout steps.
+
+For ordinary implementation and documentation tasks, use the focused direct
+reads and exact searches authorized by the task. Existing saved context may be
+used only as non-authoritative navigation evidence when `AGENTS.md` and the task
+permit it.
+
+## Documentation work
+
+Documentation-only tasks do not authorize application code, tests,
+dependencies, datasets, runtime project fixtures, training records, model
+artifacts, or live runtime/model execution. Report exactly what changed, the
+validation performed, deferred work, repository state, and whether any Git
+staging or publication occurred.
+
+## Dramatica-flow boundary
+
+The app-owned `dramatica_flow_informed_rubric` is the approved application/MVP
+boundary for permitted analysis-only concepts, rules, and structural reasoning
+from the upstream reference. It is not evidence that the external
+`dramatica_flow` runtime ran. That runtime is not MVP-required, and any future
+integration requires separate explicit owner authorization and an analysis-only
+safety review.

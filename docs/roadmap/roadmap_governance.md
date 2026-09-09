@@ -1,14 +1,38 @@
 # Roadmap Governance
 
-## Control Layer
+## Authority hierarchy
 
-Roadmap execution is controlled by:
+Use this hierarchy for application roadmap work:
 
-1. `docs/roadmap/roadmap_index.yaml`
-2. `docs/roadmap/implementation_status.md`
-3. `docs/roadmap/validation/latest_roadmap_validation.md`
+1. Current explicit owner decisions.
+2. The current roadmap/index and active task authority.
+3. Tracked implementation evidence within its declared role.
+4. Supporting context and external/reference material.
+5. Historical records for the state and time they document.
 
-GitHub Issues and GitHub Projects are not authoritative until a future sync task explicitly makes them part of the source hierarchy.
+Within that hierarchy:
+
+- `PRODUCT.md` owns the durable human-readable product and MVP contract.
+- `docs/roadmap/roadmap_index.yaml` owns mutable current frontier, status, and
+  dependencies.
+- The active task, inventory, and enrichment records referenced by the index
+  own detailed current work.
+- Accepted decision records own their scoped decisions; later records
+  supersede only the exact earlier claims they name.
+- Human-readable status, backlog, phase-map, risk, question, decision-log, and
+  validation views are subordinate projections or historical indexes. They do
+  not independently select current work.
+- Historical prose, old “next” statements, completed task summaries, and
+  generated context cannot activate, reorder, or close current work.
+- Generated context and model output are not authority or implementation
+  proof.
+
+Project Memory, Plan Integrity, supervision, and execution routing remain
+preserved but paused/nonblocking for ordinary application work. This hierarchy
+does not reactivate them or create a new schema, service, or governance gate.
+
+GitHub Issues and GitHub Projects are not authoritative unless a later explicit
+owner decision makes them part of this hierarchy.
 
 ## ID Governance
 
@@ -79,19 +103,19 @@ GitHub Issues and GitHub Projects are not authoritative until a future sync task
 | `review_api_planning` | Whether and how the review queue is exposed through a read-only review queue API, and whether backend routes are needed before UI, is decided before any review route exists; a future review queue API stays read-only, review-workflow-only, and evidence/provenance-backed and never exposes approval/canon/promotion. |
 | `owner_action_api_planning` | The owner-action command API contract (accepted/rejected commands and states, fail-closed behavior, audit affirmations) is decided before any owner action route or execution exists; owner actions are not apply-promotion and owner action execution remains deferred. |
 | `review_ui_planning` | The frontend review UI display/interaction boundary is decided before any review screen exists; a future review UI must display evidence/provenance/uncertainty and non-approval status, show no-promotion warnings, and must not imply canon. |
-| `no_apply_promotion` | Must not implement or trigger apply-promotion; apply-promotion remains a separate future owner-approved, audited, explicit, separately tested gate. |
+| `no_apply_promotion` | Do not implement or trigger apply-promotion in a task carrying this boundary; the implemented workflow remains separate, explicit, owner-confirmed, audited, and separately validated. |
 | `review_api_implementation` | The pure helper module that satisfies the expected-red review API contract tests at `tests/test_writer_assistant_review_api_contract.py` for future `backend.review_api`. The module is read-only, review-workflow-only, evidence/provenance-backed, and never exposes approval/canon/promotion or performs apply-promotion. |
 | `route_boundary` | The future `backend.review_api` module must not register FastAPI routes in `backend/app.py`, `backend/main.py`, or any backend router file. Route registration remains deferred to a later owner-approved parent. |
 | `no_owner_action_execution` | The future `backend.review_api` owner action command validators must never execute owner actions. They are validators/response builders only and must not mutate queue entries, candidate records, memory, canon, or project files. |
 | `no_raw_artifact_persistence` | Must not add raw extraction artifact write/read/list helpers or persist any new raw artifacts through the review API, the command API, or the orchestrator. |
-| `no_booknlp_install` | Must not install, import, run, execute, vendor, or copy BookNLP code in the current parent. Real BookNLP runtime remains deferred. |
-| `no_spacy_install` | Must not install, import, run, execute, vendor, or copy spaCy code in the current parent. Real spaCy runtime remains deferred. |
+| `no_booknlp_install` | Do not install or run BookNLP in a task carrying this boundary; this tag does not classify the global MVP requirement. |
+| `no_spacy_install` | Do not install or run spaCy in a task carrying this boundary; this tag does not classify the global MVP requirement. |
 | `mvp_required_runtime_extraction` | Runtime extraction over owner-authored or owner-provided project text is required before MVP usability/testing; extraction output remains evidence-backed, candidate-only, and owner-reviewed. |
 | `mvp_required_raw_persistence` | Project-local raw extraction artifact persistence with manifests, raw refs, safe path validation, and non-canon/non-candidate/non-training-data boundaries is required before MVP usability/testing. |
 | `mvp_required_apply_promotion` | Explicit audited apply-promotion is required before MVP usability/testing; it must require validated candidates, evidence, provenance, source locators, owner confirmation, and must never be automatic. |
 | `mvp_required_memory_canon_mutation` | Approved memory/canon mutation is required before MVP usability/testing, but only through apply-promotion or another explicit owner-approved workflow. |
 | `mvp_required_model_assisted_extraction` | Model-assisted extraction is required before MVP usability/testing and may produce only evidence-backed candidate drafts or diagnostic questions, never prose, direct canon writes, or automatic promotion. |
-| `mvp_required_analysis_runtime` | NCP/Subtxt/dramatica-flow runtime integration is required before MVP usability/testing as analysis/context/rubric integration only; imported/context output is never automatic truth. |
+| `mvp_required_analysis_runtime` | Required free/local analysis behavior covers applicable NCP gateway execution plus MVP-required external contributors under current task authority. Official paid Subtxt is optional. The app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary; external `dramatica_flow` is reference/provenance-only, not MVP-required, and requires no runtime proof. Imported/context output is never automatic truth. |
 | `mvp_required_frontend_owner_action_execution` | Frontend owner-action execution is required before MVP usability/testing and must execute only safe owner-review workflow actions with clear read-only/command separation and confirmation for promotion/canon-changing actions. |
 | `fine_tuning_deferred` | Fine-tuning remains outside MVP usability/testing and continues as a separate deferred track. |
 | `generated_prose_permanently_forbidden` | Generated prose, rewriting, continuation, imitation, polish, improvement, expansion, outline generation, chapter generation, write/revise, export-as-prose, and prose-production paths are permanently forbidden, not future backlog work. |

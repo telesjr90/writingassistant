@@ -31,6 +31,7 @@
     "t006_milestone_pending_runtime_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md",
     "t006_implementation_commit": "23d4825da9a257180cdc0d1d1239ce13b4e01f78",
     "subtxt_optional_paid_decision": "docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md",
+    "dramatica_flow_mvp_boundary_decision": "docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md",
     "real_execution_completion_decision": "docs/roadmap/decisions/2026-09-07-real-tool-execution-required-for-tool-integration-completion.md",
     "real_tool_reality_audit": "docs/roadmap/decisions/PHASE8-IMPL-025-real-tool-integration-reality-audit.md"
   },
@@ -56,6 +57,18 @@
       "separate audited promotion and apply-promotion boundaries"
     ]
   },
+  "dramatica_flow_mvp_boundary": {
+    "upstream_reference": "ydsgangge-ux/dramatica-flow",
+    "observed_upstream_commit": "3a6fa55e84a8248e596527f0a5013748945a6cb8",
+    "approved_app_owned_boundary": "dramatica_flow_informed_rubric",
+    "app_owned_rubric_mvp_required_within_accepted_scope": true,
+    "external_runtime_mvp_required": false,
+    "external_runtime_proof_required": false,
+    "external_runtime_implementation_or_execution_authorized": false,
+    "future_external_integration_requires_separate_owner_authorization_and_analysis_only_safety_review": true,
+    "app_owned_rubric_is_external_runtime_evidence": false,
+    "historical_t020b_preserved": true
+  },
   "required_free_local_mvp_path": {
     "contributors": [
       "spaCy",
@@ -76,7 +89,7 @@
     "real BookNLP character/location findings after narrow compatibility repair",
     "explicit owner-selected NCP JSON candidate import validation",
     "app-owned subtxt_informed_rubric",
-    "app-owned dramatica_flow_informed_rubric",
+    "app-owned dramatica_flow_informed_rubric as the approved MVP boundary for wanted dramatica-flow-derived analysis concepts; not evidence of external runtime execution",
     "deterministic fusion IDs, fingerprints, duplicate/conflict/uncertainty metadata",
     "candidate-only persistence",
     "grouped owner review with T023A and T023B complete/PASS",
@@ -134,7 +147,7 @@
     "PHASE8-IMPL-025-T005": "complete/PASS; implementation commit 7e58e4859f828b3ca0edb886c999f5f376f151ac",
     "PHASE8-IMPL-025-T006": "accepted/closed optional paid-integration foundation at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; real paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero available official runtime surfaces",
     "PHASE8-IMPL-025-T007": "planned/not-begun; dependency-satisfied/eligible and next application frontier; T007E requires bounded real current-layer Ollama/qwen3:8b and Story Check execution",
-    "PHASE8-IMPL-025-T008": "planned/not-begun; awaits required T004 real-execution gate and T007; optional Subtxt absence does not block acceptance; fixtures alone cannot satisfy required contributor validation"
+    "PHASE8-IMPL-025-T008": "planned/not-begun; awaits required T004 real-execution gate and T007; optional Subtxt absence does not block acceptance; external dramatica_flow is not a dependency or required runtime proof; fixtures alone cannot satisfy required contributor validation"
   },
   "child_task_ordering": {
     "T001": [
@@ -332,7 +345,7 @@
     "failed collectors or partial validation mistaken for architecture completion",
     "optional official/full Subtxt runtime remains unavailable and its runtime/interface/version/provider/model provenance remains unknown where not evidenced",
     "historical real execution mistaken for current T002/T003 layered execution",
-    "external dramatica_flow owner-blocked/reference-only authority conflicts with any claim that it remains an MVP-required external integration"
+    "app-owned dramatica_flow_informed_rubric mistaken for evidence that the external dramatica_flow runtime ran"
   ],
   "open_questions": [
     "optional future official/full Subtxt runtime provisioning and evidenced callable interface/source granularity",
@@ -341,8 +354,7 @@
     "NCP import/export mapping version",
     "trusted app-generated NCP round-trip rules",
     "project-level narrative-diagnostic context contract",
-    "owner correction and candidate merge/split lifecycle",
-    "OWNER_DECISION_REQUIRED_BEFORE_EXTERNAL_DRAMATICA_FLOW_IMPLEMENTATION"
+    "owner correction and candidate merge/split lifecycle"
   ],
   "validation_frontier": {
     "preserved_verified_foundation": [
@@ -371,8 +383,7 @@
       "full NCP approved export and round trip",
       "expanded correction workflows",
       "layered-runtime and integration deltas over PHASE8-IMPL-024-T008",
-      "terminal PHASE8-IMPL-027 owner acceptance",
-      "external dramatica_flow MVP/runtime authority decision"
+      "terminal PHASE8-IMPL-027 owner acceptance"
     ],
     "optional_future_debt": [
       "real official/full Subtxt execution through a production runner connected to T003 after paid access and separate authorization",

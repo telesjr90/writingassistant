@@ -1,24 +1,33 @@
-# Dramatica-Informed Writing Assistant Master Plan
+# Dramatica-Informed Writing Assistant Master Plan — Historical Reference
 
-<!-- CURRENT-REPOSITORY-TRUTH:START -->
-- Active application parent: `PHASE8-IMPL-024`
-- Immediate application frontier: `PHASE8-IMPL-024-T003C`
-- Planned architecture parent: `PHASE8-IMPL-025`
-- Terminal MVP gate: `PHASE8-IMPL-027`
-- Current application policy: `docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md`
-<!-- CURRENT-REPOSITORY-TRUTH:END -->
+> **Authority status:** This document preserves historical planning chronology
+> and reference material. It is not current frontier, status, dependency, or
+> source-of-truth authority. Older “current,” “next,” “recommended next,”
+> blocker, path, branch, and sequencing statements below describe the repository
+> state at the time they were written.
 
-This delimited block is the current summary. Later chronological task narratives
-are historical at the commits they describe unless a section explicitly says it
-is current. Do not use an older unqualified “next” or “recommended next” claim
-to determine the current frontier.
+Use the following current authority surfaces instead:
 
-Implementation-only mode is active. Project Memory, Plan Integrity, supervision,
-and execution routing are preserved but are not implementation, validation,
-acceptance, or closeout gates for ordinary application work. Application work
-uses current owner decisions, current roadmap/task documents, tracked
-application evidence, saved context outputs, and focused direct reads. See the
-current application policy linked above.
+- [`../PRODUCT.md`](../PRODUCT.md) owns durable human-readable product and MVP
+  truth.
+- [`roadmap/roadmap_index.yaml`](roadmap/roadmap_index.yaml) owns the mutable
+  machine-readable frontier, status, and dependencies.
+- The active task, inventory, and enrichment records referenced by the roadmap
+  index own detailed current work.
+- Accepted records under [`roadmap/decisions/`](roadmap/decisions/) own their
+  scoped owner decisions.
+- [`../AGENTS.md`](../AGENTS.md) owns repository implementation and safety
+  policy.
+
+Nothing in the historical chronology below overrides those sources. Project
+Memory, Plan Integrity, supervision, execution routing, generated context, and
+this master-plan archive are not gates for ordinary application work unless a
+later explicit owner decision says otherwise.
+
+## Historical planning chronology
+
+The remaining content is preserved for historical context. It must not be used
+to select or begin current work.
 
 ## 1. Project Overview
 

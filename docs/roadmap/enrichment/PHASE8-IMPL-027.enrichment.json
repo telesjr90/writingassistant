@@ -7,7 +7,7 @@
   "depends_on": ["PHASE8-IMPL-025-T012"],
   "activation": "after PHASE8-IMPL-025 and T012 are complete/PASS",
   "owner_gate": "accept/reject/defer required",
-  "mandatory_refresh": true,
+  "mandatory_refresh": false,
   "required_evidence": [
     "current application and real owner project data",
     "browser-to-HTTP live invocation",
@@ -18,7 +18,8 @@
     "clean browser console/network plus accessibility/responsive evidence",
     "filesystem diff proving no unauthorized mutation",
     "limitations and support evidence",
-    "authoritative closeout publication and final Project Memory refresh"
+    "required free/local contributor evidence from PHASE8-IMPL-025-T012; no paid Subtxt or external dramatica_flow runtime proof required",
+    "authoritative application closeout publication; Project Memory freshness/refresh, Plan Integrity, and execution-routing resolution remain paused/nonblocking"
   ],
   "boundaries": [
     "analysis-only",
@@ -27,6 +28,9 @@
     "no automatic promotion",
     "no automatic apply-promotion",
     "no automatic Memory/Canon mutation",
+    "dramatica_flow_informed_rubric is the approved MVP boundary and is not external runtime evidence",
+    "external dramatica_flow is reference/provenance-only for MVP and not authorized for implementation or execution",
+    "official paid Subtxt runtime is optional and not required for terminal acceptance",
     "explicit owner control"
   ]
 }

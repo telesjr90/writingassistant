@@ -1,5 +1,14 @@
 # MVP Completion Test Matrix
 
+> **Historical foundation matrix:** This document preserves the MVP foundation
+> criteria and evidence model from the phase in which it was written. It is no
+> longer the sole or current terminal MVP authority. Current completion
+> authority is `PHASE8-IMPL-025-T012` followed by the terminal
+> `PHASE8-IMPL-027` owner-acceptance gate. Statements below that call this the
+> “formal MVP exit gate,” make live Ollama optional, treat apply-promotion as
+> absent, or place implemented workspace/core behavior in the future are
+> superseded but preserved as historical evidence.
+
 ## Purpose
 
 This matrix defines the formal MVP exit gate for the local Dramatica-informed writing assistant. It is a planning artifact only. It does not create tests, scripts, runtime routes, frontend UI, model calls, OMI promotion behavior, training data, or model artifacts.
