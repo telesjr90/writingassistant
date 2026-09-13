@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -160,6 +161,57 @@ def test_non_factual_diagnostics_are_retained_unverified(fixture_data):
         item["validator_result"]["outcome"] == "not_applicable"
         for item in result["diagnostics"]
     )
+
+
+def test_mixed_factual_and_non_factual_fixture_preserves_item_dispositions(
+    fixture_data,
+):
+    source = source_snapshot(fixture_data)
+    supported = fixture_data["supported"]
+    unsupported = fixture_data["unsupported"]
+    payload = {
+        "grounding_diagnostics": [
+            explicit_diagnostic(supported, [evidence(source, supported)]),
+            explicit_diagnostic(unsupported, []),
+            *fixture_data["non_factual"],
+        ]
+    }
+    original = copy.deepcopy(payload)
+
+    result = ground_story_check_result(payload, source)
+    diagnostics = {
+        item["diagnostic_id"]: item for item in result["grounding"]["diagnostics"]
+    }
+
+    assert result["grounding"]["source_identity"] == source.identity.to_dict()
+    assert diagnostics["supported-location"]["verification_state"] == "verified"
+    assert diagnostics["supported-location"]["validator_result"]["outcome"] == (
+        "supported"
+    )
+    assert diagnostics["supported-location"]["evidence"] == [
+        evidence(source, supported)
+    ]
+
+    quarantined = diagnostics["unsupported-location"]
+    assert quarantined["classification"] == "factual_warning"
+    assert quarantined["verification_state"] == "quarantined"
+    assert quarantined["validator_result"]["outcome"] == "unsupported"
+    assert quarantined["validator_result"]["reason_codes"] == ["evidence_absent"]
+    assert quarantined["evidence"] == []
+    assert quarantined["producer"] == "story_check"
+
+    for diagnostic_id in ("structural-1", "question-1", "observation-1"):
+        diagnostic = diagnostics[diagnostic_id]
+        assert diagnostic["verification_state"] == "unverified"
+        assert diagnostic["validator_result"]["outcome"] == "not_applicable"
+        assert diagnostic["validator_result"]["reason_codes"] == [
+            "validation_not_applicable"
+        ]
+        assert diagnostic["evidence"] == []
+        assert diagnostic["producer"] == "story_check"
+
+    assert result["grounding_diagnostics"] == original["grounding_diagnostics"]
+    assert payload == original
 
 
 def test_legacy_malformed_and_unknown_producer_states_never_default_verified(fixture_data):

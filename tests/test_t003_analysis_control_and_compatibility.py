@@ -121,6 +121,18 @@ def _grounded_story_check_result(
             "evidence": [],
         },
         {
+            "diagnostic_id": "unverified-throughline-observation",
+            "classification": "observation",
+            "message": "The selected span may inform throughline review.",
+            "evidence": [],
+        },
+        {
+            "diagnostic_id": "unverified-diagnostic-question",
+            "classification": "question",
+            "message": "Which throughline is supported by the selected span?",
+            "evidence": [],
+        },
+        {
             "diagnostic_id": "quarantined-unsupported-fact",
             "classification": "factual_warning",
             "message": "A different place is named.",
@@ -470,6 +482,7 @@ def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
         source_id=source_id,
         source_content=source,
     )
+    original = copy.deepcopy(grounded)
 
     def grounded_runner(*args, **kwargs):
         return omi_analysis_orchestrator.analyze_omi_raw_idea_with_tools(
@@ -489,11 +502,21 @@ def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
     run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
     source_identity = manifest["sources"][0]
+    assert manifest["run_id"] == run["run_id"]
     assert source_identity["project_id"] == "example"
     assert source_identity["source_document_id"] == source_id
     assert source_identity["content_hash"] == grounded["grounding"][
         "source_identity"
     ]["source_sha256"]
+    source_artifact = next(
+        item
+        for item in manifest["artifact_references"]
+        if item["artifact_id"] == "source-artifact"
+    )
+    assert source_artifact["content_hash"] == source_identity["content_hash"]
+    assert source_artifact["source_snapshot_ids"] == [
+        source_identity["snapshot_id"]
+    ]
 
     operation = manifest["operations"][0]
     assert operation["operation_id"] == "analyze-story-check"
@@ -508,29 +531,72 @@ def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
     assert contributor["result_state"] == "succeeded"
     assert contributor["source_snapshot_ids"] == [source_identity["snapshot_id"]]
 
-    outputs = {item["disposition"]: item for item in manifest["outputs"]}
-    assert set(outputs) == {"validated", "unverified", "quarantined"}
-    assert outputs["validated"]["verification_outcome"] == "supported"
-    assert outputs["validated"]["original_output_reference_id"] == (
+    outputs_by_disposition = {
+        disposition: [
+            item for item in manifest["outputs"] if item["disposition"] == disposition
+        ]
+        for disposition in ("validated", "unverified", "quarantined")
+    }
+    assert {key: len(value) for key, value in outputs_by_disposition.items()} == {
+        "validated": 1,
+        "unverified": 3,
+        "quarantined": 1,
+    }
+    validated_output = outputs_by_disposition["validated"][0]
+    assert validated_output["verification_outcome"] == "supported"
+    assert validated_output["original_output_reference_id"] == (
         "result-artifact"
     )
-    assert outputs["validated"]["evidence_reference_ids"]
-    assert outputs["unverified"]["verification_outcome"] == "not_applicable"
-    assert outputs["unverified"]["missing_evidence_reason"] == (
-        "validation_not_applicable"
+    assert len(validated_output["evidence_reference_ids"]) == 1
+    assert len(validated_output["transformation_ids"]) == 1
+    assert all(
+        output["verification_outcome"] == "not_applicable"
+        and output["missing_evidence_reason"] == "validation_not_applicable"
+        and output["evidence_reference_ids"] == []
+        and output["transformation_ids"] == []
+        for output in outputs_by_disposition["unverified"]
     )
-    assert outputs["unverified"]["evidence_reference_ids"] == []
-    assert outputs["quarantined"]["verification_outcome"] == "unsupported"
-    assert outputs["quarantined"]["missing_evidence_reason"] == "evidence_absent"
-    assert outputs["quarantined"]["evidence_reference_ids"] == []
+    quarantined_output = outputs_by_disposition["quarantined"][0]
+    assert quarantined_output["verification_outcome"] == "unsupported"
+    assert quarantined_output["missing_evidence_reason"] == "evidence_absent"
+    assert quarantined_output["evidence_reference_ids"] == []
+    assert quarantined_output["transformation_ids"] == []
     assert all(
         output["source_snapshot_ids"] == [source_identity["snapshot_id"]]
+        and output["original_output_reference_id"] == "result-artifact"
         for output in manifest["outputs"]
     )
+    expected_noncandidate_ids = {
+        "output-"
+        + __import__("hashlib").sha256(
+            f"analyze-story-check|grounding|{diagnostic_id}".encode("utf-8")
+        ).hexdigest()[:24]
+        for diagnostic_id in (
+            "unverified-structure",
+            "unverified-throughline-observation",
+            "unverified-diagnostic-question",
+            "quarantined-unsupported-fact",
+        )
+    }
+    assert expected_noncandidate_ids == {
+        output["output_id"]
+        for output in (
+            *outputs_by_disposition["unverified"],
+            quarantined_output,
+        )
+    }
     transformation = manifest["transformations"][0]
+    assert len(manifest["transformations"]) == 1
     assert transformation["operation_id"] == "analyze-story-check"
     assert transformation["transformation_kind"] == "validated_normalization"
     assert transformation["input_reference_ids"] == ["result-artifact"]
+    assert transformation["output_reference_ids"] == [validated_output["output_id"]]
+    assert transformation["transformation_id"] in validated_output[
+        "transformation_ids"
+    ]
+    assert set(contributor["output_ids"]) == {
+        output["output_id"] for output in manifest["outputs"]
+    }
 
     chain = scan_evidence_ledger(
         project_dir=project,
@@ -544,9 +610,15 @@ def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
         and event["payload"]["output_id"] is not None
     ]
     assert len(finding_evidence) == 1
+    assert finding_evidence[0]["run_id"] == run["run_id"]
     assert finding_evidence[0]["operation_id"] == "analyze-story-check"
     assert finding_evidence[0]["adapter_id"] == "story_check"
+    assert finding_evidence[0]["disposition"] == "validated"
+    assert finding_evidence[0]["output_id"] == validated_output["output_id"]
+    assert finding_evidence[0]["source_identity"] == source_identity
     locator = finding_evidence[0]["source_locator"]
+    assert locator["snapshot_id"] == source_identity["snapshot_id"]
+    assert locator["snapshot_hash"] == source_identity["content_hash"]
     assert (locator["char_start"], locator["char_end"]) == (3, 9)
     assert (locator["byte_start"], locator["byte_end"]) == (3, 12)
 
@@ -560,7 +632,8 @@ def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
         "analyze-story-check"
     )
     operation_result = published["operation_results"][0]
-    assert operation_result["original_output"] == grounded
+    assert operation_result["original_output"] == original
+    assert grounded == original
     assert published["persisted_candidate_ids"] == []
 
 
@@ -637,15 +710,23 @@ def test_story_check_noncandidate_grounding_survives_empty_manifest_lineage(
     assert published["persisted_candidate_ids"] == []
 
 
+@pytest.mark.parametrize(
+    ("grounded_source_id", "grounded_source_content"),
+    [
+        ("different-source", "AA café 雨 ZZ"),
+        ("selected-source", "AA café 雨 ZZ changed"),
+    ],
+    ids=["source-id-mismatch", "source-hash-snapshot-mismatch"],
+)
 def test_story_check_grounding_source_mismatch_fails_closed_in_control_plane(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path, grounded_source_id, grounded_source_content
 ):
     project = _project(monkeypatch, tmp_path)
     source = "AA café 雨 ZZ"
     grounded = _grounded_story_check_result(
         project_id="example",
-        source_id="different-source",
-        source_content=source,
+        source_id=grounded_source_id,
+        source_content=grounded_source_content,
     )
 
     def mismatched_runner(*args, **kwargs):

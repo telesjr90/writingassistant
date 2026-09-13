@@ -91,6 +91,18 @@ def _grounded_story_check_result(
     start_byte = source_bytes.index(supported.encode("utf-8"))
     diagnostics = [
         {
+            "diagnostic_id": "unverified-structure",
+            "classification": "structural_diagnostic",
+            "message": "The archive-key pressure may need structural review.",
+            "evidence": [],
+        },
+        {
+            "diagnostic_id": "unverified-throughline-observation",
+            "classification": "observation",
+            "message": "The mentor relationship may inform throughline review.",
+            "evidence": [],
+        },
+        {
             "diagnostic_id": "unverified-throughline-question",
             "classification": "question",
             "message": "Which throughline is supported by the owner source?",
@@ -293,12 +305,14 @@ def test_valid_story_check_diagnostic_question_is_review_support_not_prose() -> 
 
 def test_grounded_story_check_maps_only_verified_direct_evidence_candidates() -> None:
     grounded = _grounded_story_check_result()
+    original = copy.deepcopy(grounded)
 
     result = _run_story_check(grounded, source_idea_id="idea-grounded")
 
     env = _story_check_env(result)
     assert env["state"] == "succeeded"
-    assert env["original_output"] == grounded
+    assert env["original_output"] == original
+    assert grounded == original
     assert [finding["raw_finding_id"] for finding in result["findings"]] == [
         "verified-archive-key"
     ]
@@ -313,10 +327,34 @@ def test_grounded_story_check_maps_only_verified_direct_evidence_candidates() ->
     assert finding["evidence"][0]["source_sha256"] == grounded["grounding"][
         "source_identity"
     ]["source_sha256"]
+    assert finding["evidence"][0]["source_id"] == "idea-grounded"
+    diagnostics = {
+        item["diagnostic_id"]: item
+        for item in env["original_output"]["grounding"]["diagnostics"]
+    }
+    quarantined = diagnostics["quarantined-unsupported-fact"]
+    assert quarantined["verification_state"] == "quarantined"
+    assert quarantined["validator_result"]["outcome"] == "unsupported"
+    assert quarantined["validator_result"]["reason_codes"] == ["evidence_absent"]
+    assert quarantined["evidence"] == []
+    assert quarantined["producer"] == "story_check"
+    for diagnostic_id in (
+        "unverified-structure",
+        "unverified-throughline-observation",
+        "unverified-throughline-question",
+    ):
+        diagnostic = diagnostics[diagnostic_id]
+        assert diagnostic["verification_state"] == "unverified"
+        assert diagnostic["validator_result"]["outcome"] == "not_applicable"
+        assert diagnostic["evidence"] == []
+        assert diagnostic["producer"] == "story_check"
     assert {
+        "unverified-structure",
+        "unverified-throughline-observation",
         "unverified-throughline-question",
         "quarantined-unsupported-fact",
     }.isdisjoint({finding["raw_finding_id"] for finding in result["findings"]})
+    assert result["persisted_candidate_ids"] == []
 
 
 def test_grounded_story_check_with_only_noncandidate_states_is_empty() -> None:
