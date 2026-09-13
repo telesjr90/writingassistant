@@ -403,6 +403,357 @@ def test_ollama_exact_source_operation_manifest_and_lineage_are_distinct(
     )
 
 
+def test_t007b_same_adapter_sequential_manifest_and_ledger_lineage(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ owner clue"
+    t007a = omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID
+    t007b = omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+    received_packet = {}
+
+    def finding(adapter, label, claim, excerpt, raw_finding_id):
+        return {
+            "candidate_type": "evidence_note",
+            "label": label,
+            "extracted_claim": claim,
+            "evidence": [
+                {
+                    "source_excerpt": excerpt,
+                    "source_locator": "raw_idea:exact",
+                }
+            ],
+            "source_locator": "raw_idea:exact",
+            "provenance": {
+                "tool_source": adapter,
+                "adapter": adapter,
+                "support": "bounded source support only",
+                "implementation_kind": "fixture_mock",
+            },
+            "source_adapter": adapter,
+            "support_label": "bounded support",
+            "owner_decision": {"decision": "pending", "approved": False},
+            "review_status": "candidate_review_pending",
+            "raw_finding_id": raw_finding_id,
+        }
+
+    def upstream_runner(*args, **kwargs):
+        assert kwargs["requested_adapters"] == ["ollama_model", "spacy"]
+        spacy = finding(
+            "spacy",
+            "Upstream normalized evidence",
+            "The selected span supplies bounded evidence.",
+            "café 雨",
+            "spacy-001",
+        )
+        exact = finding(
+            "ollama_model",
+            "Exact-source extraction",
+            "The exact source identifies an owner clue.",
+            "owner clue",
+            "ollama-exact-001",
+        )
+        return {
+            "analysis_status": "succeeded",
+            "explanation": "upstream fixtures completed",
+            "source_idea_id": kwargs.get("source_idea_id"),
+            "adapter_results": [
+                {
+                    "adapter": "ollama_model",
+                    "state": "succeeded",
+                    "explanation": "exact-source fixture completed",
+                    "candidates": [exact],
+                },
+                {
+                    "adapter": "spacy",
+                    "state": "succeeded",
+                    "explanation": "producer fixture completed",
+                    "candidates": [spacy],
+                },
+            ],
+            "findings": [exact, spacy],
+            "persisted_candidate_ids": [],
+            "safety": {
+                "no_prose": True,
+                "no_memory_canon_mutation": True,
+                "no_apply_promotion": True,
+            },
+        }
+
+    def t007b_runner(*, normalized_evidence_packet):
+        received_packet.update(copy.deepcopy(normalized_evidence_packet))
+        assert "raw_idea" not in normalized_evidence_packet
+        assert "owner_selected_source" not in normalized_evidence_packet
+        assert {item["producer_operation_id"] for item in normalized_evidence_packet["items"]} == {
+            "analyze-spacy"
+        }
+        interpreted = finding(
+            "ollama_model",
+            "Bounded interpretation",
+            "The normalized evidence leaves the clue attribution uncertain.",
+            "café 雨",
+            "ollama-interpreted-001",
+        )
+        return {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "explanation": "normalized-evidence fixture completed",
+            "candidates": [interpreted],
+        }
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="idea-t007b",
+        requested_adapters=["spacy", "ollama_model"],
+        requested_operations=["analyze-spacy", t007a, t007b],
+        runner=upstream_runner,
+        operation_runners={t007b: t007b_runner},
+        created_at="2026-09-08T21:00:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    operations = {item["operation_id"]: item for item in manifest["operations"]}
+    assert operations[t007a]["adapter_id"] == "ollama_model"
+    assert operations[t007a]["consumes"] == ["owner_selected_source"]
+    assert operations[t007b] == {
+        "operation_id": t007b,
+        "adapter_id": "ollama_model",
+        "consumes": ["normalized_evidence"],
+        "produces": ["diagnostic_candidate_finding"],
+        "configuration": {
+            "execution_mode": "synchronous",
+            "adapter_role": "normalized_evidence_interpreter",
+            "operation_semantics": "normalized_evidence_interpretation",
+        },
+        "feature_flags": {"candidate_persistence": False},
+    }
+    assert manifest["dependency_graph"] == [
+        {
+            "producer_operation_id": "analyze-spacy",
+            "consumer_operation_id": t007b,
+            "dependency_class": "normalized_evidence",
+        }
+    ]
+    contributors = {item["operation_id"]: item for item in manifest["contributors"]}
+    assert contributors[t007a]["adapter_id"] == "ollama_model"
+    assert contributors[t007b]["adapter_id"] == "ollama_model"
+    assert contributors[t007a]["provenance"]["operation_id"] == t007a
+    assert contributors[t007b]["provenance"]["operation_id"] == t007b
+    outputs_by_operation = {}
+    for output in manifest["outputs"]:
+        outputs_by_operation.setdefault(output["operation_id"], []).append(output)
+    assert set(outputs_by_operation) == {"analyze-spacy", t007a, t007b}
+    t007b_output = outputs_by_operation[t007b][0]
+    assert t007b_output["original_output_reference_id"] == "result-artifact"
+    transformations = {
+        item["operation_id"]: item for item in manifest["transformations"]
+    }
+    assert transformations[t007b]["transformation_kind"] == (
+        "normalized_evidence_interpretation"
+    )
+    assert set(transformations[t007b]["input_reference_ids"]) == {
+        item["output_id"] for item in outputs_by_operation["analyze-spacy"]
+    }
+    chain = scan_evidence_ledger(
+        project_dir=project, project_id="example", run_id=run["run_id"]
+    )
+    contributor_events = [
+        event for event in chain if event["event_type"] == "contributor_recorded"
+    ]
+    assert len(contributor_events) == 3
+    assert len({event["idempotency_key"] for event in contributor_events}) == 3
+    assert {event["payload"]["operation_id"] for event in contributor_events} == {
+        "analyze-spacy",
+        t007a,
+        t007b,
+    }
+    assert received_packet["run_id"] == run["run_id"]
+    assert received_packet["source_snapshot_id"] == manifest["sources"][0]["snapshot_id"]
+    published_result = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    t007b_findings = [
+        item
+        for item in published_result["findings"]
+        if item["provenance"].get("operation_id") == t007b
+    ]
+    assert len(t007b_findings) == 1
+    assert t007b_findings[0]["normalized_evidence_refs"]
+    assert t007b_findings[0]["owner_decision"] == {
+        "decision": "pending",
+        "approved": False,
+    }
+    assert published_result["persisted_candidate_ids"] == []
+    t007b_operation_result = next(
+        item
+        for item in published_result["operation_results"]
+        if item["operation_id"] == t007b
+    )
+    assert t007b_operation_result["original_output"]["explanation"] == (
+        "normalized-evidence fixture completed"
+    )
+
+
+def test_t007b_missing_dependency_is_unavailable_and_nonproducing(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    t007b = omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+
+    def must_not_run(**kwargs):
+        raise AssertionError("T007B runner must not run without normalized evidence")
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea="Owner source remains identity metadata only.",
+        source_idea_id="idea-t007b-missing",
+        requested_adapters=["ollama_model"],
+        requested_operations=[t007b],
+        runner=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("raw-source runner must not be invoked")
+        ),
+        operation_runners={t007b: must_not_run},
+        created_at="2026-09-08T21:01:00Z",
+    )
+    manifest = json.loads(
+        (
+            project
+            / "writer_assistant/analysis_runs"
+            / run["run_id"]
+            / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == t007b
+    assert contributor["result_state"] == "unavailable"
+    assert contributor["output_ids"] == []
+    assert manifest["outputs"] == []
+    assert manifest["transformations"] == []
+    result = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_t007b_rejected_output_is_preserved_only_in_immutable_result_artifact(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    t007b = omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+    rejected_candidate = {
+        "candidate_type": "diagnostic_question",
+        "label": "Rejected prose-shaped output",
+        "extracted_claim": "Rewrite: continue the scene as polished story prose.",
+        "evidence": [
+            {
+                "source_excerpt": "café 雨",
+                "source_locator": "raw_idea:exact",
+            }
+        ],
+        "source_locator": "raw_idea:exact",
+        "provenance": {
+            "tool_source": "ollama_model",
+            "adapter": "ollama_model",
+            "support": "Ollama interpretation support only",
+        },
+        "source_adapter": "ollama_model",
+        "support_label": "bounded interpretation support",
+        "owner_decision": {"decision": "pending", "approved": False},
+        "review_status": "candidate_review_pending",
+        "raw_finding_id": "rejected-t007b-001",
+    }
+    rejected_output = {
+        "adapter": "ollama_model",
+        "state": "succeeded",
+        "explanation": "deterministic unsafe T007B fixture",
+        "candidates": [rejected_candidate],
+    }
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea="AA café 雨 ZZ",
+        source_idea_id="idea-t007b-rejected",
+        requested_adapters=["spacy", "ollama_model"],
+        requested_operations=["analyze-spacy", t007b],
+        runner=_finding_result,
+        operation_runners={t007b: lambda **kwargs: rejected_output},
+        created_at="2026-09-08T21:02:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    result_path = (
+        project
+        / "writer_assistant/raw_artifacts"
+        / f"bundle-{run['run_id']}"
+        / "artifacts/result.json"
+    )
+    persisted_result = json.loads(result_path.read_text(encoding="utf-8"))
+    t007b_result = next(
+        item
+        for item in persisted_result["operation_results"]
+        if item["operation_id"] == t007b
+    )
+    assert t007b_result["state"] == "failed_closed"
+    assert t007b_result["candidates"] == []
+    assert t007b_result["original_output"] == rejected_output
+    assert all(
+        finding["raw_finding_id"] != "rejected-t007b-001"
+        for finding in persisted_result["findings"]
+    )
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert not any(
+        output["operation_id"] == t007b for output in manifest["outputs"]
+    )
+    contributor = next(
+        item for item in manifest["contributors"] if item["operation_id"] == t007b
+    )
+    assert contributor["result_state"] == "failed_closed"
+    assert contributor["output_ids"] == []
+    assert persisted_result["persisted_candidate_ids"] == []
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
+    assert persisted_result["safety"]["no_prose"] is True
+    assert persisted_result["safety"]["no_memory_canon_mutation"] is True
+    assert persisted_result["safety"]["no_apply_promotion"] is True
+
+
+def test_explicit_operation_selection_has_stable_distinct_request_identity() -> None:
+    t007a = omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID
+    t007b = omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+    default_request = analysis_run_control._stable_request(
+        project_id="example",
+        source_idea_id="idea-request",
+        snapshot_id="snapshot-request",
+        requested_adapters=["ollama_model"],
+        allow_deterministic_fallback=False,
+    )
+    assert "requested_operations" not in default_request
+    assert analysis_run_control._DEFAULT_OPERATION_BY_ADAPTER["ollama_model"] == t007a
+
+    exact_only = analysis_run_control._stable_request(
+        project_id="example",
+        source_idea_id="idea-request",
+        snapshot_id="snapshot-request",
+        requested_adapters=["ollama_model"],
+        allow_deterministic_fallback=False,
+        requested_operations=[t007a],
+    )
+    both_roles = analysis_run_control._stable_request(
+        project_id="example",
+        source_idea_id="idea-request",
+        snapshot_id="snapshot-request",
+        requested_adapters=["ollama_model"],
+        allow_deterministic_fallback=False,
+        requested_operations=[t007a, t007b],
+    )
+    assert analysis_run_control.canonical_sha256(exact_only) != (
+        analysis_run_control.canonical_sha256(both_roles)
+    )
+
+
 def test_t003g_validates_standalone_ledger_and_promotion_audit_variants(tmp_path):
     payload = {
         "artifact_id": "bundle-001",

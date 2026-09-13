@@ -65,6 +65,12 @@ SUPPORTED_ADAPTERS = frozenset(omi_analysis_orchestrator.OMI_TOOL_ADAPTER_IDENTI
 _PROCESS_SUBMISSION_LOCKS: dict[tuple[str, str], threading.Lock] = {}
 _PROCESS_SUBMISSION_LOCKS_GUARD = threading.Lock()
 
+
+class _BoundedAnalysisExecutionError(Exception):
+    def __init__(self, original: Exception) -> None:
+        super().__init__(str(original))
+        self.original = original
+
 _OPERATION_CONTRACTS = {
     "analyze-spacy": {
         "adapter_id": "spacy",
@@ -89,6 +95,16 @@ _OPERATION_CONTRACTS = {
         "produces": ("diagnostic_candidate_finding",),
         "role": "exact_source_structured_extractor",
         "label": "Ollama exact-source structured extraction",
+    },
+    omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID: {
+        "adapter_id": omi_analysis_orchestrator.OMI_OLLAMA_ADAPTER_NAME,
+        "operation_semantics": (
+            omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_SEMANTICS
+        ),
+        "consumes": ("normalized_evidence",),
+        "produces": ("diagnostic_candidate_finding",),
+        "role": "normalized_evidence_interpreter",
+        "label": "Ollama normalized-evidence interpretation",
     },
     "analyze-story-check": {
         "adapter_id": "story_check",
@@ -287,8 +303,9 @@ def _stable_request(
     snapshot_id: str,
     requested_adapters: list[str],
     allow_deterministic_fallback: bool,
+    requested_operations: list[str] | None = None,
 ) -> dict[str, Any]:
-    return {
+    request = {
         "project_id": project_id,
         "source_idea_id": source_idea_id,
         "source_snapshot_id": snapshot_id,
@@ -297,6 +314,30 @@ def _stable_request(
         "persist_candidates": False,
         "execution_mode": "synchronous",
     }
+    if requested_operations is not None:
+        request["requested_operations"] = sorted(requested_operations)
+    return request
+
+
+def _resolve_requested_operations(
+    effective_adapters: list[str],
+    requested_operations: list[str] | None,
+) -> list[str]:
+    if requested_operations is None:
+        return [_DEFAULT_OPERATION_BY_ADAPTER[adapter] for adapter in effective_adapters]
+    if not isinstance(requested_operations, list) or not requested_operations:
+        raise ValueError("requested_operations must be a non-empty list when provided")
+    if len(requested_operations) != len(set(requested_operations)):
+        raise ValueError("requested_operations contains duplicates")
+    if any(operation_id not in _OPERATION_CONTRACTS for operation_id in requested_operations):
+        raise ValueError("unsupported operation selection")
+    selected_adapters = {
+        _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+        for operation_id in requested_operations
+    }
+    if selected_adapters != set(effective_adapters):
+        raise ValueError("requested operation selection does not match requested adapters")
+    return sorted(requested_operations)
 
 
 def _prepare_stable_submission(
@@ -306,7 +347,8 @@ def _prepare_stable_submission(
     source_idea_id: str | None,
     requested_adapters: list[str],
     allow_deterministic_fallback: bool,
-) -> tuple[Any, list[str], str, str]:
+    requested_operations: list[str] | None = None,
+) -> tuple[Any, list[str], list[str], str, str]:
     """Normalize once for both request locking and durable run identity."""
 
     if not isinstance(raw_idea, str):
@@ -323,6 +365,18 @@ def _prepare_stable_submission(
     if allow_deterministic_fallback and "deterministic_fallback" not in effective_adapters:
         effective_adapters.append("deterministic_fallback")
     effective_adapters = sorted(effective_adapters)
+    if (
+        requested_operations is not None
+        and allow_deterministic_fallback
+        and "analyze-deterministic-fallback" not in requested_operations
+    ):
+        requested_operations = [
+            *requested_operations,
+            "analyze-deterministic-fallback",
+        ]
+    effective_operations = _resolve_requested_operations(
+        effective_adapters, requested_operations
+    )
     source_id = source_idea_id or "request-source"
     snapshot = build_exact_source_snapshot(
         project_id=project_id,
@@ -338,9 +392,18 @@ def _prepare_stable_submission(
         snapshot_id=snapshot.identity.snapshot_id,
         requested_adapters=effective_adapters,
         allow_deterministic_fallback=allow_deterministic_fallback,
+        requested_operations=(
+            effective_operations if requested_operations is not None else None
+        ),
     )
     request_hash = canonical_sha256(request)
-    return snapshot, effective_adapters, request_hash, f"analysis-run-{request_hash[:32]}"
+    return (
+        snapshot,
+        effective_adapters,
+        effective_operations,
+        request_hash,
+        f"analysis-run-{request_hash[:32]}",
+    )
 
 
 def supported_analysis_tools(
@@ -447,7 +510,10 @@ def _run_state(coverage: str, result: dict[str, Any]) -> str:
 
 
 def _validate_analysis_result(
-    result: Any, *, selected_adapters: list[str]
+    result: Any,
+    *,
+    selected_adapters: list[str],
+    selected_operations: list[str] | None = None,
 ) -> dict[str, Any]:
     if not isinstance(result, dict):
         raise ValueError("analysis runner returned an invalid result")
@@ -479,6 +545,59 @@ def _validate_analysis_result(
     identities = [item["adapter"] for item in validated_envelopes]
     if len(identities) != len(set(identities)) or set(identities) != set(selected_adapters):
         raise ValueError("analysis result contributor selection mismatch")
+    operations = selected_operations or [
+        _DEFAULT_OPERATION_BY_ADAPTER[adapter_id]
+        for adapter_id in selected_adapters
+    ]
+    if len(operations) != len(set(operations)) or any(
+        operation_id not in _OPERATION_CONTRACTS for operation_id in operations
+    ):
+        raise ValueError("analysis result operation selection mismatch")
+    supplied_operation_results = result.get("operation_results")
+    validated_operation_results: list[dict[str, Any]] = []
+    if supplied_operation_results is not None:
+        if not isinstance(supplied_operation_results, list):
+            raise ValueError("analysis result operation_results must be a list")
+        for operation_result in supplied_operation_results:
+            if not isinstance(operation_result, dict):
+                raise ValueError("analysis operation result must be an object")
+            operation_id = operation_result.get("operation_id")
+            if operation_id not in operations:
+                raise ValueError("analysis result carries an unselected operation")
+            envelope = omi_analysis_orchestrator.validate_adapter_result(
+                {
+                    key: copy.deepcopy(value)
+                    for key, value in operation_result.items()
+                    if key not in {"operation_id", "original_output"}
+                }
+            )
+            if envelope["adapter"] != _OPERATION_CONTRACTS[operation_id]["adapter_id"]:
+                raise ValueError("analysis operation result adapter mismatch")
+            validated_operation_result = {"operation_id": operation_id, **envelope}
+            if "original_output" in operation_result:
+                if not isinstance(operation_result["original_output"], dict):
+                    raise ValueError("analysis operation original_output must be an object")
+                validated_operation_result["original_output"] = copy.deepcopy(
+                    operation_result["original_output"]
+                )
+            validated_operation_results.append(validated_operation_result)
+        if {item["operation_id"] for item in validated_operation_results} != set(operations):
+            raise ValueError("analysis result operation selection mismatch")
+    else:
+        operations_by_adapter: dict[str, list[str]] = {}
+        for operation_id in operations:
+            operations_by_adapter.setdefault(
+                _OPERATION_CONTRACTS[operation_id]["adapter_id"], []
+            ).append(operation_id)
+        if any(len(operation_ids) != 1 for operation_ids in operations_by_adapter.values()):
+            raise ValueError("multi-operation analysis requires operation_results")
+        for envelope in validated_envelopes:
+            validated_operation_results.append(
+                {
+                    "operation_id": operations_by_adapter[envelope["adapter"]][0],
+                    **copy.deepcopy(envelope),
+                }
+            )
     findings = result.get("findings")
     if not isinstance(findings, list):
         raise ValueError("analysis result requires findings")
@@ -498,6 +617,18 @@ def _validate_analysis_result(
                     validated["provenance"][field] = copy.deepcopy(
                         original_provenance[field]
                     )
+        candidate_operations = [
+            operation_id
+            for operation_id in operations
+            if _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+            == validated["source_adapter"]
+        ]
+        operation_id = validated["provenance"].get("operation_id")
+        if operation_id is None and len(candidate_operations) == 1:
+            operation_id = candidate_operations[0]
+            validated["provenance"]["operation_id"] = operation_id
+        if operation_id not in candidate_operations:
+            raise ValueError("finding operation attribution is missing or mismatched")
         validated_findings.append(validated)
     if result.get("persisted_candidate_ids", []) != []:
         raise ValueError("analysis control plane cannot persist candidates")
@@ -512,6 +643,7 @@ def _validate_analysis_result(
             raise ValueError("analysis result safety boundary is not affirmative")
     checked = copy.deepcopy(result)
     checked["adapter_results"] = validated_envelopes
+    checked["operation_results"] = validated_operation_results
     checked["findings"] = validated_findings
     return _enforce_t001_control_plane_inputs(checked)
 
@@ -531,6 +663,13 @@ def _enforce_t001_control_plane_inputs(result: dict[str, Any]) -> dict[str, Any]
             envelope["explanation"] = reason
             envelope["candidates"] = []
     if blocked_adapters:
+        for operation_result in checked.get("operation_results", []):
+            if operation_result["adapter"] in blocked_adapters:
+                operation_result["state"] = "unavailable"
+                operation_result["explanation"] = _UNPROVIDED_CONTROL_PLANE_INPUTS[
+                    operation_result["adapter"]
+                ]
+                operation_result["candidates"] = []
         checked["findings"] = [
             finding for finding in checked["findings"]
             if finding["source_adapter"] not in blocked_adapters
@@ -726,6 +865,247 @@ def _dependency_graph_for_operations(operations: list[OperationDeclaration]) -> 
     )
 
 
+def _build_normalized_evidence_packet(
+    *,
+    project_id: str,
+    run_id: str,
+    snapshot: Any,
+    producer_operations: dict[str, str],
+    findings: list[dict[str, Any]],
+    artifact_hashes: dict[str, str] | None = None,
+) -> dict[str, Any] | None:
+    items = []
+    for finding in findings:
+        operation_id = finding["provenance"].get("operation_id")
+        if operation_id not in producer_operations:
+            continue
+        validated = omi_analysis_orchestrator.validate_normalized_finding(finding)
+        if validated["source_adapter"] != producer_operations[operation_id]:
+            raise ValueError("normalized evidence producer attribution mismatch")
+        _exact_finding_evidence_ranges(
+            snapshot,
+            validated,
+            artifact_hashes=artifact_hashes,
+        )
+
+        def refs(field: str) -> list[str]:
+            value = validated.get(field, [])
+            if value is None:
+                return []
+            if not isinstance(value, list) or not all(
+                isinstance(item, str) and item for item in value
+            ):
+                raise ValueError(f"normalized evidence {field} must be list[str]")
+            return list(value)
+
+        items.append(
+            {
+                "producer_operation_id": operation_id,
+                "producer_adapter_id": validated["source_adapter"],
+                "normalized_finding_id": validated["normalized_finding_id"],
+                "finding": validated,
+                "source_refs": refs("source_refs"),
+                "evidence_refs": refs("evidence_refs"),
+                "provenance_refs": refs("provenance_refs"),
+                "source_locator_refs": refs("source_locator_refs"),
+            }
+        )
+    if not items:
+        return None
+    identity = snapshot.identity.to_dict()
+    return {
+        "schema_version": (
+            omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_PACKET_VERSION
+        ),
+        "project_id": project_id,
+        "run_id": run_id,
+        "source_identity": identity,
+        "source_snapshot_id": snapshot.identity.snapshot_id,
+        "source_content_hash": snapshot.identity.content_hash,
+        "consumer_operation_id": (
+            omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+        ),
+        "items": items,
+    }
+
+
+def _execute_requested_operations(
+    *,
+    execute: Callable[..., dict[str, Any]],
+    project_id: str,
+    raw_idea: str,
+    source_idea_id: str | None,
+    snapshot: Any,
+    run_id: str,
+    effective_adapters: list[str],
+    effective_operations: list[str],
+    operation_runners: dict[str, Callable[..., dict[str, Any]]] | None,
+) -> dict[str, Any]:
+    def call_upstream(adapters: list[str]) -> dict[str, Any]:
+        try:
+            return execute(
+                project_id,
+                raw_idea,
+                source_idea_id=source_idea_id,
+                persist_candidates=False,
+                requested_adapters=adapters,
+                allow_deterministic_fallback=False,
+            )
+        except Exception as exc:
+            raise _BoundedAnalysisExecutionError(exc) from exc
+
+    t007b_operation_id = (
+        omi_analysis_orchestrator.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+    )
+    if t007b_operation_id not in effective_operations:
+        result = call_upstream(effective_adapters)
+        return _validate_analysis_result(
+            result,
+            selected_adapters=effective_adapters,
+            selected_operations=effective_operations,
+        )
+    if operation_runners is not None:
+        if not isinstance(operation_runners, dict):
+            raise ValueError("operation_runners must be a dict[str, Callable]")
+        for operation_id, operation_runner in operation_runners.items():
+            if (
+                operation_id != t007b_operation_id
+                or operation_id not in effective_operations
+                or not callable(operation_runner)
+            ):
+                raise ValueError("operation_runners contains an invalid operation runner")
+
+    upstream_operations = [
+        operation_id
+        for operation_id in effective_operations
+        if operation_id != t007b_operation_id
+    ]
+    upstream_adapters = [
+        _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+        for operation_id in upstream_operations
+    ]
+    if len(upstream_adapters) != len(set(upstream_adapters)):
+        raise ValueError("unsupported duplicate-adapter upstream operation selection")
+    if upstream_operations:
+        upstream_result = call_upstream(upstream_adapters)
+        upstream_result = _validate_analysis_result(
+            upstream_result,
+            selected_adapters=upstream_adapters,
+            selected_operations=upstream_operations,
+        )
+    else:
+        upstream_result = {
+            "analysis_status": "fail_closed",
+            "explanation": "no upstream operations were selected",
+            "source_idea_id": source_idea_id,
+            "adapter_results": [],
+            "operation_results": [],
+            "findings": [],
+            "persisted_candidate_ids": [],
+            "new_candidate_ids": [],
+            "reused_candidate_ids": [],
+            "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(),
+        }
+    producer_operations = {
+        operation_id: _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+        for operation_id in upstream_operations
+        if "normalized_evidence" in _OPERATION_CONTRACTS[operation_id]["produces"]
+        and any(
+            result["operation_id"] == operation_id
+            and result["state"] == "succeeded"
+            for result in upstream_result["operation_results"]
+        )
+    }
+    try:
+        packet = _build_normalized_evidence_packet(
+            project_id=project_id,
+            run_id=run_id,
+            snapshot=snapshot,
+            producer_operations=producer_operations,
+            findings=upstream_result["findings"],
+            artifact_hashes={
+                item["artifact_file_id"]: item["sha256"]
+                for envelope in upstream_result["adapter_results"]
+                for item in (envelope.get("raw_artifacts") or {}).get("files", [])
+            },
+        )
+    except ValueError as exc:
+        t007b_result = {
+            "operation_id": t007b_operation_id,
+            "adapter": omi_analysis_orchestrator.OMI_OLLAMA_ADAPTER_NAME,
+            "state": "failed_closed",
+            "explanation": f"normalized-evidence handoff failed closed: {exc}",
+            "candidates": [],
+        }
+    else:
+        t007b_result = omi_analysis_orchestrator.run_ollama_normalized_evidence_operation(
+            packet,
+            expected_run_id=run_id,
+            expected_source_identity=snapshot.identity.to_dict(),
+            producer_operations=producer_operations,
+            runner=(operation_runners or {}).get(t007b_operation_id),
+        )
+    operation_results = [
+        *copy.deepcopy(upstream_result["operation_results"]),
+        copy.deepcopy(t007b_result),
+    ]
+    adapter_results = copy.deepcopy(upstream_result["adapter_results"])
+    if not any(
+        item["adapter"] == omi_analysis_orchestrator.OMI_OLLAMA_ADAPTER_NAME
+        for item in adapter_results
+    ):
+        adapter_results.append(
+            {
+                key: copy.deepcopy(value)
+                for key, value in t007b_result.items()
+                if key not in {"operation_id", "original_output"}
+            }
+        )
+    findings = [
+        *copy.deepcopy(upstream_result["findings"]),
+        *copy.deepcopy(t007b_result["candidates"]),
+    ]
+    findings, fusion_summary = omi_analysis_orchestrator.fuse_normalized_findings(
+        findings
+    )
+    states = [item["state"] for item in operation_results]
+    analysis_status = (
+        "succeeded"
+        if findings
+        else "error" if states and all(state == "error" for state in states)
+        else "fail_closed"
+    )
+    result = {
+        "analysis_status": analysis_status,
+        "explanation": (
+            "Selected operations executed sequentially with normalized evidence "
+            "provided only to declared consumers; findings remain candidate-only."
+        ),
+        "source_idea_id": source_idea_id,
+        "adapter_results": adapter_results,
+        "operation_results": operation_results,
+        "findings": findings,
+        "fusion_contract": {
+            field: None
+            for field in omi_analysis_orchestrator.OMI_FUSION_FINDING_FIELDS
+        },
+        "fusion_summary": fusion_summary,
+        "persisted_candidate_ids": [],
+        "new_candidate_ids": [],
+        "reused_candidate_ids": [],
+        "persistence_status": "not_requested",
+        "persistence_explanation": (
+            "The T007B control plane does not persist candidates."
+        ),
+        "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(),
+    }
+    return _validate_analysis_result(
+        result,
+        selected_adapters=effective_adapters,
+        selected_operations=effective_operations,
+    )
+
+
 def _build_manifest_and_evidence(
     *,
     project_id: str,
@@ -733,36 +1113,45 @@ def _build_manifest_and_evidence(
     snapshot,
     result: dict[str, Any],
     requested_adapters: list[str],
+    requested_operations: list[str],
     source_artifact_hash: str,
     result_artifact_hash: str,
     created_at: str,
     raw_artifact_handoffs: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[AnalysisRunManifest, list[dict[str, Any]]]:
     adapter_results = list(result.get("adapter_results") or [])
-    by_adapter = {item["adapter"]: item for item in adapter_results}
+    operation_results = list(result.get("operation_results") or [])
+    by_operation = {item["operation_id"]: item for item in operation_results}
     operations = []
     contributors = []
     outputs = []
     transformations = []
     evidence_records = []
     findings = list(result.get("findings") or [])
-    output_ids_by_adapter: dict[str, list[str]] = {adapter: [] for adapter in requested_adapters}
+    output_ids_by_operation: dict[str, list[str]] = {
+        operation_id: [] for operation_id in requested_operations
+    }
+    operation_ids_by_adapter: dict[str, list[str]] = {}
+    for operation_id in requested_operations:
+        operation_ids_by_adapter.setdefault(
+            _OPERATION_CONTRACTS[operation_id]["adapter_id"], []
+        ).append(operation_id)
     handoffs = raw_artifact_handoffs or {}
     booknlp_artifact_hashes = {
         item["artifact_file_id"]: item["sha256"]
         for item in handoffs.get("booknlp", {}).get("files", [])
     }
     whole_span = OffsetRange(0, len(snapshot.source_content), CHAR_OFFSET_BASIS)
-    for adapter_id in requested_adapters:
-        operation_id = _DEFAULT_OPERATION_BY_ADAPTER[adapter_id]
-        adapter_result = by_adapter.get(adapter_id) or {
+    for operation_id in requested_operations:
+        contract = _OPERATION_CONTRACTS[operation_id]
+        adapter_id = contract["adapter_id"]
+        operation_result = by_operation.get(operation_id) or {
             "adapter": adapter_id,
             "state": "error",
-            "explanation": "selected adapter returned no attributable result envelope",
+            "explanation": "selected operation returned no attributable result envelope",
             "candidates": [],
         }
-        state = adapter_result["state"]
-        contract = _OPERATION_CONTRACTS[operation_id]
+        state = operation_result["state"]
         operation_configuration = {
             "execution_mode": "synchronous",
             "adapter_role": contract["role"],
@@ -782,7 +1171,7 @@ def _build_manifest_and_evidence(
             )
         )
         disposition = "validated" if state in {"succeeded", "empty"} else "unverified"
-        reason = None if disposition == "validated" else adapter_result["explanation"]
+        reason = None if disposition == "validated" else operation_result["explanation"]
         evidence = build_exact_evidence_record(
             snapshot=snapshot,
             run_id=run_id,
@@ -797,17 +1186,29 @@ def _build_manifest_and_evidence(
             reason=reason,
         )
         evidence_records.append(evidence)
+    finding_outputs: list[tuple[dict[str, Any], str, str, str]] = []
     for index, finding in enumerate(findings):
         adapter_id = finding.get("source_adapter")
-        if adapter_id not in output_ids_by_adapter:
+        if adapter_id not in operation_ids_by_adapter:
             raise ValueError("finding adapter was not selected")
-        operation_id = _DEFAULT_OPERATION_BY_ADAPTER[adapter_id]
-        output_id = str(finding.get("normalized_finding_id") or finding.get("raw_finding_id") or f"finding-{index}")
+        operation_id = finding.get("provenance", {}).get("operation_id")
+        if operation_id not in operation_ids_by_adapter[adapter_id]:
+            raise ValueError("finding operation was not selected")
+        output_material = str(
+            finding.get("normalized_finding_id")
+            or finding.get("raw_finding_id")
+            or f"finding-{index}"
+        )
+        if len(operation_ids_by_adapter[adapter_id]) > 1:
+            output_material = f"{operation_id}|{output_material}"
         # T002 IDs permit dots/colons but no traversal; prefixing a digest also
         # avoids carrying an unsafe producer-controlled identifier into paths.
-        output_id = f"output-{hashlib.sha256(output_id.encode('utf-8')).hexdigest()[:24]}"
+        output_id = f"output-{hashlib.sha256(output_material.encode('utf-8')).hexdigest()[:24]}"
         transformation_id = f"transform-{output_id[7:]}"
-        output_ids_by_adapter[adapter_id].append(output_id)
+        output_ids_by_operation[operation_id].append(output_id)
+        finding_outputs.append((finding, operation_id, output_id, transformation_id))
+    for finding, operation_id, output_id, transformation_id in finding_outputs:
+        adapter_id = _OPERATION_CONTRACTS[operation_id]["adapter_id"]
         output_evidence_ids = []
         finding_artifact_ids: list[str] = []
         for character_range, byte_range, artifact_file_id in _exact_finding_evidence_ranges(
@@ -824,7 +1225,7 @@ def _build_manifest_and_evidence(
                 operation_id=operation_id,
                 adapter_id=adapter_id,
                 disposition="validated",
-                contributor_state=by_adapter[adapter_id]["state"],
+                contributor_state=by_operation[operation_id]["state"],
                 character_range=character_range,
                 byte_range=byte_range,
                 created_at=created_at,
@@ -833,13 +1234,34 @@ def _build_manifest_and_evidence(
             )
             evidence_records.append(output_evidence)
             output_evidence_ids.append(output_evidence["evidence_id"])
+        normalized_input_ids = tuple(
+            output_id_value
+            for producer_operation_id in requested_operations
+            if "normalized_evidence"
+            in _OPERATION_CONTRACTS[producer_operation_id]["produces"]
+            for output_id_value in output_ids_by_operation[producer_operation_id]
+        )
+        consumes_normalized_evidence = (
+            "normalized_evidence" in _OPERATION_CONTRACTS[operation_id]["consumes"]
+        )
+        if consumes_normalized_evidence and not normalized_input_ids:
+            raise ValueError("normalized-evidence output lacks upstream output lineage")
+        transformation_inputs = (
+            normalized_input_ids
+            if consumes_normalized_evidence
+            else tuple(dict.fromkeys(finding_artifact_ids)) or ("result-artifact",)
+        )
         transformations.append(
             TransformationLineage(
                 transformation_id=transformation_id,
                 operation_id=operation_id,
-                transformation_kind="validated_normalization",
+                transformation_kind=(
+                    "normalized_evidence_interpretation"
+                    if consumes_normalized_evidence
+                    else "validated_normalization"
+                ),
                 transformation_version="1",
-                input_reference_ids=tuple(dict.fromkeys(finding_artifact_ids)) or ("result-artifact",),
+                input_reference_ids=transformation_inputs,
                 output_reference_ids=(output_id,),
             )
         )
@@ -849,37 +1271,43 @@ def _build_manifest_and_evidence(
                 operation_id=operation_id,
                 source_snapshot_ids=(snapshot.identity.snapshot_id,),
                 disposition="validated",
-                original_output_reference_id=(finding_artifact_ids[0] if finding_artifact_ids else "result-artifact"),
+                original_output_reference_id=(
+                    "result-artifact"
+                    if consumes_normalized_evidence
+                    else finding_artifact_ids[0] if finding_artifact_ids else "result-artifact"
+                ),
                 evidence_reference_ids=tuple(output_evidence_ids),
                 transformation_ids=(transformation_id,),
                 verification_outcome="omi_boundary_validated",
             )
         )
-    coverage = _coverage(adapter_results)
-    for adapter_id in requested_adapters:
-        adapter_result = by_adapter.get(adapter_id) or {
+    coverage = _coverage(operation_results)
+    for operation_id in requested_operations:
+        adapter_id = _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+        operation_result = by_operation.get(operation_id) or {
             "state": "error",
-            "explanation": "selected adapter returned no attributable result envelope",
+            "explanation": "selected operation returned no attributable result envelope",
         }
-        state = adapter_result["state"]
+        state = operation_result["state"]
         contributors.append(
             ContributorLineage(
-                operation_id=_DEFAULT_OPERATION_BY_ADAPTER[adapter_id],
+                operation_id=operation_id,
                 adapter_id=adapter_id,
                 source_snapshot_ids=(snapshot.identity.snapshot_id,),
                 result_state=state,
                 coverage="complete" if state in {"succeeded", "empty"} else "none",
-                explanation=adapter_result["explanation"],
+                explanation=operation_result["explanation"],
                 provenance=_adapter_provenance(
                     adapter_id,
-                    _DEFAULT_OPERATION_BY_ADAPTER[adapter_id],
+                    operation_id,
                     state,
                     ([handoffs[adapter_id]["provenance"]] if adapter_id in handoffs else []) + [
                         finding["provenance"] for finding in findings
                         if finding["source_adapter"] == adapter_id
+                        and finding["provenance"].get("operation_id") == operation_id
                     ],
                 ),
-                output_ids=tuple(output_ids_by_adapter[adapter_id]),
+                output_ids=tuple(output_ids_by_operation[operation_id]),
             )
         )
     manifest = AnalysisRunManifest(
@@ -963,10 +1391,12 @@ def _submit_analysis_run_locked(
     source_idea_id: str | None,
     snapshot: Any,
     effective_adapters: list[str],
+    effective_operations: list[str],
     request_hash: str,
     run_id: str,
     idempotency_key: str | None = None,
     runner: Callable[..., dict[str, Any]] | None = None,
+    operation_runners: dict[str, Callable[..., dict[str, Any]]] | None = None,
     created_at: str | None = None,
 ) -> dict[str, Any]:
     """Execute and durably finalize one deterministic synchronous run."""
@@ -997,15 +1427,19 @@ def _submit_analysis_run_locked(
     timestamp = created_at or _now()
     execute = runner or omi_analysis_orchestrator.analyze_omi_raw_idea_with_tools
     try:
-        result = execute(
-            project_id,
-            raw_idea,
+        result = _execute_requested_operations(
+            execute=execute,
+            project_id=project_id,
+            raw_idea=raw_idea,
             source_idea_id=source_idea_id,
-            persist_candidates=False,
-            requested_adapters=effective_adapters,
-            allow_deterministic_fallback=False,
+            snapshot=snapshot,
+            run_id=run_id,
+            effective_adapters=effective_adapters,
+            effective_operations=effective_operations,
+            operation_runners=operation_runners,
         )
-    except Exception as exc:
+    except _BoundedAnalysisExecutionError as bounded_exc:
+        exc = bounded_exc.original
         result = {
             "analysis_status": "error",
             "explanation": f"bounded synchronous analysis error: {type(exc).__name__}",
@@ -1019,11 +1453,27 @@ def _submit_analysis_run_locked(
                 }
                 for adapter in effective_adapters
             ],
+            "operation_results": [
+                {
+                    "operation_id": operation_id,
+                    "adapter": _OPERATION_CONTRACTS[operation_id]["adapter_id"],
+                    "state": "error",
+                    "explanation": (
+                        f"operation run ended in controlled error: {type(exc).__name__}"
+                    ),
+                    "candidates": [],
+                }
+                for operation_id in effective_operations
+            ],
             "findings": [],
             "persisted_candidate_ids": [],
             "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(),
         }
-    result = _validate_analysis_result(result, selected_adapters=effective_adapters)
+    result = _validate_analysis_result(
+        result,
+        selected_adapters=effective_adapters,
+        selected_operations=effective_operations,
+    )
     result, raw_artifact_handoffs = _extract_booknlp_raw_artifact_handoffs(
         result, snapshot
     )
@@ -1035,6 +1485,7 @@ def _submit_analysis_run_locked(
         snapshot=snapshot,
         result=result,
         requested_adapters=effective_adapters,
+        requested_operations=effective_operations,
         source_artifact_hash=hashlib.sha256(source_payload).hexdigest(),
         result_artifact_hash=hashlib.sha256(result_payload).hexdigest(),
         created_at=timestamp,
@@ -1045,7 +1496,22 @@ def _submit_analysis_run_locked(
     manifest_path = run_path / "manifest.json"
     _write_immutable_object(manifest_path, manifest_dict)
     evidence_ids = [record["evidence_id"] for record in evidence_records]
-    provenance_refs = [f"contributor-{adapter}" for adapter in effective_adapters]
+    adapter_operation_counts = {
+        adapter_id: sum(
+            _OPERATION_CONTRACTS[operation_id]["adapter_id"] == adapter_id
+            for operation_id in effective_operations
+        )
+        for adapter_id in effective_adapters
+    }
+    contributor_ref_by_operation = {
+        operation_id: (
+            f"contributor-{operation_id}"
+            if adapter_operation_counts[_OPERATION_CONTRACTS[operation_id]["adapter_id"]] > 1
+            else f"contributor-{_OPERATION_CONTRACTS[operation_id]['adapter_id']}"
+        )
+        for operation_id in effective_operations
+    }
+    provenance_refs = list(contributor_ref_by_operation.values())
     bundle_id = f"bundle-{run_id}"
     files = [
         _file_ref(
@@ -1085,7 +1551,16 @@ def _submit_analysis_run_locked(
                     payload=payload,
                     source_ref=snapshot.identity.snapshot_id,
                     evidence_refs=evidence_ids,
-                    provenance_refs=[f"contributor-{adapter_id}"],
+                    provenance_refs=[
+                        contributor_ref_by_operation[
+                            next(
+                                operation_id
+                                for operation_id in effective_operations
+                                if _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+                                == adapter_id
+                            )
+                        ]
+                    ],
                     record_count=item["record_count"],
                     line_count=item["line_count"],
                     schema_name=item["schema_name"],
@@ -1155,7 +1630,9 @@ def _submit_analysis_run_locked(
             project_id=project_id,
             run_id=run_id,
             event_type="contributor_recorded",
-            idempotency_key=f"contributor-{contributor['adapter_id']}",
+            idempotency_key=contributor_ref_by_operation[
+                contributor["operation_id"]
+            ],
             created_at=timestamp,
             payload=contributor,
         )
@@ -1208,9 +1685,11 @@ def submit_analysis_run(
     raw_idea: str,
     source_idea_id: str | None,
     requested_adapters: list[str],
+    requested_operations: list[str] | None = None,
     allow_deterministic_fallback: bool = False,
     idempotency_key: str | None = None,
     runner: Callable[..., dict[str, Any]] | None = None,
+    operation_runners: dict[str, Callable[..., dict[str, Any]]] | None = None,
     created_at: str | None = None,
 ) -> dict[str, Any]:
     """Serialize one project-scoped logical submission before execution."""
@@ -1225,12 +1704,19 @@ def submit_analysis_run(
         or "\\" in idempotency_key
     ):
         raise ValueError("idempotency_key must be a safe non-empty string")
-    snapshot, effective_adapters, request_hash, run_id = _prepare_stable_submission(
+    (
+        snapshot,
+        effective_adapters,
+        effective_operations,
+        request_hash,
+        run_id,
+    ) = _prepare_stable_submission(
         project_id=project_id,
         raw_idea=raw_idea,
         source_idea_id=source_idea_id,
         requested_adapters=requested_adapters,
         allow_deterministic_fallback=allow_deterministic_fallback,
+        requested_operations=requested_operations,
     )
     request_scope = f"request:{request_hash}"
 
@@ -1244,10 +1730,12 @@ def submit_analysis_run(
                 source_idea_id=source_idea_id,
                 snapshot=snapshot,
                 effective_adapters=effective_adapters,
+                effective_operations=effective_operations,
                 request_hash=request_hash,
                 run_id=run_id,
                 idempotency_key=idempotency_key,
                 runner=runner,
+                operation_runners=operation_runners,
                 created_at=created_at,
             )
 

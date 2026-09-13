@@ -134,6 +134,236 @@ def test_ollama_exact_source_operation_identity_is_explicit() -> None:
     )
 
 
+def _normalized_evidence_fixture() -> tuple[dict[str, Any], dict[str, Any]]:
+    source_identity = {
+        "project_id": "demo",
+        "snapshot_id": "snapshot-t007b",
+        "content_hash": "a" * 64,
+    }
+    finding = oao.validate_normalized_finding(
+        {
+            "candidate_type": "evidence_note",
+            "label": "Upstream evidence",
+            "extracted_claim": "The selected clue supplies bounded support.",
+            "evidence": [
+                {
+                    "source_excerpt": "library clue",
+                    "source_locator": {
+                        "snapshot_id": source_identity["snapshot_id"],
+                        "source_hash": source_identity["content_hash"],
+                    },
+                }
+            ],
+            "source_locator": "raw_idea:L1:C0-12",
+            "provenance": {
+                "tool_source": "spacy",
+                "adapter": "spacy",
+                "support": "spaCy support only",
+                "operation_id": "analyze-spacy",
+            },
+            "source_adapter": "spacy",
+            "support_label": "bounded support",
+            "owner_decision": {"decision": "pending", "approved": False},
+            "review_status": "candidate_review_pending",
+            "raw_finding_id": "spacy-upstream-001",
+        }
+    )
+    packet = {
+        "schema_version": oao.OMI_OLLAMA_NORMALIZED_EVIDENCE_PACKET_VERSION,
+        "project_id": "demo",
+        "run_id": "analysis-run-t007b",
+        "source_identity": source_identity,
+        "source_snapshot_id": source_identity["snapshot_id"],
+        "source_content_hash": source_identity["content_hash"],
+        "consumer_operation_id": oao.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+        "items": [
+            {
+                "producer_operation_id": "analyze-spacy",
+                "producer_adapter_id": "spacy",
+                "normalized_finding_id": finding["normalized_finding_id"],
+                "finding": finding,
+                "source_refs": [],
+                "evidence_refs": [],
+                "provenance_refs": [],
+                "source_locator_refs": [],
+            }
+        ],
+    }
+    return packet, source_identity
+
+
+def _normalized_t007b_candidate(**overrides: Any) -> dict[str, Any]:
+    candidate = {
+        "candidate_type": "diagnostic_question",
+        "label": "Evidence interpretation",
+        "extracted_claim": "The bounded evidence leaves motive unresolved.",
+        "evidence": [
+            {
+                "source_excerpt": "library clue",
+                "source_locator": "raw_idea:L1:C0-12",
+            }
+        ],
+        "source_locator": "raw_idea:L1:C0-12",
+        "provenance": {
+            "tool_source": "ollama_model",
+            "adapter": "ollama_model",
+            "support": "Ollama interpretation support only",
+        },
+        "source_adapter": "ollama_model",
+        "support_label": "bounded interpretation support",
+        "owner_decision": {"decision": "pending", "approved": False},
+        "review_status": "candidate_review_pending",
+        "raw_finding_id": "ollama-t007b-001",
+    }
+    candidate.update(overrides)
+    return candidate
+
+
+def test_ollama_normalized_evidence_operation_identity_and_bounded_runner() -> None:
+    assert oao.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID == (
+        "analyze-ollama-normalized-evidence"
+    )
+    assert oao.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_SEMANTICS == (
+        "normalized_evidence_interpretation"
+    )
+    received = {}
+
+    def runner(*, normalized_evidence_packet):
+        received.update(normalized_evidence_packet)
+        assert "raw_idea" not in normalized_evidence_packet
+        assert "owner_selected_source" not in normalized_evidence_packet
+        assert "raw_artifacts" not in normalized_evidence_packet
+        return {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "explanation": "deterministic normalized-evidence fixture",
+            "candidates": [_normalized_t007b_candidate()],
+        }
+
+    packet, identity = _normalized_evidence_fixture()
+    result = oao.run_ollama_normalized_evidence_operation(
+        packet,
+        expected_run_id="analysis-run-t007b",
+        expected_source_identity=identity,
+        producer_operations={"analyze-spacy": "spacy"},
+        runner=runner,
+    )
+    assert result["operation_id"] == oao.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+    assert result["adapter"] == oao.OMI_OLLAMA_ADAPTER_NAME
+    assert result["state"] == "succeeded"
+    assert received["items"][0]["finding"]["normalized_finding_id"]
+    candidate = result["candidates"][0]
+    assert candidate["provenance"]["operation_id"] == (
+        oao.OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+    )
+    assert candidate["normalized_evidence_refs"] == [
+        packet["items"][0]["normalized_finding_id"]
+    ]
+    assert candidate["owner_decision"] == {"decision": "pending", "approved": False}
+    assert candidate["review_status"] == "candidate_review_pending"
+
+
+def test_ollama_normalized_evidence_missing_invalid_and_mismatched_fail_closed() -> None:
+    packet, identity = _normalized_evidence_fixture()
+    calls = 0
+
+    def runner(**kwargs):
+        nonlocal calls
+        calls += 1
+        return {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "explanation": "must not run",
+            "candidates": [_normalized_t007b_candidate()],
+        }
+
+    missing = oao.run_ollama_normalized_evidence_operation(
+        None,
+        expected_run_id="analysis-run-t007b",
+        expected_source_identity=identity,
+        producer_operations={"analyze-spacy": "spacy"},
+        runner=runner,
+    )
+    assert missing["state"] == "unavailable"
+    assert missing["candidates"] == []
+
+    invalid_packets = []
+    invalid_finding = json.loads(json.dumps(packet))
+    invalid_finding["items"][0]["finding"] = {"candidate_type": "evidence_note"}
+    invalid_packets.append((invalid_finding, "analysis-run-t007b", identity))
+    wrong_run = json.loads(json.dumps(packet))
+    wrong_run["run_id"] = "analysis-run-other"
+    invalid_packets.append((wrong_run, "analysis-run-t007b", identity))
+    wrong_source = json.loads(json.dumps(packet))
+    wrong_source["source_snapshot_id"] = "snapshot-other"
+    invalid_packets.append((wrong_source, "analysis-run-t007b", identity))
+    opaque_artifact = json.loads(json.dumps(packet))
+    opaque_artifact["raw_artifact"] = {"payload": "opaque output"}
+    invalid_packets.append((opaque_artifact, "analysis-run-t007b", identity))
+
+    for invalid, expected_run_id, expected_identity in invalid_packets:
+        result = oao.run_ollama_normalized_evidence_operation(
+            invalid,
+            expected_run_id=expected_run_id,
+            expected_source_identity=expected_identity,
+            producer_operations={"analyze-spacy": "spacy"},
+            runner=runner,
+        )
+        assert result["state"] == "failed_closed"
+        assert result["candidates"] == []
+    assert calls == 0
+
+
+def test_ollama_normalized_evidence_unsafe_output_fails_closed() -> None:
+    packet, identity = _normalized_evidence_fixture()
+    unsafe_candidates = [
+        _normalized_t007b_candidate(
+            extracted_claim="Rewrite: continue the scene as polished prose."
+        ),
+        _normalized_t007b_candidate(support_label="canon truth support"),
+        _normalized_t007b_candidate(
+            owner_decision={"decision": "approve", "approved": True}
+        ),
+    ]
+    for candidate in unsafe_candidates:
+        raw_result = {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "explanation": "unsafe fixture",
+            "candidates": [candidate],
+        }
+        result = oao.run_ollama_normalized_evidence_operation(
+            packet,
+            expected_run_id="analysis-run-t007b",
+            expected_source_identity=identity,
+            producer_operations={"analyze-spacy": "spacy"},
+            runner=lambda **kwargs: raw_result,
+        )
+        assert result["state"] == "failed_closed"
+        assert result["candidates"] == []
+        assert result["original_output"] == raw_result
+        assert result["original_output"] is not raw_result
+
+
+def test_ollama_normalized_evidence_runner_exception_invents_no_output() -> None:
+    packet, identity = _normalized_evidence_fixture()
+
+    def runner(**kwargs):
+        raise RuntimeError("deterministic runner failure")
+
+    result = oao.run_ollama_normalized_evidence_operation(
+        packet,
+        expected_run_id="analysis-run-t007b",
+        expected_source_identity=identity,
+        producer_operations={"analyze-spacy": "spacy"},
+        runner=runner,
+    )
+    assert result["state"] == "error"
+    assert result["candidates"] == []
+    assert "original_output" not in result
+    assert "RuntimeError" in result["explanation"]
+
+
 def test_ollama_model_without_fixture_does_not_call_live_model_and_returns_unavailable() -> None:
     result = oao.analyze_omi_raw_idea_with_tools(
         "demo",

@@ -1303,6 +1303,7 @@ def validate_normalized_finding(finding: Any) -> dict[str, Any]:
         "evidence_refs",
         "provenance_refs",
         "source_locator_refs",
+        "normalized_evidence_refs",
     ):
         if optional_metadata_field not in finding:
             continue
@@ -1392,6 +1393,14 @@ def _validate_finding_provenance(provenance: Any) -> dict[str, Any]:
         "tool_source": tool_source,
         "adapter": adapter,
         "support": support,
+        **(
+            {"operation_id": _require_non_empty_string(
+                provenance["operation_id"],
+                "normalized finding provenance.operation_id",
+            )}
+            if "operation_id" in provenance
+            else {}
+        ),
     }
 
 
@@ -1508,6 +1517,13 @@ OMI_OLLAMA_SCHEMA_VERSION = "omi_ollama_structured_extraction.v1"
 OMI_OLLAMA_ADAPTER_NAME = "ollama_model"
 OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID = "analyze-ollama-model"
 OMI_OLLAMA_EXACT_SOURCE_OPERATION_SEMANTICS = "exact_source_structured_extraction"
+OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID = "analyze-ollama-normalized-evidence"
+OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_SEMANTICS = (
+    "normalized_evidence_interpretation"
+)
+OMI_OLLAMA_NORMALIZED_EVIDENCE_PACKET_VERSION = (
+    "omi-ollama-normalized-evidence-packet.v1"
+)
 OMI_OLLAMA_SUPPORT_LABEL = "ollama model support strength only"
 
 # Required top-level fields in the Ollama JSON envelope. Top-level payload
@@ -1991,6 +2007,269 @@ def _build_ollama_model_fixture_runner(
         }
 
     return _runner
+
+
+def _validate_normalized_evidence_snapshot_refs(
+    finding: dict[str, Any],
+    *,
+    snapshot_id: str,
+    content_hash: str,
+) -> None:
+    """Reject explicit finding/evidence identity that names another source."""
+
+    for evidence_item in finding["evidence"]:
+        locator = evidence_item.get("source_locator", evidence_item.get("locator"))
+        identity_values = [evidence_item]
+        if isinstance(locator, dict):
+            identity_values.append(locator)
+        for identity in identity_values:
+            for field, expected in (
+                ("snapshot_id", snapshot_id),
+                ("snapshot_hash", content_hash),
+                ("source_hash", content_hash),
+            ):
+                supplied = identity.get(field)
+                if supplied is not None and supplied != expected:
+                    raise ValueError(
+                        "normalized evidence does not match the expected source snapshot"
+                    )
+
+
+def validate_ollama_normalized_evidence_packet(
+    packet: Any,
+    *,
+    expected_run_id: str,
+    expected_source_identity: Mapping[str, Any],
+    producer_operations: Mapping[str, str],
+) -> dict[str, Any]:
+    """Validate the bounded T007B handoff without accepting raw-source fallback."""
+
+    value = _require_dict(packet, "Ollama normalized-evidence packet")
+    required_fields = {
+        "schema_version",
+        "project_id",
+        "run_id",
+        "source_identity",
+        "source_snapshot_id",
+        "source_content_hash",
+        "consumer_operation_id",
+        "items",
+    }
+    if set(value) != required_fields:
+        raise ValueError("Ollama normalized-evidence packet fields are closed")
+    if value["schema_version"] != OMI_OLLAMA_NORMALIZED_EVIDENCE_PACKET_VERSION:
+        raise ValueError("unsupported Ollama normalized-evidence packet version")
+    run_id = _require_non_empty_string(value["run_id"], "normalized evidence run_id")
+    if run_id != expected_run_id:
+        raise ValueError("normalized evidence run identity mismatch")
+    source_identity = _require_dict(
+        value["source_identity"], "normalized evidence source_identity"
+    )
+    expected_identity = dict(expected_source_identity)
+    if source_identity != expected_identity:
+        raise ValueError("normalized evidence source identity mismatch")
+    project_id = _require_non_empty_string(
+        value["project_id"], "normalized evidence project_id"
+    )
+    snapshot_id = _require_non_empty_string(
+        value["source_snapshot_id"], "normalized evidence source_snapshot_id"
+    )
+    content_hash = _require_non_empty_string(
+        value["source_content_hash"], "normalized evidence source_content_hash"
+    )
+    if (
+        project_id != expected_identity.get("project_id")
+        or snapshot_id != expected_identity.get("snapshot_id")
+        or content_hash != expected_identity.get("content_hash")
+    ):
+        raise ValueError("normalized evidence source snapshot/hash mismatch")
+    if value["consumer_operation_id"] != OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID:
+        raise ValueError("normalized evidence consumer operation mismatch")
+    if not isinstance(producer_operations, Mapping) or not producer_operations:
+        raise ValueError("normalized evidence requires declared producer operations")
+    items = _require_list(value["items"], "normalized evidence items")
+    if not items:
+        raise ValueError("normalized evidence items must not be empty")
+    required_item_fields = {
+        "producer_operation_id",
+        "producer_adapter_id",
+        "normalized_finding_id",
+        "finding",
+        "source_refs",
+        "evidence_refs",
+        "provenance_refs",
+        "source_locator_refs",
+    }
+    checked_items: list[dict[str, Any]] = []
+    seen_items: set[tuple[str, str]] = set()
+    for item in items:
+        item_value = _require_dict(item, "normalized evidence item")
+        if set(item_value) != required_item_fields:
+            raise ValueError("normalized evidence item fields are closed")
+        producer_operation_id = _require_non_empty_string(
+            item_value["producer_operation_id"],
+            "normalized evidence producer_operation_id",
+        )
+        producer_adapter_id = _require_non_empty_string(
+            item_value["producer_adapter_id"],
+            "normalized evidence producer_adapter_id",
+        )
+        if producer_operations.get(producer_operation_id) != producer_adapter_id:
+            raise ValueError("normalized evidence producer operation mismatch")
+        finding = validate_normalized_finding(item_value["finding"])
+        if finding["source_adapter"] != producer_adapter_id:
+            raise ValueError("normalized evidence producer adapter mismatch")
+        normalized_finding_id_value = _require_non_empty_string(
+            item_value["normalized_finding_id"],
+            "normalized evidence normalized_finding_id",
+        )
+        if finding["normalized_finding_id"] != normalized_finding_id_value:
+            raise ValueError("normalized evidence finding identity mismatch")
+        _validate_normalized_evidence_snapshot_refs(
+            finding,
+            snapshot_id=snapshot_id,
+            content_hash=content_hash,
+        )
+        key = (producer_operation_id, normalized_finding_id_value)
+        if key in seen_items:
+            raise ValueError("duplicate normalized evidence item")
+        seen_items.add(key)
+        checked_refs: dict[str, list[str]] = {}
+        for ref_field in (
+            "source_refs",
+            "evidence_refs",
+            "provenance_refs",
+            "source_locator_refs",
+        ):
+            refs = item_value[ref_field]
+            if not isinstance(refs, list) or not all(
+                isinstance(ref, str) and ref for ref in refs
+            ):
+                raise ValueError(f"normalized evidence {ref_field} must be list[str]")
+            checked_refs[ref_field] = list(refs)
+        checked_items.append(
+            {
+                "producer_operation_id": producer_operation_id,
+                "producer_adapter_id": producer_adapter_id,
+                "normalized_finding_id": normalized_finding_id_value,
+                "finding": finding,
+                **checked_refs,
+            }
+        )
+    return {
+        "schema_version": OMI_OLLAMA_NORMALIZED_EVIDENCE_PACKET_VERSION,
+        "project_id": project_id,
+        "run_id": run_id,
+        "source_identity": copy.deepcopy(source_identity),
+        "source_snapshot_id": snapshot_id,
+        "source_content_hash": content_hash,
+        "consumer_operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+        "items": checked_items,
+    }
+
+
+def run_ollama_normalized_evidence_operation(
+    packet: Any,
+    *,
+    expected_run_id: str,
+    expected_source_identity: Mapping[str, Any],
+    producer_operations: Mapping[str, str],
+    runner: Callable[..., dict[str, Any]] | None,
+) -> dict[str, Any]:
+    """Run only the injected T007B operation; never resolve the live Ollama path."""
+
+    if packet is None or not isinstance(packet, dict) or not packet.get("items"):
+        return {
+            "operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+            "adapter": OMI_OLLAMA_ADAPTER_NAME,
+            "state": "unavailable",
+            "explanation": (
+                "validated same-run normalized evidence is unavailable; "
+                "T007B does not fall back to owner source or raw artifacts"
+            ),
+            "candidates": [],
+        }
+    try:
+        checked_packet = validate_ollama_normalized_evidence_packet(
+            packet,
+            expected_run_id=expected_run_id,
+            expected_source_identity=expected_source_identity,
+            producer_operations=producer_operations,
+        )
+    except ValueError as exc:
+        return {
+            "operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+            "adapter": OMI_OLLAMA_ADAPTER_NAME,
+            "state": "failed_closed",
+            "explanation": f"normalized-evidence validation failed: {exc}",
+            "candidates": [],
+        }
+    if runner is None:
+        return {
+            "operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+            "adapter": OMI_OLLAMA_ADAPTER_NAME,
+            "state": "unavailable",
+            "explanation": (
+                "T007B requires an explicit deterministic operation runner; "
+                "the live Ollama path is not enabled for normalized evidence"
+            ),
+            "candidates": [],
+        }
+    try:
+        raw_result = runner(normalized_evidence_packet=copy.deepcopy(checked_packet))
+    except Exception as exc:
+        return {
+            "operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+            "adapter": OMI_OLLAMA_ADAPTER_NAME,
+            "state": "error",
+            "explanation": f"T007B operation runner error: {type(exc).__name__}: {exc}",
+            "candidates": [],
+        }
+    original_output = copy.deepcopy(raw_result)
+    try:
+        envelope = validate_adapter_result(raw_result)
+        if envelope["adapter"] != OMI_OLLAMA_ADAPTER_NAME:
+            raise ValueError("T007B runner returned another adapter identity")
+        checked_candidates = []
+        normalized_evidence_refs = [
+            item["normalized_finding_id"] for item in checked_packet["items"]
+        ]
+        for candidate in envelope["candidates"]:
+            original_provenance = (
+                candidate.get("provenance") if isinstance(candidate, dict) else None
+            )
+            if (
+                isinstance(original_provenance, dict)
+                and original_provenance.get("operation_id")
+                not in {None, OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID}
+            ):
+                raise ValueError("T007B finding carries another operation identity")
+            checked = validate_normalized_finding(candidate)
+            _validate_normalized_evidence_snapshot_refs(
+                checked,
+                snapshot_id=checked_packet["source_snapshot_id"],
+                content_hash=checked_packet["source_content_hash"],
+            )
+            checked["provenance"]["operation_id"] = (
+                OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID
+            )
+            checked["normalized_evidence_refs"] = list(normalized_evidence_refs)
+            checked_candidates.append(checked)
+        envelope["candidates"] = checked_candidates
+    except Exception as exc:
+        return {
+            "operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+            "adapter": OMI_OLLAMA_ADAPTER_NAME,
+            "state": "failed_closed" if isinstance(exc, ValueError) else "error",
+            "explanation": f"T007B operation failed closed: {type(exc).__name__}: {exc}",
+            "candidates": [],
+            "original_output": original_output,
+        }
+    return {
+        "operation_id": OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_ID,
+        "original_output": original_output,
+        **envelope,
+    }
 
 
 # ---------------------------------------------------------------------------
