@@ -653,7 +653,14 @@ class AnalysisRunManifest:
                 raise AnalysisRunManifestValidationError(
                     "contributor cannot claim another operation's output"
                 )
-            if contributor.result_state in {"empty", "skipped", "unavailable"} and (
+            if contributor.result_state == "empty" and any(
+                output.disposition not in {"unverified", "quarantined"}
+                for output in claimed_outputs
+            ):
+                raise AnalysisRunManifestValidationError(
+                    "empty contributor can claim only unverified or quarantined output"
+                )
+            if contributor.result_state in {"skipped", "unavailable"} and (
                 contributor.output_ids
             ):
                 raise AnalysisRunManifestValidationError(

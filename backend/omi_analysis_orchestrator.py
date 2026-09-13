@@ -105,6 +105,14 @@ from typing import Any, Callable, Mapping
 
 from backend.story_knowledge import booknlp_adapter_contract
 from backend.story_knowledge import source_map as exact_source_map
+from backend.story_check_grounding_contract import (
+    StoryCheckDiagnostic,
+    StoryCheckDiagnosticResult,
+    StoryCheckEvidenceReference,
+    StoryCheckSourceSnapshot,
+    StoryCheckValidatorResult,
+    StoryCheckVerificationState,
+)
 
 # ---------------------------------------------------------------------------
 # Adapter identity and result-state constants
@@ -1098,7 +1106,7 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
     # accepted only for the real BookNLP identity and only through the strict
     # T004 in-memory handoff contract; the T003 control plane removes payloads
     # from the result envelope before publishing them immutably.
-    allowed_extras = {"fallback_only", "raw_artifacts"}
+    allowed_extras = {"fallback_only", "raw_artifacts", "original_output"}
     extras: dict[str, Any] = {}
     for key, value in result.items():
         if key in {"adapter", "state", "explanation", "candidates"}:
@@ -1113,6 +1121,12 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
             extras[key] = booknlp_adapter_contract.validate_booknlp_raw_artifact_handoff(
                 value
             )
+        elif key == "original_output":
+            if adapter != OMI_STORY_CHECK_ADAPTER_NAME or not isinstance(value, dict):
+                raise ValueError(
+                    "only story_check may attach a grounded original_output object"
+                )
+            extras[key] = copy.deepcopy(value)
         else:
             extras[key] = value
     return {
@@ -2937,6 +2951,7 @@ def _build_local_nlp_fixture_runner(
 
 OMI_STORY_CHECK_SCHEMA_VERSION = "omi_story_check_diagnostic_handoff.v1"
 OMI_STORY_CHECK_ADAPTER_NAME = "story_check"
+OMI_STORY_CHECK_OPERATION_ID = "analyze-story-check"
 OMI_STORY_CHECK_SUPPORT_LABEL = "Story Check diagnostic support only"
 OMI_STORY_CHECK_ALLOWED_STATUSES: frozenset[str] = frozenset(
     {"succeeded", "empty", "failed_closed", "error"}
@@ -3039,6 +3054,257 @@ _OMI_STORY_CHECK_FINAL_TRUTH_LABEL_RE = re.compile(
     r"canon|canonical|truth|approved|promoted|confirmed_fact)\b",
     re.IGNORECASE,
 )
+
+
+def _reconstruct_story_check_evidence_reference(
+    serialized: Any,
+    *,
+    source_snapshot: StoryCheckSourceSnapshot,
+    index: int,
+) -> StoryCheckEvidenceReference:
+    value = _require_dict(
+        serialized,
+        f"Story Check grounded evidence item {index}",
+    )
+    reference = StoryCheckEvidenceReference(
+        source_snapshot,
+        value.get("start_byte"),
+        value.get("end_byte"),
+        value.get("excerpt"),
+        source_id=value.get("source_id"),
+        source_sha256=value.get("source_sha256"),
+        offset_basis=value.get("offset_basis"),
+    )
+    if reference.to_dict() != value:
+        raise ValueError(
+            "Story Check grounded evidence serialization is not authoritative"
+        )
+    return reference
+
+
+def _reconstruct_story_check_validator_result(
+    serialized: Any,
+) -> StoryCheckValidatorResult:
+    value = _require_dict(serialized, "Story Check validator_result")
+    reason_codes = value.get("reason_codes")
+    if not isinstance(reason_codes, list):
+        raise ValueError("Story Check validator reason_codes must be a list")
+    validator_result = StoryCheckValidatorResult(
+        validator_id=value.get("validator_id"),
+        validator_version=value.get("validator_version"),
+        outcome=value.get("outcome"),
+        reason_codes=tuple(reason_codes),
+        comparison_method=value.get("comparison_method"),
+        normalized_claim=value.get("normalized_claim"),
+        normalized_source=value.get("normalized_source"),
+        direct_evidence_matched=value.get("direct_evidence_matched"),
+        detail=value.get("detail"),
+    )
+    if validator_result.to_dict() != value:
+        raise ValueError(
+            "Story Check validator result serialization is not authoritative"
+        )
+    return validator_result
+
+
+def _reconstruct_story_check_diagnostic(
+    serialized: Any,
+    *,
+    source_snapshot: StoryCheckSourceSnapshot,
+    index: int,
+) -> StoryCheckDiagnostic:
+    value = _require_dict(
+        serialized,
+        f"Story Check grounded diagnostic {index}",
+    )
+    evidence_values = _require_list(
+        value.get("evidence"),
+        "Story Check grounded diagnostic evidence",
+    )
+    evidence = tuple(
+        _reconstruct_story_check_evidence_reference(
+            item,
+            source_snapshot=source_snapshot,
+            index=evidence_index,
+        )
+        for evidence_index, item in enumerate(evidence_values)
+    )
+    diagnostic = StoryCheckDiagnostic(
+        diagnostic_id=value.get("diagnostic_id"),
+        classification=value.get("classification"),
+        message=value.get("message"),
+        source_identity=source_snapshot.identity,
+        verification_state=value.get("verification_state"),
+        validator_result=_reconstruct_story_check_validator_result(
+            value.get("validator_result")
+        ),
+        evidence=evidence,
+        producer=value.get("producer"),
+        producer_version=value.get("producer_version"),
+    )
+    if diagnostic.producer != OMI_STORY_CHECK_ADAPTER_NAME:
+        raise ValueError("Story Check diagnostic producer identity mismatch")
+    if diagnostic.to_dict() != value:
+        raise ValueError(
+            "Story Check grounded diagnostic serialization is not authoritative"
+        )
+    return diagnostic
+
+
+def validate_story_check_grounded_result(
+    payload: Any,
+    *,
+    project_name: str,
+    source_id: str,
+    source_content: str,
+) -> dict[str, Any]:
+    """Project a completed grounding result without reclassifying its output."""
+
+    original_output = copy.deepcopy(_require_dict(payload, "Story Check result"))
+    grounding = _require_dict(
+        original_output.get("grounding"), "Story Check grounding envelope"
+    )
+    source_snapshot = StoryCheckSourceSnapshot(
+        _require_non_empty_string(project_name, "project_name"),
+        "scene",
+        _require_non_empty_string(source_id, "source_id"),
+        source_content,
+    )
+    if grounding.get("source_identity") != source_snapshot.identity.to_dict():
+        raise ValueError(
+            "story_check_source_identity_mismatch: grounded Story Check source "
+            "identity does not match the exact selected source"
+        )
+    status = _require_non_empty_string(
+        grounding.get("status"), "Story Check grounding status"
+    )
+    diagnostic_values = _require_list(
+        grounding.get("diagnostics"), "Story Check grounding diagnostics"
+    )
+    if status == "failed_closed":
+        reason_codes = _require_list(
+            grounding.get("reason_codes"),
+            "Story Check failed-closed reason_codes",
+        )
+        if diagnostic_values or not reason_codes:
+            raise ValueError("Story Check failed-closed grounding is malformed")
+        checked_reason_codes = [
+            _require_non_empty_string(
+                reason,
+                "Story Check failed-closed reason_code",
+            )
+            for reason in reason_codes
+        ]
+        authoritative_empty = StoryCheckDiagnosticResult(
+            source_snapshot.identity,
+            (),
+        ).to_dict()
+        serialized_contract = {
+            key: copy.deepcopy(value)
+            for key, value in grounding.items()
+            if key not in {"status", "reason_codes"}
+        }
+        if serialized_contract != authoritative_empty:
+            raise ValueError(
+                "Story Check failed-closed grounding serialization is not authoritative"
+            )
+        return {
+            "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+            "state": "failed_closed",
+            "explanation": "Story Check grounding failed closed: "
+            + ", ".join(checked_reason_codes),
+            "candidates": [],
+            "original_output": original_output,
+        }
+    if status != "completed":
+        raise ValueError("Story Check grounding status is unsupported")
+
+    diagnostics = tuple(
+        _reconstruct_story_check_diagnostic(
+            item,
+            source_snapshot=source_snapshot,
+            index=index,
+        )
+        for index, item in enumerate(diagnostic_values)
+    )
+    authoritative_result = StoryCheckDiagnosticResult(
+        source_snapshot.identity,
+        diagnostics,
+    )
+    serialized_contract = {
+        key: copy.deepcopy(value)
+        for key, value in grounding.items()
+        if key != "status"
+    }
+    if authoritative_result.to_dict() != serialized_contract:
+        raise ValueError(
+            "Story Check grounding serialization is not authoritative"
+        )
+
+    candidate_type_by_classification = {
+        "factual_warning": "continuity_warning",
+        "structural_diagnostic": "structural_diagnostic",
+        "question": "diagnostic_question",
+        "observation": "evidence_note",
+    }
+    candidates: list[dict[str, Any]] = []
+    for diagnostic in diagnostics:
+        if diagnostic.verification_state != StoryCheckVerificationState.VERIFIED:
+            continue
+        normalized_evidence = [
+            {
+                "source_excerpt": reference.excerpt,
+                "source_locator": source_snapshot.source_id,
+                "source_id": reference.source_id,
+                "source_hash": reference.source_sha256,
+                "source_sha256": reference.source_sha256,
+                "byte_start": reference.start_byte,
+                "byte_end": reference.end_byte,
+                "byte_offset_basis": reference.offset_basis,
+            }
+            for reference in diagnostic.evidence
+        ]
+        classification = diagnostic.classification.value
+        candidates.append(
+            {
+                "candidate_type": candidate_type_by_classification[classification],
+                "label": f"Story Check {classification.replace('_', ' ')}",
+                "extracted_claim": diagnostic.message,
+                "evidence": normalized_evidence,
+                "source_locator": source_snapshot.source_id,
+                "provenance": {
+                    "tool_source": OMI_STORY_CHECK_ADAPTER_NAME,
+                    "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                    "support": OMI_STORY_CHECK_SUPPORT_LABEL,
+                    "operation_id": OMI_STORY_CHECK_OPERATION_ID,
+                },
+                "source_adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "support_label": OMI_STORY_CHECK_SUPPORT_LABEL,
+                "support_metadata": {
+                    "story_check_verification_state": (
+                        diagnostic.verification_state.value
+                    ),
+                    "story_check_validator_result": (
+                        diagnostic.validator_result.to_dict()
+                    ),
+                },
+                "owner_decision": {"decision": "pending", "approved": False},
+                "review_status": OMI_FINDING_REVIEW_STATUS_DEFAULT,
+                "raw_finding_id": diagnostic.diagnostic_id,
+            }
+        )
+    return {
+        "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+        "state": "succeeded" if candidates else "empty",
+        "explanation": (
+            "Story Check grounding envelope retained "
+            f"{len(diagnostics)} diagnostics and mapped {len(candidates)} "
+            "authoritatively verified direct-evidence diagnostics to "
+            "candidate-only normalized findings."
+        ),
+        "candidates": candidates,
+        "original_output": original_output,
+    }
 
 
 def _coerce_story_check_candidate_type(finding: dict[str, Any]) -> str:
@@ -3604,9 +3870,22 @@ def _build_story_check_fixture_runner(
         source_idea_id: str | None,
     ) -> dict[str, Any]:
         nonlocal cached_envelope, cached_error
-        _ = project_name
-        _ = raw_idea
-        _ = source_idea_id
+        if isinstance(fixture, dict) and isinstance(fixture.get("grounding"), dict):
+            try:
+                return validate_story_check_grounded_result(
+                    fixture,
+                    project_name=project_name,
+                    source_id=source_idea_id or "request-source",
+                    source_content=raw_idea,
+                )
+            except ValueError as exc:
+                return {
+                    "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                    "state": "failed_closed",
+                    "explanation": f"Story Check grounding failed closed: {exc}",
+                    "candidates": [],
+                    "original_output": copy.deepcopy(fixture),
+                }
         if cached_error is not None:
             return {
                 "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
@@ -7689,6 +7968,23 @@ def _build_story_check_live_runner(
                 ),
                 "candidates": [],
             }
+
+        if isinstance(legacy_result.get("grounding"), dict):
+            try:
+                return validate_story_check_grounded_result(
+                    legacy_result,
+                    project_name=project_name.strip(),
+                    source_id=source_idea_id or "request-source",
+                    source_content=raw_idea,
+                )
+            except ValueError as exc:
+                return {
+                    "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                    "state": "failed_closed",
+                    "explanation": f"Story Check grounding failed closed: {exc}",
+                    "candidates": [],
+                    "original_output": copy.deepcopy(legacy_result),
+                }
 
         envelope = _story_check_result_to_envelope(
             legacy_result,

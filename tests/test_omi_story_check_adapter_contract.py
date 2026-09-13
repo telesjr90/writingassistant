@@ -8,6 +8,7 @@ story prose.
 
 from __future__ import annotations
 
+import copy
 import json
 import sys
 from pathlib import Path
@@ -18,6 +19,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from backend import omi_analysis_orchestrator as oao
+from backend.story_check_grounding_contract import build_story_check_source_snapshot
+from backend.story_check_grounding_integration import ground_story_check_result
 
 
 RAW_IDEA = (
@@ -68,6 +71,60 @@ def _story_check_envelope(
     }
     envelope.update(overrides)
     return envelope
+
+
+def _grounded_story_check_result(
+    *,
+    project_id: str = "demo",
+    source_id: str = "idea-grounded",
+    source_content: str = RAW_IDEA,
+    include_verified: bool = True,
+) -> dict[str, Any]:
+    snapshot = build_story_check_source_snapshot(
+        project_id,
+        "scene",
+        source_id,
+        source_content,
+    )
+    supported = "Mara must recover the archive key before the hearing"
+    source_bytes = source_content.encode("utf-8")
+    start_byte = source_bytes.index(supported.encode("utf-8"))
+    diagnostics = [
+        {
+            "diagnostic_id": "unverified-throughline-question",
+            "classification": "question",
+            "message": "Which throughline is supported by the owner source?",
+            "evidence": [],
+        },
+        {
+            "diagnostic_id": "quarantined-unsupported-fact",
+            "classification": "factual_warning",
+            "message": "The hearing occurs at midnight.",
+            "evidence": [],
+        },
+    ]
+    if include_verified:
+        diagnostics.insert(
+            0,
+            {
+                "diagnostic_id": "verified-archive-key",
+                "classification": "factual_warning",
+                "message": supported,
+                "evidence": [
+                    {
+                        "source_id": source_id,
+                        "source_sha256": snapshot.source_sha256,
+                        "start_byte": start_byte,
+                        "end_byte": start_byte + len(supported.encode("utf-8")),
+                        "excerpt": supported,
+                    }
+                ],
+            },
+        )
+    return ground_story_check_result(
+        {"grounding_diagnostics": diagnostics},
+        snapshot,
+    )
 
 
 def _run_story_check(fixture: Any | None = None, **kwargs: Any) -> dict[str, Any]:
@@ -232,6 +289,79 @@ def test_valid_story_check_diagnostic_question_is_review_support_not_prose() -> 
     assert finding["candidate_type"] == "diagnostic_question"
     assert finding["extracted_claim"].endswith("?")
     _assert_candidate_only_finding(finding)
+
+
+def test_grounded_story_check_maps_only_verified_direct_evidence_candidates() -> None:
+    grounded = _grounded_story_check_result()
+
+    result = _run_story_check(grounded, source_idea_id="idea-grounded")
+
+    env = _story_check_env(result)
+    assert env["state"] == "succeeded"
+    assert env["original_output"] == grounded
+    assert [finding["raw_finding_id"] for finding in result["findings"]] == [
+        "verified-archive-key"
+    ]
+    finding = result["findings"][0]
+    assert finding["provenance"]["operation_id"] == "analyze-story-check"
+    assert finding["support_metadata"]["story_check_verification_state"] == (
+        "verified"
+    )
+    assert finding["support_metadata"]["story_check_validator_result"][
+        "outcome"
+    ] == "supported"
+    assert finding["evidence"][0]["source_sha256"] == grounded["grounding"][
+        "source_identity"
+    ]["source_sha256"]
+    assert {
+        "unverified-throughline-question",
+        "quarantined-unsupported-fact",
+    }.isdisjoint({finding["raw_finding_id"] for finding in result["findings"]})
+
+
+def test_grounded_story_check_with_only_noncandidate_states_is_empty() -> None:
+    grounded = _grounded_story_check_result(include_verified=False)
+    original = copy.deepcopy(grounded)
+
+    result = _run_story_check(grounded, source_idea_id="idea-grounded")
+
+    env = _story_check_env(result)
+    assert env["state"] == "empty"
+    assert env["candidates"] == []
+    assert env["original_output"] == original
+    assert grounded == original
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_contradictory_serialized_grounding_state_fails_closed() -> None:
+    grounded = _grounded_story_check_result(include_verified=False)
+    contradictory = copy.deepcopy(grounded)
+    factual = next(
+        diagnostic
+        for diagnostic in contradictory["grounding"]["diagnostics"]
+        if diagnostic["classification"] == "factual_warning"
+    )
+    assert factual["validator_result"]["outcome"] == "unsupported"
+    factual["verification_state"] = "unverified"
+
+    result = _run_story_check(contradictory, source_idea_id="idea-grounded")
+
+    env = _assert_failed_closed(result)
+    assert "unsupported factual warnings must be quarantined" in env["explanation"]
+    assert env["original_output"] == contradictory
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_grounded_story_check_source_identity_mismatch_fails_closed() -> None:
+    grounded = _grounded_story_check_result(source_id="another-source")
+
+    result = _run_story_check(grounded, source_idea_id="idea-grounded")
+
+    env = _assert_failed_closed(result)
+    assert "source_identity_mismatch" in env["explanation"]
+    assert env["original_output"] == grounded
 
 
 def test_story_check_invalid_json_schema_adapter_or_unknown_type_fails_closed() -> None:

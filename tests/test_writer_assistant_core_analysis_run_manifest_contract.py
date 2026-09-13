@@ -401,6 +401,73 @@ def test_unsuccessful_output_without_reason_fails_closed():
         )
 
 
+def test_empty_contributor_may_retain_unverified_and_quarantined_outputs():
+    identity = source()
+    artifact = ArtifactReference(
+        "raw-grounding",
+        "unknown",
+        (identity.snapshot_id,),
+    )
+    outputs = (
+        OutputLineage(
+            "unverified-diagnostic",
+            "extract",
+            (identity.snapshot_id,),
+            "unverified",
+            artifact.artifact_id,
+            verification_outcome="not_applicable",
+            missing_evidence_reason="validation_not_applicable",
+        ),
+        OutputLineage(
+            "quarantined-diagnostic",
+            "extract",
+            (identity.snapshot_id,),
+            "quarantined",
+            artifact.artifact_id,
+            verification_outcome="unsupported",
+            missing_evidence_reason="evidence_absent",
+        ),
+    )
+
+    value = manifest(
+        contributors=(
+            contributor(
+                identity.snapshot_id,
+                state="empty",
+                coverage="complete",
+                output_ids=tuple(output.output_id for output in outputs),
+            ),
+        ),
+        artifact_references=(artifact,),
+        outputs=outputs,
+        transformations=(),
+        coverage="complete",
+    )
+
+    assert value.contributors[0].result_state == "empty"
+    assert [output.disposition for output in value.outputs] == [
+        "quarantined",
+        "unverified",
+    ]
+
+
+def test_empty_contributor_cannot_claim_validated_output():
+    identity = source()
+    with pytest.raises(
+        AnalysisRunManifestValidationError,
+        match="empty contributor can claim only unverified or quarantined output",
+    ):
+        manifest(
+            contributors=(
+                contributor(
+                    identity.snapshot_id,
+                    state="empty",
+                    coverage="complete",
+                ),
+            ),
+        )
+
+
 def test_transformation_lineage_keeps_original_and_derived_references():
     serialized = manifest().to_dict()
     transformation = serialized["transformations"][0]

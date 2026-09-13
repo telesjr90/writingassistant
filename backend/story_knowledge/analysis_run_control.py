@@ -106,7 +106,7 @@ _OPERATION_CONTRACTS = {
         "role": "normalized_evidence_interpreter",
         "label": "Ollama normalized-evidence interpretation",
     },
-    "analyze-story-check": {
+    omi_analysis_orchestrator.OMI_STORY_CHECK_OPERATION_ID: {
         "adapter_id": "story_check",
         "consumes": ("owner_selected_source",),
         "produces": ("diagnostic_candidate_finding",),
@@ -160,7 +160,7 @@ _DEFAULT_OPERATION_BY_ADAPTER = {
     "spacy": "analyze-spacy",
     "booknlp": "analyze-booknlp",
     "ollama_model": omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID,
-    "story_check": "analyze-story-check",
+    "story_check": omi_analysis_orchestrator.OMI_STORY_CHECK_OPERATION_ID,
     "subtxt_informed_rubric": "analyze-subtxt-informed-rubric",
     "dramatica_flow_informed_rubric": "analyze-dramatica-flow-informed-rubric",
     "deterministic_fallback": "analyze-deterministic-fallback",
@@ -839,6 +839,63 @@ def _exact_finding_evidence_ranges(
     return resolved
 
 
+def _story_check_grounding_diagnostics(
+    snapshot,
+    operation_result: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Return source-bound diagnostics from the immutable grounded output."""
+
+    if operation_result.get("state") not in {"succeeded", "empty"}:
+        return []
+    original_output = operation_result.get("original_output")
+    if not isinstance(original_output, dict) or not isinstance(
+        original_output.get("grounding"), dict
+    ):
+        return []
+    validated = omi_analysis_orchestrator.validate_story_check_grounded_result(
+        original_output,
+        project_name=snapshot.identity.project_id,
+        source_id=snapshot.identity.source_id,
+        source_content=snapshot.source_content,
+    )
+    if validated["state"] != operation_result["state"]:
+        raise ValueError("Story Check operation state disagrees with grounding output")
+    if validated["candidates"] != operation_result["candidates"]:
+        raise ValueError("Story Check candidates disagree with grounding output")
+    return copy.deepcopy(original_output["grounding"]["diagnostics"])
+
+
+def _story_check_diagnostic_evidence_ranges(
+    snapshot,
+    diagnostic: dict[str, Any],
+) -> list[tuple[OffsetRange, OffsetRange]]:
+    """Translate only exact byte evidence retained by the grounding contract."""
+
+    resolved = []
+    for reference in diagnostic["evidence"]:
+        if reference["source_id"] != snapshot.identity.source_id:
+            raise ValueError("Story Check evidence source identity mismatch")
+        if reference["source_sha256"] != snapshot.identity.content_hash:
+            raise ValueError("Story Check evidence source hash mismatch")
+        byte_range = OffsetRange(
+            reference["start_byte"], reference["end_byte"], BYTE_OFFSET_BASIS
+        )
+        character_range = translate_exact_offset_range(
+            snapshot,
+            byte_range,
+            target_basis=CHAR_OFFSET_BASIS,
+            expected_snapshot_id=snapshot.identity.snapshot_id,
+            expected_content_hash=snapshot.identity.content_hash,
+        )
+        if (
+            snapshot.source_content[character_range.start : character_range.end]
+            != reference["excerpt"]
+        ):
+            raise ValueError("Story Check evidence excerpt mismatch")
+        resolved.append((character_range, byte_range))
+    return resolved
+
+
 def _dependency_graph_for_operations(operations: list[OperationDeclaration]) -> tuple[DependencyEdge, ...]:
     edges = []
     for producer in operations:
@@ -1141,6 +1198,21 @@ def _build_manifest_and_evidence(
         item["artifact_file_id"]: item["sha256"]
         for item in handoffs.get("booknlp", {}).get("files", [])
     }
+    story_check_operation_id = omi_analysis_orchestrator.OMI_STORY_CHECK_OPERATION_ID
+    story_check_diagnostics = (
+        _story_check_grounding_diagnostics(
+            snapshot,
+            by_operation.get(story_check_operation_id, {}),
+        )
+        if story_check_operation_id in requested_operations
+        else []
+    )
+    story_check_diagnostics_by_id = {
+        diagnostic["diagnostic_id"]: diagnostic
+        for diagnostic in story_check_diagnostics
+    }
+    if len(story_check_diagnostics_by_id) != len(story_check_diagnostics):
+        raise ValueError("Story Check grounding diagnostic IDs must be unique")
     whole_span = OffsetRange(0, len(snapshot.source_content), CHAR_OFFSET_BASIS)
     for operation_id in requested_operations:
         contract = _OPERATION_CONTRACTS[operation_id]
@@ -1209,6 +1281,18 @@ def _build_manifest_and_evidence(
         finding_outputs.append((finding, operation_id, output_id, transformation_id))
     for finding, operation_id, output_id, transformation_id in finding_outputs:
         adapter_id = _OPERATION_CONTRACTS[operation_id]["adapter_id"]
+        story_check_diagnostic = None
+        if operation_id == story_check_operation_id and story_check_diagnostics:
+            story_check_diagnostic = story_check_diagnostics_by_id.get(
+                finding.get("raw_finding_id")
+            )
+            if (
+                story_check_diagnostic is None
+                or story_check_diagnostic["verification_state"] != "verified"
+            ):
+                raise ValueError(
+                    "Story Check candidate lacks verified grounding lineage"
+                )
         output_evidence_ids = []
         finding_artifact_ids: list[str] = []
         for character_range, byte_range, artifact_file_id in _exact_finding_evidence_ranges(
@@ -1249,6 +1333,8 @@ def _build_manifest_and_evidence(
         transformation_inputs = (
             normalized_input_ids
             if consumes_normalized_evidence
+            else ("result-artifact",)
+            if story_check_diagnostic is not None
             else tuple(dict.fromkeys(finding_artifact_ids)) or ("result-artifact",)
         )
         transformations.append(
@@ -1273,12 +1359,74 @@ def _build_manifest_and_evidence(
                 disposition="validated",
                 original_output_reference_id=(
                     "result-artifact"
-                    if consumes_normalized_evidence
+                    if consumes_normalized_evidence or story_check_diagnostic is not None
                     else finding_artifact_ids[0] if finding_artifact_ids else "result-artifact"
                 ),
                 evidence_reference_ids=tuple(output_evidence_ids),
                 transformation_ids=(transformation_id,),
-                verification_outcome="omi_boundary_validated",
+                verification_outcome=(
+                    story_check_diagnostic["validator_result"]["outcome"]
+                    if story_check_diagnostic is not None
+                    else "omi_boundary_validated"
+                ),
+            )
+        )
+    candidate_story_check_ids = {
+        finding["raw_finding_id"]
+        for finding, operation_id, _, _ in finding_outputs
+        if operation_id == story_check_operation_id
+    }
+    for diagnostic in story_check_diagnostics:
+        if diagnostic["diagnostic_id"] in candidate_story_check_ids:
+            continue
+        disposition = (
+            "validated"
+            if diagnostic["verification_state"] == "verified"
+            else diagnostic["verification_state"]
+        )
+        validator_result = diagnostic["validator_result"]
+        reason = ",".join(validator_result["reason_codes"])
+        output_material = (
+            f"{story_check_operation_id}|grounding|{diagnostic['diagnostic_id']}"
+        )
+        output_id = (
+            "output-"
+            + hashlib.sha256(output_material.encode("utf-8")).hexdigest()[:24]
+        )
+        output_evidence_ids = []
+        for character_range, byte_range in _story_check_diagnostic_evidence_ranges(
+            snapshot, diagnostic
+        ):
+            output_evidence = build_exact_evidence_record(
+                snapshot=snapshot,
+                run_id=run_id,
+                artifact_id=f"bundle-{run_id}",
+                artifact_file_id="source-artifact",
+                operation_id=story_check_operation_id,
+                adapter_id=omi_analysis_orchestrator.OMI_STORY_CHECK_ADAPTER_NAME,
+                disposition=disposition,
+                contributor_state=by_operation[story_check_operation_id]["state"],
+                character_range=character_range,
+                byte_range=byte_range,
+                created_at=created_at,
+                output_id=output_id,
+                reason=None if disposition == "validated" else reason,
+            )
+            evidence_records.append(output_evidence)
+            output_evidence_ids.append(output_evidence["evidence_id"])
+        output_ids_by_operation[story_check_operation_id].append(output_id)
+        outputs.append(
+            OutputLineage(
+                output_id=output_id,
+                operation_id=story_check_operation_id,
+                source_snapshot_ids=(snapshot.identity.snapshot_id,),
+                disposition=disposition,
+                original_output_reference_id="result-artifact",
+                evidence_reference_ids=tuple(output_evidence_ids),
+                verification_outcome=validator_result["outcome"],
+                missing_evidence_reason=(
+                    reason if disposition != "validated" else None
+                ),
             )
         )
     coverage = _coverage(operation_results)

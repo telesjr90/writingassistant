@@ -18,6 +18,8 @@ from backend.story_knowledge.evidence_ledger import (
     scan_evidence_ledger,
 )
 from backend.story_knowledge.promotion_apply_events import append_event
+from backend.story_check_grounding_contract import build_story_check_source_snapshot
+from backend.story_check_grounding_integration import ground_story_check_result
 
 
 def _project(monkeypatch, tmp_path):
@@ -93,6 +95,60 @@ def _finding_result(*args, provenance_extra=None, **kwargs):
             "no_apply_promotion": True,
         },
     }
+
+
+def _grounded_story_check_result(
+    *,
+    project_id: str,
+    source_id: str,
+    source_content: str,
+    include_verified: bool = True,
+) -> dict[str, object]:
+    snapshot = build_story_check_source_snapshot(
+        project_id,
+        "scene",
+        source_id,
+        source_content,
+    )
+    supported = "café 雨"
+    source_bytes = source_content.encode("utf-8")
+    start_byte = source_bytes.index(supported.encode("utf-8"))
+    diagnostics = [
+        {
+            "diagnostic_id": "unverified-structure",
+            "classification": "structural_diagnostic",
+            "message": "The source may need structural review.",
+            "evidence": [],
+        },
+        {
+            "diagnostic_id": "quarantined-unsupported-fact",
+            "classification": "factual_warning",
+            "message": "A different place is named.",
+            "evidence": [],
+        },
+    ]
+    if include_verified:
+        diagnostics.insert(
+            0,
+            {
+                "diagnostic_id": "verified-source-span",
+                "classification": "factual_warning",
+                "message": supported,
+                "evidence": [
+                    {
+                        "source_id": source_id,
+                        "source_sha256": snapshot.source_sha256,
+                        "start_byte": start_byte,
+                        "end_byte": start_byte + len(supported.encode("utf-8")),
+                        "excerpt": supported,
+                    }
+                ],
+            },
+        )
+    return ground_story_check_result(
+        {"grounding_diagnostics": diagnostics},
+        snapshot,
+    )
 
 
 def test_routes_and_truthful_control_capabilities_are_registered():
@@ -401,6 +457,226 @@ def test_ollama_exact_source_operation_manifest_and_lineage_are_distinct(
     assert analysis_run_control._DEFAULT_OPERATION_BY_ADAPTER["ollama_model"] == (
         operation_id
     )
+
+
+def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ"
+    source_id = "idea-story-check-grounded"
+    grounded = _grounded_story_check_result(
+        project_id="example",
+        source_id=source_id,
+        source_content=source,
+    )
+
+    def grounded_runner(*args, **kwargs):
+        return omi_analysis_orchestrator.analyze_omi_raw_idea_with_tools(
+            *args,
+            adapter_fixture_outputs={"story_check": grounded},
+            **kwargs,
+        )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id=source_id,
+        requested_adapters=["story_check"],
+        runner=grounded_runner,
+        created_at="2026-09-12T20:00:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    source_identity = manifest["sources"][0]
+    assert source_identity["project_id"] == "example"
+    assert source_identity["source_document_id"] == source_id
+    assert source_identity["content_hash"] == grounded["grounding"][
+        "source_identity"
+    ]["source_sha256"]
+
+    operation = manifest["operations"][0]
+    assert operation["operation_id"] == "analyze-story-check"
+    assert operation["adapter_id"] == "story_check"
+    assert operation["consumes"] == ["owner_selected_source"]
+    assert operation["configuration"]["adapter_role"] == (
+        "grounded_diagnostic_consumer"
+    )
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == "analyze-story-check"
+    assert contributor["adapter_id"] == "story_check"
+    assert contributor["result_state"] == "succeeded"
+    assert contributor["source_snapshot_ids"] == [source_identity["snapshot_id"]]
+
+    outputs = {item["disposition"]: item for item in manifest["outputs"]}
+    assert set(outputs) == {"validated", "unverified", "quarantined"}
+    assert outputs["validated"]["verification_outcome"] == "supported"
+    assert outputs["validated"]["original_output_reference_id"] == (
+        "result-artifact"
+    )
+    assert outputs["validated"]["evidence_reference_ids"]
+    assert outputs["unverified"]["verification_outcome"] == "not_applicable"
+    assert outputs["unverified"]["missing_evidence_reason"] == (
+        "validation_not_applicable"
+    )
+    assert outputs["unverified"]["evidence_reference_ids"] == []
+    assert outputs["quarantined"]["verification_outcome"] == "unsupported"
+    assert outputs["quarantined"]["missing_evidence_reason"] == "evidence_absent"
+    assert outputs["quarantined"]["evidence_reference_ids"] == []
+    assert all(
+        output["source_snapshot_ids"] == [source_identity["snapshot_id"]]
+        for output in manifest["outputs"]
+    )
+    transformation = manifest["transformations"][0]
+    assert transformation["operation_id"] == "analyze-story-check"
+    assert transformation["transformation_kind"] == "validated_normalization"
+    assert transformation["input_reference_ids"] == ["result-artifact"]
+
+    chain = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    finding_evidence = [
+        event["payload"]
+        for event in chain
+        if event["event_type"] == "evidence_recorded"
+        and event["payload"]["output_id"] is not None
+    ]
+    assert len(finding_evidence) == 1
+    assert finding_evidence[0]["operation_id"] == "analyze-story-check"
+    assert finding_evidence[0]["adapter_id"] == "story_check"
+    locator = finding_evidence[0]["source_locator"]
+    assert (locator["char_start"], locator["char_end"]) == (3, 9)
+    assert (locator["byte_start"], locator["byte_end"]) == (3, 12)
+
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert [item["raw_finding_id"] for item in published["findings"]] == [
+        "verified-source-span"
+    ]
+    assert published["findings"][0]["provenance"]["operation_id"] == (
+        "analyze-story-check"
+    )
+    operation_result = published["operation_results"][0]
+    assert operation_result["original_output"] == grounded
+    assert published["persisted_candidate_ids"] == []
+
+
+def test_story_check_noncandidate_grounding_survives_empty_manifest_lineage(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ"
+    source_id = "idea-story-check-noncandidate"
+    grounded = _grounded_story_check_result(
+        project_id="example",
+        source_id=source_id,
+        source_content=source,
+        include_verified=False,
+    )
+    original = copy.deepcopy(grounded)
+
+    def grounded_runner(*args, **kwargs):
+        return omi_analysis_orchestrator.analyze_omi_raw_idea_with_tools(
+            *args,
+            adapter_fixture_outputs={"story_check": grounded},
+            **kwargs,
+        )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id=source_id,
+        requested_adapters=["story_check"],
+        runner=grounded_runner,
+        created_at="2026-09-12T20:00:30Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == "analyze-story-check"
+    assert contributor["adapter_id"] == "story_check"
+    assert contributor["result_state"] == "empty"
+
+    outputs = {item["disposition"]: item for item in manifest["outputs"]}
+    assert set(outputs) == {"unverified", "quarantined"}
+    assert outputs["unverified"]["verification_outcome"] == "not_applicable"
+    assert outputs["unverified"]["missing_evidence_reason"] == (
+        "validation_not_applicable"
+    )
+    assert outputs["quarantined"]["verification_outcome"] == "unsupported"
+    assert outputs["quarantined"]["missing_evidence_reason"] == "evidence_absent"
+    assert all(
+        output["original_output_reference_id"] == "result-artifact"
+        and output["evidence_reference_ids"] == []
+        for output in manifest["outputs"]
+    )
+    assert manifest["transformations"] == []
+
+    chain = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    assert [
+        event
+        for event in chain
+        if event["event_type"] == "evidence_recorded"
+        and event["payload"]["output_id"] is not None
+    ] == []
+
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert published["findings"] == []
+    assert published["operation_results"][0]["state"] == "empty"
+    assert published["operation_results"][0]["original_output"] == original
+    assert grounded == original
+    assert published["persisted_candidate_ids"] == []
+
+
+def test_story_check_grounding_source_mismatch_fails_closed_in_control_plane(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ"
+    grounded = _grounded_story_check_result(
+        project_id="example",
+        source_id="different-source",
+        source_content=source,
+    )
+
+    def mismatched_runner(*args, **kwargs):
+        return omi_analysis_orchestrator.analyze_omi_raw_idea_with_tools(
+            *args,
+            adapter_fixture_outputs={"story_check": grounded},
+            **kwargs,
+        )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="selected-source",
+        requested_adapters=["story_check"],
+        runner=mismatched_runner,
+        created_at="2026-09-12T20:01:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["outputs"] == []
+    assert manifest["transformations"] == []
+    assert manifest["contributors"][0]["result_state"] == "failed_closed"
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert published["findings"] == []
+    assert published["operation_results"][0]["original_output"] == grounded
+    assert "source_identity_mismatch" in published["operation_results"][0][
+        "explanation"
+    ]
+    assert published["persisted_candidate_ids"] == []
 
 
 def test_t007b_same_adapter_sequential_manifest_and_ledger_lineage(
