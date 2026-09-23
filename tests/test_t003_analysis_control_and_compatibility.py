@@ -2,15 +2,21 @@ from __future__ import annotations
 
 import copy
 import concurrent.futures
+import hashlib
 import json
 import threading
+import urllib.request
 from contextlib import contextmanager
 
 import pytest
 
 from backend import main, omi_analysis_orchestrator, project_manager
 from backend.routes import omi_analysis_runs
-from backend.story_knowledge import analysis_run_control, persisted_compatibility
+from backend.story_knowledge import (
+    analysis_run_control,
+    persisted_compatibility,
+    raw_artifacts,
+)
 from backend.story_knowledge.apply_promotion import build_promotion_audit_record
 from backend.story_knowledge.evidence_ledger import (
     append_evidence_ledger_event,
@@ -161,6 +167,41 @@ def _grounded_story_check_result(
         {"grounding_diagnostics": diagnostics},
         snapshot,
     )
+
+
+def _failed_closed_story_check_analysis_result(
+    grounded_output: dict[str, object],
+    *,
+    source_idea_id: str,
+) -> dict[str, object]:
+    from backend import analysis_engine
+
+    execution_metadata = analysis_engine._story_check_runtime_metadata(
+        actual_model="qwen3:8b",
+        response_observed=True,
+    )
+    adapter_result = {
+        "adapter": "story_check",
+        "state": "failed_closed",
+        "explanation": (
+            "separate post-grounding application gate failed closed"
+        ),
+        "candidates": [],
+        "original_output": copy.deepcopy(grounded_output),
+        **execution_metadata,
+    }
+    return {
+        "analysis_status": "fail_closed",
+        "explanation": "Story Check retained diagnostics but failed closed later.",
+        "source_idea_id": source_idea_id,
+        "adapter_results": [adapter_result],
+        "findings": [],
+        "persisted_candidate_ids": [],
+        "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(
+            real_tool_calls_occurred=True,
+            model_calls_occurred=True,
+        ),
+    }
 
 
 def test_routes_and_truthful_control_capabilities_are_registered():
@@ -471,6 +512,600 @@ def test_ollama_exact_source_operation_manifest_and_lineage_are_distinct(
     )
 
 
+def test_exact_source_snapshot_runtime_and_artifact_bytes_are_identical(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = (
+        "VALIDATION RECORD.\n"
+        "Person: Mara Vale.\n"
+        "Object: brass compass.\n"
+    )
+    source_bytes = source.encode("utf-8")
+    source_hash = hashlib.sha256(source_bytes).hexdigest()
+    captured_snapshots = []
+    captured_runtime_sources = {}
+    build_snapshot = analysis_run_control.build_exact_source_snapshot
+
+    def capture_snapshot(**kwargs):
+        snapshot = build_snapshot(**kwargs)
+        captured_snapshots.append(snapshot)
+        return snapshot
+
+    def capture_runner(adapter_id):
+        def runner(*, project_name, raw_idea, source_idea_id):
+            captured_runtime_sources[adapter_id] = raw_idea
+            return {
+                "adapter": adapter_id,
+                "state": "empty",
+                "explanation": "deterministic exact-source boundary capture",
+                "candidates": [],
+            }
+
+        return runner
+
+    def execute(project_name, raw_idea, **kwargs):
+        return omi_analysis_orchestrator.analyze_omi_raw_idea_with_tools(
+            project_name,
+            raw_idea,
+            source_idea_id=kwargs.get("source_idea_id"),
+            persist_candidates=kwargs["persist_candidates"],
+            requested_adapters=kwargs["requested_adapters"],
+            allow_deterministic_fallback=kwargs["allow_deterministic_fallback"],
+            adapter_runners={
+                "ollama_model": capture_runner("ollama_model"),
+                "story_check": capture_runner("story_check"),
+            },
+        )
+
+    monkeypatch.setattr(
+        analysis_run_control,
+        "build_exact_source_snapshot",
+        capture_snapshot,
+    )
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="validation-record-exact-source",
+        requested_adapters=["ollama_model", "story_check"],
+        runner=execute,
+        created_at="2026-09-14T00:00:00Z",
+    )
+
+    assert source.endswith("\n")
+    assert len(source_bytes) == 61
+    assert source_hash == (
+        "4da6a38ab30a3702ec91d4c03facea2703ee13e173d2de067aa9ed022a647970"
+    )
+    assert len(captured_snapshots) == 1
+    snapshot = captured_snapshots[0]
+    assert snapshot.source_content == source
+    assert snapshot.source_content.encode("utf-8") == source_bytes
+    assert snapshot.identity.content_hash == source_hash
+    assert captured_runtime_sources == {
+        "ollama_model": source,
+        "story_check": source,
+    }
+    assert {
+        adapter_id: hashlib.sha256(value.encode("utf-8")).hexdigest()
+        for adapter_id, value in captured_runtime_sources.items()
+    } == {
+        "ollama_model": source_hash,
+        "story_check": source_hash,
+    }
+
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["sources"][0]["content_hash"] == source_hash
+    source_artifact = next(
+        item
+        for item in manifest["artifact_references"]
+        if item["artifact_id"] == "source-artifact"
+    )
+    assert source_artifact["content_hash"] == source_hash
+
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    source_file = next(
+        item
+        for item in raw_manifest["artifact_files"]
+        if item["artifact_file_id"] == "source-artifact"
+    )
+    bundle_dir = raw_artifacts.raw_artifact_bundle_storage_dir(
+        tmp_path, "example", bundle_id
+    )
+    artifact_bytes = (bundle_dir / source_file["relative_path"]).read_bytes()
+    assert artifact_bytes == source_bytes
+    assert len(artifact_bytes) == 61
+    assert hashlib.sha256(artifact_bytes).hexdigest() == source_hash
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
+
+
+def test_live_ollama_rejected_original_persists_with_provenance_and_truthful_flags(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = (
+        "VALIDATION RECORD.\n"
+        "Person: Mara Vale.\n"
+        "Object: brass compass.\n"
+    )
+    invalid_model_content = json.dumps(
+        {
+            "schema_version": omi_analysis_orchestrator.OMI_OLLAMA_SCHEMA_VERSION,
+            "adapter": "ollama_model",
+            "status": "succeeded",
+            "explanation": "mocked live invalid-type extraction",
+            "findings": [
+                {
+                    "candidate_type": "person",
+                    "label": "Mara Vale",
+                    "extracted_claim": "Mara Vale is named in the validation record.",
+                    "evidence": [
+                        {
+                            "source_excerpt": "Mara Vale",
+                            "source_locator": "raw_idea:L2:C8-17",
+                        }
+                    ],
+                    "source_locator": "raw_idea:L2:C8-17",
+                    "support_label": "ollama model support strength only",
+                }
+            ],
+        }
+    )
+    response_data = {
+        "model": "qwen3:8b",
+        "created_at": "2026-09-13T23:50:00Z",
+        "message": {"role": "assistant", "content": invalid_model_content},
+        "done": True,
+    }
+
+    class MockResponse:
+        def read(self):
+            return json.dumps(response_data).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+    monkeypatch.setattr(
+        urllib.request,
+        "urlopen",
+        lambda *args, **kwargs: MockResponse(),
+    )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="validation-record-live-rejected",
+        requested_adapters=["ollama_model"],
+        created_at="2026-09-13T23:50:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    operation_id = omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID
+    contributor = manifest["contributors"][0]
+    provenance = contributor["provenance"]
+    assert contributor["operation_id"] == operation_id
+    assert contributor["adapter_id"] == "ollama_model"
+    assert contributor["result_state"] == "failed_closed"
+    assert provenance["implementation_kind"] == "official_external"
+    assert provenance["tool"] == {
+        "availability": "available",
+        "name": "Ollama",
+        "version": None,
+    }
+    assert provenance["runtime"] == {
+        "availability": "available",
+        "name": "Ollama HTTP API",
+        "version": None,
+    }
+    assert provenance["provider"]["name"] == "Ollama"
+    assert provenance["model"] == {
+        "availability": "available",
+        "name": "qwen3:8b",
+        "version": None,
+    }
+
+    source_identity = manifest["sources"][0]
+    source_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    assert source_identity["content_hash"] == source_hash
+    artifact_refs = {
+        item["artifact_id"]: item for item in manifest["artifact_references"]
+    }
+    original_artifact_id = f"original-output-{operation_id}"
+    assert artifact_refs["source-artifact"]["content_hash"] == source_hash
+    assert original_artifact_id in artifact_refs
+    output = manifest["outputs"][0]
+    assert output["operation_id"] == operation_id
+    assert output["disposition"] == "rejected"
+    assert output["original_output_reference_id"] == original_artifact_id
+    assert output["source_snapshot_ids"] == [source_identity["snapshot_id"]]
+    assert output["transformation_ids"] == []
+    assert contributor["output_ids"] == [output["output_id"]]
+
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    file_refs = {
+        item["artifact_file_id"]: item for item in raw_manifest["artifact_files"]
+    }
+    assert set(file_refs) == {
+        "source-artifact",
+        "result-artifact",
+        original_artifact_id,
+    }
+    assert "authorized_model_calls_occurred" in raw_manifest["boundary_flags"]
+    assert "no_model_calls" not in raw_manifest["boundary_flags"]
+    assert {
+        "raw_artifacts_support_data_only",
+        "raw_artifacts_not_canon",
+        "raw_artifacts_not_candidates",
+        "raw_artifacts_not_training_data",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+    }.issubset(raw_manifest["boundary_flags"])
+    assert raw_manifest["no_model_call_confirmation"] is False
+    for file_ref in file_refs.values():
+        assert "authorized_model_calls_occurred" in file_ref["boundary_flags"]
+        assert "no_model_calls" not in file_ref["boundary_flags"]
+    bundle_dir = raw_artifacts.raw_artifact_bundle_storage_dir(
+        tmp_path, "example", bundle_id
+    )
+    source_bytes = (bundle_dir / file_refs["source-artifact"]["relative_path"]).read_bytes()
+    original_bytes = (bundle_dir / file_refs[original_artifact_id]["relative_path"]).read_bytes()
+    result_bytes = (bundle_dir / file_refs["result-artifact"]["relative_path"]).read_bytes()
+    assert source_bytes == source.encode("utf-8")
+    assert hashlib.sha256(original_bytes).hexdigest() == file_refs[original_artifact_id]["sha256"]
+    assert hashlib.sha256(result_bytes).hexdigest() == file_refs["result-artifact"]["sha256"]
+    assert original_bytes != result_bytes
+    original_output = json.loads(original_bytes)
+    assert json.loads(original_output["message"]["content"])["findings"][0][
+        "candidate_type"
+    ] == "person"
+    persisted_result = json.loads(result_bytes)
+    assert persisted_result["analysis_status"] == "fail_closed"
+    assert persisted_result["findings"] == []
+    assert persisted_result["persisted_candidate_ids"] == []
+    assert persisted_result["safety"]["no_real_tool_calls"] is False
+    assert persisted_result["safety"]["no_model_calls"] is False
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
+    ledger = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    output_event = next(item for item in ledger if item["event_type"] == "output_recorded")
+    assert output_event["payload"]["output_id"] == output["output_id"]
+    assert output_event["payload"]["disposition"] == "rejected"
+
+
+def test_unavailable_ollama_remains_unavailable_and_confirms_no_model_call(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea="VALIDATION RECORD.",
+        source_idea_id="validation-record-unavailable",
+        requested_adapters=["ollama_model"],
+        runner=_fake_result,
+        created_at="2026-09-13T23:51:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["result_state"] == "unavailable"
+    for plane in ("tool", "runtime", "provider", "model"):
+        assert contributor["provenance"][plane] == {
+            "availability": "unavailable",
+            "name": None,
+            "version": None,
+        }
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    assert "no_model_calls" in raw_manifest["boundary_flags"]
+    assert "authorized_model_calls_occurred" not in raw_manifest["boundary_flags"]
+    assert raw_manifest["no_model_call_confirmation"] is True
+    assert manifest["outputs"] == []
+
+
+def test_ambiguous_ollama_transport_failure_persists_unknown_model_call_state(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+
+    def timeout_before_response(*args, **kwargs):
+        raise TimeoutError("mock timeout before response")
+
+    monkeypatch.setattr(urllib.request, "urlopen", timeout_before_response)
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea="VALIDATION RECORD. Person: Mara Vale.",
+        source_idea_id="validation-record-transport-unknown",
+        requested_adapters=["ollama_model"],
+        created_at="2026-09-13T23:52:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["result_state"] == "failed_closed"
+    for plane in ("tool", "runtime", "provider", "model"):
+        assert contributor["provenance"][plane] == {
+            "availability": "unknown",
+            "name": None,
+            "version": None,
+        }
+    assert manifest["outputs"] == []
+    assert not any(
+        item["artifact_id"].startswith("original-output-")
+        for item in manifest["artifact_references"]
+    )
+
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    assert "model_call_state_unknown" in raw_manifest["boundary_flags"]
+    assert "no_model_calls" not in raw_manifest["boundary_flags"]
+    assert "authorized_model_calls_occurred" not in raw_manifest["boundary_flags"]
+    assert raw_manifest["no_model_call_confirmation"] is False
+    for file_ref in raw_manifest["artifact_files"]:
+        assert "model_call_state_unknown" in file_ref["boundary_flags"]
+        assert "no_model_calls" not in file_ref["boundary_flags"]
+        assert "authorized_model_calls_occurred" not in file_ref["boundary_flags"]
+    bundle_dir = raw_artifacts.raw_artifact_bundle_storage_dir(
+        tmp_path, "example", bundle_id
+    )
+    result_ref = next(
+        item
+        for item in raw_manifest["artifact_files"]
+        if item["artifact_file_id"] == "result-artifact"
+    )
+    persisted_result = json.loads(
+        (bundle_dir / result_ref["relative_path"]).read_text(encoding="utf-8")
+    )
+    operation_result = persisted_result["operation_results"][0]
+    assert operation_result["state"] == "failed_closed"
+    assert operation_result["candidates"] == []
+    assert "original_output" not in operation_result
+    assert operation_result["runtime_execution"]["model_calls_occurred"] is None
+    assert persisted_result["findings"] == []
+    assert persisted_result["persisted_candidate_ids"] == []
+    assert persisted_result["safety"]["no_real_tool_calls"] is False
+    assert persisted_result["safety"]["no_model_calls"] is None
+    assert persisted_result["safety"]["model_calls_occurred"] is None
+    assert persisted_result["safety"]["model_call_state"] == "unknown"
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
+
+
+def test_story_check_live_response_provenance_survives_zero_verified_findings(
+    monkeypatch, tmp_path
+):
+    from backend import analysis_engine
+
+    project = _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ"
+    source_id = "story-check-live-zero-verified"
+    grounded = _grounded_story_check_result(
+        project_id="example",
+        source_id=source_id,
+        source_content=source,
+        include_verified=False,
+    )
+    live_result = copy.deepcopy(grounded)
+    live_result[analysis_engine.STORY_CHECK_RUNTIME_METADATA_KEY] = (
+        analysis_engine._story_check_runtime_metadata(
+            actual_model="qwen3:8b",
+            response_observed=True,
+        )
+    )
+
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_STORY_CHECK_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_STORY_CHECK_SCENE_ID", source_id)
+    monkeypatch.setattr(
+        analysis_engine,
+        "run_story_check",
+        lambda project_name, scene_id: copy.deepcopy(live_result),
+    )
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id=source_id,
+        requested_adapters=["story_check"],
+        created_at="2026-09-14T01:00:00Z",
+    )
+
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == "analyze-story-check"
+    assert contributor["adapter_id"] == "story_check"
+    assert contributor["result_state"] == "empty"
+    assert contributor["provenance"] == {
+        "adapter_id": "story_check",
+        "operation_id": "analyze-story-check",
+        "user_facing_label": "Story Check grounded diagnostics",
+        "implementation_kind": "app_owned",
+        "tool": {
+            "availability": "available",
+            "name": "Story Check",
+            "version": None,
+        },
+        "runtime": {
+            "availability": "available",
+            "name": "Writing Assistant Story Check runtime",
+            "version": None,
+        },
+        "provider": {
+            "availability": "available",
+            "name": "Ollama",
+            "version": None,
+        },
+        "model": {
+            "availability": "available",
+            "name": "qwen3:8b",
+            "version": None,
+        },
+    }
+
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    assert "authorized_model_calls_occurred" in raw_manifest["boundary_flags"]
+    assert "no_model_calls" not in raw_manifest["boundary_flags"]
+    assert raw_manifest["no_model_call_confirmation"] is False
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    operation_result = published["operation_results"][0]
+    assert operation_result["operation_id"] == "analyze-story-check"
+    assert operation_result["state"] == "empty"
+    assert operation_result["candidates"] == []
+    assert operation_result["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": True,
+    }
+    assert published["findings"] == []
+    assert published["safety"]["no_real_tool_calls"] is False
+    assert published["safety"]["no_model_calls"] is False
+    assert published["safety"]["model_call_state"] == "occurred"
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+
+
+def test_story_check_transport_failure_persists_unknown_model_call_state(
+    monkeypatch, tmp_path
+):
+    from backend import analysis_engine
+
+    project = _project(monkeypatch, tmp_path)
+    source_id = "story-check-live-transport-unknown"
+    failed_result = {
+        "error": "mocked Story Check Ollama timeout",
+        analysis_engine.STORY_CHECK_RUNTIME_METADATA_KEY: (
+            analysis_engine._story_check_runtime_metadata(
+                actual_model=None,
+                response_observed=False,
+            )
+        ),
+    }
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_STORY_CHECK_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_STORY_CHECK_SCENE_ID", source_id)
+    monkeypatch.setattr(
+        analysis_engine,
+        "run_story_check",
+        lambda project_name, scene_id: copy.deepcopy(failed_result),
+    )
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea="Owner-selected Story Check source.",
+        source_idea_id=source_id,
+        requested_adapters=["story_check"],
+        created_at="2026-09-14T01:01:00Z",
+    )
+
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == "analyze-story-check"
+    assert contributor["result_state"] == "error"
+    for plane in ("tool", "runtime", "provider", "model"):
+        assert contributor["provenance"][plane] == {
+            "availability": "unknown",
+            "name": None,
+            "version": None,
+        }
+
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    assert "model_call_state_unknown" in raw_manifest["boundary_flags"]
+    assert "no_model_calls" not in raw_manifest["boundary_flags"]
+    assert "authorized_model_calls_occurred" not in raw_manifest["boundary_flags"]
+    assert raw_manifest["no_model_call_confirmation"] is False
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert published["operation_results"][0]["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": None,
+    }
+    assert published["safety"]["no_real_tool_calls"] is False
+    assert published["safety"]["no_model_calls"] is None
+    assert published["safety"]["model_call_state"] == "unknown"
+    assert published["findings"] == []
+    assert published["persisted_candidate_ids"] == []
+
+
+def test_unavailable_story_check_confirms_no_runtime_or_model_call(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    monkeypatch.delenv("OMI_LIVE_TOOLS_ENABLED", raising=False)
+    monkeypatch.delenv("OMI_LIVE_STORY_CHECK_ENABLED", raising=False)
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea="Owner-selected Story Check source.",
+        source_idea_id="story-check-unavailable",
+        requested_adapters=["story_check"],
+        created_at="2026-09-14T01:02:00Z",
+    )
+
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["result_state"] == "unavailable"
+    for plane in ("tool", "runtime", "provider", "model"):
+        assert contributor["provenance"][plane] == {
+            "availability": "unavailable",
+            "name": None,
+            "version": None,
+        }
+    bundle_id = f"bundle-{run['run_id']}"
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", bundle_id, project_dir=tmp_path
+    )
+    assert "no_model_calls" in raw_manifest["boundary_flags"]
+    assert "model_call_state_unknown" not in raw_manifest["boundary_flags"]
+    assert raw_manifest["no_model_call_confirmation"] is True
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert "runtime_execution" not in published["operation_results"][0]
+    assert published["safety"]["no_real_tool_calls"] is True
+    assert published["safety"]["no_model_calls"] is True
+    assert published["safety"]["model_call_state"] == "not_occurred"
+
+
 def test_story_check_grounding_states_survive_manifest_and_ledger_integration(
     monkeypatch, tmp_path
 ):
@@ -708,6 +1343,161 @@ def test_story_check_noncandidate_grounding_survives_empty_manifest_lineage(
     assert published["operation_results"][0]["original_output"] == original
     assert grounded == original
     assert published["persisted_candidate_ids"] == []
+
+
+def test_failed_closed_story_check_retains_nonvalidated_diagnostic_lineage(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "AA café 雨 ZZ"
+    source_id = "idea-story-check-failed-closed-lineage"
+    grounded = _grounded_story_check_result(
+        project_id="example",
+        source_id=source_id,
+        source_content=source,
+        include_verified=False,
+    )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id=source_id,
+        requested_adapters=["story_check"],
+        runner=lambda *args, **kwargs: _failed_closed_story_check_analysis_result(
+            grounded,
+            source_idea_id=source_id,
+        ),
+        created_at="2026-09-14T22:00:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    source_snapshot_id = manifest["sources"][0]["snapshot_id"]
+    diagnostic_ids = [
+        item["diagnostic_id"]
+        for item in grounded["grounding"]["diagnostics"]
+    ]
+    expected_output_ids = {
+        diagnostic_id: (
+            "output-"
+            + hashlib.sha256(
+                f"analyze-story-check|grounding|{diagnostic_id}".encode("utf-8")
+            ).hexdigest()[:24]
+        )
+        for diagnostic_id in diagnostic_ids
+    }
+    outputs_by_id = {
+        item["output_id"]: item for item in manifest["outputs"]
+    }
+
+    assert len(outputs_by_id) == 4
+    assert set(outputs_by_id) == set(expected_output_ids.values())
+    assert sum(
+        output["disposition"] == "unverified"
+        for output in outputs_by_id.values()
+    ) == 3
+    assert sum(
+        output["disposition"] == "quarantined"
+        for output in outputs_by_id.values()
+    ) == 1
+    for diagnostic in grounded["grounding"]["diagnostics"]:
+        output = outputs_by_id[expected_output_ids[diagnostic["diagnostic_id"]]]
+        expected_disposition = diagnostic["verification_state"]
+        assert output["operation_id"] == "analyze-story-check"
+        assert output["source_snapshot_ids"] == [source_snapshot_id]
+        assert output["disposition"] == expected_disposition
+        assert output["original_output_reference_id"] == "result-artifact"
+        assert output["verification_outcome"] == diagnostic["validator_result"][
+            "outcome"
+        ]
+        assert output["missing_evidence_reason"] == ",".join(
+            diagnostic["validator_result"]["reason_codes"]
+        )
+        assert output["evidence_reference_ids"] == []
+        assert output["transformation_ids"] == []
+
+    contributor = manifest["contributors"][0]
+    assert contributor["result_state"] == "failed_closed"
+    assert set(contributor["output_ids"]) == set(outputs_by_id)
+    assert contributor["provenance"]["implementation_kind"] == "app_owned"
+    assert contributor["provenance"]["model"]["name"] == "qwen3:8b"
+    assert manifest["transformations"] == []
+
+    chain = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    output_events = [
+        event for event in chain if event["event_type"] == "output_recorded"
+    ]
+    assert {event["payload"]["output_id"] for event in output_events} == set(
+        outputs_by_id
+    )
+    assert [
+        event
+        for event in chain
+        if event["event_type"] == "evidence_recorded"
+        and event["payload"]["output_id"] is not None
+    ] == []
+
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    assert published["operation_results"][0]["state"] == "failed_closed"
+    assert published["operation_results"][0]["original_output"] == grounded
+    assert published["operation_results"][0]["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": True,
+    }
+    assert published["findings"] == []
+    assert published["persisted_candidate_ids"] == []
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+
+
+def test_failed_closed_story_check_with_no_diagnostics_creates_no_output_lineage(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "Owner source without Story Check diagnostics."
+    source_id = "idea-story-check-failed-closed-empty"
+    snapshot = build_story_check_source_snapshot(
+        "example",
+        "scene",
+        source_id,
+        source,
+    )
+    grounded = ground_story_check_result(
+        {"grounding_diagnostics": []},
+        snapshot,
+    )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id=source_id,
+        requested_adapters=["story_check"],
+        runner=lambda *args, **kwargs: _failed_closed_story_check_analysis_result(
+            grounded,
+            source_idea_id=source_id,
+        ),
+        created_at="2026-09-14T22:01:00Z",
+    )
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["outputs"] == []
+    assert manifest["transformations"] == []
+    assert manifest["contributors"][0]["output_ids"] == []
+    chain = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    assert [
+        event for event in chain if event["event_type"] == "output_recorded"
+    ] == []
 
 
 @pytest.mark.parametrize(

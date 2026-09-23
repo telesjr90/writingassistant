@@ -572,18 +572,42 @@ def adapter_contract(adapter_name: str) -> dict[str, Any]:
     return dict(OMI_ADAPTER_CONTRACTS[adapter_name])
 
 
-def build_orchestrator_safety_envelope() -> dict[str, Any]:
-    """Return a static safety-envelope summary for logs / audit records.
+def build_orchestrator_safety_envelope(
+    *,
+    real_tool_calls_occurred: bool = False,
+    model_calls_occurred: bool | None = False,
+) -> dict[str, Any]:
+    """Return a truthful safety/runtime summary for logs and audit records.
 
     This helper is intentionally side-effect free: it does not perform any
     analysis or I/O and does not mutate any global state.
     """
+    if not isinstance(real_tool_calls_occurred, bool) or not (
+        isinstance(model_calls_occurred, bool) or model_calls_occurred is None
+    ):
+        raise ValueError("runtime execution safety flags must be bool or None")
+    if model_calls_occurred is not False and not real_tool_calls_occurred:
+        raise ValueError("a model call is also a real tool call")
+    model_call_state = (
+        "unknown"
+        if model_calls_occurred is None
+        else "occurred"
+        if model_calls_occurred
+        else "not_occurred"
+    )
     return {
         "no_prose": True,
         "no_memory_canon_mutation": True,
         "no_apply_promotion": True,
         "no_canon_promotion": True,
-        "no_real_tool_calls": True,
+        "no_prohibited_real_tool_calls": True,
+        "no_real_tool_calls": not real_tool_calls_occurred,
+        "authorized_real_tool_calls_occurred": real_tool_calls_occurred,
+        "no_model_calls": (
+            None if model_calls_occurred is None else not model_calls_occurred
+        ),
+        "model_calls_occurred": model_calls_occurred,
+        "model_call_state": model_call_state,
         "no_package_installs": True,
         "no_story_prose_generation": True,
         "candidate_presence_is_not_canon": True,
@@ -1106,7 +1130,13 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
     # accepted only for the real BookNLP identity and only through the strict
     # T004 in-memory handoff contract; the T003 control plane removes payloads
     # from the result envelope before publishing them immutably.
-    allowed_extras = {"fallback_only", "raw_artifacts", "original_output"}
+    allowed_extras = {
+        "fallback_only",
+        "raw_artifacts",
+        "original_output",
+        "execution_provenance",
+        "runtime_execution",
+    }
     extras: dict[str, Any] = {}
     for key, value in result.items():
         if key in {"adapter", "state", "explanation", "candidates"}:
@@ -1122,10 +1152,95 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
                 value
             )
         elif key == "original_output":
-            if adapter != OMI_STORY_CHECK_ADAPTER_NAME or not isinstance(value, dict):
+            if adapter not in {
+                OMI_STORY_CHECK_ADAPTER_NAME,
+                OMI_OLLAMA_ADAPTER_NAME,
+            } or not isinstance(value, dict):
                 raise ValueError(
-                    "only story_check may attach a grounded original_output object"
+                    "only story_check or ollama_model may attach an original_output object"
                 )
+            extras[key] = copy.deepcopy(value)
+        elif key == "execution_provenance":
+            live_implementation_kinds = {
+                OMI_OLLAMA_ADAPTER_NAME: "official_external",
+                OMI_STORY_CHECK_ADAPTER_NAME: "app_owned",
+            }
+            if adapter not in live_implementation_kinds or not isinstance(value, dict):
+                raise ValueError(
+                    "only story_check or ollama_model may attach live execution provenance"
+                )
+            required = {
+                "implementation_kind",
+                "user_facing_label",
+                "tool",
+                "runtime",
+                "provider",
+                "model",
+            }
+            if set(value) != required:
+                raise ValueError("invalid live execution provenance fields")
+            if value["implementation_kind"] != live_implementation_kinds[adapter]:
+                raise ValueError("invalid live execution implementation kind")
+            user_facing_label = _require_non_empty_string(
+                value["user_facing_label"],
+                "live execution user_facing_label",
+            )
+            if (
+                adapter == OMI_STORY_CHECK_ADAPTER_NAME
+                and user_facing_label != "Story Check grounded diagnostics"
+            ):
+                raise ValueError("invalid Story Check live execution label")
+            for plane in ("tool", "runtime", "provider", "model"):
+                component = value[plane]
+                if not isinstance(component, dict) or set(component) != {
+                    "availability",
+                    "name",
+                    "version",
+                }:
+                    raise ValueError(f"invalid live {plane} provenance")
+                availability = component["availability"]
+                if availability not in {"available", "unknown"}:
+                    raise ValueError(f"invalid live {plane} provenance availability")
+                if availability == "available":
+                    _require_non_empty_string(
+                        component["name"], f"live {plane} provenance name"
+                    )
+                elif component["name"] is not None or component["version"] is not None:
+                    raise ValueError(
+                        f"unknown live {plane} provenance cannot claim identity"
+                    )
+                if component["version"] is not None and not isinstance(
+                    component["version"], str
+                ):
+                    raise ValueError(f"invalid live {plane} provenance version")
+            extras[key] = copy.deepcopy(value)
+        elif key == "runtime_execution":
+            if adapter not in {
+                OMI_STORY_CHECK_ADAPTER_NAME,
+                OMI_OLLAMA_ADAPTER_NAME,
+            } or not isinstance(value, dict):
+                raise ValueError(
+                    "only story_check or ollama_model may attach runtime execution state"
+                )
+            if set(value) != {
+                "authorized",
+                "real_tool_calls_occurred",
+                "model_calls_occurred",
+            }:
+                raise ValueError("invalid runtime execution state")
+            if not isinstance(value["authorized"], bool) or not isinstance(
+                value["real_tool_calls_occurred"], bool
+            ) or not (
+                isinstance(value["model_calls_occurred"], bool)
+                or value["model_calls_occurred"] is None
+            ):
+                raise ValueError("invalid runtime execution state")
+            if not value["authorized"]:
+                raise ValueError("live runtime execution must be explicitly authorized")
+            if value["model_calls_occurred"] is not False and not value[
+                "real_tool_calls_occurred"
+            ]:
+                raise ValueError("a model call is also a real tool call")
             extras[key] = copy.deepcopy(value)
         else:
             extras[key] = value
@@ -1538,6 +1653,7 @@ OMI_OLLAMA_NORMALIZED_EVIDENCE_OPERATION_SEMANTICS = (
 OMI_OLLAMA_NORMALIZED_EVIDENCE_PACKET_VERSION = (
     "omi-ollama-normalized-evidence-packet.v1"
 )
+OMI_OLLAMA_LIVE_ORIGINAL_OUTPUT_VERSION = "omi-ollama-live-original-output.v1"
 OMI_OLLAMA_SUPPORT_LABEL = "ollama model support strength only"
 
 # Required top-level fields in the Ollama JSON envelope. Top-level payload
@@ -6817,7 +6933,7 @@ def _build_spacy_live_runner(
                 "candidates": [],
             }
 
-        raw_text = raw_idea.strip()
+        raw_text = raw_idea
 
         try:
             import spacy  # lazy import
@@ -7064,7 +7180,7 @@ def _build_ollama_model_live_runner(
                 "candidates": [],
             }
 
-        raw_text = raw_idea.strip()
+        raw_text = raw_idea
         base_url = os.environ.get(
             _OMI_LIVE_OLLAMA_BASE_URL_ENV,
             _OMI_LIVE_OLLAMA_BASE_URL_DEFAULT,
@@ -7097,6 +7213,64 @@ def _build_ollama_model_live_runner(
             "options": {"num_predict": 2048},
         }).encode("utf-8")
 
+        def _execution_provenance(
+            actual_model: str | None,
+            *,
+            ollama_response_observed: bool,
+        ) -> dict[str, Any]:
+            def component(
+                name: str | None,
+                *,
+                observed: bool,
+            ) -> dict[str, Any]:
+                return {
+                    "availability": "available" if observed else "unknown",
+                    "name": name if observed else None,
+                    "version": None,
+                }
+
+            return {
+                "implementation_kind": "official_external",
+                "user_facing_label": "Ollama exact-source structured extraction",
+                "tool": component("Ollama", observed=ollama_response_observed),
+                "runtime": component(
+                    "Ollama HTTP API", observed=ollama_response_observed
+                ),
+                "provider": component("Ollama", observed=ollama_response_observed),
+                "model": component(
+                    actual_model,
+                    observed=ollama_response_observed and actual_model is not None,
+                ),
+            }
+
+        def _runtime_execution(
+            *, model_call: bool | None
+        ) -> dict[str, bool | None]:
+            return {
+                "authorized": True,
+                "real_tool_calls_occurred": True,
+                "model_calls_occurred": model_call,
+            }
+
+        def _original_output(
+            response_data: Any,
+            *,
+            response_text: str,
+        ) -> dict[str, Any]:
+            if not isinstance(response_data, dict):
+                return {
+                    "schema_version": OMI_OLLAMA_LIVE_ORIGINAL_OUTPUT_VERSION,
+                    "response_text": response_text,
+                }
+            return {
+                "schema_version": OMI_OLLAMA_LIVE_ORIGINAL_OUTPUT_VERSION,
+                "model": copy.deepcopy(response_data.get("model")),
+                "created_at": copy.deepcopy(response_data.get("created_at")),
+                "message": copy.deepcopy(response_data.get("message")),
+                "done": copy.deepcopy(response_data.get("done")),
+                "done_reason": copy.deepcopy(response_data.get("done_reason")),
+            }
+
         try:
             req = urllib.request.Request(
                 chat_url,
@@ -7105,7 +7279,7 @@ def _build_ollama_model_live_runner(
                 headers={"Content-Type": "application/json"},
             )
             with urllib.request.urlopen(req, timeout=timeout_seconds) as resp:
-                response_data = json.loads(resp.read().decode("utf-8"))
+                response_text = resp.read().decode("utf-8")
         except Exception as exc:
             return {
                 "adapter": OMI_OLLAMA_ADAPTER_NAME,
@@ -7116,7 +7290,59 @@ def _build_ollama_model_live_runner(
                     "Failing closed with no candidates."
                 ),
                 "candidates": [],
+                "execution_provenance": _execution_provenance(
+                    None,
+                    ollama_response_observed=False,
+                ),
+                "runtime_execution": _runtime_execution(model_call=None),
             }
+
+        try:
+            response_data = json.loads(response_text)
+        except (TypeError, json.JSONDecodeError) as exc:
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live Ollama response was not valid JSON: "
+                    f"{type(exc).__name__}: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+                "original_output": _original_output(
+                    None,
+                    response_text=response_text,
+                ),
+                "execution_provenance": _execution_provenance(
+                    None,
+                    ollama_response_observed=False,
+                ),
+                "runtime_execution": _runtime_execution(model_call=None),
+            }
+
+        original_output = _original_output(
+            response_data,
+            response_text=response_text,
+        )
+        ollama_response_observed = (
+            isinstance(response_data, dict)
+            and isinstance(response_data.get("message"), dict)
+            and isinstance(response_data.get("done"), bool)
+        )
+        actual_model = (
+            response_data.get("model")
+            if isinstance(response_data, dict)
+            and isinstance(response_data.get("model"), str)
+            and response_data["model"].strip()
+            else None
+        )
+        execution_provenance = _execution_provenance(
+            actual_model,
+            ollama_response_observed=ollama_response_observed,
+        )
+        runtime_execution = _runtime_execution(
+            model_call=True if ollama_response_observed else None
+        )
 
         try:
             message_content = response_data["message"]["content"]
@@ -7130,6 +7356,9 @@ def _build_ollama_model_live_runner(
                     "Failing closed with no candidates."
                 ),
                 "candidates": [],
+                "original_output": original_output,
+                "execution_provenance": execution_provenance,
+                "runtime_execution": runtime_execution,
             }
 
         try:
@@ -7143,6 +7372,9 @@ def _build_ollama_model_live_runner(
                     "Failing closed with no candidates."
                 ),
                 "candidates": [],
+                "original_output": original_output,
+                "execution_provenance": execution_provenance,
+                "runtime_execution": runtime_execution,
             }
 
         env_status = validated["status"]
@@ -7159,6 +7391,9 @@ def _build_ollama_model_live_runner(
                 or "Live Ollama structured extraction completed."
             ),
             "candidates": validated["findings"],
+            "original_output": original_output,
+            "execution_provenance": execution_provenance,
+            "runtime_execution": runtime_execution,
         }
 
     return _runner
@@ -7969,14 +8204,41 @@ def _build_story_check_live_runner(
                 "candidates": [],
             }
 
+        legacy_result = copy.deepcopy(legacy_result)
+        execution_metadata = legacy_result.pop(
+            analysis_engine.STORY_CHECK_RUNTIME_METADATA_KEY,
+            None,
+        )
+        if execution_metadata is None:
+            execution_extras: dict[str, Any] = {}
+        elif (
+            isinstance(execution_metadata, dict)
+            and set(execution_metadata)
+            == {"execution_provenance", "runtime_execution"}
+        ):
+            execution_extras = copy.deepcopy(execution_metadata)
+        else:
+            return {
+                "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    "Live Story Check returned malformed application-owned "
+                    "runtime metadata. Failing closed with no findings."
+                ),
+                "candidates": [],
+            }
+
         if isinstance(legacy_result.get("grounding"), dict):
             try:
-                return validate_story_check_grounded_result(
-                    legacy_result,
-                    project_name=project_name.strip(),
-                    source_id=source_idea_id or "request-source",
-                    source_content=raw_idea,
-                )
+                return {
+                    **validate_story_check_grounded_result(
+                        legacy_result,
+                        project_name=project_name.strip(),
+                        source_id=source_idea_id or "request-source",
+                        source_content=raw_idea,
+                    ),
+                    **execution_extras,
+                }
             except ValueError as exc:
                 return {
                     "adapter": OMI_STORY_CHECK_ADAPTER_NAME,
@@ -7984,6 +8246,7 @@ def _build_story_check_live_runner(
                     "explanation": f"Story Check grounding failed closed: {exc}",
                     "candidates": [],
                     "original_output": copy.deepcopy(legacy_result),
+                    **execution_extras,
                 }
 
         envelope = _story_check_result_to_envelope(
@@ -8003,6 +8266,7 @@ def _build_story_check_live_runner(
                     f"validation: {exc}. Failing closed with no findings."
                 ),
                 "candidates": [],
+                **execution_extras,
             }
 
         env_status = validated["status"]
@@ -8019,6 +8283,7 @@ def _build_story_check_live_runner(
                 or "Live Story Check diagnostic adapter completed."
             ),
             "candidates": validated["findings"],
+            **execution_extras,
         }
 
     return _runner
@@ -9263,7 +9528,7 @@ def _build_booknlp_live_runner(
                 "candidates": [],
             }
 
-        raw_text = raw_idea.strip()
+        raw_text = raw_idea
 
         model_name = os.environ.get(
             _OMI_LIVE_BOOKNLP_MODEL_ENV, _OMI_LIVE_BOOKNLP_MODEL_DEFAULT
@@ -10075,7 +10340,7 @@ def analyze_omi_raw_idea_with_tools(
         # here. Today this branch is unreachable; kept for shape.
         result = runner(
             project_name=project_name,
-            raw_idea=(raw_idea_exact if adapter == "booknlp" else raw_idea_text),
+            raw_idea=raw_idea_exact,
             source_idea_id=source_idea_id,
         )
         envelope = validate_adapter_result(result)
@@ -10151,6 +10416,27 @@ def analyze_omi_raw_idea_with_tools(
             "Memory/Canon mutation or apply-promotion. Confidence/support is "
             "support only, not truth. Details: " + " | ".join(explanation_parts)
         )
+
+    real_tool_calls_occurred = any(
+        result.get("runtime_execution", {}).get("real_tool_calls_occurred") is True
+        for result in adapter_results
+    )
+    model_call_states = [
+        result["runtime_execution"]["model_calls_occurred"]
+        for result in adapter_results
+        if "runtime_execution" in result
+    ]
+    model_calls_occurred = (
+        True
+        if any(state is True for state in model_call_states)
+        else None
+        if any(state is None for state in model_call_states)
+        else False
+    )
+    safety = build_orchestrator_safety_envelope(
+        real_tool_calls_occurred=real_tool_calls_occurred,
+        model_calls_occurred=model_calls_occurred,
+    )
 
     return {
         "analysis_status": analysis_status,

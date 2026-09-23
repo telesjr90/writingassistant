@@ -14,6 +14,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -562,6 +564,79 @@ def _reset_live_story_check_env(monkeypatch: Any) -> None:
         monkeypatch.delenv(name, raising=False)
 
 
+def _run_live_story_check_through_mocked_ollama(
+    monkeypatch: Any,
+    *,
+    transport_error: Exception | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    import backend.analysis_engine as analysis_engine
+
+    scene_id = "scene_runtime_001"
+    calls: list[dict[str, Any]] = []
+
+    class FakeStoryform:
+        @classmethod
+        def from_file(cls, project_name: str) -> "FakeStoryform":
+            assert project_name == "demo"
+            return cls()
+
+        def to_prompt_context(self) -> str:
+            return "mocked Storyform context"
+
+    class MockResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict[str, Any]:
+            return {
+                "model": "qwen3:8b",
+                "message": {
+                    "role": "assistant",
+                    "content": json.dumps(
+                        _structured_legacy_story_check_result()
+                    ),
+                },
+                "done": True,
+            }
+
+    def mocked_post(url: str, **kwargs: Any) -> MockResponse:
+        calls.append({"url": url, **kwargs})
+        if transport_error is not None:
+            raise transport_error
+        return MockResponse()
+
+    _reset_live_story_check_env(monkeypatch)
+    monkeypatch.setenv(oao._OMI_LIVE_TOOLS_ENABLED_ENV, "1")
+    monkeypatch.setenv(oao._OMI_LIVE_STORY_CHECK_ENABLED_ENV, "1")
+    monkeypatch.setattr(
+        analysis_engine.analysis_modes,
+        "get_analysis_mode",
+        lambda: "live",
+    )
+    monkeypatch.setattr(
+        analysis_engine.project_manager,
+        "load_scene",
+        lambda project_name, selected_scene_id: RAW_IDEA,
+    )
+    monkeypatch.setattr(
+        analysis_engine.project_manager,
+        "load_bible",
+        lambda project_name: {},
+    )
+    monkeypatch.setattr(analysis_engine, "Storyform", FakeStoryform)
+    monkeypatch.setattr(analysis_engine.requests, "post", mocked_post)
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        source_idea_id=scene_id,
+        persist_candidates=False,
+        requested_adapters=["story_check"],
+        story_check_scene_id=scene_id,
+    )
+    return result, calls
+
+
 def _structured_legacy_story_check_result() -> dict[str, Any]:
     """Return a structured legacy Story Check result with T016C1-safe text.
 
@@ -713,6 +788,113 @@ def test_live_story_check_disabled_by_default_does_not_import_runtime(
     env = _assert_failed_closed(result)
     assert env["state"] == "unavailable"
     assert "live story check" in env["explanation"].lower()
+    assert "execution_provenance" not in env
+    assert "runtime_execution" not in env
+    assert result["safety"]["no_real_tool_calls"] is True
+    assert result["safety"]["no_model_calls"] is True
+    assert result["safety"]["model_call_state"] == "not_occurred"
+
+
+def test_live_story_check_recognizable_response_retains_execution_truth_with_no_candidates(
+    monkeypatch: Any,
+) -> None:
+    result, calls = _run_live_story_check_through_mocked_ollama(monkeypatch)
+
+    assert len(calls) == 1
+    assert calls[0]["url"].endswith("/api/chat")
+    assert RAW_IDEA in calls[0]["json"]["messages"][0]["content"]
+    env = _story_check_env(result)
+    assert env["adapter"] == "story_check"
+    assert oao.OMI_STORY_CHECK_OPERATION_ID == "analyze-story-check"
+    assert env["state"] == "empty"
+    assert env["candidates"] == []
+    assert result["findings"] == []
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": True,
+    }
+    assert env["execution_provenance"] == {
+        "implementation_kind": "app_owned",
+        "user_facing_label": "Story Check grounded diagnostics",
+        "tool": {
+            "availability": "available",
+            "name": "Story Check",
+            "version": None,
+        },
+        "runtime": {
+            "availability": "available",
+            "name": "Writing Assistant Story Check runtime",
+            "version": None,
+        },
+        "provider": {
+            "availability": "available",
+            "name": "Ollama",
+            "version": None,
+        },
+        "model": {
+            "availability": "available",
+            "name": "qwen3:8b",
+            "version": None,
+        },
+    }
+    diagnostics = env["original_output"]["grounding"]["diagnostics"]
+    states = [item["verification_state"] for item in diagnostics]
+    assert states.count("verified") == 0
+    assert states.count("unverified") > 0
+    assert states.count("quarantined") > 0
+    assert result["safety"]["no_real_tool_calls"] is False
+    assert result["safety"]["no_model_calls"] is False
+    assert result["safety"]["model_call_state"] == "occurred"
+    assert result["persisted_candidate_ids"] == []
+
+
+def test_live_story_check_transport_failure_reports_unknown_model_execution(
+    monkeypatch: Any,
+) -> None:
+    result, calls = _run_live_story_check_through_mocked_ollama(
+        monkeypatch,
+        transport_error=TimeoutError("mocked Story Check Ollama timeout"),
+    )
+
+    assert len(calls) == 1
+    env = _assert_failed_closed(result)
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": None,
+    }
+    for plane in ("tool", "runtime", "provider", "model"):
+        assert env["execution_provenance"][plane] == {
+            "availability": "unknown",
+            "name": None,
+            "version": None,
+        }
+    assert result["safety"]["no_real_tool_calls"] is False
+    assert result["safety"]["no_model_calls"] is None
+    assert result["safety"]["model_call_state"] == "unknown"
+
+
+def test_story_check_live_execution_metadata_validation_is_adapter_narrow(
+    monkeypatch: Any,
+) -> None:
+    result, _ = _run_live_story_check_through_mocked_ollama(monkeypatch)
+    env = _story_check_env(result)
+    assert oao.validate_adapter_result(env)["execution_provenance"] == (
+        env["execution_provenance"]
+    )
+
+    wrong_adapter = copy.deepcopy(env)
+    wrong_adapter["adapter"] = "spacy"
+    with pytest.raises(ValueError, match="only story_check or ollama_model"):
+        oao.validate_adapter_result(wrong_adapter)
+
+    wrong_identity = copy.deepcopy(env)
+    wrong_identity["execution_provenance"]["implementation_kind"] = (
+        "official_external"
+    )
+    with pytest.raises(ValueError, match="implementation kind"):
+        oao.validate_adapter_result(wrong_identity)
 
 
 def test_live_story_check_enabled_with_mocked_runtime_normalizes_candidate_findings(

@@ -46,6 +46,7 @@ from backend.story_knowledge.raw_artifacts import (
     IMMUTABLE_RAW_ARTIFACT_VERSION,
     build_immutable_raw_artifact_manifest,
     delete_immutable_raw_artifact_bundle,
+    raw_artifact_boundary_flags,
     read_immutable_raw_artifact_bundle,
     write_immutable_raw_artifact_bundle,
 )
@@ -461,6 +462,7 @@ def _adapter_provenance(
     operation_id: str,
     state: str,
     finding_provenance: list[dict[str, Any]],
+    execution_provenance: dict[str, Any] | None = None,
 ) -> AdapterProvenance:
     contract = _OPERATION_CONTRACTS[operation_id]
     if contract["adapter_id"] != adapter_id:
@@ -472,7 +474,11 @@ def _adapter_provenance(
     ]
     if supplied and any(item != supplied[0] for item in supplied[1:]):
         raise ValueError("conflicting actual provenance for one adapter operation")
-    metadata = supplied[0] if supplied else {}
+    metadata = (
+        copy.deepcopy(execution_provenance)
+        if execution_provenance is not None
+        else supplied[0] if supplied else {}
+    )
     if adapter_id == "deterministic_fallback":
         default_kind = "fallback"
     elif adapter_id.endswith("_informed_rubric"):
@@ -641,6 +647,38 @@ def _validate_analysis_result(
     for field in ("no_prose", "no_memory_canon_mutation", "no_apply_promotion"):
         if safety.get(field) is not True:
             raise ValueError("analysis result safety boundary is not affirmative")
+    runtime_results = [
+        item["runtime_execution"]
+        for item in validated_operation_results
+        if "runtime_execution" in item
+    ]
+    if runtime_results:
+        real_tool_calls_occurred = any(
+            item["real_tool_calls_occurred"] for item in runtime_results
+        )
+        model_calls_occurred = _aggregate_model_call_state(
+            validated_operation_results
+        )
+        if safety.get("no_real_tool_calls") is not (not real_tool_calls_occurred):
+            raise ValueError("analysis result misreports real tool execution")
+        expected_no_model_calls = (
+            None if model_calls_occurred is None else not model_calls_occurred
+        )
+        if safety.get("no_model_calls") is not expected_no_model_calls:
+            raise ValueError("analysis result misreports model execution")
+        if safety.get("authorized_real_tool_calls_occurred") is not real_tool_calls_occurred:
+            raise ValueError("analysis result misreports authorized tool execution")
+        if safety.get("model_calls_occurred") is not model_calls_occurred:
+            raise ValueError("analysis result misreports model execution")
+        expected_model_call_state = (
+            "unknown"
+            if model_calls_occurred is None
+            else "occurred"
+            if model_calls_occurred
+            else "not_occurred"
+        )
+        if safety.get("model_call_state") != expected_model_call_state:
+            raise ValueError("analysis result misreports model execution state")
     checked = copy.deepcopy(result)
     checked["adapter_results"] = validated_envelopes
     checked["operation_results"] = validated_operation_results
@@ -690,9 +728,8 @@ def _file_ref(
     provenance_refs: list[str], record_count: int = 1, line_count: int | None = None,
     schema_name: str = "t003_analysis_support_data", schema_version: str = "1",
     parser_hint: str = "json",
+    model_calls_occurred: bool | None = False,
 ) -> dict[str, Any]:
-    from backend.story_knowledge.raw_artifacts import _REQUIRED_BOUNDARY_FLAGS
-
     return {
         "artifact_file_id": artifact_file_id,
         "artifact_type": artifact_type,
@@ -709,8 +746,55 @@ def _file_ref(
         "source_locator_refs": [source_ref],
         "evidence_refs": evidence_refs,
         "provenance_refs": provenance_refs,
-        "boundary_flags": sorted(_REQUIRED_BOUNDARY_FLAGS),
+        "boundary_flags": raw_artifact_boundary_flags(
+            model_calls_occurred=model_calls_occurred
+        ),
     }
+
+
+def _aggregate_model_call_state(
+    operation_results: list[dict[str, Any]],
+) -> bool | None:
+    states = [
+        item["runtime_execution"]["model_calls_occurred"]
+        for item in operation_results
+        if "runtime_execution" in item
+    ]
+    if any(state is True for state in states):
+        return True
+    if any(state is None for state in states):
+        return None
+    return False
+
+
+def _ollama_original_output_handoffs(
+    result: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Build immutable file handoffs for live T007A original outputs only."""
+
+    handoffs: dict[str, dict[str, Any]] = {}
+    operation_id = omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID
+    for operation_result in result.get("operation_results", []):
+        if operation_result.get("operation_id") != operation_id:
+            continue
+        runtime_execution = operation_result.get("runtime_execution") or {}
+        original_output = operation_result.get("original_output")
+        if (
+            runtime_execution.get("real_tool_calls_occurred") is not True
+            or not isinstance(original_output, dict)
+        ):
+            continue
+        artifact_file_id = f"original-output-{operation_id}"
+        handoffs[operation_id] = {
+            "artifact_file_id": artifact_file_id,
+            "artifact_type": "adapter_metadata",
+            "relative_path": f"artifacts/{artifact_file_id}.json",
+            "media_type": "application/json",
+            "payload": canonical_json_bytes(copy.deepcopy(original_output)),
+            "schema_name": omi_analysis_orchestrator.OMI_OLLAMA_LIVE_ORIGINAL_OUTPUT_VERSION,
+            "schema_version": "1",
+        }
+    return handoffs
 
 
 def _extract_booknlp_raw_artifact_handoffs(
@@ -845,23 +929,34 @@ def _story_check_grounding_diagnostics(
 ) -> list[dict[str, Any]]:
     """Return source-bound diagnostics from the immutable grounded output."""
 
-    if operation_result.get("state") not in {"succeeded", "empty"}:
+    operation_state = operation_result.get("state")
+    if operation_state not in {"succeeded", "empty", "failed_closed"}:
         return []
     original_output = operation_result.get("original_output")
     if not isinstance(original_output, dict) or not isinstance(
         original_output.get("grounding"), dict
     ):
         return []
-    validated = omi_analysis_orchestrator.validate_story_check_grounded_result(
-        original_output,
-        project_name=snapshot.identity.project_id,
-        source_id=snapshot.identity.source_id,
-        source_content=snapshot.source_content,
-    )
-    if validated["state"] != operation_result["state"]:
-        raise ValueError("Story Check operation state disagrees with grounding output")
-    if validated["candidates"] != operation_result["candidates"]:
-        raise ValueError("Story Check candidates disagree with grounding output")
+    try:
+        validated = omi_analysis_orchestrator.validate_story_check_grounded_result(
+            original_output,
+            project_name=snapshot.identity.project_id,
+            source_id=snapshot.identity.source_id,
+            source_content=snapshot.source_content,
+        )
+    except ValueError:
+        if operation_state == "failed_closed":
+            return []
+        raise
+    if operation_state in {"succeeded", "empty"}:
+        if validated["state"] != operation_state:
+            raise ValueError("Story Check operation state disagrees with grounding output")
+        if validated["candidates"] != operation_result["candidates"]:
+            raise ValueError("Story Check candidates disagree with grounding output")
+    elif validated["candidates"] or operation_result["candidates"]:
+        raise ValueError(
+            "failed-closed Story Check operation cannot attribute verified candidates"
+        )
     return copy.deepcopy(original_output["grounding"]["diagnostics"])
 
 
@@ -1132,6 +1227,11 @@ def _execute_requested_operations(
         else "error" if states and all(state == "error" for state in states)
         else "fail_closed"
     )
+    real_tool_calls_occurred = any(
+        item.get("runtime_execution", {}).get("real_tool_calls_occurred") is True
+        for item in operation_results
+    )
+    model_calls_occurred = _aggregate_model_call_state(operation_results)
     result = {
         "analysis_status": analysis_status,
         "explanation": (
@@ -1154,7 +1254,10 @@ def _execute_requested_operations(
         "persistence_explanation": (
             "The T007B control plane does not persist candidates."
         ),
-        "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(),
+        "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(
+            real_tool_calls_occurred=real_tool_calls_occurred,
+            model_calls_occurred=model_calls_occurred,
+        ),
     }
     return _validate_analysis_result(
         result,
@@ -1175,6 +1278,7 @@ def _build_manifest_and_evidence(
     result_artifact_hash: str,
     created_at: str,
     raw_artifact_handoffs: dict[str, dict[str, Any]] | None = None,
+    original_output_handoffs: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[AnalysisRunManifest, list[dict[str, Any]]]:
     adapter_results = list(result.get("adapter_results") or [])
     operation_results = list(result.get("operation_results") or [])
@@ -1194,6 +1298,7 @@ def _build_manifest_and_evidence(
             _OPERATION_CONTRACTS[operation_id]["adapter_id"], []
         ).append(operation_id)
     handoffs = raw_artifact_handoffs or {}
+    original_handoffs = original_output_handoffs or {}
     booknlp_artifact_hashes = {
         item["artifact_file_id"]: item["sha256"]
         for item in handoffs.get("booknlp", {}).get("files", [])
@@ -1214,6 +1319,7 @@ def _build_manifest_and_evidence(
     if len(story_check_diagnostics_by_id) != len(story_check_diagnostics):
         raise ValueError("Story Check grounding diagnostic IDs must be unique")
     whole_span = OffsetRange(0, len(snapshot.source_content), CHAR_OFFSET_BASIS)
+    operation_evidence_ids: dict[str, str] = {}
     for operation_id in requested_operations:
         contract = _OPERATION_CONTRACTS[operation_id]
         adapter_id = contract["adapter_id"]
@@ -1258,6 +1364,7 @@ def _build_manifest_and_evidence(
             reason=reason,
         )
         evidence_records.append(evidence)
+        operation_evidence_ids[operation_id] = evidence["evidence_id"]
     finding_outputs: list[tuple[dict[str, Any], str, str, str]] = []
     for index, finding in enumerate(findings):
         adapter_id = finding.get("source_adapter")
@@ -1358,7 +1465,9 @@ def _build_manifest_and_evidence(
                 source_snapshot_ids=(snapshot.identity.snapshot_id,),
                 disposition="validated",
                 original_output_reference_id=(
-                    "result-artifact"
+                    original_handoffs[operation_id]["artifact_file_id"]
+                    if operation_id in original_handoffs
+                    else "result-artifact"
                     if consumes_normalized_evidence or story_check_diagnostic is not None
                     else finding_artifact_ids[0] if finding_artifact_ids else "result-artifact"
                 ),
@@ -1368,6 +1477,46 @@ def _build_manifest_and_evidence(
                     story_check_diagnostic["validator_result"]["outcome"]
                     if story_check_diagnostic is not None
                     else "omi_boundary_validated"
+                ),
+            )
+        )
+    for operation_id, handoff in original_handoffs.items():
+        if output_ids_by_operation[operation_id]:
+            continue
+        operation_result = by_operation[operation_id]
+        state = operation_result["state"]
+        disposition = (
+            "validated"
+            if state in {"succeeded", "empty"}
+            else "rejected"
+            if state == "failed_closed"
+            else "unverified"
+        )
+        output_material = f"{operation_id}|original-runtime-output"
+        output_id = (
+            "output-"
+            + hashlib.sha256(output_material.encode("utf-8")).hexdigest()[:24]
+        )
+        output_ids_by_operation[operation_id].append(output_id)
+        outputs.append(
+            OutputLineage(
+                output_id=output_id,
+                operation_id=operation_id,
+                source_snapshot_ids=(snapshot.identity.snapshot_id,),
+                disposition=disposition,
+                original_output_reference_id=handoff["artifact_file_id"],
+                evidence_reference_ids=(operation_evidence_ids[operation_id],),
+                verification_outcome=(
+                    "normalization_accepted"
+                    if disposition == "validated"
+                    else "normalization_rejected"
+                    if disposition == "rejected"
+                    else "normalization_unverified"
+                ),
+                missing_evidence_reason=(
+                    operation_result["explanation"]
+                    if disposition != "validated"
+                    else None
                 ),
             )
         )
@@ -1454,6 +1603,7 @@ def _build_manifest_and_evidence(
                         if finding["source_adapter"] == adapter_id
                         and finding["provenance"].get("operation_id") == operation_id
                     ],
+                    operation_result.get("execution_provenance"),
                 ),
                 output_ids=tuple(output_ids_by_operation[operation_id]),
             )
@@ -1493,6 +1643,17 @@ def _build_manifest_and_evidence(
                 )
                 for handoff in handoffs.values()
                 for item in handoff["files"]
+            ),
+            *tuple(
+                ArtifactReference(
+                    artifact_id=item["artifact_file_id"],
+                    availability="available",
+                    source_snapshot_ids=(snapshot.identity.snapshot_id,),
+                    content_hash=hashlib.sha256(item["payload"]).hexdigest(),
+                    hash_algorithm="sha256",
+                    media_type=item["media_type"],
+                )
+                for item in original_handoffs.values()
             ),
         ),
         outputs=tuple(outputs),
@@ -1625,6 +1786,10 @@ def _submit_analysis_run_locked(
     result, raw_artifact_handoffs = _extract_booknlp_raw_artifact_handoffs(
         result, snapshot
     )
+    original_output_handoffs = _ollama_original_output_handoffs(result)
+    model_calls_occurred = _aggregate_model_call_state(
+        result.get("operation_results", [])
+    )
     source_payload = raw_idea.encode("utf-8")
     result_payload = canonical_json_bytes(result)
     manifest, evidence_records = _build_manifest_and_evidence(
@@ -1638,6 +1803,7 @@ def _submit_analysis_run_locked(
         result_artifact_hash=hashlib.sha256(result_payload).hexdigest(),
         created_at=timestamp,
         raw_artifact_handoffs=raw_artifact_handoffs,
+        original_output_handoffs=original_output_handoffs,
     )
     manifest_dict = manifest.to_dict()
     manifest_hash = canonical_sha256(manifest_dict)
@@ -1671,6 +1837,7 @@ def _submit_analysis_run_locked(
             source_ref=snapshot.identity.snapshot_id,
             evidence_refs=evidence_ids,
             provenance_refs=provenance_refs,
+            model_calls_occurred=model_calls_occurred,
         ),
         _file_ref(
             artifact_file_id="result-artifact",
@@ -1681,6 +1848,7 @@ def _submit_analysis_run_locked(
             source_ref=snapshot.identity.snapshot_id,
             evidence_refs=evidence_ids,
             provenance_refs=provenance_refs,
+            model_calls_occurred=model_calls_occurred,
         ),
     ]
     raw_payloads: dict[str, bytes] = {
@@ -1714,9 +1882,27 @@ def _submit_analysis_run_locked(
                     schema_name=item["schema_name"],
                     schema_version=item["schema_version"],
                     parser_hint=item["parser_hint"],
+                    model_calls_occurred=model_calls_occurred,
                 )
             )
             raw_payloads[item["artifact_file_id"]] = payload
+    for operation_id, item in original_output_handoffs.items():
+        files.append(
+            _file_ref(
+                artifact_file_id=item["artifact_file_id"],
+                artifact_type=item["artifact_type"],
+                relative_path=item["relative_path"],
+                media_type=item["media_type"],
+                payload=item["payload"],
+                source_ref=snapshot.identity.snapshot_id,
+                evidence_refs=evidence_ids,
+                provenance_refs=[contributor_ref_by_operation[operation_id]],
+                schema_name=item["schema_name"],
+                schema_version=item["schema_version"],
+                model_calls_occurred=model_calls_occurred,
+            )
+        )
+        raw_payloads[item["artifact_file_id"]] = item["payload"]
     raw_manifest = build_immutable_raw_artifact_manifest(
         project_id=project_id,
         run_id=run_id,
@@ -1730,6 +1916,7 @@ def _submit_analysis_run_locked(
         source_locator_refs=[snapshot.identity.snapshot_id],
         adapter_name="omi_analysis_control",
         adapter_version="1",
+        model_calls_occurred=model_calls_occurred,
     )
     write_immutable_raw_artifact_bundle(
         raw_manifest,

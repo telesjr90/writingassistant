@@ -35,6 +35,7 @@ MOCK_STORY_CHECK_PATH = Path(__file__).resolve().parent / "mock_responses" / "st
 DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434"
 DEFAULT_OLLAMA_MODEL = "qwen3:8b"
 OLLAMA_STORY_CHECK_NUM_PREDICT = 2048
+STORY_CHECK_RUNTIME_METADATA_KEY = "_story_check_runtime_metadata"
 
 
 def _parse_story_check_response(content: str) -> dict[str, Any]:
@@ -55,8 +56,50 @@ def _ollama_chat_url() -> str:
     return f"{base_url}/api/chat"
 
 
+def _story_check_runtime_metadata(
+    *, actual_model: str | None, response_observed: bool
+) -> dict[str, Any]:
+    def component(name: str | None, *, observed: bool) -> dict[str, Any]:
+        return {
+            "availability": "available" if observed else "unknown",
+            "name": name if observed else None,
+            "version": None,
+        }
+
+    return {
+        "execution_provenance": {
+            "implementation_kind": "app_owned",
+            "user_facing_label": "Story Check grounded diagnostics",
+            "tool": component("Story Check", observed=response_observed),
+            "runtime": component(
+                "Writing Assistant Story Check runtime",
+                observed=response_observed,
+            ),
+            "provider": component("Ollama", observed=response_observed),
+            "model": component(
+                actual_model,
+                observed=response_observed and actual_model is not None,
+            ),
+        },
+        "runtime_execution": {
+            "authorized": True,
+            "real_tool_calls_occurred": True,
+            "model_calls_occurred": True if response_observed else None,
+        },
+    }
+
+
+def _with_story_check_runtime_metadata(
+    result: dict[str, Any], metadata: dict[str, Any] | None
+) -> dict[str, Any]:
+    if metadata is not None:
+        result[STORY_CHECK_RUNTIME_METADATA_KEY] = metadata
+    return result
+
+
 def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
     source_snapshot = None
+    runtime_metadata = None
     try:
         scene_text = project_manager.load_scene(project_name, scene_id)
         source_snapshot = build_story_check_source_snapshot(
@@ -85,6 +128,10 @@ def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
             bible_summary=bible_summary,
         )
 
+        runtime_metadata = _story_check_runtime_metadata(
+            actual_model=None,
+            response_observed=False,
+        )
         response = requests.post(
             _ollama_chat_url(),
             json={
@@ -102,14 +149,41 @@ def run_story_check(project_name: str, scene_id: str) -> dict[str, Any]:
         )
         response.raise_for_status()
         payload = response.json()
+        recognizable_response = (
+            isinstance(payload, dict)
+            and isinstance(payload.get("message"), dict)
+            and isinstance(payload["message"].get("content"), str)
+            and payload.get("done") is True
+        )
+        actual_model = (
+            payload.get("model")
+            if isinstance(payload, dict)
+            and isinstance(payload.get("model"), str)
+            and payload["model"].strip()
+            else None
+        )
+        runtime_metadata = _story_check_runtime_metadata(
+            actual_model=actual_model,
+            response_observed=recognizable_response,
+        )
         content = payload.get("message", {}).get("content", "")
 
-        return ground_story_check_result(
-            _parse_story_check_response(content), source_snapshot
+        return _with_story_check_runtime_metadata(
+            ground_story_check_result(
+                _parse_story_check_response(content), source_snapshot
+            ),
+            runtime_metadata,
         )
     except StoryCheckGroundingIntegrationError as exc:
         if source_snapshot is not None:
-            return build_story_check_grounding_failure(source_snapshot, str(exc))
-        return {"error": str(exc)}
+            return _with_story_check_runtime_metadata(
+                build_story_check_grounding_failure(source_snapshot, str(exc)),
+                runtime_metadata,
+            )
+        return _with_story_check_runtime_metadata(
+            {"error": str(exc)}, runtime_metadata
+        )
     except Exception as e:
-        return {"error": str(e)}
+        return _with_story_check_runtime_metadata(
+            {"error": str(e)}, runtime_metadata
+        )

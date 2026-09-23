@@ -69,7 +69,7 @@ _FORBIDDEN_VALUES = frozenset(
     }
 )
 
-_REQUIRED_BOUNDARY_FLAGS = frozenset(
+_STATIC_REQUIRED_BOUNDARY_FLAGS = frozenset(
     {
         "raw_artifacts_support_data_only",
         "raw_artifacts_not_canon",
@@ -81,13 +81,23 @@ _REQUIRED_BOUNDARY_FLAGS = frozenset(
         "path_safe_fail_closed",
         "no_runtime_extraction",
         "no_booknlp_" + "sp" + "acy_runtime",
-        "no_model_calls",
         "no_apply_promotion",
         "no_memory_canon_mutation",
         "no_generated_prose",
         "generated_prose_permanently_forbidden",
         "no_" + "training_artifacts",
     }
+)
+_MODEL_CALL_BOUNDARY_FLAGS = frozenset(
+    {
+        "no_model_calls",
+        "authorized_model_calls_occurred",
+        "model_call_state_unknown",
+    }
+)
+# Backward-compatible default used by existing deterministic bundle callers.
+_REQUIRED_BOUNDARY_FLAGS = frozenset(
+    {*_STATIC_REQUIRED_BOUNDARY_FLAGS, "no_model_calls"}
 )
 
 _REQUIRED_CONFIRMATIONS = frozenset(
@@ -247,11 +257,30 @@ def _validate_count(value):
 
 def _validate_boundary_flags(value):
     flags = frozenset(_require_list(value, non_empty=True))
-    if not _REQUIRED_BOUNDARY_FLAGS.issubset(flags):
+    if not _STATIC_REQUIRED_BOUNDARY_FLAGS.issubset(flags):
+        raise ValueError("invalid field")
+    if len(flags & _MODEL_CALL_BOUNDARY_FLAGS) != 1:
         raise ValueError("invalid field")
     if flags & _FORBIDDEN_VALUES:
         raise ValueError("invalid field")
     return sorted(flags)
+
+
+def raw_artifact_boundary_flags(*, model_calls_occurred=False):
+    """Return truthful T003 boundary flags for the producing execution."""
+
+    if not (
+        isinstance(model_calls_occurred, bool) or model_calls_occurred is None
+    ):
+        raise ValueError("model_calls_occurred must be bool or None")
+    model_call_flag = (
+        "model_call_state_unknown"
+        if model_calls_occurred is None
+        else "authorized_model_calls_occurred"
+        if model_calls_occurred
+        else "no_model_calls"
+    )
+    return sorted({*_STATIC_REQUIRED_BOUNDARY_FLAGS, model_call_flag})
 
 
 def _validate_relative_path(relative_path):
@@ -361,6 +390,7 @@ def build_raw_artifact_file_ref(
     schema_name=None,
     schema_version=None,
     parser_hint=None,
+    model_calls_occurred=False,
 ):
     """Build one validated T003 file reference for already-produced bytes.
 
@@ -389,7 +419,9 @@ def build_raw_artifact_file_ref(
             "source_locator_refs": list(source_locator_refs),
             "evidence_refs": list(evidence_refs),
             "provenance_refs": list(provenance_refs),
-            "boundary_flags": sorted(_REQUIRED_BOUNDARY_FLAGS),
+            "boundary_flags": raw_artifact_boundary_flags(
+                model_calls_occurred=model_calls_occurred
+            ),
         }
     )
 
@@ -468,9 +500,16 @@ def validate_raw_artifact_manifest(manifest):
     if "content_hash" in working:
         _validate_hash(working["content_hash"])
     working["boundary_flags"] = _validate_boundary_flags(working["boundary_flags"])
-    for field in _REQUIRED_CONFIRMATIONS:
+    for field in _REQUIRED_CONFIRMATIONS - {"no_model_call_confirmation"}:
         if working[field] is not True:
             raise ValueError("invalid field")
+    if not isinstance(working["no_model_call_confirmation"], bool):
+        raise ValueError("invalid field")
+    boundary_flags = set(working["boundary_flags"])
+    if working["no_model_call_confirmation"] != (
+        "no_model_calls" in boundary_flags
+    ):
+        raise ValueError("invalid field")
     if working["schema_version"] == IMMUTABLE_RAW_ARTIFACT_VERSION:
         _validate_immutable_manifest_extension(working)
     return working
@@ -535,6 +574,7 @@ def build_immutable_raw_artifact_manifest(
     adapter_version=None,
     tool_name=None,
     tool_version=None,
+    model_calls_occurred=False,
 ):
     """Build the strict T003 immutable bundle contract over exact file hashes."""
 
@@ -560,8 +600,11 @@ def build_immutable_raw_artifact_manifest(
         adapter_version=adapter_version,
         tool_name=tool_name,
         tool_version=tool_version,
+        boundary_flags=raw_artifact_boundary_flags(
+            model_calls_occurred=model_calls_occurred
+        ),
         no_generated_prose_confirmation=True,
-        no_model_call_confirmation=True,
+        no_model_call_confirmation=model_calls_occurred is False,
         no_training_artifact_confirmation=True,
         no_apply_promotion_confirmation=True,
         no_memory_canon_mutation_confirmation=True,
@@ -646,7 +689,9 @@ def build_raw_artifact_manifest(
         "pipeline_version": metadata.pop("pipeline_version", None),
         "artifact_files": validated_files,
         "bundle_hash": "0" * 64,
-        "boundary_flags": sorted(_REQUIRED_BOUNDARY_FLAGS),
+        "boundary_flags": metadata.pop(
+            "boundary_flags", raw_artifact_boundary_flags()
+        ),
         "validation_status": metadata.pop("validation_status", "valid"),
         "quarantine_reason": metadata.pop("quarantine_reason", None),
         "no_generated_prose_confirmation": metadata.pop(
@@ -1405,6 +1450,7 @@ __all__ = (
     "validate_raw_artifact_manifest",
     "build_raw_artifact_manifest",
     "build_raw_artifact_file_ref",
+    "raw_artifact_boundary_flags",
     "validate_raw_artifact_file_ref",
     "raw_artifact_bundle_storage_dir",
     "raw_artifact_manifest_path",

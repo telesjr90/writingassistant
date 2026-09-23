@@ -708,6 +708,11 @@ def test_live_ollama_disabled_by_default_returns_unavailable() -> None:
     env = _assert_ollama_failed_closed(result)
     assert env["state"] == "unavailable"
     assert "T006 fixture" in env["explanation"] or "fixture" in env["explanation"]
+    assert "execution_provenance" not in env
+    assert "runtime_execution" not in env
+    assert result["safety"]["no_real_tool_calls"] is True
+    assert result["safety"]["no_model_calls"] is True
+    assert result["safety"]["model_call_state"] == "not_occurred"
 
 
 def test_live_ollama_enabled_with_mocked_valid_model_returns_candidates(
@@ -730,10 +735,16 @@ def test_live_ollama_enabled_with_mocked_valid_model_returns_candidates(
     assert "ollama model" in finding["provenance"]["support"].lower()
 
 
-def test_live_ollama_runner_normalizes_owner_input_whitespace(
+def test_live_ollama_runner_preserves_exact_owner_source_bytes(
     monkeypatch: Any,
 ) -> None:
-    """The pre-T004 live-runner boundary trims surrounding whitespace."""
+    """The exact-source operation preserves a semantically observable newline."""
+    source = (
+        "VALIDATION RECORD.\n"
+        "Person: Mara Vale.\n"
+        "Object: brass compass.\n"
+    )
+    source_bytes = source.encode("utf-8")
     bodies: list[bytes] = []
 
     def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
@@ -742,18 +753,29 @@ def test_live_ollama_runner_normalizes_owner_input_whitespace(
             _valid_ollama_chat_response(_valid_live_model_content())
         )
 
+    _mock_live_ollama_env(monkeypatch)
     monkeypatch.setattr(urllib.request, "urlopen", capture_urlopen)
-    runner = oao._build_ollama_model_live_runner()
-    result = runner(
-        project_name="demo",
-        raw_idea=f"  \n{RAW_IDEA}\n  ",
-        source_idea_id=None,
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        source,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
     )
 
-    assert result["state"] == "succeeded"
+    assert source.endswith("\n")
+    assert len(source_bytes) == 61
+    assert __import__("hashlib").sha256(source_bytes).hexdigest() == (
+        "4da6a38ab30a3702ec91d4c03facea2703ee13e173d2de067aa9ed022a647970"
+    )
+    assert result["analysis_status"] == "succeeded"
     assert len(bodies) == 1
     sent_body = json.loads(bodies[0].decode("utf-8"))
-    assert sent_body["messages"][1] == {"role": "user", "content": RAW_IDEA}
+    runtime_source = sent_body["messages"][1]["content"]
+    assert runtime_source == source
+    assert len(runtime_source.encode("utf-8")) == len(source_bytes)
+    assert __import__("hashlib").sha256(
+        runtime_source.encode("utf-8")
+    ).hexdigest() == __import__("hashlib").sha256(source_bytes).hexdigest()
 
 
 def test_live_ollama_uses_env_base_url(monkeypatch: Any) -> None:
@@ -846,6 +868,26 @@ def test_live_ollama_http_error_fails_closed(monkeypatch: Any) -> None:
     )
     env = _assert_ollama_failed_closed(result)
     assert "HTTP" in env["explanation"] or "failed" in env["explanation"]
+    assert "original_output" not in env
+    for plane in ("tool", "runtime", "provider", "model"):
+        assert env["execution_provenance"][plane] == {
+            "availability": "unknown",
+            "name": None,
+            "version": None,
+        }
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": None,
+    }
+    assert result["safety"]["no_real_tool_calls"] is False
+    assert result["safety"]["authorized_real_tool_calls_occurred"] is True
+    assert result["safety"]["no_model_calls"] is None
+    assert result["safety"]["model_calls_occurred"] is None
+    assert result["safety"]["model_call_state"] == "unknown"
+    assert result["safety"]["no_prohibited_real_tool_calls"] is True
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
 
 
 def test_live_ollama_invalid_response_json_fails_closed(
@@ -868,6 +910,83 @@ def test_live_ollama_invalid_response_json_fails_closed(
     assert "validation" in env["explanation"].lower() or "json" in (
         env["explanation"].lower()
     )
+
+
+def test_live_ollama_invalid_person_type_retains_original_and_runtime_truth(
+    monkeypatch: Any,
+) -> None:
+    """Rejected live output remains immutable support, never a finding/candidate."""
+
+    _mock_live_ollama_env(monkeypatch)
+    invalid_content = json.dumps(
+        {
+            "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+            "adapter": "ollama_model",
+            "status": "succeeded",
+            "explanation": "mocked live extraction with an invalid type",
+            "findings": [
+                {
+                    "candidate_type": "person",
+                    "label": "Mara Vale",
+                    "extracted_claim": "Mara Vale is named in the validation record.",
+                    "evidence": [
+                        {
+                            "source_excerpt": "Mara Vale",
+                            "source_locator": "raw_idea:L1:C0-9",
+                        }
+                    ],
+                    "source_locator": "raw_idea:L1:C0-9",
+                    "support_label": "ollama model support strength only",
+                }
+            ],
+        }
+    )
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(invalid_content),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+
+    env = _assert_ollama_failed_closed(result)
+    assert "candidate_type" in env["explanation"]
+    assert json.loads(env["original_output"]["message"]["content"])["findings"][0][
+        "candidate_type"
+    ] == "person"
+    assert env["original_output"]["message"]["content"] == invalid_content
+    assert env["candidates"] == []
+    assert result["findings"] == []
+    assert result["persisted_candidate_ids"] == []
+    assert env["execution_provenance"] == {
+        "implementation_kind": "official_external",
+        "user_facing_label": "Ollama exact-source structured extraction",
+        "tool": {"availability": "available", "name": "Ollama", "version": None},
+        "runtime": {
+            "availability": "available",
+            "name": "Ollama HTTP API",
+            "version": None,
+        },
+        "provider": {"availability": "available", "name": "Ollama", "version": None},
+        "model": {"availability": "available", "name": "qwen3:8b", "version": None},
+    }
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": True,
+    }
+    assert result["safety"]["no_prohibited_real_tool_calls"] is True
+    assert result["safety"]["no_real_tool_calls"] is False
+    assert result["safety"]["authorized_real_tool_calls_occurred"] is True
+    assert result["safety"]["no_model_calls"] is False
+    assert result["safety"]["model_calls_occurred"] is True
+    assert result["safety"]["model_call_state"] == "occurred"
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
 
 
 def test_live_ollama_missing_message_content_fails_closed(
