@@ -5,9 +5,9 @@
     "current_track": "Layered analysis architecture and tool-integration expansion",
     "current_parent_task_id": "PHASE8-IMPL-025",
     "current_parent_task_title": "Layered Analysis Architecture and Tool Integration Expansion",
-    "next_readiness_task_id": "PHASE8-IMPL-025-T007",
-    "next_readiness_task_title": "Evidence-bounded Ollama and Story Check",
-    "next_readiness_task_type": "planned dependency-satisfied/eligible application frontier; not begun",
+    "next_readiness_task_id": "PHASE8-IMPL-025-T004",
+    "next_readiness_task_title": "BookNLP extraction expansion",
+    "next_readiness_task_type": "accepted implementation milestone with required T004G real current-layer validation pending",
     "remaining_mvp_parent_task_ids": [
       "PHASE8-IMPL-025",
       "PHASE8-IMPL-027"
@@ -18,7 +18,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; official Subtxt/Dramatica is optional paid integration; T005 contract complete/PASS; T006 application-adapter and mock-validation foundation accepted/closed; T006G not executed and paid runtime deferred; app-owned identities remain separate",
-    "frontier_note": "PHASE8-IMPL-024 and T008 are complete/closed as complete/PASS with accepted child evidence. PHASE8-IMPL-025 is published/active. T001-T003 implementation milestones are accepted and T005 is complete/PASS. T004 implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f remains accepted, but required real expanded BookNLP output through the current T002/T003 artifact/ledger/fusion/candidate chain is unproven. T006 implementation commit 23d4825da9a257180cdc0d1d1239ce13b4e01f78 remains accepted/closed as the optional paid-integration foundation; T006G is NOT_EXECUTED_RUNTIME_UNAVAILABLE, no concrete production official runner exists, T003 does not reach the official adapter, and no real Subtxt/runtime/API/model call occurred. Paid Subtxt absence is fail-closed optional debt and does not block MVP. T007 is the planned dependency-satisfied/eligible next frontier and is not begun; T008 is planned and not begun, waits for required T004 and T007 gates, and accepts optional Subtxt output only when configured and available. Historical real spaCy, BookNLP, Ollama/qwen3:8b, Story Check, and owner-selected NCP import evidence remains valid foundation but does not prove current layered-path execution. The app-owned dramatica_flow_informed_rubric is the approved MVP boundary for wanted dramatica-flow-derived analysis concepts; external dramatica_flow is reference/provenance-only for MVP, not MVP-required, requires no runtime proof, and is not authorized for implementation or execution. Project Memory and execution routing remain paused/nonblocking for ordinary application work. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027. Boundaries remain analysis-only, candidate-first, evidence/provenance-backed, owner-controlled, nonautomatic, explicit owner-approved destination mutation only, and no generated prose."
+    "frontier_note": "PHASE8-IMPL-025 is published/active. T001-T003, T005, and T007 are complete/PASS. T007 implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170 is accepted after 379 deterministic tests plus bounded real Ollama/qwen3:8b and Story Check current-layer application-path execution. T004 implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f remains accepted, but required T004G expanded real BookNLP fusion/candidate validation through the current T002/T003 path remains unproven and is the next required application frontier. T006 remains accepted/closed as optional paid integration with T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE and paid runtime deferred. T008 is planned/not begun: T007 is satisfied, while T004/T004G remains its outstanding required contributor gate. External dramatica_flow remains reference/provenance-only for MVP. Project Memory and execution routing remain paused/nonblocking for ordinary application work. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5524,7 +5524,14 @@
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-024.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-024.enrichment.json",
       "context_pack": ".codex-context/application-uiux-audit/",
-      "controlling_child_order": ["PHASE8-IMPL-024-T003", "PHASE8-IMPL-024-T006", "PHASE8-IMPL-024-T007", "PHASE8-IMPL-024-T004", "PHASE8-IMPL-024-T005", "PHASE8-IMPL-024-T008"],
+      "controlling_child_order": [
+        "PHASE8-IMPL-024-T003",
+        "PHASE8-IMPL-024-T006",
+        "PHASE8-IMPL-024-T007",
+        "PHASE8-IMPL-024-T004",
+        "PHASE8-IMPL-024-T005",
+        "PHASE8-IMPL-024-T008"
+      ],
       "latest_child_task": "PHASE8-IMPL-024-T008",
       "latest_child_status": "complete/PASS",
       "next_child_task": null,
@@ -5540,7 +5547,14 @@
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
       "depends_on": [],
-      "boundary_tags": ["owner_authored_prose_storage", "no_model_calls", "no_auto_promotion", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose"],
+      "boundary_tags": [
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_apply_promotion",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS; T001A backend commit 77d9968d1b8eb893a76bdd4f485c0415fb75f907, T001B frontend commit 5bcaed06e429a8d6e1d5f65974c5a08fe7185656, T001C final PASS evidence 20260712T205343Z with prior BLOCKED run preserved as superseded history, and T001D docs/status closeout complete"
     },
     {
@@ -5549,8 +5563,17 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T001"],
-      "boundary_tags": ["candidate_only", "evidence_first", "no_model_calls", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T001"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_apply_promotion",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS; T002A commit 1ee250b9c1432651436149c3f377ce69790d7add, T002B commit cde5f8855925c1a8245d3c9b5c939de8b93316eb, T002C commit 02e9e5e40ff63aaa2e092a98ca6f9a1a7dc38ad2, T002D commit 467b7b747c7544054685053f5a44154e4e5eefe1 with final PASS evidence 20260713T022337Z, and T002E docs/status closeout complete; P0-B repaired/closed; PHASE8-IMPL-025-T007 consumes contract"
     },
     {
@@ -5559,8 +5582,16 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T002"],
-      "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T002"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS workstream; T003A context-availability/readiness contract complete/PASS; T003B conditional frontend loading complete/PASS (final commit 83de5db); T003C console/network regression validation complete/PASS from accepted aggregate evidence 20260718T042148Z + 20260718T045420Z"
     },
     {
@@ -5569,8 +5600,16 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024-T003",
-      "depends_on": ["PHASE8-IMPL-024-T002"],
-      "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T002"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS; deterministic project_context_readiness.v1 backend contract"
     },
     {
@@ -5579,8 +5618,16 @@
       "type": "runtime_microtask",
       "status": "done",
       "parent": "PHASE8-IMPL-024-T003",
-      "depends_on": ["PHASE8-IMPL-024-T003A"],
-      "boundary_tags": ["read_only", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T003A"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS (final commit 83de5db8a8b017bdcc55f22876024219fdb4be3e); readiness-first conditional frontend loading with distinct absent/invalid/unavailable/readiness-failure/direct-failure states; stale-operation session-generation guards; ABA rejection; project-switch reset; Retry; independent unrelated loading; 62 focused tests passed; full frontend regression 89 passed; T003C later completed/PASS from accepted aggregate evidence 20260718T042148Z + 20260718T045420Z"
     },
     {
@@ -5589,8 +5636,16 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024-T003",
-      "depends_on": ["PHASE8-IMPL-024-T003B"],
-      "boundary_tags": ["validation", "read_only", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T003B"
+      ],
+      "boundary_tags": [
+        "validation",
+        "read_only",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS browser console/network regression closeout; accepted aggregate evidence 20260718T042148Z + 20260718T045420Z; all five scenarios pass; focused backend 16 passed; focused frontend 63 passed; build PASS; zero unexpected errors, failures, or mutations"
     },
     {
@@ -5599,21 +5654,71 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T007C"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T007C"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS through T004A-T004C; commits d6318c678f07015f0bfebc6997cc8c69cfd7cd2a (T004A), d72ace8f25afb248afc39f6b38d1ad0fcdd8bcf6 (T004B), faae964f65e7d68efe3c16bf21f11c6c258ff2d6 (T004C)"
     },
     {
-      "id": "PHASE8-IMPL-024-T004A", "title": "Document overflow repair and native-control containment", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T007C"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit d6318c678f07015f0bfebc6997cc8c69cfd7cd2a"
+      "id": "PHASE8-IMPL-024-T004A",
+      "title": "Document overflow repair and native-control containment",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T004",
+      "depends_on": [
+        "PHASE8-IMPL-024-T007C"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit d6318c678f07015f0bfebc6997cc8c69cfd7cd2a"
     },
     {
-      "id": "PHASE8-IMPL-024-T004B", "title": "OMI containment and contextual workspace", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T004A"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit d72ace8f25afb248afc39f6b38d1ad0fcdd8bcf6"
+      "id": "PHASE8-IMPL-024-T004B",
+      "title": "OMI containment and contextual workspace",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T004",
+      "depends_on": [
+        "PHASE8-IMPL-024-T004A"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit d72ace8f25afb248afc39f6b38d1ad0fcdd8bcf6"
     },
     {
-      "id": "PHASE8-IMPL-024-T004C", "title": "Six-width responsive validation", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T004", "depends_on": ["PHASE8-IMPL-024-T004B"],
-      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit faae964f65e7d68efe3c16bf21f11c6c258ff2d6"
+      "id": "PHASE8-IMPL-024-T004C",
+      "title": "Six-width responsive validation",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T004",
+      "depends_on": [
+        "PHASE8-IMPL-024-T004B"
+      ],
+      "boundary_tags": [
+        "validation",
+        "review_ui_planning",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit faae964f65e7d68efe3c16bf21f11c6c258ff2d6"
     },
     {
       "id": "PHASE8-IMPL-024-T005",
@@ -5621,21 +5726,71 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T004C"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T004C"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS through T005A-T005C; commits 0825ababcf9f4785e6b55aee6b19fc5c7419355b (T005A), 30d33eda3aa077bd675aba1b6a3527b9d74ba348 (T005B), a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e (T005C)"
     },
     {
-      "id": "PHASE8-IMPL-024-T005A", "title": "Heading hierarchy and minimum operable-target policy", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T004C"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit 0825ababcf9f4785e6b55aee6b19fc5c7419355b"
+      "id": "PHASE8-IMPL-024-T005A",
+      "title": "Heading hierarchy and minimum operable-target policy",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T005",
+      "depends_on": [
+        "PHASE8-IMPL-024-T004C"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit 0825ababcf9f4785e6b55aee6b19fc5c7419355b"
     },
     {
-      "id": "PHASE8-IMPL-024-T005B", "title": "Coarse-pointer sizing, hit areas, and focus visibility", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T005A"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit 30d33eda3aa077bd675aba1b6a3527b9d74ba348"
+      "id": "PHASE8-IMPL-024-T005B",
+      "title": "Coarse-pointer sizing, hit areas, and focus visibility",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T005",
+      "depends_on": [
+        "PHASE8-IMPL-024-T005A"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit 30d33eda3aa077bd675aba1b6a3527b9d74ba348"
     },
     {
-      "id": "PHASE8-IMPL-024-T005C", "title": "Manual keyboard validation", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T005", "depends_on": ["PHASE8-IMPL-024-T005B"],
-      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e"
+      "id": "PHASE8-IMPL-024-T005C",
+      "title": "Manual keyboard validation",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T005",
+      "depends_on": [
+        "PHASE8-IMPL-024-T005B"
+      ],
+      "boundary_tags": [
+        "validation",
+        "review_ui_planning",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit a0d3bac4e3b7ce3f2c479c525e456c9a041fd17e"
     },
     {
       "id": "PHASE8-IMPL-024-T006",
@@ -5643,21 +5798,72 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T003"],
-      "boundary_tags": ["candidate_only", "review_ui_planning", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T003"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "review_ui_planning",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS through T006A-T006C; T006A commit 64dd90c23a926465ec42718032d79c6181d138e4; T006B commit 14e8c8138621a87973fb469e8233c08180da8374; T006C fresh PASS evidence 20260718T202605Z; truthful destinations, centralized reset, review-only promotion, App-owned approved Memory/Canon delegation, zero mutations"
     },
     {
-      "id": "PHASE8-IMPL-024-T006A", "title": "Resettable OMI Dashboard navigation and state-owner decision", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T003C"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit 64dd90c23a926465ec42718032d79c6181d138e4; App owns coarse workspace selection and OMIShell owns inner navigation/reset state"
+      "id": "PHASE8-IMPL-024-T006A",
+      "title": "Resettable OMI Dashboard navigation and state-owner decision",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T006",
+      "depends_on": [
+        "PHASE8-IMPL-024-T003C"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit 64dd90c23a926465ec42718032d79c6181d138e4; App owns coarse workspace selection and OMIShell owns inner navigation/reset state"
     },
     {
-      "id": "PHASE8-IMPL-024-T006B", "title": "Repeated inner-view navigation and truthful enabled actions", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006A"],
-      "boundary_tags": ["review_ui_planning", "local_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; commit 14e8c8138621a87973fb469e8233c08180da8374; actionable implemented destinations and truthful unavailable status rows"
+      "id": "PHASE8-IMPL-024-T006B",
+      "title": "Repeated inner-view navigation and truthful enabled actions",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T006",
+      "depends_on": [
+        "PHASE8-IMPL-024-T006A"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "local_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; commit 14e8c8138621a87973fb469e8233c08180da8374; actionable implemented destinations and truthful unavailable status rows"
     },
     {
-      "id": "PHASE8-IMPL-024-T006C", "title": "Navigation regression validation and closeout", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T006", "depends_on": ["PHASE8-IMPL-024-T006B"],
-      "boundary_tags": ["validation", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; fresh evidence .codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z; 127/127 dedicated assertions, four tracked harnesses PASS, zero mutations, identical protected snapshots/manifests"
+      "id": "PHASE8-IMPL-024-T006C",
+      "title": "Navigation regression validation and closeout",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T006",
+      "depends_on": [
+        "PHASE8-IMPL-024-T006B"
+      ],
+      "boundary_tags": [
+        "validation",
+        "review_ui_planning",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; fresh evidence .codex-context/PHASE8-IMPL-024/manual-validation/T006C-navigation-regression/20260718T202605Z; 127/127 dedicated assertions, four tracked harnesses PASS, zero mutations, identical protected snapshots/manifests"
     },
     {
       "id": "PHASE8-IMPL-024-T007",
@@ -5665,21 +5871,72 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T006"],
-      "boundary_tags": ["candidate_only", "evidence_first", "review_ui_planning", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T006"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "review_ui_planning",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS; T007A and T007B complete/PASS; T007C complete/PASS_WITH_FINDINGS; Radix Dialog for Evidence Drawer; DESIGN.md/semantic-token foundation; OMILoadingState; OMIEmptyCandidateShellWarning; seven nonblocking findings; closeout decision docs/roadmap/decisions/PHASE8-IMPL-024-T007-design-system-and-shared-component-standardization-closeout.md"
     },
     {
-      "id": "PHASE8-IMPL-024-T007A", "title": "Evidence-based Impeccable UI review", "type": "planning_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T006C"],
-      "boundary_tags": ["review_ui_planning", "evidence_first", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; read-only evidence-based Impeccable UI review at .codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z; 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no tracked/product-data changes; no commit or push; no component foundation selected or installed; NO_PRODUCT_MD waiver expired with T007A; T006 preserved; neutral T007B handoff"
+      "id": "PHASE8-IMPL-024-T007A",
+      "title": "Evidence-based Impeccable UI review",
+      "type": "planning_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T007",
+      "depends_on": [
+        "PHASE8-IMPL-024-T006C"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "evidence_first",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; read-only evidence-based Impeccable UI review at .codex-context/PHASE8-IMPL-024/manual-validation/T007A-impeccable-ui-review/20260718T222816Z; 42 captures across 11 scenarios and 6 viewport sizes; 4 verified P2 defects; no P0/P1 findings; no tracked/product-data changes; no commit or push; no component foundation selected or installed; NO_PRODUCT_MD waiver expired with T007A; T006 preserved; neutral T007B handoff"
     },
     {
-      "id": "PHASE8-IMPL-024-T007B", "title": "Owner component-foundation decision", "type": "planning_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007A"],
-      "boundary_tags": ["owner_review_required", "review_ui_planning", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; owner selected Radix Primitives for incremental complex interactions and accessibility primitives; native HTML remains preferred where sufficient; product semantics remain application-owned; Tailwind and shadcn/ui are not authorized; no dependency installed or version pinned; T007C subsequently adopted Radix Dialog for the bounded Evidence Drawer gate; decision docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md"
+      "id": "PHASE8-IMPL-024-T007B",
+      "title": "Owner component-foundation decision",
+      "type": "planning_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T007",
+      "depends_on": [
+        "PHASE8-IMPL-024-T007A"
+      ],
+      "boundary_tags": [
+        "owner_review_required",
+        "review_ui_planning",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; owner selected Radix Primitives for incremental complex interactions and accessibility primitives; native HTML remains preferred where sufficient; product semantics remain application-owned; Tailwind and shadcn/ui are not authorized; no dependency installed or version pinned; T007C subsequently adopted Radix Dialog for the bounded Evidence Drawer gate; decision docs/roadmap/decisions/PHASE8-IMPL-024-T007B-owner-component-foundation-decision.md"
     },
     {
-      "id": "PHASE8-IMPL-024-T007C", "title": "Design-system and shared-component standardization", "type": "runtime_microtask", "status": "complete", "parent": "PHASE8-IMPL-024-T007", "depends_on": ["PHASE8-IMPL-024-T007B"],
-      "boundary_tags": ["review_ui_planning", "candidate_only", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS_WITH_FINDINGS; four accepted implementation gates: Radix Dialog for Evidence Drawer (71393b40), DESIGN.md/semantic tokens (9ea8557c), OMILoadingState (8c338913), OMIEmptyCandidateShellWarning (945254a8); accepted consolidated validation PASS; seven nonblocking findings; closeout decision docs/roadmap/decisions/PHASE8-IMPL-024-T007-design-system-and-shared-component-standardization-closeout.md"
+      "id": "PHASE8-IMPL-024-T007C",
+      "title": "Design-system and shared-component standardization",
+      "type": "runtime_microtask",
+      "status": "complete",
+      "parent": "PHASE8-IMPL-024-T007",
+      "depends_on": [
+        "PHASE8-IMPL-024-T007B"
+      ],
+      "boundary_tags": [
+        "review_ui_planning",
+        "candidate_only",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS_WITH_FINDINGS; four accepted implementation gates: Radix Dialog for Evidence Drawer (71393b40), DESIGN.md/semantic tokens (9ea8557c), OMILoadingState (8c338913), OMIEmptyCandidateShellWarning (945254a8); accepted consolidated validation PASS; seven nonblocking findings; closeout decision docs/roadmap/decisions/PHASE8-IMPL-024-T007-design-system-and-shared-component-standardization-closeout.md"
     },
     {
       "id": "PHASE8-IMPL-024-T008",
@@ -5687,33 +5944,129 @@
       "type": "runtime_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-024",
-      "depends_on": ["PHASE8-IMPL-024-T005C"],
-      "boundary_tags": ["candidate_only", "evidence_first", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-024-T005C"
+      ],
+      "boundary_tags": [
+        "candidate_only",
+        "evidence_first",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "complete/PASS for required PHASE8-IMPL-024 application closeout validation; T008A->T008B->T008C->T008D->T008E->T008F preserved complete/PASS; final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b; ordinary Python aggregate 5203 passed with zero unexpected failures/errors and exact expected-red reproduction; roadmap validators, Node 8/8, build, live-backend browser, responsive, semantic accessibility-tree proxy, and Chromium page-scale 2.0 PASS; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; no project/application/repository mutation; accepted archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md; no next child or new child ID"
     },
     {
-      "id": "PHASE8-IMPL-024-T008A", "title": "Guided-creation persistence suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T005C"],
-      "boundary_tags": ["validation", "owner_authored_prose_storage", "no_model_calls", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS (validation-only); accepted evidence archive /tmp/PHASE8-IMPL-024-T008A-validation-20260729T184242Z.tar.gz SHA-256 808f663d4719444a13dfedeaee2d34b241c16ccdd61d538b91235019f69bba95; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md"
+      "id": "PHASE8-IMPL-024-T008A",
+      "title": "Guided-creation persistence suite",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-024-T008",
+      "depends_on": [
+        "PHASE8-IMPL-024-T005C"
+      ],
+      "boundary_tags": [
+        "validation",
+        "owner_authored_prose_storage",
+        "no_model_calls",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS (validation-only); accepted evidence archive /tmp/PHASE8-IMPL-024-T008A-validation-20260729T184242Z.tar.gz SHA-256 808f663d4719444a13dfedeaee2d34b241c16ccdd61d538b91235019f69bba95; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008A-guided-creation-persistence-suite-closeout.md"
     },
     {
-      "id": "PHASE8-IMPL-024-T008B", "title": "Candidate lifecycle and grouped-review owner-decision suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008A"],
-      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; validation-led with one narrow stale-test correction; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; accepted runtime SHA-256 66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md; no application behavior change"
+      "id": "PHASE8-IMPL-024-T008B",
+      "title": "Candidate lifecycle and grouped-review owner-decision suite",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-024-T008",
+      "depends_on": [
+        "PHASE8-IMPL-024-T008A"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; validation-led with one narrow stale-test correction; correction commit 81f6d7c3a5566ab5b2a9ffb8e30c5ed4bc275593; accepted runtime SHA-256 66f7a42ea64361f5a76f4ca56eef22ca24b90791f8d514ced1d18ab1732cfe2a; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008B-candidate-lifecycle-grouped-review-owner-decision-suite-closeout.md; no application behavior change"
     },
     {
-      "id": "PHASE8-IMPL-024-T008C", "title": "Promotion creation and handoff suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008B"],
-      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; validation-led with bounded frontend correction; implementation commit f8b8be5d37a28e182f18cacd719667db5884a969; validation SHA-256 0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41; commit evidence SHA-256 c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md; audit/candidate-side only; does not apply promotion"
+      "id": "PHASE8-IMPL-024-T008C",
+      "title": "Promotion creation and handoff suite",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-024-T008",
+      "depends_on": [
+        "PHASE8-IMPL-024-T008B"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; validation-led with bounded frontend correction; implementation commit f8b8be5d37a28e182f18cacd719667db5884a969; validation SHA-256 0cd09a08358c522f49e6eeb2f852db2b74316e7c92d24ebe23edbc5f9e341d41; commit evidence SHA-256 c24c35b2bda11b0fa1c05cc0527e3818ddaf17af679dd43f25afbf5d71939c3c; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008C-promotion-creation-and-handoff-suite-closeout.md; audit/candidate-side only; does not apply promotion"
     },
     {
-      "id": "PHASE8-IMPL-024-T008D", "title": "Apply-promotion suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008C"],
-      "boundary_tags": ["validation", "evidence_first", "owner_review_required", "no_auto_promotion", "mvp_required_apply_promotion", "mvp_required_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; implementation commit bc93fcedd6e4609ce3e695b2706be4cc7682a6b0; reviewed patch SHA-256 08f96fe2c0dbe4469dd386a606b5c8e70ca02fa8ab47f8cbcf7d7dd22ee2f578; supervisor diff-review SHA-256 24a8368dab0419d74386c33aaf36930268af6c9405d1aea65e8492df81d4fd55; commit-review SHA-256 2ef0afba383ab25f9f21cb4c1105ccec72d179c4207c1de82ac74a875359c23a; explicit create/update only; successful final apply mutates only the approved destination record and appends accepted audit/recovery events; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md"
+      "id": "PHASE8-IMPL-024-T008D",
+      "title": "Apply-promotion suite",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-024-T008",
+      "depends_on": [
+        "PHASE8-IMPL-024-T008C"
+      ],
+      "boundary_tags": [
+        "validation",
+        "evidence_first",
+        "owner_review_required",
+        "no_auto_promotion",
+        "mvp_required_apply_promotion",
+        "mvp_required_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; implementation commit bc93fcedd6e4609ce3e695b2706be4cc7682a6b0; reviewed patch SHA-256 08f96fe2c0dbe4469dd386a606b5c8e70ca02fa8ab47f8cbcf7d7dd22ee2f578; supervisor diff-review SHA-256 24a8368dab0419d74386c33aaf36930268af6c9405d1aea65e8492df81d4fd55; commit-review SHA-256 2ef0afba383ab25f9f21cb4c1105ccec72d179c4207c1de82ac74a875359c23a; explicit create/update only; successful final apply mutates only the approved destination record and appends accepted audit/recovery events; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008D-apply-promotion-suite-closeout.md"
     },
     {
-      "id": "PHASE8-IMPL-024-T008E", "title": "Review-queue command suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008D"],
-      "boundary_tags": ["validation", "candidate_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; implementation commit f9f189c2f037e08feb65ae5a4b8c7c5327ea1275; reviewed patch SHA-256 79564b206d9c3ad5b72d09599edf4ba2bfdbc121ecb582c7ef250dd7bbe6dc7b; deterministic, accepted runtime/API, and final browser validation PASS; candidate/evidence/provenance preserved; no automatic promotion/apply-promotion or Memory/Canon mutation; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md"
+      "id": "PHASE8-IMPL-024-T008E",
+      "title": "Review-queue command suite",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-024-T008",
+      "depends_on": [
+        "PHASE8-IMPL-024-T008D"
+      ],
+      "boundary_tags": [
+        "validation",
+        "candidate_only",
+        "owner_review_required",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; implementation commit f9f189c2f037e08feb65ae5a4b8c7c5327ea1275; reviewed patch SHA-256 79564b206d9c3ad5b72d09599edf4ba2bfdbc121ecb582c7ef250dd7bbe6dc7b; deterministic, accepted runtime/API, and final browser validation PASS; candidate/evidence/provenance preserved; no automatic promotion/apply-promotion or Memory/Canon mutation; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008E-review-queue-command-suite-closeout.md"
     },
     {
-      "id": "PHASE8-IMPL-024-T008F", "title": "Non-mutating resilience and accessibility suite", "type": "runtime_microtask", "status": "done", "parent": "PHASE8-IMPL-024-T008", "depends_on": ["PHASE8-IMPL-024-T008E"],
-      "boundary_tags": ["validation", "read_only", "owner_review_required", "no_memory_canon_mutation", "no_generated_prose"], "result": "complete/PASS; validation-only/read-only; focused pytest 165 passed; Grouped Review Node 1 passed; frontend build PASS; resilience/recovery, keyboard/focus, eligible Grouped Review ARIA snapshot, semantic accessibility-tree proxy, and Chromium page-scale emulation at 2.0 PASS; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; final browser 79 PASS / 0 FAIL; all telemetry zero; nonGetApiRequests=0; mutatingApiRequests=0; accepted archive SHA-256 83e373a0101bb77ef33e25d82946b8ce244012fbedd302367eed02256718fd79; no product defect or repository/application/project-data mutation; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008F-non-mutating-resilience-and-accessibility-suite-closeout.md"
+      "id": "PHASE8-IMPL-024-T008F",
+      "title": "Non-mutating resilience and accessibility suite",
+      "type": "runtime_microtask",
+      "status": "done",
+      "parent": "PHASE8-IMPL-024-T008",
+      "depends_on": [
+        "PHASE8-IMPL-024-T008E"
+      ],
+      "boundary_tags": [
+        "validation",
+        "read_only",
+        "owner_review_required",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
+      "result": "complete/PASS; validation-only/read-only; focused pytest 165 passed; Grouped Review Node 1 passed; frontend build PASS; resilience/recovery, keyboard/focus, eligible Grouped Review ARIA snapshot, semantic accessibility-tree proxy, and Chromium page-scale emulation at 2.0 PASS; ACTUAL_SCREEN_READER_EXECUTION=NOT_PERFORMED; final browser 79 PASS / 0 FAIL; all telemetry zero; nonGetApiRequests=0; mutatingApiRequests=0; accepted archive SHA-256 83e373a0101bb77ef33e25d82946b8ce244012fbedd302367eed02256718fd79; no product defect or repository/application/project-data mutation; closeout docs/roadmap/decisions/PHASE8-IMPL-024-T008F-non-mutating-resilience-and-accessibility-suite-closeout.md"
     },
     {
       "id": "PHASE8-IMPL-025",
@@ -5743,12 +6096,12 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-025.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
       "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
-      "latest_child_task": "PHASE8-IMPL-025-T006",
-      "latest_child_status": "accepted/closed optional paid-integration foundation; real paid runtime deferred; T006G not executed",
-      "next_child_task": "PHASE8-IMPL-025-T007",
+      "latest_child_task": "PHASE8-IMPL-025-T007",
+      "latest_child_status": "complete/PASS",
+      "next_child_task": "PHASE8-IMPL-025-T004",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T006-full-subtxt-adapter-integration-and-validation.md",
-      "result": "published/active architecture-integration parent after PHASE8-IMPL-024 complete/closed and application closeout validation PASS; T001-T003 and T005 complete/PASS; T004 implementation milestone ca2f99f35a7dc029a217954872ca7a5ab479ed2f accepted with required real expanded BookNLP current-layer validation pending; T006 implementation milestone 23d4825da9a257180cdc0d1d1239ce13b4e01f78 accepted/closed as optional paid-integration foundation with T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE, zero verified official runtime surfaces, no real execution, and paid runtime deferred; T007 is the planned dependency-satisfied/eligible next frontier and not begun; T008 planned/not begun with hard dependencies T004 and T007; app-owned dramatica_flow_informed_rubric is the approved MVP boundary and external dramatica_flow is reference/provenance-only, not MVP-required, and not authorized for implementation/execution; Project Memory paused/nonblocking and not an activation gate"
+      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T007-evidence-bounded-ollama-and-story-check-closeout.md",
+      "result": "published/active architecture-integration parent; T001-T003, T005, and T007 complete/PASS. T007 implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170 accepted after deterministic and bounded real Ollama/qwen3:8b and Story Check current-layer execution. T004 implementation milestone ca2f99f35a7dc029a217954872ca7a5ab479ed2f remains accepted with required T004G real expanded BookNLP current-layer validation pending and now the remaining required contributor frontier before T008. T006 remains accepted/closed as optional paid integration with real paid execution deferred. T008 remains planned/not begun. App-owned dramatica_flow_informed_rubric remains the approved MVP boundary; external dramatica_flow is reference/provenance-only. Project Memory remains paused/nonblocking."
     },
     {
       "id": "PHASE8-IMPL-025-T001",
@@ -5756,8 +6109,17 @@
       "type": "planning_microtask",
       "status": "done",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025"],
-      "boundary_tags": ["orchestration_contract", "evidence_first", "candidate_only", "owner_review_required", "no_generated_prose", "no_memory_canon_mutation"],
+      "depends_on": [
+        "PHASE8-IMPL-025"
+      ],
+      "boundary_tags": [
+        "orchestration_contract",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_generated_prose",
+        "no_memory_canon_mutation"
+      ],
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T001-tool-role-and-layered-orchestration-contract.md",
       "result": "complete/PASS documentation-only contract for adapter roles and input/output dependency classes, layered-plus-parallel sequencing and activation, stable identity/label/provenance separation, and fail-closed partial-run/no-silent-fallback lineage; no runtime or schema implementation"
     },
@@ -5767,8 +6129,17 @@
       "type": "runtime_microtask",
       "status": "done",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T001"],
-      "boundary_tags": ["evidence_first", "metadata_only", "local_first", "candidate_only", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T001"
+      ],
+      "boundary_tags": [
+        "evidence_first",
+        "metadata_only",
+        "local_first",
+        "candidate_only",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md",
       "result": "complete/PASS pure local contract for stable path-independent source IDs, exact UTF-8 snapshots/hashes and provable character/byte offsets, immutable AnalysisRunManifest with dependency/provenance/transformation lineage, and preserved rejected/quarantined/unverified/partial results; no T003 persistence or runtime execution"
     },
@@ -5903,7 +6274,7 @@
       "id": "PHASE8-IMPL-025-T007",
       "title": "Evidence-bounded Ollama and Story Check",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-025",
       "depends_on": [
         "PHASE8-IMPL-025-T003"
@@ -5917,7 +6288,9 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned and not begun; dependency-satisfied/eligible and the next application frontier after T006 optional-foundation closeout; T007E requires deterministic regressions plus bounded real Ollama/qwen3:8b and Story Check execution through current exact-source/hash, manifest, native/raw artifact, evidence-ledger, grounding/quarantine, normalization, and candidate semantics; historical PHASE8-IMPL-023 live runs are foundation only"
+      "result": "complete/PASS through T007E; implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170; deterministic T007E gate 379 passed; real analyze-ollama-model application-path execution reached Ollama/qwen3:8b with exact-source identity, immutable original-output retention, provenance, truthful T003 model-call state, rejected-output lineage, and zero persisted candidates; real analyze-story-check application-path execution reached Story Check -> Ollama/qwen3:8b exactly once, preserved exact source identity, produced 16 diagnostics (0 verified, 15 unverified, 1 quarantined), retained all 16 through output lineage with zero fabricated nonvalidated evidence references, and persisted zero candidates; no automatic approval/promotion/apply-promotion, Memory/Canon mutation, training/dataset mutation, or generated prose",
+      "implementation_commit": "f843b615762192ca8f6865e76b2c4e4c9bcc2170",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T007-evidence-bounded-ollama-and-story-check-closeout.md"
     },
     {
       "id": "PHASE8-IMPL-025-T008",
@@ -5938,7 +6311,7 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned and not begun; awaits required T004 real-execution completion plus T007; requires deterministic fixture regression coverage and actual current-layer real outputs for every applicable MVP-required free/local contributor; optional official Subtxt output may participate when configured and available and must pass identical guardrails/evidence/candidate boundaries, but its absence does not block T008 or MVP acceptance; app-owned dramatica_flow_informed_rubric participates within its accepted scope while external dramatica_flow is not a dependency or required runtime proof"
+      "result": "planned and not begun; T007 is complete/PASS and that dependency is satisfied; awaits required T004/T004G real BookNLP current-layer completion; requires deterministic fixture regression coverage and actual current-layer real outputs for every applicable MVP-required free/local contributor; optional official Subtxt output may participate when configured and available but its absence does not block T008 or MVP acceptance; external dramatica_flow is not a dependency or required runtime proof"
     },
     {
       "id": "PHASE8-IMPL-025-T009",
@@ -5946,8 +6319,20 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T008"],
-      "boundary_tags": ["read_only", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose", "no_rewrite", "no_continuation"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T008"
+      ],
+      "boundary_tags": [
+        "read_only",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose",
+        "no_rewrite",
+        "no_continuation"
+      ],
       "result": "planned causal/thread/information/relationship/emotional/promise-payoff/hook diagnostics over multiple sources and approved-context snapshots with read-only candidate output"
     },
     {
@@ -5956,8 +6341,18 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T008"],
-      "boundary_tags": ["owner_supplied_material", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T008"
+      ],
+      "boundary_tags": [
+        "owner_supplied_material",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "planned immutable import artifact, explicit NCP mappings, JSON-pointer/value-hash provenance, candidate review, approved-context export, validation, and real supported-schema round-trip execution through the current gateway, plus owner UI after T009 diagnostics and backend contracts; historical owner-selected import is foundation only"
     },
     {
@@ -5966,8 +6361,16 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025-T010",
-      "depends_on": ["PHASE8-IMPL-025-T009", "PHASE8-IMPL-025-T010"],
-      "boundary_tags": ["owner_action_workflow_planning", "candidate_only", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T009",
+        "PHASE8-IMPL-025-T010"
+      ],
+      "boundary_tags": [
+        "owner_action_workflow_planning",
+        "candidate_only",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "planned NCP import/export, safe destination selection, validation feedback, scoped diagnostics, full state/retry/confirmation coverage, accessibility/responsive/browser validation, and preserved later owner semantic gates"
     },
     {
@@ -5976,8 +6379,18 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T008"],
-      "boundary_tags": ["owner_action_workflow_planning", "candidate_only", "owner_review_required", "no_auto_promotion", "no_memory_canon_mutation", "no_apply_promotion", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T008"
+      ],
+      "boundary_tags": [
+        "owner_action_workflow_planning",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_memory_canon_mutation",
+        "no_apply_promotion",
+        "no_generated_prose"
+      ],
       "result": "planned bounded approve/reject/needs-evidence, merge, split, correction, rerun, grouped-review/audit slices, plus separate owner live-run workflow using the completed PHASE8-IMPL-024 component foundation"
     },
     {
@@ -5986,8 +6399,19 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025-T011",
-      "depends_on": ["PHASE8-IMPL-025-T003F", "PHASE8-IMPL-024-T007C"],
-      "boundary_tags": ["owner_action_workflow_planning", "candidate_only", "owner_review_required", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T003F",
+        "PHASE8-IMPL-024-T007C"
+      ],
+      "boundary_tags": [
+        "owner_action_workflow_planning",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "result": "planned readiness, selection, submission, progress, partial/unavailable/failure/timeout/retry/recovery, result/provenance/manifest/ledger inspection, candidate handoff, explicit apply boundary, and browser validation"
     },
     {
@@ -5996,8 +6420,23 @@
       "type": "runtime_microtask",
       "status": "planned",
       "parent": "PHASE8-IMPL-025",
-      "depends_on": ["PHASE8-IMPL-025-T003F", "PHASE8-IMPL-025-T003G", "PHASE8-IMPL-025-T009", "PHASE8-IMPL-025-T010", "PHASE8-IMPL-025-T010H", "PHASE8-IMPL-025-T011", "PHASE8-IMPL-025-T011H"],
-      "boundary_tags": ["validation", "evidence_first", "candidate_only", "owner_review_required", "no_auto_promotion", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T003F",
+        "PHASE8-IMPL-025-T003G",
+        "PHASE8-IMPL-025-T009",
+        "PHASE8-IMPL-025-T010",
+        "PHASE8-IMPL-025-T010H",
+        "PHASE8-IMPL-025-T011",
+        "PHASE8-IMPL-025-T011H"
+      ],
+      "boundary_tags": [
+        "validation",
+        "evidence_first",
+        "candidate_only",
+        "owner_review_required",
+        "no_auto_promotion",
+        "no_generated_prose"
+      ],
       "result": "planned layered-runtime and integration deltas over reusable PHASE8-IMPL-024-T008 baselines; for every enabled MVP-required external contributor, prove real source -> current layered control plane -> real external tool/interface -> native/raw output -> manifest/artifact/evidence ledger -> normalization -> guardrails/fusion -> candidate persistence -> owner review; deterministic mocks remain required but are insufficient; includes live browser-to-HTTP, compatibility, provisioning, negative paths, owner workflows, and isolated apply-promotion; optional paid Subtxt and external dramatica_flow runtime proof are not required; no duplicate terminal suite"
     },
     {
@@ -6051,7 +6490,9 @@
       "type": "planning_microtask",
       "status": "complete",
       "parent": "PHASE8-IMPL-026",
-      "depends_on": ["PHASE8-IMPL-026"],
+      "depends_on": [
+        "PHASE8-IMPL-026"
+      ],
       "boundary_tags": [
         "docs_only",
         "candidate_only",
@@ -6074,8 +6515,19 @@
       "type": "validation",
       "status": "planned",
       "parent": null,
-      "depends_on": ["PHASE8-IMPL-025-T012"],
-      "boundary_tags": ["validation", "owner_review_required", "candidate_only", "evidence_first", "no_auto_promotion", "no_apply_promotion", "no_memory_canon_mutation", "no_generated_prose"],
+      "depends_on": [
+        "PHASE8-IMPL-025-T012"
+      ],
+      "boundary_tags": [
+        "validation",
+        "owner_review_required",
+        "candidate_only",
+        "evidence_first",
+        "no_auto_promotion",
+        "no_apply_promotion",
+        "no_memory_canon_mutation",
+        "no_generated_prose"
+      ],
       "task_record": "docs/roadmap/tasks/PHASE8-IMPL-027.md",
       "inventory_record": "docs/roadmap/inventory/PHASE8-IMPL-027.md",
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-027.enrichment.json",

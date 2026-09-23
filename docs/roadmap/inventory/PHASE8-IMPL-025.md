@@ -5,8 +5,9 @@
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
 - Status: published/active
-- Immediate implementation frontier: `PHASE8-IMPL-025-T007` (`planned`;
-  dependency-satisfied/eligible; not begun)
+- Immediate implementation frontier: `PHASE8-IMPL-025-T004` (implementation
+  milestone accepted; required `T004G` expanded real-runtime fusion and
+  candidate-only persistence validation remains pending)
 - Activation dependency: satisfied by PHASE8-IMPL-024 fully complete/closed
   with application closeout validation PASS; Project Memory is
   paused/nonblocking and is not an activation gate
@@ -32,6 +33,9 @@
   `23d4825da9a257180cdc0d1d1239ce13b4e01f78`; T006G remains
   `NOT_EXECUTED_RUNTIME_UNAVAILABLE`, and paid production-runner/current-layer
   real execution is deferred optional debt
+- Completed child: `PHASE8-IMPL-025-T007` (`complete/PASS`), implementation
+  commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`; deterministic and bounded
+  real Ollama/qwen3:8b plus Story Check current-layer execution accepted
 - T002 closeout:
   `docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md`
 - T005 contract/closeout:
@@ -121,12 +125,13 @@ validation is pending.
    `NOT_EXECUTED_RUNTIME_UNAVAILABLE`; T006K zero currently available official
    runtime surfaces; real paid execution deferred).
 7. `PHASE8-IMPL-025-T007` — Evidence-bounded Ollama and Story Check
-   (`planned`; dependency-satisfied/eligible; not begun; next application
-   frontier).
+   (`complete/PASS`; implementation commit
+   `f843b615762192ca8f6865e76b2c4e4c9bcc2170`; deterministic and bounded real
+   current-layer Ollama/qwen3:8b and Story Check execution accepted).
 8. `PHASE8-IMPL-025-T008` — Cross-adapter semantic guardrails (`planned`; not
-   begun; awaits required T004 and T007 gates; optional Subtxt absence does not
-   block acceptance; external `dramatica_flow` is not a dependency or required
-   runtime proof).
+   begun; T007 dependency satisfied; awaits required T004/T004G real-execution
+   gate; optional Subtxt absence does not block acceptance; external
+   `dramatica_flow` is not a dependency or required runtime proof).
 9. `PHASE8-IMPL-025-T009` — Read-only project-level narrative diagnostics.
 10. `PHASE8-IMPL-025-T010` — Full NCP gateway.
 11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion.
@@ -137,11 +142,12 @@ data compatibility; T005H/T006K provisioning and current-machine runtime
 compatibility; T010H NCP/diagnostics owner UI; T011H owner live-run workflow;
 T012K layered integration deltas. PHASE8-IMPL-027 is the terminal gate.
 
-T001-T003 and T005 are complete/PASS. T004 has an accepted implementation
-milestone with an open required real-execution gate. T006 is accepted/closed as
-the optional paid-integration foundation, with paid real execution deferred.
-T007 is the next dependency-eligible frontier. T007 through T012 remain planned
-and not begun. Lettered bounded slices are defined in the parent task record.
+T001-T003, T005, and T007 are complete/PASS. T004 has an accepted
+implementation milestone with an open required T004G real-execution gate. T006
+is accepted/closed as the optional paid-integration foundation, with paid real
+execution deferred. T004/T004G is the remaining required contributor frontier
+before T008. T008 through T012 remain planned and not begun. Lettered bounded
+slices are defined in the parent task record.
 
 ## Dependencies
 
@@ -154,16 +160,16 @@ PHASE8-IMPL-024 closeout + application validation PASS
   -> T012 -> PHASE8-IMPL-027
 ```
 
-T007 consumes PHASE8-IMPL-024-T002's completed Story Check grounding work and
-must not duplicate it; T007E must add current-layer real Ollama and Story Check
-execution. T010H waits for T009 and T010 backend contracts; T011H
+T007 consumed PHASE8-IMPL-024-T002's completed Story Check grounding work
+without duplicating it; T007E accepted current-layer real Ollama/qwen3:8b and
+Story Check execution through the T002/T003 layered path. T010H waits for T009 and T010 backend contracts; T011H
 waits for T003F and the completed PHASE8-IMPL-024 component foundation. T012
 reuses PHASE8-IMPL-024-T008 and adds only layered deltas. T012I apply-promotion
-validation remains isolated. T007 is the next dependency-eligible frontier and
-remains planned/not begun. T008 remains not begun and waits for required T004
-real-execution completion plus T007. Optional official Subtxt output may
-participate when configured and available, but its absence does not block T008
-or MVP acceptance. The app-owned `dramatica_flow_informed_rubric` participates
+validation remains isolated. T007 is complete/PASS. T004/T004G is the remaining required
+dependency frontier. T008 remains not begun and waits for required T004
+real-execution completion; its T007 dependency is satisfied. Optional official
+Subtxt output may participate when configured and available, but its absence
+does not block T008 or MVP acceptance. The app-owned `dramatica_flow_informed_rubric` participates
 within its accepted internal scope; external `dramatica_flow` is not part of
 the T007/T008/T012/PHASE8-IMPL-027 execution or proof path.
 

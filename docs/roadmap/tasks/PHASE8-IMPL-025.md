@@ -4,22 +4,24 @@
 
 Published/active. T001-T003 implementation milestones and the T005 contract are
 complete/PASS. T004 retains its accepted implementation milestone and required
-current-layer real BookNLP execution debt. T006 is accepted/closed as the
+T004G current-layer real BookNLP execution debt. T006 is accepted/closed as the
 optional paid Subtxt/Dramatica integration foundation; T006G remains
 `NOT_EXECUTED_RUNTIME_UNAVAILABLE`, and paid real-runtime execution is deferred
-without blocking MVP. T007 is the next dependency-eligible application
-frontier. T007 and T008 remain planned and not begun.
+without blocking MVP. T007 is complete/PASS through T007E at implementation
+commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`. T004/T004G is now the
+remaining required contributor frontier before T008. T008 remains planned and
+not begun.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
 accepted PHASE8-IMPL-024-T008 closeout, so this parent is published/active.
 Project Memory is not an activation gate while the accepted 2026-07-17 pause
-decision remains current. The current application frontier is
-`PHASE8-IMPL-025-T007`: planned, not begun, dependency-satisfied/eligible, and
-dependent on completed/PASS T003. T004's separate current-layer real BookNLP
-validation debt must be satisfied before downstream acceptance relies on that
-contributor. T008 remains planned/not begun and does not wait for optional paid
-Subtxt execution.
+decision remains current. T007 is complete/PASS through T007E. The current
+application frontier returns to `PHASE8-IMPL-025-T004`, whose T004G bounded
+current-layer real BookNLP validation remains required before downstream
+acceptance relies on that contributor. T008 remains planned/not begun; its T007
+dependency is satisfied, while its required T004/T004G dependency remains open.
+Optional paid Subtxt execution is not an MVP or T008 blocker.
 
 The owner-authorized T001 context prerequisite is satisfied by the generated,
 read-only supporting pack at
@@ -284,10 +286,11 @@ that real execution; no such claim is made here.
 
 ### PHASE8-IMPL-025-T007 — Evidence-bounded Ollama and Story Check
 
-Status: `planned`; depends on completed/PASS T003; not begun;
-dependency-satisfied/eligible and the next application frontier after T006
-closeout. It consumes the completed `PHASE8-IMPL-024-T002` grounding repair
-rather than duplicating it.
+Status: `complete/PASS`; dependency on completed/PASS T003 satisfied.
+Implementation commit:
+`f843b615762192ca8f6865e76b2c4e4c9bcc2170`.
+It consumes the completed `PHASE8-IMPL-024-T002` grounding repair rather than
+duplicating it.
 
 - `T007A` — Ollama exact-source structured extraction role.
 - `T007B` — Ollama evidence-bounded interpretation of normalized evidence.
@@ -304,13 +307,31 @@ rather than duplicating it.
 Neither role may assert truth or canon. Original tool/model output is retained
 with its verification state and is never silently rewritten.
 
+T007E closeout accepted the current-layer deterministic and real-runtime gates.
+The final deterministic gate passed 379 tests. Real `analyze-ollama-model`
+execution reached Ollama/qwen3:8b through the application path, preserved the
+exact 180-byte source and immutable original output, truthfully recorded model
+execution, rejected unsupported `candidate_type="person"` output without
+coercion, and persisted zero candidates. A separate real
+`analyze-story-check` application-path execution reached Story Check ->
+Ollama/qwen3:8b exactly once, preserved exact source identity, produced
+16 grounded diagnostics (0 verified, 15 unverified, 1 quarantined), retained
+all 16 through output lineage with 16 `output_recorded` events and zero
+nonvalidated evidence references, and persisted zero candidates.
+
+No automatic approval, promotion/apply-promotion, Memory/Canon mutation,
+training/dataset/model mutation, or generated story prose occurred.
+
+Closeout:
+`docs/roadmap/decisions/PHASE8-IMPL-025-T007-evidence-bounded-ollama-and-story-check-closeout.md`.
+
 ### PHASE8-IMPL-025-T008 — Cross-adapter semantic guardrails
 
-Status: `planned`; not begun; depends on T004 and T007. T004 retains its
-accepted implementation milestone and required real-execution gate. The shared
-guardrail and integration layer waits for every MVP-required free/local
-contributor branch and its required real current-layer output. Optional paid
-official Subtxt absence does not block T008 or MVP acceptance. The app-owned
+Status: `planned`; not begun; depends on T004 and T007. T007 is now
+complete/PASS. T004 retains its accepted implementation milestone and required
+T004G real-execution gate. The shared guardrail and integration layer therefore
+remains blocked on T004/T004G. Optional paid official Subtxt absence does not
+block T008 or MVP acceptance. The app-owned
 `dramatica_flow_informed_rubric` participates within its accepted internal
 scope; the external `dramatica_flow` runtime is not an MVP dependency and
 requires no T008 execution or proof.

@@ -33,7 +33,9 @@
     "subtxt_optional_paid_decision": "docs/roadmap/decisions/2026-09-07-subtxt-optional-paid-integration-free-local-mvp-path.md",
     "dramatica_flow_mvp_boundary_decision": "docs/roadmap/decisions/2026-09-08-dramatica-flow-analysis-only-reference-and-app-owned-rubric-mvp-boundary.md",
     "real_execution_completion_decision": "docs/roadmap/decisions/2026-09-07-real-tool-execution-required-for-tool-integration-completion.md",
-    "real_tool_reality_audit": "docs/roadmap/decisions/PHASE8-IMPL-025-real-tool-integration-reality-audit.md"
+    "real_tool_reality_audit": "docs/roadmap/decisions/PHASE8-IMPL-025-real-tool-integration-reality-audit.md",
+    "t007_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T007-evidence-bounded-ollama-and-story-check-closeout.md",
+    "t007_implementation_commit": "f843b615762192ca8f6865e76b2c4e4c9bcc2170"
   },
   "owner_subtxt_authorization": {
     "licensing_resolved": true,
@@ -99,15 +101,13 @@
     "T006 official/full Subtxt application adapter and mocked-validation foundation accepted/closed at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; optional paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero currently available verified official runtime surfaces"
   ],
   "missing_layers": [
-    "two-role evidence-bounded Ollama contract",
-    "layered reuse of the completed Story Check factual-grounding repair",
     "cross-adapter semantic guardrails",
     "read-only project-level narrative diagnostics",
     "full NCP import/export gateway and round-trip provenance",
     "expanded owner correction, merge, split, and rerun lifecycle",
     "owner live-run workflow",
     "real expanded BookNLP execution through the T002/T003 artifact, ledger, fusion, and candidate path",
-    "current-layer real execution proof for historical spaCy, Ollama/qwen3:8b, Story Check, BookNLP, and NCP foundations",
+    "current-layer real execution proof for remaining historical spaCy, BookNLP, and NCP foundations",
     "NCP and diagnostics owner UI",
     "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
   ],
@@ -117,13 +117,13 @@
       "PHASE8-IMPL-024"
     ],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": "PHASE8-IMPL-025-T007",
-    "immediate_next_task_status": "planned/not-begun; dependency-satisfied/eligible; next application frontier after T006 optional-foundation closeout",
+    "immediate_next_task": "PHASE8-IMPL-025-T004",
+    "immediate_next_task_status": "implementation milestone accepted; required T004G expanded real-runtime fusion and candidate-only persistence validation pending; remaining required contributor frontier before T008",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "complete/PASS",
-    "latest_completed_task": "PHASE8-IMPL-025-T006",
-    "latest_completed_task_status": "accepted/closed optional paid-integration foundation; real paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE",
-    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T006 at 23d4825da9a257180cdc0d1d1239ce13b4e01f78"
+    "latest_completed_task": "PHASE8-IMPL-025-T007",
+    "latest_completed_task_status": "complete/PASS; implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170",
+    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T007 at f843b615762192ca8f6865e76b2c4e4c9bcc2170"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -146,8 +146,8 @@
     "PHASE8-IMPL-025-T004": "implementation milestone accepted at ca2f99f35a7dc029a217954872ca7a5ab479ed2f; overall real-tool completion open pending expanded BookNLP current-layer execution",
     "PHASE8-IMPL-025-T005": "complete/PASS; implementation commit 7e58e4859f828b3ca0edb886c999f5f376f151ac",
     "PHASE8-IMPL-025-T006": "accepted/closed optional paid-integration foundation at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; real paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero available official runtime surfaces",
-    "PHASE8-IMPL-025-T007": "planned/not-begun; dependency-satisfied/eligible and next application frontier; T007E requires bounded real current-layer Ollama/qwen3:8b and Story Check execution",
-    "PHASE8-IMPL-025-T008": "planned/not-begun; awaits required T004 real-execution gate and T007; optional Subtxt absence does not block acceptance; external dramatica_flow is not a dependency or required runtime proof; fixtures alone cannot satisfy required contributor validation"
+    "PHASE8-IMPL-025-T007": "complete/PASS; implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170; deterministic T007E gate 379 passed; bounded real Ollama/qwen3:8b and Story Check current-layer application-path execution accepted; exact-source, immutable output, provenance, T003 model-call truthfulness, grounding/quarantine, nonvalidated output lineage, and candidate/canon safety passed",
+    "PHASE8-IMPL-025-T008": "planned/not-begun; T007 dependency satisfied; awaits required T004/T004G real-execution completion; optional Subtxt absence does not block acceptance; external dramatica_flow is not a dependency or required runtime proof"
   },
   "child_task_ordering": {
     "T001": [
