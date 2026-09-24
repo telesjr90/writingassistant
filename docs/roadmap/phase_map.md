@@ -40,15 +40,16 @@ frontier changes under this policy.
 
 # PHASE8-IMPL-025 Layered Analysis Architecture and Tool Integration Expansion
 
-- Status: published/active; T001-T003, T005, and T007 are complete/PASS; T004 retains an outstanding required T004G real BookNLP current-layer validation gate; T006 is accepted/closed as optional paid integration with real paid runtime deferred; T008 remains planned and not begun.
+- Status: published/active; T001-T003 implementation milestones are accepted; T005 and T007 are complete/PASS; T004 has an outstanding required T004G real BookNLP current-layer validation gate; T006 is accepted/closed as the optional paid-integration foundation with real paid runtime deferred; T008 remains planned and not begun.
 - Controlling decision: `docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md`.
 - Accepted architecture: parallel independent contributors plus sequential layers for source identity, raw extraction, immutable run evidence, interpretation, grounding/semantic guardrails, fusion, candidate review, explicit promotion, and the NCP gateway.
-- T007 closeout: implementation commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`; deterministic and bounded real Ollama/qwen3:8b and Story Check current-layer gates accepted.
-- Owner Subtxt decision: official Subtxt/Dramatica remains optional paid integration; no paid runtime execution is required for the free/local MVP.
-- Dramatica-flow decision: the app-owned `dramatica_flow_informed_rubric` remains the approved MVP boundary; external `dramatica_flow` is reference/provenance-only and outside the required execution/proof path.
-- Dependency boundary: T007/T007E is satisfied. PHASE8-IMPL-025-T004G expanded real BookNLP fusion and candidate-only persistence validation remains required before T008.
-- Branched delivery map: T001 -> T002 -> T003; outstanding T004/T004G plus completed T007/T007E -> T008; optional T005->T006 may contribute when available; T009/T010/T011 follow T008 and join at T012; PHASE8-IMPL-027 is the terminal gate.
-- Read-only/safety boundary: diagnostics never settle truth; review status alone never changes canon; apply-promotion remains isolated; no generated prose or automatic truth/promotion/Memory-Canon mutation is authorized.
+- T007 closeout: implementation commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`; 379 deterministic tests plus bounded real Ollama/qwen3:8b and Story Check current-layer gates accepted.
+- Owner Subtxt decision: official Subtxt/Dramatica is an optional paid integration under T005/T006, distinct from the completed app-owned `subtxt_informed_rubric`; no paid subscription/token/API execution is required for the free/local MVP, and no app-owned identity may impersonate or silently replace official `subtxt`.
+- Dramatica-flow decision: the app-owned `dramatica_flow_informed_rubric` is the approved MVP boundary for wanted dramatica-flow-derived analysis concepts. External `dramatica_flow` is reference/provenance-only for MVP, not MVP-required, requires no runtime proof, and is not authorized for implementation or execution.
+- Preserved foundation: historical real spaCy, Ollama, Story Check, BookNLP, and NCP import; both app-owned rubrics; fusion; candidate-only persistence; grouped review; and T023A/T023B remain valid within their completed scopes. Historical real execution does not prove current layered-path execution.
+- Dependency boundary: PHASE8-IMPL-025-T007/T007E is complete/PASS. PHASE8-IMPL-025-T004G current-layer real BookNLP validation remains required before downstream acceptance relying on BookNLP. T006 paid runtime remains optional deferred debt. T008 now waits on the remaining required T004/T004G gate.
+- Branched delivery map: T001 -> T002 -> T003; then outstanding T004/T004G plus completed T007/T007E -> T008; T005->T006 supplies optional official Subtxt input only when configured and available; T009/T010/T011 branch after T008 and join at T012; PHASE8-IMPL-027 is the terminal owner-acceptance/closeout gate. T003F/T003G, T010H, and T011H carry the accepted API, compatibility, NCP/diagnostics UI, and live-run UI obligations.
+- Read-only/safety boundary: project-level diagnostics never settle truth; review status alone never changes canon; apply-promotion is isolated; no generated prose or automatic truth/promotion/Memory-Canon mutation is authorized.
 
 # PHASE8 Owner Override: AI Tool-Assisted OMI Analysis Required Before MVP Closeout
 
