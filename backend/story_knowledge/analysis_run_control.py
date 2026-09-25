@@ -467,16 +467,35 @@ def _adapter_provenance(
     contract = _OPERATION_CONTRACTS[operation_id]
     if contract["adapter_id"] != adapter_id:
         raise ValueError("operation contract does not match adapter identity")
+    control_fields = {"tool_source", "adapter", "support", "operation_id"}
+
+    def actual_provenance(item: dict[str, Any]) -> dict[str, Any]:
+        claimed_operation_id = item.get("operation_id")
+        if claimed_operation_id is not None and claimed_operation_id != operation_id:
+            raise ValueError("provenance operation attribution mismatch")
+        return {
+            key: copy.deepcopy(value)
+            for key, value in item.items()
+            if key not in control_fields
+        }
+
     supplied = [
-        {key: copy.deepcopy(value) for key, value in item.items() if key not in {"tool_source", "adapter", "support"}}
+        actual
         for item in finding_provenance
-        if any(key not in {"tool_source", "adapter", "support"} for key in item)
+        if (actual := actual_provenance(item))
     ]
+    execution_metadata = (
+        actual_provenance(execution_provenance)
+        if execution_provenance is not None
+        else None
+    )
+    if execution_metadata:
+        supplied.append(execution_metadata)
     if supplied and any(item != supplied[0] for item in supplied[1:]):
         raise ValueError("conflicting actual provenance for one adapter operation")
     metadata = (
-        copy.deepcopy(execution_provenance)
-        if execution_provenance is not None
+        execution_metadata
+        if execution_metadata
         else supplied[0] if supplied else {}
     )
     if adapter_id == "deterministic_fallback":

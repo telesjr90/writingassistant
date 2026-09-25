@@ -103,6 +103,123 @@ def _finding_result(*args, provenance_extra=None, **kwargs):
     }
 
 
+def _booknlp_actual_provenance(
+    *, operation_id: str | None = None, tool_version: str = "1.0.8"
+) -> dict[str, object]:
+    provenance: dict[str, object] = {
+        "tool_source": "booknlp",
+        "adapter": "booknlp",
+        "support": "BookNLP external runtime support only",
+        "implementation_kind": "official_external",
+        "user_facing_label": "BookNLP evidence production",
+        "tool": {
+            "availability": "available",
+            "name": "BookNLP",
+            "version": tool_version,
+        },
+        "runtime": {
+            "availability": "available",
+            "name": "python",
+            "version": "3.12.3",
+        },
+        "provider": {"availability": "unknown"},
+        "model": {
+            "availability": "available",
+            "name": "small",
+            "version": None,
+        },
+    }
+    if operation_id is not None:
+        provenance["operation_id"] = operation_id
+    return provenance
+
+
+def test_adapter_provenance_reconciles_omitted_and_matching_operation_id() -> None:
+    expected_operation = "analyze-booknlp"
+    provenance = analysis_run_control._adapter_provenance(
+        "booknlp",
+        expected_operation,
+        "succeeded",
+        [
+            _booknlp_actual_provenance(),
+            _booknlp_actual_provenance(operation_id=expected_operation),
+        ],
+    )
+
+    assert provenance.operation_id == expected_operation
+    assert provenance.tool.name == "BookNLP"
+    assert provenance.tool.version == "1.0.8"
+
+
+def test_adapter_provenance_reconciles_matching_explicit_operation_ids() -> None:
+    expected_operation = "analyze-booknlp"
+    provenance = analysis_run_control._adapter_provenance(
+        "booknlp",
+        expected_operation,
+        "succeeded",
+        [
+            _booknlp_actual_provenance(operation_id=expected_operation),
+            _booknlp_actual_provenance(operation_id=expected_operation),
+        ],
+    )
+
+    assert provenance.operation_id == expected_operation
+
+
+def test_adapter_provenance_rejects_mismatched_explicit_operation_id() -> None:
+    with pytest.raises(ValueError, match="operation attribution mismatch"):
+        analysis_run_control._adapter_provenance(
+            "booknlp",
+            "analyze-booknlp",
+            "succeeded",
+            [_booknlp_actual_provenance(operation_id="analyze-spacy")],
+        )
+
+
+def test_adapter_provenance_rejects_genuine_actual_provenance_conflict() -> None:
+    with pytest.raises(
+        ValueError, match="conflicting actual provenance for one adapter operation"
+    ):
+        analysis_run_control._adapter_provenance(
+            "booknlp",
+            "analyze-booknlp",
+            "succeeded",
+            [
+                _booknlp_actual_provenance(tool_version="1.0.8"),
+                _booknlp_actual_provenance(tool_version="different-version"),
+            ],
+        )
+
+
+def test_adapter_provenance_reconciles_execution_provenance_strictly() -> None:
+    expected_operation = "analyze-booknlp"
+    finding = _booknlp_actual_provenance(operation_id=expected_operation)
+    execution = _booknlp_actual_provenance()
+
+    provenance = analysis_run_control._adapter_provenance(
+        "booknlp",
+        expected_operation,
+        "succeeded",
+        [finding],
+        execution,
+    )
+    assert provenance.runtime.name == "python"
+
+    conflicting_execution = _booknlp_actual_provenance(
+        tool_version="different-version"
+    )
+    with pytest.raises(
+        ValueError, match="conflicting actual provenance for one adapter operation"
+    ):
+        analysis_run_control._adapter_provenance(
+            "booknlp",
+            expected_operation,
+            "succeeded",
+            [finding],
+            conflicting_execution,
+        )
+
+
 def _grounded_story_check_result(
     *,
     project_id: str,
