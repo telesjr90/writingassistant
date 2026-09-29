@@ -35,7 +35,9 @@
     "real_execution_completion_decision": "docs/roadmap/decisions/2026-09-07-real-tool-execution-required-for-tool-integration-completion.md",
     "real_tool_reality_audit": "docs/roadmap/decisions/PHASE8-IMPL-025-real-tool-integration-reality-audit.md",
     "t007_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T007-evidence-bounded-ollama-and-story-check-closeout.md",
-    "t007_implementation_commit": "f843b615762192ca8f6865e76b2c4e4c9bcc2170"
+    "t007_implementation_commit": "f843b615762192ca8f6865e76b2c4e4c9bcc2170",
+    "t008_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md",
+    "t008_implementation_commit": "2465722cedfe9f8dcb4135d8de124f36a999593f"
   },
   "owner_subtxt_authorization": {
     "licensing_resolved": true,
@@ -96,18 +98,17 @@
     "candidate-only persistence",
     "grouped owner review with T023A and T023B complete/PASS",
     "T003 immutable raw-artifact/evidence-ledger persistence, live-run control plane, and persisted-data compatibility complete/PASS",
-    "T004 expanded BookNLP implementation milestone accepted at ca2f99f35a7dc029a217954872ca7a5ab479ed2f; real expanded current-layer execution unproven",
+    "T004 expanded BookNLP extraction complete/PASS: implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f preserved separately from accepted T004G real-runtime validation/fix commit bc2a65e6350fdd65720606253b120d7fbcfa2b78",
     "T005 official/full Subtxt runtime inventory and fail-closed contracts complete/PASS",
-    "T006 official/full Subtxt application adapter and mocked-validation foundation accepted/closed at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; optional paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero currently available verified official runtime surfaces"
+    "T006 official/full Subtxt application adapter and mocked-validation foundation accepted/closed at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; optional paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero currently available verified official runtime surfaces",
+    "T008 cross-adapter semantic guardrails complete/PASS at 2465722cedfe9f8dcb4135d8de124f36a999593f; six classifications, normalized-evidence enforcement, no interpretive self-support, author-intent distinction, exactly-once pre-fusion assessment, immutable annotations, and no truth/canon selection accepted"
   ],
   "missing_layers": [
-    "cross-adapter semantic guardrails",
     "read-only project-level narrative diagnostics",
     "full NCP import/export gateway and round-trip provenance",
     "expanded owner correction, merge, split, and rerun lifecycle",
     "owner live-run workflow",
-    "real expanded BookNLP execution through the T002/T003 artifact, ledger, fusion, and candidate path",
-    "current-layer real execution proof for remaining historical spaCy, BookNLP, and NCP foundations",
+    "current-layer real execution proof for remaining historical spaCy and NCP foundations",
     "NCP and diagnostics owner UI",
     "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
   ],
@@ -117,13 +118,13 @@
       "PHASE8-IMPL-024"
     ],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": "PHASE8-IMPL-025-T004",
-    "immediate_next_task_status": "implementation milestone accepted; required T004G expanded real-runtime fusion and candidate-only persistence validation pending; remaining required contributor frontier before T008",
+    "immediate_next_task": null,
+    "immediate_next_task_status": "no singular next implementation task selected; T009, T010, and T011 remain planned/not-begun with T008 dependency satisfied and current authority permits parallel work without owner-priority selection",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "complete/PASS",
-    "latest_completed_task": "PHASE8-IMPL-025-T007",
-    "latest_completed_task_status": "complete/PASS; implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170",
-    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T007 at f843b615762192ca8f6865e76b2c4e4c9bcc2170"
+    "latest_completed_task": "PHASE8-IMPL-025-T008",
+    "latest_completed_task_status": "complete/PASS; implementation commit 2465722cedfe9f8dcb4135d8de124f36a999593f; deterministic validation 458 passed, 7 existing Pydantic deprecation warnings; accepted BookNLP, Ollama/qwen3:8b, and Story Check current-layer evidence",
+    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T008 at 2465722cedfe9f8dcb4135d8de124f36a999593f"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -143,11 +144,14 @@
     "PHASE8-IMPL-025-T001": "complete/PASS",
     "PHASE8-IMPL-025-T002": "complete/PASS",
     "PHASE8-IMPL-025-T003": "complete/PASS; implementation commit 95a406e3f97899d83c00ff1cdeb229ced1400cef",
-    "PHASE8-IMPL-025-T004": "implementation milestone accepted at ca2f99f35a7dc029a217954872ca7a5ab479ed2f; overall real-tool completion open pending expanded BookNLP current-layer execution",
+    "PHASE8-IMPL-025-T004": "complete/PASS through T004G; implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f; accepted T004G real-runtime validation/fix commit bc2a65e6350fdd65720606253b120d7fbcfa2b78; required current-layer BookNLP fusion and candidate-only persistence validation satisfied before T008",
     "PHASE8-IMPL-025-T005": "complete/PASS; implementation commit 7e58e4859f828b3ca0edb886c999f5f376f151ac",
     "PHASE8-IMPL-025-T006": "accepted/closed optional paid-integration foundation at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; real paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero available official runtime surfaces",
     "PHASE8-IMPL-025-T007": "complete/PASS; implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170; deterministic T007E gate 379 passed; bounded real Ollama/qwen3:8b and Story Check current-layer application-path execution accepted; exact-source, immutable output, provenance, T003 model-call truthfulness, grounding/quarantine, nonvalidated output lineage, and candidate/canon safety passed",
-    "PHASE8-IMPL-025-T008": "planned/not-begun; T007 dependency satisfied; awaits required T004/T004G real-execution completion; optional Subtxt absence does not block acceptance; external dramatica_flow is not a dependency or required runtime proof"
+    "PHASE8-IMPL-025-T008": "complete/PASS through T008A-T008E; implementation commit 2465722cedfe9f8dcb4135d8de124f36a999593f; deterministic validation 458 passed, 7 existing Pydantic deprecation warnings; py_compile PASS; BookNLP 49 findings/49 annotations (45 supported, 4 ambiguous); live Ollama/qwen3:8b one finding/one insufficient_evidence annotation for eligible_normalized_evidence_missing plus separate malformed-locator fail-closed output; Story Check 16 retained diagnostics/16 annotations (15 insufficient_evidence, 1 unsupported), zero candidate transformations and zero fusion-eligible retained annotations; original outputs unchanged; zero persistence; optional paid Subtxt unavailable and nonblocking; external dramatica_flow not executed and reference/provenance-only",
+    "PHASE8-IMPL-025-T009": "planned/not-begun; T008 dependency satisfied; not activated or prioritized by T008 documentation closeout",
+    "PHASE8-IMPL-025-T010": "planned/not-begun; T008 dependency satisfied; backend gateway contracts may proceed in parallel with T009; not activated or prioritized by T008 documentation closeout",
+    "PHASE8-IMPL-025-T011": "planned/not-begun; T008 dependency satisfied; may proceed in parallel with T009/T010; not activated or prioritized by T008 documentation closeout"
   },
   "child_task_ordering": {
     "T001": [
@@ -284,7 +288,7 @@
       "T003 -> T003F",
       "T003 -> T003G"
     ],
-    "guardrail_join": "T004 + T007 -> T008; optional T006 Subtxt output joins when configured and available",
+    "guardrail_join": "T004/T004G prerequisite satisfied at accepted validation/fix commit bc2a65e6350fdd65720606253b120d7fbcfa2b78 plus T007/T007E complete -> T008 complete/PASS at 2465722cedfe9f8dcb4135d8de124f36a999593f; optional T006 Subtxt output was unavailable and nonblocking",
     "integration_branches": [
       "T008 -> T009",
       "T008 -> T010",
@@ -327,7 +331,7 @@
     "mvp_required": false,
     "absence_behavior": "fail closed under official subtxt identity; no app-owned identity fallback",
     "future_optional_debt": "production runner, T003 wiring, provisioning, and bounded real execution",
-    "t008_participation": "optional when configured and available; same guardrails and evidence/candidate boundaries apply"
+    "t008_participation": "official paid runtime was unavailable/unconfigured and not executed; absence was nonblocking for complete/PASS T008; the same guardrails and evidence/candidate boundaries apply if configured in future authorized work"
   },
   "risks": [
     "source-to-candidate traceability gaps",

@@ -3,25 +3,32 @@
 ## Status
 
 Published/active. T001-T003 implementation milestones and the T005 contract are
-complete/PASS. T004 retains its accepted implementation milestone and required
-T004G current-layer real BookNLP execution debt. T006 is accepted/closed as the
+complete/PASS. T004 is complete/PASS through T004G: implementation commit
+`ca2f99f35a7dc029a217954872ca7a5ab479ed2f` is preserved separately from the
+accepted T004G real-runtime validation/fix commit
+`bc2a65e6350fdd65720606253b120d7fbcfa2b78`. T006 is accepted/closed as the
 optional paid Subtxt/Dramatica integration foundation; T006G remains
 `NOT_EXECUTED_RUNTIME_UNAVAILABLE`, and paid real-runtime execution is deferred
 without blocking MVP. T007 is complete/PASS through T007E at implementation
-commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`. T004/T004G is now the
-remaining required contributor frontier before T008. T008 remains planned and
-not begun.
+commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`. T008 is complete/PASS
+through T008E at accepted implementation commit
+`2465722cedfe9f8dcb4135d8de124f36a999593f`. Accepted T004/T004G and
+T007/T007E supplied the satisfied contributor prerequisites for T008. T009,
+T010, and T011 remain planned and not begun; their T008 dependency is
+satisfied, and no singular owner implementation priority among them is
+selected here.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
 accepted PHASE8-IMPL-024-T008 closeout, so this parent is published/active.
 Project Memory is not an activation gate while the accepted 2026-07-17 pause
 decision remains current. T007 is complete/PASS through T007E. The current
-application frontier returns to `PHASE8-IMPL-025-T004`, whose T004G bounded
-current-layer real BookNLP validation remains required before downstream
-acceptance relies on that contributor. T008 remains planned/not begun; its T007
-dependency is satisfied, while its required T004/T004G dependency remains open.
-Optional paid Subtxt execution is not an MVP or T008 blocker.
+accepted/closed child is `PHASE8-IMPL-025-T008` at
+`2465722cedfe9f8dcb4135d8de124f36a999593f`. The accepted T004G closeout HEAD
+`bc2a65e6350fdd65720606253b120d7fbcfa2b78` satisfied the BookNLP prerequisite
+before T008 implementation began. Optional paid Subtxt execution was not an
+MVP or T008 blocker. T009, T010, and T011 are dependency-satisfied planned
+downstream workstreams; none is activated by this reconciliation.
 
 The owner-authorized T001 context prerequisite is satisfied by the generated,
 read-only supporting pack at
@@ -187,10 +194,12 @@ or training data.
 
 ### PHASE8-IMPL-025-T004 — BookNLP extraction expansion
 
-Status: implementation milestone accepted; overall real-tool completion open
-pending T004G current-layer real execution. Depends on completed/PASS T003.
+Status: `complete/PASS` through T004G. Depends on completed/PASS T003.
 Accepted implementation commit:
-`ca2f99f35a7dc029a217954872ca7a5ab479ed2f`.
+`ca2f99f35a7dc029a217954872ca7a5ab479ed2f`. Accepted T004G real-runtime
+validation/fix commit:
+`bc2a65e6350fdd65720606253b120d7fbcfa2b78` (`fix(analysis): validate BookNLP
+real-runtime retry`).
 
 - `T004A` — Immutable BookNLP raw artifacts, source hash, run manifest, and
   precise token-to-character offset translation.
@@ -205,11 +214,10 @@ Accepted implementation commit:
 BookNLP remains an evidence producer. Coreference and speaker attribution may
 support candidates but may not select truth.
 
-Historical PHASE8-IMPL-023 BookNLP execution remains valid foundation evidence,
-but no accepted evidence proves that real expanded T004 outputs traversed T002
-source identity/hash, T003 manifest/raw artifacts/evidence ledger, fusion, and
-candidate output. T004G must supply that proof in a separately authorized
-validation task; this audit does not execute it.
+Historical PHASE8-IMPL-023 BookNLP execution remains valid foundation evidence.
+Accepted T004G real-runtime retry validation subsequently proved the required
+current-layer BookNLP path and satisfied the final T004 completion condition
+before T008 began.
 
 ### PHASE8-IMPL-025-T005 — Full Subtxt runtime inventory and contracts
 
@@ -327,14 +335,9 @@ Closeout:
 
 ### PHASE8-IMPL-025-T008 — Cross-adapter semantic guardrails
 
-Status: `planned`; not begun; depends on T004 and T007. T007 is now
-complete/PASS. T004 retains its accepted implementation milestone and required
-T004G real-execution gate. The shared guardrail and integration layer therefore
-remains blocked on T004/T004G. Optional paid official Subtxt absence does not
-block T008 or MVP acceptance. The app-owned
-`dramatica_flow_informed_rubric` participates within its accepted internal
-scope; the external `dramatica_flow` runtime is not an MVP dependency and
-requires no T008 execution or proof.
+Status: `complete/PASS` through T008A-T008E. Accepted implementation commit:
+`2465722cedfe9f8dcb4135d8de124f36a999593f` (parent
+`bc2a65e6350fdd65720606253b120d7fbcfa2b78`).
 
 - `T008A` — Shared guardrail input/result contract and execution ordering.
 - `T008B` — Classification of Ollama, Story Check, NCP, Subtxt, and rubric
@@ -352,9 +355,42 @@ requires no T008 execution or proof.
   evidence/candidate boundaries; its absence is an accepted fail-closed
   optional-feature state.
 
+The accepted implementation provides the shared six-classification contract:
+`supported`, `unsupported`, `ambiguous`, `subject_matter_only`,
+`author_intent_dependent`, and `insufficient_evidence`. It requires normalized
+evidence, prevents interpretive output from self-supporting its own claims,
+distinguishes ordinary owner interpretation from author intent, and checks
+perspective ambiguity plus unsupported Storypoint/Throughline overclaims.
+Guardrails run exactly once before a single deterministic fusion pass.
+Immutable guardrail annotations remain separate from unchanged findings and do
+not rewrite findings or select truth/canon.
+
+Accepted deterministic validation: `458 passed, 7 warnings`; the warnings were
+existing Pydantic deprecations and not product failures. `py_compile` and
+`git diff --check` passed. Accepted T008E current-layer evidence covered 49
+BookNLP findings with 49 annotations (45 `supported`, 4 `ambiguous`), one live
+Ollama/qwen3:8b finding classified `insufficient_evidence` for
+`eligible_normalized_evidence_missing`, and 16 retained Story Check diagnostics
+with 16 separate annotations (15 `insufficient_evidence`, 1 `unsupported`) and
+zero candidate transformations or fusion-eligible retained annotations. A
+separate malformed-locator qwen3:8b output failed closed with zero findings and
+annotations. Original outputs remained unchanged and runtime validation
+persisted zero candidates.
+
+Official Subtxt remained unavailable/unconfigured optional paid integration;
+no installation, subscription, provisioning, or execution occurred, and its
+absence was nonblocking. External `dramatica_flow` was not executed and remains
+reference/provenance-only for MVP. No owner approval, automatic truth/canon
+selection, promotion/apply-promotion, Memory/Canon mutation,
+training/dataset/model mutation, or generated story prose occurred.
+
+Closeout:
+`docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md`.
+
 ### PHASE8-IMPL-025-T009 — Read-only project-level narrative diagnostics
 
-Status: `planned`; depends on T008.
+Status: `planned`; not begun. Its T008 dependency is satisfied. This
+reconciliation does not activate or prioritize T009.
 
 - `T009A` — Project-level context contract covering multiple exact sources and
   approved-context snapshots.
@@ -372,8 +408,9 @@ surface is authorized.
 
 ### PHASE8-IMPL-025-T010 — Full NCP gateway
 
-Status: `planned`; depends on T008 and may build its backend gateway contracts
-in parallel with T009 diagnostics.
+Status: `planned`; not begun. Its T008 dependency is satisfied, and it may
+build its backend gateway contracts in parallel with T009 diagnostics. This
+reconciliation does not activate or prioritize T010.
 
 - `T010A` — Immutable original import artifact, pinned schema/mapping version,
   and validation-before-import.
@@ -404,8 +441,9 @@ An external `complete` status never becomes local approval.
 
 ### PHASE8-IMPL-025-T011 — Candidate review lifecycle expansion
 
-Status: `planned`; depends on T008 and may proceed in parallel with T009/T010.
-These actions are separate bounded tasks;
+Status: `planned`; not begun. Its T008 dependency is satisfied, and it may
+proceed in parallel with T009/T010. This reconciliation does not activate or
+prioritize T011. These actions are separate bounded tasks;
 they are not authorized as one implementation change.
 
 - `T011A` — Approve, reject, and needs-more-evidence lifecycle contract.
@@ -479,15 +517,16 @@ terminal integration gate by themselves.
 Documentation publication occurred before this reconciliation. The
 PHASE8-IMPL-024 parent-closeout boundary has passed and this parent is
 published/active. T001 -> T002 -> T003 established the shared contracts. T005
-is complete/PASS. T004 retains its accepted implementation milestone and
-required real-execution debt. T006 is accepted/closed as the optional paid
-integration foundation, with real paid runtime deferred. T007 stays
-planned/not begun and is the next dependency-eligible frontier. T008 joins
-real current-layer outputs from the MVP-required free/local contributor
-branches; optional official Subtxt output joins only when configured and
-available. T009,
-T010 backend work, and T011 lifecycle work may then proceed according to their
-actual prerequisites; T010H waits for T009 and T010 backend contracts, while
+is complete/PASS. T004 is complete/PASS through accepted T004G real-runtime
+retry validation. T006 is accepted/closed as the optional paid integration
+foundation, with real paid runtime deferred. T007 and T008 are complete/PASS.
+T008 accepted real current-layer outputs from the applicable
+MVP-required free/local contributor branches; optional official Subtxt was
+unavailable and nonblocking. T009, T010 backend work, and T011 lifecycle work
+remain planned and not begun with their T008 dependency satisfied. They may
+proceed in parallel according to their actual prerequisites, and this record
+does not select a singular next implementation priority. T010H waits for T009
+and T010 backend contracts, while
 T011H waits for T003F and the completed PHASE8-IMPL-024 component foundation.
 T009, T010, and T011 join at T012.
 T012 must pass before terminal PHASE8-IMPL-027 acceptance.

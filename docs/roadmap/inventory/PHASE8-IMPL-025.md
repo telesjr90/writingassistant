@@ -5,9 +5,10 @@
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
 - Status: published/active
-- Immediate implementation frontier: `PHASE8-IMPL-025-T004` (implementation
-  milestone accepted; required `T004G` expanded real-runtime fusion and
-  candidate-only persistence validation remains pending)
+- Immediate implementation frontier: no singular child selected. T009, T010,
+  and T011 remain planned and not begun with their T008 dependency satisfied;
+  current authority permits parallel work and does not prioritize one. T004 is
+  complete/PASS through accepted T004G real-runtime retry validation.
 - Activation dependency: satisfied by PHASE8-IMPL-024 fully complete/closed
   with application closeout validation PASS; Project Memory is
   paused/nonblocking and is not an activation gate
@@ -23,10 +24,10 @@
 - Completed child: `PHASE8-IMPL-025-T002` (`complete/PASS`)
 - Completed child: `PHASE8-IMPL-025-T003` (`complete/PASS`), implementation
   commit `95a406e3f97899d83c00ff1cdeb229ced1400cef`
-- Accepted T004 implementation milestone: commit
-  `ca2f99f35a7dc029a217954872ca7a5ab479ed2f`; overall real-tool completion
-  remains open pending expanded BookNLP execution through T002/T003 artifacts,
-  ledger, fusion, and candidates
+- Completed child: `PHASE8-IMPL-025-T004` (`complete/PASS`), preserving
+  implementation commit `ca2f99f35a7dc029a217954872ca7a5ab479ed2f`
+  separately from accepted T004G real-runtime validation/fix commit
+  `bc2a65e6350fdd65720606253b120d7fbcfa2b78`
 - Completed child: `PHASE8-IMPL-025-T005` (`complete/PASS`), implementation
   commit `7e58e4859f828b3ca0edb886c999f5f376f151ac`
 - Accepted/closed T006 optional paid-integration foundation: commit
@@ -36,6 +37,11 @@
 - Completed child: `PHASE8-IMPL-025-T007` (`complete/PASS`), implementation
   commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`; deterministic and bounded
   real Ollama/qwen3:8b plus Story Check current-layer execution accepted
+- Completed child: `PHASE8-IMPL-025-T008` (`complete/PASS`), implementation
+  commit `2465722cedfe9f8dcb4135d8de124f36a999593f`; deterministic validation and
+  BookNLP, Ollama/qwen3:8b, and Story Check current-layer evidence accepted
+- T008 closeout:
+  `docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md`
 - T002 closeout:
   `docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md`
 - T005 contract/closeout:
@@ -81,18 +87,18 @@
 9. Grouped owner review; T023A/T023B complete/PASS.
 10. T003 immutable raw-artifact/evidence-ledger persistence, live-run control
     plane, and persisted-data compatibility.
-11. T004 expanded BookNLP extraction and evidence mappings.
+11. T004 expanded BookNLP extraction and evidence mappings, with accepted
+    T004G real-runtime retry validation.
 12. T005 official/full Subtxt runtime inventory and fail-closed contracts.
 13. T006 official/full Subtxt adapter, integration, mocked validation, and
     zero-available-runtime current-machine matrix.
 
-These results establish accepted historical and implementation foundation, not
-current-layer real-execution completion. A genuinely available official/full
+These results establish accepted historical and implementation foundation;
+T004G also establishes accepted current-layer BookNLP real-runtime validation.
+A genuinely available official/full
 Subtxt runtime and T006G live execution remain unavailable; T006 is nevertheless
 accepted/closed as an optional paid-integration foundation without making the
-adapter implementation a failure or claiming a runtime PASS. T004's expanded
-implementation likewise remains accepted while required real layered
-validation is pending.
+adapter implementation a failure or claiming a runtime PASS.
 
 ## Layer inventory
 
@@ -102,7 +108,7 @@ validation is pending.
 | 1 | Raw spaCy, BookNLP, explicit NCP parsing, deterministic extraction | partial foundation |
 | 2 | Immutable raw artifact/evidence ledger and run manifest | complete shared T002/T003 contracts and persistence |
 | 3 | Ollama, Story Check, optional full Subtxt, app-owned rubrics, diagnostics | partial; T006 optional paid-integration foundation accepted/closed, paid official runtime deferred, project diagnostics missing |
-| 4 | Exact grounding and semantic guardrails | P0 Story Check grounding and bounded T006 seam complete; shared T008 guardrail missing |
+| 4 | Exact grounding and semantic guardrails | complete shared T008 six-classification guardrail contract and exactly-once pre-fusion assessment |
 | 5 | Fusion/conflict/uncertainty/provenance | implemented foundation; layered inputs not fully validated |
 | 6 | Candidate persistence and expanded owner review | implemented foundation; correction lifecycle incomplete |
 | 7 | Explicit promotion and approved context | existing isolated boundary; layered handoff validation incomplete |
@@ -116,8 +122,10 @@ validation is pending.
    (`complete/PASS`).
 3. `PHASE8-IMPL-025-T003` — Immutable raw artifact and evidence ledger
    (`complete/PASS`).
-4. `PHASE8-IMPL-025-T004` — BookNLP extraction expansion (implementation
-   milestone accepted; real expanded current-layer validation pending).
+4. `PHASE8-IMPL-025-T004` — BookNLP extraction expansion (`complete/PASS`;
+   implementation commit `ca2f99f35a7dc029a217954872ca7a5ab479ed2f`;
+   accepted T004G real-runtime validation/fix commit
+   `bc2a65e6350fdd65720606253b120d7fbcfa2b78`).
 5. `PHASE8-IMPL-025-T005` — Full Subtxt runtime inventory and contracts
    (`complete/PASS`).
 6. `PHASE8-IMPL-025-T006` — Full Subtxt adapter, integration, and validation
@@ -128,13 +136,20 @@ validation is pending.
    (`complete/PASS`; implementation commit
    `f843b615762192ca8f6865e76b2c4e4c9bcc2170`; deterministic and bounded real
    current-layer Ollama/qwen3:8b and Story Check execution accepted).
-8. `PHASE8-IMPL-025-T008` — Cross-adapter semantic guardrails (`planned`; not
-   begun; T007 dependency satisfied; awaits required T004/T004G real-execution
-   gate; optional Subtxt absence does not block acceptance; external
-   `dramatica_flow` is not a dependency or required runtime proof).
-9. `PHASE8-IMPL-025-T009` — Read-only project-level narrative diagnostics.
-10. `PHASE8-IMPL-025-T010` — Full NCP gateway.
-11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion.
+8. `PHASE8-IMPL-025-T008` — Cross-adapter semantic guardrails
+   (`complete/PASS`; implementation commit
+   `2465722cedfe9f8dcb4135d8de124f36a999593f`; T008A-T008E satisfied;
+   deterministic validation `458 passed, 7 warnings`; BookNLP,
+   Ollama/qwen3:8b, and Story Check current-layer evidence accepted; optional
+   Subtxt absence nonblocking; external `dramatica_flow` not executed and not
+   required runtime proof).
+9. `PHASE8-IMPL-025-T009` — Read-only project-level narrative diagnostics
+   (`planned`; not begun; T008 dependency satisfied).
+10. `PHASE8-IMPL-025-T010` — Full NCP gateway (`planned`; not begun; T008
+    dependency satisfied; may build backend contracts in parallel with T009).
+11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion (`planned`;
+    not begun; T008 dependency satisfied; may proceed in parallel with
+    T009/T010).
 12. `PHASE8-IMPL-025-T012` — Layered end-to-end validation.
 
 Accepted bounded additions: T003F live-run API/control plane; T003G persisted-
@@ -142,12 +157,15 @@ data compatibility; T005H/T006K provisioning and current-machine runtime
 compatibility; T010H NCP/diagnostics owner UI; T011H owner live-run workflow;
 T012K layered integration deltas. PHASE8-IMPL-027 is the terminal gate.
 
-T001-T003, T005, and T007 are complete/PASS. T004 has an accepted
-implementation milestone with an open required T004G real-execution gate. T006
-is accepted/closed as the optional paid-integration foundation, with paid real
-execution deferred. T004/T004G is the remaining required contributor frontier
-before T008. T008 through T012 remain planned and not begun. Lettered bounded
-slices are defined in the parent task record.
+T001-T005, T007, and T008 are complete/PASS. T004 completion preserves its
+implementation commit and the later accepted T004G real-runtime validation/fix
+commit as distinct identities. T006 is accepted/closed as the optional
+paid-integration foundation, with paid real execution deferred. T008 is
+complete/PASS at
+`2465722cedfe9f8dcb4135d8de124f36a999593f`. T009, T010, T011, and T012 remain
+planned and not begun; the T008 dependency of T009/T010/T011 is satisfied, and
+no singular priority among them is selected. Lettered bounded slices are
+defined in the parent task record.
 
 ## Dependencies
 
@@ -165,11 +183,14 @@ without duplicating it; T007E accepted current-layer real Ollama/qwen3:8b and
 Story Check execution through the T002/T003 layered path. T010H waits for T009 and T010 backend contracts; T011H
 waits for T003F and the completed PHASE8-IMPL-024 component foundation. T012
 reuses PHASE8-IMPL-024-T008 and adds only layered deltas. T012I apply-promotion
-validation remains isolated. T007 is complete/PASS. T004/T004G is the remaining required
-dependency frontier. T008 remains not begun and waits for required T004
-real-execution completion; its T007 dependency is satisfied. Optional official
-Subtxt output may participate when configured and available, but its absence
-does not block T008 or MVP acceptance. The app-owned `dramatica_flow_informed_rubric` participates
+validation remains isolated. T007 is complete/PASS. The T004/T004G
+contributor branch was satisfied before T008 at accepted T004G closeout HEAD
+`bc2a65e6350fdd65720606253b120d7fbcfa2b78`. T008 is complete/PASS; its
+completion satisfies the dependency of
+planned T009/T010/T011 without activating or prioritizing any of them. Optional
+official Subtxt output may participate in future applicable work when
+configured and available, but its absence did not block T008 or MVP acceptance.
+The app-owned `dramatica_flow_informed_rubric` participates
 within its accepted internal scope; external `dramatica_flow` is not part of
 the T007/T008/T012/PHASE8-IMPL-027 execution or proof path.
 
@@ -179,7 +200,6 @@ the T007/T008/T012/PHASE8-IMPL-027 execution or proof path.
   Subtxt callable interface and its evidenced source granularity.
 - Optional Subtxt runtime/interface/version/provider/model provenance where a
   future available runtime reports it.
-- Cross-adapter guardrail ordering.
 - NCP schema/mapping versions and trusted round-trip rules.
 - Project-level diagnostic context contract.
 - Owner correction and merge/split lifecycle.
@@ -187,6 +207,8 @@ the T007/T008/T012/PHASE8-IMPL-027 execution or proof path.
 Subtxt authorization/licensing and external `dramatica_flow` MVP classification
 are not open questions. Historical T020B remains unchanged; the 2026-09-08
 owner decision resolves the later classification question.
+Cross-adapter guardrail ordering is resolved by accepted T008: one pre-fusion
+guardrail assessment followed by one deterministic fusion pass.
 
 ## Safety inventory
 
