@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from backend import omi_analysis_orchestrator, omi_runtime_preflight, project_manager
-from backend.story_knowledge import booknlp_adapter_contract
+from backend.story_knowledge import booknlp_adapter_contract, semantic_guardrails
 from backend.story_knowledge.analysis_run_manifest import (
     AdapterProvenance,
     AnalysisRunManifest,
@@ -702,7 +702,116 @@ def _validate_analysis_result(
     checked["adapter_results"] = validated_envelopes
     checked["operation_results"] = validated_operation_results
     checked["findings"] = validated_findings
+    annotations = result.get("guardrail_annotations")
+    if annotations is not None:
+        if not isinstance(annotations, list):
+            raise ValueError("analysis result guardrail_annotations must be a list")
+        checked["guardrail_annotations"] = (
+            semantic_guardrails.validate_guardrail_annotations(
+                result["findings"],
+                annotations,
+            )
+        )
+        if result.get("guardrail_contract") != (
+            omi_analysis_orchestrator.OMI_SEMANTIC_GUARDRAIL_CONTRACT
+        ):
+            raise ValueError("analysis result semantic guardrail contract mismatch")
+    retained_annotations = result.get("retained_diagnostic_guardrail_annotations")
+    if retained_annotations is not None:
+        if not isinstance(retained_annotations, list):
+            raise ValueError(
+                "analysis result retained diagnostic annotations must be a list"
+            )
+        checked_retained = []
+        for annotation in retained_annotations:
+            validated_annotation = (
+                semantic_guardrails.validate_guardrail_annotation(annotation)
+            )
+            if (
+                validated_annotation.get("finding_kind")
+                != "retained_story_check_diagnostic"
+                or validated_annotation.get("candidate_transformation_performed")
+                is not False
+                or validated_annotation.get("fusion_eligible") is not False
+                or not isinstance(validated_annotation.get("diagnostic_id"), str)
+                or not isinstance(
+                    validated_annotation.get("immutable_diagnostic_sha256"), str
+                )
+            ):
+                raise ValueError("invalid retained Story Check guardrail annotation")
+            checked_retained.append(validated_annotation)
+        if len({item["annotation_id"] for item in checked_retained}) != len(
+            checked_retained
+        ):
+            raise ValueError("retained diagnostic annotation IDs must be unique")
+        checked["retained_diagnostic_guardrail_annotations"] = checked_retained
     return _enforce_t001_control_plane_inputs(checked)
+
+
+def _apply_semantic_guardrails(
+    result: dict[str, Any],
+    *,
+    run_id: str,
+    snapshot: Any,
+) -> dict[str, Any]:
+    """Assess validated findings before the control plane's fusion boundary."""
+
+    checked = copy.deepcopy(result)
+    findings = list(checked.get("findings") or [])
+    findings = omi_analysis_orchestrator.prepare_normalized_findings_for_guardrails(
+        findings
+    )
+    normalized_evidence = semantic_guardrails.select_upstream_normalized_evidence(
+        findings
+    )
+    annotations = semantic_guardrails.assess_findings(
+        findings,
+        normalized_evidence=normalized_evidence,
+        source_lineage={
+            "run_id": run_id,
+            "source_identity": snapshot.identity.to_dict(),
+        },
+    )
+    story_check_finding_ids = {
+        str(finding.get("raw_finding_id") or "")
+        for finding in findings
+        if finding.get("source_adapter")
+        == omi_analysis_orchestrator.OMI_STORY_CHECK_ADAPTER_NAME
+    }
+    retained_diagnostic_annotations: list[dict[str, Any]] = []
+    for operation_result in checked.get("operation_results", []):
+        if (
+            operation_result.get("adapter")
+            != omi_analysis_orchestrator.OMI_STORY_CHECK_ADAPTER_NAME
+            or not isinstance(operation_result.get("original_output"), dict)
+        ):
+            continue
+        retained_diagnostic_annotations.extend(
+            semantic_guardrails.assess_retained_story_check_diagnostics(
+                operation_result["original_output"],
+                normalized_evidence=normalized_evidence,
+                source_lineage={
+                    "run_id": run_id,
+                    "source_identity": snapshot.identity.to_dict(),
+                },
+                original_output_reference="result-artifact",
+                excluded_diagnostic_ids=sorted(story_check_finding_ids),
+            )
+        )
+    findings, fusion_summary = omi_analysis_orchestrator.fuse_normalized_findings(
+        findings,
+        guardrail_annotations=annotations,
+    )
+    checked["findings"] = findings
+    checked["guardrail_contract"] = copy.deepcopy(
+        omi_analysis_orchestrator.OMI_SEMANTIC_GUARDRAIL_CONTRACT
+    )
+    checked["guardrail_annotations"] = annotations
+    checked["retained_diagnostic_guardrail_annotations"] = (
+        retained_diagnostic_annotations
+    )
+    checked["fusion_summary"] = fusion_summary
+    return checked
 
 
 def _enforce_t001_control_plane_inputs(result: dict[str, Any]) -> dict[str, Any]:
@@ -1114,14 +1223,23 @@ def _execute_requested_operations(
 ) -> dict[str, Any]:
     def call_upstream(adapters: list[str]) -> dict[str, Any]:
         try:
-            return execute(
+            kwargs = {
+                "source_idea_id": source_idea_id,
+                "persist_candidates": False,
+                "requested_adapters": adapters,
+                "allow_deterministic_fallback": False,
+                "defer_guardrails_and_fusion": True,
+            }
+            result = execute(
                 project_id,
                 raw_idea,
-                source_idea_id=source_idea_id,
-                persist_candidates=False,
-                requested_adapters=adapters,
-                allow_deterministic_fallback=False,
+                **kwargs,
             )
+            if result.get("guardrail_annotations") is not None:
+                raise ValueError(
+                    "analysis control plane requires pre-guardrail runner output"
+                )
+            return result
         except Exception as exc:
             raise _BoundedAnalysisExecutionError(exc) from exc
 
@@ -1236,9 +1354,12 @@ def _execute_requested_operations(
         *copy.deepcopy(upstream_result["findings"]),
         *copy.deepcopy(t007b_result["candidates"]),
     ]
-    findings, fusion_summary = omi_analysis_orchestrator.fuse_normalized_findings(
+    findings = omi_analysis_orchestrator.prepare_normalized_findings_for_guardrails(
         findings
     )
+    fusion_summary = omi_analysis_orchestrator._fusion_zero_summary()
+    fusion_summary["total_input_findings"] = len(findings)
+    fusion_summary["total_output_findings"] = len(findings)
     states = [item["state"] for item in operation_results]
     analysis_status = (
         "succeeded"
@@ -1797,6 +1918,11 @@ def _submit_analysis_run_locked(
             "persisted_candidate_ids": [],
             "safety": omi_analysis_orchestrator.build_orchestrator_safety_envelope(),
         }
+    result = _apply_semantic_guardrails(
+        result,
+        run_id=run_id,
+        snapshot=snapshot,
+    )
     result = _validate_analysis_result(
         result,
         selected_adapters=effective_adapters,

@@ -104,6 +104,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from backend.story_knowledge import booknlp_adapter_contract
+from backend.story_knowledge import semantic_guardrails
 from backend.story_knowledge import source_map as exact_source_map
 from backend.story_check_grounding_contract import (
     StoryCheckDiagnostic,
@@ -486,6 +487,19 @@ OMI_FUSION_FINDING_FIELDS: tuple[str, ...] = (
     "support_label",
 )
 
+OMI_SEMANTIC_GUARDRAIL_CONTRACT: dict[str, Any] = {
+    "contract_version": semantic_guardrails.GUARDRAIL_CONTRACT_VERSION,
+    "annotation_schema_version": (
+        semantic_guardrails.GUARDRAIL_ANNOTATION_SCHEMA_VERSION
+    ),
+    "classifications": sorted(semantic_guardrails.SEMANTIC_CLASSIFICATIONS),
+    "execution_order": "post_normalization_pre_fusion",
+    "separate_annotations": True,
+    "rewrites_findings": False,
+    "selects_truth_or_canon": False,
+    "selects_owner_decision": False,
+}
+
 # Forbid labels that imply truth/canon/approval/confirmation. These must
 # never appear in any orchestrator-produced field.
 _OMI_FORBIDDEN_TRUTH_LABELS = (
@@ -827,6 +841,7 @@ def _fusion_zero_summary() -> dict[str, Any]:
         "conflict_group_count": 0,
         "uncertain_finding_count": 0,
         "adapters_contributing_findings": [],
+        "semantic_guardrails": semantic_guardrails.guardrail_summary([]),
     }
 
 
@@ -949,8 +964,34 @@ def _fusion_uncertainty_label_for_finding(
     return None
 
 
+def prepare_normalized_findings_for_guardrails(
+    findings: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Finalize stable normalized identity fields before guardrail assessment.
+
+    This is still normalization: it does not group findings, mark duplicates,
+    create conflict groups, or otherwise perform fusion.
+    """
+
+    prepared: list[dict[str, Any]] = []
+    for original in _require_list(findings, "normalized findings"):
+        finding = _require_dict(original, "normalized finding")
+        item = dict(finding)
+        item["candidate_fingerprint"] = _fusion_candidate_fingerprint(item)
+        item["evidence_fingerprint"] = evidence_fingerprint(item["evidence"])
+        item["normalized_finding_id"] = normalized_finding_id(
+            str(item["source_adapter"]),
+            str(item["raw_finding_id"]),
+            item["candidate_fingerprint"],
+        )
+        prepared.append(item)
+    return prepared
+
+
 def fuse_normalized_findings(
     findings: list[dict[str, Any]],
+    *,
+    guardrail_annotations: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Annotate normalized findings with deterministic fusion metadata.
 
@@ -961,7 +1002,16 @@ def fuse_normalized_findings(
     """
     findings = _require_list(findings, "normalized findings")
     if not findings:
-        return [], _fusion_zero_summary()
+        if guardrail_annotations:
+            raise ValueError("guardrail annotations cannot exist without findings")
+        summary = _fusion_zero_summary()
+        summary["semantic_guardrails"] = semantic_guardrails.guardrail_summary([])
+        return [], summary
+
+    validated_guardrails = semantic_guardrails.validate_guardrail_annotations(
+        findings,
+        guardrail_annotations or [],
+    ) if guardrail_annotations is not None else []
 
     fused: list[dict[str, Any]] = []
     duplicate_groups: dict[tuple[tuple[str, str], str], list[str]] = {}
@@ -969,16 +1019,7 @@ def fuse_normalized_findings(
     signature_by_id: dict[str, str] = {}
     by_id: dict[str, dict[str, Any]] = {}
 
-    for original in findings:
-        finding = _require_dict(original, "normalized finding")
-        item = dict(finding)
-        item["candidate_fingerprint"] = _fusion_candidate_fingerprint(item)
-        item["evidence_fingerprint"] = evidence_fingerprint(item["evidence"])
-        item["normalized_finding_id"] = normalized_finding_id(
-            str(item["source_adapter"]),
-            str(item["raw_finding_id"]),
-            item["candidate_fingerprint"],
-        )
+    for item in prepare_normalized_findings_for_guardrails(findings):
         item["duplicate_of"] = list(item.get("duplicate_of") or [])
         item["related_finding_ids"] = list(item.get("related_finding_ids") or [])
         item["conflict_group_id"] = None
@@ -1046,6 +1087,9 @@ def fuse_normalized_findings(
                 for item in fused
                 if item.get("source_adapter")
             }
+        ),
+        "semantic_guardrails": semantic_guardrails.guardrail_summary(
+            validated_guardrails
         ),
     }
     return fused, summary
@@ -9998,6 +10042,7 @@ def analyze_omi_raw_idea_with_tools(
     adapter_runners: dict[str, Callable[..., dict[str, Any]]] | None = None,
     adapter_config: dict[str, Any] | None = None,
     story_check_scene_id: str | None = None,
+    defer_guardrails_and_fusion: bool = False,
 ) -> dict[str, Any]:
     """Run the AI/tool-assisted OMI analysis orchestrator on ``raw_idea``.
 
@@ -10102,6 +10147,12 @@ def analyze_omi_raw_idea_with_tools(
 
     if not isinstance(persist_candidates, bool):
         raise ValueError("OMI orchestrator persist_candidates must be a bool")
+    if not isinstance(defer_guardrails_and_fusion, bool):
+        raise ValueError("defer_guardrails_and_fusion must be a bool")
+    if defer_guardrails_and_fusion and persist_candidates:
+        raise ValueError(
+            "deferred guardrails/fusion cannot cross the persistence boundary"
+        )
 
     if (
         story_check_scene_id is not None
@@ -10167,6 +10218,16 @@ def analyze_omi_raw_idea_with_tools(
             "source_idea_id": source_idea_id,
             "adapter_results": adapter_results,
             "findings": [],
+            **(
+                {
+                    "guardrail_contract": copy.deepcopy(
+                        OMI_SEMANTIC_GUARDRAIL_CONTRACT
+                    ),
+                    "guardrail_annotations": [],
+                }
+                if not defer_guardrails_and_fusion
+                else {}
+            ),
             "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
             "fusion_summary": _fusion_zero_summary(),
             "persisted_candidate_ids": [],
@@ -10351,7 +10412,30 @@ def analyze_omi_raw_idea_with_tools(
             for finding in envelope["candidates"]:
                 findings.append(validate_normalized_finding(finding))
 
-    findings, fusion_summary = fuse_normalized_findings(findings)
+    findings = prepare_normalized_findings_for_guardrails(findings)
+    guardrail_annotations: list[dict[str, Any]] | None = None
+    if defer_guardrails_and_fusion:
+        fusion_summary = _fusion_zero_summary()
+        fusion_summary["total_input_findings"] = len(findings)
+        fusion_summary["total_output_findings"] = len(findings)
+    else:
+        normalized_evidence = (
+            semantic_guardrails.select_upstream_normalized_evidence(findings)
+        )
+        guardrail_annotations = semantic_guardrails.assess_findings(
+            findings,
+            normalized_evidence=normalized_evidence,
+            source_lineage={
+                "source_id": source_idea_id,
+                "source_content_hash": hashlib.sha256(
+                    raw_idea_exact.encode("utf-8")
+                ).hexdigest(),
+            },
+        )
+        findings, fusion_summary = fuse_normalized_findings(
+            findings,
+            guardrail_annotations=guardrail_annotations,
+        )
 
     if persist_candidates:
         if findings:
@@ -10444,6 +10528,16 @@ def analyze_omi_raw_idea_with_tools(
         "source_idea_id": source_idea_id,
         "adapter_results": adapter_results,
         "findings": findings,
+        **(
+            {
+                "guardrail_contract": copy.deepcopy(
+                    OMI_SEMANTIC_GUARDRAIL_CONTRACT
+                ),
+                "guardrail_annotations": guardrail_annotations,
+            }
+            if guardrail_annotations is not None
+            else {}
+        ),
         "fusion_contract": {field: None for field in OMI_FUSION_FINDING_FIELDS},
         "fusion_summary": fusion_summary,
         "persisted_candidate_ids": persisted_candidate_ids,
