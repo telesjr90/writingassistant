@@ -36,6 +36,9 @@ DIAGNOSTIC_KINDS = frozenset(
         "information_boundary",
         "relationship_delta",
         "emotional_state_delta",
+        "promise_payoff",
+        "hook_foreshadowing",
+        "narrative_lifecycle",
     }
 )
 CAUSAL_ASSESSMENTS = frozenset(
@@ -74,6 +77,40 @@ EMOTIONAL_STATE_DELTA_ASSESSMENTS = frozenset(
         "insufficient_evidence",
     }
 )
+PROMISE_PAYOFF_ASSESSMENTS = frozenset(
+    {
+        "supported_pairing",
+        "supported_open_promise",
+        "supported_payoff",
+        "unsupported",
+        "conflict",
+        "ambiguous",
+        "insufficient_evidence",
+    }
+)
+HOOK_FORESHADOWING_ASSESSMENTS = frozenset(
+    {
+        "supported_hook",
+        "supported_foreshadowing",
+        "supported_link",
+        "unsupported",
+        "conflict",
+        "ambiguous",
+        "insufficient_evidence",
+    }
+)
+NARRATIVE_LIFECYCLE_ASSESSMENTS = frozenset(
+    {
+        "supported_active",
+        "supported_resolved",
+        "supported_dormant",
+        "supported_transition",
+        "unsupported",
+        "conflict",
+        "ambiguous",
+        "insufficient_evidence",
+    }
+)
 
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,255}\Z")
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -87,6 +124,9 @@ _AUTHORITATIVE_BOUNDARY = {
     "thread_status": "diagnostic_only",
     "relationship_status": "not_settled",
     "emotional_status": "not_settled",
+    "promise_payoff_status": "diagnostic_only",
+    "hook_foreshadowing_status": "diagnostic_only",
+    "lifecycle_status": "not_canonical",
     "author_intent_status": "not_inferred",
     "approved_memory_status": "not_established",
     "owner_control": "required",
@@ -153,6 +193,12 @@ def _snapshot_id(source: Mapping[str, Any]) -> str:
     if "source_snapshot" in source:
         return source["source_snapshot"]["identity"]["snapshot_id"]
     return source["source_identity"]["snapshot_id"]
+
+
+def _optional_safe_id(value: Any, label: str) -> str | None:
+    if value is None:
+        return None
+    return _safe_id(value, label)
 
 
 def _context_indexes(context: Mapping[str, Any]) -> dict[str, Any]:
@@ -290,6 +336,107 @@ def _diagnostic_payload(kind: str, payload: Any) -> dict[str, Any]:
         if item["delta_assessment"] not in EMOTIONAL_STATE_DELTA_ASSESSMENTS:
             _fail("emotional-state-delta assessment is not allowed")
         return item
+    if kind == "promise_payoff":
+        item = _closed_object(
+            payload,
+            required={
+                "promise_ref",
+                "payoff_ref",
+                "narrative_element_ref",
+                "assessment",
+                "lifecycle_context_ref",
+            },
+            label="promise-payoff diagnostic payload",
+        )
+        promise_ref = _optional_safe_id(item["promise_ref"], "promise_ref")
+        payoff_ref = _optional_safe_id(item["payoff_ref"], "payoff_ref")
+        _safe_id(item["narrative_element_ref"], "narrative_element_ref")
+        _optional_safe_id(item["lifecycle_context_ref"], "lifecycle_context_ref")
+        assessment = item["assessment"]
+        if assessment not in PROMISE_PAYOFF_ASSESSMENTS:
+            _fail("promise-payoff assessment is not allowed")
+        if promise_ref is None and payoff_ref is None:
+            _fail("promise-payoff diagnostic requires a promise or payoff reference")
+        if assessment == "supported_pairing" and (
+            promise_ref is None or payoff_ref is None or promise_ref == payoff_ref
+        ):
+            _fail("supported promise-payoff pairing requires distinct references")
+        if assessment == "supported_open_promise" and promise_ref is None:
+            _fail("supported open promise requires a promise reference")
+        if assessment == "supported_payoff" and payoff_ref is None:
+            _fail("supported payoff requires a payoff reference")
+        return item
+    if kind == "hook_foreshadowing":
+        item = _closed_object(
+            payload,
+            required={
+                "hook_ref",
+                "foreshadowing_ref",
+                "target_ref",
+                "assessment",
+                "lifecycle_context_ref",
+            },
+            label="hook-foreshadowing diagnostic payload",
+        )
+        hook_ref = _optional_safe_id(item["hook_ref"], "hook_ref")
+        foreshadowing_ref = _optional_safe_id(
+            item["foreshadowing_ref"], "foreshadowing_ref"
+        )
+        _safe_id(item["target_ref"], "target_ref")
+        _optional_safe_id(item["lifecycle_context_ref"], "lifecycle_context_ref")
+        assessment = item["assessment"]
+        if assessment not in HOOK_FORESHADOWING_ASSESSMENTS:
+            _fail("hook-foreshadowing assessment is not allowed")
+        if hook_ref is None and foreshadowing_ref is None:
+            _fail(
+                "hook-foreshadowing diagnostic requires a hook or "
+                "foreshadowing reference"
+            )
+        if assessment == "supported_link" and (
+            hook_ref is None
+            or foreshadowing_ref is None
+            or hook_ref == foreshadowing_ref
+        ):
+            _fail("supported hook-foreshadowing link requires distinct references")
+        if assessment == "supported_hook" and hook_ref is None:
+            _fail("supported hook requires a hook reference")
+        if assessment == "supported_foreshadowing" and foreshadowing_ref is None:
+            _fail("supported foreshadowing requires a foreshadowing reference")
+        return item
+    if kind == "narrative_lifecycle":
+        item = _closed_object(
+            payload,
+            required={
+                "lifecycle_subject_ref",
+                "lifecycle_stage_ref",
+                "prior_reference",
+                "current_reference",
+                "related_thread_ref",
+                "assessment",
+            },
+            label="narrative-lifecycle diagnostic payload",
+        )
+        _safe_id(item["lifecycle_subject_ref"], "lifecycle_subject_ref")
+        _safe_id(item["lifecycle_stage_ref"], "lifecycle_stage_ref")
+        prior_ref = _optional_safe_id(item["prior_reference"], "prior_reference")
+        current_ref = _optional_safe_id(
+            item["current_reference"], "current_reference"
+        )
+        _optional_safe_id(item["related_thread_ref"], "related_thread_ref")
+        assessment = item["assessment"]
+        if assessment not in NARRATIVE_LIFECYCLE_ASSESSMENTS:
+            _fail("narrative-lifecycle assessment is not allowed")
+        if assessment == "supported_transition" and (
+            prior_ref is None or current_ref is None or prior_ref == current_ref
+        ):
+            _fail("supported lifecycle transition requires distinct references")
+        if assessment in {
+            "supported_active",
+            "supported_resolved",
+            "supported_dormant",
+        } and current_ref is None:
+            _fail("supported lifecycle state requires a current reference")
+        return item
     _fail("diagnostic_kind is not allowed")
 
 
@@ -324,6 +471,64 @@ def _enforce_support_semantics(
     support_classification: str,
     uncertainty_classification: str,
 ) -> None:
+    if kind in {
+        "promise_payoff",
+        "hook_foreshadowing",
+        "narrative_lifecycle",
+    }:
+        if support_classification == "author_intent_dependent" or (
+            uncertainty_classification == "author_intent_dependent"
+        ):
+            _fail("promise, hook, and lifecycle diagnostics cannot infer author intent")
+        assessment = payload["assessment"]
+        if assessment.startswith("supported_"):
+            if not evidence_ids:
+                _fail(
+                    "supported promise, hook, or lifecycle diagnostics require "
+                    "evidence"
+                )
+            if support_classification != "supported":
+                _fail(
+                    "supported promise, hook, or lifecycle diagnostics require "
+                    "supported evidence"
+                )
+        elif assessment == "conflict":
+            if not evidence_ids:
+                _fail(
+                    "conflicting promise, hook, or lifecycle diagnostics require "
+                    "evidence"
+                )
+            if uncertainty_classification != "conflicting":
+                _fail("conflict diagnostics require conflicting uncertainty")
+            if support_classification not in {"supported", "ambiguous"}:
+                _fail("conflict diagnostics require evidence-backed support")
+        elif assessment == "ambiguous":
+            if support_classification != "ambiguous" or (
+                uncertainty_classification != "ambiguous"
+            ):
+                _fail("ambiguous diagnostics require explicit ambiguity")
+        elif assessment == "unsupported":
+            if support_classification != "unsupported":
+                _fail(
+                    "unsupported promise, hook, or lifecycle diagnostic requires "
+                    "unsupported classification"
+                )
+            if not evidence_ids and uncertainty_classification not in {
+                "ambiguous",
+                "conflicting",
+                "insufficient_evidence",
+            }:
+                _fail(
+                    "unsupported promise, hook, or lifecycle diagnostic requires "
+                    "evidence or explicit uncertainty"
+                )
+        elif assessment == "insufficient_evidence" and (
+            support_classification != "insufficient_evidence"
+            or uncertainty_classification != "insufficient_evidence"
+        ):
+            _fail("insufficient-evidence diagnostics require explicit uncertainty")
+        return
+
     if kind in {
         "information_boundary",
         "relationship_delta",
@@ -684,6 +889,110 @@ def build_emotional_state_delta_diagnostic(
     )
 
 
+def build_promise_payoff_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    promise_ref: str | None,
+    payoff_ref: str | None,
+    narrative_element_ref: str,
+    assessment: str,
+    lifecycle_context_ref: str | None = None,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="promise_payoff",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "promise_ref": promise_ref,
+            "payoff_ref": payoff_ref,
+            "narrative_element_ref": narrative_element_ref,
+            "assessment": assessment,
+            "lifecycle_context_ref": lifecycle_context_ref,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
+def build_hook_foreshadowing_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    hook_ref: str | None,
+    foreshadowing_ref: str | None,
+    target_ref: str,
+    assessment: str,
+    lifecycle_context_ref: str | None = None,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="hook_foreshadowing",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "hook_ref": hook_ref,
+            "foreshadowing_ref": foreshadowing_ref,
+            "target_ref": target_ref,
+            "assessment": assessment,
+            "lifecycle_context_ref": lifecycle_context_ref,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
+def build_narrative_lifecycle_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    lifecycle_subject_ref: str,
+    lifecycle_stage_ref: str,
+    assessment: str,
+    prior_reference: str | None = None,
+    current_reference: str | None = None,
+    related_thread_ref: str | None = None,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="narrative_lifecycle",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "lifecycle_subject_ref": lifecycle_subject_ref,
+            "lifecycle_stage_ref": lifecycle_stage_ref,
+            "prior_reference": prior_reference,
+            "current_reference": current_reference,
+            "related_thread_ref": related_thread_ref,
+            "assessment": assessment,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
 def _validate_without_id(
     value: Any, indexes: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -851,6 +1160,9 @@ __all__ = (
     "INFORMATION_BOUNDARY_ASSESSMENTS",
     "RELATIONSHIP_DELTA_ASSESSMENTS",
     "EMOTIONAL_STATE_DELTA_ASSESSMENTS",
+    "PROMISE_PAYOFF_ASSESSMENTS",
+    "HOOK_FORESHADOWING_ASSESSMENTS",
+    "NARRATIVE_LIFECYCLE_ASSESSMENTS",
     "ProjectNarrativeDiagnosticValidationError",
     "build_project_narrative_diagnostic",
     "build_causal_continuity_diagnostic",
@@ -859,6 +1171,9 @@ __all__ = (
     "build_information_boundary_diagnostic",
     "build_relationship_delta_diagnostic",
     "build_emotional_state_delta_diagnostic",
+    "build_promise_payoff_diagnostic",
+    "build_hook_foreshadowing_diagnostic",
+    "build_narrative_lifecycle_diagnostic",
     "validate_project_narrative_diagnostic",
     "serialize_project_narrative_diagnostic",
 )
