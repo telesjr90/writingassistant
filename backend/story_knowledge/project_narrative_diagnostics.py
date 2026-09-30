@@ -39,6 +39,7 @@ DIAGNOSTIC_KINDS = frozenset(
         "promise_payoff",
         "hook_foreshadowing",
         "narrative_lifecycle",
+        "multi_source_comparison",
     }
 )
 CAUSAL_ASSESSMENTS = frozenset(
@@ -111,6 +112,17 @@ NARRATIVE_LIFECYCLE_ASSESSMENTS = frozenset(
         "insufficient_evidence",
     }
 )
+MULTI_SOURCE_COMPARISON_ASSESSMENTS = frozenset(
+    {
+        "supported_alignment",
+        "supported_difference",
+        "supported_gap",
+        "supported_conflict",
+        "unsupported",
+        "ambiguous",
+        "insufficient_evidence",
+    }
+)
 
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,255}\Z")
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -127,6 +139,7 @@ _AUTHORITATIVE_BOUNDARY = {
     "promise_payoff_status": "diagnostic_only",
     "hook_foreshadowing_status": "diagnostic_only",
     "lifecycle_status": "not_canonical",
+    "multi_source_comparison_status": "diagnostic_only",
     "author_intent_status": "not_inferred",
     "approved_memory_status": "not_established",
     "owner_control": "required",
@@ -199,6 +212,41 @@ def _optional_safe_id(value: Any, label: str) -> str | None:
     if value is None:
         return None
     return _safe_id(value, label)
+
+
+def _source_comparison_refs(value: Any) -> list[dict[str, str]]:
+    if not isinstance(value, list) or len(value) < 2:
+        _fail("multi-source comparison requires at least two source references")
+    refs: list[dict[str, str]] = []
+    source_ids: set[str] = set()
+    comparison_ids: set[str] = set()
+    for value_item in value:
+        item = _closed_object(
+            value_item,
+            required={"source_snapshot_id", "comparison_reference_id"},
+            label="source comparison reference",
+        )
+        source_id = _safe_id(item["source_snapshot_id"], "source_snapshot_id")
+        comparison_id = _safe_id(
+            item["comparison_reference_id"], "comparison_reference_id"
+        )
+        if source_id in source_ids or comparison_id in comparison_ids:
+            _fail("multi-source comparison references must be distinct")
+        source_ids.add(source_id)
+        comparison_ids.add(comparison_id)
+        refs.append(
+            {
+                "source_snapshot_id": source_id,
+                "comparison_reference_id": comparison_id,
+            }
+        )
+    return sorted(
+        refs,
+        key=lambda item: (
+            item["source_snapshot_id"],
+            item["comparison_reference_id"],
+        ),
+    )
 
 
 def _context_indexes(context: Mapping[str, Any]) -> dict[str, Any]:
@@ -437,6 +485,30 @@ def _diagnostic_payload(kind: str, payload: Any) -> dict[str, Any]:
         } and current_ref is None:
             _fail("supported lifecycle state requires a current reference")
         return item
+    if kind == "multi_source_comparison":
+        item = _closed_object(
+            payload,
+            required={
+                "comparison_subject_ref",
+                "comparison_axis_ref",
+                "source_comparison_refs",
+                "assessment",
+                "related_diagnostic_context_ref",
+            },
+            label="multi-source-comparison diagnostic payload",
+        )
+        _safe_id(item["comparison_subject_ref"], "comparison_subject_ref")
+        _safe_id(item["comparison_axis_ref"], "comparison_axis_ref")
+        item["source_comparison_refs"] = _source_comparison_refs(
+            item["source_comparison_refs"]
+        )
+        _optional_safe_id(
+            item["related_diagnostic_context_ref"],
+            "related_diagnostic_context_ref",
+        )
+        if item["assessment"] not in MULTI_SOURCE_COMPARISON_ASSESSMENTS:
+            _fail("multi-source-comparison assessment is not allowed")
+        return item
     _fail("diagnostic_kind is not allowed")
 
 
@@ -470,7 +542,57 @@ def _enforce_support_semantics(
     evidence_ids: Sequence[str],
     support_classification: str,
     uncertainty_classification: str,
+    indexes: Mapping[str, Any],
+    source_ids: Sequence[str],
 ) -> None:
+    if kind == "multi_source_comparison":
+        if support_classification == "author_intent_dependent" or (
+            uncertainty_classification == "author_intent_dependent"
+        ):
+            _fail("multi-source comparison diagnostics cannot infer author intent")
+        assessment = payload["assessment"]
+        evidence_source_ids = {
+            indexes["evidence"][evidence_id]["source_identity"]["snapshot_id"]
+            for evidence_id in evidence_ids
+        }
+        if assessment.startswith("supported_"):
+            if not evidence_ids:
+                _fail("supported multi-source comparisons require evidence")
+            if evidence_source_ids != set(source_ids):
+                _fail(
+                    "supported multi-source comparisons require evidence for "
+                    "every compared source"
+                )
+            if assessment == "supported_conflict":
+                if uncertainty_classification != "conflicting":
+                    _fail("supported conflict requires conflicting uncertainty")
+                if support_classification not in {"supported", "ambiguous"}:
+                    _fail("supported conflict requires evidence-backed support")
+            elif support_classification != "supported":
+                _fail("supported multi-source comparisons require supported evidence")
+        elif assessment == "ambiguous":
+            if support_classification != "ambiguous" or (
+                uncertainty_classification != "ambiguous"
+            ):
+                _fail("ambiguous comparisons require explicit ambiguity")
+        elif assessment == "unsupported":
+            if support_classification != "unsupported":
+                _fail("unsupported comparison requires unsupported classification")
+            if not evidence_ids and uncertainty_classification not in {
+                "ambiguous",
+                "conflicting",
+                "insufficient_evidence",
+            }:
+                _fail(
+                    "unsupported comparison requires evidence or explicit uncertainty"
+                )
+        elif assessment == "insufficient_evidence" and (
+            support_classification != "insufficient_evidence"
+            or uncertainty_classification != "insufficient_evidence"
+        ):
+            _fail("insufficient-evidence comparisons require explicit uncertainty")
+        return
+
     if kind in {
         "promise_payoff",
         "hook_foreshadowing",
@@ -993,6 +1115,42 @@ def build_narrative_lifecycle_diagnostic(
     )
 
 
+def build_multi_source_comparison_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    comparison_subject_ref: str,
+    comparison_axis_ref: str,
+    source_comparison_refs: Sequence[Mapping[str, Any]],
+    assessment: str,
+    related_diagnostic_context_ref: str | None = None,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    """Build a source-separated, non-authoritative comparison diagnostic."""
+
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="multi_source_comparison",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "comparison_subject_ref": comparison_subject_ref,
+            "comparison_axis_ref": comparison_axis_ref,
+            "source_comparison_refs": copy.deepcopy(list(source_comparison_refs)),
+            "assessment": assessment,
+            "related_diagnostic_context_ref": related_diagnostic_context_ref,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
 def _validate_without_id(
     value: Any, indexes: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -1090,12 +1248,26 @@ def _validate_without_id(
     if item["uncertainty_classification"] not in UNCERTAINTY_CLASSIFICATIONS:
         _fail("uncertainty_classification is not allowed")
     payload = _diagnostic_payload(item["diagnostic_kind"], item["payload"])
+    if item["diagnostic_kind"] == "multi_source_comparison":
+        if len(source_ids) < 2:
+            _fail("multi-source comparison requires at least two source snapshots")
+        payload_source_ids = {
+            reference["source_snapshot_id"]
+            for reference in payload["source_comparison_refs"]
+        }
+        if payload_source_ids != set(source_ids):
+            _fail(
+                "multi-source comparison references must match declared source "
+                "boundaries"
+            )
     _enforce_support_semantics(
         kind=item["diagnostic_kind"],
         payload=payload,
         evidence_ids=evidence_ids,
         support_classification=item["support_classification"],
         uncertainty_classification=item["uncertainty_classification"],
+        indexes=indexes,
+        source_ids=source_ids,
     )
 
     lineage = _closed_object(
@@ -1163,6 +1335,7 @@ __all__ = (
     "PROMISE_PAYOFF_ASSESSMENTS",
     "HOOK_FORESHADOWING_ASSESSMENTS",
     "NARRATIVE_LIFECYCLE_ASSESSMENTS",
+    "MULTI_SOURCE_COMPARISON_ASSESSMENTS",
     "ProjectNarrativeDiagnosticValidationError",
     "build_project_narrative_diagnostic",
     "build_causal_continuity_diagnostic",
@@ -1174,6 +1347,7 @@ __all__ = (
     "build_promise_payoff_diagnostic",
     "build_hook_foreshadowing_diagnostic",
     "build_narrative_lifecycle_diagnostic",
+    "build_multi_source_comparison_diagnostic",
     "validate_project_narrative_diagnostic",
     "serialize_project_narrative_diagnostic",
 )
