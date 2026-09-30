@@ -1,4 +1,4 @@
-"""Pure read-only causal, timeline, and thread diagnostic contracts.
+"""Pure read-only project narrative diagnostic contracts.
 
 The builders in this module consume an already validated T009A project
 diagnostic context and emit deterministic support-only records.  They perform
@@ -29,7 +29,13 @@ PROJECT_DIAGNOSTIC_CONTEXT_REFERENCE_VERSION = (
 )
 
 DIAGNOSTIC_KINDS = frozenset(
-    {"causal_continuity", "chronology_timeline", "thread_activity"}
+    {
+        "causal_continuity",
+        "chronology_timeline",
+        "thread_activity",
+        "information_boundary",
+        "relationship_delta",
+    }
 )
 CAUSAL_ASSESSMENTS = frozenset(
     {
@@ -44,6 +50,19 @@ TIMELINE_ASSESSMENTS = frozenset(
     {"supported_ordering", "conflict", "ambiguous", "insufficient_evidence"}
 )
 THREAD_ACTIVITY_CLASSIFICATIONS = frozenset({"active", "inactive", "uncertain"})
+INFORMATION_BOUNDARY_ASSESSMENTS = frozenset(
+    {"supported_boundary", "conflict", "ambiguous", "insufficient_evidence"}
+)
+RELATIONSHIP_DELTA_ASSESSMENTS = frozenset(
+    {
+        "supported_change",
+        "supported_stability",
+        "unsupported",
+        "conflict",
+        "ambiguous",
+        "insufficient_evidence",
+    }
+)
 
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,255}\Z")
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -184,6 +203,58 @@ def _diagnostic_payload(kind: str, payload: Any) -> dict[str, Any]:
         if item["activity_classification"] not in THREAD_ACTIVITY_CLASSIFICATIONS:
             _fail("thread activity classification is not allowed")
         return item
+    if kind == "information_boundary":
+        item = _closed_object(
+            payload,
+            required={
+                "information_ref",
+                "apparently_informed_actor_ref",
+                "apparently_uninformed_actor_ref",
+                "assessment",
+            },
+            label="information-boundary diagnostic payload",
+        )
+        _safe_id(item["information_ref"], "information_ref")
+        _safe_id(
+            item["apparently_informed_actor_ref"],
+            "apparently_informed_actor_ref",
+        )
+        _safe_id(
+            item["apparently_uninformed_actor_ref"],
+            "apparently_uninformed_actor_ref",
+        )
+        if (
+            item["apparently_informed_actor_ref"]
+            == item["apparently_uninformed_actor_ref"]
+        ):
+            _fail("information boundary requires distinct actor references")
+        if item["assessment"] not in INFORMATION_BOUNDARY_ASSESSMENTS:
+            _fail("information-boundary assessment is not allowed")
+        return item
+    if kind == "relationship_delta":
+        item = _closed_object(
+            payload,
+            required={
+                "participant_refs",
+                "relationship_axis",
+                "prior_reference",
+                "later_reference",
+                "delta_assessment",
+            },
+            label="relationship-delta diagnostic payload",
+        )
+        participants = _id_list(item["participant_refs"], "participant_refs")
+        if len(participants) != 2:
+            _fail("relationship delta requires exactly two distinct participants")
+        item["participant_refs"] = participants
+        _safe_id(item["relationship_axis"], "relationship_axis")
+        _safe_id(item["prior_reference"], "prior_reference")
+        _safe_id(item["later_reference"], "later_reference")
+        if item["prior_reference"] == item["later_reference"]:
+            _fail("relationship delta requires distinct prior and later references")
+        if item["delta_assessment"] not in RELATIONSHIP_DELTA_ASSESSMENTS:
+            _fail("relationship-delta assessment is not allowed")
+        return item
     _fail("diagnostic_kind is not allowed")
 
 
@@ -218,6 +289,60 @@ def _enforce_support_semantics(
     support_classification: str,
     uncertainty_classification: str,
 ) -> None:
+    if kind in {"information_boundary", "relationship_delta"}:
+        if support_classification == "author_intent_dependent" or (
+            uncertainty_classification == "author_intent_dependent"
+        ):
+            _fail("information and relationship diagnostics cannot infer author intent")
+        assessment = (
+            payload["assessment"]
+            if kind == "information_boundary"
+            else payload["delta_assessment"]
+        )
+        supported = assessment in {
+            "supported_boundary",
+            "supported_change",
+            "supported_stability",
+        }
+        if supported:
+            if not evidence_ids:
+                _fail("supported information or relationship diagnostics require evidence")
+            if support_classification != "supported":
+                _fail(
+                    "supported information or relationship diagnostics require "
+                    "supported evidence"
+                )
+        elif assessment == "conflict":
+            if not evidence_ids:
+                _fail("conflicting information or relationship diagnostics require evidence")
+            if uncertainty_classification != "conflicting":
+                _fail("conflict diagnostics require conflicting uncertainty")
+            if support_classification not in {"supported", "ambiguous"}:
+                _fail("conflict diagnostics require evidence-backed support")
+        elif assessment == "ambiguous":
+            if support_classification != "ambiguous" or (
+                uncertainty_classification != "ambiguous"
+            ):
+                _fail("ambiguous diagnostics require explicit ambiguity")
+        elif assessment == "unsupported":
+            if support_classification != "unsupported":
+                _fail("unsupported relationship delta requires unsupported classification")
+            if not evidence_ids and uncertainty_classification not in {
+                "ambiguous",
+                "conflicting",
+                "insufficient_evidence",
+            }:
+                _fail(
+                    "unsupported relationship delta requires evidence or explicit "
+                    "uncertainty"
+                )
+        elif assessment == "insufficient_evidence" and (
+            support_classification != "insufficient_evidence"
+            or uncertainty_classification != "insufficient_evidence"
+        ):
+            _fail("insufficient-evidence diagnostics require explicit uncertainty")
+        return
+
     assessment = payload.get("assessment")
     assertive = assessment in {
         "supported_link",
@@ -406,6 +531,72 @@ def build_thread_activity_diagnostic(
     )
 
 
+def build_information_boundary_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    information_ref: str,
+    apparently_informed_actor_ref: str,
+    apparently_uninformed_actor_ref: str,
+    assessment: str,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="information_boundary",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "information_ref": information_ref,
+            "apparently_informed_actor_ref": apparently_informed_actor_ref,
+            "apparently_uninformed_actor_ref": apparently_uninformed_actor_ref,
+            "assessment": assessment,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
+def build_relationship_delta_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    participant_refs: Sequence[str],
+    relationship_axis: str,
+    prior_reference: str,
+    later_reference: str,
+    delta_assessment: str,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="relationship_delta",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "participant_refs": list(participant_refs),
+            "relationship_axis": relationship_axis,
+            "prior_reference": prior_reference,
+            "later_reference": later_reference,
+            "delta_assessment": delta_assessment,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
 def _validate_without_id(
     value: Any, indexes: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -570,11 +761,15 @@ __all__ = (
     "CAUSAL_ASSESSMENTS",
     "TIMELINE_ASSESSMENTS",
     "THREAD_ACTIVITY_CLASSIFICATIONS",
+    "INFORMATION_BOUNDARY_ASSESSMENTS",
+    "RELATIONSHIP_DELTA_ASSESSMENTS",
     "ProjectNarrativeDiagnosticValidationError",
     "build_project_narrative_diagnostic",
     "build_causal_continuity_diagnostic",
     "build_timeline_diagnostic",
     "build_thread_activity_diagnostic",
+    "build_information_boundary_diagnostic",
+    "build_relationship_delta_diagnostic",
     "validate_project_narrative_diagnostic",
     "serialize_project_narrative_diagnostic",
 )
