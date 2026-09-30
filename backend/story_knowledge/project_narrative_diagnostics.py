@@ -35,6 +35,7 @@ DIAGNOSTIC_KINDS = frozenset(
         "thread_activity",
         "information_boundary",
         "relationship_delta",
+        "emotional_state_delta",
     }
 )
 CAUSAL_ASSESSMENTS = frozenset(
@@ -54,6 +55,16 @@ INFORMATION_BOUNDARY_ASSESSMENTS = frozenset(
     {"supported_boundary", "conflict", "ambiguous", "insufficient_evidence"}
 )
 RELATIONSHIP_DELTA_ASSESSMENTS = frozenset(
+    {
+        "supported_change",
+        "supported_stability",
+        "unsupported",
+        "conflict",
+        "ambiguous",
+        "insufficient_evidence",
+    }
+)
+EMOTIONAL_STATE_DELTA_ASSESSMENTS = frozenset(
     {
         "supported_change",
         "supported_stability",
@@ -255,6 +266,30 @@ def _diagnostic_payload(kind: str, payload: Any) -> dict[str, Any]:
         if item["delta_assessment"] not in RELATIONSHIP_DELTA_ASSESSMENTS:
             _fail("relationship-delta assessment is not allowed")
         return item
+    if kind == "emotional_state_delta":
+        item = _closed_object(
+            payload,
+            required={
+                "subject_ref",
+                "emotional_axis",
+                "prior_reference",
+                "later_reference",
+                "related_context_ref",
+                "delta_assessment",
+            },
+            label="emotional-state-delta diagnostic payload",
+        )
+        _safe_id(item["subject_ref"], "subject_ref")
+        _safe_id(item["emotional_axis"], "emotional_axis")
+        _safe_id(item["prior_reference"], "prior_reference")
+        _safe_id(item["later_reference"], "later_reference")
+        if item["prior_reference"] == item["later_reference"]:
+            _fail("emotional-state delta requires distinct prior and later references")
+        if item["related_context_ref"] is not None:
+            _safe_id(item["related_context_ref"], "related_context_ref")
+        if item["delta_assessment"] not in EMOTIONAL_STATE_DELTA_ASSESSMENTS:
+            _fail("emotional-state-delta assessment is not allowed")
+        return item
     _fail("diagnostic_kind is not allowed")
 
 
@@ -289,11 +324,18 @@ def _enforce_support_semantics(
     support_classification: str,
     uncertainty_classification: str,
 ) -> None:
-    if kind in {"information_boundary", "relationship_delta"}:
+    if kind in {
+        "information_boundary",
+        "relationship_delta",
+        "emotional_state_delta",
+    }:
         if support_classification == "author_intent_dependent" or (
             uncertainty_classification == "author_intent_dependent"
         ):
-            _fail("information and relationship diagnostics cannot infer author intent")
+            _fail(
+                "information, relationship, and emotional diagnostics cannot "
+                "infer author intent"
+            )
         assessment = (
             payload["assessment"]
             if kind == "information_boundary"
@@ -306,15 +348,21 @@ def _enforce_support_semantics(
         }
         if supported:
             if not evidence_ids:
-                _fail("supported information or relationship diagnostics require evidence")
+                _fail(
+                    "supported information, relationship, or emotional diagnostics "
+                    "require evidence"
+                )
             if support_classification != "supported":
                 _fail(
-                    "supported information or relationship diagnostics require "
-                    "supported evidence"
+                    "supported information, relationship, or emotional diagnostics "
+                    "require supported evidence"
                 )
         elif assessment == "conflict":
             if not evidence_ids:
-                _fail("conflicting information or relationship diagnostics require evidence")
+                _fail(
+                    "conflicting information, relationship, or emotional diagnostics "
+                    "require evidence"
+                )
             if uncertainty_classification != "conflicting":
                 _fail("conflict diagnostics require conflicting uncertainty")
             if support_classification not in {"supported", "ambiguous"}:
@@ -326,15 +374,18 @@ def _enforce_support_semantics(
                 _fail("ambiguous diagnostics require explicit ambiguity")
         elif assessment == "unsupported":
             if support_classification != "unsupported":
-                _fail("unsupported relationship delta requires unsupported classification")
+                _fail(
+                    "unsupported relationship or emotional delta requires "
+                    "unsupported classification"
+                )
             if not evidence_ids and uncertainty_classification not in {
                 "ambiguous",
                 "conflicting",
                 "insufficient_evidence",
             }:
                 _fail(
-                    "unsupported relationship delta requires evidence or explicit "
-                    "uncertainty"
+                    "unsupported relationship or emotional delta requires evidence "
+                    "or explicit uncertainty"
                 )
         elif assessment == "insufficient_evidence" and (
             support_classification != "insufficient_evidence"
@@ -597,6 +648,42 @@ def build_relationship_delta_diagnostic(
     )
 
 
+def build_emotional_state_delta_diagnostic(
+    *,
+    context: Mapping[str, Any],
+    source_snapshot_ids: Sequence[str],
+    subject_ref: str,
+    emotional_axis: str,
+    prior_reference: str,
+    later_reference: str,
+    delta_assessment: str,
+    related_context_ref: str | None = None,
+    evidence_reference_ids: Sequence[str] = (),
+    diagnostic_support_reference_ids: Sequence[str] = (),
+    approved_context_snapshot_ids: Sequence[str] = (),
+    support_classification: str,
+    uncertainty_classification: str,
+) -> dict[str, Any]:
+    return build_project_narrative_diagnostic(
+        context=context,
+        diagnostic_kind="emotional_state_delta",
+        source_snapshot_ids=source_snapshot_ids,
+        payload={
+            "subject_ref": subject_ref,
+            "emotional_axis": emotional_axis,
+            "prior_reference": prior_reference,
+            "later_reference": later_reference,
+            "related_context_ref": related_context_ref,
+            "delta_assessment": delta_assessment,
+        },
+        evidence_reference_ids=evidence_reference_ids,
+        diagnostic_support_reference_ids=diagnostic_support_reference_ids,
+        approved_context_snapshot_ids=approved_context_snapshot_ids,
+        support_classification=support_classification,
+        uncertainty_classification=uncertainty_classification,
+    )
+
+
 def _validate_without_id(
     value: Any, indexes: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -763,6 +850,7 @@ __all__ = (
     "THREAD_ACTIVITY_CLASSIFICATIONS",
     "INFORMATION_BOUNDARY_ASSESSMENTS",
     "RELATIONSHIP_DELTA_ASSESSMENTS",
+    "EMOTIONAL_STATE_DELTA_ASSESSMENTS",
     "ProjectNarrativeDiagnosticValidationError",
     "build_project_narrative_diagnostic",
     "build_causal_continuity_diagnostic",
@@ -770,6 +858,7 @@ __all__ = (
     "build_thread_activity_diagnostic",
     "build_information_boundary_diagnostic",
     "build_relationship_delta_diagnostic",
+    "build_emotional_state_delta_diagnostic",
     "validate_project_narrative_diagnostic",
     "serialize_project_narrative_diagnostic",
 )
