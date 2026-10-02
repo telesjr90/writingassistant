@@ -30,6 +30,7 @@ QUEUE_ENTRY_ID = "review_queue_entry_scene_001_character_001"
 REVIEW_FIXTURE_TIME = "2026-08-09T20:00:00Z"
 
 ALLOWED_REVIEW_COMMANDS = (
+    "approve",
     "mark_reviewed",
     "request_more_evidence",
     "defer",
@@ -224,6 +225,10 @@ def review_command_payload(action_type: str, **overrides: Any) -> dict[str, Any]
     }
     payload.update(
         {
+            "approve": {
+                "owner_note": "Owner approves review metadata only.",
+                "rationale": "Evidence supports review approval.",
+            },
             "request_more_evidence": {"owner_note": "Need more supporting evidence."},
             "defer": {"owner_note": "Defer for later owner review."},
             "reject": {"owner_note": "Reject after owner review."},
@@ -395,6 +400,8 @@ def test_review_queue_actions_do_not_mutate_approved_memory_or_canon(
     assert response.status_code == 200
     payload = response.json()
     assert payload["review_workflow_state"]["is_canon"] is False
+    assert payload["review_workflow_state"]["candidate_record_mutation_performed"] is False
+    assert payload["review_workflow_state"]["promotion_created"] is False
     assert payload["review_workflow_state"]["apply_promotion_performed"] is False
     assert payload["review_workflow_state"]["memory_canon_mutation_performed"] is False
     assert any("not canon" in warning.lower() for warning in payload["warnings"])

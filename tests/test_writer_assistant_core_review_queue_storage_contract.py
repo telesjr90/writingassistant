@@ -96,6 +96,7 @@ ALLOWED_REVIEW_STATUS_VALUES = frozenset(
     {
         "pending",
         "needs_info",
+        "approved",
         "rejected",
         "deferred",
         "duplicate",
@@ -110,6 +111,7 @@ ALLOWED_LIFECYCLE_STATES = frozenset(
         "needs_more_evidence",
         "blocked_invalid_support",
         "owner_review_pending",
+        "owner_reviewed_approved",
         "owner_reviewed_rejected",
         "owner_reviewed_deferred",
         "duplicate_candidate",
@@ -124,6 +126,7 @@ VALID_REVIEW_STATE_PAIRS = frozenset(
         ("pending", "owner_review_pending"),
         ("needs_info", "needs_more_evidence"),
         ("needs_info", "blocked_invalid_support"),
+        ("approved", "owner_reviewed_approved"),
         ("rejected", "owner_reviewed_rejected"),
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
@@ -187,6 +190,7 @@ OWNER_ACTION_REQUIRED_FIELDS = frozenset(
 )
 
 OWNER_ACTION_ALLOWED_COMMANDS = (
+    "approve_candidate",
     "request_more_evidence",
     "mark_needs_info",
     "defer_review",
@@ -202,7 +206,6 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
 )
 
 OWNER_ACTION_FORBIDDEN_COMMANDS = (
-    "approve_candidate",
     "promote_candidate",
     "write_to_memory",
     "write_to_canon",
@@ -214,7 +217,6 @@ OWNER_ACTION_FORBIDDEN_COMMANDS = (
 )
 
 OWNER_ACTION_FORBIDDEN_STATES = (
-    "approved",
     "promoted",
     "canon",
     "memory",
@@ -697,7 +699,7 @@ def test_validate_entry_validates_disposition_linkage_fields():
             )
 
 
-@pytest.mark.parametrize("bad_status", ("approved", "promoted", "canon", "unknown_status"))
+@pytest.mark.parametrize("bad_status", ("promoted", "canon", "unknown_status"))
 def test_validate_entry_rejects_unsupported_review_status(bad_status):
     entry = build_valid_queue_entry(review_status=bad_status)
     with pytest.raises(ValueError):
@@ -705,7 +707,7 @@ def test_validate_entry_rejects_unsupported_review_status(bad_status):
 
 
 @pytest.mark.parametrize(
-    "bad_state", ("approved", "promoted", "canon", "owner_reviewed_approved", "unknown_state")
+    "bad_state", ("approved", "promoted", "canon", "unknown_state")
 )
 def test_validate_entry_rejects_unsupported_lifecycle_state(bad_state):
     entry = build_valid_queue_entry(lifecycle_state=bad_state)
@@ -1062,7 +1064,10 @@ def test_build_review_queue_index_has_no_approval_or_promotion_fields():
 
 
 def test_build_review_queue_index_rejects_invalid_entries():
-    invalid = build_valid_queue_entry(review_status="approved")
+    invalid = build_valid_queue_entry(
+        review_status="approved",
+        lifecycle_state="draft_ready_for_review",
+    )
     with pytest.raises(ValueError):
         review_queue_storage.build_review_queue_index([invalid], project_id=PROJECT_ID)
 
@@ -1134,7 +1139,17 @@ def test_validate_owner_action_requires_some_actor_reference():
 
 @pytest.mark.parametrize("command", OWNER_ACTION_ALLOWED_COMMANDS)
 def test_validate_owner_action_accepts_allowed_commands(command):
+    result_pairs = {
+        "approve_candidate": ("approved", "owner_reviewed_approved"),
+        "request_more_evidence": ("needs_info", "needs_more_evidence"),
+        "mark_needs_info": ("needs_info", "needs_more_evidence"),
+        "reject_candidate": ("rejected", "owner_reviewed_rejected"),
+    }
     action = build_valid_owner_action_record(action_command=command)
+    if command in result_pairs:
+        action["resulting_review_status"], action["resulting_lifecycle_state"] = (
+            result_pairs[command]
+        )
     result = review_queue_storage.validate_owner_action_record(action)
     assert result["action_command"] == command
 
@@ -1152,18 +1167,34 @@ def test_validate_owner_action_rejects_unknown_command():
         review_queue_storage.validate_owner_action_record(action)
 
 
-@pytest.mark.parametrize("review_status", sorted(ALLOWED_REVIEW_STATUS_VALUES))
-def test_validate_owner_action_accepts_allowed_resulting_review_status(review_status):
-    action = build_valid_owner_action_record(resulting_review_status=review_status)
+@pytest.mark.parametrize(
+    "review_status,lifecycle_state", sorted(VALID_REVIEW_STATE_PAIRS)
+)
+def test_validate_owner_action_accepts_only_valid_resulting_state_pairs(
+    review_status,
+    lifecycle_state,
+):
+    action = build_valid_owner_action_record(
+        action_command="add_reviewer_note",
+        resulting_review_status=review_status,
+        resulting_lifecycle_state=lifecycle_state,
+    )
     result = review_queue_storage.validate_owner_action_record(action)
     assert result["resulting_review_status"] == review_status
-
-
-@pytest.mark.parametrize("lifecycle_state", sorted(ALLOWED_LIFECYCLE_STATES))
-def test_validate_owner_action_accepts_allowed_resulting_lifecycle_state(lifecycle_state):
-    action = build_valid_owner_action_record(resulting_lifecycle_state=lifecycle_state)
-    result = review_queue_storage.validate_owner_action_record(action)
     assert result["resulting_lifecycle_state"] == lifecycle_state
+
+
+def test_validate_owner_action_accepts_review_only_approval_with_safety_flags():
+    action = build_valid_owner_action_record(
+        action_command="approve_candidate",
+        resulting_review_status="approved",
+        resulting_lifecycle_state="owner_reviewed_approved",
+        reason_code="evidence_sufficient",
+        reviewer_note="Approved as review metadata only.",
+    )
+    result = review_queue_storage.validate_owner_action_record(action)
+    assert result["no_promotion_performed"] is True
+    assert result["no_memory_canon_mutation"] is True
 
 
 @pytest.mark.parametrize("bad_state", OWNER_ACTION_FORBIDDEN_STATES)
@@ -1240,8 +1271,13 @@ def test_validate_owner_action_output_has_no_forbidden_terms():
 @pytest.mark.parametrize(
     "mutate",
     [
-        pytest.param(lambda e: e.update(review_status="approved"), id="approved_review_status"),
-        pytest.param(lambda e: e.update(lifecycle_state="owner_reviewed_approved"), id="approved_lifecycle"),
+        pytest.param(
+            lambda e: e.update(
+                review_status="approved",
+                lifecycle_state="draft_ready_for_review",
+            ),
+            id="mismatched_approved_lifecycle",
+        ),
         pytest.param(lambda e: e.pop("source_locator"), id="missing_source_locator"),
         pytest.param(lambda e: e.pop("evidence_refs"), id="missing_evidence_refs"),
         pytest.param(lambda e: e.pop("provenance_refs"), id="missing_provenance_refs"),
@@ -1279,11 +1315,17 @@ def test_validate_entry_fail_closed_matrix(mutate):
 @pytest.mark.parametrize(
     "mutate",
     [
-        pytest.param(lambda a: a.update(action_command="approve_candidate"), id="approve_command"),
         pytest.param(lambda a: a.update(action_command="promote_candidate"), id="promote_command"),
         pytest.param(lambda a: a.update(action_command="apply_promotion"), id="apply_promotion_command"),
         pytest.param(lambda a: a.update(action_command="run_extractor"), id="run_extractor_command"),
-        pytest.param(lambda a: a.update(resulting_review_status="approved"), id="approved_state"),
+        pytest.param(
+            lambda a: a.update(
+                action_command="approve_candidate",
+                resulting_review_status="approved",
+                resulting_lifecycle_state="owner_reviewed_rejected",
+            ),
+            id="mismatched_approval_state",
+        ),
         pytest.param(lambda a: a.update(resulting_lifecycle_state="promoted"), id="promoted_state"),
         pytest.param(lambda a: a.update(no_promotion_performed=False), id="promotion_performed"),
         pytest.param(lambda a: a.update(no_memory_canon_mutation=False), id="memory_mutation"),

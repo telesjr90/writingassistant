@@ -221,3 +221,34 @@ def test_restart_replay_uses_only_durable_state(durable_project: tuple[Path, Pat
     assert replay["action_id"] == first["action_id"]
     assert replay["completion_event_hash"] == first["completion_event_hash"]
     assert replay["replay"] is True
+
+
+def test_approve_replay_is_deterministic_and_conflicting_disposition_fails_closed(
+    durable_project: tuple[Path, Path],
+) -> None:
+    request = payload(
+        action_type="approve",
+        owner_note="Owner approves this review lifecycle state only.",
+        rationale="Evidence is sufficient for review approval.",
+    )
+    first = execute(request, durable_project)
+    before_replay = tree_snapshot(durable_project[0])
+    replay = execute(request, durable_project)
+    assert replay | {"replay": False} == first
+    assert replay["review_status"] == "approved"
+    assert replay["lifecycle_state"] == "owner_reviewed_approved"
+    assert replay["review_workflow_state"]["is_canon"] is False
+    assert replay["review_workflow_state"]["promotion_created"] is False
+    assert tree_snapshot(durable_project[0]) == before_replay
+
+    conflict = payload(
+        action_type="reject",
+        owner_note="Conflicting terminal disposition.",
+        expected_current_review_status="approved",
+        expected_current_version=1,
+    )
+    before_conflict = tree_snapshot(durable_project[0])
+    with pytest.raises(review_api.ReviewActionUnprocessable) as raised:
+        execute(conflict, durable_project)
+    assert raised.value.payload["error_code"] == "REVIEW_ACTION_INVALID_TRANSITION"
+    assert tree_snapshot(durable_project[0]) == before_conflict

@@ -69,6 +69,7 @@ _ALLOWED_REVIEW_STATUS = frozenset(
     {
         "pending",
         "needs_info",
+        "approved",
         "rejected",
         "deferred",
         "duplicate",
@@ -83,6 +84,7 @@ _ALLOWED_LIFECYCLE_STATES = frozenset(
         "needs_more_evidence",
         "blocked_invalid_support",
         "owner_review_pending",
+        "owner_reviewed_approved",
         "owner_reviewed_rejected",
         "owner_reviewed_deferred",
         "duplicate_candidate",
@@ -97,6 +99,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("pending", "owner_review_pending"),
         ("needs_info", "needs_more_evidence"),
         ("needs_info", "blocked_invalid_support"),
+        ("approved", "owner_reviewed_approved"),
         ("rejected", "owner_reviewed_rejected"),
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
@@ -153,6 +156,7 @@ _OWNER_ACTION_OPTIONAL = frozenset(
 
 _OWNER_ACTION_ALLOWED_COMMANDS = frozenset(
     {
+        "approve_candidate",
         "request_more_evidence",
         "mark_needs_info",
         "defer_review",
@@ -167,6 +171,13 @@ _OWNER_ACTION_ALLOWED_COMMANDS = frozenset(
         "mark_ready_for_separate_promotion_flow",
     }
 )
+
+_OWNER_ACTION_COMMAND_RESULT_PAIRS = {
+    "approve_candidate": ("approved", "owner_reviewed_approved"),
+    "request_more_evidence": ("needs_info", "needs_more_evidence"),
+    "mark_needs_info": ("needs_info", "needs_more_evidence"),
+    "reject_candidate": ("rejected", "owner_reviewed_rejected"),
+}
 
 _OWNER_ACTION_ID_FIELDS = (
     "action_id",
@@ -302,6 +313,8 @@ def validate_review_queue_entry(entry):
         ("owner_note", 10_000),
         ("rationale", 1_000),
         ("quarantine_note", 10_000),
+        ("insufficient_evidence_reason", 10_000),
+        ("rejected_output_reason", 10_000),
     ):
         if field in working:
             _require_optional_text(working[field], maximum=maximum)
@@ -580,6 +593,17 @@ def validate_owner_action_record(action):
     if working["resulting_review_status"] not in _ALLOWED_REVIEW_STATUS:
         raise ValueError("invalid field")
     if working["resulting_lifecycle_state"] not in _ALLOWED_LIFECYCLE_STATES:
+        raise ValueError("invalid field")
+    resulting_pair = (
+        working["resulting_review_status"],
+        working["resulting_lifecycle_state"],
+    )
+    if resulting_pair not in _VALID_REVIEW_STATE_PAIRS:
+        raise ValueError("invalid field")
+    required_result_pair = _OWNER_ACTION_COMMAND_RESULT_PAIRS.get(
+        working["action_command"]
+    )
+    if required_result_pair is not None and resulting_pair != required_result_pair:
         raise ValueError("invalid field")
 
     if working["no_promotion_performed"] is not True:

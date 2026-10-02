@@ -75,6 +75,7 @@ _COMMAND_OPTIONAL_FIELDS = {
 _COMMAND_FIELDS = _COMMAND_REQUIRED_FIELDS | _COMMAND_OPTIONAL_FIELDS
 
 _COMMAND_NAMES = {
+    "approve_candidate",
     "request_more_evidence",
     "mark_needs_info",
     "defer_review",
@@ -126,6 +127,9 @@ _ENTRY_RESPONSE_FIELDS = (
     "updated_at",
     "review_version",
     "owner_note",
+    "rationale",
+    "rejected_output_reason",
+    "insufficient_evidence_reason",
     "owner_review_completed",
     "owner_reviewed_at",
 )
@@ -157,6 +161,7 @@ def _blocked_marker(*parts: str) -> str:
 
 
 _REVIEW_ACTION_ALLOWED_COMMANDS = {
+    "approve",
     "mark_reviewed",
     "request_more_evidence",
     "defer",
@@ -244,6 +249,7 @@ _REVIEW_STATUSES = frozenset(
     {
         "pending",
         "needs_info",
+        "approved",
         "rejected",
         "deferred",
         "duplicate",
@@ -257,6 +263,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("pending", "owner_review_pending"),
         ("needs_info", "needs_more_evidence"),
         ("needs_info", "blocked_invalid_support"),
+        ("approved", "owner_reviewed_approved"),
         ("rejected", "owner_reviewed_rejected"),
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
@@ -274,6 +281,14 @@ _TARGET_STATE_PAIRS = {
     "archived": ("archived", "archived_without_promotion"),
 }
 _COMMAND_ALLOWED_SOURCE_PAIRS = {
+    "approve": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
     "mark_reviewed": frozenset(
         {
             ("pending", "draft_ready_for_review"),
@@ -314,9 +329,11 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
         }
     ),
     "update_owner_note": _VALID_REVIEW_STATE_PAIRS,
-    "set_review_status": _VALID_REVIEW_STATE_PAIRS,
+    "set_review_status": _VALID_REVIEW_STATE_PAIRS
+    - {("approved", "owner_reviewed_approved")},
 }
 _COMMAND_FIELD_RULES = {
+    "approve": (frozenset({"owner_note"}), frozenset({"rationale"})),
     "mark_reviewed": (frozenset(), frozenset({"owner_note", "rationale"})),
     "request_more_evidence": (
         frozenset({"owner_note"}),
@@ -595,6 +612,9 @@ def _safe_entry(entry: dict[str, Any]) -> dict[str, Any]:
     }
     safe.setdefault("review_version", 0)
     safe.setdefault("owner_note", None)
+    safe.setdefault("rationale", None)
+    safe.setdefault("rejected_output_reason", None)
+    safe.setdefault("insufficient_evidence_reason", None)
     safe.setdefault("owner_review_completed", False)
     safe.setdefault("owner_reviewed_at", None)
     return safe
@@ -1195,7 +1215,12 @@ def compute_review_queue_transition(
 
     target = deepcopy(source)
     state_change = action not in {"mark_reviewed", "update_owner_note"}
-    if action == "set_review_status":
+    if action == "approve":
+        target["review_status"], target["lifecycle_state"] = (
+            "approved",
+            "owner_reviewed_approved",
+        )
+    elif action == "set_review_status":
         target_status = command["target_review_status"]
         if source_pair == ("archived", "archived_without_promotion") and target_status != "pending":
             raise _transition_error(command, "archived entries may only reopen to pending")
@@ -1265,7 +1290,10 @@ def compute_review_queue_transition(
                 "superseded_by_candidate_id"
             ]
 
-    if action == "mark_reviewed":
+    if action in {"approve", "reject"}:
+        target["owner_review_completed"] = True
+        target["owner_reviewed_at"] = command_time
+    elif action == "mark_reviewed":
         target["owner_review_completed"] = True
         target["owner_reviewed_at"] = command_time
     if "owner_note" in command and command["owner_note"] is not None:
@@ -1492,9 +1520,16 @@ def _build_success_response(
         "owner_reviewed_at": queue_entry["owner_reviewed_at"],
         "owner_note": queue_entry.get("owner_note"),
         "rationale": queue_entry.get("rationale"),
+        "rejected_output_reason": queue_entry.get("rejected_output_reason"),
+        "insufficient_evidence_reason": queue_entry.get(
+            "insufficient_evidence_reason"
+        ),
         "completion_event_hash": completion["event_hash"],
         "review_workflow_state": {
+            "approval_scope": "review_lifecycle_metadata_only",
             "is_canon": False,
+            "candidate_record_mutation_performed": False,
+            "promotion_created": False,
             "apply_promotion_performed": False,
             "memory_canon_mutation_performed": False,
             "project_truth_mutation_performed": False,

@@ -32,6 +32,7 @@ _EVENT_TYPES = frozenset(
 )
 _ACTION_COMMANDS = frozenset(
     {
+        "approve",
         "mark_reviewed",
         "request_more_evidence",
         "defer",

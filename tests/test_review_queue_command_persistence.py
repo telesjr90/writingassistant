@@ -1,4 +1,4 @@
-"""Durable transition coverage for all seven review commands."""
+"""Durable transition coverage for all eight review commands."""
 
 from __future__ import annotations
 
@@ -27,6 +27,7 @@ STATE_PAIRS = (
     ("pending", "owner_review_pending"),
     ("needs_info", "needs_more_evidence"),
     ("needs_info", "blocked_invalid_support"),
+    ("approved", "owner_reviewed_approved"),
     ("rejected", "owner_reviewed_rejected"),
     ("deferred", "owner_reviewed_deferred"),
     ("duplicate", "duplicate_candidate"),
@@ -111,6 +112,7 @@ def command(action: str, **overrides) -> dict:
         "expected_current_version": 0,
     }
     required = {
+        "approve": {"owner_note": "Approve for review lifecycle only"},
         "request_more_evidence": {"owner_note": "Need more support"},
         "defer": {"owner_note": "Defer for owner review"},
         "reject": {"owner_note": "Reject after review"},
@@ -196,6 +198,74 @@ def test_each_target_sets_preserves_and_clears_exact_fields() -> None:
     assert result["owner_review_completed"] is False
     assert result["owner_reviewed_at"] is None
     assert result["rationale"] == source["rationale"]
+
+
+@pytest.mark.parametrize(
+    ("action", "extras", "expected_pair", "review_complete"),
+    (
+        (
+            "approve",
+            {"rationale": "Evidence supports review approval."},
+            ("approved", "owner_reviewed_approved"),
+            True,
+        ),
+        (
+            "reject",
+            {"rejected_output_reason": "Evidence contradicts the claim."},
+            ("rejected", "owner_reviewed_rejected"),
+            True,
+        ),
+        (
+            "request_more_evidence",
+            {"insufficient_evidence_reason": "A second source is required."},
+            ("needs_info", "needs_more_evidence"),
+            False,
+        ),
+    ),
+)
+def test_t011a_dispositions_are_explicit_auditable_review_metadata(
+    action: str,
+    extras: dict,
+    expected_pair: tuple[str, str],
+    review_complete: bool,
+) -> None:
+    source = queue_entry()
+    result = review_api.compute_review_queue_transition(
+        source,
+        command(action, **extras),
+        command_time=NOW,
+    )
+    assert (result["review_status"], result["lifecycle_state"]) == expected_pair
+    assert result["owner_review_completed"] is review_complete
+    assert result["owner_reviewed_at"] == (NOW if review_complete else None)
+    assert result["candidate_record_id"] == source["candidate_record_id"]
+    assert result["evidence_refs"] == source["evidence_refs"]
+    assert result["provenance_refs"] == source["provenance_refs"]
+    for field, value in extras.items():
+        assert result[field] == value
+
+
+@pytest.mark.parametrize(
+    "terminal_pair",
+    (
+        ("approved", "owner_reviewed_approved"),
+        ("rejected", "owner_reviewed_rejected"),
+    ),
+)
+@pytest.mark.parametrize(
+    "action",
+    ("approve", "reject", "request_more_evidence"),
+)
+def test_t011a_terminal_dispositions_fail_closed_on_repeated_or_conflicting_action(
+    terminal_pair: tuple[str, str],
+    action: str,
+) -> None:
+    with pytest.raises(review_api.ReviewActionUnprocessable):
+        review_api.compute_review_queue_transition(
+            queue_entry(terminal_pair),
+            command(action),
+            command_time=NOW,
+        )
 
 
 def test_mark_reviewed_sets_completion_without_changing_state() -> None:

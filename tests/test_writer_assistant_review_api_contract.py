@@ -185,6 +185,7 @@ OWNER_ACTION_OPTIONAL_FIELDS = {
 }
 
 OWNER_ACTION_ALLOWED_COMMANDS = (
+    "approve_candidate",
     "request_more_evidence",
     "mark_needs_info",
     "defer_review",
@@ -200,7 +201,6 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
 )
 
 OWNER_ACTION_FORBIDDEN_COMMANDS = (
-    "approve_candidate",
     "promote_candidate",
     "apply_promotion",
     "write_to_memory",
@@ -305,7 +305,6 @@ FORBIDDEN_SOURCE_TERMS = (
     "write_to_memory",
     "write_to_canon",
     "promote_candidate",
-    "approve_candidate",
     "rewrite_source",
     "continue_scene",
     "run_booknlp",
@@ -640,6 +639,22 @@ def test_validate_owner_action_command_request_does_not_mutate_caller_input():
 
     assert request == original
     assert result is not request
+
+
+def test_approve_candidate_command_is_review_only_and_explicit():
+    request = valid_owner_action_command(
+        action_command="approve_candidate",
+        reason_code="evidence_sufficient",
+        reviewer_note="Approved as review lifecycle metadata only.",
+        target_review_status="approved",
+        target_lifecycle_state="owner_reviewed_approved",
+    )
+    result = review_api.validate_owner_action_command_request(request)
+    assert result["action_command"] == "approve_candidate"
+    assert result["target_review_status"] == "approved"
+    assert result["target_lifecycle_state"] == "owner_reviewed_approved"
+    assert result["no_promotion_requested"] is True
+    assert result["no_memory_canon_mutation_requested"] is True
 
 
 def test_build_owner_action_command_response_returns_workflow_only_shape():

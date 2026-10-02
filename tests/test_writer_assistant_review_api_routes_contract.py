@@ -42,6 +42,9 @@ EXPECTED_ENTRY_FIELDS = {
     "updated_at",
     "review_version",
     "owner_note",
+    "rationale",
+    "rejected_output_reason",
+    "insufficient_evidence_reason",
     "owner_review_completed",
     "owner_reviewed_at",
 }
@@ -92,6 +95,9 @@ def sample_entry() -> dict:
         queue_entry_id=QUEUE_ENTRY_ID,
         review_version=3,
         owner_note="Owner-authored review note.",
+        rationale="Owner-authored rationale.",
+        rejected_output_reason="Owner-authored rejection reason.",
+        insufficient_evidence_reason="Owner-authored evidence request.",
         owner_review_completed=True,
         owner_reviewed_at=NOW,
     )
@@ -102,6 +108,12 @@ def assert_entry_preserves_review_support(entry: dict) -> None:
     assert EXPECTED_ENTRY_FIELDS <= set(entry)
     assert entry["review_version"] == 3
     assert entry["owner_note"] == "Owner-authored review note."
+    assert entry["rationale"] == "Owner-authored rationale."
+    assert entry["rejected_output_reason"] == "Owner-authored rejection reason."
+    assert (
+        entry["insufficient_evidence_reason"]
+        == "Owner-authored evidence request."
+    )
     assert entry["owner_review_completed"] is True
     assert entry["owner_reviewed_at"] == NOW
     assert entry["evidence_refs"] == sample_entry()["evidence_refs"]
@@ -184,6 +196,9 @@ def test_legacy_get_normalizes_review_support_without_writing(
     for field in (
         "review_version",
         "owner_note",
+        "rationale",
+        "rejected_output_reason",
+        "insufficient_evidence_reason",
         "owner_review_completed",
         "owner_reviewed_at",
     ):
@@ -198,6 +213,9 @@ def test_legacy_get_normalizes_review_support_without_writing(
     )
     assert response["entry"]["review_version"] == 0
     assert response["entry"]["owner_note"] is None
+    assert response["entry"]["rationale"] is None
+    assert response["entry"]["rejected_output_reason"] is None
+    assert response["entry"]["insufficient_evidence_reason"] is None
     assert response["entry"]["owner_review_completed"] is False
     assert response["entry"]["owner_reviewed_at"] is None
     assert entry_path.read_bytes() == before
