@@ -34,6 +34,8 @@ STATE_PAIRS = (
     ("deferred", "owner_reviewed_deferred"),
     ("duplicate", "duplicate_candidate"),
     ("split_required", "incorrect_cluster_split_required"),
+    ("correction_recorded", "rename_metadata_recorded"),
+    ("correction_recorded", "source_linkage_correction_recorded"),
     ("superseded", "superseded_candidate"),
     ("archived", "archived_without_promotion"),
 )
@@ -101,6 +103,23 @@ def queue_entry(pair=("pending", "owner_review_pending"), **overrides) -> dict:
         owner_reviewed_at=None,
     )
     entry.update(overrides)
+    if pair == ("correction_recorded", "rename_metadata_recorded"):
+        entry.update(
+            original_owner_visible_label="Original review label",
+            requested_owner_visible_label="Corrected review label",
+            owner_visible_label="Corrected review label",
+        )
+    elif pair == (
+        "correction_recorded",
+        "source_linkage_correction_recorded",
+    ):
+        entry.update(
+            original_source_locator=entry["source_locator"],
+            requested_source_locator={
+                **entry["source_locator"],
+                "source_document_id": "scene_002",
+            },
+        )
     return review_queue_storage.validate_review_queue_entry(entry)
 
 
@@ -147,6 +166,20 @@ def command(action: str, **overrides) -> dict:
         "mark_split_required": {
             "owner_note": "This cluster must be split before further review",
             "rationale": "The source combines independently reviewable claims",
+        },
+        "rename_candidate_metadata": {
+            "owner_note": "Owner requests a review-only display rename",
+            "rationale": "The prior display label is misleading",
+            "requested_owner_visible_label": "Corrected review label",
+        },
+        "record_source_linkage_correction": {
+            "owner_note": "Owner records corrected source linkage",
+            "rationale": "The candidate was linked to the wrong scene",
+            "requested_source_locator": {
+                "project_id": PROJECT_ID,
+                "source_document_type": "scene",
+                "source_document_id": "scene_002",
+            },
         },
         "quarantine": {"owner_note": "Support is invalid"},
         "update_owner_note": {"owner_note": "Updated owner note"},

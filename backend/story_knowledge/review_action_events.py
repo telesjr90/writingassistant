@@ -39,6 +39,8 @@ _ACTION_COMMANDS = frozenset(
         "reject",
         "mark_duplicate",
         "mark_split_required",
+        "rename_candidate_metadata",
+        "record_source_linkage_correction",
         "quarantine",
         "update_owner_note",
         "set_review_status",
@@ -358,6 +360,37 @@ def _validate_intent(event) -> None:
             raise ValueError("invalid split-required action target")
     elif target_pair == ("split_required", "incorrect_cluster_split_required"):
         raise ValueError("split-required target requires mark_split_required action")
+    if event["action_command"] == "rename_candidate_metadata":
+        if target_pair != ("correction_recorded", "rename_metadata_recorded"):
+            raise ValueError("invalid rename-metadata action target")
+        if (
+            "original_owner_visible_label" not in validated_target
+            or validated_target.get("requested_owner_visible_label") is None
+            or validated_target.get("owner_visible_label")
+            != validated_target.get("requested_owner_visible_label")
+        ):
+            raise ValueError("invalid rename-metadata action linkage")
+    elif target_pair == ("correction_recorded", "rename_metadata_recorded"):
+        raise ValueError("rename-metadata target requires explicit action")
+    if event["action_command"] == "record_source_linkage_correction":
+        if target_pair != (
+            "correction_recorded",
+            "source_linkage_correction_recorded",
+        ):
+            raise ValueError("invalid source-link correction action target")
+        if (
+            validated_target.get("original_source_locator")
+            != validated_target.get("source_locator")
+            or validated_target.get("requested_source_locator") is None
+            or validated_target.get("requested_source_locator")
+            == validated_target.get("source_locator")
+        ):
+            raise ValueError("invalid source-link correction action linkage")
+    elif target_pair == (
+        "correction_recorded",
+        "source_linkage_correction_recorded",
+    ):
+        raise ValueError("source-link correction target requires explicit action")
 
 
 def _validate_completed(event, *, intent) -> None:

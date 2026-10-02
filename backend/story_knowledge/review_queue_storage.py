@@ -47,6 +47,10 @@ _OPTIONAL_ENTRY_FIELDS = frozenset(
         "priority_reason",
         "reviewer_notes",
         "owner_visible_label",
+        "original_owner_visible_label",
+        "requested_owner_visible_label",
+        "original_source_locator",
+        "requested_source_locator",
         "related_candidate_ids",
         "conflict_candidate_ids",
         "duplicate_candidate_ids",
@@ -78,6 +82,7 @@ _ALLOWED_REVIEW_STATUS = frozenset(
         "deferred",
         "duplicate",
         "split_required",
+        "correction_recorded",
         "superseded",
         "archived",
     }
@@ -94,6 +99,8 @@ _ALLOWED_LIFECYCLE_STATES = frozenset(
         "owner_reviewed_deferred",
         "duplicate_candidate",
         "incorrect_cluster_split_required",
+        "rename_metadata_recorded",
+        "source_linkage_correction_recorded",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -110,6 +117,8 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
         ("split_required", "incorrect_cluster_split_required"),
+        ("correction_recorded", "rename_metadata_recorded"),
+        ("correction_recorded", "source_linkage_correction_recorded"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -159,6 +168,8 @@ _OWNER_ACTION_OPTIONAL = frozenset(
         "duplicate_target_review_version",
         "superseded_by_candidate_id",
         "requested_evidence_note",
+        "requested_owner_visible_label",
+        "requested_source_locator",
         "action_batch_id",
         "storage_version",
         "action_hash",
@@ -174,6 +185,8 @@ _OWNER_ACTION_ALLOWED_COMMANDS = frozenset(
         "reject_candidate",
         "mark_duplicate",
         "mark_split_required",
+        "rename_candidate_metadata",
+        "record_source_linkage_correction",
         "mark_superseded",
         "archive_without_promotion",
         "add_reviewer_note",
@@ -191,6 +204,11 @@ _OWNER_ACTION_COMMAND_RESULT_PAIRS = {
     "reject_candidate": ("rejected", "owner_reviewed_rejected"),
     "mark_duplicate": ("duplicate", "duplicate_candidate"),
     "mark_split_required": ("split_required", "incorrect_cluster_split_required"),
+    "rename_candidate_metadata": ("correction_recorded", "rename_metadata_recorded"),
+    "record_source_linkage_correction": (
+        "correction_recorded",
+        "source_linkage_correction_recorded",
+    ),
 }
 
 _OWNER_ACTION_ID_FIELDS = (
@@ -324,6 +342,9 @@ def validate_review_queue_entry(entry):
         raise ValueError("invalid field")
 
     for field, maximum in (
+        ("owner_visible_label", 256),
+        ("original_owner_visible_label", 256),
+        ("requested_owner_visible_label", 256),
         ("owner_note", 10_000),
         ("rationale", 1_000),
         ("quarantine_note", 10_000),
@@ -332,6 +353,25 @@ def validate_review_queue_entry(entry):
     ):
         if field in working:
             _require_optional_text(working[field], maximum=maximum)
+
+    for field in ("owner_visible_label", "requested_owner_visible_label"):
+        value = working.get(field)
+        if value is not None and (
+            not value
+            or value != value.strip()
+            or value in {".", ".."}
+            or "/" in value
+            or "\\" in value
+            or any(ord(character) < 32 or ord(character) == 127 for character in value)
+        ):
+            raise ValueError("invalid field")
+
+    for field in ("original_source_locator", "requested_source_locator"):
+        value = working.get(field)
+        if value is not None:
+            validated_locator = candidate_record.validate_source_locator(value)
+            if validated_locator["project_id"] != working["project_id"]:
+                raise ValueError("invalid field")
 
     if "duplicate_candidate_ids" in working:
         duplicate_ids = working["duplicate_candidate_ids"]
@@ -396,6 +436,42 @@ def validate_review_queue_entry(entry):
     _require_non_empty_string(working["source_document"])
 
     candidate_record.validate_source_locator(working["source_locator"])
+
+    state_pair = (working["review_status"], working["lifecycle_state"])
+    rename_pair = ("correction_recorded", "rename_metadata_recorded")
+    source_correction_pair = (
+        "correction_recorded",
+        "source_linkage_correction_recorded",
+    )
+    if state_pair == rename_pair:
+        if (
+            "original_owner_visible_label" not in working
+            or working.get("requested_owner_visible_label") is None
+            or working.get("owner_visible_label")
+            != working.get("requested_owner_visible_label")
+            or working.get("original_source_locator") is not None
+            or working.get("requested_source_locator") is not None
+        ):
+            raise ValueError("invalid field")
+    elif state_pair == source_correction_pair:
+        if (
+            working.get("original_source_locator") != working["source_locator"]
+            or working.get("requested_source_locator") is None
+            or working.get("requested_source_locator") == working["source_locator"]
+            or working.get("original_owner_visible_label") is not None
+            or working.get("requested_owner_visible_label") is not None
+        ):
+            raise ValueError("invalid field")
+    elif any(
+        working.get(field) is not None
+        for field in (
+            "original_owner_visible_label",
+            "requested_owner_visible_label",
+            "original_source_locator",
+            "requested_source_locator",
+        )
+    ):
+        raise ValueError("invalid field")
 
     if not isinstance(working["evidence_summary"], str):
         raise ValueError("invalid field")
@@ -674,6 +750,18 @@ def validate_owner_action_record(action):
         if duplicate_ids[0] == working["candidate_record_id"]:
             raise ValueError("invalid field")
         if _require_safe_id(target_queue_entry_id) == working["queue_entry_id"]:
+            raise ValueError("invalid field")
+
+    if working["action_command"] == "rename_candidate_metadata":
+        label = working.get("requested_owner_visible_label")
+        _require_optional_text(label, maximum=256)
+        if not label or label != label.strip() or "/" in label or "\\" in label:
+            raise ValueError("invalid field")
+    if working["action_command"] == "record_source_linkage_correction":
+        locator = candidate_record.validate_source_locator(
+            working.get("requested_source_locator")
+        )
+        if locator["project_id"] != working["project_id"]:
             raise ValueError("invalid field")
 
     if working["no_promotion_performed"] is not True:

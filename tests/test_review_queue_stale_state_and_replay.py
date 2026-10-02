@@ -118,12 +118,12 @@ def tree_snapshot(root: Path) -> dict[str, bytes]:
     }
 
 
-def test_canonical_request_record_has_exact_22_fields_and_bytes() -> None:
+def test_canonical_request_record_has_exact_24_fields_and_bytes() -> None:
     record = review_api.build_canonical_review_action_request_record(
         validated(), project_id=PROJECT_ID, queue_entry_id=QUEUE_ENTRY_ID
     )
     assert tuple(record) == review_api._CANONICAL_REQUEST_FIELDS
-    assert len(record) == 22
+    assert len(record) == 24
     raw = review_api.canonical_review_action_request_bytes(record)
     assert raw == json.dumps(record, ensure_ascii=False, separators=(",", ":")).encode()
     assert not raw.endswith(b"\n")

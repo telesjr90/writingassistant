@@ -14,6 +14,7 @@ from urllib.parse import unquote
 
 from backend.story_knowledge import apply_contract
 from backend.story_knowledge import candidate_persistence
+from backend.story_knowledge import candidate_record
 from backend.story_knowledge import review_action_events
 from backend.story_knowledge import review_queue_storage
 
@@ -73,6 +74,8 @@ _COMMAND_OPTIONAL_FIELDS = {
     "requested_evidence_note",
     "command_metadata",
     "idempotency_key",
+    "requested_owner_visible_label",
+    "requested_source_locator",
 }
 
 _COMMAND_FIELDS = _COMMAND_REQUIRED_FIELDS | _COMMAND_OPTIONAL_FIELDS
@@ -85,6 +88,8 @@ _COMMAND_NAMES = {
     "reject_candidate",
     "mark_duplicate",
     "mark_split_required",
+    "rename_candidate_metadata",
+    "record_source_linkage_correction",
     "mark_superseded",
     "archive_without_promotion",
     "add_reviewer_note",
@@ -137,6 +142,11 @@ _ENTRY_RESPONSE_FIELDS = (
     "insufficient_evidence_reason",
     "owner_review_completed",
     "owner_reviewed_at",
+    "owner_visible_label",
+    "original_owner_visible_label",
+    "requested_owner_visible_label",
+    "original_source_locator",
+    "requested_source_locator",
     "duplicate_candidate_ids",
     "duplicate_target_queue_entry_id",
     "duplicate_target_review_status",
@@ -178,6 +188,8 @@ _REVIEW_ACTION_ALLOWED_COMMANDS = {
     "reject",
     "mark_duplicate",
     "mark_split_required",
+    "rename_candidate_metadata",
+    "record_source_linkage_correction",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -253,6 +265,8 @@ _REVIEW_ACTION_COMMAND_FIELDS = frozenset(
         "rejected_output_reason",
         "insufficient_evidence_reason",
         "quarantine_note",
+        "requested_owner_visible_label",
+        "requested_source_locator",
     }
 )
 _REVIEW_ACTION_FIELDS = (
@@ -269,6 +283,7 @@ _REVIEW_STATUSES = frozenset(
         "deferred",
         "duplicate",
         "split_required",
+        "correction_recorded",
         "superseded",
         "archived",
     }
@@ -284,6 +299,8 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
         ("split_required", "incorrect_cluster_split_required"),
+        ("correction_recorded", "rename_metadata_recorded"),
+        ("correction_recorded", "source_linkage_correction_recorded"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -355,6 +372,22 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
             ("deferred", "owner_reviewed_deferred"),
         }
     ),
+    "rename_candidate_metadata": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
+    "record_source_linkage_correction": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
     "quarantine": frozenset(
         {
             ("pending", "draft_ready_for_review"),
@@ -368,6 +401,8 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
         ("approved", "owner_reviewed_approved"),
         ("duplicate", "duplicate_candidate"),
         ("split_required", "incorrect_cluster_split_required"),
+        ("correction_recorded", "rename_metadata_recorded"),
+        ("correction_recorded", "source_linkage_correction_recorded"),
     },
 }
 _COMMAND_FIELD_RULES = {
@@ -396,6 +431,14 @@ _COMMAND_FIELD_RULES = {
     ),
     "mark_split_required": (
         frozenset({"owner_note", "rationale"}),
+        frozenset(),
+    ),
+    "rename_candidate_metadata": (
+        frozenset({"owner_note", "rationale", "requested_owner_visible_label"}),
+        frozenset(),
+    ),
+    "record_source_linkage_correction": (
+        frozenset({"owner_note", "rationale", "requested_source_locator"}),
         frozenset(),
     ),
     "quarantine": (
@@ -427,6 +470,8 @@ _CANONICAL_REQUEST_FIELDS = (
     "rejected_output_reason",
     "insufficient_evidence_reason",
     "quarantine_note",
+    "requested_owner_visible_label",
+    "requested_source_locator",
 )
 _EVIDENCE_PROVENANCE_PROJECTION_FIELDS = (
     "source_document",
@@ -887,6 +932,20 @@ def _require_unicode_scalar_text(
     return value
 
 
+def _require_owner_visible_label(value: Any) -> str:
+    label = _require_unicode_scalar_text(value, maximum=256, allow_null=False)
+    if (
+        not label
+        or label != label.strip()
+        or label in {".", ".."}
+        or "/" in label
+        or "\\" in label
+        or any(ord(character) < 32 or ord(character) == 127 for character in label)
+    ):
+        raise ValueError("invalid owner-visible label")
+    return label
+
+
 def _require_uuid4(value: Any) -> str:
     if not isinstance(value, str):
         raise ValueError("invalid UUIDv4")
@@ -1123,6 +1182,14 @@ def validate_review_action_command_request(
             not isinstance(value["rationale"], str) or not value["rationale"]
         ):
             raise ValueError("rationale is required")
+        if "requested_owner_visible_label" in required:
+            _require_owner_visible_label(value["requested_owner_visible_label"])
+        if "requested_source_locator" in required:
+            corrected_locator = candidate_record.validate_source_locator(
+                value["requested_source_locator"]
+            )
+            if corrected_locator["project_id"] != project_id:
+                raise ValueError("corrected source locator must remain project-local")
         if "duplicate_candidate_ids" in required:
             duplicate_ids = value["duplicate_candidate_ids"]
             if not isinstance(duplicate_ids, list) or len(duplicate_ids) != 1:
@@ -1211,6 +1278,12 @@ def build_canonical_review_action_request_record(
             "insufficient_evidence_reason"
         ),
         "quarantine_note": validated_request.get("quarantine_note"),
+        "requested_owner_visible_label": validated_request.get(
+            "requested_owner_visible_label"
+        ),
+        "requested_source_locator": deepcopy(
+            validated_request.get("requested_source_locator")
+        ),
     }
     if tuple(record) != _CANONICAL_REQUEST_FIELDS:
         raise ValueError("invalid canonical request record")
@@ -1259,12 +1332,16 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
         "rejected_output_reason",
         "insufficient_evidence_reason",
         "quarantine_note",
+        "requested_owner_visible_label",
     ):
         value = ordered[field]
         if value is not None:
             if not isinstance(value, str):
                 raise ValueError("invalid canonical request record")
             _require_unicode_scalar_text(value, maximum=max(len(value), 1), allow_null=False)
+    requested_source_locator = ordered["requested_source_locator"]
+    if requested_source_locator is not None:
+        candidate_record.validate_source_locator(requested_source_locator)
     duplicate_ids = ordered["duplicate_candidate_ids"]
     if duplicate_ids is not None:
         if not isinstance(duplicate_ids, list):
@@ -1406,6 +1483,18 @@ def compute_review_queue_transition(
         target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
             "split_required"
         ]
+    elif action == "rename_candidate_metadata":
+        requested_label = command["requested_owner_visible_label"]
+        if requested_label == source.get("owner_visible_label"):
+            raise _transition_error(command, "rename must change owner-visible metadata")
+        target["review_status"] = "correction_recorded"
+        target["lifecycle_state"] = "rename_metadata_recorded"
+    elif action == "record_source_linkage_correction":
+        requested_locator = command["requested_source_locator"]
+        if requested_locator == source["source_locator"]:
+            raise _transition_error(command, "source-link correction must change linkage")
+        target["review_status"] = "correction_recorded"
+        target["lifecycle_state"] = "source_linkage_correction_recorded"
     elif action == "quarantine":
         target["review_status"], target["lifecycle_state"] = (
             "needs_info",
@@ -1425,6 +1514,10 @@ def compute_review_queue_transition(
             "rejected_output_reason",
             "insufficient_evidence_reason",
             "quarantine_note",
+            "original_owner_visible_label",
+            "requested_owner_visible_label",
+            "original_source_locator",
+            "requested_source_locator",
         ):
             target[field] = None
         target["owner_review_completed"] = False
@@ -1472,8 +1565,31 @@ def compute_review_queue_transition(
             target["superseded_by_candidate_id"] = command[
                 "superseded_by_candidate_id"
             ]
+        elif target_pair == ("correction_recorded", "rename_metadata_recorded"):
+            target["original_owner_visible_label"] = source.get(
+                "owner_visible_label"
+            )
+            target["requested_owner_visible_label"] = command[
+                "requested_owner_visible_label"
+            ]
+            target["owner_visible_label"] = command["requested_owner_visible_label"]
+        elif target_pair == (
+            "correction_recorded",
+            "source_linkage_correction_recorded",
+        ):
+            target["original_source_locator"] = deepcopy(source["source_locator"])
+            target["requested_source_locator"] = deepcopy(
+                command["requested_source_locator"]
+            )
 
-    if action in {"approve", "reject", "mark_duplicate", "mark_split_required"}:
+    if action in {
+        "approve",
+        "reject",
+        "mark_duplicate",
+        "mark_split_required",
+        "rename_candidate_metadata",
+        "record_source_linkage_correction",
+    }:
         target["owner_review_completed"] = True
         target["owner_reviewed_at"] = command_time
     elif action == "mark_reviewed":
@@ -1722,11 +1838,26 @@ def _build_success_response(
         "duplicate_target_review_version": queue_entry.get(
             "duplicate_target_review_version"
         ),
+        "owner_visible_label": queue_entry.get("owner_visible_label"),
+        "original_owner_visible_label": queue_entry.get(
+            "original_owner_visible_label"
+        ),
+        "requested_owner_visible_label": queue_entry.get(
+            "requested_owner_visible_label"
+        ),
+        "original_source_locator": deepcopy(
+            queue_entry.get("original_source_locator")
+        ),
+        "requested_source_locator": deepcopy(
+            queue_entry.get("requested_source_locator")
+        ),
         "completion_event_hash": completion["event_hash"],
         "review_workflow_state": {
             "approval_scope": "review_lifecycle_metadata_only",
             "duplicate_linkage_scope": "review_lifecycle_metadata_only",
             "split_scope": "review_lifecycle_metadata_only",
+            "rename_scope": "review_lifecycle_metadata_only",
+            "source_linkage_correction_scope": "review_lifecycle_metadata_only",
             "is_canon": False,
             "candidate_record_mutation_performed": False,
             "target_candidate_mutation_performed": False,
@@ -1743,6 +1874,8 @@ def _build_success_response(
             "model_call_performed": False,
             "generated_prose_performed": False,
             "owner_authored_correction_performed": False,
+            "source_linkage_mutation_performed": False,
+            "source_document_mutation_performed": False,
             "training_artifact_performed": False,
         },
         "warnings": [
@@ -2398,6 +2531,14 @@ def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
             or not isinstance(target_version, int)
             or not 0 <= target_version <= _MAX_REVIEW_VERSION
         ):
+            raise ValueError("invalid request")
+    if value["action_command"] == "rename_candidate_metadata":
+        _require_owner_visible_label(value.get("requested_owner_visible_label"))
+    if value["action_command"] == "record_source_linkage_correction":
+        locator = candidate_record.validate_source_locator(
+            value.get("requested_source_locator")
+        )
+        if locator["project_id"] != value["project_id"]:
             raise ValueError("invalid request")
     return _copy_mapping(value)
 

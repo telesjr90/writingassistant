@@ -39,6 +39,8 @@ ALLOWED_REVIEW_COMMANDS = (
     "reject",
     "mark_duplicate",
     "mark_split_required",
+    "rename_candidate_metadata",
+    "record_source_linkage_correction",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -251,6 +253,20 @@ def review_command_payload(action_type: str, **overrides: Any) -> dict[str, Any]
             "mark_split_required": {
                 "owner_note": "This incorrect cluster requires a later split.",
                 "rationale": "The evidence supports separately reviewable units.",
+            },
+            "rename_candidate_metadata": {
+                "owner_note": "Owner requests a review-only display rename.",
+                "rationale": "The current review label is misleading.",
+                "requested_owner_visible_label": "Corrected review label",
+            },
+            "record_source_linkage_correction": {
+                "owner_note": "Owner records corrected source linkage.",
+                "rationale": "The candidate points to the wrong scene.",
+                "requested_source_locator": {
+                    "project_id": PROJECT_ID,
+                    "source_document_type": "scene",
+                    "source_document_id": "scene_002",
+                },
             },
             "quarantine": {"owner_note": "The supporting evidence is invalid."},
             "update_owner_note": {"owner_note": "Owner-authored review note."},

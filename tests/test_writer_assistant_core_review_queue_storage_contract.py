@@ -101,6 +101,7 @@ ALLOWED_REVIEW_STATUS_VALUES = frozenset(
         "deferred",
         "duplicate",
         "split_required",
+        "correction_recorded",
         "superseded",
         "archived",
     }
@@ -117,6 +118,8 @@ ALLOWED_LIFECYCLE_STATES = frozenset(
         "owner_reviewed_deferred",
         "duplicate_candidate",
         "incorrect_cluster_split_required",
+        "rename_metadata_recorded",
+        "source_linkage_correction_recorded",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -133,6 +136,8 @@ VALID_REVIEW_STATE_PAIRS = frozenset(
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
         ("split_required", "incorrect_cluster_split_required"),
+        ("correction_recorded", "rename_metadata_recorded"),
+        ("correction_recorded", "source_linkage_correction_recorded"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -200,6 +205,8 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "reject_candidate",
     "mark_duplicate",
     "mark_split_required",
+    "rename_candidate_metadata",
+    "record_source_linkage_correction",
     "mark_superseded",
     "archive_without_promotion",
     "add_reviewer_note",
@@ -424,6 +431,23 @@ def build_valid_queue_entry(**overrides):
     record = candidate_record.validate_candidate_record(build_valid_candidate_record())
     entry = candidate_review_gate.build_review_queue_entry(record, project_id=PROJECT_ID)
     entry.update(overrides)
+    pair = (entry["review_status"], entry["lifecycle_state"])
+    if pair == ("correction_recorded", "rename_metadata_recorded"):
+        entry.setdefault("original_owner_visible_label", None)
+        entry.setdefault("requested_owner_visible_label", "Corrected review label")
+        entry.setdefault("owner_visible_label", entry["requested_owner_visible_label"])
+    elif pair == (
+        "correction_recorded",
+        "source_linkage_correction_recorded",
+    ):
+        entry.setdefault("original_source_locator", copy.deepcopy(entry["source_locator"]))
+        entry.setdefault(
+            "requested_source_locator",
+            {
+                **copy.deepcopy(entry["source_locator"]),
+                "source_document_id": "scene_002",
+            },
+        )
     return entry
 
 
@@ -1194,6 +1218,14 @@ def test_validate_owner_action_accepts_allowed_commands(command):
             "split_required",
             "incorrect_cluster_split_required",
         ),
+        "rename_candidate_metadata": (
+            "correction_recorded",
+            "rename_metadata_recorded",
+        ),
+        "record_source_linkage_correction": (
+            "correction_recorded",
+            "source_linkage_correction_recorded",
+        ),
     }
     action = build_valid_owner_action_record(action_command=command)
     if command == "mark_duplicate":
@@ -1201,6 +1233,14 @@ def test_validate_owner_action_accepts_allowed_commands(command):
             duplicate_candidate_ids=["candidate_002"],
             duplicate_target_queue_entry_id="queue_entry_002",
         )
+    elif command == "rename_candidate_metadata":
+        action["requested_owner_visible_label"] = "Corrected review label"
+    elif command == "record_source_linkage_correction":
+        action["requested_source_locator"] = {
+            "project_id": PROJECT_ID,
+            "source_document_type": "scene",
+            "source_document_id": "scene_002",
+        }
     if command in result_pairs:
         action["resulting_review_status"], action["resulting_lifecycle_state"] = (
             result_pairs[command]

@@ -185,6 +185,8 @@ OWNER_ACTION_OPTIONAL_FIELDS = {
     "requested_evidence_note",
     "command_metadata",
     "idempotency_key",
+    "requested_owner_visible_label",
+    "requested_source_locator",
 }
 
 OWNER_ACTION_ALLOWED_COMMANDS = (
@@ -195,6 +197,8 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "reject_candidate",
     "mark_duplicate",
     "mark_split_required",
+    "rename_candidate_metadata",
+    "record_source_linkage_correction",
     "mark_superseded",
     "archive_without_promotion",
     "add_reviewer_note",
@@ -595,6 +599,14 @@ def test_validate_owner_action_command_request_accepts_only_t003_allowed_command
             duplicate_target_expected_review_status="pending",
             duplicate_target_expected_version=0,
         )
+    elif command == "rename_candidate_metadata":
+        request["requested_owner_visible_label"] = "Corrected review label"
+    elif command == "record_source_linkage_correction":
+        request["requested_source_locator"] = {
+            "project_id": PROJECT_ID,
+            "source_document_type": "scene",
+            "source_document_id": "scene_002",
+        }
     result = review_api.validate_owner_action_command_request(request)
 
     assert result["action_command"] == command
@@ -650,6 +662,28 @@ def test_validate_owner_action_command_request_does_not_mutate_caller_input():
 
     assert request == original
     assert result is not request
+
+
+@pytest.mark.parametrize(
+    "payload",
+    (
+        valid_owner_action_command(
+            action_command="rename_candidate_metadata",
+            requested_owner_visible_label="../escape",
+        ),
+        valid_owner_action_command(
+            action_command="record_source_linkage_correction",
+            requested_source_locator={
+                "project_id": "other_project",
+                "source_document_type": "scene",
+                "source_document_id": "scene_002",
+            },
+        ),
+    ),
+)
+def test_legacy_correction_commands_reject_unsafe_or_cross_project_metadata(payload):
+    with pytest.raises((TypeError, ValueError)):
+        review_api.validate_owner_action_command_request(payload)
 
 
 def test_approve_candidate_command_is_review_only_and_explicit():
