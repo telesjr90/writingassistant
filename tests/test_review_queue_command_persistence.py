@@ -1,4 +1,4 @@
-"""Durable transition coverage for all eight review commands."""
+"""Durable transition coverage for all review commands."""
 
 from __future__ import annotations
 
@@ -33,6 +33,7 @@ STATE_PAIRS = (
     ("rejected", "owner_reviewed_rejected"),
     ("deferred", "owner_reviewed_deferred"),
     ("duplicate", "duplicate_candidate"),
+    ("split_required", "incorrect_cluster_split_required"),
     ("superseded", "superseded_candidate"),
     ("archived", "archived_without_promotion"),
 )
@@ -143,6 +144,10 @@ def command(action: str, **overrides) -> dict:
             "duplicate_target_expected_review_status": "pending",
             "duplicate_target_expected_version": 0,
         },
+        "mark_split_required": {
+            "owner_note": "This cluster must be split before further review",
+            "rationale": "The source combines independently reviewable claims",
+        },
         "quarantine": {"owner_note": "Support is invalid"},
         "update_owner_note": {"owner_note": "Updated owner note"},
         "set_review_status": {
@@ -205,7 +210,7 @@ def test_each_command_accepts_only_its_allowed_source_pairs(action: str) -> None
 
 def test_set_review_status_derives_exact_target_pairs_and_archive_rule() -> None:
     for status, pair in review_api._TARGET_STATE_PAIRS.items():
-        if status == "duplicate":
+        if status in {"duplicate", "split_required"}:
             continue
         extras = {}
         if status not in {"pending", "archived"}:
@@ -230,6 +235,8 @@ def test_set_review_status_derives_exact_target_pairs_and_archive_rule() -> None
             duplicate_candidate_ids=[TARGET_CANDIDATE_ID],
             owner_note="Duplicate",
         )
+    with pytest.raises(review_api.ReviewActionUnprocessable):
+        command("set_review_status", target_review_status="split_required")
 
 
 def test_each_target_sets_preserves_and_clears_exact_fields() -> None:

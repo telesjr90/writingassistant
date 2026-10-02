@@ -229,6 +229,45 @@ def test_duplicate_intent_requires_explicit_command_and_audited_target_linkage()
         )
 
 
+def test_split_required_intent_requires_its_explicit_command():
+    target = _queue_entry()
+    target.update(
+        review_status="split_required",
+        lifecycle_state="incorrect_cluster_split_required",
+        owner_note="Split this incorrect cluster.",
+        rationale="It combines distinct analytical claims.",
+        owner_review_completed=True,
+        owner_reviewed_at=COMPLETED_AT,
+    )
+    target = review_queue_storage.validate_review_queue_entry(target)
+    raw = apply_contract.canonical_json_bytes(target)
+    encoded = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    values = {
+        "sequence": 1,
+        "previous_event_hash": None,
+        "project_id": PROJECT_ID,
+        "queue_entry_id": QUEUE_ENTRY_ID,
+        "candidate_record_id": CANDIDATE_ID,
+        "action_command": "mark_split_required",
+        "action_id": ACTION_ID,
+        "idempotency_key": IDEMPOTENCY_KEY,
+        "request_hash": REQUEST_HASH,
+        "created_at": CREATED_AT,
+        "queue_before_hash": QUEUE_BEFORE_HASH,
+        "target_queue_canonical_bytes_b64url": encoded,
+        "target_queue_hash": hashlib.sha256(raw).hexdigest(),
+        "candidate_before_hash": CANDIDATE_HASH,
+        "evidence_projection_before_hash": EVIDENCE_HASH,
+    }
+    assert review_action_events.build_action_intent_event_v1(**values)[
+        "action_command"
+    ] == "mark_split_required"
+    with pytest.raises(ValueError):
+        review_action_events.build_action_intent_event_v1(
+            **{**values, "action_command": "set_review_status"}
+        )
+
+
 def test_each_event_schema_rejects_missing_unknown_wrong_type_and_invalid_null_fields():
     intent = _intent()
     failed = _failed(intent)

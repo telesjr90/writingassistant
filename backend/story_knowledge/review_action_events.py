@@ -38,6 +38,7 @@ _ACTION_COMMANDS = frozenset(
         "defer",
         "reject",
         "mark_duplicate",
+        "mark_split_required",
         "quarantine",
         "update_owner_note",
         "set_review_status",
@@ -352,6 +353,11 @@ def _validate_intent(event) -> None:
             raise ValueError("invalid duplicate action linkage")
     elif target_pair == ("duplicate", "duplicate_candidate"):
         raise ValueError("duplicate target requires mark_duplicate action")
+    if event["action_command"] == "mark_split_required":
+        if target_pair != ("split_required", "incorrect_cluster_split_required"):
+            raise ValueError("invalid split-required action target")
+    elif target_pair == ("split_required", "incorrect_cluster_split_required"):
+        raise ValueError("split-required target requires mark_split_required action")
 
 
 def _validate_completed(event, *, intent) -> None:

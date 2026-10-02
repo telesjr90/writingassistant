@@ -194,6 +194,7 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "defer_review",
     "reject_candidate",
     "mark_duplicate",
+    "mark_split_required",
     "mark_superseded",
     "archive_without_promotion",
     "add_reviewer_note",

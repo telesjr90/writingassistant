@@ -84,6 +84,7 @@ _COMMAND_NAMES = {
     "defer_review",
     "reject_candidate",
     "mark_duplicate",
+    "mark_split_required",
     "mark_superseded",
     "archive_without_promotion",
     "add_reviewer_note",
@@ -176,6 +177,7 @@ _REVIEW_ACTION_ALLOWED_COMMANDS = {
     "defer",
     "reject",
     "mark_duplicate",
+    "mark_split_required",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -266,6 +268,7 @@ _REVIEW_STATUSES = frozenset(
         "rejected",
         "deferred",
         "duplicate",
+        "split_required",
         "superseded",
         "archived",
     }
@@ -280,6 +283,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("rejected", "owner_reviewed_rejected"),
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
+        ("split_required", "incorrect_cluster_split_required"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -290,6 +294,7 @@ _TARGET_STATE_PAIRS = {
     "rejected": ("rejected", "owner_reviewed_rejected"),
     "deferred": ("deferred", "owner_reviewed_deferred"),
     "duplicate": ("duplicate", "duplicate_candidate"),
+    "split_required": ("split_required", "incorrect_cluster_split_required"),
     "superseded": ("superseded", "superseded_candidate"),
     "archived": ("archived", "archived_without_promotion"),
 }
@@ -342,6 +347,14 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
             ("deferred", "owner_reviewed_deferred"),
         }
     ),
+    "mark_split_required": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
     "quarantine": frozenset(
         {
             ("pending", "draft_ready_for_review"),
@@ -354,6 +367,7 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
     - {
         ("approved", "owner_reviewed_approved"),
         ("duplicate", "duplicate_candidate"),
+        ("split_required", "incorrect_cluster_split_required"),
     },
 }
 _COMMAND_FIELD_RULES = {
@@ -379,6 +393,10 @@ _COMMAND_FIELD_RULES = {
             }
         ),
         frozenset({"rationale"}),
+    ),
+    "mark_split_required": (
+        frozenset({"owner_note", "rationale"}),
+        frozenset(),
     ),
     "quarantine": (
         frozenset({"owner_note"}),
@@ -884,8 +902,8 @@ def _require_uuid4(value: Any) -> str:
 def _set_review_status_field_rules(target: Any) -> tuple[frozenset[str], frozenset[str]]:
     if target not in _TARGET_STATE_PAIRS:
         raise ValueError("invalid target review status")
-    if target == "duplicate":
-        raise ValueError("duplicate requires mark_duplicate")
+    if target in {"duplicate", "split_required"}:
+        raise ValueError("specialized lifecycle state requires its explicit command")
     required = {"target_review_status"}
     optional = {"rationale"}
     if target in {"pending", "archived"}:
@@ -1101,6 +1119,10 @@ def validate_review_action_command_request(
             or (action_type != "update_owner_note" and not value["owner_note"])
         ):
             raise ValueError("owner_note is required")
+        if "rationale" in required and (
+            not isinstance(value["rationale"], str) or not value["rationale"]
+        ):
+            raise ValueError("rationale is required")
         if "duplicate_candidate_ids" in required:
             duplicate_ids = value["duplicate_candidate_ids"]
             if not isinstance(duplicate_ids, list) or len(duplicate_ids) != 1:
@@ -1380,6 +1402,10 @@ def compute_review_queue_transition(
         target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
             "duplicate"
         ]
+    elif action == "mark_split_required":
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            "split_required"
+        ]
     elif action == "quarantine":
         target["review_status"], target["lifecycle_state"] = (
             "needs_info",
@@ -1447,7 +1473,7 @@ def compute_review_queue_transition(
                 "superseded_by_candidate_id"
             ]
 
-    if action in {"approve", "reject", "mark_duplicate"}:
+    if action in {"approve", "reject", "mark_duplicate", "mark_split_required"}:
         target["owner_review_completed"] = True
         target["owner_reviewed_at"] = command_time
     elif action == "mark_reviewed":
@@ -1700,11 +1726,14 @@ def _build_success_response(
         "review_workflow_state": {
             "approval_scope": "review_lifecycle_metadata_only",
             "duplicate_linkage_scope": "review_lifecycle_metadata_only",
+            "split_scope": "review_lifecycle_metadata_only",
             "is_canon": False,
             "candidate_record_mutation_performed": False,
             "target_candidate_mutation_performed": False,
             "source_candidate_deleted": False,
             "content_merge_performed": False,
+            "content_split_performed": False,
+            "split_target_records_created": False,
             "promotion_created": False,
             "apply_promotion_performed": False,
             "memory_canon_mutation_performed": False,
@@ -1713,6 +1742,7 @@ def _build_success_response(
             "runtime_extraction_performed": False,
             "model_call_performed": False,
             "generated_prose_performed": False,
+            "owner_authored_correction_performed": False,
             "training_artifact_performed": False,
         },
         "warnings": [

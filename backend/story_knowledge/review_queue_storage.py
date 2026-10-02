@@ -77,6 +77,7 @@ _ALLOWED_REVIEW_STATUS = frozenset(
         "rejected",
         "deferred",
         "duplicate",
+        "split_required",
         "superseded",
         "archived",
     }
@@ -92,6 +93,7 @@ _ALLOWED_LIFECYCLE_STATES = frozenset(
         "owner_reviewed_rejected",
         "owner_reviewed_deferred",
         "duplicate_candidate",
+        "incorrect_cluster_split_required",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -107,6 +109,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("rejected", "owner_reviewed_rejected"),
         ("deferred", "owner_reviewed_deferred"),
         ("duplicate", "duplicate_candidate"),
+        ("split_required", "incorrect_cluster_split_required"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -170,6 +173,7 @@ _OWNER_ACTION_ALLOWED_COMMANDS = frozenset(
         "defer_review",
         "reject_candidate",
         "mark_duplicate",
+        "mark_split_required",
         "mark_superseded",
         "archive_without_promotion",
         "add_reviewer_note",
@@ -186,6 +190,7 @@ _OWNER_ACTION_COMMAND_RESULT_PAIRS = {
     "mark_needs_info": ("needs_info", "needs_more_evidence"),
     "reject_candidate": ("rejected", "owner_reviewed_rejected"),
     "mark_duplicate": ("duplicate", "duplicate_candidate"),
+    "mark_split_required": ("split_required", "incorrect_cluster_split_required"),
 }
 
 _OWNER_ACTION_ID_FIELDS = (

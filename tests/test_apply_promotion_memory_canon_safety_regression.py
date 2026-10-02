@@ -38,6 +38,7 @@ ALLOWED_REVIEW_COMMANDS = (
     "defer",
     "reject",
     "mark_duplicate",
+    "mark_split_required",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -246,6 +247,10 @@ def review_command_payload(action_type: str, **overrides: Any) -> dict[str, Any]
                 "duplicate_target_queue_entry_id": TARGET_QUEUE_ENTRY_ID,
                 "duplicate_target_expected_review_status": "pending",
                 "duplicate_target_expected_version": 0,
+            },
+            "mark_split_required": {
+                "owner_note": "This incorrect cluster requires a later split.",
+                "rationale": "The evidence supports separately reviewable units.",
             },
             "quarantine": {"owner_note": "The supporting evidence is invalid."},
             "update_owner_note": {"owner_note": "Owner-authored review note."},
