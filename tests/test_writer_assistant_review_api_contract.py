@@ -178,6 +178,9 @@ OWNER_ACTION_OPTIONAL_FIELDS = {
     "target_lifecycle_state",
     "related_candidate_ids",
     "duplicate_candidate_ids",
+    "duplicate_target_queue_entry_id",
+    "duplicate_target_expected_review_status",
+    "duplicate_target_expected_version",
     "superseded_by_candidate_id",
     "requested_evidence_note",
     "command_metadata",
@@ -584,6 +587,13 @@ def test_validate_owner_action_command_request_requires_actor_ref_or_actor_id():
 @pytest.mark.parametrize("command", OWNER_ACTION_ALLOWED_COMMANDS)
 def test_validate_owner_action_command_request_accepts_only_t003_allowed_commands(command):
     request = valid_owner_action_command(action_command=command)
+    if command == "mark_duplicate":
+        request.update(
+            duplicate_candidate_ids=["core_candidate_target_001"],
+            duplicate_target_queue_entry_id="review_queue_entry_target_001",
+            duplicate_target_expected_review_status="pending",
+            duplicate_target_expected_version=0,
+        )
     result = review_api.validate_owner_action_command_request(request)
 
     assert result["action_command"] == command

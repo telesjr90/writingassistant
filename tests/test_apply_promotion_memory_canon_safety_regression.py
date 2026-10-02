@@ -27,6 +27,8 @@ from backend.story_knowledge.apply_contract import ApplyContractError
 PROJECT_ID = "example"
 CANDIDATE_ID = "core_candidate_scene_001_character_001"
 QUEUE_ENTRY_ID = "review_queue_entry_scene_001_character_001"
+TARGET_CANDIDATE_ID = "core_candidate_scene_002_character_001"
+TARGET_QUEUE_ENTRY_ID = "review_queue_entry_scene_002_character_001"
 REVIEW_FIXTURE_TIME = "2026-08-09T20:00:00Z"
 
 ALLOWED_REVIEW_COMMANDS = (
@@ -35,6 +37,7 @@ ALLOWED_REVIEW_COMMANDS = (
     "request_more_evidence",
     "defer",
     "reject",
+    "mark_duplicate",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -141,10 +144,13 @@ def valid_queue_entry(**overrides: Any) -> dict[str, Any]:
     return entry
 
 
-def valid_review_candidate_record() -> dict[str, Any]:
+def valid_review_candidate_record(
+    candidate_id: str = CANDIDATE_ID,
+    source_document_id: str = "scene_001",
+) -> dict[str, Any]:
     return candidate_record.validate_candidate_record(
         {
-            "candidate_id": CANDIDATE_ID,
+            "candidate_id": candidate_id,
             "project_id": PROJECT_ID,
             "candidate_type": "character_candidate",
             "status": "candidate",
@@ -152,7 +158,7 @@ def valid_review_candidate_record() -> dict[str, Any]:
             "source_locator": {
                 "project_id": PROJECT_ID,
                 "source_document_type": "scene",
-                "source_document_id": "scene_001",
+                "source_document_id": source_document_id,
                 "section_id": None,
                 "chapter_id": None,
                 "scene_id": "scene_001",
@@ -178,10 +184,12 @@ def valid_review_candidate_record() -> dict[str, Any]:
     )
 
 
-def valid_review_queue_entry(candidate: dict[str, Any]) -> dict[str, Any]:
+def valid_review_queue_entry(
+    candidate: dict[str, Any], queue_entry_id: str = QUEUE_ENTRY_ID
+) -> dict[str, Any]:
     entry = candidate_review_gate.build_review_queue_entry(candidate, project_id=PROJECT_ID)
     entry.update(
-        queue_entry_id=QUEUE_ENTRY_ID,
+        queue_entry_id=queue_entry_id,
         review_status="pending",
         lifecycle_state="owner_review_pending",
         evidence_summary="Evidence summary",
@@ -232,6 +240,13 @@ def review_command_payload(action_type: str, **overrides: Any) -> dict[str, Any]
             "request_more_evidence": {"owner_note": "Need more supporting evidence."},
             "defer": {"owner_note": "Defer for later owner review."},
             "reject": {"owner_note": "Reject after owner review."},
+            "mark_duplicate": {
+                "owner_note": "Owner marks this as a duplicate candidate.",
+                "duplicate_candidate_ids": [TARGET_CANDIDATE_ID],
+                "duplicate_target_queue_entry_id": TARGET_QUEUE_ENTRY_ID,
+                "duplicate_target_expected_review_status": "pending",
+                "duplicate_target_expected_version": 0,
+            },
             "quarantine": {"owner_note": "The supporting evidence is invalid."},
             "update_owner_note": {"owner_note": "Owner-authored review note."},
             "set_review_status": {
@@ -382,9 +397,17 @@ def test_review_queue_actions_do_not_mutate_approved_memory_or_canon(
     project_manager.create_project("Example", projects_dir=tmp_path)
     project_dir = (tmp_path / PROJECT_ID).resolve()
     candidate = valid_review_candidate_record()
+    target_candidate = valid_review_candidate_record(
+        TARGET_CANDIDATE_ID, "scene_002"
+    )
     candidate_persistence.write_candidate_record(project_dir, candidate)
+    candidate_persistence.write_candidate_record(project_dir, target_candidate)
     review_queue_storage.write_review_queue_entry(
         valid_review_queue_entry(candidate), project_dir=project_dir
+    )
+    review_queue_storage.write_review_queue_entry(
+        valid_review_queue_entry(target_candidate, TARGET_QUEUE_ENTRY_ID),
+        project_dir=project_dir,
     )
     runtime_dir = tmp_path / "runtime"
     runtime_dir.mkdir(mode=0o700)

@@ -187,6 +187,48 @@ def test_all_four_complete_closed_event_schemas_validate():
     )
 
 
+def test_duplicate_intent_requires_explicit_command_and_audited_target_linkage():
+    target = _queue_entry()
+    target.update(
+        review_status="duplicate",
+        lifecycle_state="duplicate_candidate",
+        duplicate_candidate_ids=["core_candidate_target_001"],
+        duplicate_target_queue_entry_id="review_queue_entry_target_001",
+        duplicate_target_review_status="pending",
+        duplicate_target_lifecycle_state="owner_review_pending",
+        duplicate_target_review_version=0,
+        owner_review_completed=True,
+        owner_reviewed_at=COMPLETED_AT,
+    )
+    target = review_queue_storage.validate_review_queue_entry(target)
+    raw = apply_contract.canonical_json_bytes(target)
+    encoded = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    values = {
+        "sequence": 1,
+        "previous_event_hash": None,
+        "project_id": PROJECT_ID,
+        "queue_entry_id": QUEUE_ENTRY_ID,
+        "candidate_record_id": CANDIDATE_ID,
+        "action_command": "mark_duplicate",
+        "action_id": ACTION_ID,
+        "idempotency_key": IDEMPOTENCY_KEY,
+        "request_hash": REQUEST_HASH,
+        "created_at": CREATED_AT,
+        "queue_before_hash": QUEUE_BEFORE_HASH,
+        "target_queue_canonical_bytes_b64url": encoded,
+        "target_queue_hash": hashlib.sha256(raw).hexdigest(),
+        "candidate_before_hash": CANDIDATE_HASH,
+        "evidence_projection_before_hash": EVIDENCE_HASH,
+    }
+    intent = review_action_events.build_action_intent_event_v1(**values)
+    assert intent["action_command"] == "mark_duplicate"
+
+    with pytest.raises(ValueError):
+        review_action_events.build_action_intent_event_v1(
+            **{**values, "action_command": "set_review_status"}
+        )
+
+
 def test_each_event_schema_rejects_missing_unknown_wrong_type_and_invalid_null_fields():
     intent = _intent()
     failed = _failed(intent)

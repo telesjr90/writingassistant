@@ -37,6 +37,7 @@ _ACTION_COMMANDS = frozenset(
         "request_more_evidence",
         "defer",
         "reject",
+        "mark_duplicate",
         "quarantine",
         "update_owner_note",
         "set_review_status",
@@ -333,6 +334,24 @@ def _validate_intent(event) -> None:
     ):
         if event[event_field] != validated_target[target_field]:
             raise ValueError("target queue linkage mismatch")
+    target_pair = (
+        validated_target["review_status"],
+        validated_target["lifecycle_state"],
+    )
+    if event["action_command"] == "mark_duplicate":
+        if target_pair != ("duplicate", "duplicate_candidate"):
+            raise ValueError("invalid duplicate action target")
+        if (
+            not isinstance(validated_target.get("duplicate_candidate_ids"), list)
+            or len(validated_target["duplicate_candidate_ids"]) != 1
+            or validated_target.get("duplicate_target_queue_entry_id") is None
+            or validated_target.get("duplicate_target_review_status") is None
+            or validated_target.get("duplicate_target_lifecycle_state") is None
+            or validated_target.get("duplicate_target_review_version") is None
+        ):
+            raise ValueError("invalid duplicate action linkage")
+    elif target_pair == ("duplicate", "duplicate_candidate"):
+        raise ValueError("duplicate target requires mark_duplicate action")
 
 
 def _validate_completed(event, *, intent) -> None:

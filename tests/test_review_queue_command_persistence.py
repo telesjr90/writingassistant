@@ -21,6 +21,8 @@ from backend.story_knowledge import (
 PROJECT_ID = "example"
 QUEUE_ENTRY_ID = "review_queue_entry_command_001"
 CANDIDATE_ID = "core_candidate_command_001"
+TARGET_QUEUE_ENTRY_ID = "review_queue_entry_command_target_001"
+TARGET_CANDIDATE_ID = "core_candidate_command_target_001"
 NOW = "2026-08-09T20:00:00Z"
 STATE_PAIRS = (
     ("pending", "draft_ready_for_review"),
@@ -36,10 +38,13 @@ STATE_PAIRS = (
 )
 
 
-def candidate() -> dict:
+def candidate(
+    candidate_id: str = CANDIDATE_ID,
+    source_document_id: str = "scene_001",
+) -> dict:
     return candidate_record.validate_candidate_record(
         {
-            "candidate_id": CANDIDATE_ID,
+            "candidate_id": candidate_id,
             "project_id": PROJECT_ID,
             "candidate_type": "character_candidate",
             "status": "candidate",
@@ -47,7 +52,7 @@ def candidate() -> dict:
             "source_locator": {
                 "project_id": PROJECT_ID,
                 "source_document_type": "scene",
-                "source_document_id": "scene_001",
+                "source_document_id": source_document_id,
                 "section_id": None,
                 "chapter_id": None,
                 "scene_id": "scene_001",
@@ -98,6 +103,21 @@ def queue_entry(pair=("pending", "owner_review_pending"), **overrides) -> dict:
     return review_queue_storage.validate_review_queue_entry(entry)
 
 
+def duplicate_target_queue_entry(**overrides) -> dict:
+    target_candidate = candidate(TARGET_CANDIDATE_ID, "scene_002")
+    entry = candidate_review_gate.build_review_queue_entry(
+        target_candidate, project_id=PROJECT_ID
+    )
+    entry.update(
+        queue_entry_id=TARGET_QUEUE_ENTRY_ID,
+        review_status="pending",
+        lifecycle_state="owner_review_pending",
+        review_version=0,
+    )
+    entry.update(overrides)
+    return review_queue_storage.validate_review_queue_entry(entry)
+
+
 def command(action: str, **overrides) -> dict:
     payload = {
         "action_type": action,
@@ -116,6 +136,13 @@ def command(action: str, **overrides) -> dict:
         "request_more_evidence": {"owner_note": "Need more support"},
         "defer": {"owner_note": "Defer for owner review"},
         "reject": {"owner_note": "Reject after review"},
+        "mark_duplicate": {
+            "owner_note": "Merge duplicate into the selected candidate",
+            "duplicate_candidate_ids": [TARGET_CANDIDATE_ID],
+            "duplicate_target_queue_entry_id": TARGET_QUEUE_ENTRY_ID,
+            "duplicate_target_expected_review_status": "pending",
+            "duplicate_target_expected_version": 0,
+        },
         "quarantine": {"owner_note": "Support is invalid"},
         "update_owner_note": {"owner_note": "Updated owner note"},
         "set_review_status": {
@@ -136,7 +163,13 @@ def persisted_project(tmp_path: Path) -> tuple[Path, Path]:
     project_manager.create_project("Example", projects_dir=projects)
     project_dir = (projects / PROJECT_ID).resolve()
     candidate_persistence.write_candidate_record(project_dir, candidate())
+    candidate_persistence.write_candidate_record(
+        project_dir, candidate(TARGET_CANDIDATE_ID, "scene_002")
+    )
     review_queue_storage.write_review_queue_entry(queue_entry(), project_dir=project_dir)
+    review_queue_storage.write_review_queue_entry(
+        duplicate_target_queue_entry(), project_dir=project_dir
+    )
     runtime = tmp_path / "runtime"
     runtime.mkdir(mode=0o700)
     return project_dir, runtime
@@ -150,19 +183,33 @@ def test_each_command_accepts_only_its_allowed_source_pairs(action: str) -> None
         if action == "set_review_status" and pair == ("archived", "archived_without_promotion"):
             cmd = command(action, target_review_status="pending", owner_note=None)
         if pair in accepted:
-            review_api.compute_review_queue_transition(queue_entry(pair), cmd, command_time=NOW)
+            review_api.compute_review_queue_transition(
+                queue_entry(pair),
+                cmd,
+                command_time=NOW,
+                duplicate_target=duplicate_target_queue_entry()
+                if action == "mark_duplicate"
+                else None,
+            )
         else:
             with pytest.raises(review_api.ReviewActionUnprocessable):
-                review_api.compute_review_queue_transition(queue_entry(pair), cmd, command_time=NOW)
+                review_api.compute_review_queue_transition(
+                    queue_entry(pair),
+                    cmd,
+                    command_time=NOW,
+                    duplicate_target=duplicate_target_queue_entry()
+                    if action == "mark_duplicate"
+                    else None,
+                )
 
 
 def test_set_review_status_derives_exact_target_pairs_and_archive_rule() -> None:
     for status, pair in review_api._TARGET_STATE_PAIRS.items():
+        if status == "duplicate":
+            continue
         extras = {}
         if status not in {"pending", "archived"}:
             extras["owner_note"] = "Owner disposition"
-        if status == "duplicate":
-            extras["duplicate_candidate_ids"] = ["core_candidate_other_001"]
         if status == "superseded":
             extras["superseded_by_candidate_id"] = "core_candidate_other_001"
         result = review_api.compute_review_queue_transition(
@@ -174,6 +221,14 @@ def test_set_review_status_derives_exact_target_pairs_and_archive_rule() -> None
             queue_entry(("archived", "archived_without_promotion")),
             command("set_review_status", target_review_status="rejected", owner_note="No"),
             command_time=NOW,
+        )
+
+    with pytest.raises(review_api.ReviewActionUnprocessable):
+        command(
+            "set_review_status",
+            target_review_status="duplicate",
+            duplicate_candidate_ids=[TARGET_CANDIDATE_ID],
+            owner_note="Duplicate",
         )
 
 
@@ -189,14 +244,19 @@ def test_each_target_sets_preserves_and_clears_exact_fields() -> None:
     )
     result = review_api.compute_review_queue_transition(
         source,
-        command("set_review_status", target_review_status="duplicate", duplicate_candidate_ids=["core_candidate_other_001"], owner_note="Duplicate"),
+        command("mark_duplicate"),
         command_time=NOW,
+        duplicate_target=duplicate_target_queue_entry(),
     )
-    assert result["duplicate_candidate_ids"] == ["core_candidate_other_001"]
+    assert result["duplicate_candidate_ids"] == [TARGET_CANDIDATE_ID]
+    assert result["duplicate_target_queue_entry_id"] == TARGET_QUEUE_ENTRY_ID
+    assert result["duplicate_target_review_status"] == "pending"
+    assert result["duplicate_target_lifecycle_state"] == "owner_review_pending"
+    assert result["duplicate_target_review_version"] == 0
     for field in ("superseded_by_candidate_id", "rejected_output_reason", "insufficient_evidence_reason", "quarantine_note"):
         assert result[field] is None
-    assert result["owner_review_completed"] is False
-    assert result["owner_reviewed_at"] is None
+    assert result["owner_review_completed"] is True
+    assert result["owner_reviewed_at"] == NOW
     assert result["rationale"] == source["rationale"]
 
 

@@ -66,6 +66,9 @@ _COMMAND_OPTIONAL_FIELDS = {
     "target_lifecycle_state",
     "related_candidate_ids",
     "duplicate_candidate_ids",
+    "duplicate_target_queue_entry_id",
+    "duplicate_target_expected_review_status",
+    "duplicate_target_expected_version",
     "superseded_by_candidate_id",
     "requested_evidence_note",
     "command_metadata",
@@ -97,6 +100,7 @@ _ID_FIELDS = {
     "actor_id",
     "actor_ref",
     "superseded_by_candidate_id",
+    "duplicate_target_queue_entry_id",
 }
 
 _ID_LIST_FIELDS = {
@@ -132,6 +136,11 @@ _ENTRY_RESPONSE_FIELDS = (
     "insufficient_evidence_reason",
     "owner_review_completed",
     "owner_reviewed_at",
+    "duplicate_candidate_ids",
+    "duplicate_target_queue_entry_id",
+    "duplicate_target_review_status",
+    "duplicate_target_lifecycle_state",
+    "duplicate_target_review_version",
 )
 
 _ENTRY_FILTER_FIELDS = (
@@ -166,6 +175,7 @@ _REVIEW_ACTION_ALLOWED_COMMANDS = {
     "request_more_evidence",
     "defer",
     "reject",
+    "mark_duplicate",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -232,6 +242,9 @@ _REVIEW_ACTION_COMMAND_FIELDS = frozenset(
     {
         "target_review_status",
         "duplicate_candidate_ids",
+        "duplicate_target_queue_entry_id",
+        "duplicate_target_expected_review_status",
+        "duplicate_target_expected_version",
         "superseded_by_candidate_id",
         "owner_note",
         "rationale",
@@ -321,6 +334,14 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
             ("deferred", "owner_reviewed_deferred"),
         }
     ),
+    "mark_duplicate": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
     "quarantine": frozenset(
         {
             ("pending", "draft_ready_for_review"),
@@ -330,7 +351,10 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
     ),
     "update_owner_note": _VALID_REVIEW_STATE_PAIRS,
     "set_review_status": _VALID_REVIEW_STATE_PAIRS
-    - {("approved", "owner_reviewed_approved")},
+    - {
+        ("approved", "owner_reviewed_approved"),
+        ("duplicate", "duplicate_candidate"),
+    },
 }
 _COMMAND_FIELD_RULES = {
     "approve": (frozenset({"owner_note"}), frozenset({"rationale"})),
@@ -343,6 +367,18 @@ _COMMAND_FIELD_RULES = {
     "reject": (
         frozenset({"owner_note"}),
         frozenset({"rationale", "rejected_output_reason"}),
+    ),
+    "mark_duplicate": (
+        frozenset(
+            {
+                "owner_note",
+                "duplicate_candidate_ids",
+                "duplicate_target_queue_entry_id",
+                "duplicate_target_expected_review_status",
+                "duplicate_target_expected_version",
+            }
+        ),
+        frozenset({"rationale"}),
     ),
     "quarantine": (
         frozenset({"owner_note"}),
@@ -364,6 +400,9 @@ _CANONICAL_REQUEST_FIELDS = (
     "expected_current_version",
     "target_review_status",
     "duplicate_candidate_ids",
+    "duplicate_target_queue_entry_id",
+    "duplicate_target_expected_review_status",
+    "duplicate_target_expected_version",
     "superseded_by_candidate_id",
     "owner_note",
     "rationale",
@@ -381,6 +420,15 @@ _EVIDENCE_PROVENANCE_PROJECTION_FIELDS = (
     "raw_output_refs",
 )
 _MAX_REVIEW_VERSION = 2_147_483_647
+_DUPLICATE_TARGET_ALLOWED_STATE_PAIRS = frozenset(
+    {
+        ("pending", "draft_ready_for_review"),
+        ("pending", "owner_review_pending"),
+        ("needs_info", "needs_more_evidence"),
+        ("approved", "owner_reviewed_approved"),
+        ("deferred", "owner_reviewed_deferred"),
+    }
+)
 
 
 class ReviewActionCommandError(ValueError):
@@ -513,6 +561,7 @@ def _check_command_text_fields(request: dict[str, Any]) -> None:
         "previous_lifecycle_state",
         "target_review_status",
         "target_lifecycle_state",
+        "duplicate_target_expected_review_status",
     ):
         if field in request:
             _require_safe_text_id(request[field])
@@ -835,6 +884,8 @@ def _require_uuid4(value: Any) -> str:
 def _set_review_status_field_rules(target: Any) -> tuple[frozenset[str], frozenset[str]]:
     if target not in _TARGET_STATE_PAIRS:
         raise ValueError("invalid target review status")
+    if target == "duplicate":
+        raise ValueError("duplicate requires mark_duplicate")
     required = {"target_review_status"}
     optional = {"rationale"}
     if target in {"pending", "archived"}:
@@ -845,8 +896,6 @@ def _set_review_status_field_rules(target: Any) -> tuple[frozenset[str], frozens
         optional.add("insufficient_evidence_reason")
     elif target == "rejected":
         optional.add("rejected_output_reason")
-    elif target == "duplicate":
-        required.add("duplicate_candidate_ids")
     elif target == "superseded":
         required.add("superseded_by_candidate_id")
     return frozenset(required), frozenset(optional)
@@ -1054,12 +1103,29 @@ def validate_review_action_command_request(
             raise ValueError("owner_note is required")
         if "duplicate_candidate_ids" in required:
             duplicate_ids = value["duplicate_candidate_ids"]
-            if not isinstance(duplicate_ids, list) or not duplicate_ids:
+            if not isinstance(duplicate_ids, list) or len(duplicate_ids) != 1:
                 raise ValueError("duplicate candidate IDs are required")
             for duplicate_id in duplicate_ids:
                 _safe_id(duplicate_id)
             if len(set(duplicate_ids)) != len(duplicate_ids):
                 raise ValueError("duplicate candidate IDs must be unique")
+            if duplicate_ids[0] == value["candidate_id"]:
+                raise ValueError("candidate cannot duplicate itself")
+            target_queue_entry_id = _safe_id(
+                value["duplicate_target_queue_entry_id"]
+            )
+            if target_queue_entry_id == value["queue_entry_id"]:
+                raise ValueError("queue entry cannot duplicate itself")
+            target_status = value["duplicate_target_expected_review_status"]
+            if target_status not in _REVIEW_STATUSES:
+                raise ValueError("invalid duplicate target status")
+            target_version = value["duplicate_target_expected_version"]
+            if (
+                isinstance(target_version, bool)
+                or not isinstance(target_version, int)
+                or not 0 <= target_version <= _MAX_REVIEW_VERSION
+            ):
+                raise ValueError("invalid duplicate target version")
         if "superseded_by_candidate_id" in required:
             superseding_id = _safe_id(value["superseded_by_candidate_id"])
             if superseding_id == value["candidate_id"]:
@@ -1103,6 +1169,15 @@ def build_canonical_review_action_request_record(
         "target_review_status": validated_request.get("target_review_status"),
         "duplicate_candidate_ids": deepcopy(
             validated_request.get("duplicate_candidate_ids")
+        ),
+        "duplicate_target_queue_entry_id": validated_request.get(
+            "duplicate_target_queue_entry_id"
+        ),
+        "duplicate_target_expected_review_status": validated_request.get(
+            "duplicate_target_expected_review_status"
+        ),
+        "duplicate_target_expected_version": validated_request.get(
+            "duplicate_target_expected_version"
         ),
         "superseded_by_candidate_id": validated_request.get(
             "superseded_by_candidate_id"
@@ -1154,6 +1229,8 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
         raise ValueError("invalid canonical request record")
     for field in (
         "target_review_status",
+        "duplicate_target_queue_entry_id",
+        "duplicate_target_expected_review_status",
         "superseded_by_candidate_id",
         "owner_note",
         "rationale",
@@ -1174,6 +1251,13 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
             if not isinstance(item, str):
                 raise ValueError("invalid canonical request record")
             _require_unicode_scalar_text(item, maximum=max(len(item), 1), allow_null=False)
+    duplicate_target_version = ordered["duplicate_target_expected_version"]
+    if duplicate_target_version is not None and (
+        isinstance(duplicate_target_version, bool)
+        or not isinstance(duplicate_target_version, int)
+        or not 0 <= duplicate_target_version <= _MAX_REVIEW_VERSION
+    ):
+        raise ValueError("invalid canonical request record")
     return json.dumps(
         ordered,
         ensure_ascii=False,
@@ -1196,11 +1280,61 @@ def _transition_error(command: dict[str, Any], message: str) -> ReviewActionUnpr
     )
 
 
+def _validated_duplicate_target(
+    source: dict[str, Any],
+    command: dict[str, Any],
+    duplicate_target: Any,
+) -> dict[str, Any]:
+    try:
+        target = review_queue_storage.validate_review_queue_entry(duplicate_target)
+    except (TypeError, ValueError) as exc:
+        raise _transition_error(command, "invalid duplicate target queue entry") from exc
+    target_candidate_ids = command.get("duplicate_candidate_ids")
+    if (
+        not isinstance(target_candidate_ids, list)
+        or len(target_candidate_ids) != 1
+        or target["queue_entry_id"] != command.get("duplicate_target_queue_entry_id")
+        or target["candidate_record_id"] != target_candidate_ids[0]
+        or target["project_id"] != source["project_id"]
+        or target["queue_entry_id"] == source["queue_entry_id"]
+        or target["candidate_record_id"] == source["candidate_record_id"]
+        or target["candidate_type"] != source["candidate_type"]
+        or target["target_category"] != source["target_category"]
+    ):
+        raise _transition_error(command, "duplicate source/target linkage mismatch")
+    if (
+        target["review_status"]
+        != command.get("duplicate_target_expected_review_status")
+        or target["review_version"]
+        != command.get("duplicate_target_expected_version")
+    ):
+        raise _command_error(
+            ReviewActionConflict,
+            "stale duplicate target status or version",
+            error_code="REVIEW_ACTION_STALE_DUPLICATE_TARGET",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        )
+    target_pair = (target["review_status"], target["lifecycle_state"])
+    if target_pair not in _DUPLICATE_TARGET_ALLOWED_STATE_PAIRS:
+        raise _command_error(
+            ReviewActionConflict,
+            "duplicate target is not eligible",
+            error_code="REVIEW_ACTION_DUPLICATE_TARGET_CONFLICT",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        )
+    return target
+
+
 def compute_review_queue_transition(
     queue_entry: dict[str, Any],
     command: dict[str, Any],
     *,
     command_time: str,
+    duplicate_target: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     try:
         source = review_queue_storage.validate_review_queue_entry(queue_entry)
@@ -1239,6 +1373,13 @@ def compute_review_queue_transition(
         target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
             "rejected"
         ]
+    elif action == "mark_duplicate":
+        duplicate_target = _validated_duplicate_target(
+            source, command, duplicate_target
+        )
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            "duplicate"
+        ]
     elif action == "quarantine":
         target["review_status"], target["lifecycle_state"] = (
             "needs_info",
@@ -1250,6 +1391,10 @@ def compute_review_queue_transition(
         target_pair = (target["review_status"], target["lifecycle_state"])
         for field in (
             "duplicate_candidate_ids",
+            "duplicate_target_queue_entry_id",
+            "duplicate_target_review_status",
+            "duplicate_target_lifecycle_state",
+            "duplicate_target_review_version",
             "superseded_by_candidate_id",
             "rejected_output_reason",
             "insufficient_evidence_reason",
@@ -1285,12 +1430,24 @@ def compute_review_queue_transition(
             target["duplicate_candidate_ids"] = deepcopy(
                 command["duplicate_candidate_ids"]
             )
+            target["duplicate_target_queue_entry_id"] = duplicate_target[
+                "queue_entry_id"
+            ]
+            target["duplicate_target_review_status"] = duplicate_target[
+                "review_status"
+            ]
+            target["duplicate_target_lifecycle_state"] = duplicate_target[
+                "lifecycle_state"
+            ]
+            target["duplicate_target_review_version"] = duplicate_target[
+                "review_version"
+            ]
         elif target_pair == ("superseded", "superseded_candidate"):
             target["superseded_by_candidate_id"] = command[
                 "superseded_by_candidate_id"
             ]
 
-    if action in {"approve", "reject"}:
+    if action in {"approve", "reject", "mark_duplicate"}:
         target["owner_review_completed"] = True
         target["owner_reviewed_at"] = command_time
     elif action == "mark_reviewed":
@@ -1524,11 +1681,30 @@ def _build_success_response(
         "insufficient_evidence_reason": queue_entry.get(
             "insufficient_evidence_reason"
         ),
+        "duplicate_candidate_ids": deepcopy(
+            queue_entry.get("duplicate_candidate_ids")
+        ),
+        "duplicate_target_queue_entry_id": queue_entry.get(
+            "duplicate_target_queue_entry_id"
+        ),
+        "duplicate_target_review_status": queue_entry.get(
+            "duplicate_target_review_status"
+        ),
+        "duplicate_target_lifecycle_state": queue_entry.get(
+            "duplicate_target_lifecycle_state"
+        ),
+        "duplicate_target_review_version": queue_entry.get(
+            "duplicate_target_review_version"
+        ),
         "completion_event_hash": completion["event_hash"],
         "review_workflow_state": {
             "approval_scope": "review_lifecycle_metadata_only",
+            "duplicate_linkage_scope": "review_lifecycle_metadata_only",
             "is_canon": False,
             "candidate_record_mutation_performed": False,
+            "target_candidate_mutation_performed": False,
+            "source_candidate_deleted": False,
+            "content_merge_performed": False,
             "promotion_created": False,
             "apply_promotion_performed": False,
             "memory_canon_mutation_performed": False,
@@ -2019,9 +2195,56 @@ def execute_review_action_command(
                     request=valid,
                 ) from exc
 
+            duplicate_target = None
+            if valid["action_type"] == "mark_duplicate":
+                target_queue_entry_id = valid["duplicate_target_queue_entry_id"]
+                try:
+                    duplicate_target = review_queue_storage.read_review_queue_entry(
+                        target_queue_entry_id,
+                        project_dir=resolved_project_dir,
+                    )
+                except (OSError, TypeError, ValueError) as exc:
+                    target_path = review_queue_storage.review_queue_entry_path(
+                        resolved_project_dir, target_queue_entry_id
+                    )
+                    error_type = (
+                        ReviewActionNotFound
+                        if not target_path.exists()
+                        else ReviewActionUnprocessable
+                    )
+                    raise _command_error(
+                        error_type,
+                        "duplicate target queue entry was not found"
+                        if error_type is ReviewActionNotFound
+                        else "duplicate target queue entry is invalid",
+                        error_code="REVIEW_ACTION_DUPLICATE_TARGET_NOT_FOUND"
+                        if error_type is ReviewActionNotFound
+                        else "REVIEW_ACTION_INVALID_DUPLICATE_TARGET",
+                        project_id=project_id,
+                        queue_entry_id=queue_entry_id,
+                        request=valid,
+                    ) from exc
+                try:
+                    _linked_candidate_bytes_and_hash(
+                        duplicate_target, project_dir=resolved_project_dir
+                    )
+                    _evidence_provenance_projection_hash(duplicate_target)
+                except (OSError, TypeError, ValueError) as exc:
+                    raise _command_error(
+                        ReviewActionUnprocessable,
+                        "duplicate target candidate or support linkage is invalid",
+                        error_code="REVIEW_ACTION_INVALID_DUPLICATE_TARGET",
+                        project_id=project_id,
+                        queue_entry_id=queue_entry_id,
+                        request=valid,
+                    ) from exc
+
             command_time = _utc_now()
             target = compute_review_queue_transition(
-                queue_entry, valid, command_time=command_time
+                queue_entry,
+                valid,
+                command_time=command_time,
+                duplicate_target=duplicate_target,
             )
             target_bytes = _canonical_queue_bytes(target)
             target_hash = hashlib.sha256(target_bytes).hexdigest()
@@ -2121,6 +2344,31 @@ def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
             _safe_id(value[field])
     _check_id_lists(value)
     _check_command_text_fields(value)
+    if value["action_command"] == "mark_duplicate":
+        required = {
+            "duplicate_candidate_ids",
+            "duplicate_target_queue_entry_id",
+            "duplicate_target_expected_review_status",
+            "duplicate_target_expected_version",
+        }
+        if not required <= set(value):
+            raise ValueError("invalid request")
+        duplicate_ids = value["duplicate_candidate_ids"]
+        if (
+            len(duplicate_ids) != 1
+            or duplicate_ids[0] == value["candidate_record_id"]
+            or value["duplicate_target_queue_entry_id"] == value["queue_entry_id"]
+            or value["duplicate_target_expected_review_status"]
+            not in _REVIEW_STATUSES
+        ):
+            raise ValueError("invalid request")
+        target_version = value["duplicate_target_expected_version"]
+        if (
+            isinstance(target_version, bool)
+            or not isinstance(target_version, int)
+            or not 0 <= target_version <= _MAX_REVIEW_VERSION
+        ):
+            raise ValueError("invalid request")
     return _copy_mapping(value)
 
 

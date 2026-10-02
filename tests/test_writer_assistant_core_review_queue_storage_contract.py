@@ -687,6 +687,20 @@ def test_validate_entry_validates_disposition_linkage_fields():
     assert result["duplicate_candidate_ids"] == duplicate_ids
     assert result["superseded_by_candidate_id"] == "candidate_004"
 
+    duplicate = review_queue_storage.validate_review_queue_entry(
+        build_valid_queue_entry(
+            review_status="duplicate",
+            lifecycle_state="duplicate_candidate",
+            duplicate_candidate_ids=["candidate_002"],
+            duplicate_target_queue_entry_id="queue_entry_002",
+            duplicate_target_review_status="approved",
+            duplicate_target_lifecycle_state="owner_reviewed_approved",
+            duplicate_target_review_version=4,
+        )
+    )
+    assert duplicate["duplicate_target_queue_entry_id"] == "queue_entry_002"
+    assert duplicate["duplicate_target_review_version"] == 4
+
     for invalid in ([], ["candidate_002", "candidate_002"], ["../escape"], "candidate_002"):
         with pytest.raises(ValueError):
             review_queue_storage.validate_review_queue_entry(
@@ -697,6 +711,33 @@ def test_validate_entry_validates_disposition_linkage_fields():
             review_queue_storage.validate_review_queue_entry(
                 build_valid_queue_entry(superseded_by_candidate_id=invalid)
             )
+    for overrides in (
+        {"duplicate_candidate_ids": [SAFE_CANDIDATE_ID]},
+        {"duplicate_target_queue_entry_id": SAFE_QUEUE_ENTRY_ID},
+        {
+            "duplicate_target_queue_entry_id": "queue_entry_002",
+            "duplicate_candidate_ids": ["candidate_002"],
+        },
+    ):
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(
+                build_valid_queue_entry(**overrides)
+            )
+
+    for overrides in (
+        {"duplicate_candidate_ids": ["../escape"]},
+        {"duplicate_target_queue_entry_id": "../escape"},
+    ):
+        action = build_valid_owner_action_record(
+            action_command="mark_duplicate",
+            resulting_review_status="duplicate",
+            resulting_lifecycle_state="duplicate_candidate",
+            duplicate_candidate_ids=["candidate_002"],
+            duplicate_target_queue_entry_id="queue_entry_002",
+        )
+        action.update(overrides)
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_owner_action_record(action)
 
 
 @pytest.mark.parametrize("bad_status", ("promoted", "canon", "unknown_status"))
@@ -1144,8 +1185,14 @@ def test_validate_owner_action_accepts_allowed_commands(command):
         "request_more_evidence": ("needs_info", "needs_more_evidence"),
         "mark_needs_info": ("needs_info", "needs_more_evidence"),
         "reject_candidate": ("rejected", "owner_reviewed_rejected"),
+        "mark_duplicate": ("duplicate", "duplicate_candidate"),
     }
     action = build_valid_owner_action_record(action_command=command)
+    if command == "mark_duplicate":
+        action.update(
+            duplicate_candidate_ids=["candidate_002"],
+            duplicate_target_queue_entry_id="queue_entry_002",
+        )
     if command in result_pairs:
         action["resulting_review_status"], action["resulting_lifecycle_state"] = (
             result_pairs[command]

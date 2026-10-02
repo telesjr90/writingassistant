@@ -118,20 +118,27 @@ def tree_snapshot(root: Path) -> dict[str, bytes]:
     }
 
 
-def test_canonical_request_record_has_exact_19_fields_and_bytes() -> None:
+def test_canonical_request_record_has_exact_22_fields_and_bytes() -> None:
     record = review_api.build_canonical_review_action_request_record(
         validated(), project_id=PROJECT_ID, queue_entry_id=QUEUE_ENTRY_ID
     )
     assert tuple(record) == review_api._CANONICAL_REQUEST_FIELDS
-    assert len(record) == 19
+    assert len(record) == 22
     raw = review_api.canonical_review_action_request_bytes(record)
     assert raw == json.dumps(record, ensure_ascii=False, separators=(",", ":")).encode()
     assert not raw.endswith(b"\n")
 
 
 def test_canonical_request_missing_null_unicode_integer_and_array_order_cases() -> None:
-    first = payload(action_type="set_review_status", target_review_status="duplicate", owner_note=" Café e\u0301 ", duplicate_candidate_ids=["core_candidate_b", "core_candidate_a"])
-    second = dict(first, duplicate_candidate_ids=["core_candidate_a", "core_candidate_b"])
+    first = payload(
+        action_type="mark_duplicate",
+        owner_note=" Café e\u0301 ",
+        duplicate_candidate_ids=["core_candidate_b"],
+        duplicate_target_queue_entry_id="review_queue_entry_b",
+        duplicate_target_expected_review_status="pending",
+        duplicate_target_expected_version=0,
+    )
+    second = dict(first, duplicate_candidate_ids=["core_candidate_a"])
     record = review_api.build_canonical_review_action_request_record(validated(first), project_id=PROJECT_ID, queue_entry_id=QUEUE_ENTRY_ID)
     explicit_null = dict(first, rationale=None)
     null_record = review_api.build_canonical_review_action_request_record(validated(explicit_null), project_id=PROJECT_ID, queue_entry_id=QUEUE_ENTRY_ID)
@@ -142,7 +149,7 @@ def test_canonical_request_missing_null_unicode_integer_and_array_order_cases() 
     with pytest.raises(review_api.ReviewActionUnprocessable):
         validated(payload(expected_current_version=True))
     with pytest.raises(review_api.ReviewActionUnprocessable):
-        validated(dict(first, duplicate_candidate_ids=["core_candidate_a", "core_candidate_a"]))
+        validated(dict(first, duplicate_candidate_ids=["core_candidate_a", "core_candidate_b"]))
 
 
 def test_idempotency_key_and_transport_fields_are_excluded_from_request_hash() -> None:

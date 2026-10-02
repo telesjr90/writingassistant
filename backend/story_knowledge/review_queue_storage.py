@@ -50,6 +50,10 @@ _OPTIONAL_ENTRY_FIELDS = frozenset(
         "related_candidate_ids",
         "conflict_candidate_ids",
         "duplicate_candidate_ids",
+        "duplicate_target_queue_entry_id",
+        "duplicate_target_review_status",
+        "duplicate_target_lifecycle_state",
+        "duplicate_target_review_version",
         "insufficient_evidence_reason",
         "rejected_output_reason",
         "review_version",
@@ -146,6 +150,10 @@ _OWNER_ACTION_OPTIONAL = frozenset(
         "previous_lifecycle_state",
         "related_candidate_ids",
         "duplicate_candidate_ids",
+        "duplicate_target_queue_entry_id",
+        "duplicate_target_review_status",
+        "duplicate_target_lifecycle_state",
+        "duplicate_target_review_version",
         "superseded_by_candidate_id",
         "requested_evidence_note",
         "action_batch_id",
@@ -177,6 +185,7 @@ _OWNER_ACTION_COMMAND_RESULT_PAIRS = {
     "request_more_evidence": ("needs_info", "needs_more_evidence"),
     "mark_needs_info": ("needs_info", "needs_more_evidence"),
     "reject_candidate": ("rejected", "owner_reviewed_rejected"),
+    "mark_duplicate": ("duplicate", "duplicate_candidate"),
 }
 
 _OWNER_ACTION_ID_FIELDS = (
@@ -327,6 +336,42 @@ def validate_review_queue_entry(entry):
             validated_ids = [_require_safe_id(value) for value in duplicate_ids]
             if len(set(validated_ids)) != len(validated_ids):
                 raise ValueError("invalid field")
+            if working["candidate_record_id"] in validated_ids:
+                raise ValueError("invalid field")
+
+    duplicate_target_fields = (
+        "duplicate_target_queue_entry_id",
+        "duplicate_target_review_status",
+        "duplicate_target_lifecycle_state",
+        "duplicate_target_review_version",
+    )
+    supplied_duplicate_target_fields = [
+        field for field in duplicate_target_fields if working.get(field) is not None
+    ]
+    if supplied_duplicate_target_fields:
+        if len(supplied_duplicate_target_fields) != len(duplicate_target_fields):
+            raise ValueError("invalid field")
+        target_queue_entry_id = _require_safe_id(
+            working["duplicate_target_queue_entry_id"]
+        )
+        if target_queue_entry_id == working["queue_entry_id"]:
+            raise ValueError("invalid field")
+        target_pair = (
+            working["duplicate_target_review_status"],
+            working["duplicate_target_lifecycle_state"],
+        )
+        if target_pair not in _VALID_REVIEW_STATE_PAIRS:
+            raise ValueError("invalid field")
+        target_version = working["duplicate_target_review_version"]
+        if (
+            isinstance(target_version, bool)
+            or not isinstance(target_version, int)
+            or not 0 <= target_version <= 2_147_483_647
+        ):
+            raise ValueError("invalid field")
+        duplicate_ids = working.get("duplicate_candidate_ids")
+        if not isinstance(duplicate_ids, list) or len(duplicate_ids) != 1:
+            raise ValueError("invalid field")
 
     if "superseded_by_candidate_id" in working:
         superseding_id = working["superseded_by_candidate_id"]
@@ -605,6 +650,26 @@ def validate_owner_action_record(action):
     )
     if required_result_pair is not None and resulting_pair != required_result_pair:
         raise ValueError("invalid field")
+
+    if "duplicate_candidate_ids" in working:
+        duplicate_ids = working["duplicate_candidate_ids"]
+        if not isinstance(duplicate_ids, list) or not duplicate_ids:
+            raise ValueError("invalid field")
+        validated_ids = [_require_safe_id(value) for value in duplicate_ids]
+        if len(set(validated_ids)) != len(validated_ids):
+            raise ValueError("invalid field")
+    if "duplicate_target_queue_entry_id" in working:
+        _require_safe_id(working["duplicate_target_queue_entry_id"])
+
+    if working["action_command"] == "mark_duplicate":
+        duplicate_ids = working.get("duplicate_candidate_ids")
+        target_queue_entry_id = working.get("duplicate_target_queue_entry_id")
+        if not isinstance(duplicate_ids, list) or len(duplicate_ids) != 1:
+            raise ValueError("invalid field")
+        if duplicate_ids[0] == working["candidate_record_id"]:
+            raise ValueError("invalid field")
+        if _require_safe_id(target_queue_entry_id) == working["queue_entry_id"]:
+            raise ValueError("invalid field")
 
     if working["no_promotion_performed"] is not True:
         raise ValueError("invalid field")
