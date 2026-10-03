@@ -36,6 +36,7 @@ STATE_PAIRS = (
     ("split_required", "incorrect_cluster_split_required"),
     ("correction_recorded", "rename_metadata_recorded"),
     ("correction_recorded", "source_linkage_correction_recorded"),
+    ("correction_recorded", "owner_authored_correction_recorded"),
     ("superseded", "superseded_candidate"),
     ("archived", "archived_without_promotion"),
 )
@@ -95,7 +96,6 @@ def queue_entry(pair=("pending", "owner_review_pending"), **overrides) -> dict:
         owner_note="Existing owner note",
         rationale="Existing rationale",
         duplicate_candidate_ids=None,
-        superseded_by_candidate_id=None,
         rejected_output_reason=None,
         insufficient_evidence_reason=None,
         quarantine_note=None,
@@ -120,6 +120,21 @@ def queue_entry(pair=("pending", "owner_review_pending"), **overrides) -> dict:
                 "source_document_id": "scene_002",
             },
         )
+    elif pair == (
+        "correction_recorded",
+        "owner_authored_correction_recorded",
+    ):
+        entry["owner_authored_correction"] = "Exact owner correction."
+    elif pair == ("superseded", "superseded_candidate"):
+        entry.setdefault("superseded_by_candidate_id", TARGET_CANDIDATE_ID)
+        entry.setdefault(
+            "superseding_target_queue_entry_id", TARGET_QUEUE_ENTRY_ID
+        )
+        entry.setdefault("superseding_target_review_status", "pending")
+        entry.setdefault(
+            "superseding_target_lifecycle_state", "owner_review_pending"
+        )
+        entry.setdefault("superseding_target_review_version", 0)
     return review_queue_storage.validate_review_queue_entry(entry)
 
 
@@ -181,6 +196,19 @@ def command(action: str, **overrides) -> dict:
                 "source_document_id": "scene_002",
             },
         },
+        "mark_superseded": {
+            "owner_note": "Owner supersedes this review candidate",
+            "rationale": "A newer candidate represents the corrected analysis",
+            "superseded_by_candidate_id": TARGET_CANDIDATE_ID,
+            "superseding_target_queue_entry_id": TARGET_QUEUE_ENTRY_ID,
+            "superseding_target_expected_review_status": "pending",
+            "superseding_target_expected_version": 0,
+        },
+        "record_owner_authored_correction": {
+            "owner_note": "Owner records an exact correction",
+            "rationale": "The candidate review metadata needs correction",
+            "owner_authored_correction": "Exact owner correction.",
+        },
         "quarantine": {"owner_note": "Support is invalid"},
         "update_owner_note": {"owner_note": "Updated owner note"},
         "set_review_status": {
@@ -228,6 +256,9 @@ def test_each_command_accepts_only_its_allowed_source_pairs(action: str) -> None
                 duplicate_target=duplicate_target_queue_entry()
                 if action == "mark_duplicate"
                 else None,
+                superseding_target=duplicate_target_queue_entry()
+                if action == "mark_superseded"
+                else None,
             )
         else:
             with pytest.raises(review_api.ReviewActionUnprocessable):
@@ -238,18 +269,19 @@ def test_each_command_accepts_only_its_allowed_source_pairs(action: str) -> None
                     duplicate_target=duplicate_target_queue_entry()
                     if action == "mark_duplicate"
                     else None,
+                    superseding_target=duplicate_target_queue_entry()
+                    if action == "mark_superseded"
+                    else None,
                 )
 
 
 def test_set_review_status_derives_exact_target_pairs_and_archive_rule() -> None:
     for status, pair in review_api._TARGET_STATE_PAIRS.items():
-        if status in {"duplicate", "split_required"}:
+        if status in {"duplicate", "split_required", "superseded"}:
             continue
         extras = {}
         if status not in {"pending", "archived"}:
             extras["owner_note"] = "Owner disposition"
-        if status == "superseded":
-            extras["superseded_by_candidate_id"] = "core_candidate_other_001"
         result = review_api.compute_review_queue_transition(
             queue_entry(), command("set_review_status", target_review_status=status, **extras), command_time=NOW
         )
@@ -270,12 +302,13 @@ def test_set_review_status_derives_exact_target_pairs_and_archive_rule() -> None
         )
     with pytest.raises(review_api.ReviewActionUnprocessable):
         command("set_review_status", target_review_status="split_required")
+    with pytest.raises(review_api.ReviewActionUnprocessable):
+        command("set_review_status", target_review_status="superseded")
 
 
 def test_each_target_sets_preserves_and_clears_exact_fields() -> None:
     source = queue_entry(
         duplicate_candidate_ids=["core_candidate_old_duplicate"],
-        superseded_by_candidate_id="core_candidate_old_superseder",
         rejected_output_reason="old reject",
         insufficient_evidence_reason="old evidence",
         quarantine_note="old quarantine",
@@ -293,8 +326,9 @@ def test_each_target_sets_preserves_and_clears_exact_fields() -> None:
     assert result["duplicate_target_review_status"] == "pending"
     assert result["duplicate_target_lifecycle_state"] == "owner_review_pending"
     assert result["duplicate_target_review_version"] == 0
-    for field in ("superseded_by_candidate_id", "rejected_output_reason", "insufficient_evidence_reason", "quarantine_note"):
+    for field in ("rejected_output_reason", "insufficient_evidence_reason", "quarantine_note"):
         assert result[field] is None
+    assert "superseded_by_candidate_id" not in result
     assert result["owner_review_completed"] is True
     assert result["owner_reviewed_at"] == NOW
     assert result["rationale"] == source["rationale"]

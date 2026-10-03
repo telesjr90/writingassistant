@@ -71,6 +71,10 @@ _COMMAND_OPTIONAL_FIELDS = {
     "duplicate_target_expected_review_status",
     "duplicate_target_expected_version",
     "superseded_by_candidate_id",
+    "superseding_target_queue_entry_id",
+    "superseding_target_expected_review_status",
+    "superseding_target_expected_version",
+    "owner_authored_correction",
     "requested_evidence_note",
     "command_metadata",
     "idempotency_key",
@@ -91,6 +95,7 @@ _COMMAND_NAMES = {
     "rename_candidate_metadata",
     "record_source_linkage_correction",
     "mark_superseded",
+    "record_owner_authored_correction",
     "archive_without_promotion",
     "add_reviewer_note",
     "clear_reviewer_note",
@@ -107,6 +112,7 @@ _ID_FIELDS = {
     "actor_ref",
     "superseded_by_candidate_id",
     "duplicate_target_queue_entry_id",
+    "superseding_target_queue_entry_id",
 }
 
 _ID_LIST_FIELDS = {
@@ -152,6 +158,12 @@ _ENTRY_RESPONSE_FIELDS = (
     "duplicate_target_review_status",
     "duplicate_target_lifecycle_state",
     "duplicate_target_review_version",
+    "superseded_by_candidate_id",
+    "superseding_target_queue_entry_id",
+    "superseding_target_review_status",
+    "superseding_target_lifecycle_state",
+    "superseding_target_review_version",
+    "owner_authored_correction",
 )
 
 _ENTRY_FILTER_FIELDS = (
@@ -190,6 +202,8 @@ _REVIEW_ACTION_ALLOWED_COMMANDS = {
     "mark_split_required",
     "rename_candidate_metadata",
     "record_source_linkage_correction",
+    "mark_superseded",
+    "record_owner_authored_correction",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -260,6 +274,10 @@ _REVIEW_ACTION_COMMAND_FIELDS = frozenset(
         "duplicate_target_expected_review_status",
         "duplicate_target_expected_version",
         "superseded_by_candidate_id",
+        "superseding_target_queue_entry_id",
+        "superseding_target_expected_review_status",
+        "superseding_target_expected_version",
+        "owner_authored_correction",
         "owner_note",
         "rationale",
         "rejected_output_reason",
@@ -301,6 +319,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("split_required", "incorrect_cluster_split_required"),
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
+        ("correction_recorded", "owner_authored_correction_recorded"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -388,6 +407,22 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
             ("deferred", "owner_reviewed_deferred"),
         }
     ),
+    "mark_superseded": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
+    "record_owner_authored_correction": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
     "quarantine": frozenset(
         {
             ("pending", "draft_ready_for_review"),
@@ -403,6 +438,8 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
         ("split_required", "incorrect_cluster_split_required"),
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
+        ("correction_recorded", "owner_authored_correction_recorded"),
+        ("superseded", "superseded_candidate"),
     },
 }
 _COMMAND_FIELD_RULES = {
@@ -441,6 +478,23 @@ _COMMAND_FIELD_RULES = {
         frozenset({"owner_note", "rationale", "requested_source_locator"}),
         frozenset(),
     ),
+    "mark_superseded": (
+        frozenset(
+            {
+                "owner_note",
+                "rationale",
+                "superseded_by_candidate_id",
+                "superseding_target_queue_entry_id",
+                "superseding_target_expected_review_status",
+                "superseding_target_expected_version",
+            }
+        ),
+        frozenset(),
+    ),
+    "record_owner_authored_correction": (
+        frozenset({"owner_note", "rationale", "owner_authored_correction"}),
+        frozenset(),
+    ),
     "quarantine": (
         frozenset({"owner_note"}),
         frozenset({"rationale", "quarantine_note"}),
@@ -465,6 +519,10 @@ _CANONICAL_REQUEST_FIELDS = (
     "duplicate_target_expected_review_status",
     "duplicate_target_expected_version",
     "superseded_by_candidate_id",
+    "superseding_target_queue_entry_id",
+    "superseding_target_expected_review_status",
+    "superseding_target_expected_version",
+    "owner_authored_correction",
     "owner_note",
     "rationale",
     "rejected_output_reason",
@@ -492,6 +550,7 @@ _DUPLICATE_TARGET_ALLOWED_STATE_PAIRS = frozenset(
         ("deferred", "owner_reviewed_deferred"),
     }
 )
+_SUPERSEDING_TARGET_ALLOWED_STATE_PAIRS = _DUPLICATE_TARGET_ALLOWED_STATE_PAIRS
 
 
 class ReviewActionCommandError(ValueError):
@@ -961,7 +1020,7 @@ def _require_uuid4(value: Any) -> str:
 def _set_review_status_field_rules(target: Any) -> tuple[frozenset[str], frozenset[str]]:
     if target not in _TARGET_STATE_PAIRS:
         raise ValueError("invalid target review status")
-    if target in {"duplicate", "split_required"}:
+    if target in {"duplicate", "split_required", "superseded"}:
         raise ValueError("specialized lifecycle state requires its explicit command")
     required = {"target_review_status"}
     optional = {"rationale"}
@@ -1170,6 +1229,7 @@ def validate_review_action_command_request(
             ("quarantine_note", 10_000),
             ("rejected_output_reason", 10_000),
             ("insufficient_evidence_reason", 10_000),
+            ("owner_authored_correction", 10_000),
         ):
             if field in value:
                 _require_unicode_scalar_text(value[field], maximum=maximum)
@@ -1219,6 +1279,25 @@ def validate_review_action_command_request(
             superseding_id = _safe_id(value["superseded_by_candidate_id"])
             if superseding_id == value["candidate_id"]:
                 raise ValueError("candidate cannot supersede itself")
+            target_queue_entry_id = _safe_id(
+                value["superseding_target_queue_entry_id"]
+            )
+            if target_queue_entry_id == value["queue_entry_id"]:
+                raise ValueError("queue entry cannot supersede itself")
+            target_status = value["superseding_target_expected_review_status"]
+            if target_status not in _REVIEW_STATUSES:
+                raise ValueError("invalid superseding target status")
+            target_version = value["superseding_target_expected_version"]
+            if (
+                isinstance(target_version, bool)
+                or not isinstance(target_version, int)
+                or not 0 <= target_version <= _MAX_REVIEW_VERSION
+            ):
+                raise ValueError("invalid superseding target version")
+        if "owner_authored_correction" in required:
+            correction = value["owner_authored_correction"]
+            if not isinstance(correction, str) or not correction.strip():
+                raise ValueError("owner-authored correction is required")
     except (TypeError, ValueError) as exc:
         raise _command_error(
             ReviewActionUnprocessable,
@@ -1270,6 +1349,18 @@ def build_canonical_review_action_request_record(
         ),
         "superseded_by_candidate_id": validated_request.get(
             "superseded_by_candidate_id"
+        ),
+        "superseding_target_queue_entry_id": validated_request.get(
+            "superseding_target_queue_entry_id"
+        ),
+        "superseding_target_expected_review_status": validated_request.get(
+            "superseding_target_expected_review_status"
+        ),
+        "superseding_target_expected_version": validated_request.get(
+            "superseding_target_expected_version"
+        ),
+        "owner_authored_correction": validated_request.get(
+            "owner_authored_correction"
         ),
         "owner_note": validated_request.get("owner_note"),
         "rationale": validated_request.get("rationale"),
@@ -1327,6 +1418,9 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
         "duplicate_target_queue_entry_id",
         "duplicate_target_expected_review_status",
         "superseded_by_candidate_id",
+        "superseding_target_queue_entry_id",
+        "superseding_target_expected_review_status",
+        "owner_authored_correction",
         "owner_note",
         "rationale",
         "rejected_output_reason",
@@ -1355,6 +1449,13 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
         isinstance(duplicate_target_version, bool)
         or not isinstance(duplicate_target_version, int)
         or not 0 <= duplicate_target_version <= _MAX_REVIEW_VERSION
+    ):
+        raise ValueError("invalid canonical request record")
+    superseding_target_version = ordered["superseding_target_expected_version"]
+    if superseding_target_version is not None and (
+        isinstance(superseding_target_version, bool)
+        or not isinstance(superseding_target_version, int)
+        or not 0 <= superseding_target_version <= _MAX_REVIEW_VERSION
     ):
         raise ValueError("invalid canonical request record")
     return json.dumps(
@@ -1428,12 +1529,65 @@ def _validated_duplicate_target(
     return target
 
 
+def _validated_superseding_target(
+    source: dict[str, Any],
+    command: dict[str, Any],
+    superseding_target: Any,
+) -> dict[str, Any]:
+    try:
+        target = review_queue_storage.validate_review_queue_entry(
+            superseding_target
+        )
+    except (TypeError, ValueError) as exc:
+        raise _transition_error(
+            command, "invalid superseding target queue entry"
+        ) from exc
+    if (
+        target["queue_entry_id"]
+        != command.get("superseding_target_queue_entry_id")
+        or target["candidate_record_id"]
+        != command.get("superseded_by_candidate_id")
+        or target["project_id"] != source["project_id"]
+        or target["queue_entry_id"] == source["queue_entry_id"]
+        or target["candidate_record_id"] == source["candidate_record_id"]
+        or target["candidate_type"] != source["candidate_type"]
+        or target["target_category"] != source["target_category"]
+    ):
+        raise _transition_error(command, "supersede source/target linkage mismatch")
+    if (
+        target["review_status"]
+        != command.get("superseding_target_expected_review_status")
+        or target["review_version"]
+        != command.get("superseding_target_expected_version")
+    ):
+        raise _command_error(
+            ReviewActionConflict,
+            "stale superseding target status or version",
+            error_code="REVIEW_ACTION_STALE_SUPERSEDING_TARGET",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        )
+    target_pair = (target["review_status"], target["lifecycle_state"])
+    if target_pair not in _SUPERSEDING_TARGET_ALLOWED_STATE_PAIRS:
+        raise _command_error(
+            ReviewActionConflict,
+            "superseding target is not eligible",
+            error_code="REVIEW_ACTION_SUPERSEDING_TARGET_CONFLICT",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        )
+    return target
+
+
 def compute_review_queue_transition(
     queue_entry: dict[str, Any],
     command: dict[str, Any],
     *,
     command_time: str,
     duplicate_target: dict[str, Any] | None = None,
+    superseding_target: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     try:
         source = review_queue_storage.validate_review_queue_entry(queue_entry)
@@ -1495,6 +1649,16 @@ def compute_review_queue_transition(
             raise _transition_error(command, "source-link correction must change linkage")
         target["review_status"] = "correction_recorded"
         target["lifecycle_state"] = "source_linkage_correction_recorded"
+    elif action == "mark_superseded":
+        superseding_target = _validated_superseding_target(
+            source, command, superseding_target
+        )
+        target["review_status"], target["lifecycle_state"] = _TARGET_STATE_PAIRS[
+            "superseded"
+        ]
+    elif action == "record_owner_authored_correction":
+        target["review_status"] = "correction_recorded"
+        target["lifecycle_state"] = "owner_authored_correction_recorded"
     elif action == "quarantine":
         target["review_status"], target["lifecycle_state"] = (
             "needs_info",
@@ -1511,6 +1675,11 @@ def compute_review_queue_transition(
             "duplicate_target_lifecycle_state",
             "duplicate_target_review_version",
             "superseded_by_candidate_id",
+            "superseding_target_queue_entry_id",
+            "superseding_target_review_status",
+            "superseding_target_lifecycle_state",
+            "superseding_target_review_version",
+            "owner_authored_correction",
             "rejected_output_reason",
             "insufficient_evidence_reason",
             "quarantine_note",
@@ -1565,6 +1734,18 @@ def compute_review_queue_transition(
             target["superseded_by_candidate_id"] = command[
                 "superseded_by_candidate_id"
             ]
+            target["superseding_target_queue_entry_id"] = superseding_target[
+                "queue_entry_id"
+            ]
+            target["superseding_target_review_status"] = superseding_target[
+                "review_status"
+            ]
+            target["superseding_target_lifecycle_state"] = superseding_target[
+                "lifecycle_state"
+            ]
+            target["superseding_target_review_version"] = superseding_target[
+                "review_version"
+            ]
         elif target_pair == ("correction_recorded", "rename_metadata_recorded"):
             target["original_owner_visible_label"] = source.get(
                 "owner_visible_label"
@@ -1581,6 +1762,13 @@ def compute_review_queue_transition(
             target["requested_source_locator"] = deepcopy(
                 command["requested_source_locator"]
             )
+        elif target_pair == (
+            "correction_recorded",
+            "owner_authored_correction_recorded",
+        ):
+            target["owner_authored_correction"] = command[
+                "owner_authored_correction"
+            ]
 
     if action in {
         "approve",
@@ -1589,6 +1777,8 @@ def compute_review_queue_transition(
         "mark_split_required",
         "rename_candidate_metadata",
         "record_source_linkage_correction",
+        "mark_superseded",
+        "record_owner_authored_correction",
     }:
         target["owner_review_completed"] = True
         target["owner_reviewed_at"] = command_time
@@ -1851,6 +2041,24 @@ def _build_success_response(
         "requested_source_locator": deepcopy(
             queue_entry.get("requested_source_locator")
         ),
+        "superseded_by_candidate_id": queue_entry.get(
+            "superseded_by_candidate_id"
+        ),
+        "superseding_target_queue_entry_id": queue_entry.get(
+            "superseding_target_queue_entry_id"
+        ),
+        "superseding_target_review_status": queue_entry.get(
+            "superseding_target_review_status"
+        ),
+        "superseding_target_lifecycle_state": queue_entry.get(
+            "superseding_target_lifecycle_state"
+        ),
+        "superseding_target_review_version": queue_entry.get(
+            "superseding_target_review_version"
+        ),
+        "owner_authored_correction": queue_entry.get(
+            "owner_authored_correction"
+        ),
         "completion_event_hash": completion["event_hash"],
         "review_workflow_state": {
             "approval_scope": "review_lifecycle_metadata_only",
@@ -1858,6 +2066,10 @@ def _build_success_response(
             "split_scope": "review_lifecycle_metadata_only",
             "rename_scope": "review_lifecycle_metadata_only",
             "source_linkage_correction_scope": "review_lifecycle_metadata_only",
+            "supersede_scope": "review_lifecycle_metadata_only",
+            "owner_authored_correction_scope": (
+                "review_lifecycle_metadata_only"
+            ),
             "is_canon": False,
             "candidate_record_mutation_performed": False,
             "target_candidate_mutation_performed": False,
@@ -1873,7 +2085,9 @@ def _build_success_response(
             "runtime_extraction_performed": False,
             "model_call_performed": False,
             "generated_prose_performed": False,
-            "owner_authored_correction_performed": False,
+            "owner_authored_correction_performed": (
+                intent["action_command"] == "record_owner_authored_correction"
+            ),
             "source_linkage_mutation_performed": False,
             "source_document_mutation_performed": False,
             "training_artifact_performed": False,
@@ -2402,12 +2616,58 @@ def execute_review_action_command(
                         request=valid,
                     ) from exc
 
+            superseding_target = None
+            if valid["action_type"] == "mark_superseded":
+                target_queue_entry_id = valid[
+                    "superseding_target_queue_entry_id"
+                ]
+                try:
+                    superseding_target = review_queue_storage.read_review_queue_entry(
+                        target_queue_entry_id,
+                        project_dir=resolved_project_dir,
+                    )
+                except (OSError, TypeError, ValueError) as exc:
+                    target_path = review_queue_storage.review_queue_entry_path(
+                        resolved_project_dir, target_queue_entry_id
+                    )
+                    error_type = (
+                        ReviewActionNotFound
+                        if not target_path.exists()
+                        else ReviewActionUnprocessable
+                    )
+                    raise _command_error(
+                        error_type,
+                        "superseding target queue entry was not found"
+                        if error_type is ReviewActionNotFound
+                        else "superseding target queue entry is invalid",
+                        error_code="REVIEW_ACTION_SUPERSEDING_TARGET_NOT_FOUND"
+                        if error_type is ReviewActionNotFound
+                        else "REVIEW_ACTION_INVALID_SUPERSEDING_TARGET",
+                        project_id=project_id,
+                        queue_entry_id=queue_entry_id,
+                        request=valid,
+                    ) from exc
+                try:
+                    _linked_candidate_bytes_and_hash(
+                        superseding_target, project_dir=resolved_project_dir
+                    )
+                    _evidence_provenance_projection_hash(superseding_target)
+                except (OSError, TypeError, ValueError) as exc:
+                    raise _command_error(
+                        ReviewActionUnprocessable,
+                        "superseding target candidate or support linkage is invalid",
+                        error_code="REVIEW_ACTION_INVALID_SUPERSEDING_TARGET",
+                        project_id=project_id,
+                        queue_entry_id=queue_entry_id,
+                        request=valid,
+                    ) from exc
             command_time = _utc_now()
             target = compute_review_queue_transition(
                 queue_entry,
                 valid,
                 command_time=command_time,
                 duplicate_target=duplicate_target,
+                superseding_target=superseding_target,
             )
             target_bytes = _canonical_queue_bytes(target)
             target_hash = hashlib.sha256(target_bytes).hexdigest()
@@ -2539,6 +2799,38 @@ def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
             value.get("requested_source_locator")
         )
         if locator["project_id"] != value["project_id"]:
+            raise ValueError("invalid request")
+    if value["action_command"] == "mark_superseded":
+        required = {
+            "superseded_by_candidate_id",
+            "superseding_target_queue_entry_id",
+            "superseding_target_expected_review_status",
+            "superseding_target_expected_version",
+        }
+        if not required <= set(value):
+            raise ValueError("invalid request")
+        if (
+            value["superseded_by_candidate_id"] == value["candidate_record_id"]
+            or value["superseding_target_queue_entry_id"]
+            == value["queue_entry_id"]
+            or value["superseding_target_expected_review_status"]
+            not in _REVIEW_STATUSES
+        ):
+            raise ValueError("invalid request")
+        target_version = value["superseding_target_expected_version"]
+        if (
+            isinstance(target_version, bool)
+            or not isinstance(target_version, int)
+            or not 0 <= target_version <= _MAX_REVIEW_VERSION
+        ):
+            raise ValueError("invalid request")
+    if value["action_command"] == "record_owner_authored_correction":
+        correction = _require_unicode_scalar_text(
+            value.get("owner_authored_correction"),
+            maximum=10_000,
+            allow_null=False,
+        )
+        if not correction.strip():
             raise ValueError("invalid request")
     return _copy_mapping(value)
 

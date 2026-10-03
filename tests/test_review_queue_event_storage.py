@@ -76,6 +76,28 @@ def _target_material():
     return encoded, hashlib.sha256(raw).hexdigest()
 
 
+def _intent_values_for_target(target, action_command):
+    raw = apply_contract.canonical_json_bytes(target)
+    encoded = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    return {
+        "sequence": 1,
+        "previous_event_hash": None,
+        "project_id": PROJECT_ID,
+        "queue_entry_id": QUEUE_ENTRY_ID,
+        "candidate_record_id": CANDIDATE_ID,
+        "action_command": action_command,
+        "action_id": ACTION_ID,
+        "idempotency_key": IDEMPOTENCY_KEY,
+        "request_hash": REQUEST_HASH,
+        "created_at": CREATED_AT,
+        "queue_before_hash": QUEUE_BEFORE_HASH,
+        "target_queue_canonical_bytes_b64url": encoded,
+        "target_queue_hash": hashlib.sha256(raw).hexdigest(),
+        "candidate_before_hash": CANDIDATE_HASH,
+        "evidence_projection_before_hash": EVIDENCE_HASH,
+    }
+
+
 def _intent(
     *,
     sequence=1,
@@ -265,6 +287,74 @@ def test_split_required_intent_requires_its_explicit_command():
     with pytest.raises(ValueError):
         review_action_events.build_action_intent_event_v1(
             **{**values, "action_command": "set_review_status"}
+        )
+
+
+def test_supersede_intent_requires_explicit_command_and_complete_target_linkage():
+    target = _queue_entry()
+    target.update(
+        review_status="superseded",
+        lifecycle_state="superseded_candidate",
+        superseded_by_candidate_id="core_candidate_target_001",
+        superseding_target_queue_entry_id="review_queue_entry_target_001",
+        superseding_target_review_status="pending",
+        superseding_target_lifecycle_state="owner_review_pending",
+        superseding_target_review_version=0,
+        owner_review_completed=True,
+        owner_reviewed_at=COMPLETED_AT,
+    )
+    target = review_queue_storage.validate_review_queue_entry(target)
+    values = _intent_values_for_target(target, "mark_superseded")
+    assert review_action_events.build_action_intent_event_v1(**values)[
+        "action_command"
+    ] == "mark_superseded"
+
+    with pytest.raises(ValueError):
+        review_action_events.build_action_intent_event_v1(
+            **{**values, "action_command": "set_review_status"}
+        )
+
+    incomplete = copy.deepcopy(target)
+    del incomplete["superseding_target_review_version"]
+    with pytest.raises(ValueError):
+        review_action_events.build_action_intent_event_v1(
+            **_intent_values_for_target(incomplete, "mark_superseded")
+        )
+
+
+def test_owner_correction_intent_requires_explicit_command_and_excludes_supersede():
+    target = _queue_entry()
+    target.update(
+        review_status="correction_recorded",
+        lifecycle_state="owner_authored_correction_recorded",
+        owner_authored_correction="Exact owner-authored correction.",
+        owner_review_completed=True,
+        owner_reviewed_at=COMPLETED_AT,
+    )
+    target = review_queue_storage.validate_review_queue_entry(target)
+    values = _intent_values_for_target(target, "record_owner_authored_correction")
+    assert review_action_events.build_action_intent_event_v1(**values)[
+        "action_command"
+    ] == "record_owner_authored_correction"
+
+    with pytest.raises(ValueError):
+        review_action_events.build_action_intent_event_v1(
+            **{**values, "action_command": "set_review_status"}
+        )
+
+    mixed = copy.deepcopy(target)
+    mixed.update(
+        superseded_by_candidate_id="core_candidate_target_001",
+        superseding_target_queue_entry_id="review_queue_entry_target_001",
+        superseding_target_review_status="pending",
+        superseding_target_lifecycle_state="owner_review_pending",
+        superseding_target_review_version=0,
+    )
+    with pytest.raises(ValueError):
+        review_action_events.build_action_intent_event_v1(
+            **_intent_values_for_target(
+                mixed, "record_owner_authored_correction"
+            )
         )
 
 

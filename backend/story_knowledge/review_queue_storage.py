@@ -58,6 +58,11 @@ _OPTIONAL_ENTRY_FIELDS = frozenset(
         "duplicate_target_review_status",
         "duplicate_target_lifecycle_state",
         "duplicate_target_review_version",
+        "superseding_target_queue_entry_id",
+        "superseding_target_review_status",
+        "superseding_target_lifecycle_state",
+        "superseding_target_review_version",
+        "owner_authored_correction",
         "insufficient_evidence_reason",
         "rejected_output_reason",
         "review_version",
@@ -101,6 +106,7 @@ _ALLOWED_LIFECYCLE_STATES = frozenset(
         "incorrect_cluster_split_required",
         "rename_metadata_recorded",
         "source_linkage_correction_recorded",
+        "owner_authored_correction_recorded",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -119,6 +125,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("split_required", "incorrect_cluster_split_required"),
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
+        ("correction_recorded", "owner_authored_correction_recorded"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -167,6 +174,11 @@ _OWNER_ACTION_OPTIONAL = frozenset(
         "duplicate_target_lifecycle_state",
         "duplicate_target_review_version",
         "superseded_by_candidate_id",
+        "superseding_target_queue_entry_id",
+        "superseding_target_review_status",
+        "superseding_target_lifecycle_state",
+        "superseding_target_review_version",
+        "owner_authored_correction",
         "requested_evidence_note",
         "requested_owner_visible_label",
         "requested_source_locator",
@@ -188,6 +200,7 @@ _OWNER_ACTION_ALLOWED_COMMANDS = frozenset(
         "rename_candidate_metadata",
         "record_source_linkage_correction",
         "mark_superseded",
+        "record_owner_authored_correction",
         "archive_without_promotion",
         "add_reviewer_note",
         "clear_reviewer_note",
@@ -208,6 +221,11 @@ _OWNER_ACTION_COMMAND_RESULT_PAIRS = {
     "record_source_linkage_correction": (
         "correction_recorded",
         "source_linkage_correction_recorded",
+    ),
+    "mark_superseded": ("superseded", "superseded_candidate"),
+    "record_owner_authored_correction": (
+        "correction_recorded",
+        "owner_authored_correction_recorded",
     ),
 }
 
@@ -350,6 +368,7 @@ def validate_review_queue_entry(entry):
         ("quarantine_note", 10_000),
         ("insufficient_evidence_reason", 10_000),
         ("rejected_output_reason", 10_000),
+        ("owner_authored_correction", 10_000),
     ):
         if field in working:
             _require_optional_text(working[field], maximum=maximum)
@@ -423,6 +442,37 @@ def validate_review_queue_entry(entry):
         if superseding_id is not None:
             _require_safe_id(superseding_id)
 
+    superseding_target_fields = (
+        "superseding_target_queue_entry_id",
+        "superseding_target_review_status",
+        "superseding_target_lifecycle_state",
+        "superseding_target_review_version",
+    )
+    supplied_superseding_target_fields = [
+        field for field in superseding_target_fields if working.get(field) is not None
+    ]
+    if supplied_superseding_target_fields:
+        if len(supplied_superseding_target_fields) != len(superseding_target_fields):
+            raise ValueError("invalid field")
+        target_queue_entry_id = _require_safe_id(
+            working["superseding_target_queue_entry_id"]
+        )
+        if target_queue_entry_id == working["queue_entry_id"]:
+            raise ValueError("invalid field")
+        target_pair = (
+            working["superseding_target_review_status"],
+            working["superseding_target_lifecycle_state"],
+        )
+        if target_pair not in _VALID_REVIEW_STATE_PAIRS:
+            raise ValueError("invalid field")
+        target_version = working["superseding_target_review_version"]
+        if (
+            isinstance(target_version, bool)
+            or not isinstance(target_version, int)
+            or not 0 <= target_version <= 2_147_483_647
+        ):
+            raise ValueError("invalid field")
+
     completion = working["owner_review_completed"]
     reviewed_at = working["owner_reviewed_at"]
     if not isinstance(completion, bool):
@@ -443,6 +493,33 @@ def validate_review_queue_entry(entry):
         "correction_recorded",
         "source_linkage_correction_recorded",
     )
+    owner_correction_pair = (
+        "correction_recorded",
+        "owner_authored_correction_recorded",
+    )
+    superseded_pair = ("superseded", "superseded_candidate")
+    supersede_metadata_fields = (
+        "superseded_by_candidate_id",
+        *superseding_target_fields,
+    )
+    correction_metadata_fields = (
+        "original_owner_visible_label",
+        "requested_owner_visible_label",
+        "original_source_locator",
+        "requested_source_locator",
+    )
+    if state_pair == superseded_pair:
+        if (
+            any(
+                working.get(field) is None for field in supersede_metadata_fields
+            )
+            or working["superseded_by_candidate_id"]
+            == working["candidate_record_id"]
+            or working.get("owner_authored_correction") is not None
+        ):
+            raise ValueError("invalid field")
+    elif any(working.get(field) is not None for field in supersede_metadata_fields):
+        raise ValueError("invalid field")
     if state_pair == rename_pair:
         if (
             "original_owner_visible_label" not in working
@@ -462,16 +539,32 @@ def validate_review_queue_entry(entry):
             or working.get("requested_owner_visible_label") is not None
         ):
             raise ValueError("invalid field")
-    elif any(
-        working.get(field) is not None
-        for field in (
-            "original_owner_visible_label",
-            "requested_owner_visible_label",
-            "original_source_locator",
-            "requested_source_locator",
-        )
-    ):
+    elif state_pair == owner_correction_pair:
+        correction = working.get("owner_authored_correction")
+        if (
+            not isinstance(correction, str)
+            or not correction.strip()
+            or any(working.get(field) is not None for field in correction_metadata_fields)
+        ):
+            raise ValueError("invalid field")
+    elif any(working.get(field) is not None for field in correction_metadata_fields):
         raise ValueError("invalid field")
+
+    if state_pair != owner_correction_pair and working.get(
+        "owner_authored_correction"
+    ) is not None:
+        raise ValueError("invalid field")
+
+    state_specific_metadata_fields = (
+        *supersede_metadata_fields,
+        "owner_authored_correction",
+        *correction_metadata_fields,
+    )
+    for field in state_specific_metadata_fields:
+        if working.get(field) is None and not (
+            state_pair == rename_pair and field == "original_owner_visible_label"
+        ):
+            working.pop(field, None)
 
     if not isinstance(working["evidence_summary"], str):
         raise ValueError("invalid field")
@@ -741,6 +834,8 @@ def validate_owner_action_record(action):
             raise ValueError("invalid field")
     if "duplicate_target_queue_entry_id" in working:
         _require_safe_id(working["duplicate_target_queue_entry_id"])
+    if "superseding_target_queue_entry_id" in working:
+        _require_safe_id(working["superseding_target_queue_entry_id"])
 
     if working["action_command"] == "mark_duplicate":
         duplicate_ids = working.get("duplicate_candidate_ids")
@@ -750,6 +845,25 @@ def validate_owner_action_record(action):
         if duplicate_ids[0] == working["candidate_record_id"]:
             raise ValueError("invalid field")
         if _require_safe_id(target_queue_entry_id) == working["queue_entry_id"]:
+            raise ValueError("invalid field")
+
+    if working["action_command"] == "mark_superseded":
+        superseding_candidate_id = _require_safe_id(
+            working.get("superseded_by_candidate_id")
+        )
+        target_queue_entry_id = _require_safe_id(
+            working.get("superseding_target_queue_entry_id")
+        )
+        if (
+            superseding_candidate_id == working["candidate_record_id"]
+            or target_queue_entry_id == working["queue_entry_id"]
+        ):
+            raise ValueError("invalid field")
+
+    if working["action_command"] == "record_owner_authored_correction":
+        correction = working.get("owner_authored_correction")
+        _require_optional_text(correction, maximum=10_000)
+        if not correction or not correction.strip():
             raise ValueError("invalid field")
 
     if working["action_command"] == "rename_candidate_metadata":

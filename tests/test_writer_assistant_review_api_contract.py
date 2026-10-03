@@ -182,6 +182,10 @@ OWNER_ACTION_OPTIONAL_FIELDS = {
     "duplicate_target_expected_review_status",
     "duplicate_target_expected_version",
     "superseded_by_candidate_id",
+    "superseding_target_queue_entry_id",
+    "superseding_target_expected_review_status",
+    "superseding_target_expected_version",
+    "owner_authored_correction",
     "requested_evidence_note",
     "command_metadata",
     "idempotency_key",
@@ -200,6 +204,7 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "rename_candidate_metadata",
     "record_source_linkage_correction",
     "mark_superseded",
+    "record_owner_authored_correction",
     "archive_without_promotion",
     "add_reviewer_note",
     "clear_reviewer_note",
@@ -607,6 +612,15 @@ def test_validate_owner_action_command_request_accepts_only_t003_allowed_command
             "source_document_type": "scene",
             "source_document_id": "scene_002",
         }
+    elif command == "mark_superseded":
+        request.update(
+            superseded_by_candidate_id="core_candidate_target_001",
+            superseding_target_queue_entry_id="review_queue_entry_target_001",
+            superseding_target_expected_review_status="pending",
+            superseding_target_expected_version=0,
+        )
+    elif command == "record_owner_authored_correction":
+        request["owner_authored_correction"] = "Exact owner correction text."
     result = review_api.validate_owner_action_command_request(request)
 
     assert result["action_command"] == command

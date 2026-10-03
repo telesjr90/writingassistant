@@ -120,6 +120,7 @@ ALLOWED_LIFECYCLE_STATES = frozenset(
         "incorrect_cluster_split_required",
         "rename_metadata_recorded",
         "source_linkage_correction_recorded",
+        "owner_authored_correction_recorded",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -138,6 +139,7 @@ VALID_REVIEW_STATE_PAIRS = frozenset(
         ("split_required", "incorrect_cluster_split_required"),
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
+        ("correction_recorded", "owner_authored_correction_recorded"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -208,6 +210,7 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "rename_candidate_metadata",
     "record_source_linkage_correction",
     "mark_superseded",
+    "record_owner_authored_correction",
     "archive_without_promotion",
     "add_reviewer_note",
     "clear_reviewer_note",
@@ -448,6 +451,21 @@ def build_valid_queue_entry(**overrides):
                 "source_document_id": "scene_002",
             },
         )
+    elif pair == (
+        "correction_recorded",
+        "owner_authored_correction_recorded",
+    ):
+        entry.setdefault(
+            "owner_authored_correction", "Exact owner-authored correction."
+        )
+    elif pair == ("superseded", "superseded_candidate"):
+        entry.setdefault("superseded_by_candidate_id", "candidate_002")
+        entry.setdefault("superseding_target_queue_entry_id", "queue_entry_002")
+        entry.setdefault("superseding_target_review_status", "pending")
+        entry.setdefault(
+            "superseding_target_lifecycle_state", "owner_review_pending"
+        )
+        entry.setdefault("superseding_target_review_version", 0)
     return entry
 
 
@@ -707,13 +725,9 @@ def test_validate_entry_preserves_owner_text_unicode_exactly():
 def test_validate_entry_validates_disposition_linkage_fields():
     duplicate_ids = ["candidate_002", "candidate_003"]
     result = review_queue_storage.validate_review_queue_entry(
-        build_valid_queue_entry(
-            duplicate_candidate_ids=duplicate_ids,
-            superseded_by_candidate_id="candidate_004",
-        )
+        build_valid_queue_entry(duplicate_candidate_ids=duplicate_ids)
     )
     assert result["duplicate_candidate_ids"] == duplicate_ids
-    assert result["superseded_by_candidate_id"] == "candidate_004"
 
     duplicate = review_queue_storage.validate_review_queue_entry(
         build_valid_queue_entry(
@@ -737,7 +751,11 @@ def test_validate_entry_validates_disposition_linkage_fields():
     for invalid in ("../escape", 1, [], False):
         with pytest.raises(ValueError):
             review_queue_storage.validate_review_queue_entry(
-                build_valid_queue_entry(superseded_by_candidate_id=invalid)
+                build_valid_queue_entry(
+                    review_status="superseded",
+                    lifecycle_state="superseded_candidate",
+                    superseded_by_candidate_id=invalid,
+                )
             )
     for overrides in (
         {"duplicate_candidate_ids": [SAFE_CANDIDATE_ID]},
@@ -766,6 +784,67 @@ def test_validate_entry_validates_disposition_linkage_fields():
         action.update(overrides)
         with pytest.raises(ValueError):
             review_queue_storage.validate_owner_action_record(action)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    (
+        ("superseded_by_candidate_id", "candidate_002"),
+        ("superseding_target_queue_entry_id", "queue_entry_002"),
+        ("superseding_target_review_status", "pending"),
+        ("superseding_target_lifecycle_state", "owner_review_pending"),
+        ("superseding_target_review_version", 0),
+    ),
+)
+def test_validate_entry_rejects_supersede_metadata_outside_superseded_state(
+    field, value
+):
+    with pytest.raises(ValueError):
+        review_queue_storage.validate_review_queue_entry(
+            build_valid_queue_entry(**{field: value})
+        )
+
+
+def test_validate_entry_rejects_incomplete_supersede_metadata():
+    entry = build_valid_queue_entry(
+        review_status="superseded",
+        lifecycle_state="superseded_candidate",
+    )
+    for field in (
+        "superseded_by_candidate_id",
+        "superseding_target_queue_entry_id",
+        "superseding_target_review_status",
+        "superseding_target_lifecycle_state",
+        "superseding_target_review_version",
+    ):
+        incomplete = copy.deepcopy(entry)
+        del incomplete[field]
+        with pytest.raises(ValueError):
+            review_queue_storage.validate_review_queue_entry(incomplete)
+
+
+def test_validate_entry_rejects_owner_correction_outside_its_state():
+    with pytest.raises(ValueError):
+        review_queue_storage.validate_review_queue_entry(
+            build_valid_queue_entry(
+                owner_authored_correction="Exact owner-authored correction."
+            )
+        )
+
+
+def test_validate_entry_rejects_owner_correction_with_supersede_metadata():
+    with pytest.raises(ValueError):
+        review_queue_storage.validate_review_queue_entry(
+            build_valid_queue_entry(
+                review_status="correction_recorded",
+                lifecycle_state="owner_authored_correction_recorded",
+                superseded_by_candidate_id="candidate_002",
+                superseding_target_queue_entry_id="queue_entry_002",
+                superseding_target_review_status="pending",
+                superseding_target_lifecycle_state="owner_review_pending",
+                superseding_target_review_version=0,
+            )
+        )
 
 
 @pytest.mark.parametrize("bad_status", ("promoted", "canon", "unknown_status"))
@@ -1226,6 +1305,11 @@ def test_validate_owner_action_accepts_allowed_commands(command):
             "correction_recorded",
             "source_linkage_correction_recorded",
         ),
+        "mark_superseded": ("superseded", "superseded_candidate"),
+        "record_owner_authored_correction": (
+            "correction_recorded",
+            "owner_authored_correction_recorded",
+        ),
     }
     action = build_valid_owner_action_record(action_command=command)
     if command == "mark_duplicate":
@@ -1241,6 +1325,13 @@ def test_validate_owner_action_accepts_allowed_commands(command):
             "source_document_type": "scene",
             "source_document_id": "scene_002",
         }
+    elif command == "mark_superseded":
+        action.update(
+            superseded_by_candidate_id="candidate_002",
+            superseding_target_queue_entry_id="queue_entry_002",
+        )
+    elif command == "record_owner_authored_correction":
+        action["owner_authored_correction"] = "Exact owner-authored correction."
     if command in result_pairs:
         action["resulting_review_status"], action["resulting_lifecycle_state"] = (
             result_pairs[command]

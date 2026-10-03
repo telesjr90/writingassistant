@@ -41,6 +41,8 @@ _ACTION_COMMANDS = frozenset(
         "mark_split_required",
         "rename_candidate_metadata",
         "record_source_linkage_correction",
+        "mark_superseded",
+        "record_owner_authored_correction",
         "quarantine",
         "update_owner_note",
         "set_review_status",
@@ -391,6 +393,49 @@ def _validate_intent(event) -> None:
         "source_linkage_correction_recorded",
     ):
         raise ValueError("source-link correction target requires explicit action")
+    superseding_target_fields = (
+        "superseding_target_queue_entry_id",
+        "superseding_target_review_status",
+        "superseding_target_lifecycle_state",
+        "superseding_target_review_version",
+    )
+    if event["action_command"] == "mark_superseded":
+        if target_pair != ("superseded", "superseded_candidate"):
+            raise ValueError("invalid supersede action target")
+        if (
+            validated_target.get("superseded_by_candidate_id") is None
+            or any(
+                validated_target.get(field) is None
+                for field in superseding_target_fields
+            )
+            or validated_target["superseded_by_candidate_id"]
+            == event["candidate_record_id"]
+            or validated_target["superseding_target_queue_entry_id"]
+            == event["queue_entry_id"]
+            or "owner_authored_correction" in validated_target
+        ):
+            raise ValueError("invalid supersede action linkage")
+    elif target_pair == ("superseded", "superseded_candidate"):
+        raise ValueError("supersede target requires mark_superseded action")
+    if event["action_command"] == "record_owner_authored_correction":
+        correction = validated_target.get("owner_authored_correction")
+        if target_pair != (
+            "correction_recorded",
+            "owner_authored_correction_recorded",
+        ):
+            raise ValueError("invalid owner-authored correction action target")
+        if (
+            not isinstance(correction, str)
+            or not correction.strip()
+            or "superseded_by_candidate_id" in validated_target
+            or any(field in validated_target for field in superseding_target_fields)
+        ):
+            raise ValueError("invalid owner-authored correction action linkage")
+    elif target_pair == (
+        "correction_recorded",
+        "owner_authored_correction_recorded",
+    ):
+        raise ValueError("owner-authored correction target requires explicit action")
 
 
 def _validate_completed(event, *, intent) -> None:
