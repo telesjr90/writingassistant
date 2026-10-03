@@ -5,6 +5,8 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
+import stat
 import uuid
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -12,6 +14,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+from backend.story_knowledge import analysis_run_manifest
 from backend.story_knowledge import apply_contract
 from backend.story_knowledge import candidate_persistence
 from backend.story_knowledge import candidate_record
@@ -75,6 +78,12 @@ _COMMAND_OPTIONAL_FIELDS = {
     "superseding_target_expected_review_status",
     "superseding_target_expected_version",
     "owner_authored_correction",
+    "prior_analysis_run_id",
+    "prior_analysis_run_manifest_hash",
+    "prior_source_snapshot_id",
+    "prior_source_hash",
+    "prior_source_locator",
+    "selected_source_locator",
     "requested_evidence_note",
     "command_metadata",
     "idempotency_key",
@@ -96,6 +105,7 @@ _COMMAND_NAMES = {
     "record_source_linkage_correction",
     "mark_superseded",
     "record_owner_authored_correction",
+    "request_rerun_selected_source",
     "archive_without_promotion",
     "add_reviewer_note",
     "clear_reviewer_note",
@@ -113,6 +123,8 @@ _ID_FIELDS = {
     "superseded_by_candidate_id",
     "duplicate_target_queue_entry_id",
     "superseding_target_queue_entry_id",
+    "prior_analysis_run_id",
+    "prior_source_snapshot_id",
 }
 
 _ID_LIST_FIELDS = {
@@ -164,6 +176,13 @@ _ENTRY_RESPONSE_FIELDS = (
     "superseding_target_lifecycle_state",
     "superseding_target_review_version",
     "owner_authored_correction",
+    "prior_analysis_run_id",
+    "prior_analysis_run_manifest_hash",
+    "prior_source_snapshot_id",
+    "prior_source_hash",
+    "prior_source_locator",
+    "selected_source_locator",
+    "prior_run_lineage_verification",
 )
 
 _ENTRY_FILTER_FIELDS = (
@@ -204,6 +223,7 @@ _REVIEW_ACTION_ALLOWED_COMMANDS = {
     "record_source_linkage_correction",
     "mark_superseded",
     "record_owner_authored_correction",
+    "request_rerun_selected_source",
     "quarantine",
     "update_owner_note",
     "set_review_status",
@@ -285,6 +305,12 @@ _REVIEW_ACTION_COMMAND_FIELDS = frozenset(
         "quarantine_note",
         "requested_owner_visible_label",
         "requested_source_locator",
+        "prior_analysis_run_id",
+        "prior_analysis_run_manifest_hash",
+        "prior_source_snapshot_id",
+        "prior_source_hash",
+        "prior_source_locator",
+        "selected_source_locator",
     }
 )
 _REVIEW_ACTION_FIELDS = (
@@ -320,6 +346,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
         ("correction_recorded", "owner_authored_correction_recorded"),
+        ("needs_info", "rerun_selected_source_requested"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -423,6 +450,14 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
             ("deferred", "owner_reviewed_deferred"),
         }
     ),
+    "request_rerun_selected_source": frozenset(
+        {
+            ("pending", "draft_ready_for_review"),
+            ("pending", "owner_review_pending"),
+            ("needs_info", "needs_more_evidence"),
+            ("deferred", "owner_reviewed_deferred"),
+        }
+    ),
     "quarantine": frozenset(
         {
             ("pending", "draft_ready_for_review"),
@@ -439,6 +474,7 @@ _COMMAND_ALLOWED_SOURCE_PAIRS = {
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
         ("correction_recorded", "owner_authored_correction_recorded"),
+        ("needs_info", "rerun_selected_source_requested"),
         ("superseded", "superseded_candidate"),
     },
 }
@@ -495,6 +531,21 @@ _COMMAND_FIELD_RULES = {
         frozenset({"owner_note", "rationale", "owner_authored_correction"}),
         frozenset(),
     ),
+    "request_rerun_selected_source": (
+        frozenset(
+            {
+                "owner_note",
+                "rationale",
+                "prior_analysis_run_id",
+                "prior_analysis_run_manifest_hash",
+                "prior_source_snapshot_id",
+                "prior_source_hash",
+                "prior_source_locator",
+                "selected_source_locator",
+            }
+        ),
+        frozenset(),
+    ),
     "quarantine": (
         frozenset({"owner_note"}),
         frozenset({"rationale", "quarantine_note"}),
@@ -523,6 +574,12 @@ _CANONICAL_REQUEST_FIELDS = (
     "superseding_target_expected_review_status",
     "superseding_target_expected_version",
     "owner_authored_correction",
+    "prior_analysis_run_id",
+    "prior_analysis_run_manifest_hash",
+    "prior_source_snapshot_id",
+    "prior_source_hash",
+    "prior_source_locator",
+    "selected_source_locator",
     "owner_note",
     "rationale",
     "rejected_output_reason",
@@ -640,6 +697,16 @@ def _safe_id(value: Any) -> str:
         raise ValueError("unsafe id")
     if any(0xD800 <= ord(character) <= 0xDFFF for character in value):
         raise ValueError("unsafe id")
+    return value
+
+
+def _require_sha256(value: Any) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
+    ):
+        raise ValueError("invalid SHA-256")
     return value
 
 
@@ -1298,6 +1365,24 @@ def validate_review_action_command_request(
             correction = value["owner_authored_correction"]
             if not isinstance(correction, str) or not correction.strip():
                 raise ValueError("owner-authored correction is required")
+        if action_type == "request_rerun_selected_source":
+            _safe_id(value["prior_analysis_run_id"])
+            _safe_id(value["prior_source_snapshot_id"])
+            _require_sha256(value["prior_analysis_run_manifest_hash"])
+            prior_source_hash = _require_sha256(value["prior_source_hash"])
+            prior_locator = candidate_record.validate_source_locator(
+                value["prior_source_locator"]
+            )
+            selected_locator = candidate_record.validate_source_locator(
+                value["selected_source_locator"]
+            )
+            if (
+                prior_locator["project_id"] != project_id
+                or selected_locator["project_id"] != project_id
+                or prior_locator != selected_locator
+                or prior_locator.get("source_hash") not in {None, prior_source_hash}
+            ):
+                raise ValueError("invalid rerun source lineage")
     except (TypeError, ValueError) as exc:
         raise _command_error(
             ReviewActionUnprocessable,
@@ -1362,6 +1447,22 @@ def build_canonical_review_action_request_record(
         "owner_authored_correction": validated_request.get(
             "owner_authored_correction"
         ),
+        "prior_analysis_run_id": validated_request.get(
+            "prior_analysis_run_id"
+        ),
+        "prior_analysis_run_manifest_hash": validated_request.get(
+            "prior_analysis_run_manifest_hash"
+        ),
+        "prior_source_snapshot_id": validated_request.get(
+            "prior_source_snapshot_id"
+        ),
+        "prior_source_hash": validated_request.get("prior_source_hash"),
+        "prior_source_locator": deepcopy(
+            validated_request.get("prior_source_locator")
+        ),
+        "selected_source_locator": deepcopy(
+            validated_request.get("selected_source_locator")
+        ),
         "owner_note": validated_request.get("owner_note"),
         "rationale": validated_request.get("rationale"),
         "rejected_output_reason": validated_request.get("rejected_output_reason"),
@@ -1421,6 +1522,10 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
         "superseding_target_queue_entry_id",
         "superseding_target_expected_review_status",
         "owner_authored_correction",
+        "prior_analysis_run_id",
+        "prior_analysis_run_manifest_hash",
+        "prior_source_snapshot_id",
+        "prior_source_hash",
         "owner_note",
         "rationale",
         "rejected_output_reason",
@@ -1436,6 +1541,14 @@ def canonical_review_action_request_bytes(record: dict[str, Any]) -> bytes:
     requested_source_locator = ordered["requested_source_locator"]
     if requested_source_locator is not None:
         candidate_record.validate_source_locator(requested_source_locator)
+    for field in ("prior_source_locator", "selected_source_locator"):
+        locator = ordered[field]
+        if locator is not None:
+            candidate_record.validate_source_locator(locator)
+    for field in ("prior_analysis_run_manifest_hash", "prior_source_hash"):
+        digest = ordered[field]
+        if digest is not None:
+            _require_sha256(digest)
     duplicate_ids = ordered["duplicate_candidate_ids"]
     if duplicate_ids is not None:
         if not isinstance(duplicate_ids, list):
@@ -1581,6 +1694,107 @@ def _validated_superseding_target(
     return target
 
 
+def _validate_prior_run_lineage(
+    source: dict[str, Any],
+    command: dict[str, Any],
+    *,
+    project_dir: Path,
+) -> None:
+    run_id = command["prior_analysis_run_id"]
+    manifest_path = (
+        project_dir
+        / "writer_assistant"
+        / "analysis_runs"
+        / run_id
+        / "manifest.json"
+    )
+    try:
+        resolved_manifest = manifest_path.resolve(strict=True)
+        expected_manifest = manifest_path
+        metadata = os.lstat(manifest_path)
+        if (
+            resolved_manifest != expected_manifest
+            or stat.S_ISLNK(metadata.st_mode)
+            or not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_nlink != 1
+        ):
+            raise ValueError("unsafe prior-run manifest path")
+        raw = resolved_manifest.read_bytes()
+        payload = apply_contract.strict_json_loads(raw, max_bytes=4_194_304)
+        if apply_contract.canonical_json_bytes(payload) != raw:
+            raise ValueError("prior-run manifest is not canonical")
+        manifest = analysis_run_manifest.analysis_run_manifest_from_dict(payload)
+    except FileNotFoundError as exc:
+        raise _command_error(
+            ReviewActionNotFound,
+            "prior analysis run manifest was not found",
+            error_code="REVIEW_ACTION_PRIOR_RUN_NOT_FOUND",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        ) from exc
+    except (OSError, TypeError, ValueError) as exc:
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "prior analysis run manifest is invalid",
+            error_code="REVIEW_ACTION_INVALID_PRIOR_RUN_LINEAGE",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        ) from exc
+
+    requested_locator = candidate_record.validate_source_locator(
+        command["selected_source_locator"]
+    )
+    matching_source = next(
+        (
+            item
+            for item in manifest.sources
+            if item.snapshot_id == command["prior_source_snapshot_id"]
+        ),
+        None,
+    )
+    source_locator = source["source_locator"]
+    expected_locator_fields = {
+        "project_id": matching_source.project_id if matching_source else None,
+        "source_document_type": (
+            matching_source.source_document_type if matching_source else None
+        ),
+        "source_document_id": (
+            matching_source.source_document_id if matching_source else None
+        ),
+    }
+    for optional_field in ("section_id", "chapter_id", "scene_id"):
+        if matching_source is not None and getattr(matching_source, optional_field) is not None:
+            expected_locator_fields[optional_field] = getattr(
+                matching_source, optional_field
+            )
+    if (
+        manifest.run_id != run_id
+        or manifest.project_id != source["project_id"]
+        or hashlib.sha256(raw).hexdigest()
+        != command["prior_analysis_run_manifest_hash"]
+        or matching_source is None
+        or matching_source.content_hash != command["prior_source_hash"]
+        or requested_locator != command["prior_source_locator"]
+        or requested_locator != source_locator
+        or any(
+            requested_locator.get(field) != expected
+            for field, expected in expected_locator_fields.items()
+        )
+        or requested_locator.get("source_hash")
+        not in {None, matching_source.content_hash}
+    ):
+        raise _command_error(
+            ReviewActionUnprocessable,
+            "prior analysis run lineage does not match the selected source",
+            error_code="REVIEW_ACTION_INVALID_PRIOR_RUN_LINEAGE",
+            project_id=source["project_id"],
+            queue_entry_id=source["queue_entry_id"],
+            request=command,
+        )
+
+
 def compute_review_queue_transition(
     queue_entry: dict[str, Any],
     command: dict[str, Any],
@@ -1659,6 +1873,16 @@ def compute_review_queue_transition(
     elif action == "record_owner_authored_correction":
         target["review_status"] = "correction_recorded"
         target["lifecycle_state"] = "owner_authored_correction_recorded"
+    elif action == "request_rerun_selected_source":
+        if (
+            command["prior_source_locator"] != source["source_locator"]
+            or command["selected_source_locator"] != source["source_locator"]
+        ):
+            raise _transition_error(
+                command, "rerun-selected-source linkage mismatch"
+            )
+        target["review_status"] = "needs_info"
+        target["lifecycle_state"] = "rerun_selected_source_requested"
     elif action == "quarantine":
         target["review_status"], target["lifecycle_state"] = (
             "needs_info",
@@ -1687,6 +1911,13 @@ def compute_review_queue_transition(
             "requested_owner_visible_label",
             "original_source_locator",
             "requested_source_locator",
+            "prior_analysis_run_id",
+            "prior_analysis_run_manifest_hash",
+            "prior_source_snapshot_id",
+            "prior_source_hash",
+            "prior_source_locator",
+            "selected_source_locator",
+            "prior_run_lineage_verification",
         ):
             target[field] = None
         target["owner_review_completed"] = False
@@ -1769,6 +2000,19 @@ def compute_review_queue_transition(
             target["owner_authored_correction"] = command[
                 "owner_authored_correction"
             ]
+        elif target_pair == ("needs_info", "rerun_selected_source_requested"):
+            for field in (
+                "prior_analysis_run_id",
+                "prior_analysis_run_manifest_hash",
+                "prior_source_snapshot_id",
+                "prior_source_hash",
+                "prior_source_locator",
+                "selected_source_locator",
+            ):
+                target[field] = deepcopy(command[field])
+            target["prior_run_lineage_verification"] = (
+                "verified_analysis_run_manifest"
+            )
 
     if action in {
         "approve",
@@ -2059,6 +2303,19 @@ def _build_success_response(
         "owner_authored_correction": queue_entry.get(
             "owner_authored_correction"
         ),
+        "prior_analysis_run_id": queue_entry.get("prior_analysis_run_id"),
+        "prior_analysis_run_manifest_hash": queue_entry.get(
+            "prior_analysis_run_manifest_hash"
+        ),
+        "prior_source_snapshot_id": queue_entry.get("prior_source_snapshot_id"),
+        "prior_source_hash": queue_entry.get("prior_source_hash"),
+        "prior_source_locator": deepcopy(queue_entry.get("prior_source_locator")),
+        "selected_source_locator": deepcopy(
+            queue_entry.get("selected_source_locator")
+        ),
+        "prior_run_lineage_verification": queue_entry.get(
+            "prior_run_lineage_verification"
+        ),
         "completion_event_hash": completion["event_hash"],
         "review_workflow_state": {
             "approval_scope": "review_lifecycle_metadata_only",
@@ -2070,6 +2327,7 @@ def _build_success_response(
             "owner_authored_correction_scope": (
                 "review_lifecycle_metadata_only"
             ),
+            "rerun_request_scope": "review_lifecycle_metadata_only",
             "is_canon": False,
             "candidate_record_mutation_performed": False,
             "target_candidate_mutation_performed": False,
@@ -2084,6 +2342,8 @@ def _build_success_response(
             "raw_artifact_persistence_performed": False,
             "runtime_extraction_performed": False,
             "model_call_performed": False,
+            "rerun_execution_performed": False,
+            "candidate_generation_performed": False,
             "generated_prose_performed": False,
             "owner_authored_correction_performed": (
                 intent["action_command"] == "record_owner_authored_correction"
@@ -2661,6 +2921,12 @@ def execute_review_action_command(
                         queue_entry_id=queue_entry_id,
                         request=valid,
                     ) from exc
+            if valid["action_type"] == "request_rerun_selected_source":
+                _validate_prior_run_lineage(
+                    queue_entry,
+                    valid,
+                    project_dir=resolved_project_dir,
+                )
             command_time = _utc_now()
             target = compute_review_queue_transition(
                 queue_entry,
@@ -2831,6 +3097,34 @@ def validate_owner_action_command_request(request: Any) -> dict[str, Any]:
             allow_null=False,
         )
         if not correction.strip():
+            raise ValueError("invalid request")
+    if value["action_command"] == "request_rerun_selected_source":
+        required = {
+            "prior_analysis_run_id",
+            "prior_analysis_run_manifest_hash",
+            "prior_source_snapshot_id",
+            "prior_source_hash",
+            "prior_source_locator",
+            "selected_source_locator",
+        }
+        if not required <= set(value):
+            raise ValueError("invalid request")
+        _safe_id(value["prior_analysis_run_id"])
+        _safe_id(value["prior_source_snapshot_id"])
+        _require_sha256(value["prior_analysis_run_manifest_hash"])
+        prior_source_hash = _require_sha256(value["prior_source_hash"])
+        prior_locator = candidate_record.validate_source_locator(
+            value["prior_source_locator"]
+        )
+        selected_locator = candidate_record.validate_source_locator(
+            value["selected_source_locator"]
+        )
+        if (
+            prior_locator["project_id"] != value["project_id"]
+            or selected_locator["project_id"] != value["project_id"]
+            or prior_locator != selected_locator
+            or prior_locator.get("source_hash") not in {None, prior_source_hash}
+        ):
             raise ValueError("invalid request")
     return _copy_mapping(value)
 

@@ -43,6 +43,7 @@ _ACTION_COMMANDS = frozenset(
         "record_source_linkage_correction",
         "mark_superseded",
         "record_owner_authored_correction",
+        "request_rerun_selected_source",
         "quarantine",
         "update_owner_note",
         "set_review_status",
@@ -436,6 +437,30 @@ def _validate_intent(event) -> None:
         "owner_authored_correction_recorded",
     ):
         raise ValueError("owner-authored correction target requires explicit action")
+    rerun_pair = ("needs_info", "rerun_selected_source_requested")
+    rerun_fields = (
+        "prior_analysis_run_id",
+        "prior_analysis_run_manifest_hash",
+        "prior_source_snapshot_id",
+        "prior_source_hash",
+        "prior_source_locator",
+        "selected_source_locator",
+        "prior_run_lineage_verification",
+    )
+    if event["action_command"] == "request_rerun_selected_source":
+        if (
+            target_pair != rerun_pair
+            or any(validated_target.get(field) is None for field in rerun_fields)
+            or validated_target["prior_source_locator"]
+            != validated_target["source_locator"]
+            or validated_target["selected_source_locator"]
+            != validated_target["source_locator"]
+            or validated_target["prior_run_lineage_verification"]
+            != "verified_analysis_run_manifest"
+        ):
+            raise ValueError("invalid rerun-selected-source action linkage")
+    elif target_pair == rerun_pair:
+        raise ValueError("rerun-selected-source target requires explicit action")
 
 
 def _validate_completed(event, *, intent) -> None:

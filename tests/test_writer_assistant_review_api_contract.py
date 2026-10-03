@@ -186,6 +186,12 @@ OWNER_ACTION_OPTIONAL_FIELDS = {
     "superseding_target_expected_review_status",
     "superseding_target_expected_version",
     "owner_authored_correction",
+    "prior_analysis_run_id",
+    "prior_analysis_run_manifest_hash",
+    "prior_source_snapshot_id",
+    "prior_source_hash",
+    "prior_source_locator",
+    "selected_source_locator",
     "requested_evidence_note",
     "command_metadata",
     "idempotency_key",
@@ -205,6 +211,7 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "record_source_linkage_correction",
     "mark_superseded",
     "record_owner_authored_correction",
+    "request_rerun_selected_source",
     "archive_without_promotion",
     "add_reviewer_note",
     "clear_reviewer_note",
@@ -621,6 +628,20 @@ def test_validate_owner_action_command_request_accepts_only_t003_allowed_command
         )
     elif command == "record_owner_authored_correction":
         request["owner_authored_correction"] = "Exact owner correction text."
+    elif command == "request_rerun_selected_source":
+        locator = {
+            "project_id": PROJECT_ID,
+            "source_document_type": "scene",
+            "source_document_id": "scene_001",
+        }
+        request.update(
+            prior_analysis_run_id="analysis-run-prior-001",
+            prior_analysis_run_manifest_hash="a" * 64,
+            prior_source_snapshot_id="source-snapshot-prior-001",
+            prior_source_hash="b" * 64,
+            prior_source_locator=locator,
+            selected_source_locator=locator,
+        )
     result = review_api.validate_owner_action_command_request(request)
 
     assert result["action_command"] == command

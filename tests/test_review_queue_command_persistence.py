@@ -10,11 +10,14 @@ import pytest
 
 from backend import project_manager, review_api
 from backend.story_knowledge import (
+    analysis_run_manifest,
+    apply_contract,
     candidate_persistence,
     candidate_record,
     candidate_review_gate,
     candidate_storage,
     review_queue_storage,
+    source_map,
 )
 
 
@@ -37,9 +40,76 @@ STATE_PAIRS = (
     ("correction_recorded", "rename_metadata_recorded"),
     ("correction_recorded", "source_linkage_correction_recorded"),
     ("correction_recorded", "owner_authored_correction_recorded"),
+    ("needs_info", "rerun_selected_source_requested"),
     ("superseded", "superseded_candidate"),
     ("archived", "archived_without_promotion"),
 )
+
+
+def prior_run_fixture() -> tuple[dict, bytes]:
+    identity = source_map.build_exact_source_snapshot(
+        project_id=PROJECT_ID,
+        source_document_type="scene",
+        source_document_id="scene_001",
+        source_document_version="1",
+        source_ownership="owner_authored",
+        source_content="Owner source.",
+        scene_id="scene_001",
+    ).identity
+    operation = analysis_run_manifest.OperationDeclaration(
+        operation_id="fixture-analysis",
+        adapter_id="deterministic_fallback",
+        consumes=("owner_selected_source",),
+        produces=("diagnostic_candidate_finding",),
+        configuration={},
+        feature_flags={},
+    )
+    provenance = analysis_run_manifest.AdapterProvenance(
+        adapter_id="deterministic_fallback",
+        operation_id="fixture-analysis",
+        user_facing_label="Fixture analysis",
+        implementation_kind="fallback",
+        tool=analysis_run_manifest.ProvenanceComponent("unknown"),
+        runtime=analysis_run_manifest.ProvenanceComponent("unknown"),
+        provider=analysis_run_manifest.ProvenanceComponent("unknown"),
+        model=analysis_run_manifest.ProvenanceComponent("unknown"),
+    )
+    manifest = analysis_run_manifest.AnalysisRunManifest(
+        run_id="analysis-run-prior-001",
+        project_id=PROJECT_ID,
+        sources=(identity,),
+        operations=(operation,),
+        dependency_graph=(),
+        contributors=(
+            analysis_run_manifest.ContributorLineage(
+                operation_id="fixture-analysis",
+                adapter_id="deterministic_fallback",
+                source_snapshot_ids=(identity.snapshot_id,),
+                result_state="empty",
+                coverage="complete",
+                explanation="No candidate output is created by this fixture.",
+                provenance=provenance,
+                output_ids=(),
+            ),
+        ),
+        artifact_references=(),
+        outputs=(),
+        transformations=(),
+        coverage="complete",
+        created_at=NOW,
+        finalized_at=NOW,
+        configuration={},
+        feature_flags={},
+    )
+    raw = apply_contract.canonical_json_bytes(manifest.to_dict())
+    return {
+        "prior_analysis_run_id": manifest.run_id,
+        "prior_analysis_run_manifest_hash": hashlib.sha256(raw).hexdigest(),
+        "prior_source_snapshot_id": identity.snapshot_id,
+        "prior_source_hash": identity.content_hash,
+        "prior_source_locator": candidate()["source_locator"],
+        "selected_source_locator": candidate()["source_locator"],
+    }, raw
 
 
 def candidate(
@@ -135,6 +205,10 @@ def queue_entry(pair=("pending", "owner_review_pending"), **overrides) -> dict:
             "superseding_target_lifecycle_state", "owner_review_pending"
         )
         entry.setdefault("superseding_target_review_version", 0)
+    elif pair == ("needs_info", "rerun_selected_source_requested"):
+        lineage, _ = prior_run_fixture()
+        entry.update(lineage)
+        entry["prior_run_lineage_verification"] = "verified_analysis_run_manifest"
     return review_queue_storage.validate_review_queue_entry(entry)
 
 
@@ -209,6 +283,11 @@ def command(action: str, **overrides) -> dict:
             "rationale": "The candidate review metadata needs correction",
             "owner_authored_correction": "Exact owner correction.",
         },
+        "request_rerun_selected_source": {
+            "owner_note": "Owner requests a selected-source rerun.",
+            "rationale": "The prior analysis requires another candidate-only review pass.",
+            **prior_run_fixture()[0],
+        },
         "quarantine": {"owner_note": "Support is invalid"},
         "update_owner_note": {"owner_note": "Updated owner note"},
         "set_review_status": {
@@ -236,6 +315,16 @@ def persisted_project(tmp_path: Path) -> tuple[Path, Path]:
     review_queue_storage.write_review_queue_entry(
         duplicate_target_queue_entry(), project_dir=project_dir
     )
+    lineage, manifest_raw = prior_run_fixture()
+    manifest_path = (
+        project_dir
+        / "writer_assistant"
+        / "analysis_runs"
+        / lineage["prior_analysis_run_id"]
+        / "manifest.json"
+    )
+    manifest_path.parent.mkdir(parents=True)
+    manifest_path.write_bytes(manifest_raw)
     runtime = tmp_path / "runtime"
     runtime.mkdir(mode=0o700)
     return project_dir, runtime

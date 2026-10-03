@@ -63,6 +63,13 @@ _OPTIONAL_ENTRY_FIELDS = frozenset(
         "superseding_target_lifecycle_state",
         "superseding_target_review_version",
         "owner_authored_correction",
+        "prior_analysis_run_id",
+        "prior_analysis_run_manifest_hash",
+        "prior_source_snapshot_id",
+        "prior_source_hash",
+        "prior_source_locator",
+        "selected_source_locator",
+        "prior_run_lineage_verification",
         "insufficient_evidence_reason",
         "rejected_output_reason",
         "review_version",
@@ -107,6 +114,7 @@ _ALLOWED_LIFECYCLE_STATES = frozenset(
         "rename_metadata_recorded",
         "source_linkage_correction_recorded",
         "owner_authored_correction_recorded",
+        "rerun_selected_source_requested",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -126,6 +134,7 @@ _VALID_REVIEW_STATE_PAIRS = frozenset(
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
         ("correction_recorded", "owner_authored_correction_recorded"),
+        ("needs_info", "rerun_selected_source_requested"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -179,6 +188,12 @@ _OWNER_ACTION_OPTIONAL = frozenset(
         "superseding_target_lifecycle_state",
         "superseding_target_review_version",
         "owner_authored_correction",
+        "prior_analysis_run_id",
+        "prior_analysis_run_manifest_hash",
+        "prior_source_snapshot_id",
+        "prior_source_hash",
+        "prior_source_locator",
+        "selected_source_locator",
         "requested_evidence_note",
         "requested_owner_visible_label",
         "requested_source_locator",
@@ -201,6 +216,7 @@ _OWNER_ACTION_ALLOWED_COMMANDS = frozenset(
         "record_source_linkage_correction",
         "mark_superseded",
         "record_owner_authored_correction",
+        "request_rerun_selected_source",
         "archive_without_promotion",
         "add_reviewer_note",
         "clear_reviewer_note",
@@ -226,6 +242,10 @@ _OWNER_ACTION_COMMAND_RESULT_PAIRS = {
     "record_owner_authored_correction": (
         "correction_recorded",
         "owner_authored_correction_recorded",
+    ),
+    "request_rerun_selected_source": (
+        "needs_info",
+        "rerun_selected_source_requested",
     ),
 }
 
@@ -290,6 +310,16 @@ def _require_list(value):
 
 def _require_non_empty_string(value):
     if not isinstance(value, str) or not value.strip():
+        raise ValueError("invalid field")
+    return value
+
+
+def _require_sha256(value):
+    if (
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
+    ):
         raise ValueError("invalid field")
     return value
 
@@ -497,6 +527,16 @@ def validate_review_queue_entry(entry):
         "correction_recorded",
         "owner_authored_correction_recorded",
     )
+    rerun_request_pair = ("needs_info", "rerun_selected_source_requested")
+    rerun_metadata_fields = (
+        "prior_analysis_run_id",
+        "prior_analysis_run_manifest_hash",
+        "prior_source_snapshot_id",
+        "prior_source_hash",
+        "prior_source_locator",
+        "selected_source_locator",
+        "prior_run_lineage_verification",
+    )
     superseded_pair = ("superseded", "superseded_candidate")
     supersede_metadata_fields = (
         "superseded_by_candidate_id",
@@ -555,10 +595,37 @@ def validate_review_queue_entry(entry):
     ) is not None:
         raise ValueError("invalid field")
 
+    if state_pair == rerun_request_pair:
+        if any(working.get(field) is None for field in rerun_metadata_fields):
+            raise ValueError("invalid field")
+        _require_safe_id(working["prior_analysis_run_id"])
+        _require_safe_id(working["prior_source_snapshot_id"])
+        _require_sha256(working["prior_analysis_run_manifest_hash"])
+        prior_source_hash = _require_sha256(working["prior_source_hash"])
+        prior_locator = candidate_record.validate_source_locator(
+            working["prior_source_locator"]
+        )
+        selected_locator = candidate_record.validate_source_locator(
+            working["selected_source_locator"]
+        )
+        if (
+            prior_locator["project_id"] != working["project_id"]
+            or selected_locator["project_id"] != working["project_id"]
+            or prior_locator != selected_locator
+            or selected_locator != working["source_locator"]
+            or prior_locator.get("source_hash") not in {None, prior_source_hash}
+            or working["prior_run_lineage_verification"]
+            != "verified_analysis_run_manifest"
+        ):
+            raise ValueError("invalid field")
+    elif any(working.get(field) is not None for field in rerun_metadata_fields):
+        raise ValueError("invalid field")
+
     state_specific_metadata_fields = (
         *supersede_metadata_fields,
         "owner_authored_correction",
         *correction_metadata_fields,
+        *rerun_metadata_fields,
     )
     for field in state_specific_metadata_fields:
         if working.get(field) is None and not (
@@ -864,6 +931,26 @@ def validate_owner_action_record(action):
         correction = working.get("owner_authored_correction")
         _require_optional_text(correction, maximum=10_000)
         if not correction or not correction.strip():
+            raise ValueError("invalid field")
+
+    if working["action_command"] == "request_rerun_selected_source":
+        _require_safe_id(working.get("prior_analysis_run_id"))
+        _require_safe_id(working.get("prior_source_snapshot_id"))
+        _require_sha256(working.get("prior_analysis_run_manifest_hash"))
+        prior_source_hash = _require_sha256(working.get("prior_source_hash"))
+        prior_locator = candidate_record.validate_source_locator(
+            working.get("prior_source_locator")
+        )
+        selected_locator = candidate_record.validate_source_locator(
+            working.get("selected_source_locator")
+        )
+        if (
+            prior_locator["project_id"] != working["project_id"]
+            or selected_locator["project_id"] != working["project_id"]
+            or prior_locator != selected_locator
+            or selected_locator != working["source_locator"]
+            or prior_locator.get("source_hash") not in {None, prior_source_hash}
+        ):
             raise ValueError("invalid field")
 
     if working["action_command"] == "rename_candidate_metadata":

@@ -121,6 +121,7 @@ ALLOWED_LIFECYCLE_STATES = frozenset(
         "rename_metadata_recorded",
         "source_linkage_correction_recorded",
         "owner_authored_correction_recorded",
+        "rerun_selected_source_requested",
         "superseded_candidate",
         "archived_without_promotion",
     }
@@ -140,6 +141,7 @@ VALID_REVIEW_STATE_PAIRS = frozenset(
         ("correction_recorded", "rename_metadata_recorded"),
         ("correction_recorded", "source_linkage_correction_recorded"),
         ("correction_recorded", "owner_authored_correction_recorded"),
+        ("needs_info", "rerun_selected_source_requested"),
         ("superseded", "superseded_candidate"),
         ("archived", "archived_without_promotion"),
     }
@@ -211,6 +213,7 @@ OWNER_ACTION_ALLOWED_COMMANDS = (
     "record_source_linkage_correction",
     "mark_superseded",
     "record_owner_authored_correction",
+    "request_rerun_selected_source",
     "archive_without_promotion",
     "add_reviewer_note",
     "clear_reviewer_note",
@@ -466,6 +469,16 @@ def build_valid_queue_entry(**overrides):
             "superseding_target_lifecycle_state", "owner_review_pending"
         )
         entry.setdefault("superseding_target_review_version", 0)
+    elif pair == ("needs_info", "rerun_selected_source_requested"):
+        entry.update(
+            prior_analysis_run_id="analysis-run-prior-001",
+            prior_analysis_run_manifest_hash="a" * 64,
+            prior_source_snapshot_id="source-snapshot-prior-001",
+            prior_source_hash="b" * 64,
+            prior_source_locator=copy.deepcopy(entry["source_locator"]),
+            selected_source_locator=copy.deepcopy(entry["source_locator"]),
+            prior_run_lineage_verification="verified_analysis_run_manifest",
+        )
     return entry
 
 
@@ -1310,6 +1323,10 @@ def test_validate_owner_action_accepts_allowed_commands(command):
             "correction_recorded",
             "owner_authored_correction_recorded",
         ),
+        "request_rerun_selected_source": (
+            "needs_info",
+            "rerun_selected_source_requested",
+        ),
     }
     action = build_valid_owner_action_record(action_command=command)
     if command == "mark_duplicate":
@@ -1332,6 +1349,15 @@ def test_validate_owner_action_accepts_allowed_commands(command):
         )
     elif command == "record_owner_authored_correction":
         action["owner_authored_correction"] = "Exact owner-authored correction."
+    elif command == "request_rerun_selected_source":
+        action.update(
+            prior_analysis_run_id="analysis-run-prior-001",
+            prior_analysis_run_manifest_hash="a" * 64,
+            prior_source_snapshot_id="source-snapshot-prior-001",
+            prior_source_hash="b" * 64,
+            prior_source_locator=copy.deepcopy(action["source_locator"]),
+            selected_source_locator=copy.deepcopy(action["source_locator"]),
+        )
     if command in result_pairs:
         action["resulting_review_status"], action["resulting_lifecycle_state"] = (
             result_pairs[command]
