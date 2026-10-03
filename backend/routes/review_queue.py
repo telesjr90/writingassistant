@@ -265,6 +265,63 @@ def _ensure_payload(
     elif payload_key == "summary":
         if not isinstance(payload.get("summary"), dict):
             raise ValueError("invalid response")
+    elif payload_key == "groups":
+        groups = payload.get("groups")
+        if not isinstance(groups, list):
+            raise ValueError("invalid response")
+        seen_queue_entry_ids: set[str] = set()
+        for group in groups:
+            if not isinstance(group, dict) or not isinstance(group.get("entries"), list):
+                raise ValueError("invalid response")
+            pair = (group.get("review_status"), group.get("lifecycle_state"))
+            if group.get("group_key") != f"{pair[0]}:{pair[1]}":
+                raise ValueError("invalid response")
+            if group.get("entry_count") != len(group["entries"]):
+                raise ValueError("invalid response")
+            for item in group["entries"]:
+                if not isinstance(item, dict):
+                    raise ValueError("invalid response")
+                entry = item.get("entry")
+                _ensure_entry(entry, project_id=project_id, full=True)
+                if (entry["review_status"], entry["lifecycle_state"]) != pair:
+                    raise ValueError("invalid response")
+                if entry["queue_entry_id"] in seen_queue_entry_ids:
+                    raise ValueError("invalid response")
+                seen_queue_entry_ids.add(entry["queue_entry_id"])
+                audit = item.get("audit")
+                if (
+                    not isinstance(audit, dict)
+                    or audit.get("chain_validated") is not True
+                    or not isinstance(audit.get("events"), list)
+                    or audit.get("event_count") != len(audit["events"])
+                ):
+                    raise ValueError("invalid response")
+        workflow = payload.get("review_workflow_state")
+        if (
+            not isinstance(workflow, dict)
+            or workflow.get("projection_scope")
+            != "review_queue_grouped_audit_read_only"
+            or any(
+                workflow.get(field) is not False
+                for field in (
+                    "is_canon",
+                    "promotion_created",
+                    "apply_promotion_performed",
+                    "memory_canon_mutation_performed",
+                    "project_truth_mutation_performed",
+                    "candidate_record_mutation_performed",
+                    "source_candidate_deleted",
+                    "content_merge_performed",
+                    "content_split_performed",
+                    "generated_prose_performed",
+                    "runtime_extraction_performed",
+                    "model_call_performed",
+                    "rerun_execution_performed",
+                    "candidate_generation_performed",
+                )
+            )
+        ):
+            raise ValueError("invalid response")
     else:
         raise ValueError("invalid response")
 
@@ -291,7 +348,7 @@ def _readonly_response(
         )
     except HTTPException:
         raise
-    except (TypeError, ValueError) as exc:
+    except (OSError, TypeError, ValueError) as exc:
         raise HTTPException(
             status_code=422,
             detail=_error_detail(
@@ -435,6 +492,19 @@ async def get_review_queue_summary(project_id: str, request: Request) -> dict[st
         review_api.get_review_queue_summary_readonly,
         valid,
         payload_key="summary",
+    )
+
+
+@router.get("/grouped-audit")
+async def get_review_queue_grouped_audit(
+    project_id: str, request: Request
+) -> dict[str, Any]:
+    await _reject_request_body(request, project_id)
+    valid = _read_request(project_id=project_id, request=request)
+    return _readonly_response(
+        review_api.get_review_queue_grouped_audit_readonly,
+        valid,
+        payload_key="groups",
     )
 
 

@@ -185,6 +185,82 @@ _ENTRY_RESPONSE_FIELDS = (
     "prior_run_lineage_verification",
 )
 
+_GROUPED_AUDIT_EVENT_FIELDS = (
+    "sequence",
+    "event_type",
+    "event_hash",
+    "previous_event_hash",
+    "project_id",
+    "queue_entry_id",
+    "action_command",
+    "action_id",
+    "idempotency_key",
+    "request_hash",
+    "candidate_record_id",
+    "completion_state",
+    "intent_event_hash",
+    "queue_before_hash",
+    "target_queue_hash",
+    "candidate_before_hash",
+    "evidence_projection_before_hash",
+    "queue_after_hash",
+    "candidate_after_hash",
+    "evidence_projection_after_hash",
+    "failure_reason",
+    "failure_detail",
+    "observed_queue_hash",
+    "retryable",
+    "created_at",
+    "completed_at",
+    "failed_at",
+)
+
+_GROUPED_AUDIT_REQUIRED_METADATA = {
+    ("duplicate", "duplicate_candidate"): frozenset(
+        {
+            "duplicate_candidate_ids",
+            "duplicate_target_queue_entry_id",
+            "duplicate_target_review_status",
+            "duplicate_target_lifecycle_state",
+            "duplicate_target_review_version",
+        }
+    ),
+    ("correction_recorded", "rename_metadata_recorded"): frozenset(
+        {
+            "requested_owner_visible_label",
+        }
+    ),
+    ("correction_recorded", "source_linkage_correction_recorded"): frozenset(
+        {
+            "original_source_locator",
+            "requested_source_locator",
+        }
+    ),
+    ("superseded", "superseded_candidate"): frozenset(
+        {
+            "superseded_by_candidate_id",
+            "superseding_target_queue_entry_id",
+            "superseding_target_review_status",
+            "superseding_target_lifecycle_state",
+            "superseding_target_review_version",
+        }
+    ),
+    ("correction_recorded", "owner_authored_correction_recorded"): frozenset(
+        {"owner_authored_correction"}
+    ),
+    ("needs_info", "rerun_selected_source_requested"): frozenset(
+        {
+            "prior_analysis_run_id",
+            "prior_analysis_run_manifest_hash",
+            "prior_source_snapshot_id",
+            "prior_source_hash",
+            "prior_source_locator",
+            "selected_source_locator",
+            "prior_run_lineage_verification",
+        }
+    ),
+}
+
 _ENTRY_FILTER_FIELDS = (
     "review_status",
     "lifecycle_state",
@@ -856,6 +932,92 @@ def _safe_entry(entry: dict[str, Any]) -> dict[str, Any]:
     safe.setdefault("owner_review_completed", False)
     safe.setdefault("owner_reviewed_at", None)
     return safe
+
+
+def _validate_grouped_audit_entry_metadata(entry: dict[str, Any]) -> None:
+    state_pair = (entry["review_status"], entry["lifecycle_state"])
+    required = _GROUPED_AUDIT_REQUIRED_METADATA.get(state_pair, frozenset())
+    if any(entry.get(field) is None for field in required):
+        raise ValueError("incomplete grouped review metadata")
+
+
+def _grouped_audit_event_projection(
+    event: dict[str, Any],
+    *,
+    entry: dict[str, Any],
+) -> dict[str, Any]:
+    if (
+        event.get("project_id") != entry["project_id"]
+        or event.get("queue_entry_id") != entry["queue_entry_id"]
+        or event.get("candidate_record_id") != entry["candidate_record_id"]
+    ):
+        raise ValueError("review action event does not match queue entry")
+    return {
+        field: deepcopy(event[field])
+        for field in _GROUPED_AUDIT_EVENT_FIELDS
+        if field in event
+    }
+
+
+def _grouped_audit_for_entry(
+    entry: dict[str, Any],
+    *,
+    project_dir: Any,
+) -> dict[str, Any]:
+    chain = review_action_events.scan_review_action_event_chain(
+        project_dir=project_dir,
+        project_id=entry["project_id"],
+        queue_entry_id=entry["queue_entry_id"],
+    )
+    events = [
+        _grouped_audit_event_projection(event, entry=entry) for event in chain
+    ]
+    tail = chain[-1] if chain else None
+    if tail is None:
+        chain_state = "no_events"
+    elif tail["event_type"] in {"action_completed", "action_recovery_completed"}:
+        current_hash = hashlib.sha256(
+            apply_contract.canonical_json_bytes(entry)
+        ).hexdigest()
+        if tail["queue_after_hash"] != current_hash:
+            raise ValueError("review action chain does not match queue entry")
+        chain_state = "completed"
+    elif tail["event_type"] == "action_failed":
+        chain_state = "failed"
+    else:
+        chain_state = "intent_pending"
+    return {
+        "chain_validated": True,
+        "chain_state": chain_state,
+        "event_count": len(events),
+        "action_count": sum(
+            event["event_type"] == "action_intent" for event in events
+        ),
+        "chain_head_event_hash": tail["event_hash"] if tail else None,
+        "latest_action_command": tail["action_command"] if tail else None,
+        "latest_completion_state": tail["completion_state"] if tail else None,
+        "events": events,
+    }
+
+
+def _grouped_audit_safety() -> dict[str, Any]:
+    return {
+        "projection_scope": "review_queue_grouped_audit_read_only",
+        "is_canon": False,
+        "promotion_created": False,
+        "apply_promotion_performed": False,
+        "memory_canon_mutation_performed": False,
+        "project_truth_mutation_performed": False,
+        "candidate_record_mutation_performed": False,
+        "source_candidate_deleted": False,
+        "content_merge_performed": False,
+        "content_split_performed": False,
+        "generated_prose_performed": False,
+        "runtime_extraction_performed": False,
+        "model_call_performed": False,
+        "rerun_execution_performed": False,
+        "candidate_generation_performed": False,
+    }
 
 
 def _storage_warning_response(
@@ -3297,6 +3459,98 @@ def get_review_queue_summary_readonly(
         "metadata": {
             "storage_consulted": True,
         },
+        "warnings": [],
+        "errors": [],
+    }
+
+
+def get_review_queue_grouped_audit_readonly(
+    request: Any,
+    *,
+    project_dir: Any = None,
+) -> dict[str, Any]:
+    """Return a deterministic, read-only lifecycle grouping with validated audit chains."""
+
+    valid = validate_review_queue_read_request(request)
+    if project_dir is None:
+        return {
+            "schema_version": SCHEMA_VERSION,
+            "project_id": valid["project_id"],
+            "groups": [],
+            "pagination": {
+                "limit": valid.get("limit"),
+                "offset": valid.get("offset"),
+                "cursor": valid.get("cursor"),
+                "total_count": 0,
+                "returned_count": 0,
+            },
+            "summary": {
+                "entry_count": 0,
+                "projected_entry_count": 0,
+                "group_count": 0,
+                "audited_entry_count": 0,
+                "unaudited_entry_count": 0,
+            },
+            "metadata": {
+                "storage_consulted": False,
+                "event_storage_consulted": False,
+                "grouping_basis": "review_status_lifecycle_state",
+            },
+            "review_workflow_state": _grouped_audit_safety(),
+            "warnings": [],
+            "errors": [],
+        }
+
+    filtered = _sorted_entries(_read_entries(valid, project_dir=project_dir), valid)
+    paged = _paged_entries(filtered, valid)
+    grouped: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    audited_entry_count = 0
+    for entry in paged:
+        _validate_grouped_audit_entry_metadata(entry)
+        audit = _grouped_audit_for_entry(entry, project_dir=project_dir)
+        if audit["event_count"]:
+            audited_entry_count += 1
+        pair = (entry["review_status"], entry["lifecycle_state"])
+        grouped.setdefault(pair, []).append(
+            {
+                "entry": _safe_entry(entry),
+                "audit": audit,
+            }
+        )
+
+    groups = [
+        {
+            "group_key": f"{review_status}:{lifecycle_state}",
+            "review_status": review_status,
+            "lifecycle_state": lifecycle_state,
+            "entry_count": len(grouped[(review_status, lifecycle_state)]),
+            "entries": grouped[(review_status, lifecycle_state)],
+        }
+        for review_status, lifecycle_state in sorted(grouped)
+    ]
+    summary = _entry_summary(filtered)
+    summary.update(
+        projected_entry_count=len(paged),
+        group_count=len(groups),
+        audited_entry_count=audited_entry_count,
+        unaudited_entry_count=len(paged) - audited_entry_count,
+    )
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "project_id": valid["project_id"],
+        "groups": groups,
+        "pagination": _pagination(
+            valid,
+            total_count=len(filtered),
+            returned_count=len(paged),
+        ),
+        "summary": summary,
+        "metadata": {
+            "storage_consulted": True,
+            "event_storage_consulted": True,
+            "grouping_basis": "review_status_lifecycle_state",
+        },
+        "review_workflow_state": _grouped_audit_safety(),
         "warnings": [],
         "errors": [],
     }

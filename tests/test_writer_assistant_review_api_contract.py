@@ -12,6 +12,7 @@ Expected future public APIs:
 - get_review_queue_entry_readonly
 - get_review_queue_index_readonly
 - get_review_queue_summary_readonly
+- get_review_queue_grouped_audit_readonly
 - validate_review_queue_read_request
 - validate_owner_action_command_request
 - build_owner_action_command_response
@@ -42,6 +43,7 @@ EXPECTED_PUBLIC_API = (
     "get_review_queue_entry_readonly",
     "get_review_queue_index_readonly",
     "get_review_queue_summary_readonly",
+    "get_review_queue_grouped_audit_readonly",
     "validate_review_queue_read_request",
     "validate_owner_action_command_request",
     "build_owner_action_command_response",
