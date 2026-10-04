@@ -86,6 +86,7 @@ class TestOMIShellSingleH1:
             "Apply-Promotion Confirmation",
             "Grouped Owner Review",
             "Owner-Facing Live Analysis",
+            "NCP Gateway and Diagnostics",
         ):
             assert title in source
 
@@ -117,7 +118,8 @@ class TestDashboardHeadingHierarchy:
 
     def test_dashboard_does_not_render_h3(self) -> None:
         source = read_text(OMI_DASHBOARD_JSX)
-        assert "<h3>" not in source
+        dashboard = source[source.index("export default function OMIDashboard"):]
+        assert "<h3>" not in dashboard
 
 
 # ---------------------------------------------------------------------------

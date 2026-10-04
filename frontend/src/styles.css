@@ -2700,6 +2700,11 @@ h2 {
   border-color: var(--wa-color-danger-border);
 }
 
+.omi-analysis-notice.is-success {
+  background: var(--wa-color-success-surface);
+  border-color: var(--wa-color-success-border);
+}
+
 .omi-analysis-tool-list {
   display: grid;
   min-width: 0;
@@ -2832,6 +2837,209 @@ h2 {
   border-color: var(--wa-color-success-border);
 }
 
+.omi-ncp-owner {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-16);
+}
+
+.omi-ncp-header,
+.omi-ncp-section-heading,
+.omi-ncp-actions {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-12);
+}
+
+.omi-ncp-header h2,
+.omi-ncp-boundary h3,
+.omi-ncp-section h3,
+.omi-ncp-package h3 {
+  margin: 0;
+  color: var(--wa-color-text-strong);
+  text-wrap: balance;
+}
+
+.omi-ncp-header h2 {
+  margin-top: var(--wa-space-4);
+  font-size: 22px;
+}
+
+.omi-ncp-boundary,
+.omi-ncp-section,
+.omi-ncp-package {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-10);
+  padding: var(--wa-space-14);
+  border-radius: var(--wa-radius-surface);
+}
+
+.omi-ncp-boundary {
+  background: var(--wa-color-warning-surface);
+  border: 1px solid var(--wa-color-warning-border);
+}
+
+.omi-ncp-section {
+  background: var(--wa-color-surface-subtle);
+  border: 1px solid var(--wa-color-border);
+}
+
+.omi-ncp-boundary p,
+.omi-ncp-section p,
+.omi-ncp-package p,
+.omi-ncp-package ul {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.omi-ncp-package-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--wa-space-12);
+}
+
+.omi-ncp-package {
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+}
+
+.omi-ncp-package.is-standard {
+  border-color: var(--wa-color-success-border);
+}
+
+.omi-ncp-package.is-blocked {
+  background: var(--wa-color-warning-surface);
+  border-color: var(--wa-color-warning-border);
+}
+
+.omi-ncp-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-6);
+  color: var(--wa-color-text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.omi-ncp-field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: var(--wa-space-8) var(--wa-space-10);
+  color: var(--wa-color-text);
+  background: var(--wa-color-surface);
+  border: 1px solid #aab8ce;
+  border-radius: var(--wa-radius-control);
+}
+
+.omi-ncp-field input[aria-invalid="true"] {
+  border-color: var(--wa-color-danger);
+}
+
+.omi-ncp-validation {
+  min-height: 24px;
+  padding: var(--wa-space-6) var(--wa-space-8);
+  color: var(--wa-color-text-secondary);
+  background: var(--wa-color-surface-muted);
+  border-radius: var(--wa-radius-control);
+  overflow-wrap: anywhere;
+}
+
+.omi-ncp-validation.is-valid {
+  color: var(--wa-color-success);
+  background: var(--wa-color-success-surface);
+}
+
+.omi-ncp-validation.is-invalid {
+  color: var(--wa-color-danger);
+  background: var(--wa-color-danger-surface);
+}
+
+.omi-ncp-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.omi-ncp-metadata {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--wa-space-8);
+  margin: 0;
+}
+
+.omi-ncp-metadata div,
+.omi-ncp-diagnostic-summary div {
+  min-width: 0;
+  padding: var(--wa-space-8);
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-control);
+}
+
+.omi-ncp-metadata dt {
+  color: var(--wa-color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.omi-ncp-metadata dd {
+  min-width: 0;
+  margin: var(--wa-space-4) 0 0;
+  overflow-wrap: anywhere;
+}
+
+.omi-ncp-metadata code {
+  white-space: pre-wrap;
+}
+
+.omi-ncp-diagnostic-summary {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--wa-space-8);
+}
+
+.omi-ncp-diagnostic-summary strong,
+.omi-ncp-diagnostic-summary span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.omi-ncp-diagnostic-summary span {
+  margin-top: var(--wa-space-4);
+  color: var(--wa-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.omi-ncp-traceability {
+  min-width: 0;
+  padding: var(--wa-space-10) var(--wa-space-12);
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-surface);
+}
+
+.omi-ncp-traceability summary {
+  min-height: 24px;
+  color: var(--wa-color-text-secondary);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.omi-ncp-traceability[open] summary {
+  margin-bottom: var(--wa-space-10);
+}
+
 @container omi-shell (max-width: 680px) {
   .omi-candidate-detail-layout {
     grid-template-columns: 1fr;
@@ -2844,13 +3052,33 @@ h2 {
   .omi-analysis-tool-list,
   .omi-analysis-inspection-grid,
   .omi-analysis-adapter-grid,
-  .omi-analysis-metadata {
+  .omi-analysis-metadata,
+  .omi-ncp-package-grid,
+  .omi-ncp-metadata,
+  .omi-ncp-diagnostic-summary {
     grid-template-columns: 1fr;
   }
 
   .omi-analysis-header,
-  .omi-analysis-section-heading {
+  .omi-analysis-section-heading,
+  .omi-ncp-header,
+  .omi-ncp-section-heading {
     flex-direction: column;
+  }
+}
+
+@container omi-shell (max-width: 420px) {
+  .omi-ncp-boundary,
+  .omi-ncp-section,
+  .omi-ncp-package {
+    padding: var(--wa-space-10);
+  }
+
+  .omi-ncp-header > .secondary-button,
+  .omi-ncp-actions,
+  .omi-ncp-actions > button,
+  .omi-ncp-package > button {
+    width: 100%;
   }
 }
 
@@ -3253,7 +3481,9 @@ h2 {
 
   .omi-grouped-source-scope select,
   .omi-grouped-filter-grid input[type="search"],
-  .omi-grouped-filter-grid select {
+  .omi-grouped-filter-grid select,
+  .omi-ncp-field input,
+  .omi-ncp-traceability summary {
     min-height: 44px;
   }
 

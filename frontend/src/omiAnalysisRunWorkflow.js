@@ -1,4 +1,11 @@
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
+const SAFE_NCP_DESTINATION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
+const DESTRUCTIVE_DESTINATION_TOKENS = new Set([
+  'delete',
+  'overwrite',
+  'purge',
+  'replace',
+]);
 
 const RUN_STATE_LABELS = Object.freeze({
   complete: 'Succeeded',
@@ -86,4 +93,57 @@ export function makeAnalysisIdempotencyKey(projectId, sourceId) {
   const projectPart = SAFE_ID_PATTERN.test(projectId ?? '') ? projectId : 'project';
   const sourcePart = SAFE_ID_PATTERN.test(sourceId ?? '') ? sourceId : 'source';
   return `owner-run-${projectPart}-${sourcePart}-${randomPart}`.slice(0, 256);
+}
+
+export function validateNcpDestinationIdentifier(value) {
+  if (typeof value !== 'string' || value === '') {
+    return {
+      valid: false,
+      code: 'destination_required',
+      message: 'Enter a new opaque target identifier.',
+    };
+  }
+
+  if (
+    value === '.'
+    || value === '..'
+    || !SAFE_NCP_DESTINATION_PATTERN.test(value)
+    || value.includes('/')
+    || value.includes('\\')
+  ) {
+    return {
+      valid: false,
+      code: 'unsafe_destination_identifier',
+      message: 'Use only letters, numbers, dots, underscores, or hyphens. Filesystem paths are not accepted.',
+    };
+  }
+
+  const normalizedValue = value.toLowerCase();
+  if ([...DESTRUCTIVE_DESTINATION_TOKENS].some((token) => normalizedValue.includes(token))) {
+    return {
+      valid: false,
+      code: 'destructive_destination_semantics',
+      message: 'Overwrite, replace, delete, and purge semantics are disabled pending an owner decision.',
+    };
+  }
+
+  return {
+    valid: true,
+    code: 'operator_selected_new_target',
+    message: 'Safe opaque identifier selected for a new target. No path or write is authorized.',
+  };
+}
+
+export function describeNcpInterfaceState(state) {
+  const normalized = typeof state === 'string' ? state : '';
+  const states = {
+    loading: { tone: '', label: 'Loading interface contract', operable: false },
+    empty: { tone: 'is-warning', label: 'No gateway record', operable: false },
+    invalid: { tone: 'is-error', label: 'Validation blocked', operable: false },
+    unavailable: { tone: 'is-warning', label: 'Interface unavailable', operable: false },
+    request_failure: { tone: 'is-error', label: 'Interface check failed', operable: false },
+    success: { tone: 'is-success', label: 'Diagnostics available', operable: true },
+  };
+
+  return states[normalized] ?? states.unavailable;
 }

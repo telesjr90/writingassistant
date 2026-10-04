@@ -84,7 +84,7 @@ def test_shell_keeps_inner_navigation_state_and_back_cancel_wiring_local() -> No
         assert shell_owned_state in shell
 
     assert "onCancel={handleBackToDashboard}" in shell
-    assert shell.count("onBackToDashboard={handleBackToDashboard}") == 3
+    assert shell.count("onBackToDashboard={handleBackToDashboard}") == 4
     navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
     assert "handleBackToDashboard();" in navigate
 
@@ -96,6 +96,7 @@ def test_dashboard_enables_only_implemented_destination_controls() -> None:
         "Owner Input": "live-analysis",
         "Candidates": "candidates",
         "Grouped Review": "grouped-review",
+        "NCP Gateway / Diagnostics": "ncp-diagnostics",
         "Promotion Handoff Readiness": "promotion-handoff",
     }
     for area, destination in enabled_rows.items():
@@ -112,7 +113,7 @@ def test_dashboard_enables_only_implemented_destination_controls() -> None:
     assert 'aria-label="Open Approved Memory/Canon"' in dashboard
     assert "Review promotion readiness" in dashboard
     assert "Open handoff queue" not in dashboard
-    assert dashboard.count("onNavigate(") == 5
+    assert dashboard.count("onNavigate(") == 6
 
 
 def test_unavailable_dashboard_rows_are_status_only_without_callbacks() -> None:

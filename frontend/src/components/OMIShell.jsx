@@ -4,7 +4,10 @@ import OMICandidateCanonStatusStrip from './OMICandidateCanonStatusStrip.jsx';
 import OMICandidateDetail from './OMICandidateDetail.jsx';
 import OMIApplyPromotionRoute from './OMIApplyPromotionRoute.jsx';
 import OMIAnalysisRunWorkflow from './OMIAnalysisRunWorkflow.jsx';
-import OMIDashboard, { getOMIDashboardSummary } from './OMIDashboard.jsx';
+import OMIDashboard, {
+  getOMIDashboardSummary,
+  NcpDiagnosticsOwnerSurface,
+} from './OMIDashboard.jsx';
 import OMIEvidenceDrawer from './OMIEvidenceDrawer.jsx';
 import OMIGroupedReview from './OMIGroupedReview.jsx';
 
@@ -28,6 +31,9 @@ function getShellTitle(omiView) {
   }
   if (omiView === 'live-analysis') {
     return 'Owner-Facing Live Analysis';
+  }
+  if (omiView === 'ncp-diagnostics') {
+    return 'NCP Gateway and Diagnostics';
   }
   return 'OMI Dashboard';
 }
@@ -109,6 +115,14 @@ export default function OMIShell({
       setSelectedEvidence(null);
       evidenceOpenerRef.current = null;
       setOmiView('live-analysis');
+      return;
+    }
+
+    if (destination === 'ncp-diagnostics') {
+      setSelectedCandidateId('');
+      setSelectedEvidence(null);
+      evidenceOpenerRef.current = null;
+      setOmiView('ncp-diagnostics');
       return;
     }
 
@@ -212,6 +226,8 @@ export default function OMIShell({
           onOpenCandidateReview={() => handleNavigate('candidates')}
           onOpenGroupedReview={() => handleNavigate('grouped-review')}
         />
+      ) : omiView === 'ncp-diagnostics' ? (
+        <NcpDiagnosticsOwnerSurface onBackToDashboard={handleBackToDashboard} />
       ) : (
         <OMIDashboard
           omiData={omiData}
