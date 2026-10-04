@@ -37,7 +37,9 @@
     "t007_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T007-evidence-bounded-ollama-and-story-check-closeout.md",
     "t007_implementation_commit": "f843b615762192ca8f6865e76b2c4e4c9bcc2170",
     "t008_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md",
-    "t008_implementation_commit": "2465722cedfe9f8dcb4135d8de124f36a999593f"
+    "t008_implementation_commit": "2465722cedfe9f8dcb4135d8de124f36a999593f",
+    "t011h_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T011H-owner-facing-live-run-workflow-closeout.md",
+    "t011h_implementation_commit": "66d3c587655161415e9508c2dfb1aa2e09f3d231"
   },
   "owner_subtxt_authorization": {
     "licensing_resolved": true,
@@ -104,10 +106,6 @@
     "T008 cross-adapter semantic guardrails complete/PASS at 2465722cedfe9f8dcb4135d8de124f36a999593f; six classifications, normalized-evidence enforcement, no interpretive self-support, author-intent distinction, exactly-once pre-fusion assessment, immutable annotations, and no truth/canon selection accepted"
   ],
   "missing_layers": [
-    "read-only project-level narrative diagnostics",
-    "full NCP import/export gateway and round-trip provenance",
-    "expanded owner correction, merge, split, and rerun lifecycle",
-    "owner live-run workflow",
     "current-layer real execution proof for remaining historical spaCy and NCP foundations",
     "NCP and diagnostics owner UI",
     "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
@@ -118,13 +116,13 @@
       "PHASE8-IMPL-024"
     ],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": null,
-    "immediate_next_task_status": "no singular next implementation task selected; T009, T010, and T011 remain planned/not-begun with T008 dependency satisfied and current authority permits parallel work without owner-priority selection",
+    "immediate_next_task": "PHASE8-IMPL-025-T012A",
+    "immediate_next_task_status": "dependency/eligibility preflight only; implementation not begun; verify T003F, T003G, T009, T010, T010H, T011, and T011H from live repository evidence; T010H remains planned, so T012 eligibility is not asserted",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "complete/PASS",
-    "latest_completed_task": "PHASE8-IMPL-025-T008",
-    "latest_completed_task_status": "complete/PASS; implementation commit 2465722cedfe9f8dcb4135d8de124f36a999593f; deterministic validation 458 passed, 7 existing Pydantic deprecation warnings; accepted BookNLP, Ollama/qwen3:8b, and Story Check current-layer evidence",
-    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T008 at 2465722cedfe9f8dcb4135d8de124f36a999593f"
+    "latest_completed_task": "PHASE8-IMPL-025-T011H",
+    "latest_completed_task_status": "complete/PASS; implementation commit 66d3c587655161415e9508c2dfb1aa2e09f3d231; owner-facing live-run workflow accepted with frontend, backend contract, accessibility/responsive, and browser-smoke validation",
+    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -149,9 +147,9 @@
     "PHASE8-IMPL-025-T006": "accepted/closed optional paid-integration foundation at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; real paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero available official runtime surfaces",
     "PHASE8-IMPL-025-T007": "complete/PASS; implementation commit f843b615762192ca8f6865e76b2c4e4c9bcc2170; deterministic T007E gate 379 passed; bounded real Ollama/qwen3:8b and Story Check current-layer application-path execution accepted; exact-source, immutable output, provenance, T003 model-call truthfulness, grounding/quarantine, nonvalidated output lineage, and candidate/canon safety passed",
     "PHASE8-IMPL-025-T008": "complete/PASS through T008A-T008E; implementation commit 2465722cedfe9f8dcb4135d8de124f36a999593f; deterministic validation 458 passed, 7 existing Pydantic deprecation warnings; py_compile PASS; BookNLP 49 findings/49 annotations (45 supported, 4 ambiguous); live Ollama/qwen3:8b one finding/one insufficient_evidence annotation for eligible_normalized_evidence_missing plus separate malformed-locator fail-closed output; Story Check 16 retained diagnostics/16 annotations (15 insufficient_evidence, 1 unsupported), zero candidate transformations and zero fusion-eligible retained annotations; original outputs unchanged; zero persistence; optional paid Subtxt unavailable and nonblocking; external dramatica_flow not executed and reference/provenance-only",
-    "PHASE8-IMPL-025-T009": "planned/not-begun; T008 dependency satisfied; not activated or prioritized by T008 documentation closeout",
-    "PHASE8-IMPL-025-T010": "planned/not-begun; T008 dependency satisfied; backend gateway contracts may proceed in parallel with T009; not activated or prioritized by T008 documentation closeout",
-    "PHASE8-IMPL-025-T011": "planned/not-begun; T008 dependency satisfied; may proceed in parallel with T009/T010; not activated or prioritized by T008 documentation closeout"
+    "PHASE8-IMPL-025-T009": "complete/PASS; closeout commit 2b7515cfc17ba4194e4ab98af38f85b01473cb55",
+    "PHASE8-IMPL-025-T010": "implemented; commit 0622a21779c38cdea4738f8f30e63b71376a7ecb; T010H owner UI remains planned",
+    "PHASE8-IMPL-025-T011": "complete/PASS through T011H; latest accepted implementation commit 66d3c587655161415e9508c2dfb1aa2e09f3d231; T011A-T011H remained separate bounded tasks"
   },
   "child_task_ordering": {
     "T001": [

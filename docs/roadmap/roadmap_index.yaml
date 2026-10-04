@@ -18,7 +18,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; official Subtxt/Dramatica is optional paid integration; T005 contract complete/PASS; T006 application-adapter and mock-validation foundation accepted/closed; T006G not executed and paid runtime deferred; app-owned identities remain separate",
-    "frontier_note": "PHASE8-IMPL-025 is published/active. T001-T005, T007, and T008 are complete/PASS. T004 preserves implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f separately from accepted T004G real-runtime validation/fix commit bc2a65e6350fdd65720606253b120d7fbcfa2b78; T004/T004G satisfied the BookNLP prerequisite before T008. T008 implementation commit 2465722cedfe9f8dcb4135d8de124f36a999593f is accepted after 458 deterministic tests with 7 existing Pydantic deprecation warnings plus BookNLP, live Ollama/qwen3:8b, and Story Check current-layer evidence; original outputs remained unchanged and candidate persistence was zero. T006 remains accepted/closed as optional paid integration with T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE and paid runtime deferred. T009, T010, and T011 remain planned/not-begun with their T008 dependency satisfied; current authority permits parallel work and does not select a singular owner priority, so the singular next-readiness fields are null. External dramatica_flow remains reference/provenance-only for MVP. Project Memory and execution routing remain paused/nonblocking for ordinary application work. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027."
+    "frontier_note": "PHASE8-IMPL-025 is published/active. T009 is complete/PASS at 2b7515cfc17ba4194e4ab98af38f85b01473cb55, T010 is implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb, and T011 is complete/PASS through accepted T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231. T010H remains planned. The next lifecycle is T012A dependency/eligibility preflight; T012A implementation has not begun and T012 eligibility is not asserted until T003F, T003G, T009, T010, T010H, T011, and T011H are verified from live repository evidence. External dramatica_flow remains reference/provenance-only for MVP. Project Memory and execution routing remain paused/nonblocking for ordinary application work. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5498,7 +5498,7 @@
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "published/active",
-      "result": "published historical foundation; T023A/T023B remain complete/PASS; current T023C/T023D intent is incorporated into PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 is complete/PASS; PHASE8-IMPL-025 T001-T005 and T007 are complete/PASS, with T004G real-runtime retry validation accepted at bc2a65e6350fdd65720606253b120d7fbcfa2b78; T006 is accepted/closed as optional paid integration with real paid runtime deferred; T008 is complete/PASS at 2465722cedfe9f8dcb4135d8de124f36a999593f; T009/T010/T011 remain planned with T008 dependency satisfied and no singular owner priority selected"
+      "result": "published historical foundation; T023A/T023B remain complete/PASS; T023C/T023D intent is incorporated into complete PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 is complete/PASS; PHASE8-IMPL-025-T011H is accepted at 66d3c587655161415e9508c2dfb1aa2e09f3d231; T010H and T012 remain open"
     },
     {
       "id": "PHASE8-IMPL-024",
@@ -5537,7 +5537,7 @@
       "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
-      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025 T001-T005, T007, and T008 complete/PASS; T004G real-runtime retry validation accepted at bc2a65e6350fdd65720606253b120d7fbcfa2b78; T006 accepted/closed optional paid-integration foundation with real paid runtime deferred; T009/T010/T011 remain planned with T008 dependency satisfied and no singular owner priority selected",
+      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025 T009/T010/T011 through T011H have local acceptance evidence; T011H accepted at 66d3c587655161415e9508c2dfb1aa2e09f3d231; T010H and T012 remain open; T012A dependency/eligibility preflight is next and implementation is blocked pending prerequisite proof",
       "result": "complete/closed as complete/PASS; T001, T002, T003, T006, T007, T004, T005, T008, and T008A-T008F complete/PASS; accepted application closeout validation bound to final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b with 5203 ordinary Python passes, exact expected-red reproduction, roadmap/Node/build/browser/responsive/accessibility PASS, no project/application/repository mutation, and archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0; broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and PHASE8-IMPL-027"
     },
     {
@@ -6096,12 +6096,12 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-025.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
       "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
-      "latest_child_task": "PHASE8-IMPL-025-T008",
+      "latest_child_task": "PHASE8-IMPL-025-T011H",
       "latest_child_status": "complete/PASS",
-      "next_child_task": null,
+      "next_child_task": "PHASE8-IMPL-025-T012A",
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md",
-      "result": "published/active architecture-integration parent; T001-T005, T007, and T008 complete/PASS. T004 implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f is preserved separately from accepted T004G real-runtime validation/fix commit bc2a65e6350fdd65720606253b120d7fbcfa2b78; T004/T004G satisfied the BookNLP prerequisite before T008. T008 implementation commit 2465722cedfe9f8dcb4135d8de124f36a999593f accepted after 458 deterministic tests with 7 existing Pydantic deprecation warnings plus BookNLP, live Ollama/qwen3:8b, and Story Check current-layer evidence. T006 remains accepted/closed as optional paid integration with real paid execution deferred. T009, T010, and T011 remain planned/not-begun with T008 dependency satisfied; no singular next child or owner priority is selected. App-owned dramatica_flow_informed_rubric remains the approved MVP boundary; external dramatica_flow is reference/provenance-only. Project Memory remains paused/nonblocking."
+      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T011H-owner-facing-live-run-workflow-closeout.md",
+      "result": "published/active architecture-integration parent; T009 complete/PASS at 2b7515cfc17ba4194e4ab98af38f85b01473cb55; T010 implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb; T011 complete/PASS through accepted T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231. T010H and T012 remain open. T012A is the next dependency/eligibility preflight only; implementation is not begun and eligibility is not asserted until all recorded T012 prerequisites are verified. App-owned dramatica_flow_informed_rubric remains the approved MVP boundary; external dramatica_flow is reference/provenance-only. Project Memory remains paused/nonblocking."
     },
     {
       "id": "PHASE8-IMPL-025-T001",
@@ -6319,7 +6319,7 @@
       "id": "PHASE8-IMPL-025-T009",
       "title": "Read-only project-level narrative diagnostics",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-025",
       "depends_on": [
         "PHASE8-IMPL-025-T008"
@@ -6335,13 +6335,13 @@
         "no_rewrite",
         "no_continuation"
       ],
-      "result": "dependency satisfied by completed cross-adapter semantic guardrails; remains planned/not-begun and is not activated or prioritized by T008 closeout; planned causal/thread/information/relationship/emotional/promise-payoff/hook diagnostics over multiple sources and approved-context snapshots with read-only candidate output"
+      "result": "complete/PASS; closeout commit 2b7515cfc17ba4194e4ab98af38f85b01473cb55; read-only project-level narrative diagnostics accepted with candidate-only, non-canon boundaries"
     },
     {
       "id": "PHASE8-IMPL-025-T010",
       "title": "Full NCP gateway",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-025",
       "depends_on": [
         "PHASE8-IMPL-025-T008"
@@ -6355,13 +6355,13 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "dependency satisfied by completed cross-adapter semantic guardrails; remains planned/not-begun, may build backend gateway contracts in parallel with T009, and is not activated or prioritized by T008 closeout; planned immutable import artifact, explicit NCP mappings, JSON-pointer/value-hash provenance, candidate review, approved-context export, validation, and real supported-schema round-trip execution through the current gateway, plus owner UI after T009 diagnostics and backend contracts; historical owner-selected import is foundation only"
+      "result": "implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb with full NCP gateway contracts; owner UI remains separately planned as T010H; no automatic approval, promotion/apply-promotion, or Memory/Canon mutation"
     },
     {
       "id": "PHASE8-IMPL-025-T010H",
       "title": "NCP and diagnostics owner UI",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-025-T010",
       "depends_on": [
         "PHASE8-IMPL-025-T009",
@@ -6393,13 +6393,13 @@
         "no_apply_promotion",
         "no_generated_prose"
       ],
-      "result": "dependency satisfied by completed cross-adapter semantic guardrails; remains planned/not-begun, may proceed in parallel with T009/T010, and is not activated or prioritized by T008 closeout; planned bounded approve/reject/needs-evidence, merge, split, correction, rerun, grouped-review/audit slices, plus separate owner live-run workflow using the completed PHASE8-IMPL-024 component foundation"
+      "result": "complete/PASS through T011H; T011A-T011H were implemented as separate bounded tasks; latest accepted implementation commit 66d3c587655161415e9508c2dfb1aa2e09f3d231; review actions remain candidate-only, owner-controlled, non-canon, and separate from promotion/apply-promotion"
     },
     {
       "id": "PHASE8-IMPL-025-T011H",
       "title": "Owner-facing live-run workflow",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-025-T011",
       "depends_on": [
         "PHASE8-IMPL-025-T003F",
@@ -6414,7 +6414,9 @@
         "no_memory_canon_mutation",
         "no_generated_prose"
       ],
-      "result": "planned readiness, selection, submission, progress, partial/unavailable/failure/timeout/retry/recovery, result/provenance/manifest/ledger inspection, candidate handoff, explicit apply boundary, and browser validation"
+      "result": "complete/PASS at 66d3c587655161415e9508c2dfb1aa2e09f3d231; owner-facing live-run workflow over existing control-plane endpoints with readiness, tool selection, explicit submission, progress and failure states, retry/reinspection, manifest/evidence/provenance inspection, candidate-review handoff, explicit apply boundary, accessibility/responsive behavior, and browser validation; no new backend endpoint, live model/runtime completion proof, candidate persistence, automatic approval, promotion/apply-promotion, Memory/Canon/project-truth/source mutation, generated prose, or OMI grouped-review route redefinition",
+      "implementation_commit": "66d3c587655161415e9508c2dfb1aa2e09f3d231",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T011H-owner-facing-live-run-workflow-closeout.md"
     },
     {
       "id": "PHASE8-IMPL-025-T012",

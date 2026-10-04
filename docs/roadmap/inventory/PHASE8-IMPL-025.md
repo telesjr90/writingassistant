@@ -5,10 +5,10 @@
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
 - Status: published/active
-- Immediate implementation frontier: no singular child selected. T009, T010,
-  and T011 remain planned and not begun with their T008 dependency satisfied;
-  current authority permits parallel work and does not prioritize one. T004 is
-  complete/PASS through accepted T004G real-runtime retry validation.
+- Immediate implementation frontier: `PHASE8-IMPL-025-T012A` dependency/
+  eligibility preflight. T009, T010, and T011 through T011H have local
+  acceptance evidence; T010H remains planned, so T012A implementation is
+  blocked until every recorded prerequisite is proven accepted.
 - Activation dependency: satisfied by PHASE8-IMPL-024 fully complete/closed
   with application closeout validation PASS; Project Memory is
   paused/nonblocking and is not an activation gate
@@ -144,28 +144,33 @@ adapter implementation a failure or claiming a runtime PASS.
    Subtxt absence nonblocking; external `dramatica_flow` not executed and not
    required runtime proof).
 9. `PHASE8-IMPL-025-T009` — Read-only project-level narrative diagnostics
-   (`planned`; not begun; T008 dependency satisfied).
-10. `PHASE8-IMPL-025-T010` — Full NCP gateway (`planned`; not begun; T008
-    dependency satisfied; may build backend contracts in parallel with T009).
-11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion (`planned`;
-    not begun; T008 dependency satisfied; may proceed in parallel with
-    T009/T010).
-12. `PHASE8-IMPL-025-T012` — Layered end-to-end validation.
+   (`complete/PASS`; closeout commit
+   `2b7515cfc17ba4194e4ab98af38f85b01473cb55`).
+10. `PHASE8-IMPL-025-T010` — Full NCP gateway (`implemented`; commit
+    `0622a21779c38cdea4738f8f30e63b71376a7ecb`; T010H owner UI remains
+    planned).
+11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion
+    (`complete/PASS` through accepted T011H implementation commit
+    `66d3c587655161415e9508c2dfb1aa2e09f3d231`).
+12. `PHASE8-IMPL-025-T012` — Layered end-to-end validation (`planned`; not
+    begun; next lifecycle is T012A dependency/eligibility preflight).
 
 Accepted bounded additions: T003F live-run API/control plane; T003G persisted-
 data compatibility; T005H/T006K provisioning and current-machine runtime
 compatibility; T010H NCP/diagnostics owner UI; T011H owner live-run workflow;
 T012K layered integration deltas. PHASE8-IMPL-027 is the terminal gate.
 
-T001-T005, T007, and T008 are complete/PASS. T004 completion preserves its
+T001-T005 and T007-T011 are locally accepted within their recorded scopes. T004 completion preserves its
 implementation commit and the later accepted T004G real-runtime validation/fix
 commit as distinct identities. T006 is accepted/closed as the optional
 paid-integration foundation, with paid real execution deferred. T008 is
 complete/PASS at
-`2465722cedfe9f8dcb4135d8de124f36a999593f`. T009, T010, T011, and T012 remain
-planned and not begun; the T008 dependency of T009/T010/T011 is satisfied, and
-no singular priority among them is selected. Lettered bounded slices are
-defined in the parent task record.
+`2465722cedfe9f8dcb4135d8de124f36a999593f`. T011H is accepted at
+`66d3c587655161415e9508c2dfb1aa2e09f3d231`. T010H and T012 remain open.
+T012A is the next dependency/eligibility preflight; its implementation has not
+begun and must not begin until T003F, T003G, T009, T010, T010H, T011, and T011H
+are verified from live repository evidence. Lettered bounded slices are defined
+in the parent task record.
 
 ## Dependencies
 
@@ -180,14 +185,15 @@ PHASE8-IMPL-024 closeout + application validation PASS
 
 T007 consumed PHASE8-IMPL-024-T002's completed Story Check grounding work
 without duplicating it; T007E accepted current-layer real Ollama/qwen3:8b and
-Story Check execution through the T002/T003 layered path. T010H waits for T009 and T010 backend contracts; T011H
-waits for T003F and the completed PHASE8-IMPL-024 component foundation. T012
-reuses PHASE8-IMPL-024-T008 and adds only layered deltas. T012I apply-promotion
+Story Check execution through the T002/T003 layered path. T010H remains planned
+after accepted T009 and T010 backend work; T011H is accepted. T012 reuses
+PHASE8-IMPL-024-T008 and adds only layered deltas after its dependency gate.
+T012I apply-promotion
 validation remains isolated. T007 is complete/PASS. The T004/T004G
 contributor branch was satisfied before T008 at accepted T004G closeout HEAD
 `bc2a65e6350fdd65720606253b120d7fbcfa2b78`. T008 is complete/PASS; its
-completion satisfies the dependency of
-planned T009/T010/T011 without activating or prioritizing any of them. Optional
+completion satisfied the dependency of T009/T010/T011; those workstreams now
+have local acceptance evidence. Optional
 official Subtxt output may participate in future applicable work when
 configured and available, but its absence did not block T008 or MVP acceptance.
 The app-owned `dramatica_flow_informed_rubric` participates
