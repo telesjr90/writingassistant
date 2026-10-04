@@ -236,6 +236,90 @@ export async function getOMI(projectId = PROJECT_ID) {
   return requestData(() => client.get(`/projects/${projectId}/omi`));
 }
 
+export class OmiAnalysisRunError extends Error {
+  constructor(message, { status = null, payload = null } = {}) {
+    super(message);
+    this.name = 'OmiAnalysisRunError';
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
+async function requestOmiAnalysisRun(request) {
+  try {
+    const response = await request();
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new OmiAnalysisRunError(getErrorMessage(error), {
+        status: error.response?.status ?? null,
+        payload: error.response?.data ?? null,
+      });
+    }
+    throw new OmiAnalysisRunError(getErrorMessage(error));
+  }
+}
+
+export async function fetchOmiAnalysisTools(projectId = PROJECT_ID) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  return requestOmiAnalysisRun(() => (
+    client.get(`/projects/${projectId}/omi/analysis/tools`)
+  ));
+}
+
+export async function submitOmiAnalysisRun(projectId = PROJECT_ID, payload = {}) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(payload.source_idea_id, 'source_idea_id');
+  if (typeof payload.raw_idea !== 'string' || payload.raw_idea.trim() === '') {
+    throw new OmiAnalysisRunError('A non-empty owner-authored source is required.');
+  }
+  if (
+    !Array.isArray(payload.requested_adapters)
+    || payload.requested_adapters.length === 0
+    || payload.requested_adapters.some((adapterId) => !isSafeReviewRouteId(adapterId))
+    || new Set(payload.requested_adapters).size !== payload.requested_adapters.length
+  ) {
+    throw new OmiAnalysisRunError('Select one or more supported analysis tools.');
+  }
+  if (payload.allow_deterministic_fallback !== false) {
+    throw new OmiAnalysisRunError('Deterministic fallback must be selected explicitly as a tool.');
+  }
+  if (
+    typeof payload.idempotency_key !== 'string'
+    || payload.idempotency_key.length === 0
+    || payload.idempotency_key.length > 256
+    || !isSafeReviewRouteId(payload.idempotency_key)
+  ) {
+    throw new OmiAnalysisRunError('A safe idempotency key is required.');
+  }
+
+  return requestOmiAnalysisRun(() => (
+    client.post(`/projects/${projectId}/omi/analysis/runs`, {
+      raw_idea: payload.raw_idea,
+      source_idea_id: payload.source_idea_id,
+      requested_adapters: [...payload.requested_adapters],
+      allow_deterministic_fallback: false,
+      idempotency_key: payload.idempotency_key,
+    })
+  ));
+}
+
+export async function fetchOmiAnalysisRunStatus(projectId = PROJECT_ID, runId) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(runId, 'run_id');
+  return requestOmiAnalysisRun(() => (
+    client.get(`/projects/${projectId}/omi/analysis/runs/${runId}`)
+  ));
+}
+
+export async function fetchOmiAnalysisRunResult(projectId = PROJECT_ID, runId) {
+  requireSafeReviewRouteId(projectId, 'project_id');
+  requireSafeReviewRouteId(runId, 'run_id');
+  return requestOmiAnalysisRun(() => (
+    client.get(`/projects/${projectId}/omi/analysis/runs/${runId}/result`)
+  ));
+}
+
 export async function createOMIIdea(projectId = PROJECT_ID, payload) {
   return requestData(() => client.post(`/projects/${projectId}/omi/ideas`, payload));
 }

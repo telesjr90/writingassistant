@@ -85,6 +85,7 @@ class TestOMIShellSingleH1:
             "OMI Candidate Detail",
             "Apply-Promotion Confirmation",
             "Grouped Owner Review",
+            "Owner-Facing Live Analysis",
         ):
             assert title in source
 

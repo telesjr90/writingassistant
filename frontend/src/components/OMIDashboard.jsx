@@ -218,8 +218,14 @@ export default function OMIDashboard({
         degraded,
         fallback: ZERO_STATE_OWNER_INPUT,
       }),
-      unavailable: 'Unavailable in this version',
-      disabledReason: 'No risky action in row',
+      action: 'Open live analysis',
+      unavailable: degraded
+        ? 'Unavailable while OMI status is unavailable'
+        : 'Add owner input before analysis',
+      disabledReason: 'Owner confirmation and backend-enabled tools are required before submission',
+      onAction: !degraded && ownerInputCount > 0
+        ? () => onNavigate('live-analysis')
+        : null,
     },
     {
       area: 'Candidates',

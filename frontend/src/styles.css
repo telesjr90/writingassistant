@@ -2585,6 +2585,253 @@ h2 {
   outline-offset: 2px;
 }
 
+.omi-analysis-run,
+.omi-analysis-form,
+.omi-analysis-results,
+.omi-analysis-findings,
+.omi-analysis-inspection {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-12);
+}
+
+.omi-analysis-header,
+.omi-analysis-section-heading,
+.omi-analysis-actions {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wa-space-12);
+}
+
+.omi-analysis-header h2,
+.omi-analysis-card h3,
+.omi-analysis-card h4,
+.omi-analysis-boundary h3,
+.omi-analysis-inspection > h3,
+.omi-analysis-section-heading h3,
+.omi-analysis-findings h4 {
+  margin: 0;
+  color: var(--wa-color-text-strong);
+}
+
+.omi-analysis-header h2 {
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.omi-analysis-card,
+.omi-analysis-boundary {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-10);
+  padding: var(--wa-space-14);
+  background: var(--wa-color-surface-subtle);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-surface);
+}
+
+.omi-analysis-boundary {
+  background: var(--wa-color-warning-surface);
+  border-color: var(--wa-color-warning-border);
+}
+
+.omi-analysis-card p,
+.omi-analysis-boundary p,
+.omi-analysis-card fieldset {
+  margin: 0;
+}
+
+.omi-analysis-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-6);
+  color: var(--wa-color-text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.omi-analysis-field select {
+  width: 100%;
+  max-width: 100%;
+  min-height: 40px;
+  min-width: 0;
+  padding: var(--wa-space-8) var(--wa-space-10);
+  color: var(--wa-color-text);
+  background: var(--wa-color-surface);
+  border: 1px solid #aab8ce;
+  border-radius: var(--wa-radius-control);
+}
+
+.omi-analysis-source-preview,
+.omi-analysis-notice {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--wa-space-6);
+  padding: var(--wa-space-10);
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-control);
+  overflow-wrap: anywhere;
+}
+
+.omi-analysis-source-preview p {
+  white-space: pre-wrap;
+}
+
+.omi-analysis-source-preview span,
+.omi-analysis-notice span {
+  color: var(--wa-color-text-secondary);
+  font-size: 13px;
+}
+
+.omi-analysis-notice.is-warning {
+  background: var(--wa-color-warning-surface);
+  border-color: var(--wa-color-warning-border);
+}
+
+.omi-analysis-notice.is-error {
+  background: var(--wa-color-danger-surface);
+  border-color: var(--wa-color-danger-border);
+}
+
+.omi-analysis-tool-list {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--wa-space-8);
+  padding: 0;
+  border: 0;
+}
+
+.omi-analysis-tool-list legend {
+  grid-column: 1 / -1;
+  padding: 0 0 var(--wa-space-6);
+  color: var(--wa-color-text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.omi-analysis-tool,
+.omi-analysis-confirmation {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--wa-space-8);
+  padding: var(--wa-space-10);
+  background: var(--wa-color-surface);
+  border: 1px solid var(--wa-color-border);
+  border-radius: var(--wa-radius-control);
+  cursor: pointer;
+}
+
+.omi-analysis-tool.is-disabled {
+  background: var(--wa-color-surface-muted);
+  cursor: not-allowed;
+}
+
+.omi-analysis-tool > span {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--wa-space-6);
+  align-items: start;
+}
+
+.omi-analysis-tool small {
+  grid-column: 1 / -1;
+  color: var(--wa-color-text-secondary);
+  line-height: 1.45;
+}
+
+.omi-analysis-confirmation span {
+  color: var(--wa-color-text-secondary);
+  line-height: 1.5;
+}
+
+.omi-analysis-tool input,
+.omi-analysis-confirmation input {
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+
+.omi-analysis-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.omi-analysis-inspection-grid,
+.omi-analysis-adapter-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--wa-space-10);
+}
+
+.omi-analysis-adapter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.omi-analysis-metadata {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(124px, 0.35fr) minmax(0, 1fr);
+  gap: var(--wa-space-6) var(--wa-space-10);
+  margin: 0;
+}
+
+.omi-analysis-metadata div {
+  display: contents;
+}
+
+.omi-analysis-metadata dt {
+  color: var(--wa-color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.omi-analysis-metadata dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.omi-analysis-metadata code {
+  white-space: pre-wrap;
+}
+
+.omi-analysis-findings ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-8);
+  margin: 0;
+  padding-left: 22px;
+}
+
+.omi-analysis-findings li {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+.omi-analysis-findings li span {
+  color: var(--wa-color-text-secondary);
+  font-size: 13px;
+}
+
+.omi-status-badge.is-success {
+  color: var(--wa-color-success);
+  background: var(--wa-color-success-surface);
+  border-color: var(--wa-color-success-border);
+}
+
 @container omi-shell (max-width: 680px) {
   .omi-candidate-detail-layout {
     grid-template-columns: 1fr;
@@ -2592,6 +2839,18 @@ h2 {
 
   .omi-candidate-side-rail {
     gap: 10px;
+  }
+
+  .omi-analysis-tool-list,
+  .omi-analysis-inspection-grid,
+  .omi-analysis-adapter-grid,
+  .omi-analysis-metadata {
+    grid-template-columns: 1fr;
+  }
+
+  .omi-analysis-header,
+  .omi-analysis-section-heading {
+    flex-direction: column;
   }
 }
 
@@ -2668,6 +2927,13 @@ h2 {
     grid-template-columns: 1fr;
   }
 
+  .omi-analysis-tool-list,
+  .omi-analysis-inspection-grid,
+  .omi-analysis-adapter-grid,
+  .omi-analysis-metadata {
+    grid-template-columns: 1fr;
+  }
+
   .omi-grouped-source-scope p {
     grid-column: auto;
   }
@@ -2678,6 +2944,11 @@ h2 {
 
   .omi-grouped-review-header,
   .omi-grouped-detail-heading {
+    flex-direction: column;
+  }
+
+  .omi-analysis-header,
+  .omi-analysis-section-heading {
     flex-direction: column;
   }
 
@@ -2992,7 +3263,9 @@ h2 {
 
   .omi-checkbox-row,
   .omi-grouped-check-filter,
-  .omi-grouped-approval-confirmation {
+  .omi-grouped-approval-confirmation,
+  .omi-analysis-tool,
+  .omi-analysis-confirmation {
     min-height: 44px;
     align-items: flex-start;
     cursor: pointer;

@@ -84,7 +84,7 @@ def test_shell_keeps_inner_navigation_state_and_back_cancel_wiring_local() -> No
         assert shell_owned_state in shell
 
     assert "onCancel={handleBackToDashboard}" in shell
-    assert shell.count("onBackToDashboard={handleBackToDashboard}") == 2
+    assert shell.count("onBackToDashboard={handleBackToDashboard}") == 3
     navigate = shell[shell.index("function handleNavigate"):shell.index("function handleOpenEvidence")]
     assert "handleBackToDashboard();" in navigate
 
@@ -93,6 +93,7 @@ def test_dashboard_enables_only_implemented_destination_controls() -> None:
     dashboard = source(DASHBOARD)
 
     enabled_rows = {
+        "Owner Input": "live-analysis",
         "Candidates": "candidates",
         "Grouped Review": "grouped-review",
         "Promotion Handoff Readiness": "promotion-handoff",
@@ -100,21 +101,24 @@ def test_dashboard_enables_only_implemented_destination_controls() -> None:
     for area, destination in enabled_rows.items():
         row = dashboard_row(dashboard, area)
         assert "action:" in row
-        assert f"onAction: () => onNavigate('{destination}')" in row
+        assert f"onNavigate('{destination}')" in row
         assert "Unavailable in this version" not in row
+
+    owner_input = dashboard_row(dashboard, "Owner Input")
+    assert "!degraded && ownerInputCount > 0" in owner_input
+    assert "Add owner input before analysis" in owner_input
 
     assert "onClick={() => onNavigate('approved-memory-canon')}" in dashboard
     assert 'aria-label="Open Approved Memory/Canon"' in dashboard
     assert "Review promotion readiness" in dashboard
     assert "Open handoff queue" not in dashboard
-    assert dashboard.count("onAction: () => onNavigate(") == 3
+    assert dashboard.count("onNavigate(") == 5
 
 
 def test_unavailable_dashboard_rows_are_status_only_without_callbacks() -> None:
     dashboard = source(DASHBOARD)
 
     for area in (
-        "Owner Input",
         "Duplicate Decisions",
         "Promotion Audit Records",
         "Deferred Categories",
@@ -125,7 +129,6 @@ def test_unavailable_dashboard_rows_are_status_only_without_callbacks() -> None:
         assert "onAction:" not in row
 
     for unsupported_destination in (
-        "owner-input",
         "duplicate-decisions",
         "promotion-audits",
         "deferred-categories",

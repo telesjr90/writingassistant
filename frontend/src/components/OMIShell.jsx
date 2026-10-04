@@ -3,6 +3,7 @@ import OMIBoundaryBanner from './OMIBoundaryBanner.jsx';
 import OMICandidateCanonStatusStrip from './OMICandidateCanonStatusStrip.jsx';
 import OMICandidateDetail from './OMICandidateDetail.jsx';
 import OMIApplyPromotionRoute from './OMIApplyPromotionRoute.jsx';
+import OMIAnalysisRunWorkflow from './OMIAnalysisRunWorkflow.jsx';
 import OMIDashboard, { getOMIDashboardSummary } from './OMIDashboard.jsx';
 import OMIEvidenceDrawer from './OMIEvidenceDrawer.jsx';
 import OMIGroupedReview from './OMIGroupedReview.jsx';
@@ -24,6 +25,9 @@ function getShellTitle(omiView) {
   }
   if (omiView === 'grouped-review') {
     return 'Grouped Owner Review';
+  }
+  if (omiView === 'live-analysis') {
+    return 'Owner-Facing Live Analysis';
   }
   return 'OMI Dashboard';
 }
@@ -97,6 +101,14 @@ export default function OMIShell({
       setSelectedEvidence(null);
       evidenceOpenerRef.current = null;
       setOmiView('grouped-review');
+      return;
+    }
+
+    if (destination === 'live-analysis') {
+      setSelectedCandidateId('');
+      setSelectedEvidence(null);
+      evidenceOpenerRef.current = null;
+      setOmiView('live-analysis');
       return;
     }
 
@@ -190,6 +202,15 @@ export default function OMIShell({
           onUpdateCandidateDecision={onUpdateCandidateDecision}
           onOpenEvidence={handleOpenEvidence}
           onBackToDashboard={handleBackToDashboard}
+        />
+      ) : omiView === 'live-analysis' ? (
+        <OMIAnalysisRunWorkflow
+          activeProjectId={activeProjectId}
+          ideas={summary.ideas}
+          candidates={candidates}
+          onBackToDashboard={handleBackToDashboard}
+          onOpenCandidateReview={() => handleNavigate('candidates')}
+          onOpenGroupedReview={() => handleNavigate('grouped-review')}
         />
       ) : (
         <OMIDashboard
