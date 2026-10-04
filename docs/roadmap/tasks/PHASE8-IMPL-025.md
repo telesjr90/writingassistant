@@ -14,22 +14,24 @@ commit `f843b615762192ca8f6865e76b2c4e4c9bcc2170`. T008 is complete/PASS
 through T008E at accepted implementation commit
 `2465722cedfe9f8dcb4135d8de124f36a999593f`. Accepted T004/T004G and
 T007/T007E supplied the satisfied contributor prerequisites for T008. T009 is
-complete/PASS, T010 is implemented, and T011 is complete/PASS through accepted
-T011H at `66d3c587655161415e9508c2dfb1aa2e09f3d231`. T010H remains planned;
-T012A dependency/eligibility preflight is next and implementation is blocked
-until all recorded prerequisites are proven accepted.
+complete/PASS, T010 is implemented, T010H is complete/PASS at accepted
+implementation commit `9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`, and T011 is
+complete/PASS through accepted T011H at
+`66d3c587655161415e9508c2dfb1aa2e09f3d231`. T012A dependency/eligibility
+preflight is next; implementation has not begun and T012 eligibility remains
+unasserted until that separate preflight verifies every recorded prerequisite.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
 accepted PHASE8-IMPL-024-T008 closeout, so this parent is published/active.
 Project Memory is not an activation gate while the accepted 2026-07-17 pause
 decision remains current. T007 is complete/PASS through T007E. The current
-accepted/closed child is `PHASE8-IMPL-025-T011H` at
-`66d3c587655161415e9508c2dfb1aa2e09f3d231`. The accepted T004G closeout HEAD
+accepted/closed child is `PHASE8-IMPL-025-T010H` at
+`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`. The accepted T004G closeout HEAD
 `bc2a65e6350fdd65720606253b120d7fbcfa2b78` satisfied the BookNLP prerequisite
 before T008 implementation began. Optional paid Subtxt execution was not an
-MVP or T008 blocker. T010H and T012 remain open; no T012A implementation is
-activated by this reconciliation.
+MVP or T008 blocker. T010H is accepted/closed and T012 remains open; no T012A
+implementation is activated by this closeout.
 
 The owner-authorized T001 context prerequisite is satisfied by the generated,
 read-only supporting pack at
@@ -438,6 +440,22 @@ reconciliation does not activate or prioritize T010.
   or deletion, destructive operations, and unresolved candidate-bundle
   behavior.
 
+T010H status: `complete/PASS`; accepted implementation commit
+`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2` (`feat(ui): add NCP diagnostics
+owner workflow (T010H)`). The accepted UI exposes the owner-facing NCP
+gateway/diagnostics workflow, standard approved-context export readiness,
+separately blocked/pending candidate-bundle behavior, candidate-only external
+import review, safe opaque destination validation, deterministic loading,
+empty, invalid, unavailable, request-failure/retry, success, and confirmation
+states, accessibility, and responsive containment. Validation recorded 27
+backend T010H contract passes; frontend Node suites of 4, 3, 9, and 3 passes;
+frontend build PASS; 100 frontend source/accessibility passes; and browser
+smoke PASS with no mutation requests, console/page errors, failed requests, or
+HTTP errors. No story prose, live model/tool/runtime execution, export/import
+write, candidate/review/promotion/apply action, Memory/Canon mutation, or
+project-truth mutation occurred. Closeout:
+`docs/roadmap/decisions/PHASE8-IMPL-025-T010H-ncp-diagnostics-owner-workflow-closeout.md`.
+
 An external `complete` status never becomes local approval.
 
 ### PHASE8-IMPL-025-T011 — Candidate review lifecycle expansion
@@ -482,8 +500,9 @@ separate.
 
 Status: `planned`; not begun. The next lifecycle is T012A dependency/eligibility
 preflight, not T012A implementation. Live repository evidence must verify T003F,
-T003G, T009, T010, T010H, T011, and T011H before this workstream begins. T010H
-remains planned in the current roadmap, so T012 eligibility is not asserted.
+T003G, T009, T010, accepted T010H at
+`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`, T011, and T011H before this
+workstream begins. This closeout does not assert T012 eligibility.
 
 - `T012A` — Source identity and run-manifest suite.
 - `T012B` — Raw extraction and immutable artifact/evidence-ledger suite.
@@ -538,9 +557,11 @@ foundation, with real paid runtime deferred. T007 and T008 are complete/PASS.
 T008 accepted real current-layer outputs from the applicable
 MVP-required free/local contributor branches; optional official Subtxt was
 unavailable and nonblocking. T009, T010 backend work, and T011 through T011H
-have local acceptance evidence. T010H remains planned. T012A is the next
+have local acceptance evidence. T010H is accepted/closed at
+`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`. T012A is the next
 dependency/eligibility preflight, not active implementation, and must verify
-T003F, T003G, T009, T010, T010H, T011, and T011H before T012 may begin.
+T003F, T003G, T009, T010, T010H at that accepted commit, T011, and T011H before
+T012 may begin.
 T012 must pass before terminal PHASE8-IMPL-027 acceptance.
 
 The external `dramatica_flow` runtime is not part of this execution graph or
@@ -569,7 +590,7 @@ resolves only the later MVP-classification question.
 
 - T003D/T003G require owner review only if retention/deletion or physical
   migration changes owner-visible stored structures.
-- T010H preserves later decisions for export destination, retention/deletion,
+- Accepted T010H preserves later decisions for export destination, retention/deletion,
   destructive operations, and unresolved candidate-bundle behavior.
 - PHASE8-IMPL-027 requires the final owner accept/reject/defer decision.
 
