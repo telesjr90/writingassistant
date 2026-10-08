@@ -117,8 +117,8 @@ def _assert_valid_ollama_result(result: dict[str, Any]) -> dict[str, Any]:
         "review_pending",
         "candidate_review_pending",
     }
-    assert finding["evidence"][0]["source_locator"] == "raw_idea:L1:C0-78"
-    assert finding["source_locator"] == "raw_idea:L1:C0-78"
+    assert finding["evidence"][0]["source_locator"]
+    assert finding["source_locator"] == finding["evidence"][0]["source_locator"]
     assert finding["evidence_fingerprint"].startswith("omi-evid-")
     assert finding["candidate_fingerprint"].startswith("omi-cand-")
     assert finding["normalized_finding_id"].startswith("omi-find-ollama_model-")
@@ -649,8 +649,14 @@ def _valid_ollama_chat_response(model_content: str) -> dict[str, Any]:
     }
 
 
-def _valid_live_model_content() -> str:
+def _valid_live_model_content(
+    *, source: str = RAW_IDEA, source_span_id: str | None = None
+) -> str:
     """Build a valid JSON string that passes validate_ollama_model_envelope."""
+    if source_span_id is None:
+        source_span_id = oao._build_ollama_source_span_catalog(source)[0][
+            "source_span_id"
+        ]
     return json.dumps({
         "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
         "adapter": "ollama_model",
@@ -665,18 +671,17 @@ def _valid_live_model_content() -> str:
                 ),
                 "evidence": [
                     {
-                        "source_excerpt": (
-                            "Owner note names Test Character Alpha as "
-                            "the library investigator."
-                        ),
-                        "source_locator": "raw_idea:L1:C0-78",
+                        "source_span_id": source_span_id,
                     }
                 ],
-                "source_locator": "raw_idea:L1:C0-78",
-                "support_label": "ollama model support strength only",
             }
         ],
     })
+
+
+def _first_live_span_evidence(source: str = RAW_IDEA) -> list[dict[str, str]]:
+    span_id = oao._build_ollama_source_span_catalog(source)[0]["source_span_id"]
+    return [{"source_span_id": span_id}]
 
 
 def _mock_live_ollama_env(monkeypatch: Any) -> None:
@@ -733,6 +738,109 @@ def test_live_ollama_enabled_with_mocked_valid_model_returns_candidates(
     finding = _assert_valid_ollama_result(result)
     assert finding["label"] == "Test Character Alpha"
     assert "ollama model" in finding["provenance"]["support"].lower()
+    evidence = finding["evidence"][0]
+    start = RAW_IDEA.index(evidence["source_excerpt"])
+    end = start + len(evidence["source_excerpt"])
+    assert (evidence["char_start"], evidence["char_end"]) == (start, end)
+    assert evidence["char_offset_basis"] == oao.exact_source_map.CHAR_OFFSET_BASIS
+    assert (evidence["byte_start"], evidence["byte_end"]) == (
+        len(RAW_IDEA[:start].encode("utf-8")),
+        len(RAW_IDEA[:end].encode("utf-8")),
+    )
+    assert evidence["byte_offset_basis"] == oao.exact_source_map.BYTE_OFFSET_BASIS
+    assert evidence["artifact_file_id"] == "source-artifact"
+
+
+def test_live_ollama_model_supplied_paraphrase_fails_closed_before_control_plane(
+    monkeypatch: Any,
+) -> None:
+    """Model-authored evidence text is rejected instead of best-matched."""
+    source = "Owner note: repeated clue, then repeated clue."
+    content = json.dumps(
+        {
+            "schema_version": oao.OMI_OLLAMA_SCHEMA_VERSION,
+            "adapter": "ollama_model",
+            "status": "succeeded",
+            "explanation": "mocked ambiguous extraction",
+            "findings": [
+                {
+                    "candidate_type": "object",
+                    "label": "Repeated clue",
+                    "extracted_claim": "A repeated clue is identified as an object candidate",
+                        "evidence": [
+                            {
+                                "source_excerpt": "repeated clue",
+                                "source_locator": "text:1-2",
+                            }
+                        ],
+                    }
+            ],
+        }
+    )
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(monkeypatch, _valid_ollama_chat_response(content))
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        source,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+
+    envelope = _assert_ollama_failed_closed(result)
+    assert "must contain only source_span_id" in envelope["explanation"]
+    assert envelope["original_output"]["message"]["content"] == content
+    assert envelope["runtime_execution"]["model_calls_occurred"] is True
+
+
+def test_live_ollama_unknown_span_selection_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """An ID outside the app-owned catalog cannot become evidence."""
+    _mock_live_ollama_env(monkeypatch)
+    content = _valid_live_model_content(
+        source_span_id="source-span-9999-unknown000000"
+    )
+    _mock_urlopen(monkeypatch, _valid_ollama_chat_response(content))
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=True,
+    )
+
+    envelope = _assert_ollama_failed_closed(result)
+    assert "unknown source_span_id" in envelope["explanation"]
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_story_prose_generation"] is True
+
+
+def test_live_ollama_duplicate_span_selection_fails_closed(
+    monkeypatch: Any,
+) -> None:
+    """A finding cannot select the same exact span more than once."""
+    span_id = oao._build_ollama_source_span_catalog(RAW_IDEA)[0][
+        "source_span_id"
+    ]
+    payload = json.loads(_valid_live_model_content(source_span_id=span_id))
+    payload["findings"][0]["evidence"].append({"source_span_id": span_id})
+    content = json.dumps(payload)
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(monkeypatch, _valid_ollama_chat_response(content))
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=False,
+    )
+
+    envelope = _assert_ollama_failed_closed(result)
+    assert "selected duplicate source_span_id" in envelope["explanation"]
+    assert envelope["original_output"]["message"]["content"] == content
 
 
 def test_live_ollama_runner_preserves_exact_owner_source_bytes(
@@ -750,7 +858,9 @@ def test_live_ollama_runner_preserves_exact_owner_source_bytes(
     def capture_urlopen(request: Any, *args: Any, **kwargs: Any) -> _MockResponse:
         bodies.append(request.data)
         return _MockResponse(
-            _valid_ollama_chat_response(_valid_live_model_content())
+            _valid_ollama_chat_response(
+                _valid_live_model_content(source=source)
+            )
         )
 
     _mock_live_ollama_env(monkeypatch)
@@ -912,6 +1022,37 @@ def test_live_ollama_invalid_response_json_fails_closed(
     )
 
 
+def test_live_ollama_invalid_control_character_fails_closed_without_mutation(
+    monkeypatch: Any,
+) -> None:
+    """Literal control characters are retained as raw output, never repaired."""
+    invalid_content = (
+        '{"schema_version":"omi_ollama_structured_extraction.v1",'
+        '"adapter":"ollama_model","status":"empty",'
+        '"explanation":"invalid\ncontrol character","findings":[]}'
+    )
+    _mock_live_ollama_env(monkeypatch)
+    _mock_urlopen(
+        monkeypatch,
+        _valid_ollama_chat_response(invalid_content),
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        RAW_IDEA,
+        requested_adapters=["ollama_model"],
+        persist_candidates=True,
+    )
+
+    envelope = _assert_ollama_failed_closed(result)
+    assert envelope["original_output"]["message"]["content"] == invalid_content
+    assert "invalid control character" in envelope["explanation"].lower()
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_story_prose_generation"] is True
+
+
 def test_live_ollama_invalid_person_type_retains_original_and_runtime_truth(
     monkeypatch: Any,
 ) -> None:
@@ -929,13 +1070,7 @@ def test_live_ollama_invalid_person_type_retains_original_and_runtime_truth(
                     "candidate_type": "person",
                     "label": "Mara Vale",
                     "extracted_claim": "Mara Vale is named in the validation record.",
-                    "evidence": [
-                        {
-                            "source_excerpt": "Mara Vale",
-                            "source_locator": "raw_idea:L1:C0-9",
-                        }
-                    ],
-                    "source_locator": "raw_idea:L1:C0-9",
+                    "evidence": _first_live_span_evidence(),
                     "support_label": "ollama model support strength only",
                 }
             ],
@@ -1035,13 +1170,7 @@ def test_live_ollama_prose_output_fails_closed(
                         "candidate_type": "character",
                         "label": "Room",
                         "extracted_claim": prose_content,
-                        "evidence": [
-                            {
-                                "source_excerpt": "the room grew dark",
-                                "source_locator": "raw_idea:L1:C0-20",
-                            }
-                        ],
-                        "source_locator": "raw_idea:L1:C0-20",
+                            "evidence": _first_live_span_evidence(),
                     }
                 ],
             })
@@ -1077,14 +1206,8 @@ def test_live_ollama_unsafe_output_fails_closed(
                         "extracted_claim": (
                             "Test is a confirmed canonical fact"
                         ),
-                        "evidence": [
-                            {
-                                "source_excerpt": "test",
-                                "source_locator": "raw_idea:L1:C0-5",
-                            }
-                        ],
-                        "source_locator": "raw_idea:L1:C0-5",
-                        "support_label": "canon truth support",
+                            "evidence": _first_live_span_evidence(),
+                            "support_label": "canon truth support",
                     }
                 ],
             })
@@ -1159,6 +1282,35 @@ def test_live_ollama_request_payload_includes_think_false(
     assert sent_body.get("think") is False
     assert sent_body.get("stream") is False
     assert sent_body.get("model") == "qwen3:8b"
+    output_format = sent_body.get("format")
+    assert output_format["type"] == "object"
+    assert output_format["additionalProperties"] is False
+    assert output_format["required"] == [
+        "schema_version",
+        "adapter",
+        "status",
+        "explanation",
+        "findings",
+    ]
+    finding_schema = output_format["properties"]["findings"]["items"]
+    assert finding_schema["required"] == [
+        "candidate_type",
+        "label",
+        "extracted_claim",
+        "evidence",
+    ]
+    evidence_schema = finding_schema["properties"]["evidence"]["items"]
+    assert evidence_schema["required"] == ["source_span_id"]
+    assert sent_body["messages"][1]["content"] == RAW_IDEA
+    catalog = json.loads(sent_body["messages"][2]["content"])
+    expected_spans = oao._build_ollama_source_span_catalog(RAW_IDEA)
+    assert catalog["source_span_catalog"] == [
+        {
+            "source_span_id": span["source_span_id"],
+            "source_text": span["source_excerpt"],
+        }
+        for span in expected_spans
+    ]
 
 
 def test_live_ollama_parses_extraction_json_only_from_message_content(
@@ -1463,7 +1615,9 @@ def test_live_ollama_accepts_owner_prose_input(monkeypatch: Any) -> None:
     monkeypatch.setenv("OMI_LIVE_OLLAMA_TIMEOUT_SECONDS", "180")
     _mock_urlopen(
         monkeypatch,
-        _valid_ollama_chat_response(_valid_live_model_content()),
+        _valid_ollama_chat_response(
+            _valid_live_model_content(source=_OWNER_PROSE_IDEA)
+        ),
     )
 
     result = oao.analyze_omi_raw_idea_with_tools(
@@ -1516,13 +1670,7 @@ def test_live_ollama_model_prose_output_still_fails_closed(
                         "candidate_type": "character",
                         "label": "Room",
                         "extracted_claim": prose_content,
-                        "evidence": [
-                            {
-                                "source_excerpt": "the room grew dark",
-                                "source_locator": "raw_idea:L1:C0-20",
-                            }
-                        ],
-                        "source_locator": "raw_idea:L1:C0-20",
+                            "evidence": _first_live_span_evidence(),
                     }
                 ],
             })
@@ -1565,14 +1713,8 @@ def test_live_ollama_model_unsafe_truth_output_still_fails_closed(
                         "extracted_claim": (
                             "Test is a confirmed canonical fact"
                         ),
-                        "evidence": [
-                            {
-                                "source_excerpt": "test",
-                                "source_locator": "raw_idea:L1:C0-5",
-                            }
-                        ],
-                        "source_locator": "raw_idea:L1:C0-5",
-                        "support_label": "canon truth support",
+                            "evidence": _first_live_span_evidence(),
+                            "support_label": "canon truth support",
                     }
                 ],
             })

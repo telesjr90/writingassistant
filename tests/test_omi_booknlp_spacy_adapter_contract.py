@@ -538,6 +538,43 @@ def test_live_spacy_noun_chunks_produce_object_candidates(
         _assert_candidate_only_finding(finding, "spacy")
 
 
+def test_live_spacy_evidence_excerpt_matches_exact_character_locator(
+    monkeypatch: Any,
+) -> None:
+    """Live entity and noun-chunk evidence uses its exact source span."""
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+
+    entity_text = "Mara Vale"
+    entity_start = RAW_IDEA.index(entity_text)
+    entity_end = entity_start + len(entity_text)
+    chunk_text = "The brass key"
+    chunk_start = RAW_IDEA.index(chunk_text)
+    chunk_end = chunk_start + len(chunk_text)
+    mock_nlp.return_value = _make_mock_doc(
+        RAW_IDEA,
+        entities=[
+            (entity_text, "PERSON", entity_start, entity_end),
+        ],
+        noun_chunks=[
+            (chunk_text, chunk_start, chunk_end),
+        ],
+    )
+
+    result = _run_adapter("spacy")
+
+    assert result["analysis_status"] == "succeeded"
+    assert len(result["findings"]) == 2
+    for finding in result["findings"]:
+        evidence = finding["evidence"][0]
+        locator = evidence["source_locator"]
+        character_range = locator.rsplit(":C", 1)[1]
+        start_text, end_text = character_range.split("-", 1)
+        start, end = int(start_text), int(end_text)
+        assert evidence["source_excerpt"] == RAW_IDEA[start:end]
+        assert finding["source_locator"] == locator
+
+
 def test_live_spacy_missing_package_returns_unavailable(
     monkeypatch: Any,
 ) -> None:

@@ -752,6 +752,13 @@ def test_live_ollama_rejected_original_persists_with_provenance_and_truthful_fla
         "Person: Mara Vale.\n"
         "Object: brass compass.\n"
     )
+    source_span_id = next(
+        span["source_span_id"]
+        for span in omi_analysis_orchestrator._build_ollama_source_span_catalog(
+            source
+        )
+        if "Mara Vale" in span["source_excerpt"]
+    )
     invalid_model_content = json.dumps(
         {
             "schema_version": omi_analysis_orchestrator.OMI_OLLAMA_SCHEMA_VERSION,
@@ -765,11 +772,9 @@ def test_live_ollama_rejected_original_persists_with_provenance_and_truthful_fla
                     "extracted_claim": "Mara Vale is named in the validation record.",
                     "evidence": [
                         {
-                            "source_excerpt": "Mara Vale",
-                            "source_locator": "raw_idea:L2:C8-17",
+                            "source_span_id": source_span_id,
                         }
                     ],
-                    "source_locator": "raw_idea:L2:C8-17",
                     "support_label": "ollama model support strength only",
                 }
             ],
@@ -909,6 +914,181 @@ def test_live_ollama_rejected_original_persists_with_provenance_and_truthful_fla
     output_event = next(item for item in ledger if item["event_type"] == "output_recorded")
     assert output_event["payload"]["output_id"] == output["output_id"]
     assert output_event["payload"]["disposition"] == "rejected"
+
+
+def test_live_ollama_ambiguous_excerpt_fails_closed_without_submission_crash(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "VALIDATION RECORD. repeated clue then repeated clue."
+    model_content = json.dumps(
+        {
+            "schema_version": omi_analysis_orchestrator.OMI_OLLAMA_SCHEMA_VERSION,
+            "adapter": "ollama_model",
+            "status": "succeeded",
+            "explanation": "mocked ambiguous evidence",
+            "findings": [
+                {
+                    "candidate_type": "object",
+                    "label": "Repeated clue",
+                    "extracted_claim": "A repeated clue is identified as an object candidate",
+                    "evidence": [
+                        {
+                            "source_span_id": "source-span-9999-unknown000000",
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+    response_data = {
+        "model": "qwen3:8b",
+        "created_at": "2026-10-07T18:30:00Z",
+        "message": {"role": "assistant", "content": model_content},
+        "done": True,
+    }
+
+    class MockResponse:
+        def read(self):
+            return json.dumps(response_data).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+    monkeypatch.setattr(
+        urllib.request,
+        "urlopen",
+        lambda *args, **kwargs: MockResponse(),
+    )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="validation-record-ambiguous-evidence",
+        requested_adapters=["ollama_model"],
+        created_at="2026-10-07T18:30:00Z",
+    )
+
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+    assert contributor["result_state"] == "failed_closed"
+    assert manifest["outputs"][0]["disposition"] == "rejected"
+    assert run["state"] == "degraded"
+    result = analysis_run_control.get_analysis_run_result("example", run["run_id"])
+    assert result["result"]["findings"] == []
+    operation = result["result"]["operation_results"][0]
+    assert operation["state"] == "failed_closed"
+    assert "unknown source_span_id" in operation["explanation"]
+    assert operation["original_output"]["message"]["content"] == model_content
+
+
+def test_live_ollama_exact_offsets_reach_manifest_and_evidence_ledger(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = (
+        "VALIDATION RECORD.\n"
+        "Person: Mara Vale.\n"
+        "Object: brass compass.\n"
+    )
+    source_span = next(
+        span
+        for span in omi_analysis_orchestrator._build_ollama_source_span_catalog(
+            source
+        )
+        if "Mara Vale" in span["source_excerpt"]
+    )
+    model_content = json.dumps(
+        {
+            "schema_version": omi_analysis_orchestrator.OMI_OLLAMA_SCHEMA_VERSION,
+            "adapter": "ollama_model",
+            "status": "succeeded",
+            "explanation": "mocked exact evidence",
+            "findings": [
+                {
+                    "candidate_type": "character",
+                    "label": "Mara Vale",
+                    "extracted_claim": "Mara Vale is identified as a character candidate",
+                    "evidence": [
+                        {
+                            "source_span_id": source_span["source_span_id"],
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+    response_data = {
+        "model": "qwen3:8b",
+        "created_at": "2026-10-07T19:00:00Z",
+        "message": {"role": "assistant", "content": model_content},
+        "done": True,
+    }
+
+    class MockResponse:
+        def read(self):
+            return json.dumps(response_data).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+    monkeypatch.setattr(
+        urllib.request,
+        "urlopen",
+        lambda *args, **kwargs: MockResponse(),
+    )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="validation-record-exact-ollama-evidence",
+        requested_adapters=["ollama_model"],
+        created_at="2026-10-07T19:00:00Z",
+    )
+
+    assert run["state"] == "complete"
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["contributors"][0]["result_state"] == "succeeded"
+    assert manifest["outputs"][0]["disposition"] == "validated"
+    ledger = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    evidence = next(
+        event["payload"]
+        for event in ledger
+        if event["event_type"] == "evidence_recorded"
+        and event["payload"]["output_id"] is not None
+    )
+    locator = evidence["source_locator"]
+    assert (locator["char_start"], locator["char_end"]) == (
+        source_span["char_start"],
+        source_span["char_end"],
+    )
+    assert (locator["byte_start"], locator["byte_end"]) == (
+        source_span["byte_start"],
+        source_span["byte_end"],
+    )
+    assert evidence["excerpt_hash"] == hashlib.sha256(
+        source_span["source_excerpt"].encode("utf-8")
+    ).hexdigest()
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
 
 
 def test_unavailable_ollama_remains_unavailable_and_confirms_no_model_call(

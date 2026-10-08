@@ -161,7 +161,8 @@ def test_all_review_commands_mutate_only_selected_queue_and_event_paths(
     )
 
     assert response["status"] == "accepted"
-    assert response["review_workflow_state"] == {
+    workflow_state = response["review_workflow_state"]
+    expected_safety_state = {
         "is_canon": False,
         "apply_promotion_performed": False,
         "memory_canon_mutation_performed": False,
@@ -172,5 +173,13 @@ def test_all_review_commands_mutate_only_selected_queue_and_event_paths(
         "generated_prose_performed": False,
         "training_artifact_performed": False,
     }
+    assert {
+        key: workflow_state.get(key) for key in expected_safety_state
+    } == expected_safety_state
+    assert workflow_state["approval_scope"] == "review_lifecycle_metadata_only"
+    assert workflow_state["candidate_record_mutation_performed"] is False
+    assert workflow_state["promotion_created"] is False
+    assert workflow_state["rerun_execution_performed"] is False
+    assert workflow_state["candidate_generation_performed"] is False
     after = snapshot_paths(forbidden_roots)
     assert after == before

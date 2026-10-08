@@ -5840,18 +5840,64 @@ _OMI_LIVE_OLLAMA_SYSTEM_PROMPT = (
     '"explanation": "brief extraction note", '
     '"findings": [{"candidate_type": "...", "label": "...", '
     '"extracted_claim": "...", '
-    '"evidence": [{"source_excerpt": "...", "source_locator": "..."}], '
-    '"source_locator": "..."}]}. '
+    '"evidence": [{"source_span_id": "source-span-..."}]}]}. '
     "Allowed candidate types: character, location, organization, object, "
     "timeline_event, relationship, plot_thread, story_fact, open_question, "
     "storyform_context, diagnostic_question. "
     "Rules: extract only from the provided text. "
     "Do NOT rewrite, continue, brainstorm, suggest, invent facts, or make "
     "canon/truth/approval claims. Do NOT mutate Memory/Canon or create "
-    "promotion records. Every finding must include evidence from the source "
-    "text. If nothing can be extracted, set status to 'empty' with an empty "
-    "findings list."
+    "promotion records. A later message contains an app-owned source-span "
+    "catalog. Every finding must select evidence only by copying one or more "
+    "source_span_id values from that catalog. Do not emit source excerpts, "
+    "source locators, offsets, or invented span IDs. If nothing can be "
+    "extracted, set status to 'empty' with an empty findings list."
 )
+
+_OMI_LIVE_OLLAMA_FORMAT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "schema_version": {"type": "string", "enum": [OMI_OLLAMA_SCHEMA_VERSION]},
+        "adapter": {"type": "string", "enum": [OMI_OLLAMA_ADAPTER_NAME]},
+        "status": {"type": "string", "enum": ["succeeded", "empty"]},
+        "explanation": {"type": "string"},
+        "findings": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "candidate_type": {
+                        "type": "string",
+                        "enum": sorted(OMI_ORCHESTRATOR_FINDING_TYPES),
+                    },
+                    "label": {"type": "string"},
+                    "extracted_claim": {"type": "string"},
+                    "evidence": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "source_span_id": {"type": "string"},
+                            },
+                            "required": ["source_span_id"],
+                            "additionalProperties": False,
+                        },
+                        "minItems": 1,
+                    },
+                },
+                "required": [
+                    "candidate_type",
+                    "label",
+                    "extracted_claim",
+                    "evidence",
+                ],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["schema_version", "adapter", "status", "explanation", "findings"],
+    "additionalProperties": False,
+}
 
 # ---------------------------------------------------------------------------
 # Live Story Check diagnostic adapter (T016C) — behind explicit env flags
@@ -7059,6 +7105,12 @@ def _build_spacy_live_runner(
                 ),
                 "sentence": sentence,
                 "source_locator": source_locator,
+                "evidence": [
+                    {
+                        "source_excerpt": label_text,
+                        "source_locator": source_locator,
+                    }
+                ],
                 "confidence": "spaCy live support only",
             }
             findings.append(finding)
@@ -7107,6 +7159,12 @@ def _build_spacy_live_runner(
                 ),
                 "sentence": chunk_sentence,
                 "source_locator": chunk_locator,
+                "evidence": [
+                    {
+                        "source_excerpt": chunk_text,
+                        "source_locator": chunk_locator,
+                    }
+                ],
                 "confidence": "spaCy live support only",
             }
             findings.append(finding)
@@ -7168,6 +7226,191 @@ def _build_spacy_live_runner(
 # ---------------------------------------------------------------------------
 # Live Ollama structured extraction adapter runner (T015C)
 # ---------------------------------------------------------------------------
+
+
+def _ground_ollama_live_findings_to_exact_source(
+    findings: list[dict[str, Any]],
+    raw_text: str,
+) -> list[dict[str, Any]]:
+    """Attach exact T002 offsets to live Ollama evidence or fail closed."""
+    grounded = copy.deepcopy(findings)
+    for finding_index, finding in enumerate(grounded):
+        for evidence_index, item in enumerate(finding["evidence"]):
+            excerpt = item.get("source_excerpt", item.get("excerpt"))
+            if not isinstance(excerpt, str) or not excerpt:
+                raise ValueError(
+                    "live Ollama finding "
+                    f"{finding_index} evidence {evidence_index} has no exact "
+                    "source excerpt"
+                )
+            if "char_start" in item or "char_end" in item:
+                char_start = item.get("char_start")
+                char_end = item.get("char_end")
+                if (
+                    not isinstance(char_start, int)
+                    or isinstance(char_start, bool)
+                    or not isinstance(char_end, int)
+                    or isinstance(char_end, bool)
+                    or not 0 <= char_start < char_end <= len(raw_text)
+                    or item.get("char_offset_basis")
+                    != exact_source_map.CHAR_OFFSET_BASIS
+                    or raw_text[char_start:char_end] != excerpt
+                ):
+                    raise ValueError(
+                        "live Ollama finding "
+                        f"{finding_index} evidence {evidence_index} has invalid "
+                        "exact character offsets"
+                    )
+                byte_start = len(raw_text[:char_start].encode("utf-8"))
+                byte_end = len(raw_text[:char_end].encode("utf-8"))
+                if (
+                    item.get("byte_start") != byte_start
+                    or item.get("byte_end") != byte_end
+                    or item.get("byte_offset_basis")
+                    != exact_source_map.BYTE_OFFSET_BASIS
+                ):
+                    raise ValueError(
+                        "live Ollama finding "
+                        f"{finding_index} evidence {evidence_index} has invalid "
+                        "exact byte offsets"
+                    )
+                continue
+            starts: list[int] = []
+            cursor = 0
+            while True:
+                match = raw_text.find(excerpt, cursor)
+                if match < 0:
+                    break
+                starts.append(match)
+                cursor = match + 1
+            if len(starts) != 1:
+                raise ValueError(
+                    "live Ollama finding "
+                    f"{finding_index} evidence {evidence_index} must match "
+                    "exactly one source span; "
+                    f"match_count={len(starts)}"
+                )
+            char_start = starts[0]
+            char_end = char_start + len(excerpt)
+            item.update(
+                {
+                    "char_start": char_start,
+                    "char_end": char_end,
+                    "char_offset_basis": exact_source_map.CHAR_OFFSET_BASIS,
+                    "byte_start": len(raw_text[:char_start].encode("utf-8")),
+                    "byte_end": len(raw_text[:char_end].encode("utf-8")),
+                    "byte_offset_basis": exact_source_map.BYTE_OFFSET_BASIS,
+                    "artifact_file_id": "source-artifact",
+                }
+            )
+    return grounded
+
+
+def _build_ollama_source_span_catalog(raw_text: str) -> list[dict[str, Any]]:
+    """Build deterministic exact non-empty line spans from submitted source."""
+    spans: list[dict[str, Any]] = []
+    char_cursor = 0
+    for line in raw_text.splitlines(keepends=True):
+        content = line
+        if content.endswith("\r\n"):
+            content = content[:-2]
+        elif content.endswith(("\n", "\r")):
+            content = content[:-1]
+        char_start = char_cursor
+        char_end = char_start + len(content)
+        char_cursor += len(line)
+        if not content.strip():
+            continue
+        byte_start = len(raw_text[:char_start].encode("utf-8"))
+        byte_end = len(raw_text[:char_end].encode("utf-8"))
+        digest = hashlib.sha256(
+            f"{char_start}:{char_end}:".encode("utf-8")
+            + content.encode("utf-8")
+        ).hexdigest()[:12]
+        span_id = f"source-span-{len(spans) + 1:04d}-{digest}"
+        spans.append(
+            {
+                "source_span_id": span_id,
+                "source_excerpt": content,
+                "source_locator": f"raw_idea:chars:{char_start}-{char_end}",
+                "char_start": char_start,
+                "char_end": char_end,
+                "char_offset_basis": exact_source_map.CHAR_OFFSET_BASIS,
+                "byte_start": byte_start,
+                "byte_end": byte_end,
+                "byte_offset_basis": exact_source_map.BYTE_OFFSET_BASIS,
+                "artifact_file_id": "source-artifact",
+            }
+        )
+    if not spans:
+        raise ValueError("live Ollama source produced no selectable spans")
+    return spans
+
+
+def _resolve_ollama_live_span_selections(
+    payload: Any,
+    source_spans: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Resolve model-selected app span IDs into exact internal evidence."""
+    if not isinstance(payload, dict):
+        raise ValueError("live Ollama span-selection envelope must be an object")
+    resolved = copy.deepcopy(payload)
+    findings = resolved.get("findings")
+    if not isinstance(findings, list):
+        raise ValueError("live Ollama span-selection findings must be an array")
+    span_map = {
+        span["source_span_id"]: span
+        for span in source_spans
+        if isinstance(span, dict) and isinstance(span.get("source_span_id"), str)
+    }
+    if len(span_map) != len(source_spans):
+        raise ValueError("live Ollama source-span catalog contains duplicate IDs")
+    for finding_index, finding in enumerate(findings):
+        if not isinstance(finding, dict):
+            raise ValueError(f"live Ollama finding {finding_index} must be an object")
+        if "source_locator" in finding:
+            raise ValueError(
+                f"live Ollama finding {finding_index} must select app-owned spans, "
+                "not supply a source locator"
+            )
+        evidence = finding.get("evidence")
+        if not isinstance(evidence, list) or not evidence:
+            raise ValueError(
+                f"live Ollama finding {finding_index} requires span-selection evidence"
+            )
+        selected_ids: set[str] = set()
+        exact_evidence: list[dict[str, Any]] = []
+        for evidence_index, item in enumerate(evidence):
+            if not isinstance(item, dict) or set(item) != {"source_span_id"}:
+                raise ValueError(
+                    "live Ollama finding "
+                    f"{finding_index} evidence {evidence_index} must contain only "
+                    "source_span_id"
+                )
+            span_id = item.get("source_span_id")
+            if not isinstance(span_id, str) or not span_id.strip():
+                raise ValueError(
+                    "live Ollama finding "
+                    f"{finding_index} evidence {evidence_index} has a malformed "
+                    "source_span_id"
+                )
+            if span_id in selected_ids:
+                raise ValueError(
+                    f"live Ollama finding {finding_index} selected duplicate "
+                    f"source_span_id {span_id!r}"
+                )
+            span = span_map.get(span_id)
+            if span is None:
+                raise ValueError(
+                    "live Ollama finding "
+                    f"{finding_index} evidence {evidence_index} selected unknown "
+                    f"source_span_id {span_id!r}"
+                )
+            selected_ids.add(span_id)
+            exact_evidence.append(copy.deepcopy(span))
+        finding["evidence"] = exact_evidence
+        finding["source_locator"] = exact_evidence[0]["source_locator"]
+    return resolved
 
 
 def _build_ollama_model_live_runner(
@@ -7244,9 +7487,28 @@ def _build_ollama_model_live_runner(
         clean_base = base_url.rstrip("/")
         chat_url = f"{clean_base}/api/chat"
 
+        source_spans = _build_ollama_source_span_catalog(raw_text)
+        catalog_message = json.dumps(
+            {
+                "instruction": (
+                    "Select evidence only by source_span_id. Do not copy, "
+                    "paraphrase, or reconstruct source text."
+                ),
+                "source_span_catalog": [
+                    {
+                        "source_span_id": span["source_span_id"],
+                        "source_text": span["source_excerpt"],
+                    }
+                    for span in source_spans
+                ],
+            },
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
         messages = [
             {"role": "system", "content": _OMI_LIVE_OLLAMA_SYSTEM_PROMPT},
             {"role": "user", "content": raw_text},
+            {"role": "user", "content": catalog_message},
         ]
 
         request_body = json.dumps({
@@ -7254,6 +7516,7 @@ def _build_ollama_model_live_runner(
             "messages": messages,
             "stream": False,
             "think": False,
+            "format": _OMI_LIVE_OLLAMA_FORMAT_SCHEMA,
             "options": {"num_predict": 2048},
         }).encode("utf-8")
 
@@ -7406,13 +7669,33 @@ def _build_ollama_model_live_runner(
             }
 
         try:
-            validated = validate_ollama_model_envelope(message_content)
-        except ValueError as exc:
+            selected = json.loads(message_content)
+            resolved = _resolve_ollama_live_span_selections(selected, source_spans)
+            validated = validate_ollama_model_envelope(resolved)
+        except (json.JSONDecodeError, ValueError) as exc:
             return {
                 "adapter": OMI_OLLAMA_ADAPTER_NAME,
                 "state": "failed_closed",
                 "explanation": (
                     f"Live Ollama output failed validation: {exc}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+                "original_output": original_output,
+                "execution_provenance": execution_provenance,
+                "runtime_execution": runtime_execution,
+            }
+
+        try:
+            validated["findings"] = _ground_ollama_live_findings_to_exact_source(
+                validated["findings"], raw_text
+            )
+        except ValueError as exc:
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    f"Live Ollama evidence failed exact source attribution: {exc}. "
                     "Failing closed with no candidates."
                 ),
                 "candidates": [],
