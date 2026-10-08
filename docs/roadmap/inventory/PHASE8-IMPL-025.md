@@ -5,12 +5,10 @@
 - ID: `PHASE8-IMPL-025`
 - Title: Layered Analysis Architecture and Tool Integration Expansion
 - Status: published/active
-- Immediate implementation frontier: `PHASE8-IMPL-025-T012A` dependency/
-  eligibility preflight. T009, T010, accepted T010H at
-  `9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`, and T011 through T011H have local
-  acceptance evidence. T012A implementation has not begun, and T012
-  eligibility remains unasserted until the separate preflight verifies every
-  recorded prerequisite.
+- Immediate implementation frontier: no further PHASE8-IMPL-025 child is
+  accepted by this closeout. T012 is complete/PASS at
+  `e216d08eb5255d7dd58a3934e7c328249a4f52c9`. PHASE8-IMPL-027 remains the
+  existing published/planned/inactive terminal owner gate and has not begun.
 - Activation dependency: satisfied by PHASE8-IMPL-024 fully complete/closed
   with application closeout validation PASS; Project Memory is
   paused/nonblocking and is not an activation gate
@@ -44,6 +42,10 @@
   BookNLP, Ollama/qwen3:8b, and Story Check current-layer evidence accepted
 - T008 closeout:
   `docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md`
+- Completed child: `PHASE8-IMPL-025-T012` (`complete/PASS`), accepted
+  implementation commit `e216d08eb5255d7dd58a3934e7c328249a4f52c9`
+- T012 closeout:
+  `docs/roadmap/decisions/PHASE8-IMPL-025-T012-layered-end-to-end-validation-closeout.md`
 - T002 closeout:
   `docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md`
 - T005 contract/closeout:
@@ -155,8 +157,9 @@ adapter implementation a failure or claiming a runtime PASS.
 11. `PHASE8-IMPL-025-T011` — Candidate review lifecycle expansion
     (`complete/PASS` through accepted T011H implementation commit
     `66d3c587655161415e9508c2dfb1aa2e09f3d231`).
-12. `PHASE8-IMPL-025-T012` — Layered end-to-end validation (`planned`; not
-    begun; next lifecycle is T012A dependency/eligibility preflight).
+12. `PHASE8-IMPL-025-T012` — Layered end-to-end validation (`complete/PASS`;
+    accepted implementation commit
+    `e216d08eb5255d7dd58a3934e7c328249a4f52c9`).
 
 Accepted bounded additions: T003F live-run API/control plane; T003G persisted-
 data compatibility; T005H/T006K provisioning and current-machine runtime
@@ -170,10 +173,9 @@ paid-integration foundation, with paid real execution deferred. T008 is
 complete/PASS at
 `2465722cedfe9f8dcb4135d8de124f36a999593f`. T011H is accepted at
 `66d3c587655161415e9508c2dfb1aa2e09f3d231`. T010H is accepted/closed at
-`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`; T012 remains open. T012A is the
-next dependency/eligibility preflight; its implementation has not begun and
-must verify T003F, T003G, T009, T010, T010H at its accepted commit, T011, and
-T011H from live repository evidence before T012 eligibility may be asserted.
+`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`; T012 is complete/PASS at
+`e216d08eb5255d7dd58a3934e7c328249a4f52c9`. PHASE8-IMPL-027 remains the
+separate planned/inactive terminal gate and is not begun by this closeout.
 Lettered bounded slices are defined in the parent task record.
 
 ## Dependencies
@@ -191,8 +193,8 @@ T007 consumed PHASE8-IMPL-024-T002's completed Story Check grounding work
 without duplicating it; T007E accepted current-layer real Ollama/qwen3:8b and
 Story Check execution through the T002/T003 layered path. T010H is
 accepted/closed at `9376ddd379e8cb9addac00b3aa691c7c82fe1bf2` after accepted
-T009 and T010 backend work; T011H is accepted. T012 reuses
-PHASE8-IMPL-024-T008 and adds only layered deltas after its dependency gate.
+T009 and T010 backend work; T011H is accepted. T012 reused
+PHASE8-IMPL-024-T008 and completed its layered deltas after its dependency gate.
 T012I apply-promotion
 validation remains isolated. T007 is complete/PASS. The T004/T004G
 contributor branch was satisfied before T008 at accepted T004G closeout HEAD

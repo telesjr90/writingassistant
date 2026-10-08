@@ -17,21 +17,21 @@ T007/T007E supplied the satisfied contributor prerequisites for T008. T009 is
 complete/PASS, T010 is implemented, T010H is complete/PASS at accepted
 implementation commit `9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`, and T011 is
 complete/PASS through accepted T011H at
-`66d3c587655161415e9508c2dfb1aa2e09f3d231`. T012A dependency/eligibility
-preflight is next; implementation has not begun and T012 eligibility remains
-unasserted until that separate preflight verifies every recorded prerequisite.
+`66d3c587655161415e9508c2dfb1aa2e09f3d231`. T012 is complete/PASS at
+accepted implementation commit
+`e216d08eb5255d7dd58a3934e7c328249a4f52c9`.
 
 Activation had one explicit boundary: `PHASE8-IMPL-024` fully complete/closed
 with application closeout validation PASS. That boundary is satisfied by the
 accepted PHASE8-IMPL-024-T008 closeout, so this parent is published/active.
 Project Memory is not an activation gate while the accepted 2026-07-17 pause
 decision remains current. T007 is complete/PASS through T007E. The current
-accepted/closed child is `PHASE8-IMPL-025-T010H` at
-`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`. The accepted T004G closeout HEAD
+accepted/closed child is `PHASE8-IMPL-025-T012` at
+`e216d08eb5255d7dd58a3934e7c328249a4f52c9`. The accepted T004G closeout HEAD
 `bc2a65e6350fdd65720606253b120d7fbcfa2b78` satisfied the BookNLP prerequisite
 before T008 implementation began. Optional paid Subtxt execution was not an
-MVP or T008 blocker. T010H is accepted/closed and T012 remains open; no T012A
-implementation is activated by this closeout.
+MVP or T008 blocker. T012 is accepted/closed; this closeout does not close the
+parent or begin terminal PHASE8-IMPL-027.
 
 The owner-authorized T001 context prerequisite is satisfied by the generated,
 read-only supporting pack at
@@ -498,11 +498,12 @@ separate.
 
 ### PHASE8-IMPL-025-T012 — Layered end-to-end validation
 
-Status: `planned`; not begun. The next lifecycle is T012A dependency/eligibility
-preflight, not T012A implementation. Live repository evidence must verify T003F,
-T003G, T009, T010, accepted T010H at
-`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`, T011, and T011H before this
-workstream begins. This closeout does not assert T012 eligibility.
+Status: `complete/PASS`. Accepted implementation commit:
+`e216d08eb5255d7dd58a3934e7c328249a4f52c9` (`fix(omi): enforce exact
+live-analysis evidence attribution (T012)`). Focused validation passed with
+`135 passed, 7 warnings`; the real contributor chain and browser validation
+passed; `git diff --check` passed. Closeout:
+`docs/roadmap/decisions/PHASE8-IMPL-025-T012-layered-end-to-end-validation-closeout.md`.
 
 - `T012A` — Source identity and run-manifest suite.
 - `T012B` — Raw extraction and immutable artifact/evidence-ledger suite.
@@ -558,11 +559,11 @@ T008 accepted real current-layer outputs from the applicable
 MVP-required free/local contributor branches; optional official Subtxt was
 unavailable and nonblocking. T009, T010 backend work, and T011 through T011H
 have local acceptance evidence. T010H is accepted/closed at
-`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`. T012A is the next
-dependency/eligibility preflight, not active implementation, and must verify
-T003F, T003G, T009, T010, T010H at that accepted commit, T011, and T011H before
-T012 may begin.
-T012 must pass before terminal PHASE8-IMPL-027 acceptance.
+`9376ddd379e8cb9addac00b3aa691c7c82fe1bf2`. T012 subsequently completed/PASS
+at accepted implementation commit
+`e216d08eb5255d7dd58a3934e7c328249a4f52c9` after its prerequisite gate.
+PHASE8-IMPL-027 remains the separate published/planned/inactive terminal owner
+acceptance gate and is not begun by this closeout.
 
 The external `dramatica_flow` runtime is not part of this execution graph or
 the T007, T008, T012, or PHASE8-IMPL-027 acceptance path. Its upstream identity

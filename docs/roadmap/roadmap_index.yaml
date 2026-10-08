@@ -18,7 +18,7 @@
     "current_application_policy": "docs/roadmap/decisions/2026-07-17-project-memory-paused-as-an-application-implementation-gate.md",
     "execution_routing_application_gate_status": "paused_nonblocking",
     "owner_subtxt_authorization": "resolved; official Subtxt/Dramatica is optional paid integration; T005 contract complete/PASS; T006 application-adapter and mock-validation foundation accepted/closed; T006G not executed and paid runtime deferred; app-owned identities remain separate",
-    "frontier_note": "PHASE8-IMPL-025 is published/active. T009 is complete/PASS at 2b7515cfc17ba4194e4ab98af38f85b01473cb55, T010 is implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb, T010H is complete/PASS at accepted implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2, and T011 is complete/PASS through accepted T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231. The next lifecycle is T012A dependency/eligibility preflight only; T012A implementation has not begun and T012 eligibility is not asserted until T003F, T003G, T009, T010, T010H at its accepted commit, T011, and T011H are verified from live repository evidence. External dramatica_flow remains reference/provenance-only for MVP. Project Memory and execution routing remain paused/nonblocking for ordinary application work. Broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and terminal PHASE8-IMPL-027."
+    "frontier_note": "PHASE8-IMPL-025 is published/active. T009 is complete/PASS at 2b7515cfc17ba4194e4ab98af38f85b01473cb55, T010 is implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb, T010H is complete/PASS at accepted implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2, T011 is complete/PASS through accepted T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231, and T012 is complete/PASS at accepted implementation commit e216d08eb5255d7dd58a3934e7c328249a4f52c9. No further PHASE8-IMPL-025 child is accepted by this closeout. PHASE8-IMPL-027 remains the existing published/planned/inactive terminal MVP owner gate and is not begun. External dramatica_flow remains reference/provenance-only for MVP. Project Memory and execution routing remain paused/nonblocking for ordinary application work."
   },
   "id_policy": {
     "parent_task_ids_are_immutable": true,
@@ -5498,7 +5498,7 @@
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
       "architecture_follow_on_status": "published/active",
-      "result": "published historical foundation; T023A/T023B remain complete/PASS; T023C/T023D intent is incorporated into complete PHASE8-IMPL-025-T011, T024 into T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 is complete/PASS; PHASE8-IMPL-025-T010H is accepted at 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2 and T011H is accepted at 66d3c587655161415e9508c2dfb1aa2e09f3d231; T012 remains open pending its separate T012A preflight"
+      "result": "published historical foundation; T023A/T023B remain complete/PASS; T023C/T023D intent is incorporated into complete PHASE8-IMPL-025-T011, T024 into completed/PASS T012, and T025/T026 into terminal PHASE8-IMPL-027; no competing active suite or closeout; PHASE8-IMPL-024 is complete/PASS; PHASE8-IMPL-025-T012 is complete/PASS at e216d08eb5255d7dd58a3934e7c328249a4f52c9; PHASE8-IMPL-027 remains planned/inactive and not begun"
     },
     {
       "id": "PHASE8-IMPL-024",
@@ -5537,7 +5537,7 @@
       "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-024-T008-application-closeout-validation-and-parent-closeout.md",
       "architecture_follow_on_task": "PHASE8-IMPL-025",
-      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025 T009/T010/T010H/T011 through T011H have local acceptance evidence; T010H accepted at 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2 and T011H accepted at 66d3c587655161415e9508c2dfb1aa2e09f3d231; T012 remains open; T012A dependency/eligibility preflight is next, implementation has not begun, and eligibility remains pending prerequisite proof",
+      "architecture_follow_on_status": "published/active; PHASE8-IMPL-025 T009/T010/T010H/T011 through T011H remain accepted foundations; T012 is complete/PASS at e216d08eb5255d7dd58a3934e7c328249a4f52c9; PHASE8-IMPL-027 remains planned/inactive and not begun",
       "result": "complete/closed as complete/PASS; T001, T002, T003, T006, T007, T004, T005, T008, and T008A-T008F complete/PASS; accepted application closeout validation bound to final implementation HEAD f8aeaa32327500832ed8678c194e3abf5e47a75b with 5203 ordinary Python passes, exact expected-red reproduction, roadmap/Node/build/browser/responsive/accessibility PASS, no project/application/repository mutation, and archive SHA-256 cf38c0222f3b7b9fae873147817eb41f611c374c6a0e367b4e918d468a93b0d0; broad owner acceptance and MVP readiness remain blocked on PHASE8-IMPL-025 and PHASE8-IMPL-027"
     },
     {
@@ -6096,12 +6096,12 @@
       "enrichment_record": "docs/roadmap/enrichment/PHASE8-IMPL-025.enrichment.json",
       "context_pack": ".codex-context/PHASE8-IMPL-025/T001-tool-role-layered-orchestration/20260830T175126Z/",
       "context_pack_status": "generated read-only supporting evidence for T001; prerequisite satisfied; not authority and not a tracked deliverable",
-      "latest_child_task": "PHASE8-IMPL-025-T010H",
+      "latest_child_task": "PHASE8-IMPL-025-T012",
       "latest_child_status": "complete/PASS",
-      "next_child_task": "PHASE8-IMPL-025-T012A",
+      "next_child_task": null,
       "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-layered-analysis-architecture-and-subtxt-owner-authorization.md",
-      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T010H-ncp-diagnostics-owner-workflow-closeout.md",
-      "result": "published/active architecture-integration parent; T009 complete/PASS at 2b7515cfc17ba4194e4ab98af38f85b01473cb55; T010 implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb; T010H complete/PASS at accepted implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2; T011 complete/PASS through accepted T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231. T012 remains open. T012A is the next dependency/eligibility preflight only; implementation is not begun and eligibility is not asserted until all recorded T012 prerequisites are verified. App-owned dramatica_flow_informed_rubric remains the approved MVP boundary; external dramatica_flow is reference/provenance-only. Project Memory remains paused/nonblocking."
+      "latest_child_decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T012-layered-end-to-end-validation-closeout.md",
+      "result": "published/active architecture-integration parent; T009 complete/PASS at 2b7515cfc17ba4194e4ab98af38f85b01473cb55; T010 implemented at 0622a21779c38cdea4738f8f30e63b71376a7ecb; T010H complete/PASS at accepted implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2; T011 complete/PASS through accepted T011H at 66d3c587655161415e9508c2dfb1aa2e09f3d231; T012 complete/PASS at accepted implementation commit e216d08eb5255d7dd58a3934e7c328249a4f52c9. No further PHASE8-IMPL-025 child is accepted by this closeout. PHASE8-IMPL-027 remains published/planned/inactive and not begun. App-owned dramatica_flow_informed_rubric remains the approved MVP boundary; external dramatica_flow is reference/provenance-only. Project Memory remains paused/nonblocking."
     },
     {
       "id": "PHASE8-IMPL-025-T001",
@@ -6422,7 +6422,7 @@
       "id": "PHASE8-IMPL-025-T012",
       "title": "Layered end-to-end validation",
       "type": "runtime_microtask",
-      "status": "planned",
+      "status": "complete",
       "parent": "PHASE8-IMPL-025",
       "depends_on": [
         "PHASE8-IMPL-025-T003F",
@@ -6441,7 +6441,9 @@
         "no_auto_promotion",
         "no_generated_prose"
       ],
-      "result": "planned layered-runtime and integration deltas over reusable PHASE8-IMPL-024-T008 baselines; for every enabled MVP-required external contributor, prove real source -> current layered control plane -> real external tool/interface -> native/raw output -> manifest/artifact/evidence ledger -> normalization -> guardrails/fusion -> candidate persistence -> owner review; deterministic mocks remain required but are insufficient; includes live browser-to-HTTP, compatibility, provisioning, negative paths, owner workflows, and isolated apply-promotion; optional paid Subtxt and external dramatica_flow runtime proof are not required; no duplicate terminal suite"
+      "result": "complete/PASS at accepted implementation commit e216d08eb5255d7dd58a3934e7c328249a4f52c9; focused validation 135 passed with 7 warnings; real contributor chain PASS; browser-to-HTTP, grouped review, NCP no-write, keyboard focus, 390px containment, protected-state, and telemetry validation PASS; exact source attribution and fail-closed boundaries preserved; no story prose, automatic approval/promotion/apply-promotion, Memory/Canon/project-truth/source mutation, NCP export/import write, optional paid Subtxt execution, external dramatica_flow execution, or dependency/package/model/permanent infrastructure change",
+      "implementation_commit": "e216d08eb5255d7dd58a3934e7c328249a4f52c9",
+      "decision_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T012-layered-end-to-end-validation-closeout.md"
     },
     {
       "id": "PHASE8-IMPL-026",

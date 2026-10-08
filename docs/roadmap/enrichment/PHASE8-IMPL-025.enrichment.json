@@ -12,7 +12,7 @@
     "t002_contract_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T002-source-identity-and-analysis-run-manifest.md",
     "accepted_pattern": "layered plus parallel",
     "current_pattern": "source/raw idea -> independent adapters -> normalization -> fusion/conflict/uncertainty -> candidate persistence -> owner review",
-    "current_pattern_classification": "valid implemented foundation, incomplete target architecture",
+    "current_pattern_classification": "validated current-layer architecture; terminal owner acceptance remains separate",
     "layers": [
       "Layer 0 - owner source and source identity",
       "Layer 1 - raw extraction",
@@ -39,7 +39,9 @@
     "t008_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T008-cross-adapter-semantic-guardrails-closeout.md",
     "t008_implementation_commit": "2465722cedfe9f8dcb4135d8de124f36a999593f",
     "t011h_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T011H-owner-facing-live-run-workflow-closeout.md",
-    "t011h_implementation_commit": "66d3c587655161415e9508c2dfb1aa2e09f3d231"
+    "t011h_implementation_commit": "66d3c587655161415e9508c2dfb1aa2e09f3d231",
+    "t012_closeout_record": "docs/roadmap/decisions/PHASE8-IMPL-025-T012-layered-end-to-end-validation-closeout.md",
+    "t012_implementation_commit": "e216d08eb5255d7dd58a3934e7c328249a4f52c9"
   },
   "owner_subtxt_authorization": {
     "licensing_resolved": true,
@@ -84,7 +86,7 @@
       "NCP local/schema gateway when its task becomes applicable",
       "app-owned deterministic and rubric contributors within their accepted scopes"
     ],
-    "current_layer_completion_claimed": false,
+    "current_layer_completion_claimed": true,
     "historical_real_runs_are_foundation_only": true,
     "official_subtxt_paid_runtime_required": false
   },
@@ -103,11 +105,11 @@
     "T004 expanded BookNLP extraction complete/PASS: implementation commit ca2f99f35a7dc029a217954872ca7a5ab479ed2f preserved separately from accepted T004G real-runtime validation/fix commit bc2a65e6350fdd65720606253b120d7fbcfa2b78",
     "T005 official/full Subtxt runtime inventory and fail-closed contracts complete/PASS",
     "T006 official/full Subtxt application adapter and mocked-validation foundation accepted/closed at 23d4825da9a257180cdc0d1d1239ce13b4e01f78; optional paid runtime deferred; T006G NOT_EXECUTED_RUNTIME_UNAVAILABLE; T006K zero currently available verified official runtime surfaces",
-    "T008 cross-adapter semantic guardrails complete/PASS at 2465722cedfe9f8dcb4135d8de124f36a999593f; six classifications, normalized-evidence enforcement, no interpretive self-support, author-intent distinction, exactly-once pre-fusion assessment, immutable annotations, and no truth/canon selection accepted"
+    "T008 cross-adapter semantic guardrails complete/PASS at 2465722cedfe9f8dcb4135d8de124f36a999593f; six classifications, normalized-evidence enforcement, no interpretive self-support, author-intent distinction, exactly-once pre-fusion assessment, immutable annotations, and no truth/canon selection accepted",
+    "T012 layered end-to-end validation complete/PASS at e216d08eb5255d7dd58a3934e7c328249a4f52c9; real contributor chain, exact evidence, manifest/artifact/ledger lineage, candidate-only persistence, owner-review handoff, NCP no-write boundaries, browser-to-HTTP workflow, keyboard focus, mobile containment, and protected-state checks accepted"
   ],
   "missing_layers": [
-    "current-layer real execution proof for remaining historical spaCy and NCP foundations",
-    "layered validation deltas and terminal PHASE8-IMPL-027 acceptance"
+    "terminal PHASE8-IMPL-027 owner acceptance"
   ],
   "activation": {
     "status": "active",
@@ -115,13 +117,13 @@
       "PHASE8-IMPL-024"
     ],
     "activation_condition": "satisfied: PHASE8-IMPL-024 complete/closed and application closeout validation PASS; Project Memory paused/nonblocking and not an activation gate",
-    "immediate_next_task": "PHASE8-IMPL-025-T012A",
-    "immediate_next_task_status": "dependency/eligibility preflight only; implementation not begun; verify T003F, T003G, T009, T010, accepted T010H at 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2, T011, and T011H from live repository evidence; this closeout does not assert T012 eligibility",
+    "immediate_next_task": null,
+    "immediate_next_task_status": "no further PHASE8-IMPL-025 child accepted by the T012 closeout; PHASE8-IMPL-027 remains the existing published/planned/inactive terminal owner gate and is not begun",
     "first_phase8_impl_025_task": "PHASE8-IMPL-025-T001",
     "first_phase8_impl_025_task_status": "complete/PASS",
-    "latest_completed_task": "PHASE8-IMPL-025-T010H",
-    "latest_completed_task_status": "complete/PASS; implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2; owner-facing NCP gateway/diagnostics workflow accepted with safe opaque destination validation, deterministic state/retry/confirmation coverage, accessibility/responsive containment, and browser-smoke validation",
-    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T010H at 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2"
+    "latest_completed_task": "PHASE8-IMPL-025-T012",
+    "latest_completed_task_status": "complete/PASS; implementation commit e216d08eb5255d7dd58a3934e7c328249a4f52c9; focused validation 135 passed with 7 warnings; real contributor chain PASS; browser validation PASS; exact evidence, candidate-only, owner-review, NCP no-write, and safety boundaries accepted",
+    "latest_accepted_implementation_milestone": "PHASE8-IMPL-025-T012 at e216d08eb5255d7dd58a3934e7c328249a4f52c9"
   },
   "workstream_order": [
     "PHASE8-IMPL-025-T001 Tool-role and layered-orchestration contract",
@@ -149,7 +151,8 @@
     "PHASE8-IMPL-025-T009": "complete/PASS; closeout commit 2b7515cfc17ba4194e4ab98af38f85b01473cb55",
     "PHASE8-IMPL-025-T010": "implemented; commit 0622a21779c38cdea4738f8f30e63b71376a7ecb; T010H owner UI complete/PASS at accepted implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2",
     "PHASE8-IMPL-025-T010H": "complete/PASS; accepted implementation commit 9376ddd379e8cb9addac00b3aa691c7c82fe1bf2; owner-facing NCP gateway/diagnostics UI with approved-context readiness, blocked candidate bundle, candidate-only external import, safe opaque destination validation, deterministic loading/empty/invalid/unavailable/request-failure/retry/success/confirmation states, accessibility and responsive containment; 27 backend contract passes, frontend Node 4+3+9+3 passes, frontend build PASS, 100 source/accessibility passes, browser smoke PASS with zero mutation/error/failure requests; no story prose, live model/tool/runtime execution, export/import write, or candidate/review/promotion/apply/Memory/Canon/project-truth mutation",
-    "PHASE8-IMPL-025-T011": "complete/PASS through T011H; latest accepted implementation commit 66d3c587655161415e9508c2dfb1aa2e09f3d231; T011A-T011H remained separate bounded tasks"
+    "PHASE8-IMPL-025-T011": "complete/PASS through T011H; latest accepted implementation commit 66d3c587655161415e9508c2dfb1aa2e09f3d231; T011A-T011H remained separate bounded tasks",
+    "PHASE8-IMPL-025-T012": "complete/PASS; accepted implementation commit e216d08eb5255d7dd58a3934e7c328249a4f52c9; focused validation 135 passed with 7 warnings; real contributor chain PASS; browser validation PASS; patch SHA-256 956600a23735009f28c7388ac19062711b692a290af9b565f0bedd93cf2f078e"
   },
   "child_task_ordering": {
     "T001": [
