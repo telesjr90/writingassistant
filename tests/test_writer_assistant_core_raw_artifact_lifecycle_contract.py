@@ -20,6 +20,7 @@ from backend.story_knowledge.raw_artifacts import (
     compute_raw_artifact_bundle_hash,
     list_raw_artifact_bundles,
     quarantine_raw_artifact_bundle,
+    raw_artifact_boundary_flags,
     raw_artifact_bundle_storage_dir,
     read_raw_artifact_file,
     read_raw_artifact_manifest,
@@ -362,6 +363,59 @@ def test_hash_is_deterministic_and_changes_when_artifact_metadata_changes():
     assert compute_raw_artifact_bundle_hash(manifest) != compute_raw_artifact_bundle_hash(
         changed
     )
+
+
+def test_runtime_extraction_state_survives_write_read_and_hash_validation(tmp_path):
+    project = project_dir(tmp_path)
+    bundle_id = "raw_bundle_runtime_extraction"
+    payload = payload_for(bundle_id)
+    runtime_flags = raw_artifact_boundary_flags(
+        runtime_extraction_adapters=("booknlp", "spacy")
+    )
+    file_ref = artifact_file_ref(
+        bundle_id,
+        payload,
+        boundary_flags=runtime_flags,
+    )
+    manifest = build_raw_artifact_manifest(
+        project_id=PROJECT_ID,
+        raw_artifact_bundle_id=bundle_id,
+        artifact_files=[file_ref],
+        created_at="2026-10-09T22:30:00Z",
+        status="valid",
+        validation_status="valid",
+        artifact_source_type="analysis_run",
+        artifact_source_id="runtime_run",
+        extraction_run_id="runtime_run",
+        source_refs=[SOURCE_REF],
+        evidence_refs=[EVIDENCE_REF],
+        provenance_refs=[PROVENANCE_REF],
+        source_locator_refs=[SOURCE_LOCATOR_REF],
+        adapter_name="omi_analysis_control",
+        adapter_version="1",
+        boundary_flags=runtime_flags,
+        no_generated_prose_confirmation=True,
+        no_model_call_confirmation=True,
+        no_training_artifact_confirmation=True,
+        no_apply_promotion_confirmation=True,
+        no_memory_canon_mutation_confirmation=True,
+        no_runtime_extraction_confirmation=False,
+    )
+
+    write_raw_artifact_bundle(
+        manifest,
+        {f"artifact_file_{bundle_id}": payload},
+        project_dir=project,
+    )
+    stored = read_raw_artifact_manifest(
+        PROJECT_ID,
+        bundle_id,
+        project_dir=project,
+    )
+    assert stored["boundary_flags"] == sorted(runtime_flags)
+    assert stored["artifact_files"][0]["boundary_flags"] == sorted(runtime_flags)
+    assert stored["no_runtime_extraction_confirmation"] is False
+    assert compute_raw_artifact_bundle_hash(stored) == stored["bundle_hash"]
 
 
 def test_temp_project_does_not_receive_forbidden_side_effect_paths(tmp_path):

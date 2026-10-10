@@ -857,6 +857,7 @@ def _file_ref(
     schema_name: str = "t003_analysis_support_data", schema_version: str = "1",
     parser_hint: str = "json",
     model_calls_occurred: bool | None = False,
+    runtime_extraction_adapters: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     return {
         "artifact_file_id": artifact_file_id,
@@ -875,7 +876,8 @@ def _file_ref(
         "evidence_refs": evidence_refs,
         "provenance_refs": provenance_refs,
         "boundary_flags": raw_artifact_boundary_flags(
-            model_calls_occurred=model_calls_occurred
+            model_calls_occurred=model_calls_occurred,
+            runtime_extraction_adapters=runtime_extraction_adapters,
         ),
     }
 
@@ -893,6 +895,21 @@ def _aggregate_model_call_state(
     if any(state is None for state in states):
         return None
     return False
+
+
+def _aggregate_local_nlp_runtime_adapters(
+    operation_results: list[dict[str, Any]],
+) -> tuple[str, ...]:
+    """Return local-NLP adapters whose finalized result proves execution."""
+
+    executed = {
+        item["adapter"]
+        for item in operation_results
+        if item.get("adapter") in {"booknlp", "spacy"}
+        and isinstance(item.get("runtime_execution"), dict)
+        and item["runtime_execution"].get("real_tool_calls_occurred") is True
+    }
+    return tuple(sorted(executed))
 
 
 def _ollama_original_output_handoffs(
@@ -1627,7 +1644,7 @@ def _build_manifest_and_evidence(
         state = operation_result["state"]
         disposition = (
             "validated"
-            if state in {"succeeded", "empty"}
+            if state == "succeeded"
             else "rejected"
             if state == "failed_closed"
             else "unverified"
@@ -1935,6 +1952,9 @@ def _submit_analysis_run_locked(
     model_calls_occurred = _aggregate_model_call_state(
         result.get("operation_results", [])
     )
+    runtime_extraction_adapters = _aggregate_local_nlp_runtime_adapters(
+        result.get("operation_results", [])
+    )
     source_payload = raw_idea.encode("utf-8")
     result_payload = canonical_json_bytes(result)
     manifest, evidence_records = _build_manifest_and_evidence(
@@ -1983,6 +2003,7 @@ def _submit_analysis_run_locked(
             evidence_refs=evidence_ids,
             provenance_refs=provenance_refs,
             model_calls_occurred=model_calls_occurred,
+            runtime_extraction_adapters=runtime_extraction_adapters,
         ),
         _file_ref(
             artifact_file_id="result-artifact",
@@ -1994,6 +2015,7 @@ def _submit_analysis_run_locked(
             evidence_refs=evidence_ids,
             provenance_refs=provenance_refs,
             model_calls_occurred=model_calls_occurred,
+            runtime_extraction_adapters=runtime_extraction_adapters,
         ),
     ]
     raw_payloads: dict[str, bytes] = {
@@ -2028,6 +2050,7 @@ def _submit_analysis_run_locked(
                     schema_version=item["schema_version"],
                     parser_hint=item["parser_hint"],
                     model_calls_occurred=model_calls_occurred,
+                    runtime_extraction_adapters=runtime_extraction_adapters,
                 )
             )
             raw_payloads[item["artifact_file_id"]] = payload
@@ -2045,6 +2068,7 @@ def _submit_analysis_run_locked(
                 schema_name=item["schema_name"],
                 schema_version=item["schema_version"],
                 model_calls_occurred=model_calls_occurred,
+                runtime_extraction_adapters=runtime_extraction_adapters,
             )
         )
         raw_payloads[item["artifact_file_id"]] = item["payload"]
@@ -2062,6 +2086,7 @@ def _submit_analysis_run_locked(
         adapter_name="omi_analysis_control",
         adapter_version="1",
         model_calls_occurred=model_calls_occurred,
+        runtime_extraction_adapters=runtime_extraction_adapters,
     )
     write_immutable_raw_artifact_bundle(
         raw_manifest,

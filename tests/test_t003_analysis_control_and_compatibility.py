@@ -220,6 +220,55 @@ def test_adapter_provenance_reconciles_execution_provenance_strictly() -> None:
         )
 
 
+def test_local_nlp_runtime_occurrence_uses_only_proven_finalized_execution() -> None:
+    operation_results = [
+        {
+            "adapter": "booknlp",
+            "state": "succeeded",
+            "runtime_execution": {
+                "authorized": True,
+                "real_tool_calls_occurred": True,
+                "model_calls_occurred": False,
+            },
+        },
+        {
+            "adapter": "spacy",
+            "state": "failed_closed",
+            "runtime_execution": {
+                "authorized": True,
+                "real_tool_calls_occurred": True,
+                "model_calls_occurred": False,
+            },
+        },
+        {"adapter": "booknlp", "state": "unavailable"},
+        {
+            "adapter": "spacy",
+            "state": "unavailable",
+            "runtime_execution": {
+                "authorized": True,
+                "real_tool_calls_occurred": False,
+                "model_calls_occurred": False,
+            },
+        },
+        {
+            "adapter": "ollama_model",
+            "state": "succeeded",
+            "runtime_execution": {
+                "authorized": True,
+                "real_tool_calls_occurred": True,
+                "model_calls_occurred": True,
+            },
+        },
+    ]
+
+    assert analysis_run_control._aggregate_local_nlp_runtime_adapters(
+        operation_results
+    ) == ("booknlp", "spacy")
+    assert analysis_run_control._aggregate_local_nlp_runtime_adapters(
+        operation_results[2:]
+    ) == ()
+
+
 def _grounded_story_check_result(
     *,
     project_id: str,
@@ -914,6 +963,86 @@ def test_live_ollama_rejected_original_persists_with_provenance_and_truthful_fla
     output_event = next(item for item in ledger if item["event_type"] == "output_recorded")
     assert output_event["payload"]["output_id"] == output["output_id"]
     assert output_event["payload"]["disposition"] == "rejected"
+
+
+def test_live_ollama_empty_original_finalizes_as_unverified(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "VALIDATION RECORD. No extractable candidate is asserted."
+    model_content = json.dumps(
+        {
+            "schema_version": omi_analysis_orchestrator.OMI_OLLAMA_SCHEMA_VERSION,
+            "adapter": "ollama_model",
+            "status": "empty",
+            "explanation": "mocked live extraction found no candidates",
+            "findings": [],
+        }
+    )
+    response_data = {
+        "model": "qwen3:8b",
+        "created_at": "2026-10-09T20:00:00Z",
+        "message": {"role": "assistant", "content": model_content},
+        "done": True,
+    }
+
+    class MockResponse:
+        def read(self):
+            return json.dumps(response_data).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+    monkeypatch.setenv("OMI_LIVE_TOOLS_ENABLED", "true")
+    monkeypatch.setenv("OMI_LIVE_OLLAMA_ENABLED", "true")
+    monkeypatch.setattr(
+        urllib.request,
+        "urlopen",
+        lambda *args, **kwargs: MockResponse(),
+    )
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="validation-record-live-empty",
+        requested_adapters=["ollama_model"],
+        created_at="2026-10-09T20:00:00Z",
+    )
+
+    assert run["state"] == "complete"
+    run_dir = project / "writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    operation_id = omi_analysis_orchestrator.OMI_OLLAMA_EXACT_SOURCE_OPERATION_ID
+    contributor = manifest["contributors"][0]
+    assert contributor["operation_id"] == operation_id
+    assert contributor["adapter_id"] == "ollama_model"
+    assert contributor["result_state"] == "empty"
+
+    output = manifest["outputs"][0]
+    original_artifact_id = f"original-output-{operation_id}"
+    assert output["operation_id"] == operation_id
+    assert output["disposition"] == "unverified"
+    assert output["disposition"] != "validated"
+    assert output["original_output_reference_id"] == original_artifact_id
+    assert output["verification_outcome"] == "normalization_unverified"
+    assert contributor["output_ids"] == [output["output_id"]]
+
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    operation_result = published["operation_results"][0]
+    assert operation_result["state"] == "empty"
+    assert operation_result["candidates"] == []
+    assert operation_result["original_output"]["message"]["content"] == model_content
+    assert published["findings"] == []
+    assert published["persisted_candidate_ids"] == []
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
 
 
 def test_live_ollama_ambiguous_excerpt_fails_closed_without_submission_crash(

@@ -79,13 +79,29 @@ _STATIC_REQUIRED_BOUNDARY_FLAGS = frozenset(
         "manifest_backed_raw_artifacts",
         "evidence_provenance_linked",
         "path_safe_fail_closed",
-        "no_runtime_extraction",
-        "no_booknlp_" + "sp" + "acy_runtime",
         "no_apply_promotion",
         "no_memory_canon_mutation",
         "no_generated_prose",
         "generated_prose_permanently_forbidden",
         "no_" + "training_artifacts",
+    }
+)
+_NO_RUNTIME_EXTRACTION_BOUNDARY_FLAGS = frozenset(
+    {
+        "no_runtime_extraction",
+        "no_booknlp_" + "sp" + "acy_runtime",
+    }
+)
+_AUTHORIZED_RUNTIME_EXTRACTION_FLAG = "authorized_runtime_extraction_occurred"
+_LOCAL_NLP_RUNTIME_ADAPTER_FLAGS = {
+    "booknlp": "booknlp_runtime_extraction_occurred",
+    "spacy": "spacy_runtime_extraction_occurred",
+}
+_RUNTIME_EXTRACTION_BOUNDARY_FLAGS = frozenset(
+    {
+        *_NO_RUNTIME_EXTRACTION_BOUNDARY_FLAGS,
+        _AUTHORIZED_RUNTIME_EXTRACTION_FLAG,
+        *_LOCAL_NLP_RUNTIME_ADAPTER_FLAGS.values(),
     }
 )
 _MODEL_CALL_BOUNDARY_FLAGS = frozenset(
@@ -97,7 +113,11 @@ _MODEL_CALL_BOUNDARY_FLAGS = frozenset(
 )
 # Backward-compatible default used by existing deterministic bundle callers.
 _REQUIRED_BOUNDARY_FLAGS = frozenset(
-    {*_STATIC_REQUIRED_BOUNDARY_FLAGS, "no_model_calls"}
+    {
+        *_STATIC_REQUIRED_BOUNDARY_FLAGS,
+        *_NO_RUNTIME_EXTRACTION_BOUNDARY_FLAGS,
+        "no_model_calls",
+    }
 )
 
 _REQUIRED_CONFIRMATIONS = frozenset(
@@ -261,12 +281,38 @@ def _validate_boundary_flags(value):
         raise ValueError("invalid field")
     if len(flags & _MODEL_CALL_BOUNDARY_FLAGS) != 1:
         raise ValueError("invalid field")
+    no_runtime_flags = flags & _NO_RUNTIME_EXTRACTION_BOUNDARY_FLAGS
+    adapter_runtime_flags = flags & frozenset(
+        _LOCAL_NLP_RUNTIME_ADAPTER_FLAGS.values()
+    )
+    authorized_runtime = _AUTHORIZED_RUNTIME_EXTRACTION_FLAG in flags
+    if authorized_runtime:
+        if no_runtime_flags or not adapter_runtime_flags:
+            raise ValueError("invalid field")
+    elif (
+        no_runtime_flags != _NO_RUNTIME_EXTRACTION_BOUNDARY_FLAGS
+        or adapter_runtime_flags
+    ):
+        raise ValueError("invalid field")
     if flags & _FORBIDDEN_VALUES:
         raise ValueError("invalid field")
     return sorted(flags)
 
 
-def raw_artifact_boundary_flags(*, model_calls_occurred=False):
+def _normalize_runtime_extraction_adapters(value):
+    if not isinstance(value, (list, tuple, set, frozenset)):
+        raise ValueError("runtime_extraction_adapters must be a collection")
+    adapters = frozenset(value)
+    if any(not isinstance(adapter, str) for adapter in adapters):
+        raise ValueError("runtime_extraction_adapters must contain strings")
+    if not adapters.issubset(_LOCAL_NLP_RUNTIME_ADAPTER_FLAGS):
+        raise ValueError("unsupported runtime extraction adapter")
+    return adapters
+
+
+def raw_artifact_boundary_flags(
+    *, model_calls_occurred=False, runtime_extraction_adapters=()
+):
     """Return truthful T003 boundary flags for the producing execution."""
 
     if not (
@@ -280,7 +326,23 @@ def raw_artifact_boundary_flags(*, model_calls_occurred=False):
         if model_calls_occurred
         else "no_model_calls"
     )
-    return sorted({*_STATIC_REQUIRED_BOUNDARY_FLAGS, model_call_flag})
+    runtime_adapters = _normalize_runtime_extraction_adapters(
+        runtime_extraction_adapters
+    )
+    runtime_flags = (
+        {
+            _AUTHORIZED_RUNTIME_EXTRACTION_FLAG,
+            *(
+                _LOCAL_NLP_RUNTIME_ADAPTER_FLAGS[adapter]
+                for adapter in runtime_adapters
+            ),
+        }
+        if runtime_adapters
+        else set(_NO_RUNTIME_EXTRACTION_BOUNDARY_FLAGS)
+    )
+    return sorted(
+        {*_STATIC_REQUIRED_BOUNDARY_FLAGS, *runtime_flags, model_call_flag}
+    )
 
 
 def _validate_relative_path(relative_path):
@@ -391,6 +453,7 @@ def build_raw_artifact_file_ref(
     schema_version=None,
     parser_hint=None,
     model_calls_occurred=False,
+    runtime_extraction_adapters=(),
 ):
     """Build one validated T003 file reference for already-produced bytes.
 
@@ -420,7 +483,8 @@ def build_raw_artifact_file_ref(
             "evidence_refs": list(evidence_refs),
             "provenance_refs": list(provenance_refs),
             "boundary_flags": raw_artifact_boundary_flags(
-                model_calls_occurred=model_calls_occurred
+                model_calls_occurred=model_calls_occurred,
+                runtime_extraction_adapters=runtime_extraction_adapters,
             ),
         }
     )
@@ -500,7 +564,10 @@ def validate_raw_artifact_manifest(manifest):
     if "content_hash" in working:
         _validate_hash(working["content_hash"])
     working["boundary_flags"] = _validate_boundary_flags(working["boundary_flags"])
-    for field in _REQUIRED_CONFIRMATIONS - {"no_model_call_confirmation"}:
+    for field in _REQUIRED_CONFIRMATIONS - {
+        "no_model_call_confirmation",
+        "no_runtime_extraction_confirmation",
+    }:
         if working[field] is not True:
             raise ValueError("invalid field")
     if not isinstance(working["no_model_call_confirmation"], bool):
@@ -510,6 +577,19 @@ def validate_raw_artifact_manifest(manifest):
         "no_model_calls" in boundary_flags
     ):
         raise ValueError("invalid field")
+    if not isinstance(working["no_runtime_extraction_confirmation"], bool):
+        raise ValueError("invalid field")
+    if working["no_runtime_extraction_confirmation"] != (
+        "no_runtime_extraction" in boundary_flags
+    ):
+        raise ValueError("invalid field")
+    manifest_runtime_flags = boundary_flags & _RUNTIME_EXTRACTION_BOUNDARY_FLAGS
+    for file_ref in working["artifact_files"]:
+        if (
+            set(file_ref["boundary_flags"])
+            & _RUNTIME_EXTRACTION_BOUNDARY_FLAGS
+        ) != manifest_runtime_flags:
+            raise ValueError("raw artifact runtime extraction flags disagree")
     if working["schema_version"] == IMMUTABLE_RAW_ARTIFACT_VERSION:
         _validate_immutable_manifest_extension(working)
     return working
@@ -575,6 +655,7 @@ def build_immutable_raw_artifact_manifest(
     tool_name=None,
     tool_version=None,
     model_calls_occurred=False,
+    runtime_extraction_adapters=(),
 ):
     """Build the strict T003 immutable bundle contract over exact file hashes."""
 
@@ -601,14 +682,17 @@ def build_immutable_raw_artifact_manifest(
         tool_name=tool_name,
         tool_version=tool_version,
         boundary_flags=raw_artifact_boundary_flags(
-            model_calls_occurred=model_calls_occurred
+            model_calls_occurred=model_calls_occurred,
+            runtime_extraction_adapters=runtime_extraction_adapters,
         ),
         no_generated_prose_confirmation=True,
         no_model_call_confirmation=model_calls_occurred is False,
         no_training_artifact_confirmation=True,
         no_apply_promotion_confirmation=True,
         no_memory_canon_mutation_confirmation=True,
-        no_runtime_extraction_confirmation=True,
+        no_runtime_extraction_confirmation=not bool(
+            _normalize_runtime_extraction_adapters(runtime_extraction_adapters)
+        ),
     )
     # Add the extension only after the legacy builder has consumed its closed
     # metadata kwargs, then reseal both hashes over the complete v2 contract.

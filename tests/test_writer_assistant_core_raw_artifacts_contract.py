@@ -46,6 +46,7 @@ from backend.story_knowledge.raw_artifacts import (
     compute_raw_artifact_bundle_hash,
     list_raw_artifact_bundles,
     quarantine_raw_artifact_bundle,
+    raw_artifact_boundary_flags,
     raw_artifact_bundle_storage_dir,
     raw_artifact_index_path,
     raw_artifact_manifest_path,
@@ -316,6 +317,69 @@ def test_future_raw_artifact_module_public_api_import_contract():
         if globals().get(name) is not None
     }
     assert imported == set(EXPECTED_PUBLIC_API)
+
+
+def test_runtime_extraction_boundary_flags_are_conditional_and_adapter_specific():
+    no_runtime = set(raw_artifact_boundary_flags())
+    assert {"no_runtime_extraction", "no_booknlp_spacy_runtime"}.issubset(
+        no_runtime
+    )
+    assert "authorized_runtime_extraction_occurred" not in no_runtime
+
+    for adapters, expected in (
+        (("booknlp",), {"booknlp_runtime_extraction_occurred"}),
+        (("spacy",), {"spacy_runtime_extraction_occurred"}),
+        (
+            ("booknlp", "spacy"),
+            {
+                "booknlp_runtime_extraction_occurred",
+                "spacy_runtime_extraction_occurred",
+            },
+        ),
+    ):
+        flags = set(
+            raw_artifact_boundary_flags(
+                runtime_extraction_adapters=adapters
+            )
+        )
+        assert "authorized_runtime_extraction_occurred" in flags
+        assert expected.issubset(flags)
+        assert "no_runtime_extraction" not in flags
+        assert "no_booknlp_spacy_runtime" not in flags
+
+
+def test_runtime_extraction_manifest_requires_consistent_confirmation_and_files():
+    runtime_flags = raw_artifact_boundary_flags(
+        runtime_extraction_adapters=("booknlp",)
+    )
+    runtime_file = valid_artifact_file_ref(boundary_flags=runtime_flags)
+    runtime_manifest = valid_manifest(
+        boundary_flags=runtime_flags,
+        artifact_files=[runtime_file],
+        no_runtime_extraction_confirmation=False,
+    )
+    validated = validate_raw_artifact_manifest(runtime_manifest)
+    assert "booknlp_runtime_extraction_occurred" in validated["boundary_flags"]
+
+    contradictory_confirmation = copy.deepcopy(runtime_manifest)
+    contradictory_confirmation["no_runtime_extraction_confirmation"] = True
+    with pytest.raises(ValueError):
+        validate_raw_artifact_manifest(contradictory_confirmation)
+
+    contradictory_file = copy.deepcopy(runtime_manifest)
+    contradictory_file["artifact_files"][0]["boundary_flags"] = sorted(
+        REQUIRED_BOUNDARY_FLAGS
+    )
+    with pytest.raises(ValueError, match="runtime extraction flags disagree"):
+        validate_raw_artifact_manifest(contradictory_file)
+
+    contradictory_flags = set(runtime_flags)
+    contradictory_flags.add("no_runtime_extraction")
+    contradictory_flags.add("no_booknlp_spacy_runtime")
+    with pytest.raises(ValueError):
+        validate_raw_artifact_file_ref(
+            valid_artifact_file_ref(boundary_flags=sorted(contradictory_flags))
+        )
 
 
 def test_validate_raw_artifact_manifest_requires_required_fields_and_hash():

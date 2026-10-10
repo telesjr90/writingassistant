@@ -511,6 +511,13 @@ _OMI_FORBIDDEN_TRUTH_LABELS = (
     "confirmed_fact",
 )
 
+_OMI_TRUTH_LABEL_PATTERN = re.compile(
+    r"\b(?:truth|canon(?:ical)?|approved|promoted|confirmed[ _-]fact)\b"
+)
+_OMI_NEGATED_TRUTH_PREFIX_PATTERN = re.compile(
+    r"(?:\b(?:not|never|no)\s+(?:final\s+)?|\bnon[-\s]?|\bun)$"
+)
+
 # Heuristic prose-like prefixes/patterns. The orchestrator rejects findings
 # whose extracted_claim looks like story prose. The patterns here are
 # conservative: they catch only obvious prose-shaped output. They never
@@ -713,7 +720,56 @@ def is_truth_label(value: str) -> bool:
     if not isinstance(value, str):
         return False
     lowered = value.strip().lower()
-    return any(forbidden in lowered for forbidden in _OMI_FORBIDDEN_TRUTH_LABELS)
+    for match in _OMI_TRUTH_LABEL_PATTERN.finditer(lowered):
+        prefix = lowered[:match.start()]
+        negation = _OMI_NEGATED_TRUTH_PREFIX_PATTERN.search(prefix)
+        if negation is None:
+            return True
+        preceding = prefix[:negation.start()]
+        if re.search(r"\bnot\s+$", preceding):
+            # Do not treat a double negation such as ``not not canon`` as a
+            # boundary-safe denial.
+            return True
+    return False
+
+
+def _exact_local_nlp_source_context(
+    source_text: str,
+    char_start: int,
+    char_end: int,
+) -> dict[str, Any]:
+    """Return an exact sentence/line context containing one proven span."""
+
+    if (
+        not isinstance(source_text, str)
+        or isinstance(char_start, bool)
+        or isinstance(char_end, bool)
+        or not isinstance(char_start, int)
+        or not isinstance(char_end, int)
+        or char_start < 0
+        or char_end <= char_start
+        or char_end > len(source_text)
+    ):
+        raise ValueError("local NLP source context requires valid character offsets")
+    left = max(
+        source_text.rfind(marker, 0, char_start)
+        for marker in ("\n", ".", "?", "!")
+    ) + 1
+    right_candidates = [
+        position + 1
+        for marker in ("\n", ".", "?", "!")
+        if (position := source_text.find(marker, char_end)) != -1
+    ]
+    right = min(right_candidates) if right_candidates else len(source_text)
+    while left < char_start and source_text[left].isspace():
+        left += 1
+    while right > char_end and source_text[right - 1].isspace():
+        right -= 1
+    return {
+        "source_context": source_text[left:right],
+        "context_char_start": left,
+        "context_char_end": right,
+    }
 
 
 def validate_owner_raw_idea_input(raw_idea: Any) -> str:
@@ -1208,10 +1264,13 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
             live_implementation_kinds = {
                 OMI_OLLAMA_ADAPTER_NAME: "official_external",
                 OMI_STORY_CHECK_ADAPTER_NAME: "app_owned",
+                "booknlp": "official_external",
+                "spacy": "official_external",
             }
             if adapter not in live_implementation_kinds or not isinstance(value, dict):
                 raise ValueError(
-                    "only story_check or ollama_model may attach live execution provenance"
+                    "only story_check, ollama_model, booknlp, or spacy may "
+                    "attach live execution provenance"
                 )
             required = {
                 "implementation_kind",
@@ -1234,6 +1293,10 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
                 and user_facing_label != "Story Check grounded diagnostics"
             ):
                 raise ValueError("invalid Story Check live execution label")
+            if adapter == "spacy" and user_facing_label != "spaCy evidence production":
+                raise ValueError("invalid spaCy live execution label")
+            if adapter == "booknlp" and user_facing_label != "BookNLP evidence production":
+                raise ValueError("invalid BookNLP live execution label")
             for plane in ("tool", "runtime", "provider", "model"):
                 component = value[plane]
                 if not isinstance(component, dict) or set(component) != {
@@ -1262,9 +1325,12 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
             if adapter not in {
                 OMI_STORY_CHECK_ADAPTER_NAME,
                 OMI_OLLAMA_ADAPTER_NAME,
+                "booknlp",
+                "spacy",
             } or not isinstance(value, dict):
                 raise ValueError(
-                    "only story_check or ollama_model may attach runtime execution state"
+                    "only story_check, ollama_model, booknlp, or spacy may "
+                    "attach runtime execution state"
                 )
             if set(value) != {
                 "authorized",
@@ -1281,6 +1347,12 @@ def validate_adapter_result(result: Any) -> dict[str, Any]:
                 raise ValueError("invalid runtime execution state")
             if not value["authorized"]:
                 raise ValueError("live runtime execution must be explicitly authorized")
+            if adapter in {"booknlp", "spacy"} and value[
+                "model_calls_occurred"
+            ] is not False:
+                raise ValueError(
+                    f"{adapter} runtime execution cannot claim a model call"
+                )
             if value["model_calls_occurred"] is not False and not value[
                 "real_tool_calls_occurred"
             ]:
@@ -1751,7 +1823,11 @@ OMI_OLLAMA_FORBIDDEN_FIELD_NAME_SUBSTRINGS: tuple[str, ...] = (
 )
 
 
-def _validate_ollama_field_name_no_prose(field_name: str) -> None:
+def _validate_ollama_field_name_no_prose(
+    field_name: str,
+    *,
+    adapter_label: str = "Ollama",
+) -> None:
     """Reject Ollama finding/envelope field names that request story prose.
 
     The model may not smuggle prose shapes through fields like ``rewrite``,
@@ -1765,26 +1841,37 @@ def _validate_ollama_field_name_no_prose(field_name: str) -> None:
     for forbidden in OMI_OLLAMA_FORBIDDEN_FIELD_NAME_SUBSTRINGS:
         if forbidden in lowered:
             raise ValueError(
-                f"Ollama envelope contains forbidden prose-intent field "
+                f"{adapter_label} envelope contains forbidden prose-intent field "
                 f"name {field_name!r}; adapters must not request/provide "
                 f"story prose, rewriting, continuation, outline, draft, "
                 f"polish, improvement, expansion, imitation, or revision."
             )
 
 
-def _validate_ollama_field_names_no_prose(value: Any, *, path: str) -> None:
+def _validate_ollama_field_names_no_prose(
+    value: Any,
+    *,
+    path: str,
+    adapter_label: str = "Ollama",
+) -> None:
     """Walk an Ollama payload and reject prose-intent field names anywhere."""
     if isinstance(value, dict):
         for key, child in value.items():
-            _validate_ollama_field_name_no_prose(str(key))
+            _validate_ollama_field_name_no_prose(
+                str(key), adapter_label=adapter_label
+            )
             _validate_ollama_field_names_no_prose(
-                child, path=f"{path}.{key}"
+                child,
+                path=f"{path}.{key}",
+                adapter_label=adapter_label,
             )
         return
     if isinstance(value, list):
         for idx, item in enumerate(value):
             _validate_ollama_field_names_no_prose(
-                item, path=f"{path}[{idx}]"
+                item,
+                path=f"{path}[{idx}]",
+                adapter_label=adapter_label,
             )
 
 
@@ -1792,25 +1879,30 @@ def _validate_ollama_no_truth_label_in_value(
     value: Any,
     *,
     path: str,
+    adapter_label: str = "Ollama",
 ) -> None:
     """Walk an Ollama payload and reject any truth/canon/approved labels."""
     if isinstance(value, dict):
         for k, v in value.items():
             _validate_ollama_no_truth_label_in_value(
-                v, path=f"{path}.{k}"
+                v,
+                path=f"{path}.{k}",
+                adapter_label=adapter_label,
             )
         return
     if isinstance(value, list):
         for idx, item in enumerate(value):
             _validate_ollama_no_truth_label_in_value(
-                item, path=f"{path}[{idx}]"
+                item,
+                path=f"{path}[{idx}]",
+                adapter_label=adapter_label,
             )
         return
     if isinstance(value, str):
         if is_truth_label(value):
             raise ValueError(
-                f"Ollama envelope contains truth/canon/approved/promoted "
-                f"label at {path!r}: {value!r}; Ollama output is support "
+                f"{adapter_label} envelope contains truth/canon/approved/promoted "
+                f"label at {path!r}: {value!r}; {adapter_label} output is support "
                 f"only and must never be promoted to canon/approval."
             )
 
@@ -2816,21 +2908,103 @@ def _normalize_local_nlp_support_label(
     return support_label
 
 
+def _local_nlp_source_proven_negated_truth_values(
+    finding: dict[str, Any],
+) -> set[str]:
+    """Return exact token values whose source context proves explicit denial."""
+
+    raw_evidence = finding.get("evidence")
+    if isinstance(raw_evidence, dict):
+        evidence_items = [raw_evidence]
+    elif isinstance(raw_evidence, list):
+        evidence_items = raw_evidence
+    else:
+        evidence_items = []
+    allowed: set[str] = set()
+    for item in evidence_items:
+        if not isinstance(item, dict):
+            continue
+        excerpt = item.get("source_excerpt")
+        context = item.get("source_context")
+        char_start = item.get("char_start")
+        char_end = item.get("char_end")
+        context_start = item.get("context_char_start")
+        context_end = item.get("context_char_end")
+        if (
+            not isinstance(excerpt, str)
+            or not is_truth_label(excerpt)
+            or not isinstance(context, str)
+            or not context
+            or any(
+                isinstance(value, bool) or not isinstance(value, int)
+                for value in (char_start, char_end, context_start, context_end)
+            )
+            or context_start < 0
+            or char_start < context_start
+            or char_end <= char_start
+            or context_end < char_end
+            or context_end - context_start != len(context)
+        ):
+            continue
+        relative_start = char_start - context_start
+        relative_end = char_end - context_start
+        if context[relative_start:relative_end] != excerpt:
+            continue
+        if is_truth_label(context):
+            # The context is positive, mixed, ambiguous, or double-negated.
+            continue
+        allowed.add(excerpt)
+        allowed.add(excerpt.lower())
+    return allowed
+
+
+def _validate_local_nlp_no_truth_label_in_finding(
+    finding: dict[str, Any],
+    *,
+    adapter_label: str,
+) -> None:
+    """Reject truth labels except exact tokens in source-proven negations."""
+
+    allowed = _local_nlp_source_proven_negated_truth_values(finding)
+
+    def _walk(value: Any, path: str) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                _walk(child, f"{path}.{key}")
+            return
+        if isinstance(value, list):
+            for index, child in enumerate(value):
+                _walk(child, f"{path}[{index}]")
+            return
+        if isinstance(value, str) and is_truth_label(value) and value not in allowed:
+            raise ValueError(
+                f"{adapter_label} envelope contains truth/canon/approved/promoted "
+                f"label at {path!r}: {value!r}; {adapter_label} output is support "
+                "only and must never be promoted to canon/approval."
+            )
+
+    _walk(finding, f"{adapter_label.lower()}_finding")
+
+
 def _validate_local_nlp_finding(
     finding: Any,
     *,
     adapter_name: str,
     envelope_provenance: dict[str, str],
 ) -> dict[str, Any]:
+    adapter_label = "spaCy" if adapter_name == "spacy" else "BookNLP"
     finding = _require_dict(finding, f"{adapter_name} finding")
     _validate_ollama_field_names_no_prose(
-        finding, path=f"{adapter_name}_finding"
+        finding,
+        path=f"{adapter_name}_finding",
+        adapter_label=adapter_label,
     )
     _validate_tool_payload_no_forbidden_operations(
         finding, path=f"{adapter_name}_finding"
     )
-    _validate_ollama_no_truth_label_in_value(
-        finding, path=f"{adapter_name}_finding"
+    _validate_local_nlp_no_truth_label_in_finding(
+        finding,
+        adapter_label=adapter_label,
     )
 
     candidate_type = _coerce_local_nlp_candidate_type(adapter_name, finding)
@@ -2943,15 +3117,20 @@ def validate_local_nlp_fixture_envelope(
             ) from exc
         payload = parsed
 
+    adapter_label = "spaCy" if adapter_name == "spacy" else "BookNLP"
     envelope = _require_dict(payload, f"{adapter_name} envelope")
     _validate_ollama_field_names_no_prose(
-        envelope, path=f"{adapter_name}_envelope"
+        envelope,
+        path=f"{adapter_name}_envelope",
+        adapter_label=adapter_label,
     )
     _validate_tool_payload_no_forbidden_operations(
         envelope, path=f"{adapter_name}_envelope"
     )
     _validate_ollama_no_truth_label_in_value(
-        envelope, path=f"{adapter_name}_envelope"
+        {key: value for key, value in envelope.items() if key != "findings"},
+        path=f"{adapter_name}_envelope",
+        adapter_label=adapter_label,
     )
 
     missing = [
@@ -7024,13 +7203,13 @@ def _build_spacy_live_runner(
             }
 
         raw_text = raw_idea
+        model_name = os.environ.get(
+            _OMI_LIVE_SPACY_MODEL_ENV, _OMI_LIVE_SPACY_MODEL_DEFAULT
+        )
 
         try:
             import spacy  # lazy import
 
-            model_name = os.environ.get(
-                _OMI_LIVE_SPACY_MODEL_ENV, _OMI_LIVE_SPACY_MODEL_DEFAULT
-            )
             nlp = spacy.load(model_name)
             doc = nlp(raw_text)
         except ImportError:
@@ -7066,6 +7245,39 @@ def _build_spacy_live_runner(
                 "candidates": [],
             }
 
+        spacy_version = getattr(spacy, "__version__", None)
+        if not isinstance(spacy_version, str) or not spacy_version.strip():
+            spacy_version = None
+        execution_provenance = {
+            "implementation_kind": "official_external",
+            "user_facing_label": "spaCy evidence production",
+            "tool": {
+                "availability": "available",
+                "name": "spaCy",
+                "version": spacy_version,
+            },
+            "runtime": {
+                "availability": "available",
+                "name": "Python",
+                "version": sys.version.split()[0],
+            },
+            "provider": {
+                "availability": "unknown",
+                "name": None,
+                "version": None,
+            },
+            "model": {
+                "availability": "available",
+                "name": model_name,
+                "version": None,
+            },
+        }
+        runtime_execution = {
+            "authorized": True,
+            "real_tool_calls_occurred": True,
+            "model_calls_occurred": False,
+        }
+
         findings: list[dict[str, Any]] = []
         seen_entity_texts: set[str] = set()
         entity_counter = 0
@@ -7086,9 +7298,10 @@ def _build_spacy_live_runner(
             seen_entity_texts.add(label_lower)
 
             entity_counter += 1
-            sentence = doc.text
-            if ent.sent and ent.sent.text:
-                sentence = ent.sent.text
+            context_fields = _exact_local_nlp_source_context(
+                raw_text, ent.start_char, ent.end_char
+            )
+            sentence = context_fields["source_context"]
 
             source_locator = (
                 f"raw_idea:L1:C{ent.start_char}-{ent.end_char}"
@@ -7101,7 +7314,8 @@ def _build_spacy_live_runner(
                 "spacy_label": ent.label_,
                 "text": label_text,
                 "claim": (
-                    f"{label_text} appears as a {ent.label_} entity candidate"
+                    f"spaCy identified a {ent.label_} entity candidate at the "
+                    "exact source span"
                 ),
                 "sentence": sentence,
                 "source_locator": source_locator,
@@ -7109,6 +7323,10 @@ def _build_spacy_live_runner(
                     {
                         "source_excerpt": label_text,
                         "source_locator": source_locator,
+                        "char_start": ent.start_char,
+                        "char_end": ent.end_char,
+                        "char_offset_basis": exact_source_map.CHAR_OFFSET_BASIS,
+                        **context_fields,
                     }
                 ],
                 "confidence": "spaCy live support only",
@@ -7140,9 +7358,10 @@ def _build_spacy_live_runner(
                 continue
 
             noun_chunk_counter += 1
-            chunk_sentence = doc.text
-            if chunk.sent and chunk.sent.text:
-                chunk_sentence = chunk.sent.text
+            context_fields = _exact_local_nlp_source_context(
+                raw_text, chunk.start_char, chunk.end_char
+            )
+            chunk_sentence = context_fields["source_context"]
 
             chunk_locator = (
                 f"raw_idea:L1:C{chunk.start_char}-{chunk.end_char}"
@@ -7155,7 +7374,8 @@ def _build_spacy_live_runner(
                 "spacy_label": "NOUN_CHUNK",
                 "text": chunk_text,
                 "claim": (
-                    f"{chunk_text} appears as a noun chunk candidate"
+                    "spaCy identified a noun chunk candidate at the exact "
+                    "source span"
                 ),
                 "sentence": chunk_sentence,
                 "source_locator": chunk_locator,
@@ -7163,6 +7383,10 @@ def _build_spacy_live_runner(
                     {
                         "source_excerpt": chunk_text,
                         "source_locator": chunk_locator,
+                        "char_start": chunk.start_char,
+                        "char_end": chunk.end_char,
+                        "char_offset_basis": exact_source_map.CHAR_OFFSET_BASIS,
+                        **context_fields,
                     }
                 ],
                 "confidence": "spaCy live support only",
@@ -7178,6 +7402,8 @@ def _build_spacy_live_runner(
                     "raw idea text."
                 ),
                 "candidates": [],
+                "execution_provenance": execution_provenance,
+                "runtime_execution": runtime_execution,
             }
 
         envelope = {
@@ -7207,6 +7433,8 @@ def _build_spacy_live_runner(
                     f"{exc}. Failing closed with no candidates."
                 ),
                 "candidates": [],
+                "execution_provenance": execution_provenance,
+                "runtime_execution": runtime_execution,
             }
 
         state = "succeeded" if validated["findings"] else "empty"
@@ -7218,6 +7446,8 @@ def _build_spacy_live_runner(
                 or "Live spaCy local NLP extraction succeeded."
             ),
             "candidates": validated["findings"],
+            "execution_provenance": execution_provenance,
+            "runtime_execution": runtime_execution,
         }
 
     return _runner
@@ -7226,6 +7456,40 @@ def _build_spacy_live_runner(
 # ---------------------------------------------------------------------------
 # Live Ollama structured extraction adapter runner (T015C)
 # ---------------------------------------------------------------------------
+
+
+_OMI_OLLAMA_HTTP_ERROR_DETAIL_MAX_BYTES = 1024
+
+
+def _ollama_http_error_diagnostic(exc: urllib.error.HTTPError) -> str:
+    """Return bounded Ollama status/error detail without request data or headers."""
+
+    status = getattr(exc, "code", None)
+    detail = ""
+    truncated = False
+    try:
+        raw = exc.read(_OMI_OLLAMA_HTTP_ERROR_DETAIL_MAX_BYTES + 1)
+        truncated = len(raw) > _OMI_OLLAMA_HTTP_ERROR_DETAIL_MAX_BYTES
+        raw = raw[:_OMI_OLLAMA_HTTP_ERROR_DETAIL_MAX_BYTES]
+        decoded = raw.decode("utf-8", errors="replace")
+        parsed = json.loads(decoded)
+        if isinstance(parsed, dict):
+            for key in ("error", "message", "detail"):
+                value = parsed.get(key)
+                if isinstance(value, str) and value.strip():
+                    detail = re.sub(
+                        r"[\x00-\x1f\x7f]+", " ", value
+                    ).strip()
+                    break
+    except Exception:
+        detail = ""
+    parts = ["endpoint=/api/chat", f"status={status if status is not None else 'unknown'}"]
+    if detail:
+        suffix = " [truncated]" if truncated else ""
+        parts.append(f"response_error={detail!r}{suffix}")
+    else:
+        parts.append("response_error=unavailable_or_non_json")
+    return "; ".join(parts)
 
 
 def _ground_ollama_live_findings_to_exact_source(
@@ -7587,6 +7851,22 @@ def _build_ollama_model_live_runner(
             )
             with urllib.request.urlopen(req, timeout=timeout_seconds) as resp:
                 response_text = resp.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            return {
+                "adapter": OMI_OLLAMA_ADAPTER_NAME,
+                "state": "failed_closed",
+                "explanation": (
+                    "Live Ollama HTTP call failed: "
+                    f"{_ollama_http_error_diagnostic(exc)}. "
+                    "Failing closed with no candidates."
+                ),
+                "candidates": [],
+                "execution_provenance": _execution_provenance(
+                    None,
+                    ollama_response_observed=True,
+                ),
+                "runtime_execution": _runtime_execution(model_call=None),
+            }
         except Exception as exc:
             return {
                 "adapter": OMI_OLLAMA_ADAPTER_NAME,
@@ -9162,6 +9442,35 @@ def _booknlp_t004_span(
     return char_range.start, char_range.end, byte_start, byte_end, excerpt
 
 
+_BOOKNLP_HYPHEN_SPACING_PATTERN = re.compile(r"\s*([-‐‑‒–—])\s*")
+
+
+def _booknlp_t004_reconcile_entity_text(
+    emitted_text: str,
+    exact_source_excerpt: str,
+) -> str:
+    """Return the exact source text when only hyphen spacing differs.
+
+    BookNLP may render a punctuation token with surrounding spaces even when
+    the exact owner source has no such spaces. The token byte offsets remain
+    authoritative: this helper permits only removal of whitespace adjacent to
+    the same hyphen code point on both sides, then returns the exact source
+    excerpt. It does not perform fuzzy matching, case folding, punctuation
+    substitution, or semantic rewriting.
+    """
+
+    emitted = emitted_text.strip()
+    if emitted == exact_source_excerpt:
+        return exact_source_excerpt
+    normalized_emitted = _BOOKNLP_HYPHEN_SPACING_PATTERN.sub(r"\1", emitted)
+    normalized_exact = _BOOKNLP_HYPHEN_SPACING_PATTERN.sub(
+        r"\1", exact_source_excerpt
+    )
+    if normalized_emitted == normalized_exact:
+        return exact_source_excerpt
+    raise ValueError("BookNLP entity text does not match its exact token span")
+
+
 def _booknlp_t004_evidence(
     snapshot: Any,
     span: tuple[int, int, int, int, str],
@@ -9170,6 +9479,9 @@ def _booknlp_t004_evidence(
     evidence_role: str,
 ) -> dict[str, Any]:
     char_start, char_end, byte_start, byte_end, excerpt = span
+    context_fields = _exact_local_nlp_source_context(
+        snapshot.source_content, char_start, char_end
+    )
     return {
         "source_excerpt": excerpt,
         "source_locator": f"raw_idea:utf8-bytes:{byte_start}-{byte_end}",
@@ -9182,6 +9494,7 @@ def _booknlp_t004_evidence(
         "byte_start": byte_start,
         "byte_end": byte_end,
         "byte_offset_basis": exact_source_map.BYTE_OFFSET_BASIS,
+        **context_fields,
         "artifact_file_id": artifact_file_id,
         "evidence_role": evidence_role,
     }
@@ -9277,8 +9590,7 @@ def _booknlp_t004_result_to_envelope(
         label = row.get("text")
         if not isinstance(label, str) or not label.strip():
             raise ValueError("BookNLP entity mention text is required")
-        if label.strip() != span[4]:
-            raise ValueError("BookNLP entity text does not match its exact token span")
+        label = _booknlp_t004_reconcile_entity_text(label, span[4])
         coref = _booknlp_coreference_id(row.get("COREF"))
         evidence = _booknlp_t004_evidence(
             snapshot,
@@ -9422,7 +9734,7 @@ def _booknlp_t004_result_to_envelope(
                 candidate_type="evidence_note",
                 label=f"BookNLP token evidence {token_id}",
                 claim=(
-                    f"BookNLP token support: token={token_id}; lemma={token.get('lemma', '')}; "
+                    f"BookNLP token support: token={token_id}; "
                     f"dependency={token.get('dependency_relation', '')}; "
                     f"head={token.get('syntactic_head_ID', '')}; event={event_marker or ''}."
                 ),
@@ -9792,6 +10104,48 @@ def _booknlp_runtime_version() -> str | None:
         return None
 
 
+def _booknlp_live_execution_provenance(
+    *, model_name: str, tool_version: str | None
+) -> dict[str, Any]:
+    return {
+        "implementation_kind": "official_external",
+        "user_facing_label": "BookNLP evidence production",
+        "tool": {
+            "availability": "available",
+            "name": "BookNLP",
+            "version": tool_version,
+        },
+        "runtime": {
+            "availability": "available",
+            "name": "Python",
+            "version": sys.version.split()[0],
+        },
+        "provider": {
+            "availability": "unknown",
+            "name": None,
+            "version": None,
+        },
+        "model": {
+            "availability": "available",
+            "name": model_name,
+            "version": None,
+        },
+    }
+
+
+def _booknlp_handoff_with_execution_provenance(
+    handoff: dict[str, Any], execution_provenance: dict[str, Any]
+) -> dict[str, Any]:
+    checked = copy.deepcopy(handoff)
+    checked["provenance"] = {
+        "tool_source": "booknlp",
+        "adapter": "booknlp",
+        "support": "BookNLP external runtime support only",
+        **copy.deepcopy(execution_provenance),
+    }
+    return booknlp_adapter_contract.validate_booknlp_raw_artifact_handoff(checked)
+
+
 def _build_booknlp_live_runner(
     *,
     adapter_config: dict[str, Any] | None = None,
@@ -9953,6 +10307,17 @@ def _build_booknlp_live_runner(
                     "candidates": [],
                 }
 
+            tool_version = _booknlp_runtime_version()
+            execution_provenance = _booknlp_live_execution_provenance(
+                model_name=model_name,
+                tool_version=tool_version,
+            )
+            runtime_execution = {
+                "authorized": True,
+                "real_tool_calls_occurred": True,
+                "model_calls_occurred": False,
+            }
+
             try:
                 raw_files = _booknlp_collect_raw_output_files(output_dir, book_id)
             except OSError as exc:
@@ -9964,6 +10329,8 @@ def _build_booknlp_live_runner(
                         f"{type(exc).__name__}: {exc}. Failing closed."
                     ),
                     "candidates": [],
+                    "execution_provenance": execution_provenance,
+                    "runtime_execution": runtime_execution,
                 }
             if not raw_files:
                 return {
@@ -9971,6 +10338,8 @@ def _build_booknlp_live_runner(
                     "state": "empty",
                     "explanation": "Live BookNLP produced no supported raw artifacts.",
                     "candidates": [],
+                    "execution_provenance": execution_provenance,
+                    "runtime_execution": runtime_execution,
                 }
             snapshot = _booknlp_t004_snapshot(
                 project_name=project_name,
@@ -9983,15 +10352,18 @@ def _build_booknlp_live_runner(
                 if kind not in raw_files
             )
             limitations = [f"missing_raw_output:{kind}" for kind in missing]
-            handoff = booknlp_adapter_contract.build_booknlp_raw_artifact_handoff(
-                snapshot=snapshot,
-                files=raw_files,
-                tool_version=_booknlp_runtime_version(),
-                runtime_name="python",
-                runtime_version=".".join(str(value) for value in sys.version_info[:3]),
-                model_name=model_name,
-                pipeline=safe_pipeline,
-                mapping_limitations=limitations,
+            handoff = _booknlp_handoff_with_execution_provenance(
+                booknlp_adapter_contract.build_booknlp_raw_artifact_handoff(
+                    snapshot=snapshot,
+                    files=raw_files,
+                    tool_version=tool_version,
+                    runtime_name="Python",
+                    runtime_version=sys.version.split()[0],
+                    model_name=model_name,
+                    pipeline=safe_pipeline,
+                    mapping_limitations=limitations,
+                ),
+                execution_provenance,
             )
             try:
                 from backend.story_knowledge import booknlp_fixture_parser
@@ -10049,15 +10421,18 @@ def _build_booknlp_live_runner(
                     + (", ".join(combined_limitations) or "none")
                     + "."
                 )
-                handoff = booknlp_adapter_contract.build_booknlp_raw_artifact_handoff(
-                    snapshot=snapshot,
-                    files=raw_files,
-                    tool_version=_booknlp_runtime_version(),
-                    runtime_name="python",
-                    runtime_version=".".join(str(value) for value in sys.version_info[:3]),
-                    model_name=model_name,
-                    pipeline=safe_pipeline,
-                    mapping_limitations=combined_limitations,
+                handoff = _booknlp_handoff_with_execution_provenance(
+                    booknlp_adapter_contract.build_booknlp_raw_artifact_handoff(
+                        snapshot=snapshot,
+                        files=raw_files,
+                        tool_version=tool_version,
+                        runtime_name="Python",
+                        runtime_version=sys.version.split()[0],
+                        model_name=model_name,
+                        pipeline=safe_pipeline,
+                        mapping_limitations=combined_limitations,
+                    ),
+                    execution_provenance,
                 )
             except (UnicodeDecodeError, ValueError) as exc:
                 return {
@@ -10069,6 +10444,8 @@ def _build_booknlp_live_runner(
                     ),
                     "candidates": [],
                     "raw_artifacts": handoff,
+                    "execution_provenance": execution_provenance,
+                    "runtime_execution": runtime_execution,
                 }
         finally:
             try:
@@ -10090,6 +10467,9 @@ def _build_booknlp_live_runner(
                     f"validation: {exc}. Failing closed with no findings."
                 ),
                 "candidates": [],
+                "raw_artifacts": handoff,
+                "execution_provenance": execution_provenance,
+                "runtime_execution": runtime_execution,
             }
 
         env_status = validated["status"]
@@ -10107,6 +10487,8 @@ def _build_booknlp_live_runner(
             ),
             "candidates": validated["findings"],
             "raw_artifacts": handoff,
+            "execution_provenance": execution_provenance,
+            "runtime_execution": runtime_execution,
         }
 
     return _runner

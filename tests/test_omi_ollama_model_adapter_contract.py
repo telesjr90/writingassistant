@@ -632,7 +632,11 @@ class _MockRaisingUrlopen:
     def __call__(self, request: Any, *args: Any, **kwargs: Any) -> None:
         msg = "mock HTTP error"
         raise urllib.error.HTTPError(
-            "http://mock", 500, msg, {}, io.BytesIO(b"error")
+            "http://mock",
+            500,
+            msg,
+            {},
+            io.BytesIO(b'{"error":"mock runner failed"}'),
         )
 
 
@@ -978,13 +982,31 @@ def test_live_ollama_http_error_fails_closed(monkeypatch: Any) -> None:
     )
     env = _assert_ollama_failed_closed(result)
     assert "HTTP" in env["explanation"] or "failed" in env["explanation"]
+    assert "endpoint=/api/chat" in env["explanation"]
+    assert "status=500" in env["explanation"]
+    assert "response_error='mock runner failed'" in env["explanation"]
+    assert RAW_IDEA not in env["explanation"]
     assert "original_output" not in env
-    for plane in ("tool", "runtime", "provider", "model"):
-        assert env["execution_provenance"][plane] == {
-            "availability": "unknown",
-            "name": None,
-            "version": None,
-        }
+    assert env["execution_provenance"]["tool"] == {
+        "availability": "available",
+        "name": "Ollama",
+        "version": None,
+    }
+    assert env["execution_provenance"]["runtime"] == {
+        "availability": "available",
+        "name": "Ollama HTTP API",
+        "version": None,
+    }
+    assert env["execution_provenance"]["provider"] == {
+        "availability": "available",
+        "name": "Ollama",
+        "version": None,
+    }
+    assert env["execution_provenance"]["model"] == {
+        "availability": "unknown",
+        "name": None,
+        "version": None,
+    }
     assert env["runtime_execution"] == {
         "authorized": True,
         "real_tool_calls_occurred": True,

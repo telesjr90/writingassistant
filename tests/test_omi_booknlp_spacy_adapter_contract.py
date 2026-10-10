@@ -8,6 +8,7 @@ prose.
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import Any, Mapping
@@ -18,6 +19,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from backend import omi_analysis_orchestrator as oao
+from backend import project_manager
+from backend.story_knowledge import analysis_run_control
+from backend.story_knowledge.evidence_ledger import scan_evidence_ledger
+from backend.story_knowledge.source_map import CHAR_OFFSET_BASIS
 
 
 RAW_IDEA = (
@@ -342,6 +347,115 @@ def test_booknlp_and_spacy_reject_truth_canon_approved_or_promoted_output() -> N
         )
 
 
+def test_truth_label_guard_allows_explicit_denials_but_rejects_positive_claims() -> None:
+    for value in (
+        "non-canon",
+        "not canon",
+        "not canonical",
+        "not approved",
+        "not approved memory",
+        "never promoted",
+        "not final truth",
+        "unapproved owner review data",
+    ):
+        assert oao.is_truth_label(value) is False
+
+    for value in (
+        "canon",
+        "canonical",
+        "approved memory",
+        "final truth",
+        "this is canon",
+        "not canon but approved",
+        "not not canon",
+    ):
+        assert oao.is_truth_label(value) is True
+
+
+def _token_truth_evidence(context: str, token: str = "canon") -> dict[str, Any]:
+    start = context.index(token)
+    end = start + len(token)
+    return {
+        "source_excerpt": token,
+        "source_locator": f"raw_idea:L1:C{start}-{end}",
+        "char_start": start,
+        "char_end": end,
+        "char_offset_basis": CHAR_OFFSET_BASIS,
+        "source_context": context,
+        "context_char_start": 0,
+        "context_char_end": len(context),
+    }
+
+
+def _booknlp_token_truth_finding(context: str) -> dict[str, Any]:
+    evidence = _token_truth_evidence(context)
+    return _booknlp_finding(
+        raw_finding_id="booknlp-token-negated-label",
+        finding_type="evidence_note",
+        label="BookNLP token evidence",
+        extracted_claim="BookNLP token support at the exact source span",
+        source_locator=evidence["source_locator"],
+        evidence=[evidence],
+        support_metadata={"signal_kind": "token_dependency", "lemma": "canon"},
+    )
+
+
+def _spacy_token_truth_finding(context: str) -> dict[str, Any]:
+    evidence = _token_truth_evidence(context)
+    return _spacy_finding(
+        raw_finding_id="spacy-token-negated-label",
+        text="canon",
+        claim="spaCy identified an entity candidate at the exact source span",
+        sentence=context,
+        source_locator=evidence["source_locator"],
+        evidence=[evidence],
+    )
+
+
+def test_local_nlp_token_truth_label_requires_exact_explicitly_negated_context() -> None:
+    for context in ("This is not canon.", "This is non-canon owner data."):
+        booknlp = oao.validate_local_nlp_fixture_envelope(
+            _booknlp_envelope([_booknlp_token_truth_finding(context)]),
+            adapter_name="booknlp",
+        )
+        spacy = oao.validate_local_nlp_fixture_envelope(
+            _spacy_envelope([_spacy_token_truth_finding(context)]),
+            adapter_name="spacy",
+        )
+        assert booknlp["findings"][0]["evidence"][0]["source_excerpt"] == "canon"
+        assert spacy["findings"][0]["evidence"][0]["source_excerpt"] == "canon"
+
+
+def test_local_nlp_token_truth_label_rejects_positive_mixed_and_double_negation() -> None:
+    for context in (
+        "This is canon.",
+        "This is not canon but approved.",
+        "This is not not canon.",
+    ):
+        for adapter, envelope in (
+            ("booknlp", _booknlp_envelope([_booknlp_token_truth_finding(context)])),
+            ("spacy", _spacy_envelope([_spacy_token_truth_finding(context)])),
+        ):
+            try:
+                oao.validate_local_nlp_fixture_envelope(
+                    envelope,
+                    adapter_name=adapter,
+                )
+            except ValueError as exc:
+                assert "truth/canon/approved/promoted" in str(exc)
+            else:
+                raise AssertionError(f"{adapter} accepted unsafe context: {context}")
+
+
+def test_spacy_truth_label_failure_uses_spacy_specific_wording() -> None:
+    fixture = _spacy_envelope([
+        _spacy_finding(text="this is canon")
+    ])
+    env = _assert_failed_closed(_run_adapter("spacy", fixture), "spacy")
+    assert "spacy envelope contains" in env["explanation"].lower()
+    assert "ollama envelope" not in env["explanation"].lower()
+
+
 def test_booknlp_and_spacy_reject_prose_like_generated_output() -> None:
     fixtures = [
         ("booknlp", _booknlp_envelope([
@@ -413,6 +527,7 @@ def _mock_live_spacy_env(monkeypatch: Any) -> None:
 def _install_mock_spacy(monkeypatch: Any) -> MagicMock:
     """Install a mock spaCy module so import spacy succeeds."""
     mock_spacy = MagicMock()
+    mock_spacy.__version__ = "fixture-spacy-1.0"
     mock_nlp = MagicMock()
     mock_spacy.load.return_value = mock_nlp
     monkeypatch.setitem(sys.modules, "spacy", mock_spacy)
@@ -572,6 +687,7 @@ def test_live_spacy_evidence_excerpt_matches_exact_character_locator(
         start_text, end_text = character_range.split("-", 1)
         start, end = int(start_text), int(end_text)
         assert evidence["source_excerpt"] == RAW_IDEA[start:end]
+        assert evidence["char_offset_basis"] == CHAR_OFFSET_BASIS
         assert finding["source_locator"] == locator
 
 
@@ -668,6 +784,225 @@ def test_live_spacy_safety_boundaries_preserved(
         assert finding["source_adapter"] == "spacy"
         assert finding["evidence"][0]["source_excerpt"]
         assert finding["evidence"][0]["source_locator"]
+
+
+def test_live_spacy_accepts_non_canon_denial_and_records_execution_provenance(
+    monkeypatch: Any,
+) -> None:
+    """A boundary-safe denial survives validation with truthful execution metadata."""
+
+    source = "This is non-canon owner review data."
+    phrase = "non-canon owner review data"
+    start = source.index(phrase)
+    end = start + len(phrase)
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+    mock_nlp.return_value = _make_mock_doc(
+        source,
+        noun_chunks=[(phrase, start, end)],
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        source,
+        requested_adapters=["spacy"],
+        persist_candidates=False,
+    )
+
+    assert result["analysis_status"] == "succeeded"
+    env = _adapter_env(result, "spacy")
+    assert env["state"] == "succeeded"
+    assert env["execution_provenance"] == {
+        "implementation_kind": "official_external",
+        "user_facing_label": "spaCy evidence production",
+        "tool": {
+            "availability": "available",
+            "name": "spaCy",
+            "version": "fixture-spacy-1.0",
+        },
+        "runtime": {
+            "availability": "available",
+            "name": "Python",
+            "version": sys.version.split()[0],
+        },
+        "provider": {
+            "availability": "unknown",
+            "name": None,
+            "version": None,
+        },
+        "model": {
+            "availability": "available",
+            "name": "en_core_web_sm",
+            "version": None,
+        },
+    }
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": False,
+    }
+    assert result["safety"]["no_real_tool_calls"] is False
+    assert result["safety"]["model_calls_occurred"] is False
+
+
+def test_live_spacy_accepts_token_level_canon_only_in_exact_negated_context(
+    monkeypatch: Any,
+) -> None:
+    source = "This is not canon."
+    start = source.index("canon")
+    end = start + len("canon")
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+    mock_nlp.return_value = _make_mock_doc(
+        source,
+        entities=[("canon", "PERSON", start, end)],
+    )
+
+    result = oao.analyze_omi_raw_idea_with_tools(
+        "demo",
+        source,
+        requested_adapters=["spacy"],
+        persist_candidates=False,
+    )
+
+    assert result["analysis_status"] == "succeeded"
+    finding = result["findings"][0]
+    evidence = finding["evidence"][0]
+    assert finding["label"] == "canon"
+    assert evidence["source_excerpt"] == "canon"
+    assert evidence["source_context"] == source
+    assert source[evidence["char_start"]:evidence["char_end"]] == "canon"
+    assert evidence["char_offset_basis"] == CHAR_OFFSET_BASIS
+
+
+def test_live_spacy_negated_token_finalizes_with_exact_t002_basis(
+    monkeypatch: Any,
+    tmp_path: Path,
+) -> None:
+    source = "This is not canon."
+    start = source.index("canon")
+    end = start + len("canon")
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+    mock_nlp.return_value = _make_mock_doc(
+        source,
+        entities=[("canon", "PERSON", start, end)],
+    )
+    projects = tmp_path / "projects"
+    (projects / "example").mkdir(parents=True)
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", projects)
+    monkeypatch.setattr(project_manager, "REPO_ROOT", tmp_path)
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="idea-spacy-negated-t002",
+        requested_adapters=["spacy"],
+        created_at="2026-10-10T03:15:00Z",
+    )
+
+    assert run["state"] == "complete"
+    assert run["analysis_status"] == "succeeded"
+    run_dir = projects / "example/writer_assistant/analysis_runs" / run["run_id"]
+    assert (run_dir / "run.json").is_file()
+    assert (run_dir / "manifest.json").is_file()
+    result_path = (
+        projects
+        / "example/writer_assistant/raw_artifacts"
+        / f"bundle-{run['run_id']}"
+        / "artifacts/result.json"
+    )
+    assert result_path.is_file()
+    ledger = scan_evidence_ledger(
+        project_dir=projects / "example",
+        project_id="example",
+        run_id=run["run_id"],
+    )
+    output_evidence = next(
+        event["payload"]
+        for event in ledger
+        if event["event_type"] == "evidence_recorded"
+        and event["payload"]["output_id"] is not None
+    )
+    locator = output_evidence["source_locator"]
+    assert (locator["char_start"], locator["char_end"]) == (start, end)
+    assert locator["char_offset_basis"] == CHAR_OFFSET_BASIS
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
+
+
+def test_live_spacy_validation_failure_keeps_executed_provenance_in_manifest(
+    monkeypatch: Any,
+    tmp_path: Path,
+) -> None:
+    """Post-execution validation failure is not mislabeled as unavailable."""
+
+    source = "canon"
+    _mock_live_spacy_env(monkeypatch)
+    mock_nlp = _install_mock_spacy(monkeypatch)
+    mock_nlp.return_value = _make_mock_doc(
+        source,
+        entities=[("canon", "PERSON", 0, len(source))],
+    )
+    projects = tmp_path / "projects"
+    (projects / "example").mkdir(parents=True)
+    monkeypatch.setattr(project_manager, "PROJECTS_DIR", projects)
+    monkeypatch.setattr(project_manager, "REPO_ROOT", tmp_path)
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="idea-spacy-provenance",
+        requested_adapters=["spacy"],
+        created_at="2026-10-08T18:30:00Z",
+    )
+    run_dir = projects / "example/writer_assistant/analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    contributor = manifest["contributors"][0]
+
+    assert contributor["result_state"] == "failed_closed"
+    assert "spacy envelope contains" in contributor["explanation"].lower()
+    assert "ollama envelope" not in contributor["explanation"].lower()
+    assert contributor["provenance"]["implementation_kind"] == "official_external"
+    assert contributor["provenance"]["tool"] == {
+        "availability": "available",
+        "name": "spaCy",
+        "version": "fixture-spacy-1.0",
+    }
+    assert contributor["provenance"]["runtime"]["availability"] == "available"
+    assert contributor["provenance"]["model"] == {
+        "availability": "available",
+        "name": "en_core_web_sm",
+        "version": None,
+    }
+    raw_manifest_path = (
+        tmp_path
+        / "projects/example/writer_assistant/raw_artifacts"
+        / f"bundle-{run['run_id']}"
+        / "manifest.json"
+    )
+    raw_manifest = json.loads(raw_manifest_path.read_text(encoding="utf-8"))
+    runtime_flags = set(raw_manifest["boundary_flags"])
+    assert "authorized_runtime_extraction_occurred" in runtime_flags
+    assert "spacy_runtime_extraction_occurred" in runtime_flags
+    assert "booknlp_runtime_extraction_occurred" not in runtime_flags
+    assert "no_runtime_extraction" not in runtime_flags
+    assert "no_booknlp_spacy_runtime" not in runtime_flags
+    assert raw_manifest["no_runtime_extraction_confirmation"] is False
+    for file_ref in raw_manifest["artifact_files"]:
+        assert set(file_ref["boundary_flags"]) & {
+            "authorized_runtime_extraction_occurred",
+            "spacy_runtime_extraction_occurred",
+        } == {
+            "authorized_runtime_extraction_occurred",
+            "spacy_runtime_extraction_occurred",
+        }
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
 
 
 # ---------------------------------------------------------------------------
@@ -973,6 +1308,14 @@ def test_live_booknlp_malformed_entities_fails_closed(
     env = _adapter_env(result, "booknlp")
     assert env["state"] in {"empty", "failed_closed"}
     assert env["candidates"] == []
+    assert env["execution_provenance"]["implementation_kind"] == "official_external"
+    assert env["execution_provenance"]["tool"]["name"] == "BookNLP"
+    assert env["execution_provenance"]["runtime"]["availability"] == "available"
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": False,
+    }
 
 
 def test_live_booknlp_unsafe_entity_category_skipped_or_failed_closed(
@@ -1117,6 +1460,14 @@ def test_live_booknlp_entities_become_candidate_only_findings(
     assert "organization" in types
     assert "missing_raw_output:book" in env["explanation"]
     assert "missing_raw_output:supersense" in env["explanation"]
+    assert env["execution_provenance"]["implementation_kind"] == "official_external"
+    assert env["execution_provenance"]["tool"]["name"] == "BookNLP"
+    assert env["execution_provenance"]["model"]["name"] == "small"
+    assert env["runtime_execution"] == {
+        "authorized": True,
+        "real_tool_calls_occurred": True,
+        "model_calls_occurred": False,
+    }
     for finding in result["findings"]:
         _assert_candidate_only_finding(finding, "booknlp")
 

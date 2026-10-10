@@ -260,6 +260,114 @@ def test_unprovable_or_inconsistent_token_offsets_fail_closed(mutator) -> None:
         )
 
 
+def _hyphen_spacing_rows() -> tuple[str, list[dict], list[dict]]:
+    source = "This is non-canon owner review data."
+    words = ["This", "is", "non", "-", "canon", "owner", "review", "data", "."]
+    tokens: list[dict] = []
+    cursor = 0
+    for token_id, word in enumerate(words):
+        char_start = source.index(word, cursor)
+        char_end = char_start + len(word)
+        cursor = char_end
+        tokens.append({
+            "paragraph_ID": 0,
+            "sentence_ID": 0,
+            "token_ID_within_sentence": token_id,
+            "token_ID_within_document": token_id,
+            "word": word,
+            "lemma": word.lower(),
+            "byte_onset": len(source[:char_start].encode("utf-8")),
+            "byte_offset": len(source[:char_end].encode("utf-8")),
+            "POS_tag": "NN",
+            "fine_POS_tag": "NN",
+            "dependency_relation": "dep",
+            "syntactic_head_ID": token_id,
+            "event": "O",
+        })
+    entities = [{
+        "COREF": -1,
+        "start_token": 2,
+        "end_token": 5,
+        "prop": "NOM",
+        "cat": "PER",
+        "text": "non - canon owner",
+    }]
+    return source, tokens, entities
+
+
+def test_booknlp_hyphen_spacing_reconciles_to_exact_source_span() -> None:
+    source, tokens, entities = _hyphen_spacing_rows()
+    envelope = orchestrator._booknlp_t004_result_to_envelope(
+        project_name="example",
+        source_idea_id="idea-hyphen-spacing",
+        source_content=source,
+        tokens=tokens,
+        entities=entities,
+        quotes=[],
+        supersense=[],
+        book_json={},
+    )
+
+    entity = next(
+        item
+        for item in envelope["findings"]
+        if item["support_metadata"].get("signal_kind") == "entity_mention"
+    )
+    assert entity["label"] == "non-canon owner"
+    assert entity["evidence"][0]["source_excerpt"] == "non-canon owner"
+    assert source[
+        entity["evidence"][0]["char_start"]:entity["evidence"][0]["char_end"]
+    ] == entity["evidence"][0]["source_excerpt"]
+
+
+def test_booknlp_token_level_canon_uses_exact_non_canon_source_context() -> None:
+    source, tokens, entities = _hyphen_spacing_rows()
+    envelope = orchestrator._booknlp_t004_result_to_envelope(
+        project_name="example",
+        source_idea_id="idea-token-negation-context",
+        source_content=source,
+        tokens=tokens,
+        entities=entities,
+        quotes=[],
+        supersense=[],
+        book_json={},
+    )
+
+    validated = orchestrator.validate_local_nlp_fixture_envelope(
+        envelope,
+        adapter_name="booknlp",
+    )
+    token = next(
+        finding
+        for finding in validated["findings"]
+        if finding.get("support_metadata", {}).get("lemma") == "canon"
+    )
+    evidence = token["evidence"][0]
+    assert evidence["source_excerpt"] == "canon"
+    assert evidence["source_context"] == source
+    assert source[evidence["char_start"]:evidence["char_end"]] == "canon"
+
+
+def test_booknlp_genuine_entity_text_mismatch_still_fails_closed() -> None:
+    source, tokens, entities = _hyphen_spacing_rows()
+    entities[0]["text"] = "different owner"
+
+    with pytest.raises(
+        ValueError,
+        match="BookNLP entity text does not match its exact token span",
+    ):
+        orchestrator._booknlp_t004_result_to_envelope(
+            project_name="example",
+            source_idea_id="idea-hyphen-spacing-mismatch",
+            source_content=source,
+            tokens=tokens,
+            entities=entities,
+            quotes=[],
+            supersense=[],
+            book_json={},
+        )
+
+
 def test_handoff_is_exact_hash_bound_and_never_invents_events_artifact() -> None:
     handoff = _adapter_result()["raw_artifacts"]
     assert handoff["adapter_id"] == "booknlp"
