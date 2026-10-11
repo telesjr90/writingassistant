@@ -392,6 +392,32 @@ def test_parse_tokens_tsv_parses_valid_text_and_does_not_mutate_input():
     ]
 
 
+def test_parse_tokens_tsv_treats_bare_quote_lemma_as_literal_field_data():
+    rows = [
+        [
+            "0", "0", "0", "0", "Alice", "Alice", "0", "5",
+            "PROPN", "NNP", "nsubj", "2", "O",
+        ],
+        [
+            "0", "0", "1", "1", "“", '"', "6", "7",
+            "PUNCT", "``", "punct", "2", "O",
+        ],
+        [
+            "0", "0", "2", "2", "Wait", "wait", "7", "11",
+            "VERB", "VB", "ROOT", "2", "EVENT",
+        ],
+    ]
+    text = tsv_text(TOKENS_HEADER, rows)
+
+    parsed = booknlp_fixture_parser.parse_booknlp_tokens_tsv(text)
+
+    assert len(parsed) == len(text.splitlines()) - 1 == 3
+    assert parsed[1]["word"] == "“"
+    assert parsed[1]["lemma"] == '"'
+    assert parsed[2]["token_ID_within_document"] == 2
+    assert parsed[2]["word"] == "Wait"
+
+
 @pytest.mark.parametrize(
     "text",
     [

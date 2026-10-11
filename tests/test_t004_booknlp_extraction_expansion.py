@@ -163,6 +163,9 @@ def test_exact_multibyte_offsets_and_expanded_support_mappings() -> None:
     assert (evidence["byte_start"], evidence["byte_end"]) == (0, 4)
     assert evidence["source_excerpt"] == "Éva"
     assert evidence["artifact_file_id"] == "booknlp-entities"
+    assert evidence["char_offset_basis"] == "unicode-code-points-zero-based-half-open"
+    assert evidence["byte_offset_basis"] == "utf-8-bytes-zero-based-half-open"
+    assert "booknlp_token_offsets_reconciled_from_unicode_code_points" not in result["explanation"]
 
     types = {item["candidate_type"] for item in findings}
     assert {"character", "organization", "location", "object", "relationship", "timeline_event", "evidence_note"} <= types
@@ -182,6 +185,110 @@ def test_exact_multibyte_offsets_and_expanded_support_mappings() -> None:
     assert any(item["support_metadata"].get("booknlp_entity_class") == "VEH" for item in findings)
     assert not any(item["support_metadata"].get("signal_kind") == "possession" for item in findings)
     assert all(item["owner_decision"] == {"decision": "pending", "approved": False} for item in findings)
+
+
+def test_unicode_code_point_token_offsets_are_translated_exactly() -> None:
+    source = 'A “Wait,” Éva.'
+    words = ["A", "“", "Wait", ",", "”", "Éva", "."]
+    tokens = []
+    cursor = 0
+    for token_id, word in enumerate(words):
+        char_start = source.index(word, cursor)
+        char_end = char_start + len(word)
+        cursor = char_end
+        tokens.append({
+            "paragraph_ID": 0,
+            "sentence_ID": 0,
+            "token_ID_within_sentence": token_id,
+            "token_ID_within_document": token_id,
+            "word": word,
+            "lemma": word.lower(),
+            # Real BookNLP can label Unicode code-point offsets as byte columns.
+            "byte_onset": char_start,
+            "byte_offset": char_end,
+            "POS_tag": "PUNCT" if word in {"“", ",", "”", "."} else "NN",
+            "fine_POS_tag": "PUNCT" if word in {"“", ",", "”", "."} else "NN",
+            "dependency_relation": "dep",
+            "syntactic_head_ID": token_id,
+            "event": "O",
+        })
+
+    envelope = orchestrator._booknlp_t004_result_to_envelope(
+        project_name="example",
+        source_idea_id="idea-code-point-offsets",
+        source_content=source,
+        tokens=tokens,
+        entities=[],
+        quotes=[],
+        supersense=[],
+        book_json={},
+    )
+
+    assert (
+        "booknlp_token_offsets_reconciled_from_unicode_code_points"
+        in envelope["diagnostics"]
+    )
+    opening_quote = next(
+        item
+        for item in envelope["findings"]
+        if item["evidence"][0]["source_excerpt"] == "“"
+    )["evidence"][0]
+    assert (opening_quote["char_start"], opening_quote["char_end"]) == (2, 3)
+    assert (opening_quote["byte_start"], opening_quote["byte_end"]) == (2, 5)
+    assert opening_quote["char_offset_basis"] == "unicode-code-points-zero-based-half-open"
+    assert opening_quote["byte_offset_basis"] == "utf-8-bytes-zero-based-half-open"
+
+    eva = next(
+        item
+        for item in envelope["findings"]
+        if item["evidence"][0]["source_excerpt"] == "Éva"
+    )["evidence"][0]
+    assert source[eva["char_start"]:eva["char_end"]] == "Éva"
+    assert source.encode("utf-8")[eva["byte_start"]:eva["byte_end"]].decode("utf-8") == "Éva"
+
+
+def test_mixed_unprovable_token_offset_bases_fail_closed() -> None:
+    source = "Éva waits. Mara leaves."
+    words = ["Éva", "waits", ".", "Mara", "leaves", "."]
+    tokens = []
+    cursor = 0
+    for token_id, word in enumerate(words):
+        char_start = source.index(word, cursor)
+        char_end = char_start + len(word)
+        cursor = char_end
+        byte_start = len(source[:char_start].encode("utf-8"))
+        byte_end = len(source[:char_end].encode("utf-8"))
+        use_byte_basis = token_id >= 3
+        tokens.append({
+            "paragraph_ID": 0,
+            "sentence_ID": 0,
+            "token_ID_within_sentence": token_id,
+            "token_ID_within_document": token_id,
+            "word": word,
+            "lemma": word.lower(),
+            "byte_onset": byte_start if use_byte_basis else char_start,
+            "byte_offset": byte_end if use_byte_basis else char_end,
+            "POS_tag": "NN",
+            "fine_POS_tag": "NN",
+            "dependency_relation": "dep",
+            "syntactic_head_ID": token_id,
+            "event": "O",
+        })
+
+    with pytest.raises(
+        ValueError,
+        match="BookNLP token offsets do not identify the emitted token",
+    ):
+        orchestrator._booknlp_t004_result_to_envelope(
+            project_name="example",
+            source_idea_id="idea-mixed-offset-bases",
+            source_content=source,
+            tokens=tokens,
+            entities=[],
+            quotes=[],
+            supersense=[],
+            book_json={},
+        )
 
 
 def test_unsupported_entity_class_is_not_mapped_and_limitation_is_explicit() -> None:
@@ -318,6 +425,225 @@ def test_booknlp_hyphen_spacing_reconciles_to_exact_source_span() -> None:
     assert source[
         entity["evidence"][0]["char_start"]:entity["evidence"][0]["char_end"]
     ] == entity["evidence"][0]["source_excerpt"]
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("Grannie’s", "Grannie’s"),
+        ("Grannie ’s", "Grannie’s"),
+        ("old woman ’s cottage", "old woman’s cottage"),
+        ("Red Riding - Hood , who", "Red Riding-Hood, who"),
+        (
+            "Red Riding - Hood , who visited Grannie ’s cottage , twice",
+            "Red Riding-Hood, who visited Grannie’s cottage, twice",
+        ),
+    ],
+)
+def test_booknlp_entity_token_joined_punctuation_spacing_reconciles_exactly(
+    emitted: str,
+    exact: str,
+) -> None:
+    assert orchestrator._booknlp_t004_reconcile_entity_text(emitted, exact) == exact
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("Hood ; who", "Hood; who"),
+        ("Hood . who", "Hood. who"),
+        ("old  woman’s cottage", "old woman’s cottage"),
+        (" Grannie’s", "Grannie’s"),
+        ("Grannie 's", "Grannie’s"),
+        ("different owner", "non-canon owner"),
+    ],
+)
+def test_booknlp_entity_reconciliation_rejects_unsupported_changes(
+    emitted: str,
+    exact: str,
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="BookNLP entity text does not match its exact token span",
+    ):
+        orchestrator._booknlp_t004_reconcile_entity_text(emitted, exact)
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("Wait", "Wait"),
+        ("“ I am here . ”", "“I am here.”"),
+        ('" I am here . "', '"I am here."'),
+        ("“ Where are you ? ”", "“Where are you?”"),
+        ("“ Wait ; listen , please . ”", "“Wait; listen, please.”"),
+        ("“ Grannie ’s Red Riding - Hood , wait . ”", "“Grannie’s Red Riding-Hood, wait.”"),
+    ],
+)
+def test_booknlp_quote_token_joined_punctuation_spacing_reconciles_exactly(
+    emitted: str,
+    exact: str,
+) -> None:
+    assert orchestrator._booknlp_t004_reconcile_quote_text(emitted, exact) == exact
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("“ Stop ! ”", "“Stop!”"),
+        ("“ I ’ve arrived . ”", "“I’ve arrived.”"),
+        ("“ Wait : listen . ”", "“Wait: listen.”"),
+        ("“ Wait  here . ”", "“Wait here.”"),
+        ("“Wait.”", '"Wait."'),
+        ("“Wait.”", "“wait.”"),
+        ("different quote", "“Wait.”"),
+    ],
+)
+def test_booknlp_quote_reconciliation_rejects_unsupported_changes(
+    emitted: str,
+    exact: str,
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="BookNLP quote text does not match its exact token span",
+    ):
+        orchestrator._booknlp_t004_reconcile_quote_text(emitted, exact)
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("little Red Riding-Hood", "little Red Riding-Hood"),
+        ("little Red Riding - Hood", "little Red Riding-Hood"),
+        ("Grannie ’s friend", "Grannie’s friend"),
+    ],
+)
+def test_booknlp_speaker_mention_spacing_reconciles_exactly(
+    emitted: str,
+    exact: str,
+) -> None:
+    assert orchestrator._booknlp_t004_reconcile_speaker_mention(emitted, exact) == exact
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("little  Red Riding-Hood", "little Red Riding-Hood"),
+        ("little Red Riding–Hood", "little Red Riding-Hood"),
+        ("Little Red Riding-Hood", "little Red Riding-Hood"),
+        ("different speaker", "little Red Riding-Hood"),
+    ],
+)
+def test_booknlp_speaker_mention_reconciliation_rejects_unsupported_changes(
+    emitted: str,
+    exact: str,
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="BookNLP speaker mention does not match its exact token span",
+    ):
+        orchestrator._booknlp_t004_reconcile_speaker_mention(emitted, exact)
+
+
+def test_booknlp_supersense_exclamation_spacing_reconciles_exactly() -> None:
+    assert orchestrator._booknlp_t004_reconcile_supersense_text("Rap!", "Rap!") == "Rap!"
+    assert orchestrator._booknlp_t004_reconcile_supersense_text("Rap !", "Rap!") == "Rap!"
+
+
+@pytest.mark.parametrize(
+    ("emitted", "exact"),
+    [
+        ("Rap  !", "Rap!"),
+        ("Rap ?", "Rap?"),
+        ("Rap !", "Rapǃ"),
+        ("rap !", "Rap!"),
+        ("different !", "Rap!"),
+    ],
+)
+def test_booknlp_supersense_reconciliation_rejects_unsupported_changes(
+    emitted: str,
+    exact: str,
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="BookNLP supersense text does not match its exact token span",
+    ):
+        orchestrator._booknlp_t004_reconcile_supersense_text(emitted, exact)
+
+
+def test_booknlp_quote_speaker_and_supersense_reconciliation_use_exact_spans() -> None:
+    source = "“I am going to see Grannie, take this.” little Red Riding-Hood said. Rap!"
+    words = [
+        "“", "I", "am", "going", "to", "see", "Grannie", ",", "take", "this",
+        ".", "”", "little", "Red", "Riding", "-", "Hood", "said", ".", "Rap", "!",
+    ]
+    tokens = []
+    cursor = 0
+    for token_id, word in enumerate(words):
+        char_start = source.index(word, cursor)
+        char_end = char_start + len(word)
+        cursor = char_end
+        tokens.append({
+            "paragraph_ID": 0,
+            "sentence_ID": 0,
+            "token_ID_within_sentence": token_id,
+            "token_ID_within_document": token_id,
+            "word": word,
+            "lemma": word.lower(),
+            "byte_onset": len(source[:char_start].encode("utf-8")),
+            "byte_offset": len(source[:char_end].encode("utf-8")),
+            "POS_tag": "PUNCT" if word in {"“", ",", ".", "”", "-", "!"} else "NN",
+            "fine_POS_tag": "PUNCT" if word in {"“", ",", ".", "”", "-", "!"} else "NN",
+            "dependency_relation": "dep",
+            "syntactic_head_ID": token_id,
+            "event": "O",
+        })
+
+    envelope = orchestrator._booknlp_t004_result_to_envelope(
+        project_name="example",
+        source_idea_id="idea-token-joined-punctuation",
+        source_content=source,
+        tokens=tokens,
+        entities=[],
+        quotes=[{
+            "quote_start": 0,
+            "quote_end": 11,
+            "mention_start": 12,
+            "mention_end": 16,
+            "mention_phrase": "little Red Riding - Hood",
+            "char_id": 1,
+            "quote": "“ I am going to see Grannie , take this . ”",
+        }],
+        supersense=[{
+            "start_token": 19,
+            "end_token": 20,
+            "supersense_category": "noun.communication",
+            "text": "Rap !",
+        }],
+        book_json={},
+    )
+
+    quote = next(
+        finding
+        for finding in envelope["findings"]
+        if finding["support_metadata"].get("signal_kind") == "quote_attribution"
+    )
+    assert quote["support_metadata"]["speaker_mention"] == "little Red Riding-Hood"
+    assert [item["source_excerpt"] for item in quote["evidence"]] == [
+        "“I am going to see Grannie, take this.”",
+        "little Red Riding-Hood",
+    ]
+    supersense = next(
+        finding
+        for finding in envelope["findings"]
+        if finding["support_metadata"].get("supersense_category")
+        == "noun.communication"
+    )
+    assert supersense["evidence"][0]["source_excerpt"] == "Rap!"
+    assert all(
+        finding["owner_decision"] == {"decision": "pending", "approved": False}
+        for finding in envelope["findings"]
+    )
 
 
 def test_booknlp_token_level_canon_uses_exact_non_canon_source_context() -> None:

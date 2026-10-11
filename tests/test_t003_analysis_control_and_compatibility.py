@@ -19,6 +19,7 @@ from backend.story_knowledge import (
 )
 from backend.story_knowledge.apply_promotion import build_promotion_audit_record
 from backend.story_knowledge.evidence_ledger import (
+    MAX_LEDGER_EVENT_BYTES,
     append_evidence_ledger_event,
     resolve_evidence_ledger,
     scan_evidence_ledger,
@@ -2497,6 +2498,118 @@ def test_concurrent_run_submission_is_one_execution_one_replay_and_conflicts(mon
                 outcomes.append(exc)
     assert sum(isinstance(item, dict) for item in outcomes) == 1
     assert sum(isinstance(item, ValueError) and "idempotency conflict" in str(item) for item in outcomes) == 1
+
+
+def test_large_local_nlp_outputs_finalize_under_unchanged_event_guard(
+    monkeypatch, tmp_path
+):
+    project = _project(monkeypatch, tmp_path)
+    source = "Mara Vale"
+
+    def finding(adapter: str, index: int) -> dict[str, object]:
+        return {
+            "candidate_type": "evidence_note",
+            "label": f"Local NLP evidence {index}",
+            "extracted_claim": "Mara Vale",
+            "evidence": [
+                {
+                    "source_excerpt": source,
+                    "source_locator": "raw_idea:exact",
+                    "byte_start": 0,
+                    "byte_end": len(source.encode("utf-8")),
+                    "byte_offset_basis": "utf-8-bytes-zero-based-half-open",
+                    "char_start": 0,
+                    "char_end": len(source),
+                    "char_offset_basis": "unicode-code-points-zero-based-half-open",
+                }
+            ],
+            "source_locator": "raw_idea:exact",
+            "provenance": {
+                "tool_source": adapter,
+                "adapter": adapter,
+                "support": "direct source support only",
+            },
+            "source_adapter": adapter,
+            "support_label": "direct source support only",
+            "owner_decision": {"decision": "pending", "approved": False},
+            "review_status": "candidate_review_pending",
+            "raw_finding_id": f"{adapter}-large-{index}",
+        }
+
+    booknlp_findings = [finding("booknlp", index) for index in range(57)]
+    spacy_findings = [finding("spacy", index) for index in range(57, 172)]
+
+    def runner(*args, **kwargs):
+        assert kwargs["requested_adapters"] == ["booknlp", "spacy"]
+        return {
+            "analysis_status": "succeeded",
+            "explanation": "large local NLP fixture completed",
+            "source_idea_id": kwargs.get("source_idea_id"),
+            "adapter_results": [
+                {
+                    "adapter": "booknlp",
+                    "state": "succeeded",
+                    "explanation": "BookNLP fixture completed",
+                    "candidates": booknlp_findings,
+                },
+                {
+                    "adapter": "spacy",
+                    "state": "succeeded",
+                    "explanation": "spaCy fixture completed",
+                    "candidates": spacy_findings,
+                },
+            ],
+            "findings": [*booknlp_findings, *spacy_findings],
+            "persisted_candidate_ids": [],
+            "safety": {
+                "no_prose": True,
+                "no_memory_canon_mutation": True,
+                "no_apply_promotion": True,
+            },
+        }
+
+    run = analysis_run_control.submit_analysis_run(
+        "example",
+        raw_idea=source,
+        source_idea_id="idea-large-local-nlp",
+        requested_adapters=["booknlp", "spacy"],
+        runner=runner,
+        created_at="2026-10-10T23:30:00Z",
+    )
+    published = analysis_run_control.get_analysis_run_result(
+        "example", run["run_id"]
+    )["result"]
+    serialized_result = json.dumps(
+        published,
+        ensure_ascii=False,
+        allow_nan=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    run_dir = project / "writer_assistant" / "analysis_runs" / run["run_id"]
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    raw_manifest = raw_artifacts.read_immutable_raw_artifact_bundle(
+        "example", f"bundle-{run['run_id']}", project_dir=tmp_path
+    )
+    ledger = scan_evidence_ledger(
+        project_dir=project,
+        project_id="example",
+        run_id=run["run_id"],
+    )
+
+    assert len(published["findings"]) == 172
+    assert all(
+        not annotation["normalized_evidence_references"]
+        for annotation in published["guardrail_annotations"]
+    )
+    assert len(serialized_result) < MAX_LEDGER_EVENT_BYTES
+    assert manifest["run_id"] == run["run_id"]
+    assert raw_manifest["raw_artifact_bundle_id"] == f"bundle-{run['run_id']}"
+    assert ledger
+    assert run["candidate_persistence_performed"] is False
+    assert run["automatic_approval_or_promotion_performed"] is False
+    assert run["memory_canon_mutation_performed"] is False
+    assert run["story_prose_generated"] is False
 
 
 def _concurrent_semantic_replay(

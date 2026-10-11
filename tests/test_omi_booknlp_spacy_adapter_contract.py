@@ -1530,6 +1530,71 @@ def test_live_booknlp_quotes_become_dialogue_attribution_candidates(
     )
 
 
+def test_live_booknlp_rejects_only_quotes_with_invalid_numeric_fields(
+    monkeypatch: Any,
+) -> None:
+    """An unresolved speaker sentinel must not discard valid BookNLP output."""
+
+    _mock_live_booknlp_env(monkeypatch)
+    quote = {
+        "quote_start": "0",
+        "quote_end": "1",
+        "mention_start": "2",
+        "mention_end": "2",
+        "mention_phrase": "clerk",
+        "quote": "Mara Vale",
+    }
+    _install_mock_booknlp(
+        monkeypatch,
+        quotes=[
+            {**quote, "char_id": "-1"},
+            {**quote, "char_id": "42"},
+        ],
+        tokens=[
+            {
+                "paragraph_ID": "0", "sentence_ID": "0",
+                "token_ID_within_sentence": "0", "token_ID_within_document": "0",
+                "word": "Mara", "lemma": "Mara", "byte_onset": "12", "byte_offset": "16",
+                "POS_tag": "NNP", "fine_POS_tag": "NNP", "dependency_relation": "nsubj",
+                "syntactic_head_ID": "1", "event": "O",
+            },
+            {
+                "paragraph_ID": "0", "sentence_ID": "0",
+                "token_ID_within_sentence": "1", "token_ID_within_document": "1",
+                "word": "Vale", "lemma": "Vale", "byte_onset": "17", "byte_offset": "21",
+                "POS_tag": "NNP", "fine_POS_tag": "NNP", "dependency_relation": "flat",
+                "syntactic_head_ID": "0", "event": "O",
+            },
+            {
+                "paragraph_ID": "0", "sentence_ID": "0",
+                "token_ID_within_sentence": "2", "token_ID_within_document": "2",
+                "word": "clerk", "lemma": "clerk", "byte_onset": "47", "byte_offset": "52",
+                "POS_tag": "NN", "fine_POS_tag": "NN", "dependency_relation": "obj",
+                "syntactic_head_ID": "1", "event": "O",
+            },
+        ],
+    )
+
+    result = _run_adapter("booknlp")
+
+    assert result["analysis_status"] == "succeeded"
+    env = _adapter_env(result, "booknlp")
+    assert env["state"] == "succeeded"
+    assert "rejected_quote_rows_invalid_numeric_field:1" in env["explanation"]
+    dialogue = [
+        finding
+        for finding in result["findings"]
+        if "dialogue attribution" in finding["label"].lower()
+    ]
+    assert len(dialogue) == 1
+    assert dialogue[0]["support_metadata"]["speaker_cluster_id"] == 42
+    assert result["persisted_candidate_ids"] == []
+    assert result["safety"]["no_memory_canon_mutation"] is True
+    assert result["safety"]["no_apply_promotion"] is True
+    assert result["safety"]["no_canon_promotion"] is True
+    assert result["safety"]["no_story_prose_generation"] is True
+
+
 def test_live_booknlp_unsafe_excerpt_text_does_not_leak_into_findings(
     monkeypatch: Any,
 ) -> None:

@@ -89,8 +89,10 @@ context is sufficient.
 from __future__ import annotations
 
 import copy
+import csv
 import hashlib
 import importlib.metadata
+import io
 import json
 import os
 import re
@@ -9338,6 +9340,60 @@ def _booknlp_required_int(value: Any, label: str) -> int:
     return number
 
 
+def _booknlp_parse_quotes_with_invalid_numeric_rows_rejected(
+    text: str,
+    *,
+    parser: Callable[[str], list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], int]:
+    """Strictly parse quotes while isolating invalid numeric rows.
+
+    BookNLP uses ``-1`` for an unresolved quote speaker in real output, while
+    the T004 quote contract requires non-negative numeric fields.  The raw TSV
+    remains unchanged for audit.  If and only if the complete table fails with
+    the contract's exact ``invalid numeric field`` error, validate the header
+    and every data row independently through the same authoritative parser,
+    rejecting only rows that fail that numeric rule.  Any other structural,
+    text, or span error still fails the complete contributor closed.
+    """
+
+    try:
+        return parser(text), 0
+    except ValueError as exc:
+        if str(exc) != "invalid numeric field":
+            raise
+
+    rows = list(
+        csv.reader(
+            io.StringIO(text),
+            delimiter="\t",
+            quoting=csv.QUOTE_NONE,
+        )
+    )
+    if not rows:
+        return parser(text), 0
+
+    def _serialized(row: list[str]) -> str:
+        lines = ["\t".join(rows[0])]
+        if row:
+            lines.append("\t".join(row))
+        return "\n".join(lines) + "\n"
+
+    # Preserve strict header validation before considering row-level rejection.
+    parser(_serialized([]))
+    parsed: list[dict[str, Any]] = []
+    rejected = 0
+    for row in rows[1:]:
+        try:
+            parsed.extend(parser(_serialized(row)))
+        except ValueError as exc:
+            if str(exc) != "invalid numeric field":
+                raise
+            rejected += 1
+    if rejected == 0:
+        raise ValueError("invalid numeric field")
+    return parsed, rejected
+
+
 def _booknlp_coreference_id(value: Any) -> int:
     """Validate BookNLP's coreference ID, including its unresolved ``-1`` sentinel."""
 
@@ -9361,10 +9417,15 @@ def _booknlp_t004_snapshot(
     )
 
 
-def _booknlp_t004_token_index(snapshot: Any, tokens: list[dict[str, Any]]) -> dict[int, dict[str, Any]]:
+def _booknlp_t004_token_index(
+    snapshot: Any,
+    tokens: list[dict[str, Any]],
+) -> tuple[dict[int, dict[str, Any]], str]:
     if not isinstance(tokens, list) or not tokens:
         raise ValueError("BookNLP token output is required for exact offsets")
-    indexed: dict[int, dict[str, Any]] = {}
+
+    prepared: list[tuple[dict[str, Any], int, int, int, str]] = []
+    token_ids: set[int] = set()
     for raw in tokens:
         if not isinstance(raw, dict):
             raise ValueError("BookNLP token row must be an object")
@@ -9372,48 +9433,80 @@ def _booknlp_t004_token_index(snapshot: Any, tokens: list[dict[str, Any]]) -> di
             raw.get("token_ID_within_document", raw.get("token_id")),
             "token_ID_within_document",
         )
-        if token_id in indexed:
+        if token_id in token_ids:
             raise ValueError("BookNLP token IDs must be unique")
-        byte_start = _booknlp_required_int(
+        token_ids.add(token_id)
+        reported_start = _booknlp_required_int(
             raw.get("byte_onset", raw.get("byte_start")), "byte_onset"
         )
-        byte_end = _booknlp_required_int(
+        reported_end = _booknlp_required_int(
             raw.get("byte_offset", raw.get("byte_end")), "byte_offset"
         )
-        byte_range = exact_source_map.OffsetRange(
-            byte_start, byte_end, exact_source_map.BYTE_OFFSET_BASIS
-        )
-        char_range = exact_source_map.translate_exact_offset_range(
-            snapshot,
-            byte_range,
-            target_basis=exact_source_map.CHAR_OFFSET_BASIS,
-            expected_snapshot_id=snapshot.identity.snapshot_id,
-            expected_content_hash=snapshot.identity.content_hash,
-        )
-        if "char_start" in raw or "char_end" in raw:
-            supplied = exact_source_map.OffsetRange(
-                _booknlp_required_int(raw.get("char_start"), "char_start"),
-                _booknlp_required_int(raw.get("char_end"), "char_end"),
-                exact_source_map.CHAR_OFFSET_BASIS,
-            )
-            if supplied != char_range:
-                raise ValueError("BookNLP byte and character token offsets disagree")
         word = raw.get("word", raw.get("token"))
         if not isinstance(word, str) or not word:
             raise ValueError("BookNLP token word is required")
-        excerpt = snapshot.source_content[char_range.start:char_range.end]
-        if excerpt != word:
-            raise ValueError("BookNLP token offsets do not identify the emitted token")
-        indexed[token_id] = {
-            **dict(raw),
-            "token_id": token_id,
-            "byte_start": byte_start,
-            "byte_end": byte_end,
-            "char_start": char_range.start,
-            "char_end": char_range.end,
-            "source_excerpt": excerpt,
-        }
-    return indexed
+        prepared.append((raw, token_id, reported_start, reported_end, word))
+
+    def _index_for_basis(reported_basis: str) -> dict[int, dict[str, Any]] | None:
+        indexed: dict[int, dict[str, Any]] = {}
+        try:
+            for raw, token_id, reported_start, reported_end, word in prepared:
+                reported_range = exact_source_map.OffsetRange(
+                    reported_start,
+                    reported_end,
+                    reported_basis,
+                )
+                char_range = exact_source_map.translate_exact_offset_range(
+                    snapshot,
+                    reported_range,
+                    target_basis=exact_source_map.CHAR_OFFSET_BASIS,
+                    expected_snapshot_id=snapshot.identity.snapshot_id,
+                    expected_content_hash=snapshot.identity.content_hash,
+                )
+                byte_range = exact_source_map.translate_exact_offset_range(
+                    snapshot,
+                    reported_range,
+                    target_basis=exact_source_map.BYTE_OFFSET_BASIS,
+                    expected_snapshot_id=snapshot.identity.snapshot_id,
+                    expected_content_hash=snapshot.identity.content_hash,
+                )
+                if "char_start" in raw or "char_end" in raw:
+                    supplied = exact_source_map.OffsetRange(
+                        _booknlp_required_int(raw.get("char_start"), "char_start"),
+                        _booknlp_required_int(raw.get("char_end"), "char_end"),
+                        exact_source_map.CHAR_OFFSET_BASIS,
+                    )
+                    if supplied != char_range:
+                        return None
+                excerpt = snapshot.source_content[char_range.start:char_range.end]
+                if excerpt != word:
+                    return None
+                indexed[token_id] = {
+                    **dict(raw),
+                    "token_id": token_id,
+                    "byte_start": byte_range.start,
+                    "byte_end": byte_range.end,
+                    "char_start": char_range.start,
+                    "char_end": char_range.end,
+                    "source_excerpt": excerpt,
+                    "reported_offset_basis": reported_basis,
+                }
+        except ValueError:
+            return None
+        return indexed
+
+    # BookNLP names these columns byte offsets, so retain that interpretation
+    # whenever every token proves it exactly.  Some real BookNLP versions emit
+    # Unicode code-point offsets in the same columns; accept that basis only
+    # when the complete token table proves it against the immutable snapshot.
+    for reported_basis in (
+        exact_source_map.BYTE_OFFSET_BASIS,
+        exact_source_map.CHAR_OFFSET_BASIS,
+    ):
+        indexed = _index_for_basis(reported_basis)
+        if indexed is not None:
+            return indexed, reported_basis
+    raise ValueError("BookNLP token offsets do not identify the emitted token")
 
 
 def _booknlp_t004_span(
@@ -9442,33 +9535,111 @@ def _booknlp_t004_span(
     return char_range.start, char_range.end, byte_start, byte_end, excerpt
 
 
-_BOOKNLP_HYPHEN_SPACING_PATTERN = re.compile(r"\s*([-‐‑‒–—])\s*")
+_BOOKNLP_TOKEN_JOINED_HYPHEN_PATTERN = re.compile(r" ([-‐‑‒–—]) ")
+_BOOKNLP_TOKEN_JOINED_APOSTROPHE_S_PATTERN = re.compile(r" (['’])([sS])\b")
+_BOOKNLP_TOKEN_JOINED_COMMA_PATTERN = re.compile(r" ,")
+_BOOKNLP_TOKEN_JOINED_OPENING_QUOTE_PATTERN = re.compile(r'(["“]) ')
+_BOOKNLP_TOKEN_JOINED_CLOSING_QUOTE_PATTERN = re.compile(r' (["”])')
+_BOOKNLP_TOKEN_JOINED_QUOTE_PUNCTUATION_PATTERN = re.compile(r" ([,.?;])")
+_BOOKNLP_TOKEN_JOINED_EXCLAMATION_PATTERN = re.compile(r" !")
+
+
+def _booknlp_t004_reconcile_token_joined_text(
+    emitted_text: str,
+    exact_source_excerpt: str,
+    *,
+    substitutions: tuple[tuple[re.Pattern[str], str], ...],
+    mismatch_error: str,
+) -> str:
+    """Return the exact span only after explicitly allowed spacing removals.
+
+    Each substitution removes one literal ASCII token-join space around an
+    explicitly authorized punctuation pattern.  The exact source span is
+    never changed, and the emitted value is accepted only when the resulting
+    string equals that span byte-for-byte as Unicode text.
+    """
+
+    if emitted_text == exact_source_excerpt:
+        return exact_source_excerpt
+    reconciled = emitted_text
+    for pattern, replacement in substitutions:
+        reconciled = pattern.sub(replacement, reconciled)
+    if reconciled == exact_source_excerpt:
+        return exact_source_excerpt
+    raise ValueError(mismatch_error)
+
+
+_BOOKNLP_ENTITY_TOKEN_JOIN_SUBSTITUTIONS = (
+    (_BOOKNLP_TOKEN_JOINED_HYPHEN_PATTERN, r"\1"),
+    (_BOOKNLP_TOKEN_JOINED_APOSTROPHE_S_PATTERN, r"\1\2"),
+    (_BOOKNLP_TOKEN_JOINED_COMMA_PATTERN, ","),
+)
+
+_BOOKNLP_QUOTE_TOKEN_JOIN_SUBSTITUTIONS = (
+    (_BOOKNLP_TOKEN_JOINED_HYPHEN_PATTERN, r"\1"),
+    (_BOOKNLP_TOKEN_JOINED_APOSTROPHE_S_PATTERN, r"\1\2"),
+    (_BOOKNLP_TOKEN_JOINED_OPENING_QUOTE_PATTERN, r"\1"),
+    (_BOOKNLP_TOKEN_JOINED_CLOSING_QUOTE_PATTERN, r"\1"),
+    (_BOOKNLP_TOKEN_JOINED_QUOTE_PUNCTUATION_PATTERN, r"\1"),
+)
 
 
 def _booknlp_t004_reconcile_entity_text(
     emitted_text: str,
     exact_source_excerpt: str,
 ) -> str:
-    """Return the exact source text when only hyphen spacing differs.
+    """Return exact source text for narrowly proven token-join spacing.
 
-    BookNLP may render a punctuation token with surrounding spaces even when
-    the exact owner source has no such spaces. The token byte offsets remain
-    authoritative: this helper permits only removal of whitespace adjacent to
-    the same hyphen code point on both sides, then returns the exact source
-    excerpt. It does not perform fuzzy matching, case folding, punctuation
-    substitution, or semantic rewriting.
+    BookNLP constructs some entity labels by joining token text with one ASCII
+    space.  The exact token offsets remain authoritative: this helper removes
+    only that one token-join space around a hyphen, before a comma, or before
+    an apostrophe followed by ``s``.  The resulting label must equal the
+    untouched exact source span.  It does not strip or otherwise normalize
+    whitespace, change punctuation, fuzzy-match, case-fold, or rewrite text.
     """
 
-    emitted = emitted_text.strip()
-    if emitted == exact_source_excerpt:
-        return exact_source_excerpt
-    normalized_emitted = _BOOKNLP_HYPHEN_SPACING_PATTERN.sub(r"\1", emitted)
-    normalized_exact = _BOOKNLP_HYPHEN_SPACING_PATTERN.sub(
-        r"\1", exact_source_excerpt
+    return _booknlp_t004_reconcile_token_joined_text(
+        emitted_text,
+        exact_source_excerpt,
+        substitutions=_BOOKNLP_ENTITY_TOKEN_JOIN_SUBSTITUTIONS,
+        mismatch_error="BookNLP entity text does not match its exact token span",
     )
-    if normalized_emitted == normalized_exact:
-        return exact_source_excerpt
-    raise ValueError("BookNLP entity text does not match its exact token span")
+
+
+def _booknlp_t004_reconcile_quote_text(
+    emitted_text: str,
+    exact_source_excerpt: str,
+) -> str:
+    return _booknlp_t004_reconcile_token_joined_text(
+        emitted_text,
+        exact_source_excerpt,
+        substitutions=_BOOKNLP_QUOTE_TOKEN_JOIN_SUBSTITUTIONS,
+        mismatch_error="BookNLP quote text does not match its exact token span",
+    )
+
+
+def _booknlp_t004_reconcile_speaker_mention(
+    emitted_text: str,
+    exact_source_excerpt: str,
+) -> str:
+    return _booknlp_t004_reconcile_token_joined_text(
+        emitted_text,
+        exact_source_excerpt,
+        substitutions=_BOOKNLP_ENTITY_TOKEN_JOIN_SUBSTITUTIONS,
+        mismatch_error="BookNLP speaker mention does not match its exact token span",
+    )
+
+
+def _booknlp_t004_reconcile_supersense_text(
+    emitted_text: str,
+    exact_source_excerpt: str,
+) -> str:
+    return _booknlp_t004_reconcile_token_joined_text(
+        emitted_text,
+        exact_source_excerpt,
+        substitutions=((_BOOKNLP_TOKEN_JOINED_EXCLAMATION_PATTERN, "!"),),
+        mismatch_error="BookNLP supersense text does not match its exact token span",
+    )
 
 
 def _booknlp_t004_evidence(
@@ -9556,7 +9727,9 @@ def _booknlp_t004_result_to_envelope(
         source_idea_id=source_idea_id,
         source_content=source_content,
     )
-    token_index = _booknlp_t004_token_index(snapshot, tokens)
+    token_index, reported_token_offset_basis = _booknlp_t004_token_index(
+        snapshot, tokens
+    )
     if not isinstance(entities, list) or not isinstance(quotes, list) or not isinstance(supersense, list):
         raise ValueError("BookNLP parsed tables must be lists")
     if not isinstance(book_json, dict):
@@ -9571,6 +9744,10 @@ def _booknlp_t004_result_to_envelope(
         "tokens": [],
     }
     limitations: list[str] = []
+    if reported_token_offset_basis == exact_source_map.CHAR_OFFSET_BASIS:
+        limitations.append(
+            "booknlp_token_offsets_reconciled_from_unicode_code_points"
+        )
     clusters: dict[int, list[tuple[str, dict[str, Any]]]] = {}
 
     for index, row in enumerate(entities):
@@ -9663,10 +9840,10 @@ def _booknlp_t004_result_to_envelope(
         if not isinstance(mention, str) or not mention.strip():
             raise ValueError("BookNLP quote speaker mention is required")
         quote_text = row.get("quote")
-        if not isinstance(quote_text, str) or quote_text != quote_span[4]:
+        if not isinstance(quote_text, str):
             raise ValueError("BookNLP quote text does not match its exact token span")
-        if mention.strip() != mention_span[4]:
-            raise ValueError("BookNLP speaker mention does not match its exact token span")
+        quote_text = _booknlp_t004_reconcile_quote_text(quote_text, quote_span[4])
+        mention = _booknlp_t004_reconcile_speaker_mention(mention, mention_span[4])
         evidence = [
             _booknlp_t004_evidence(
                 snapshot,
@@ -9686,14 +9863,14 @@ def _booknlp_t004_result_to_envelope(
                 candidate_type="relationship",
                 label="BookNLP dialogue attribution",
                 claim=(
-                    f"BookNLP associated a quote span with speaker mention {mention.strip()}; "
+                    f"BookNLP associated a quote span with speaker mention {mention}; "
                     f"character_cluster={char_id}; owner review is required."
                 ),
                 evidence=evidence,
                 raw_finding_id=f"booknlp-quote-{index}-{char_id}-{quote_span[2]}-{quote_span[3]}",
                 support_metadata={
                     "signal_kind": "quote_attribution",
-                    "speaker_mention": mention.strip(),
+                    "speaker_mention": mention,
                     "speaker_cluster_id": char_id,
                     "attribution_resolution": "owner_review_required",
                 },
@@ -9765,8 +9942,11 @@ def _booknlp_t004_result_to_envelope(
         if not isinstance(category, str) or not category:
             raise ValueError("BookNLP supersense category is required")
         supersense_text = row.get("text")
-        if not isinstance(supersense_text, str) or supersense_text != span[4]:
+        if not isinstance(supersense_text, str):
             raise ValueError("BookNLP supersense text does not match its exact token span")
+        supersense_text = _booknlp_t004_reconcile_supersense_text(
+            supersense_text, span[4]
+        )
         candidate_type = "object" if category in object_supersenses else "evidence_note"
         findings_by_class["supersense"].append(
             _booknlp_t004_finding(
@@ -10380,13 +10560,20 @@ def _build_booknlp_live_runner(
                     if "entities" in raw_files
                     else []
                 )
-                quotes_rows = (
-                    booknlp_fixture_parser.parse_booknlp_quotes_tsv(
-                        raw_files["quotes"].decode("utf-8")
+                if "quotes" in raw_files:
+                    quotes_rows, rejected_quote_numeric_rows = (
+                        _booknlp_parse_quotes_with_invalid_numeric_rows_rejected(
+                            raw_files["quotes"].decode("utf-8"),
+                            parser=booknlp_fixture_parser.parse_booknlp_quotes_tsv,
+                        )
                     )
-                    if "quotes" in raw_files
-                    else []
-                )
+                    if rejected_quote_numeric_rows:
+                        limitations.append(
+                            "rejected_quote_rows_invalid_numeric_field:"
+                            f"{rejected_quote_numeric_rows}"
+                        )
+                else:
+                    quotes_rows = []
                 supersense_rows = (
                     booknlp_fixture_parser.parse_booknlp_supersense_tsv(
                         raw_files["supersense"].decode("utf-8")

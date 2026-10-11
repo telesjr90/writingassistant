@@ -18,6 +18,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from backend import omi_analysis_orchestrator as oao, project_manager
 from backend.story_knowledge import analysis_run_control
 from backend.story_knowledge import semantic_guardrails as sg
+from backend.story_knowledge.evidence_ledger import MAX_LEDGER_EVENT_BYTES
 
 
 def _finding(adapter: str = "ollama_model", **overrides: Any) -> dict[str, Any]:
@@ -182,6 +183,113 @@ def test_same_source_booknlp_evidence_satisfies_model_dependency() -> None:
         "source_id": "idea-1",
         "source_hash": "a" * 64,
     }
+
+
+@pytest.mark.parametrize("adapter", ["booknlp", "spacy"])
+def test_normalized_evidence_producers_do_not_materialize_peer_references(
+    adapter: str,
+) -> None:
+    producer = _producer_evidence(adapter)
+    peers = [
+        _producer_evidence(
+            "spacy" if index % 2 else "booknlp",
+        )
+        | {
+            "raw_finding_id": f"peer-{index}",
+            "normalized_finding_id": f"omi-find-peer-{index}",
+        }
+        for index in range(40)
+    ]
+    original = copy.deepcopy(producer)
+
+    annotation = _classify(producer, evidence=[producer, *peers])
+
+    assert producer == original
+    assert annotation["classification"] == "supported"
+    assert annotation["evidence_references"]
+    assert annotation["normalized_evidence_references"] == []
+    assert annotation["normalized_evidence_dependency"] == {
+        "required": False,
+        "satisfied": True,
+        "supplied_count": 41,
+        "eligible_count": 0,
+        "eligible_producer_adapters": [],
+    }
+
+
+def test_interpretive_consumer_preserves_same_source_reference_identity_and_hashes() -> None:
+    consumer = _finding("ollama_model")
+    booknlp = _producer_evidence("booknlp")
+    spacy = _producer_evidence("spacy") | {
+        "raw_finding_id": "spacy-evidence-2",
+        "normalized_finding_id": "omi-find-spacy-evidence-2",
+    }
+
+    annotation = _classify(consumer, evidence=[booknlp, spacy])
+
+    references = {
+        item["normalized_finding_id"]: item
+        for item in annotation["normalized_evidence_references"]
+    }
+    assert set(references) == {
+        booknlp["normalized_finding_id"],
+        spacy["normalized_finding_id"],
+    }
+    assert references[booknlp["normalized_finding_id"]][
+        "immutable_finding_sha256"
+    ] == sg.immutable_finding_sha256(booknlp)
+    assert references[spacy["normalized_finding_id"]][
+        "immutable_finding_sha256"
+    ] == sg.immutable_finding_sha256(spacy)
+    assert annotation["normalized_evidence_dependency"] == {
+        "required": True,
+        "satisfied": True,
+        "supplied_count": 2,
+        "eligible_count": 2,
+        "eligible_producer_adapters": ["booknlp", "spacy"],
+    }
+
+
+def test_large_local_nlp_result_shape_stays_below_unchanged_ledger_boundary() -> None:
+    findings = []
+    for index in range(172):
+        adapter = "booknlp" if index < 57 else "spacy"
+        findings.append(
+            _producer_evidence(adapter)
+            | {
+                "label": f"Local NLP evidence {index}",
+                "raw_finding_id": f"{adapter}-large-{index}",
+                "normalized_finding_id": f"omi-find-{adapter}-large-{index}",
+            }
+        )
+
+    annotations = sg.assess_findings(
+        findings,
+        normalized_evidence=findings,
+        source_lineage={
+            "run_id": "run-large-local-nlp",
+            "source_identity": {
+                "source_id": "idea-1",
+                "content_hash": "a" * 64,
+            },
+        },
+    )
+    serialized = json.dumps(
+        {"findings": findings, "guardrail_annotations": annotations},
+        ensure_ascii=False,
+        allow_nan=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+
+    assert len(annotations) == 172
+    assert all(not item["normalized_evidence_references"] for item in annotations)
+    assert all(
+        item["normalized_evidence_dependency"]["required"] is False
+        and item["normalized_evidence_dependency"]["satisfied"] is True
+        for item in annotations
+    )
+    assert len(serialized) < MAX_LEDGER_EVENT_BYTES
 
 
 def test_unrelated_source_normalized_evidence_fails_closed() -> None:

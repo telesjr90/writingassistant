@@ -390,12 +390,16 @@ def evaluate_guardrail(guardrail_input: Mapping[str, Any]) -> dict[str, Any]:
     immutable_hash = immutable_finding_sha256(finding)
     exact_evidence = finding.get("evidence")
     has_evidence = isinstance(exact_evidence, list) and bool(exact_evidence)
-    eligible_normalized_evidence, normalized_evidence_source_mismatch = (
-        _eligible_normalized_evidence(finding, evidence_inputs, lineage)
-    )
     requires_normalized_evidence = (
         source_adapter not in NORMALIZED_EVIDENCE_PRODUCER_ADAPTERS
     )
+    if requires_normalized_evidence:
+        eligible_normalized_evidence, normalized_evidence_source_mismatch = (
+            _eligible_normalized_evidence(finding, evidence_inputs, lineage)
+        )
+    else:
+        eligible_normalized_evidence = []
+        normalized_evidence_source_mismatch = False
     has_normalized_evidence = bool(eligible_normalized_evidence)
 
     verification_states = _signal_values(finding, "verification_state")

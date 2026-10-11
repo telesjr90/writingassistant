@@ -294,7 +294,13 @@ def _parse_tsv(
     negative_one_sentinel_fields=frozenset(),
 ):
     _require_text(text)
-    rows = list(csv.reader(io.StringIO(text), delimiter="\t"))
+    rows = list(
+        csv.reader(
+            io.StringIO(text),
+            delimiter="\t",
+            quoting=csv.QUOTE_NONE,
+        )
+    )
     if not rows:
         raise ValueError("invalid fixture text")
 
